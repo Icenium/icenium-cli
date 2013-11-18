@@ -8,30 +8,26 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-    "test": "vows --spec --isolate",
-    "predeploy": "echo This will be run before deploying the app",
-    "postdeploy": "echo This will be run after deploying the app"
+	"test": ".\\node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
   },
-  "main": "./lib/main",
+  "main": "./lib/ice-cli.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Icenium/icenium-cli.git"
   },
   "keywords": [
-    "cli",
     "icenium"
   ],
   "dependencies" : {
-    "colors"   :  "*",
-    "optimist" :  "0.2.x"
   },
   "analyze": true,
   "devDependencies": {
-    "vows"    :  "0.5.x"
+    "mocha": "1.14.x",
+	"chai" : "1.8.x"
   },
   "bundledDependencies": [
   ],  
-  "license": "Proprietary",
+  "license": "All rights reserved",
   "engines": {
     "node": ">=0.6"
   }
