@@ -1,0 +1,38 @@
+{
+  "name": "icenium-cli",
+  "preferGlobal": true,
+  "version": "0.1.0",
+  "author": "Telerik <icenium@telerik.com>",
+  "description": "command line interface to Telerik Icenium",
+  "bin": {
+    "ice": "./bin/ice.js"
+  },
+  "scripts": {
+    "test": "vows --spec --isolate",
+    "predeploy": "echo This will be run before deploying the app",
+    "postdeploy": "echo This will be run after deploying the app"
+  },
+  "main": "./lib/main",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Icenium/icenium-cli.git"
+  },
+  "keywords": [
+    "cli",
+    "icenium"
+  ],
+  "dependencies" : {
+    "colors"   :  "*",
+    "optimist" :  "0.2.x"
+  },
+  "analyze": true,
+  "devDependencies": {
+    "vows"    :  "0.5.x"
+  },
+  "bundledDependencies": [
+  ],  
+  "license": "Proprietary",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
