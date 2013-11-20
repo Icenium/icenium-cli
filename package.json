@@ -19,7 +19,8 @@
     "icenium"
   ],
   "dependencies": {
-    "cookie": "~0.1.0"
+    "cookie": "~0.1.0",
+    "nopt": "~2.1.2"
   },
   "analyze": true,
   "devDependencies": {
