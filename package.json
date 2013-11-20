@@ -1,0 +1,34 @@
+{
+  "name": "icenium-cli",
+  "preferGlobal": true,
+  "version": "0.1.0",
+  "author": "Telerik <icenium@telerik.com>",
+  "description": "command line interface to Telerik Icenium",
+  "bin": {
+    "ice": "./bin/ice.js"
+  },
+  "scripts": {
+	"test": ".\\node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
+  },
+  "main": "./lib/ice-cli.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Icenium/icenium-cli.git"
+  },
+  "keywords": [
+    "icenium"
+  ],
+  "dependencies" : {
+  },
+  "analyze": true,
+  "devDependencies": {
+    "mocha": "1.14.x",
+	"chai" : "1.8.x"
+  },
+  "bundledDependencies": [
+  ],  
+  "license": "All rights reserved",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
