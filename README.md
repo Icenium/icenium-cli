@@ -8,7 +8,7 @@ First steps
 After cloning the repository, run:
 
 ```
-npm install
+   $ npm install
 ```
 
 This will install all project dependencies.
@@ -26,6 +26,16 @@ To run all unit tests, run the following in the console:
 ```
    $ npm test
 ```
+
+Before commiting
+===
+Run the linter:
+
+```
+   $ lint
+```
+
+Correct any warnings from the linter before commiting.
 
 [1]: http://visionmedia.github.io/mocha/#interfaces
 [2]: http://chaijs.com/api/assert/

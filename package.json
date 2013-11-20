@@ -8,7 +8,7 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-	"test": ".\\node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
+    "test": ".\\node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
   },
   "main": "./lib/ice-cli.js",
   "repository": {
@@ -18,17 +18,16 @@
   "keywords": [
     "icenium"
   ],
-  "dependencies" : {
-  },
+  "dependencies": {},
   "analyze": true,
   "devDependencies": {
     "mocha": "1.14.x",
-	"chai" : "1.8.x"
+    "chai": "1.8.x",
+    "file": "~0.2.1"
   },
-  "bundledDependencies": [
-  ],  
+  "bundledDependencies": [],
   "license": "All rights reserved",
   "engines": {
-    "node": ">=0.6"
+    "node": ">=0.11"
   }
 }
