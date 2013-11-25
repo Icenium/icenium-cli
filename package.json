@@ -22,7 +22,8 @@
     "cookie": "~0.1.0",
     "nopt": "~2.1.2",
     "adm-zip": "~0.4.3",
-    "log4js": "~0.6.9"
+    "log4js": "~0.6.9",
+    "zipstream": "0.2.1"
   },
   "analyze": true,
   "devDependencies": {
