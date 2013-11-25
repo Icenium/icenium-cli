@@ -23,7 +23,8 @@
     "nopt": "~2.1.2",
     "adm-zip": "~0.4.3",
     "log4js": "~0.6.9",
-    "zipstream": "0.2.1"
+    "zipstream": "0.2.1",
+    "open": "0.0.4"
   },
   "analyze": true,
   "devDependencies": {
