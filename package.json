@@ -24,7 +24,8 @@
     "adm-zip": "~0.4.3",
     "log4js": "~0.6.9",
     "zipstream": "0.2.1",
-    "open": "0.0.4"
+    "open": "0.0.4",
+    "unzip": "~0.1.9"
   },
   "analyze": true,
   "devDependencies": {
