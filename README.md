@@ -13,6 +13,32 @@ After cloning the repository, run:
 
 This will install all project dependencies.
 
+Debugging
+===
+For debugging try using `node-inspector`. To install it run:
+
+```
+	$ npm install -g node-inspector
+```
+
+Open a new node.js console, run `node-inspector` and leave it running. You don't need to ever restart it or anything.
+
+Start `node` with the `--debug-brk` parameter, e.g.:
+
+```
+	$ node --debug-brk bin\ice build Android
+```
+
+Open Chrome, open `127.0.0.1:8080/debug?port=5858` and start debugging.
+
+* Place breakpoints by clicking on the line number
+* Use F10 and F11 to step over and step into
+* Use F8 to continue (like F5 in VS)
+* If you need to place a breakpoint in a file that is not open, then use the navigator in the top-left corner to see all files in the project.
+
+Fiddler
+===
+To see your HTTP requests in Fiddler, open `config.js` and set the `PROXY_TO_FIDDLER` property to `true`. Don't commit it, though! You may commit Fiddler auto-detection, though :)
 
 Writing unit tests
 ===
