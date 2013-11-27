@@ -25,7 +25,8 @@
     "log4js": "~0.6.9",
     "zipstream": "0.2.1",
     "open": "0.0.4",
-    "async": "~0.2.9"
+    "async": "~0.2.9",
+    "unzip": "~0.1.9"
   },
   "analyze": true,
   "devDependencies": {
