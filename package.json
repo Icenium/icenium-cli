@@ -30,7 +30,9 @@
     "ffi": "git+ssh://git@github.com:Fatme/node-ffi.git",
     "async": "~0.2.9",
     "ref-struct": "0.0.5",
-    "q": "~0.9.7"
+    "watchr": "2.4.4",
+    "q": "~0.9.7",
+    "underscore": "~1.5.2"
   },
   "analyze": true,
   "devDependencies": {
