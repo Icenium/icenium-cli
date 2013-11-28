@@ -61,6 +61,21 @@ Run the linter:
    $ lint
 ```
 
+Deploying iOS application
+==
+To deploy an application on iOS device, do the following:
+
+* install iTunes
+* install python
+* run the followings in the console:
+
+```
+	$ npm install node-gyp --save
+	$ npm install ref --save
+	$ npm install ffi --save
+	$ npm install hex --save
+	$ npm install binary-reader --save
+```	
 Correct any warnings from the linter before commiting.
 
 [1]: http://visionmedia.github.io/mocha/#interfaces
