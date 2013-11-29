@@ -26,7 +26,6 @@
     "zipstream": "git+ssh://git@github.com:tailsu/node-zipstream.git",
     "open": "0.0.4",
     "unzip": "~0.1.9",
-    "node-gyp": "~0.12.1",
     "ref": "~0.1.3",
     "ffi": "git+ssh://git@github.com:Fatme/node-ffi.git",
     "async": "~0.2.9",
