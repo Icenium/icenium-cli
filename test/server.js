@@ -12,8 +12,8 @@ describe("server", function() {
 				assert.isString(token, "is valid token");
 				assert.equal(200, response.statusCode);
 				done();
-			})
-		})
+			});
+		});
 
 		it("should return error when using invalid credentials", function(done) {
 			this.timeout(10000);
@@ -21,7 +21,7 @@ describe("server", function() {
 				assert.notOk(token);
 				assert.equal(401, response.statusCode);
 				done();
-			})
-		})
-	})
-})
+			});
+		});
+	});
+});
