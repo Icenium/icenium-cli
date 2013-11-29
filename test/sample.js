@@ -3,7 +3,7 @@
 var assert = require("chai").assert;
 
 describe("util", function() {
-	var util = require("../lib/util");
+	var util = require("../lib/helpers");
 
 	describe("nop", function() {
 		var nop = util.nop;
