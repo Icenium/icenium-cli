@@ -26,7 +26,8 @@
 		script.src = loginConfig.tfisServer + "/identityproviders/List.js" +
 			"?client_id=" + encodeURIComponent(loginConfig.clientId) + 
 			"&callback=showProviders" +
-			"&redirect_uri=" + encodeURIComponent(loginConfig.callbackUrl);
+			"&redirect_uri=" + encodeURIComponent(loginConfig.callbackUrl) +
+			"&state=" + encodeURIComponent(loginConfig.clientState);
 
 		document.body.appendChild(script);
 	</script>
