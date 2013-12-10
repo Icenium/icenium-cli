@@ -44,6 +44,6 @@
   "bundledDependencies": [],
   "license": "All rights reserved",
   "engines": {
-    "node": ">=0.11"
+    "node": ">=0.10"
   }
 }
