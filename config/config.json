@@ -8,5 +8,6 @@
 	"SOLUTION_SPACE_NAME": "Private_Build_Folder",
 	"QR_SIZE": 300,
 	"DEFAULT_PROJECT_TEMPLATE": "KendoUI",
-	"TEMPLATE_NAMES": [ "Blank", "Everlive", "JQuery", "KendoUI", "KendoUIDataViz" ]
+	"TEMPLATE_NAMES": [ "Blank", "Everlive", "JQuery", "KendoUI", "KendoUIDataViz" ],
+	"CORDOVA_PLUGINS_REGISTRY": "http://registry.cordova.io"
 }
