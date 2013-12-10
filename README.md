@@ -1,10 +1,12 @@
 icenium-cli
 ===========
 
-Cross Platform Command Line Interface for Icenium.
+Cross-Platform Command Line Interface for Icenium.
 
 First steps
 ===
+You must have Python 2.7.x installed. Don't install 3.x as it won't work!
+
 After cloning the repository, run:
 
 ```
@@ -12,7 +14,6 @@ After cloning the repository, run:
 ```
 
 This will install all project dependencies.
-
 
 Debugging
 ===
@@ -62,16 +63,41 @@ Run the linter:
    $ lint
 ```
 
-Correct any warnings from the linter before commiting.
+Correct any warnings from the linter before committing.
 
 Deploying to iOS
 ===
 To deploy an application on iOS device, do the following:
 
 * Install iTunes - it should be the same bitness as Node
-* Install Python - 2.7.x, don't install 3.x.x
+
+Enabling command auto-completion in Bash
+===
+You can enable command auto-completion for the Bash and zsh shells. Auto-completion for
+commands as well as options is supported.
+
+If you have `icenium-cli` installed with the `-g` option, you can install auto-completion support
+by executing the following command **in Bash**:
+
+```
+	$ ice completion >> ~/.bashrc
+```
+
+If you don't have `icenium-cli` installed with the `-g` option, the above command becomes:
+
+```
+	$ node bin/ice completion >> ~/.bashrc
+```
+
+and you must also manually add it to the `PATH` environment variable. Open the `.bashrc`
+file in a text editor (in Windows: `$ start ~/.bashrc`) and add the following line anywhere:
+
+```
+	export PATH=$PATH:/c/work/icenium-cli/bin
+```
+
+Change the path to the `icenium-cli` working copy above to match your own. Restart Bash and you're ready to go!
 
 [1]: http://visionmedia.github.io/mocha/#interfaces
 [2]: http://chaijs.com/api/assert/
 [3]: http://chaijs.com/guide/styles/#assert
-

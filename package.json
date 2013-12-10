@@ -8,9 +8,7 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-    "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/",
-    "test-ci": "node_modules\\.bin\\mocha.cmd --recursive --reporter xunit test/",
-    "lint-ci": "lint.cmd --reporter checkstyle"
+    "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
   },
   "main": "./lib/ice-cli.js",
   "repository": {
@@ -34,7 +32,8 @@
     "watchr": "2.4.4",
     "q": "~0.9.7",
     "underscore": "~1.5.2",
-    "q-io": "~1.10.6"
+    "q-io": "~1.10.6",
+    "tabtab": "git+ssh://git@github.com:tailsu/node-tabtab.git"
   },
   "analyze": true,
   "devDependencies": {
