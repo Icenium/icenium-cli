@@ -1,0 +1,12 @@
+.idea
+*.sublime-project
+lint.*
+.jshint*
+.npmignore
+
+bin/ice
+bin/ice.cmd
+config/config-*
+
+scratch/
+test/
