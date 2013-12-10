@@ -1,0 +1,12 @@
+{
+	"TFIS_SERVER": "testtfis.telerik.com",
+	"ICE_SERVER_PROTO": "http",
+	"ICE_SERVER": "localhost",
+	"DEBUG": true,
+	"PROXY_TO_FIDDLER": false,
+	"PROJECT_FILE_NAME": ".iceproject",
+	"SOLUTION_SPACE_NAME": "Private_Build_Folder",
+	"QR_SIZE": 300,
+	"DEFAULT_PROJECT_TEMPLATE": "KendoUI",
+	"TEMPLATE_NAMES": [ "Blank", "Everlive", "JQuery", "KendoUI", "KendoUIDataViz" ]
+}

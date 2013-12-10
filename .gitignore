@@ -13,7 +13,8 @@ pids
 logs
 results
 scratch/
-.idea/
+.idea/workspace.xml
+.idea/tasks.xml
 
 test-reports.xml
 

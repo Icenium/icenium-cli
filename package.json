@@ -8,7 +8,9 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-    "test": ".\\node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
+    "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/",
+    "test-ci": "node_modules\\.bin\\mocha.cmd --recursive --reporter xunit --require ./lib/config-cibuild test/",
+    "lint-ci": "lint.cmd --reporter checkstyle > lint.checkstyle.xml"
   },
   "main": "./lib/ice-cli.js",
   "repository": {
@@ -32,7 +34,8 @@
     "ref-struct": "0.0.5",
     "watchr": "2.4.4",
     "q": "~0.9.7",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "q-io": "~1.10.6"
   },
   "analyze": true,
   "devDependencies": {
