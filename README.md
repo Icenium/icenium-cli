@@ -98,6 +98,13 @@ file in a text editor (in Windows: `$ start ~/.bashrc`) and add the following li
 
 Change the path to the `icenium-cli` working copy above to match your own. Restart Bash and you're ready to go!
 
+Continuous integration
+===
+The CI task is located on the [Icenium Jenkins server](http://bpc15:8080/job/icenium-cli%20CI%20Build/).
+There you can see the status of the project, the linter statistics and the test run results.
+
+After building the packaged module, it is copied to \\telerik.com\Resources\BlackDragon\Builds\icenium-cli
+
 [1]: http://visionmedia.github.io/mocha/#interfaces
 [2]: http://chaijs.com/api/assert/
 [3]: http://chaijs.com/guide/styles/#assert

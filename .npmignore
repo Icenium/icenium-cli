@@ -6,7 +6,6 @@ lint.*
 
 bin/ice
 bin/ice.cmd
-config/config-*
 
 scratch/
 test/
