@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/",
-    "test-ci": "node_modules\\.bin\\mocha.cmd --recursive --reporter xunit --require ./lib/config-cibuild test/",
-    "lint-ci": "lint.cmd --reporter checkstyle > lint.checkstyle.xml"
+    "test-ci": "node_modules\\.bin\\mocha.cmd --recursive --reporter xunit test/",
+    "lint-ci": "lint.cmd --reporter checkstyle"
   },
   "main": "./lib/ice-cli.js",
   "repository": {
