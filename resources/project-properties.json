@@ -1,0 +1,164 @@
+{
+	"name": {
+		"description": "The project name identifies this project to the cloud build."
+	},
+	"AppIdentifier": {
+		"description": "The application identifier (or app id) must match the app id property of the iOS mobile provision used for building."
+	},
+	"iOSDisplayName": {
+		"description": "The display name in iOS of the app."
+	},
+	"BundleVersion": {
+		"description": "The application (or bundle) version.",
+		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$"
+	},
+	"FrameworkVersion": {
+		"description": "Cordova framework version.",
+		"range": ["3.0.0", "3.2.0"]
+	},
+	"CorePlugins": {
+		"description": "List of core Cordova plugins required by the app.",
+		"range": [
+			"org.apache.cordova.AudioHandler",
+			"org.apache.cordova.battery-status",
+			"org.apache.cordova.camera",
+			"org.apache.cordova.console",
+			"org.apache.cordova.contacts",
+			"org.apache.cordova.device",
+			"org.apache.cordova.device-motion",
+			"org.apache.cordova.device-orientation",
+			"org.apache.cordova.dialogs",
+			"org.apache.cordova.file",
+			"org.apache.cordova.file-transfer",
+			"org.apache.cordova.geolocation",
+			"org.apache.cordova.globalization",
+			"org.apache.cordova.inappbrowser",
+			"org.apache.cordova.media-capture",
+			"org.apache.cordova.network-information",
+			"org.apache.cordova.splashscreen",
+			"org.apache.cordova.vibration"],
+		"flags": true
+	},
+	"AndroidPermissions": {
+		"description": "Android permissions required by the app.",
+		"flags": true,
+		"range": {
+			"android.permission.CAMERA": {
+				"input": "CAMERA",
+				"description": "Required to be able to access the camera device."
+			},
+			"android.permission.VIBRATE": {
+				"input": "VIBRATE",
+				"description": "Allows access to the vibrator."
+			},
+			"android.permission.ACCESS_COARSE_LOCATION": {
+				"input": "ACCESS_COARSE_LOCATION",
+				"description": "Allows an app to access approximate location derived from network location sources such as cell towers and Wi-Fi."
+			},
+			"android.permission.ACCESS_FINE_LOCATION": {
+				"input": "ACCESS_FINE_LOCATION",
+				"description": "Allows an app to access precise location from location sources such as GPS, cell towers, and Wi-Fi."
+			},
+			"android.permission.ACCESS_LOCATION_EXTRA_COMMANDS": {
+				"input": "ACCESS_LOCATION_EXTRA_COMMANDS",
+				"description": "Allows an application to access extra location provider commands."
+			},
+			"android.permission.READ_PHONE_STATE": {
+				"input": "READ_PHONE_STATE",
+				"description": "Allows read only access to phone state."
+			},
+			"android.permission.INTERNET": {
+				"input": "INTERNET",
+				"description": "Allows applications to open network sockets."
+			},
+			"android.permission.RECEIVE_SMS": {
+				"input": "RECEIVE_SMS",
+				"description": "Allows an application to monitor incoming SMS messages, to record or perform processing on them."
+			},
+			"android.permission.RECORD_AUDIO": {
+				"input": "RECORD_AUDIO",
+				"description": "Allows an application to record audio."
+			},
+			"android.permission.MODIFY_AUDIO_SETTINGS": {
+				"input": "MODIFY_AUDIO_SETTINGS",
+				"description": "Allows an application to modify global audio settings."
+			},
+			"android.permission.READ_CONTACTS": {
+				"input": "READ_CONTACTS",
+				"description": "Allows an application to read the user's contacts data."
+			},
+			"android.permission.WRITE_CONTACTS": {
+				"input": "WRITE_CONTACTS",
+				"description": "Allows an application to write (but not read) the user's contacts data."
+			},
+			"android.permission.WRITE_EXTERNAL_STORAGE": {
+				"input": "WRITE_EXTERNAL_STORAGE",
+				"description": "Allows an application to write to external storage."
+			},
+			"android.permission.ACCESS_NETWORK_STATE": {
+				"input": "ACCESS_NETWORK_STATE",
+				"description": "Allows applications to access information about networks."
+			},
+			"android.permission.ACCOUNT_MANAGER": {
+				"input": "ACCOUNT_MANAGER",
+				"description": "Allows applications to call into AccountAuthenticators."
+			},
+			"android.permission.GET_ACCOUNTS": {
+				"input": "GET_ACCOUNTS",
+				"description": "Allows access to the list of accounts in the Accounts Service."
+			},
+			"android.permission.MANAGE_ACCOUNTS": {
+				"input": "MANAGE_ACCOUNTS",
+				"description": "Allows an application to manage the list of accounts in the AccountManager."
+			},
+			"android.permission.BROADCAST_STICKY": {
+				"input": "BROADCAST_STICKY",
+				"description": "Allows an application to broadcast sticky intents."
+			},
+			"android.permission.WAKE_LOCK": {
+				"input": "WAKE_LOCK",
+				"description": "Allows using PowerManager WakeLocks to keep processor from sleeping or screen from dimming."
+			},
+			"android.permission.GET_TASKS": {
+				"input": "GET_TASKS",
+				"description": "Allows an application to get information about the currently or recently running tasks."
+			}
+		}
+	},
+	"DeviceOrientations": {
+		"description": "List of supported device orientations",
+		"range": ["Portrait", "Landscape"],
+		"flags": true
+	},
+	"AndroidHardwareAcceleration": {
+		"description": "Enable/disable Android hardware acceleration",
+		"regex": "^(true|false)$"
+	},
+	"AndroidVersionCode": {
+		"description": "Android version code (same as android:versionCode)",
+		"regex": "^\\d+$"
+	},
+	"iOSStatusBarStyle": {
+		"description": "iOS status bar style",
+		"range": ["Default","BlackTranslucent","BlackOpaque","Hidden"]
+	},
+	"iOSDeviceFamily": {
+		"description": "List of supported iOS device families",
+		"range": {
+			"1": {
+				"input": "iPhone",
+				"description": "iPhone/iPod Touch device family"
+			},
+			"2": {
+				"input": "iPad",
+				"description": "iPad device family"
+			}
+		},
+		"flags": true
+	},
+	"iOSBackgroundMode": {
+		"description": "List of available iOS services in background mode",
+		"range": ["audio","location","voip","newsstand-content","external-accessory","bluetooth-central","bluetooth-peripheral"],
+		"flags": true
+	}
+}

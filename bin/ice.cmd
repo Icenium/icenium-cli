@@ -1,1 +1,1 @@
-node %~dp0\ice.js %*
+@node %~dp0\ice.js %*
