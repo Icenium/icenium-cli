@@ -132,7 +132,7 @@
 	},
 	"AndroidHardwareAcceleration": {
 		"description": "Enable/disable Android hardware acceleration",
-		"regex": "^(true|false)$"
+		"range": ["true", "false"]
 	},
 	"AndroidVersionCode": {
 		"description": "Android version code (same as android:versionCode)",

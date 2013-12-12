@@ -78,5 +78,17 @@ describe("project", function() {
 			var projectData = {DeviceOrientations: []};
 			assert.throws(function() {project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]);});
 		});
+
+		it("makes case-insensitive comparisons of property name", function() {
+			var projectData = {DeviceOrientations: []};
+			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]);
+			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
+		});
+
+		it("makes case-insensitive comparisons of property values", function() {
+			var projectData = {DeviceOrientations: []};
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]);
+			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
+		});
 	});
 });
