@@ -13,13 +13,12 @@ Commands:
     ion                   Deploy the project in ION.
     deploy                Deploy the project to a connected device.
     update                Synchronize the project with the cloud to enable LiveSync.
+    find-plugins          Search plugins in the Cordova Plugin Registry by keywords.
+    fetch-plugin          Copies a cordova plugin in your project folder.
 
 Options:
     --path <path>         Specifies the path to the project. If not specified, the project is searched
                           for in the current directory and all directories above it.
-
-Additional help topics. Use 'ice help topic' to access:
-    sublime               Instructions for integration with Sublime Text 2.
 
 --[/]--
 
@@ -121,6 +120,22 @@ Options:
 
 --[/]--
 
---[sublime]--
-TODO
+--[find-plugins]--
+Usage:
+    $ ice find-plugins [<keyword> [,<keyword>]*>]
+
+Search plugins in the Cordova Plugin Registry by keywords.
+--[/]--
+
+--[fetch-plugin]--
+Usage:
+    $ ice fetch-plugin <PluginId>
+
+Copies a cordova plugin in your project folder.
+The <PluginId> can be a local path, URL to a plugin repository or name of a plugin published to the Cordova Plugin Registry.
+
+Options:
+    --path <path> - Specifies the path to the project. If not specified, the project is searched
+                    for in the current directory and all directories above it.
+
 --[/]--

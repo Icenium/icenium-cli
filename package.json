@@ -33,7 +33,8 @@
     "q": "~0.9.7",
     "underscore": "~1.5.2",
     "q-io": "~1.10.6",
-    "tabtab": "git+ssh://git@github.com:tailsu/node-tabtab.git"
+    "tabtab": "git+ssh://git@github.com:tailsu/node-tabtab.git",
+    "plugman": "~0.16.0"
   },
   "analyze": true,
   "devDependencies": {
