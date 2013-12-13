@@ -1,5 +1,5 @@
 {
-	"ICE_SERVER": "icedev.telerik.com",
+	"ICE_SERVER": "icedev.icenium.com",
 	"ICE_SERVER_PROTO": "https",
 	"CI_LOGGER": true
 }
