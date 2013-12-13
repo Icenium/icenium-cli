@@ -1,10 +1,11 @@
 {
 	"name": "",
+	"projectVersion" : 1,
 	"AppIdentifier": "",
-	"ProjectGuid": "5ff4fb5a-b4e5-498c-b510-ad1065fffae7",
+	"ProjectGuid": "",
 	"iOSDisplayName": "",
 	"BundleVersion": "1.0",
-	"FrameworkVersion": "3.0.0",
+	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [
 		"org.apache.cordova.AudioHandler",
 		"org.apache.cordova.battery-status",
