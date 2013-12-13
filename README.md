@@ -105,6 +105,24 @@ There you can see the status of the project, the linter statistics and the test 
 
 After building the packaged module, it is copied to \\telerik.com\Resources\BlackDragon\Builds\icenium-cli
 
+Clean install for testing
+===
+Install prerequisites:
+* Node.js 32-bit - http://nodejs.org/dist/v0.10.23/node-v0.10.23-x86.msi
+* Python 2.7.6 - http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
+* Git for Windows - http://code.google.com/p/msysgit/downloads/detail?name=Git-1.8.4-preview20130916.exe&can=2&q=full+installer+official+git
+* Visual Studio 2010/2012/2013
+
+In Git Bash:
+
+```
+	$ npm i -g path/to/icenium-cli-0.1.0.tgz
+	$ ice completion >> ~/.bashrc
+```
+
+Restart Git Bash and you're ready to roll.
+
+
 [1]: http://visionmedia.github.io/mocha/#interfaces
 [2]: http://chaijs.com/api/assert/
 [3]: http://chaijs.com/guide/styles/#assert
