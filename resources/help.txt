@@ -19,13 +19,12 @@ Commands:
     find-plugins          Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin          Imports an Apache Cordova plugin into your project.
     simulate              Runs the current project in the device simulator.
+    list-projects         Lists all projects of your account.
+    export-project        Exports one of your remote projects into a local ice project.
 
 Global Options:
     --path <path>         Specifies the file path to the project. If not specified, ?AppBuilder CLI? searches for the
                           project in the current directory and all directories above it.
-
---[/]--
-
 
 --[login]--
 
@@ -210,4 +209,30 @@ Usage:
     $ ice simulate
 
 Runs the current project in the device simulator.
+
+Options:
+    --path <path> - Specifies the path to the project. If not specified, the project is searched
+                    for in the current directory and all directories above it.
+
+--[/]--
+
+--[list-projects]--
+Usage:
+    $ ice list-projects
+
+Lists all projects of your account.
+
+--[/]--
+
+--[export-project]--
+Usage:
+    $ ice export-project <ProjectIndex> | <ProjectName>
+
+Exports one of your remote projects into a local ice project.
+You can choose which project to export by specifying its index or name.
+All projects and their indexes can be seen by running "$ ice list-projects".
+
+Options:
+    --path <path> - Specifies the local path where the chosen project will be exported.
+
 --[/]--
