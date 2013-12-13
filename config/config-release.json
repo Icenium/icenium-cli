@@ -1,6 +1,5 @@
 {
-	"TFIS_SERVER": "tfis.telerik.com",
-	"ICE_SERVER": "app.icenium.com",
+	"ICE_SERVER": "icedev.icenium.com",
 	"ICE_SERVER_PROTO": "https",
 	"DEBUG": false
 }
