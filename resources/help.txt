@@ -13,6 +13,7 @@ Commands:
     ion                   Deploy the project in ION.
     deploy                Deploy the project to a connected device.
     update                Synchronize the project with the cloud to enable LiveSync.
+    sync                  Synchronize the project with the device.
     find-plugins          Search plugins in the Cordova Plugin Registry by keywords.
     fetch-plugin          Copies a cordova plugin in your project folder.
 
@@ -104,7 +105,7 @@ Usage:
     $ ice deploy <Platform>
 
 Platform-specific examples:
-    $ ice deploy android [--device <id>] [--live]
+    $ ice deploy android [--device <id>]
     $ ice deploy ios --certificate <id or name> --provision <id or name>
 
 Builds the project for the specified platform and deploys it to a connected device.
@@ -113,10 +114,26 @@ The certificate and provision id or name can be taken from the output of the lis
 and list-provisions commands.
 
 Options:
-    --live - continue listening for project file changes and upload changed files to the device
-        and refresh automatically. 
-
     --device - the ID of the device, if more than one device is connected.
+
+--[/]--
+
+--[sync]--
+usage:
+    $ ice sync [<Platform>]
+
+Platform-specific example:
+    $ ice sync android [--device <id>] [--live]
+    $ ice sync ios [--device <id>] [--live]
+
+Synchronize the project with the device. Execute 'sync' whenever you
+want to see updated content on a running tethered deployment.
+
+Options:
+    --live - continue listening for project file changes and upload changed files to the device
+        and refresh automatically.
+
+    --device - the serial number or index of the device, if more than one device is connected.
 
 --[/]--
 
