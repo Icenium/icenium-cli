@@ -39,7 +39,11 @@
     "underscore": "1.5.2",
     "q-io": "1.10.6",
     "tabtab": "git+https://git@github.com/tailsu/node-tabtab.git",
-    "plugman": "0.16.0"
+    "plugman": "0.16.0",
+    "plistlib": "0.2.1",
+    "bufferpack": "0.0.6",
+    "binary-reader": "0.1.0",
+    "hex": "0.0.1"
   },
   "analyze": true,
   "devDependencies": {
