@@ -7,7 +7,6 @@
 	"BundleVersion": "1.0",
 	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [
-		"org.apache.cordova.AudioHandler",
 		"org.apache.cordova.battery-status",
 		"org.apache.cordova.camera",
 		"org.apache.cordova.console",
@@ -21,9 +20,11 @@
 		"org.apache.cordova.geolocation",
 		"org.apache.cordova.globalization",
 		"org.apache.cordova.inappbrowser",
+		"org.apache.cordova.media",
 		"org.apache.cordova.media-capture",
 		"org.apache.cordova.network-information",
 		"org.apache.cordova.splashscreen",
+		"org.apache.cordova.statusbar",
 		"org.apache.cordova.vibration"
 	],
 	"AndroidPermissions": [
@@ -43,7 +44,6 @@
 		"android.permission.RECEIVE_SMS",
 		"android.permission.RECORD_AUDIO",
 		"android.permission.VIBRATE",
-		"android.permission.WAKE_LOCK",
 		"android.permission.WRITE_CONTACTS",
 		"android.permission.WRITE_EXTERNAL_STORAGE"
 	],
