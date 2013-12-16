@@ -9,6 +9,7 @@ Commands:
     create                Create a project.
     list-provisions       Lists all registered mobile provisions for iOS builds.
     list-certificates     Lists all registered certificates for iOS builds.
+    list-devices          Lists all connected devices.
     build                 Builds the project and produces a QR code for deploying the build package.
     ion                   Deploy the project in ION.
     deploy                Deploy the project to a connected device.
@@ -61,6 +62,18 @@ Usage:
 
 Lists all registered certificates for iOS builds. The list contains both indexes and names.
 Use either the index or name for the --certificate option when building.
+--[/]--
+
+--[list-devices]--
+Usage:
+    $ ice list-devices [<Platform>]
+
+Platform-specific examples:
+    $ ice list-devices android
+    $ ice list-devices ios
+
+Lists all connected devices, grouped by their platform.
+
 --[/]--
 
 --[build]--
