@@ -112,6 +112,7 @@ Install prerequisites:
 * Python 2.7.6 - http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
 * Git for Windows - http://code.google.com/p/msysgit/downloads/detail?name=Git-1.8.4-preview20130916.exe&can=2&q=full+installer+official+git
 * Visual Studio 2010/2012/2013
+* Android ADB USB Driver (skip this step if you have installed the Android SDK) - "R:\BlackDragon\Android\Universal ADB driver\UniversalAdbDriverSetup6.msi"
 
 In Git Bash:
 
