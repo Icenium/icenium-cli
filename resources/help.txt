@@ -16,7 +16,8 @@ Commands:
     update                Synchronize the project with the cloud to enable LiveSync.
     sync                  Synchronize the project with the device.
     find-plugins          Search plugins in the Cordova Plugin Registry by keywords.
-    fetch-plugin          Copies a cordova plugin in your project folder.
+    fetch-plugin          Copies a Cordova plugin in your project folder.
+    simulate              Runs the current project in the Simulator
 
 Options:
     --path <path>         Specifies the path to the project. If not specified, the project is searched
@@ -167,5 +168,18 @@ The <PluginId> can be a local path, URL to a plugin repository or name of a plug
 Options:
     --path <path> - Specifies the path to the project. If not specified, the project is searched
                     for in the current directory and all directories above it.
+
+--[/]--
+
+--[simulate]--
+Usage:
+    $ ice simulate
+
+Runs the project in the simulator.
+
+Options:
+    --path <path> - Specifies the path to the project. If not specified, the project is searched
+                    for in the current directory and all directories above it.
+
 
 --[/]--
