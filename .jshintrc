@@ -24,7 +24,7 @@
 	"globalstrict": true,
 
 	"maxcomplexity": 8,
-	"maxdepth": 5,
+	"maxdepth": 6,
 	"maxparams": 10,
 	"maxstatements": 50,
 
