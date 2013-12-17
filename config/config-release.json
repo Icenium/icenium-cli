@@ -1,5 +1,5 @@
 {
-	"ICE_SERVER": "icedev.icenium.com",
+	"ICE_SERVER": "icestage.icenium.com",
 	"ICE_SERVER_PROTO": "https",
 	"DEBUG": false
 }
