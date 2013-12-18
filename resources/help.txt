@@ -19,7 +19,7 @@ Commands:
     fetch-plugin          Copies a Cordova plugin in your project folder.
     simulate              Runs the current project in the Simulator
 
-Options:
+Global Options:
     --path <path>         Specifies the path to the project. If not specified, the project is searched
                           for in the current directory and all directories above it.
 
@@ -39,13 +39,15 @@ the browser tab and continue working on the command line.
 --[create]--
 
 Usage:
-    $ ice create [--template <Template>] [--path path]
+    $ ice create --appname <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new CLI-based project. Options:
+    --appname - The name of the application. Should be short and without spaces.
     --template <Template> - bases the new project on the given template. Supported templates
         are Blank, Everlive, JQuery, KendoUI and KendoUIDataViz. The default is KendoUI.
     --path - specifies the path where the project will be created. By default the command is
         executed in the current directory. The directory must be empty.
+    --appid - the iOS application identifier. It can also be set later.
 
 --[/]--
 
@@ -110,7 +112,7 @@ Usage:
 
 Synchronize the project with the cloud to enable LiveSync. Execute 'update' whenever you
 want to see updated content on a running ION or untethered deployment. Execute the LiveSync
-action (three-fingered tap-and-hold on iOS, menu button on Android) to download the
+action (three-fingered tap-and-hold on iOS, menu button on Android) to refresh the
 updated content.
 --[/]--
 
@@ -155,20 +157,15 @@ Options:
 Usage:
     $ ice find-plugins [<keyword> [ <keyword>]*>]
 
-Search plugins in the Cordova Plugin Registry by keywords.
+Search for plugins in the Cordova Plugin Registry by keywords.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
     $ ice fetch-plugin <PluginId> | [<keyword> [ <keyword>]*>]
 
-Copies a cordova plugin in your project folder.
+Installs a Cordova plugin into your project folder.
 The <PluginId> can be a local path, URL to a plugin repository or name of a plugin published to the Cordova Plugin Registry.
-
-Options:
-    --path <path> - Specifies the path to the project. If not specified, the project is searched
-                    for in the current directory and all directories above it.
-
 --[/]--
 
 --[simulate]--
@@ -176,10 +173,4 @@ Usage:
     $ ice simulate
 
 Runs the project in the simulator.
-
-Options:
-    --path <path> - Specifies the path to the project. If not specified, the project is searched
-                    for in the current directory and all directories above it.
-
-
 --[/]--
