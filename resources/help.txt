@@ -160,8 +160,8 @@ Platform-specific example:
 Synchronizes the latest changes in your project to connected devices.
 
 Options:
-    --live - Enables Project LiveSync. When you save changes to the project, changes are automatically synchronized on the
-        connected device.
+    --live - Enables Project LiveSync. When you save changes to the project, changes will be automatically synchronized 
+        to the connected device.
     --device - Specifies the serial number or the index of the connected device to which you want to synchronize changes. 
         Run list-devices to list all connected devices, grouped by platform.
 
