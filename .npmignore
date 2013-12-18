@@ -3,6 +3,7 @@
 lint.*
 .jshint*
 .npmignore
+test-reports.xml
 
 bin/ice
 bin/ice.cmd
