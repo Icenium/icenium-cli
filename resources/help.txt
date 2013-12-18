@@ -4,24 +4,24 @@ Usage:
     $ ice <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
-    help <command>        Shows additional help on commands in this list.
-    login                 Login.
-    create                Create a project.
-    list-provisions       Lists all registered mobile provisions for iOS builds.
-    list-certificates     Lists all registered certificates for iOS builds.
-    list-devices          Lists all connected devices.
-    build                 Builds the project and produces a QR code for deploying the build package.
-    ion                   Deploy the project in ION.
-    deploy                Deploy the project to a connected device.
-    update                Synchronize the project with the cloud to enable LiveSync.
-    sync                  Synchronize the project with the device.
-    find-plugins          Search plugins in the Cordova Plugin Registry by keywords.
-    fetch-plugin          Copies a Cordova plugin in your project folder.
-    simulate              Runs the current project in the Simulator
+    help <command>        Shows additional information about the commands in this list.
+    login                 Logs you in Telerik Platform.
+    create                Creates a new project from template.
+    list-provisions       Lists all configured provisioning profiles for code signing iOS applications.
+    list-certificates     Lists all configured certificates for code signing iOS applications.
+    list-devices          Lists all recognized connected devices.
+    build                 Builds the project and produces a QR code for deploying the application package.
+    ion                   Produces a QR code for deployment in the Telerik AppBuilder companion app.
+    deploy                Deploys the project to a connected device.
+    update                Synchronizes the project with the cloud to enable LiveSync for remote devices.
+    sync                  Synchronizes the latest changes in your project to connected devices.
+    find-plugins          Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    fetch-plugin          Imports an Apache Cordova plugin into your project.
+    simulate              Runs the current project in the device simulator.
 
 Global Options:
-    --path <path>         Specifies the path to the project. If not specified, the project is searched
-                          for in the current directory and all directories above it.
+    --path <path>         Specifies the file path to the project. If not specified, ?Icenium CLI? searches for the project 
+                          in the current directory and all directories above it.
 
 --[/]--
 
@@ -31,8 +31,9 @@ Global Options:
 Usage:
     $ ice login
 
-A browser window will open where you can enter your credentials. After completing the login, you can close
-the browser tab and continue working on the command line.
+Opens a new browser window in which you can provide your login credentials for Telerik Platform.
+After you have authenticated with Telerik Platform, you can close the browser window and continue your work from the 
+command line.
 
 --[/]--
 
@@ -41,13 +42,22 @@ the browser tab and continue working on the command line.
 Usage:
     $ ice create --appname <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
-Creates a new CLI-based project. Options:
-    --appname - The name of the application. Should be short and without spaces.
-    --template <Template> - bases the new project on the given template. Supported templates
-        are Blank, Everlive, JQuery, KendoUI and KendoUIDataViz. The default is KendoUI.
-    --path - specifies the path where the project will be created. By default the command is
-        executed in the current directory. The directory must be empty.
-    --appid - the iOS application identifier. It can also be set later.
+Creates a new project from template. Options:
+    --appname - Sets the name of the application. The maximum length of the name is 30 characters. You can use only the
+        following characters: A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&),
+        semi-colon (;), opening and closing brackets (()), and comma (,).
+    --template <Template> - Sets the source template for the project. You can use the following templates: Blank, 
+        Everlive, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
+    --path - Specifies the path where you want to create the project, if different from the current directory. 
+        The directory must be empty.
+        If not specified, ?Icenium CLI? attempts to create the project in the current directory. 
+    --appid - Sets the application identifier for your app. The application identifier must consists of at least three
+        alphanumeric strings, separated by a dot (.). Each string must start with a letter.
+        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android
+        apps.
+        If not specified, ?Icenium CLI? sets the application identifier to com.telerik.appname, where appname is the
+        value for --appname.
+        
 
 --[/]--
 
@@ -55,16 +65,16 @@ Creates a new CLI-based project. Options:
 Usage:
     $ ice list-provisions
 
-Lists all registered mobile provisions for iOS builds. The list contains both indexes and names.
-Use either the index or name for the --provision option when building.
+Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
+you can set a provisioning profile with the --provision option by index or name.
 --[/]--
 
 --[list-certificates]--
 Usage:
     $ ice list-certificates
 
-Lists all registered certificates for iOS builds. The list contains both indexes and names.
-Use either the index or name for the --certificate option when building.
+Lists with indexes and names all configured certificates for code signing iOS applications. When building an app, you can
+set a certificate with the --certificate option by index or name.
 --[/]--
 
 --[list-devices]--
@@ -75,7 +85,7 @@ Platform-specific examples:
     $ ice list-devices android
     $ ice list-devices ios
 
-Lists all connected devices, grouped by their platform.
+Lists with serial number and index all recognized connected devices, grouped by platform.
 
 --[/]--
 
@@ -85,17 +95,18 @@ Usage:
 
 Platform-specific examples:
     $ ice build android
-    $ ice build ios --certificate <id or name> --provision <id or name>
+    $ ice build ios --certificate <index or name> --provision <index or name>
 
 Builds the project for the target platform and produces a QR code for deployment.
 
-The certificate and provision id or name can be taken from the output of the list-certificates
-and list-provisions commands.
+Run list-certificates to list available certificates for code signing iOS applications.
+Run list-provisions to list available provisioning profiles for code signing iOS applications.
 
 Options:
-    --download - downloads the package to the .ice directory in the project directory, instead
-        of producing a QR code. Useful for manual deployment of iOS projects built with a
-        development provision instead of an ad-hoc one.
+    --download - If specified, downloads the application package to the .ice directory in the project directory, instead
+        of producing a QR code. Set this option when you build with provisioning profile and certificate for iOS development.
+    --certificate - Sets the certificate that you want to use for code signing your iOS app. Must match the provisioning profile.
+    --provision - Sets the provisioning profile that you want to use for code signing your iOS app. Must match the certificate.
 
 --[/]--
 
@@ -103,17 +114,18 @@ Options:
 Usage:
     $ ice ion
 
-Deploys to ION. Scan the produced QR code on an iOS device with ION installed.
+Produces a QR code for deployment in the Telerik AppBuilder companion app.
 --[/]--
 
 --[update]--
 Usage:
     $ ice update
 
-Synchronize the project with the cloud to enable LiveSync. Execute 'update' whenever you
-want to see updated content on a running ION or untethered deployment. Execute the LiveSync
-action (three-fingered tap-and-hold on iOS, menu button on Android) to refresh the
-updated content.
+Synchronizes the project with the cloud to enable LiveSync for remote devices. 
+
+To get the latest changes on an iOS device, including in the Telerik AppBuilder companion app, tap and hold with
+three fingers on the device until the download pop-up message appears.
+To get the latest changes on an Android device, press the Menu button.
 --[/]--
 
 --[deploy]--
@@ -126,11 +138,14 @@ Platform-specific examples:
 
 Builds the project for the specified platform and deploys it to a connected device.
 
-The certificate and provision id or name can be taken from the output of the list-certificates
-and list-provisions commands.
+Run list-certificates to list available certificates for code signing iOS applications.
+Run list-provisions to list available provisioning profiles for code signing iOS applications.
 
 Options:
-    --device - the ID of the device, if more than one device is connected.
+    --device - Specifies the serial number or the index of the connected device on which you want to deploy the app. 
+        Run list-devices to list all connected devices, grouped by platform.
+    --certificate - Sets the certificate that you want to use for code signing your iOS app. Must match the provisioning profile.
+    --provision - Sets the provisioning profile that you want to use for code signing your iOS app. Must match the certificate.
 
 --[/]--
 
@@ -142,14 +157,13 @@ Platform-specific example:
     $ ice sync android [--device <id>] [--live]
     $ ice sync ios [--device <id>] [--live]
 
-Synchronize the project with the device. Execute 'sync' whenever you
-want to see updated content on a running tethered deployment.
+Synchronizes the latest changes in your project to connected devices.
 
 Options:
-    --live - continue listening for project file changes and upload changed files to the device
-        and refresh automatically.
-
-    --device - the serial number or index of the device, if more than one device is connected.
+    --live - Enables Project LiveSync. When you save changes to the project, changes are automatically synchronized on the
+        connected device.
+    --device - Specifies the serial number or the index of the connected device to which you want to synchronize changes. 
+        Run list-devices to list all connected devices, grouped by platform.
 
 --[/]--
 
@@ -157,20 +171,21 @@ Options:
 Usage:
     $ ice find-plugins [<keyword> [ <keyword>]*>]
 
-Search for plugins in the Cordova Plugin Registry by keywords.
+Searches for plugins in the Apache Cordova Plugin Registry by keyword.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
     $ ice fetch-plugin <PluginId> | [<keyword> [ <keyword>]*>]
 
-Installs a Cordova plugin into your project folder.
-The <PluginId> can be a local path, URL to a plugin repository or name of a plugin published to the Cordova Plugin Registry.
+Imports the specified Apache Cordova plugin into your project. You can specify a plugin (<PluginID>) by local path,
+URL to a plugin repository, or a name of a plugin published to the Apache Cordova Plugin Registry. 
+The plugin must be Plugman-compatible.
 --[/]--
 
 --[simulate]--
 Usage:
     $ ice simulate
 
-Runs the project in the simulator.
+Runs the current project in the device simulator.
 --[/]--
