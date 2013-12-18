@@ -5,7 +5,8 @@ Usage:
 
 Commands:
     help <command>        Shows additional information about the commands in this list.
-    login                 Logs you in Telerik Platform.
+    login                 Logs you in the Telerik Platform.
+    logout                Logs you out from the Telerik Platform
     create                Creates a new project from template.
     list-provisions       Lists all configured provisioning profiles for code signing iOS applications.
     list-certificates     Lists all configured certificates for code signing iOS applications.
@@ -34,6 +35,16 @@ Usage:
 Opens a new browser window in which you can provide your login credentials for Telerik Platform.
 After you have authenticated with Telerik Platform, you can close the browser window and continue your work from the 
 command line.
+
+--[/]--
+
+--[logout]--
+
+Usage:
+    $ ice logout
+
+Logs you out from the Telerik Platform.
+In order to build your projects you will have to login again.
 
 --[/]--
 
