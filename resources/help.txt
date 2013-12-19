@@ -5,8 +5,8 @@ Usage:
 
 Commands:
     help <command>        Shows additional information about the commands in this list.
-    login                 Logs you in the Telerik Platform.
-    logout                Logs you out from the Telerik Platform
+    login                 Logs you in Telerik Platform.
+    logout                Logs you out from Telerik Platform
     create                Creates a new project from template.
     list-provisions       Lists all configured provisioning profiles for code signing iOS applications.
     list-certificates     Lists all configured certificates for code signing iOS applications.
@@ -21,8 +21,8 @@ Commands:
     simulate              Runs the current project in the device simulator.
 
 Global Options:
-    --path <path>         Specifies the file path to the project. If not specified, ?Icenium CLI? searches for the project 
-                          in the current directory and all directories above it.
+    --path <path>         Specifies the file path to the project. If not specified, ?AppBuilder CLI? searches for the
+                          project in the current directory and all directories above it.
 
 --[/]--
 
@@ -43,8 +43,8 @@ command line.
 Usage:
     $ ice logout
 
-Logs you out from the Telerik Platform.
-In order to build your projects you will have to login again.
+Logs you out from Telerik Platform.
+To build, deploy, or synchronize your projects with the cloud, you need to be logged in.
 
 --[/]--
 
@@ -53,9 +53,11 @@ In order to build your projects you will have to login again.
 Usage:
     $ ice create --appname <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
-Creates a new project from template. Options:
-    --appname - Sets the name of the application. The maximum length of the name is 30 characters. You can use only the
-        following characters: A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&),
+Creates a new project from template. 
+
+Options:
+    --appname - Sets the name of the application. The maximum length is 30 characters. You can use only the following
+        characters: A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&),
         semi-colon (;), opening and closing brackets (()), and comma (,).
     --template <Template> - Sets the source template for the project. You can use the following templates: Blank, 
         Everlive, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
@@ -66,8 +68,8 @@ Creates a new project from template. Options:
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android
         apps.
-        If not specified, ?Icenium CLI? sets the application identifier to com.telerik.appname, where appname is the
-        value for --appname.
+        If not specified, ?AppBuilder CLI? sets the application identifier to com.telerik.<App name>, where <App name>
+        is the value you have set for --appname.
         
 
 --[/]--
@@ -77,7 +79,7 @@ Usage:
     $ ice list-provisions
 
 Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
-you can set a provisioning profile with the --provision option by index or name.
+you can set the provisioning profile by index or name in the --provision option.
 --[/]--
 
 --[list-certificates]--
@@ -85,7 +87,7 @@ Usage:
     $ ice list-certificates
 
 Lists with indexes and names all configured certificates for code signing iOS applications. When building an app, you can
-set a certificate with the --certificate option by index or name.
+set the certificate by index or name in the --certificate option.
 --[/]--
 
 --[list-devices]--
@@ -110,14 +112,19 @@ Platform-specific examples:
 
 Builds the project for the target platform and produces a QR code for deployment.
 
-Run list-certificates to list available certificates for code signing iOS applications.
-Run list-provisions to list available provisioning profiles for code signing iOS applications.
+Run list-certificates to list available certificates for code signing iOS applications. You can specify a certificate
+by index or name.
+Run list-provisions to list available provisioning profiles for code signing iOS applications. You can specify a 
+provisioning profile by index or name.
 
 Options:
     --download - If specified, downloads the application package to the .ice directory in the project directory, instead
-        of producing a QR code. Set this option when you build with provisioning profile and certificate for iOS development.
-    --certificate - Sets the certificate that you want to use for code signing your iOS app. Must match the provisioning profile.
-    --provision - Sets the provisioning profile that you want to use for code signing your iOS app. Must match the certificate.
+        of producing a QR code. Set this option when you build with provisioning profile and certificate for iOS 
+        development.
+    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
+        app. Must match the specified provisioning profile. You can specify a certificate by index or name.
+    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
+        your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
 
 --[/]--
 
@@ -134,8 +141,8 @@ Usage:
 
 Synchronizes the project with the cloud to enable LiveSync for remote devices. 
 
-To get the latest changes on an iOS device, including in the Telerik AppBuilder companion app, tap and hold with
-three fingers on the device until the download pop-up message appears.
+To get the latest changes on an iOS device, tap and hold with three fingers on the device until the download pop-up
+appears.
 To get the latest changes on an Android device, press the Menu button.
 --[/]--
 
@@ -149,14 +156,18 @@ Platform-specific examples:
 
 Builds the project for the specified platform and deploys it to a connected device.
 
-Run list-certificates to list available certificates for code signing iOS applications.
-Run list-provisions to list available provisioning profiles for code signing iOS applications.
+Run list-certificates to list available certificates for code signing iOS applications. You can specify a certificate
+by index or name.
+Run list-provisions to list available provisioning profiles for code signing iOS applications. You can specify a 
+provisioning profile by index or name.
 
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app. 
         Run list-devices to list all connected devices, grouped by platform.
-    --certificate - Sets the certificate that you want to use for code signing your iOS app. Must match the provisioning profile.
-    --provision - Sets the provisioning profile that you want to use for code signing your iOS app. Must match the certificate.
+    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
+        app. Must match the specified provisioning profile. You can specify a certificate by index or name.
+    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
+        your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
 
 --[/]--
 
@@ -182,15 +193,15 @@ Options:
 Usage:
     $ ice find-plugins [<keyword> [ <keyword>]*>]
 
-Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
     $ ice fetch-plugin <PluginId> | [<keyword> [ <keyword>]*>]
 
-Imports the specified Apache Cordova plugin into your project. You can specify a plugin (<PluginID>) by local path,
-URL to a plugin repository, or a name of a plugin published to the Apache Cordova Plugin Registry. 
+Imports the specified Apache Cordova plugin into your project. You can specify a plugin by local path,
+URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 
 The plugin must be Plugman-compatible.
 --[/]--
 
