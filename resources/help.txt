@@ -50,7 +50,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ ice create <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ ice create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
