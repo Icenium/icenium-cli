@@ -50,26 +50,23 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ ice create --appname <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ ice create <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
-Creates a new project from template. 
+Creates a new project from template.
+<App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
+    A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&), semi-colon (;),
+    opening and closing brackets (()), and comma (,).
 
 Options:
-    --appname - Sets the name of the application. The maximum length is 30 characters. You can use only the following
-        characters: A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&),
-        semi-colon (;), opening and closing brackets (()), and comma (,).
-    --template <Template> - Sets the source template for the project. You can use the following templates: Blank, 
+    --template <Template> - Sets the source template for the project. You can use the following templates: Blank,
         Everlive, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
     --path - Specifies the path where you want to create the project, if different from the current directory. 
         The directory must be empty.
         If not specified, ?Icenium CLI? attempts to create the project in the current directory. 
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
-        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android
-        apps.
-        If not specified, ?AppBuilder CLI? sets the application identifier to com.telerik.<App name>, where <App name>
-        is the value you have set for --appname.
-        
+        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
+        If not specified, ?AppBuilder CLI? sets the application identifier to com.telerik.<App name>
 
 --[/]--
 
