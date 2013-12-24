@@ -32,9 +32,9 @@
     "ref-struct": "0.0.5",
     "watchr": "2.4.4",
     "valid-url": "1.0.9",
-    "request" : "2.29.0",
-    "node-uuid" : "1.4.1",
-    "fstream" : "0.1.25",
+    "request": "2.29.0",
+    "node-uuid": "1.4.1",
+    "fstream": "0.1.25",
     "q": "0.9.7",
     "underscore": "1.5.2",
     "q-io": "1.10.6",
@@ -49,7 +49,10 @@
   "devDependencies": {
     "mocha": "1.14.x",
     "chai": "1.8.x",
-    "file": "0.2.1"
+    "file": "0.2.1",
+    "grunt": "~0.4.2",
+    "grunt-ts": "~1.5.1",
+    "grunt-contrib-clean": "~0.5.0"
   },
   "bundledDependencies": [],
   "license": "All rights reserved",
