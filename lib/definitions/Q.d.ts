@@ -16,7 +16,7 @@ declare module Q {
 
     interface Deferred<T> {
         promise: Promise<T>;
-        resolve(value: T): void;
+        resolve(value?: T): void;
         reject(reason: any): void;
         notify(value: any): void;
         makeNodeResolver(): (reason: any, value: T) => void;
@@ -90,7 +90,7 @@ declare module Q {
     export function fbind<T>(method: (...args: any[]) => IPromise<T>, ...args: any[]): (...args: any[]) => Promise<T>;
     export function fbind<T>(method: (...args: any[]) => T, ...args: any[]): (...args: any[]) => Promise<T>;
 
-    export function fcall<T>(method: (...args: any[]) => T, ...args: any[]): Promise<T>;
+    export function fcall<T>(method: Function, ...args: any[]): Promise<T>;
 
     export function send<T>(obj: any, functionName: string, ...args: any[]): Promise<T>;
     export function invoke<T>(obj: any, functionName: string, ...args: any[]): Promise<T>;
@@ -129,7 +129,6 @@ declare module Q {
 
     export function isFulfilled(promise: Promise<any>): boolean;
     export function isRejected(promise: Promise<any>): boolean;
-    export function isPending(promise: Promise<any>): boolean;
 
     export function defer<T>(): Deferred<T>;
 

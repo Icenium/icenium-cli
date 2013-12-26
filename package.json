@@ -33,7 +33,7 @@
     "watchr": "2.4.4",
     "valid-url": "1.0.9",
     "request": "2.29.0",
-    "node-uuid": "1.4.1",
+    "node-uuid": "~1.4.1",
     "fstream": "0.1.25",
     "q": "0.9.7",
     "underscore": "1.5.2",

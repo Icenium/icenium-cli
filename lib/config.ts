@@ -2,57 +2,70 @@
 
 "use strict";
 
-(function() {
-	var qfs = require("q-io/fs"),
-		path = require("path"),
-		log = null /*don't log in config.js due to cyclic dependency*/;
+import path = require("path");
 
-	function getConfigName(filename) {
-		return path.join(__dirname, "../config/", filename + ".json");
-	}
+export var TFIS_SERVER;
+export var ICE_SERVER_PROTO;
+export var ICE_SERVER;
+export var DEBUG;
+export var PROXY_TO_FIDDLER;
+export var PROJECT_FILE_NAME;
+export var SOLUTION_SPACE_NAME;
+export var QR_SIZE;
+export var DEFAULT_PROJECT_TEMPLATE;
+export var TEMPLATE_NAMES;
+export var CORDOVA_PLUGINS_REGISTRY;
+export var DEFAULT_PROJECT_NAME;
+export var CI_LOGGER;
 
-	function copyFile(from, to) {
-		return qfs.read(from, "b")
-			.then(function (content) {
-				return qfs.write(to, content, "wb");
-			});
-	}
+var qfs = require("q-io/fs"),
+	log = null /*don't log in config.js due to cyclic dependency*/;
 
-	function loadConfig(name) {
-		var configFileName = getConfigName(name);
-		return JSON.parse(require("fs").readFileSync(configFileName));
-	}
-	
-	function saveConfig(config, name) {
-		var configNoFunctions = {};
-		Object.keys(config).forEach(function(key) {
-			var entry = config[key];
-			if (typeof entry !== "function") {
-				configNoFunctions[key] = entry;
-			}
+function getConfigName(filename) {
+	return path.join(__dirname, "../config/", filename + ".json");
+}
+
+function copyFile(from, to) {
+	return qfs.read(from, "b")
+		.then(function (content) {
+			return qfs.write(to, content, "wb");
 		});
+}
 
-		var configFileName = getConfigName(name);
-		return qfs.write(configFileName, JSON.stringify(configNoFunctions, null, "\t"));
-	}
+function loadConfig(name) {
+	var configFileName = getConfigName(name);
+	return JSON.parse(require("fs").readFileSync(configFileName));
+}
 
-	function mergeConfig(config, mergeFrom) {
-		Object.keys(mergeFrom).forEach(function(key) {
-			config[key] = mergeFrom[key];
-		});
-	}
+function saveConfig(config, name) {
+	var configNoFunctions = {};
+	Object.keys(config).forEach(function(key) {
+		var entry = config[key];
+		if (typeof entry !== "function") {
+			configNoFunctions[key] = entry;
+		}
+	});
 
-	mergeConfig(exports, loadConfig("config"));
+	var configFileName = getConfigName(name);
+	return qfs.write(configFileName, JSON.stringify(configNoFunctions, null, "\t"));
+}
 
-	exports.reset = function reset() {
-		return copyFile(getConfigName("config-base"), getConfigName("config"))
-			.done();
-	};
+function mergeConfig(config, mergeFrom) {
+	Object.keys(mergeFrom).forEach(function(key) {
+		config[key] = mergeFrom[key];
+	});
+}
 
-	exports.apply = function apply(configName) {
-		var baseConfig = loadConfig("config-base");
-		var newConfig = loadConfig("config-" + configName);
-		mergeConfig(baseConfig, newConfig);
-		saveConfig(baseConfig, "config").done();
-	};
-})();
+mergeConfig(exports, loadConfig("config"));
+
+export function reset() {
+	return copyFile(getConfigName("config-base"), getConfigName("config"))
+		.done();
+};
+
+export function apply(configName) {
+	var baseConfig = loadConfig("config-base");
+	var newConfig = loadConfig("config-" + configName);
+	mergeConfig(baseConfig, newConfig);
+	saveConfig(baseConfig, "config").done();
+};

@@ -206,8 +206,8 @@ interface NodeBuffer {
 declare module "querystring" {
     export function stringify(obj: any, sep?: string, eq?: string): string;
     export function parse(str: string, sep?: string, eq?: string, options?: { maxKeys?: number; }): any;
-    export function escape(): any;
-    export function unescape(): any;
+    export function escape(str: string): string;
+    export function unescape(str: string): string;
 }
 
 declare module "events" {
@@ -235,6 +235,8 @@ declare module "http" {
         listen(handle: any, listeningListener?: Function): void;
         close(cb?: any): void;
         maxHeadersCount: number;
+
+		address(): { port: number; family: string; address: string; };
     }
     export class ServerRequest extends stream.ReadableStream {
         method: string;
@@ -586,9 +588,10 @@ declare module "url" {
         hostname?: string;
         port?: string;
         host?: string;
-        pathname?: string;
+		pathname?: string;
+		path?: string;
         search?: string;
-        query?: string;
+        query?: any;
         slashes?: boolean;
         hash?: string;
     }
@@ -779,7 +782,7 @@ declare module "fs" {
     export function readSync(fd: number, buffer: NodeBuffer, offset: number, length: number, position: number): number;
     export function readFile(filename: string, encoding: string, callback: (err: Error, data: string) => void ): void;
     export function readFile(filename: string, callback: (err: Error, data: NodeBuffer) => void ): void;
-    export function readFileSync(filename: string, options?: { flag?: string; }): NodeBuffer;
+    export function readFileSync(filename: string): NodeBuffer;
     export function readFileSync(filename: string, options: { encoding: string; flag?: string; }): string;
     export function writeFile(filename: string, data: any, options?: { encoding?: string; mode?: number; flag?: string; }, callback?: Function): void;
     export function writeFile(filename: string, data: any, callback: Function): void;
@@ -810,7 +813,8 @@ declare module "fs" {
 declare module "path" {
     export function normalize(p: string): string;
     export function join(...paths: any[]): string;
-    export function resolve(from: string, to: string): string;
+	export function resolve(to: string): string;
+	export function resolve(from: string, to: string): string;
     export function resolve(from: string, from2: string, to: string): string;
     export function resolve(from: string, from2: string, from3: string, to: string): string;
     export function resolve(from: string, from2: string, from3: string, from4: string, to: string): string;
@@ -998,7 +1002,6 @@ declare module "stream" {
         destroy(): void;
         destroySoon(): void;
     }
-
     export class WritableStream extends events.EventEmitter implements WriteStream {
         writable: boolean;
         write(str: string, encoding?: string, fd?: string): boolean;
@@ -1027,7 +1030,7 @@ declare module "stream" {
         resume(): void;
         destroy(): void;
         push(chunk, encoding?): void;
-        pipe(destination: WriteStream, options?: { end?: boolean; }): void;
+        pipe(destination: WriteStream, options?: { end?: boolean; }): WritableStream;
     }
 
     export class ReadWriteStream extends events.EventEmitter implements WriteStream {

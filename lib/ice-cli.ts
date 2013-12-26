@@ -3,6 +3,7 @@
 (function() {
 	"use strict";
 	require("./extensions");
+	global.$injector = require("./yok");
 
 	var commands = {
 		"login": makeCommand("login", "loginCommand"),

@@ -11,6 +11,13 @@ interface Array {
 	contains(element: any): boolean;
 }
 
+interface Function {
+	$inject: {
+		args: string[];
+		name: string;
+	};
+}
+
 function startsWith(prefix) {
 	if (typeof prefix !== "string") {
 		throw new Error("prefix must be string");

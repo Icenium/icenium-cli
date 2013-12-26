@@ -1,43 +1,40 @@
 ///<reference path=".d.ts"/>
+"use strict";
+import _ = require("underscore");
 
-(function() {
-	"use strict";
-	var _ = require("underscore");
+var platforms: {
+	[index: string]: any;
+	android?: any;
+	ios?: any;
+} = {};
 
-	var platforms = {};
+try {
+	platforms.android = require("./platforms/android");
+} catch (ex) {}
 
-	try {
-		platforms.android = require("./platforms/android");
-	} catch (ex) {}
+try {
+	platforms.ios = require("./platforms/ios");
+} catch (ex) {}
 
-	try {
-		platforms.ios = require("./platforms/ios");
-	} catch (ex) {}
-
-	function get(platform) {
-		if (!platform) {
-			return platforms;
-		}
-		else if (isSupported(platform)) {
-			return platforms[platform.toLowerCase()];
-		}
-		return null;
+export function get(platform?: string) {
+	if (!platform) {
+		return platforms;
 	}
-
-	function getPlatformsNames() {
-		var names = [];
-		_.forEach(platforms, function(platform){
-			names.push(platform.getPlatformName());
-		});
-		return names;
+	else if (isSupported(platform)) {
+		return platforms[platform.toLowerCase()];
 	}
+	return null;
+}
 
-	function isSupported(platform) {
-		return !platform ||
-			(platform && platforms[platform.toLowerCase()]);
-	}
+export function getPlatformsNames() {
+	var names = [];
+	_.forEach(platforms, function(platform:any){
+		names.push(platform.getPlatformName());
+	});
+	return names;
+}
 
-	exports.isSupported = isSupported;
-	exports.get = get;
-	exports.getPlatformsNames = getPlatformsNames;
-}());
+export function isSupported(platform) {
+	return !platform ||
+		(platform && platforms[platform.toLowerCase()]);
+}

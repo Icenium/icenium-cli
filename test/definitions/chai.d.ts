@@ -4,7 +4,7 @@
 // DefinitelyTyped: https://github.com/borisyankov/DefinitelyTyped
 
 
-declare module chai {
+declare module "chai" {
 
     function expect(target: any): Expect;
 

@@ -1,40 +1,35 @@
 ///<reference path=".d.ts"/>
 
-(function(){
-	"use strict";
-	var fs = require("fs"),
-		path = require("path"),
-		Q = require("q"),
-		options = require("./options"),
-		helpers = require("./helpers");
+"use strict";
 
-	function saveUserState(userState) {
-		return deleteUserState()
-			.then(function() {
-				return helpers.saveFile(getUserStateFilePath(), JSON.stringify(userState));
-			});
-	}
+import fs = require("fs");
+import path = require("path");
+import Q = require("q");
+import options = require("./options");
+import helpers = require("./helpers");
 
-	function deleteUserState() {
-		return helpers.deleteFile(getUserStateFilePath());
-	}
+export function saveUserState(userState) {
+	return deleteUserState()
+		.then(function() {
+			return helpers.saveFile(getUserStateFilePath(), JSON.stringify(userState));
+		});
+}
 
-	function getUserState() {
-		return readUserStateFile()
-			.then(function(content) {
-				return JSON.parse(content);
-			});
-	}
+export function deleteUserState() {
+	return helpers.deleteFile(getUserStateFilePath());
+}
 
-	function readUserStateFile() {
-		return Q.ninvoke(fs, "readFile", getUserStateFilePath());
-	}
+export function getUserState() {
+	return readUserStateFile()
+		.then(function(content) {
+			return JSON.parse(content);
+		});
+}
 
-	function getUserStateFilePath() {
-		return path.join(options["profile-dir"], "user");
-	}
+function readUserStateFile():Q.Promise<string> {
+	return Q.ninvoke<string>(fs, "readFile", getUserStateFilePath());
+}
 
-	exports.getUserState = getUserState;
-	exports.saveUserState = saveUserState;
-	exports.deleteUserState = deleteUserState;
-})();
+function getUserStateFilePath() {
+	return path.join(options["profile-dir"], "user");
+}
