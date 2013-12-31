@@ -11,9 +11,24 @@ After cloning the repository, run:
 
 ```
    $ npm install
+   $ grunt
 ```
 
-This will install all project dependencies.
+This will install all project dependencies and compile the TypeScript files to JavaScript.
+
+Life with TypeScript
+===
+Before everything else: run `$ npm install -g typescript` to install the compiler.
+
+Manual compiling: run `$ grunt` in the project root.
+
+Committing: you can commit only .ts files; .js files are git-ignore'd.
+
+WebStorm integration: enable the TypeScript File Watcher. Uncheck "Immediate file synchronization",
+check "Track root files only". The file watcher will continuously compile your .ts files and report
+any errors as they arise. If often hangs - simply restart WebStorm to fix it. If it "forgets" to recompile
+some change to a file and you need to e.g. debug your code, either make a dummy change to trigger a recompile
+or run `grunt`.
 
 Debugging
 ===
