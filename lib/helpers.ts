@@ -184,3 +184,7 @@ export function isEmptyDir(dir) {
 export function nop() {
 	return 123;
 };
+
+export function isStringOptionEmpty(optionValue) {
+	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
+}

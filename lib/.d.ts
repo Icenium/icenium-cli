@@ -43,8 +43,14 @@
 /// <reference path="project.ts" />
 /// <reference path="remote-projects.ts" />
 /// <reference path="server.ts" />
+/// <reference path="signing-identity/cryptographic-identity-store-service.ts" />
+/// <reference path="signing-identity/cryptographic-identity.ts" />
+/// <reference path="signing-identity/provision.ts" />
 /// <reference path="simulate.ts" />
 /// <reference path="sync-service.ts" />
 /// <reference path="user.ts" />
+/// <reference path="validators/ios-deployment-validator.ts" />
+/// <reference path="validators/project-name-validator.ts" />
+/// <reference path="validators/validation-result.ts" />
 /// <reference path="yok.ts" />
 //grunt-end

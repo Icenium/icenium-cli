@@ -18,6 +18,8 @@ import xopen = require("open");
 import async = require("async");
 import devicesService = require("./devices-service");
 import Q = require("q");
+import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
+import projectNameValidator = require("./validators/project-name-validator");
 
 var cachedProjectDir = "",
 	projectData: any;
@@ -463,6 +465,8 @@ function createFromTemplate(appname, projectDir?) {
 		log.warn("--appid was not specified. Defaulting to " + options.appid);
 	}
 
+	projectNameValidator.validateNameAndLogErrorMessage(appname);
+
 	templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
 	if (fs.existsSync(templateFileName)) {
 		createProjectFile(projectDir, appname, {AppIdentifier: options.appid})
@@ -660,6 +664,13 @@ function updateProjectPropertyAndSave(mode, args) {
 }
 
 function setProjectProperty() {
+	var args = _.toArray(arguments),
+		property = args[0];
+
+	if(property === "name") {
+		projectNameValidator.validateNameAndLogErrorMessage(property);
+	}
+
 	updateProjectPropertyAndSave("set", _.toArray(arguments));
 }
 

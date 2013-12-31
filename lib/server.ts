@@ -11,6 +11,7 @@ import cookie = require("cookie");
 import util = require("util");
 import helpers = require("./helpers");
 import Url = require("url");
+import projectNameValidator = require("./validators/project-name-validator");
 
 export function httpRequest(options, callback) {
 	var requestProto =  options.proto || "http";
@@ -243,6 +244,8 @@ export function getLiveSyncUrl(urlKind, filesystemPath, liveSyncToken, callback)
 
 export function buildProject(solutionName, projectName, solutionSpace, buildProperties, callback) {
 	log.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+
+	projectNameValidator.validateNameAndLogErrorMessage(projectName);
 
 	setProjectProperties(solutionName, projectName, solutionSpace,
 		{ AppIdentifier: buildProperties.AppIdentifier },

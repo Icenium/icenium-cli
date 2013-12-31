@@ -36,3 +36,7 @@ String.prototype.isEmpty = isEmpty;
 Array.prototype.contains = function contains(object) {
 	return this.indexOf(object) >= 0;
 };
+
+(<any>RegExp).escape = function(s) {
+	return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
