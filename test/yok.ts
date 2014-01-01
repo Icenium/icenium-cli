@@ -5,6 +5,15 @@ var assert:chai.Assert = chai.assert;
 
 import yok = require("../lib/yok");
 
+class MyClass {
+	constructor(private x, public y) {
+	}
+
+	public checkX():void {
+		assert.strictEqual(this.x, "foo");
+	}
+}
+
 describe("yok", function() {
 	it("resolves pre-constructed singleton", function() {
 		var injector = new yok.Yok();
@@ -82,4 +91,16 @@ describe("yok", function() {
 
 		assert.strictEqual(obj, result.foo);
 	});
+
+	it("inject into TS constructor", function() {
+		var injector = new yok.Yok();
+
+		injector.register("x", "foo");
+		injector.register("y", 123);
+
+		var result = <MyClass> injector.resolve(MyClass);
+
+		assert.strictEqual(result.y, 123);
+		result.checkX();
+	})
 })
