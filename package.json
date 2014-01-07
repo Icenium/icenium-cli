@@ -52,8 +52,7 @@
     "file": "0.2.1",
     "grunt": "~0.4.2",
     "grunt-ts": "~1.5.1",
-    "grunt-contrib-clean": "~0.5.0",
-    "requirejs": "~2.1.9"
+    "grunt-contrib-clean": "~0.5.0"
   },
   "bundledDependencies": [],
   "license": "All rights reserved",

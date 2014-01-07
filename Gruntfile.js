@@ -3,17 +3,17 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON("package.json"),
 
 		ts: {
+			options: {
+				target: 'es5',
+				module: 'commonjs',
+				sourceMap: true,
+				declaration: false,
+				removeComments: false
+			},
+
 			devlib: {
 				src: ["lib/**/*.ts"],
-				reference: "lib/.d.ts",
-				//watch: 'lib',
-				options: {
-					target: 'es5',
-					module: 'commonjs',
-					sourceMap: true,
-					declaration: false,
-					removeComments: false
-				}
+				reference: "lib/.d.ts"
 			},
 
 			devtest: {
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
 			},
 
 			build: {
-				src: ["**/*.ts"],
+				src: ["lib/**/*.ts"],
 				options: {
 					sourceMap: false,
 					removeComments: true
