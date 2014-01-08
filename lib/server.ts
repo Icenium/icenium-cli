@@ -1,5 +1,4 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
 import querystring = require("querystring");

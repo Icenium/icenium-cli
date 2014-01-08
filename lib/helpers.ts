@@ -35,7 +35,7 @@ export function enumerateFilesInDirectorySync(directoryPath, filterCallback?: (f
 	return result;
 }
 
-export function ensureString(string, position) {
+export function ensureString(string, position = null) {
 	if (typeof string !== "string") {
 		throw new Error(util.format("Expected string as argument at position %d but got '%s'", position, util.inspect(string)));
 	}

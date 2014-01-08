@@ -27,6 +27,34 @@ if (options.log !== undefined) {
 	logger.setLevel(config.DEBUG ? "TRACE" : "INFO");
 }
 
+export class Logger implements Interfaces.ILogger {
+	fatal(...args): void {
+		logger.fatal.apply(logger, args);
+	}
+
+	error(...args): void {
+		logger.error.apply(logger, args);
+	}
+
+	warn(...args): void {
+		logger.warn.apply(logger, args);
+	}
+
+	info(...args): void {
+		logger.info.apply(logger, args);
+	}
+
+	debug(...args): void {
+		logger.debug.apply(logger, args);
+	}
+
+	trace(...args): void {
+		logger.trace.apply(logger, args);
+	}
+}
+global.$injector.register("log", Logger);
+
+// This should be deleted after all code that uses it is refactored
 export function fatal(...args): void {
 	logger.fatal.apply(logger, args);
 }

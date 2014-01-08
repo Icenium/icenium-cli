@@ -59,12 +59,14 @@ function annotate(fn) {
 var _ = <UnderscoreStatic> require("underscore");
 
 export interface IInjector {
+	require(name: string, file: string): void;
 	resolve(ctor: Function): any;
 	resolve(name: string): any;
 	register(name: string, resolver: any): void;
 }
 
 export interface IDependency {
+	require: string;
 	resolver?: () => any;
 	instance?: any;
 }
@@ -74,17 +76,20 @@ export class Yok implements IInjector {
 		[name: string]: IDependency;
 	} = {};
 
+	public require(name: string, file: string): void {
+		var dependency: IDependency = {
+			require: file
+		};
+		this.modules[name] = dependency;
+	}
+
 	register(name: string, resolver: any): void {
-		var dependency: IDependency;
+		var dependency = this.modules[name];
 
 		if (_.isFunction(resolver)) {
-			dependency = {
-				resolver: resolver
-			};
+			dependency.resolver = resolver;
 		} else {
-			dependency = {
-				instance: resolver
-			};
+			dependency.instance = resolver;
 		}
 
 		this.modules[name] = dependency;
@@ -103,7 +108,7 @@ export class Yok implements IInjector {
 		var resolvedArgs = ctor.$inject.args.map(paramName => this.resolve(paramName));
 
 		var name = ctor.$inject.name;
-		if (name && name[0] === name[0].toUpperCase()) {
+		if (!name || (name && name[0] === name[0].toUpperCase())) {
 			function EmptyCtor() {}
 			EmptyCtor.prototype = ctor.prototype;
 			var obj = new EmptyCtor();
@@ -119,7 +124,7 @@ export class Yok implements IInjector {
 		if (name[0] === "$") {
 			name = name.substr(1);
 		}
-		var dependency = this.modules[name];
+		var dependency = this.resolveDependency(name);
 
 		if (!dependency) {
 			throw new Error("unable to resolve " + name);
@@ -131,9 +136,15 @@ export class Yok implements IInjector {
 
 		return dependency.instance;
 	}
+
+	private resolveDependency(name: string): IDependency {
+		require(this.modules[name].require);
+		return this.modules[name];
+	}
 }
 
 export var injector = new Yok();
+injector.require("injector", "");
 injector.register("injector", injector);
 
 
