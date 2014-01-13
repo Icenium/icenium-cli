@@ -71,4 +71,4 @@ export class CordovaPluginsService {
 		return path.join(project.getProjectDir(), "plugins");
 	}
 }
-global.$injector.register("cordovaPluginsService", CordovaPluginsService);
+$injector.register("cordovaPluginsService", CordovaPluginsService);

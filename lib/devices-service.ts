@@ -2,7 +2,7 @@
 
 "use strict";
 import helpers = require("./helpers");
-import log = require("./log");
+import log = require("./logger");
 import Q = require("q");
 import util = require("util");
 var options:any = require("./options");

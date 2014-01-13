@@ -1,16 +1,16 @@
 global.$injector = require("./yok").injector;
 
-global.$injector.require("log", "./log");
-global.$injector.require("cordovaPluginsService", "./services/cordova-plugins");
+$injector.require("logger", "./logger");
+$injector.require("cordovaPluginsService", "./services/cordova-plugins");
 
-global.$injector.require("help", "./commands/help");
-global.$injector.require("helpCommandDataFactory", "./commands/help");
+$injector.require("helpCommandDataFactory", "./commands/help");
+$injector.requireCommand("help", "./commands/help");
 
-global.$injector.require("find-plugins", "./commands/find-plugins");
-global.$injector.require("findPluginsCommandDataFactory", "./commands/find-plugins");
+$injector.require("findPluginsCommandDataFactory", "./commands/find-plugins");
+$injector.requireCommand("find-plugins", "./commands/find-plugins");
 
-global.$injector.require("fetch-plugin", "./commands/fetch-plugin");
-global.$injector.require("fetchPluginCommandDataFactory", "./commands/fetch-plugin");
+$injector.require("fetchPluginCommandDataFactory", "./commands/fetch-plugin");
+$injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
 
-global.$injector.require("simulate", "./commands/simulate");
-global.$injector.require("simulateCommandDataFactory", "./commands/simulate");
+$injector.require("simulateCommandDataFactory", "./commands/simulate");
+$injector.requireCommand("simulate", "./commands/simulate");

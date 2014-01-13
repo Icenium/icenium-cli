@@ -7,7 +7,7 @@ import path = require("path");
 import _ = require("underscore");
 import util = require("util");
 import querystring = require("querystring");
-import log = require("./log");
+import log = require("./logger");
 import config = require("./config");
 import Q = require("q");
 

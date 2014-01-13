@@ -41,7 +41,7 @@
 			return;
 		}
 
-		command = global.$injector.resolve(commandName);
+		command = $injector.resolveCommand(commandName);
 		if (command) {
 			var commandData = command.getDataFactory().fromCliArguments(commandArguments);
 			if (command.canExecute(commandData)) {

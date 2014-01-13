@@ -1,5 +1,4 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
 import log4js = require("log4js");
@@ -19,62 +18,62 @@ if (!config.CI_LOGGER) {
 
 log4js.configure({appenders: appenders});
 
-var logger = log4js.getLogger();
+var log4jsLogger = log4js.getLogger();
 
 if (options.log !== undefined) {
-	logger.setLevel(options.log);
+	log4jsLogger.setLevel(options.log);
 } else {
-	logger.setLevel(config.DEBUG ? "TRACE" : "INFO");
+	log4jsLogger.setLevel(config.DEBUG ? "TRACE" : "INFO");
 }
 
-export class Logger implements Interfaces.ILogger {
+export class Logger implements ILogger {
 	fatal(...args): void {
-		logger.fatal.apply(logger, args);
+		log4jsLogger.fatal.apply(log4jsLogger, args);
 	}
 
 	error(...args): void {
-		logger.error.apply(logger, args);
+		log4jsLogger.error.apply(log4jsLogger, args);
 	}
 
 	warn(...args): void {
-		logger.warn.apply(logger, args);
+		log4jsLogger.warn.apply(log4jsLogger, args);
 	}
 
 	info(...args): void {
-		logger.info.apply(logger, args);
+		log4jsLogger.info.apply(log4jsLogger, args);
 	}
 
 	debug(...args): void {
-		logger.debug.apply(logger, args);
+		log4jsLogger.debug.apply(log4jsLogger, args);
 	}
 
 	trace(...args): void {
-		logger.trace.apply(logger, args);
+		log4jsLogger.trace.apply(log4jsLogger, args);
 	}
 }
-global.$injector.register("log", Logger);
+$injector.register("logger", Logger);
 
 // This should be deleted after all code that uses it is refactored
 export function fatal(...args): void {
-	logger.fatal.apply(logger, args);
+	log4jsLogger.fatal.apply(log4jsLogger, args);
 }
 
 export function error(...args): void {
-	logger.error.apply(logger, args);
+	log4jsLogger.error.apply(log4jsLogger, args);
 }
 
 export function warn(...args): void {
-	logger.warn.apply(logger, args);
+	log4jsLogger.warn.apply(log4jsLogger, args);
 }
 
 export function info(...args): void {
-	logger.info.apply(logger, args);
+	log4jsLogger.info.apply(log4jsLogger, args);
 }
 
 export function debug(...args): void {
-	logger.debug.apply(logger, args);
+	log4jsLogger.debug.apply(log4jsLogger, args);
 }
 
 export function trace(...args): void {
-	logger.trace.apply(logger, args);
+	log4jsLogger.trace.apply(log4jsLogger, args);
 }
