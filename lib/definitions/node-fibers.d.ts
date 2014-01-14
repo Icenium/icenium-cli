@@ -10,9 +10,6 @@ interface Fiber {
 }
 
 interface IFuture {
-	(...args: any[]): any;
-
-	constructor();
 	detach(): void;
 	get(): any;
 	isResolved (): boolean;
@@ -23,7 +20,11 @@ interface IFuture {
 	resolveSuccess(fn: Function): void;
 	return(result?: any): void;
 	throw (error: any): void;
-	wait (): void;
+	wait (): any;
+}
+
+interface ICallableFuture extends IFuture {
+	(...args: any[]): any;
 }
 
 declare module "fibers" {
@@ -40,10 +41,23 @@ export = Fiber;
 
 declare module "fibers/future" {
 
-	class Future {
+	class Future implements IFuture {
+		constructor();
+		detach(): void;
+		get(): any;
+		isResolved (): boolean;
+		proxy(future: IFuture): void;
+		proxyErrors(futureOrList: any): IFuture;
+		resolver(): Function;
+		resolve(fn: Function): void;
+		resolveSuccess(fn: Function): void;
+		return(result?: any): void;
+		throw (error: any): void;
+		wait (): any;
+
 		static wait(future: IFuture);
 		static wait(future_list: IFuture[]);
-		static wrap(fn: Function): IFuture;
+		static wrap(fn: Function): ICallableFuture;
 	}
 
 export = Future;

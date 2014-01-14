@@ -9,7 +9,7 @@ import os = require("os");
 import _ = require("underscore");
 import validUrl = require("valid-url");
 import fs = require("fs");
-import Fiber = require("fibers");
+import Future = require("fibers/future");
 
 export interface IPlugin {
 	name: string;
@@ -22,41 +22,41 @@ export class CordovaPluginsService {
 	}
 
 	public search(keywords: string[]): IPlugin[] {
-		var fiber = Fiber.current;
+		var future = new Future();
 		plugman.search(keywords, (result) => {
 			if (this.isError(result)) {
-				fiber.throwInto(result);
+				future.throw(result);
 			} else {
-				fiber.run(result);
+				future.return(result);
 			}
 		});
-		return Fiber.yield();
+		return future.wait();
 	}
 
 	public fetch(pluginId: string): string {
-		var fiber = Fiber.current;
+		var future = new Future();
 		plugman.fetch(pluginId, this.getPluginsDir(), false, ".", "HEAD", (result) => {
 			if (this.isError(result)) {
-				fiber.throwInto(result);
+				future.throw(result);
 			} else {
 				var message = util.format("The plugin has been successfully fetched to %s", result);
-				fiber.run(message);
+				future.return(message);
 			}
 		});
-		return Fiber.yield();
+		return future.wait();
 	}
 
 	public configure(): void {
-		var fiber = Fiber.current;
+		var future = new Future();
 		var params = ["set", "registry", config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (result) => {
 			if (this.isError(result)) {
-				fiber.throwInto(result);
+				future.throw(result);
 			} else {
-				fiber.run(result);
+				future.return(result);
 			}
 		});
-		Fiber.yield();
+		future.wait();
 	}
 
 	private isError(object:any): boolean {
