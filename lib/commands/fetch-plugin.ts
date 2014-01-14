@@ -38,23 +38,18 @@ export class FetchPluginCommand implements Commands.ICommand<FetchPluginCommandD
 		if (data.Keywords.length === 0) {
 			this.logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
 		} else if (data.Keywords.length === 1 && (this.isLocalPath(data.Keywords[0]) || this.isUrlToRepository(data.Keywords[0]))) {
-			this.cordovaPluginsService.fetch(data.Keywords[0])
-				.then(console.log)
-				.done();
+			var result = this.cordovaPluginsService.fetch(data.Keywords[0]);
+			console.log(result);
 		} else {
-			this.cordovaPluginsService.getPlugins(data.Keywords)
-				.then((plugins): any => {
-					var pluginsCount = Object.keys(plugins).length;
-					if (pluginsCount === 0) {
-						return "There are 0 matching plugins.";
-					} else if (pluginsCount > 1) {
-						return "There are more then 1 matching plugins.";
-					} else {
-						return this.cordovaPluginsService.fetch(Object.keys(plugins)[0]);
-					}
-				})
-				.then(console.log)
-				.done();
+			var plugins = this.cordovaPluginsService.getPlugins(data.Keywords);
+			var pluginsCount = Object.keys(plugins).length;
+			if (pluginsCount === 0) {
+				console.log("There are 0 matching plugins.");
+			} else if (pluginsCount > 1) {
+				console.log("There are more then 1 matching plugins.");
+			} else {
+				console.log(this.cordovaPluginsService.fetch(Object.keys(plugins)[0]));
+			}
 		}
 	}
 

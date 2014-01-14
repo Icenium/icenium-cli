@@ -1,4 +1,5 @@
 ///<reference path=".d.ts"/>
+import Fiber = require("fibers");
 
 (function() {
 	"use strict";
@@ -30,6 +31,10 @@
 		"list-projects": makeCommand("remote-projects", "listProjects"),
 		"export-project": makeCommand("remote-projects", "exportProject")
 	};
+
+	function dispatchCommandInFiber() {
+		Fiber(() => dispatchCommand()).run();
+	}
 
 	function dispatchCommand() {
 		var commandName = getCommandName();
@@ -125,6 +130,6 @@
 	if (process.argv[2] === "completion") {
 		completeCommand();
 	} else {
-		dispatchCommand();
+		dispatchCommandInFiber();
 	}
 })();

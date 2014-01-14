@@ -9,6 +9,23 @@ interface Fiber {
 	throwInto: (ex: any) => any;
 }
 
+interface IFuture {
+	(...args: any[]): any;
+
+	constructor();
+	detach(): void;
+	get(): any;
+	isResolved (): boolean;
+	proxy(future: IFuture): void;
+	proxyErrors(futureOrList: any): IFuture;
+	resolver(): Function;
+	resolve(fn: Function): void;
+	resolveSuccess(fn: Function): void;
+	return(result?: any): void;
+	throw (error: any): void;
+	wait (): void;
+}
+
 declare module "fibers" {
 
 	function Fiber(fn: Function): Fiber;
@@ -24,21 +41,9 @@ export = Fiber;
 declare module "fibers/future" {
 
 	class Future {
-		constructor();
-		detach(): void;
-		get(): any;
-		isResolved (): boolean;
-		proxy(future: Future): void;
-		proxyErrors(futureOrList: any): Future;
-		resolver(): Function;
-		resolve(fn: Function): void;
-		resolveSuccess(fn: Function): void;
-		return(result?: any): void;
-		throw (error: any): void;
-		wait (): void;
-		static wait(future: Future);
-		static wait(future_list: Future[]);
-		static wrap(fn: Function): Future
+		static wait(future: IFuture);
+		static wait(future_list: IFuture[]);
+		static wrap(fn: Function): IFuture;
 	}
 
 export = Future;
