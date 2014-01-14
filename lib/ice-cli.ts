@@ -15,8 +15,6 @@ import Fiber = require("fibers");
 		"config-apply": makeCommand("config", "apply"),
 		"telerik-login": makeCommand("login", "telerikLogin"),
 		"build": makeCommand("project", "buildCommand"),
-		"list-certificates": makeCommand("identity", "listCertificates"),
-		"list-provisions": makeCommand("identity", "listProvisions"),
 		"prop-set": makeCommand("project", "setProjectProperty"),
 		"prop-add": makeCommand("project", "addProjectProperty"),
 		"prop-del": makeCommand("project", "delProjectProperty"),

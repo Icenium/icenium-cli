@@ -2,29 +2,25 @@
 
 "use strict";
 
-import server = require("./server");
 var options:any = require("./options");
 import log = require("./logger");
 import util = require("util");
 
-export function listCertificates() {
-	server.getIdentities(function(error, data) {
-		if (error) {
-			throw error;
-		}
+export class IdentityManager {
+	constructor(private $server: Server.IServer) {
+	}
+
+	public listCertificates(): void {
+		var data = this.$server.identityStore.getIdentities();
 
 		for (var i = 0; i < data.length; i++) {
 			var ident = data[i];
 			console.log(util.format("#%d: '%s'", i + 1, ident.Alias));
 		}
-	});
-}
+	}
 
-export function listProvisions() {
-	server.getProvisions(function(error, data) {
-		if (error) {
-			throw error;
-		}
+	public listProvisions(): void {
+		var data = this.$server.mobileprovisions.getProvisions();
 
 		for (var i = 0; i < data.length; i++) {
 			var provision = data[i];
@@ -39,53 +35,49 @@ export function listProvisions() {
 				}
 			}
 		}
-	});
-}
-
-function findIdentityData(errorStr, identityStr, callback, dataSourceFunc, selector) {
-	if (!identityStr) {
-		callback(new Error(errorStr));
-		return;
 	}
 
-	dataSourceFunc.call(null, function(err, data) {
-		if (err) {
-			callback(err);
+	private findIdentityData(identityStr, data, selector): any {
+		if (!identityStr) {
+			return undefined;
 		}
 
 		for (var i = 0; i < data.length; i++) {
 			var identData = data[i];
 
 			if (identityStr === selector(identData)) {
-				callback(null, identData);
-				return;
+				return identData;
 			}
 		}
 
 		var index = parseInt(identityStr, 10) - 1;
 		if (index >= 0 && index < data.length) {
-			callback(null, data[index]);
-			return;
+			return data[index];
 		}
+	}
 
-		callback(new Error(errorStr));
-	});
-}
+	public findCertificate(identityStr, callback): void {
+		log.debug("Looking for certificate '%s'", identityStr);
+		var identities = this.$server.identityStore.getIdentities();
 
-export function findCertificate(identityStr, callback) {
-	log.debug("Looking for certificate '%s'", identityStr);
-	findIdentityData(util.format("Could not find certificate named '%s' or was not given a valid index. List registered certificates with 'list-certificates' command.", identityStr),
-		identityStr, callback, server.getIdentities,
-		function(ident) {
-			return ident.Alias;
-		});
-}
+		var result = this.findIdentityData(identityStr, identities, (ident) => ident.Alias);
+		if (!result) {
+			callback(new Error(util.format("Could not find certificate named '%s' or was not given a valid index. List registered certificates with 'list-certificates' command.", identityStr)));
+		} else {
+			callback(null, result);
+		}
+	}
 
-export function findProvision(provisionStr, callback) {
-	log.debug("Looking for provision '%s'", provisionStr);
-	findIdentityData(util.format("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr),
-		provisionStr, callback, server.getProvisions,
-		function(ident) {
-			return ident.Name;
-		});
+	public findProvision(provisionStr, callback): void {
+		log.debug("Looking for provision '%s'", provisionStr);
+		var provisions = this.$server.mobileprovisions.getProvisions();
+		var result = this.findIdentityData(provisionStr, provisions, (ident) => ident.Name);
+
+		if (!result) {
+			callback(new Error(util.format("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr)));
+		} else {
+			callback(null, result);
+		}
+	}
 }
+$injector.register("identityManager", IdentityManager);

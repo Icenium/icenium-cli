@@ -11,68 +11,89 @@ import util = require("util");
 import helpers = require("./helpers");
 import Url = require("url");
 import projectNameValidator = require("./validators/project-name-validator");
+import Future = require("fibers/future");
+import Fiber = require("fibers");
 
-export function httpRequest(options, callback) {
-	var requestProto =  options.proto || "http";
-	delete options.proto;
-	var body = options.body;
-	delete options.body;
-	var pipeTo = options.pipeTo;
-	delete options.pipeTo;
+export class HttpClient implements Server.IHttpClient {
+	httpRequest(options): Server.IResponse {
+		var requestProto =  options.proto || "http";
+		delete options.proto;
+		var body = options.body;
+		delete options.body;
+		var pipeTo = options.pipeTo;
+		delete options.pipeTo;
 
-	var proto = config.PROXY_TO_FIDDLER ? "http" : requestProto;
-	var http = require(proto);
+		var proto = config.PROXY_TO_FIDDLER ? "http" : requestProto;
+		var http = require(proto);
 
-	if (config.PROXY_TO_FIDDLER) {
-		options.path = requestProto + "://" + options.host + options.path;
-		options.headers.Host = options.host;
-		options.host = "127.0.0.1";
-		options.port = 8888;
-	}
-
-	var request = http.request(options, function (response) {
-		var data = "";
-
-		if (!pipeTo) {
-			response.on("data", function (chunk) {
-				log.trace("httpRequest: Receiving data:\n" + chunk);
-				data += chunk;
-			});
+		if (config.PROXY_TO_FIDDLER) {
+			options.path = requestProto + "://" + options.host + options.path;
+			options.headers.Host = options.host;
+			options.host = "127.0.0.1";
+			options.port = 8888;
 		}
 
-		if (pipeTo) {
-			pipeTo.on("finish", function() {
-				log.trace("httpRequest: Piping done. code = %d", response.statusCode);
-				callback({
-					response: response,
-					headers: response.headers,
-				});
-			});
-			response.on("end", function () {
-				pipeTo.end();
-			});
+		var result = new Future();
 
-			response.pipe(pipeTo);
+		var request = http.request(options, function (response) {
+			var data = "";
+
+			var callback = function(responseResult: Server.IResponse) {
+				result.return(responseResult);
+			}
+
+			if (!pipeTo) {
+				response.on("data", function (chunk) {
+					log.trace("httpRequest: Receiving data:\n" + chunk);
+					data += chunk;
+				});
+			}
+
+			if (pipeTo) {
+				pipeTo.on("finish", function() {
+					log.trace("httpRequest: Piping done. code = %d", response.statusCode);
+					callback({
+						response: response,
+						headers: response.headers
+					});
+				});
+				response.on("end", function () {
+					pipeTo.end();
+				});
+
+				response.pipe(pipeTo);
+			} else {
+				response.on("end", function () {
+					log.trace("httpRequest: Done. code = %d", response.statusCode);
+					callback({
+						body: data,
+						response: response,
+						headers: response.headers,
+						error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
+					});
+				});
+			}
+		});
+
+		log.trace("httpRequest: Sending:\n%s", body);
+
+		if (!body || !body.pipe) {
+			request.end(body);
 		} else {
-			response.on("end", function () {
-				log.trace("httpRequest: Done. code = %d", response.statusCode);
-				callback({
-					body: data,
-					response: response,
-					headers: response.headers,
-					error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
-				});
-			});
+			body.pipe(request);
 		}
-	});
 
-	log.trace("httpRequest: Sending:\n%s", body);
-
-	if (!body || !body.pipe) {
-		request.end(body);
-	} else {
-		body.pipe(request);
+		return result.wait();
 	}
+}
+$injector.register("httpClient", HttpClient);
+
+export function httpRequest(options, callback: (result: Server.IResponse) => void): void {
+	Fiber(function () {
+		var client = new HttpClient();
+		var result = client.httpRequest(options);
+		callback(result);
+	}).run();
 }
 
 export function authenticate(loginData, callback) {

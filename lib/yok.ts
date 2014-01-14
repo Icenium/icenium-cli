@@ -99,7 +99,7 @@ export class Yok implements IInjector {
 	}
 
 	public resolveCommand(name: string): Commands.ICommand<Commands.ICommandData> {
-		return this.resolve(this.createCommandName(name));
+			return this.resolve(this.createCommandName(name));
 	}
 
 	public resolve(param: any): any {
@@ -138,6 +138,10 @@ export class Yok implements IInjector {
 		}
 
 		if (!dependency.instance) {
+			if (!dependency.resolver) {
+				throw new Error("no resolver registered for " + name);
+			}
+
 			dependency.instance = this.resolveConstructor(dependency.resolver);
 		}
 
