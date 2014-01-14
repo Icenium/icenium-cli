@@ -3,7 +3,9 @@
 (function() {
 	"use strict";
 	require("./extensions");
-	global.$injector = require("./yok");
+	require("./bootstrap");
+	var util = require("util");
+	var options = require("./options");
 
 	var commands = {
 		"login": makeCommand("login", "loginCommand"),
@@ -25,28 +27,47 @@
 		"sync": makeCommand("sync-service", "sync"),
 		"list-devices": makeCommand("devices-service", "listDevices"),
 		"open-device-log-stream": makeCommand("devices-service", "openDeviceLogStream"),
-		"help": makeCommand("help", "printHelp"),
-		"find-plugins": makeCommand("cordova-plugins", "findPlugins"),
-		"fetch-plugin": makeCommand("cordova-plugins", "fetchPlugin"),
-		"simulate": makeCommand("simulate", "run"),
 		"list-projects": makeCommand("remote-projects", "listProjects"),
 		"export-project": makeCommand("remote-projects", "exportProject")
 	};
 
 	function dispatchCommand() {
-		var options = require("./options");
+		var commandName = getCommandName();
+		var commandArguments = getCommandArguments();
+
+		var command = commands[commandName];
+		if (command) {
+			command().apply(null, commandArguments);
+			return;
+		}
+
+		command = $injector.resolveCommand(commandName);
+		if (command) {
+			var commandData = command.getDataFactory().fromCliArguments(commandArguments);
+			if (command.canExecute(commandData)) {
+				command.execute(commandData);
+			}
+			return;
+		}
+
+		require("./log").fatal("Unknown command '%s'. Use 'ice help' for help.", commandName);
+		return;
+	}
+
+	function getCommandName(): string {
 		var remaining = options.argv.remain;
 		if (remaining.length > 0) {
-			var commandName = remaining[0];
-			var impl = commands[commandName.toLowerCase()];
-			if (!impl) {
-				require("./log").fatal("Unknown command '%s'. Use 'ice help' for help.", commandName);
-				return;
-			}
-			impl().apply(null, remaining.slice(1));
-		} else {
-			commands["help"]()();
+			return remaining[0].toLowerCase();
 		}
+		return "help";
+	}
+
+	function getCommandArguments(): string[] {
+		var remaining = options.argv.remain;
+		if (remaining.length > 1) {
+			return remaining.slice(1);
+		}
+		return [];
 	}
 
 	function completeCommand() {

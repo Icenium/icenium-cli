@@ -1,9 +1,8 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
 import querystring = require("querystring");
-import log = require("./log");
+import log = require("./logger");
 import fs = require("fs");
 import config = require("./config");
 import login = require("./login");

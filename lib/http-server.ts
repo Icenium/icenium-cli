@@ -6,7 +6,7 @@ import http = require("http");
 import url = require("url");
 import path = require("path");
 import fs = require("fs");
-import log = require("./log");
+import log = require("./logger");
 import helpers = require("./helpers");
 
 export function createServer(configuration): http.Server {

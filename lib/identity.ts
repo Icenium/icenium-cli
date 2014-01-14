@@ -4,7 +4,7 @@
 
 import server = require("./server");
 var options:any = require("./options");
-import log = require("./log");
+import log = require("./logger");
 import util = require("util");
 
 export function listCertificates() {
