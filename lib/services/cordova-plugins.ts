@@ -25,7 +25,7 @@ export class CordovaPluginsService {
 		var fiber = Fiber.current;
 		plugman.search(keywords, (result) => {
 			if (this.isError(result)) {
-				throw result;
+				fiber.throwInto(result);
 			} else {
 				fiber.run(result);
 			}
@@ -37,7 +37,7 @@ export class CordovaPluginsService {
 		var fiber = Fiber.current;
 		plugman.fetch(pluginId, this.getPluginsDir(), false, ".", "HEAD", (result) => {
 			if (this.isError(result)) {
-				throw result;
+				fiber.throwInto(result);
 			} else {
 				var message = util.format("The plugin has been successfully fetched to %s", result);
 				fiber.run(message);
@@ -51,7 +51,7 @@ export class CordovaPluginsService {
 		var params = ["set", "registry", config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (result) => {
 			if (this.isError(result)) {
-				throw result;
+				fiber.throwInto(result);
 			} else {
 				fiber.run(result);
 			}
