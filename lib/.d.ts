@@ -11,6 +11,7 @@
 /// <reference path="definitions/cookie.d.ts" />
 /// <reference path="definitions/log4js.d.ts" />
 /// <reference path="definitions/logger.d.ts" />
+/// <reference path="definitions/node-fibers.d.ts" />
 /// <reference path="definitions/node.d.ts" />
 /// <reference path="definitions/open.d.ts" />
 /// <reference path="definitions/plugman.d.ts" />

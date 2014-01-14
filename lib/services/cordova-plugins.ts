@@ -3,63 +3,60 @@
 
 import plugman = require("plugman");
 import path = require("path");
-import Q = require("q");
 import config = require("../config");
 import util = require("util");
 import os = require("os");
 import _ = require("underscore");
 import validUrl = require("valid-url");
 import fs = require("fs");
+import Fiber = require("fibers");
 
 export interface IPlugin {
 	name: string;
 }
 
 export class CordovaPluginsService {
-	public getPlugins(keywords: string[]): Q.Promise<IPlugin[]> {
-		return <Q.Promise<IPlugin[]>>this.configure()
-			.then(() => {
-				return this.search(keywords);
-			});
+	public getPlugins(keywords: string[]): IPlugin[] {
+		this.configure();
+		return this.search(keywords);
 	}
 
-	public search(keywords: string[]): Q.Promise<IPlugin[]> {
-		var deferred = Q.defer<IPlugin[]>();
+	public search(keywords: string[]): IPlugin[] {
+		var fiber = Fiber.current;
 		plugman.search(keywords, (result) => {
 			if (this.isError(result)) {
-				deferred.reject(result);
+				fiber.throwInto(result);
 			} else {
-				deferred.resolve(result);
+				fiber.run(result);
 			}
 		});
-		return deferred.promise;
+		return Fiber.yield();
 	}
 
-	public fetch(pluginId: string): Q.Promise<string> {
-		var deferred = Q.defer<string>();
+	public fetch(pluginId: string): string {
+		var fiber = Fiber.current;
 		plugman.fetch(pluginId, this.getPluginsDir(), false, ".", "HEAD", (result) => {
 			if (this.isError(result)) {
-				deferred.reject(result);
+				fiber.throwInto(result);
 			} else {
 				var message = util.format("The plugin has been successfully fetched to %s", result);
-				deferred.resolve(message);
+				fiber.run(message);
 			}
 		});
-		return deferred.promise;
+		return Fiber.yield();
 	}
 
-	public configure(): Q.Promise<void> {
-		var deferred = Q.defer<void>();
+	public configure(): void {
+		var fiber = Fiber.current;
 		var params = ["set", "registry", config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (result) => {
 			if (this.isError(result)) {
-				deferred.reject(result);
-			}
-			else {
-				deferred.resolve(result);
+				fiber.throwInto(result);
+			} else {
+				fiber.run(result);
 			}
 		});
-		return deferred.promise;
+		Fiber.yield();
 	}
 
 	private isError(object:any): boolean {

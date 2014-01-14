@@ -35,10 +35,8 @@ export class FindPluginsCommand implements Commands.ICommand<FindPluginsCommandD
 	}
 
 	public execute(data: FindPluginsCommandData): void {
-
-		this.cordovaPluginsService.getPlugins(data.Keywords)
-			.then((plugins) => this.printPlugins(plugins))
-			.done();
+		var plugins = this.cordovaPluginsService.getPlugins(data.Keywords);
+		this.printPlugins(plugins);
 	}
 
 	private printPlugins(plugins) {
