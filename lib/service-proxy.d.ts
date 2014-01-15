@@ -1,3 +1,6 @@
+//
+// automatically generated code; do not edit manually!
+//
 declare module Server {
 	interface IAuthenticationServiceContract {
 		agreeToEula(): void;

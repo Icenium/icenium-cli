@@ -143,11 +143,17 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		var intf = new CodePrinter();
 		var impl = new CodePrinter();
 		impl.writeLine("///<reference path=\".d.ts\"/>");
+		impl.writeLine("//");
+		impl.writeLine("// automatically generated code; do not edit manually!")
+		impl.writeLine("//");
 		impl.writeLine("\"use strict\";");
 		impl.writeLine();
 		impl.writeLine("import querystring = require('querystring');");
 		impl.writeLine();
 
+		intf.writeLine("//");
+		intf.writeLine("// automatically generated code; do not edit manually!")
+		intf.writeLine("//");
 		intf.writeLine("declare module Server {");
 
 		api.sort(function(a, b) {
