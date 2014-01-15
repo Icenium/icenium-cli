@@ -8,7 +8,7 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-    "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec test/"
+    "test": "node_modules\\.bin\\mocha --recursive --no-colors --reporter spec --require test/test-bootstrap.js test/"
   },
   "main": "./lib/ice-cli.js",
   "repository": {

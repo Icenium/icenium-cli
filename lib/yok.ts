@@ -38,10 +38,10 @@ function annotate(fn) {
 	if (typeof fn == 'function') {
 		if (!($inject = fn.$inject)) {
 			$inject = { args: [], name: "" };
+			fnText = fn.toString().replace(STRIP_COMMENTS, '');
+			argDecl = fnText.match(FN_NAME_AND_ARGS);
+			$inject.name = argDecl[1];
 			if (fn.length) {
-				fnText = fn.toString().replace(STRIP_COMMENTS, '');
-				argDecl = fnText.match(FN_NAME_AND_ARGS);
-				$inject.name = argDecl[1];
 				argDecl[2].split(FN_ARG_SPLIT).forEach(function(arg){
 					arg.replace(FN_ARG, function(all, underscore, name){
 						$inject.args.push(name);
@@ -60,7 +60,7 @@ var _ = <UnderscoreStatic> require("underscore");
 var util = require("util");
 
 export interface IDependency {
-	require: string;
+	require?: string;
 	resolver?: () => any;
 	instance?: any;
 }
@@ -87,7 +87,7 @@ export class Yok implements IInjector {
 	}
 
 	public register(name: string, resolver: any): void {
-		var dependency = this.modules[name];
+		var dependency = this.modules[name] || {};
 
 		if (_.isFunction(resolver)) {
 			dependency.resolver = resolver;
@@ -115,7 +115,7 @@ export class Yok implements IInjector {
 		var resolvedArgs = ctor.$inject.args.map(paramName => this.resolve(paramName));
 
 		var name = ctor.$inject.name;
-		if (!name || (name && name[0] === name[0].toUpperCase())) {
+		if (name && name[0] === name[0].toUpperCase()) {
 			function EmptyCtor() {}
 			EmptyCtor.prototype = ctor.prototype;
 			var obj = new EmptyCtor();
@@ -149,8 +149,11 @@ export class Yok implements IInjector {
 	}
 
 	private resolveDependency(name: string): IDependency {
-		require(this.modules[name].require);
-		return this.modules[name];
+		var mod = this.modules[name];
+		if (mod.require) {
+			require(mod.require);
+		}
+		return mod;
 	}
 
 	private createCommandName(name: string) {
@@ -159,7 +162,6 @@ export class Yok implements IInjector {
 }
 
 export var injector = new Yok();
-injector.require("injector", "");
 injector.register("injector", injector);
 
 

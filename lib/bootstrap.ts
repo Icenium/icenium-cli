@@ -22,6 +22,7 @@ $injector.require("serviceContractGenerator", "./service-util");
 $injector.require("serviceContractProvider", "./service-util");
 $injector.requireCommand("dev-generate-api", "./commands/generate-server-api");
 
+$injector.require("loginManager", "./login");
 $injector.require("identityManager", "./identity");
 $injector.requireCommand("list-certificates", "./commands/identity");
 $injector.requireCommand("list-provisions", "./commands/identity");

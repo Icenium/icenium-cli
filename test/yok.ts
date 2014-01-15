@@ -29,18 +29,18 @@ describe("yok", function() {
 		var injector = new yok.Yok();
 		var obj;
 		injector.register("foo", function() {
-			obj = {};
+			obj = {foo:"foo"};
 			return obj;
 		});
 
 		var resolved = injector.resolve("foo");
 
-		assert.strictEqual(obj, resolved);
+		assert.strictEqual(resolved, obj);
 	});
 
 	it("resolves constructed singleton", function() {
 		var injector = new yok.Yok();
-		injector.register("foo", {});
+		injector.register("foo", {foo:"foo"});
 
 		var r1 = injector.resolve("foo");
 		var r2 = injector.resolve("foo");
@@ -102,5 +102,17 @@ describe("yok", function() {
 
 		assert.strictEqual(result.y, 123);
 		result.checkX();
+	});
+
+	it("resolves a parameterless constructor", function() {
+		var injector = new yok.Yok();
+
+		function Test() {
+			this.foo = "foo";
+		}
+
+		var result = injector.resolve(Test);
+
+		assert.equal(result.foo, "foo");
 	})
 })
