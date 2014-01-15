@@ -12,7 +12,6 @@ import log = require("./logger");
 import util = require("util");
 import helpers = require("./helpers");
 import server = require("./server");
-import identity = require("./identity");
 import querystring = require("querystring");
 import xopen = require("open");
 import async = require("async");
@@ -143,14 +142,16 @@ function requestCloudBuild(platform, configuration, callback) {
 		buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
 		buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
 
-		identity.findCertificate(options.certificate, function(err, certificateData) {
+		var identityMgr = $injector.resolve("identityManager");
+
+		identityMgr.findCertificate(options.certificate, function(err, certificateData) {
 			if (err) {
 				throw err;
 			}
 
 			log.info("Using certificate '%s'", certificateData.Alias);
 
-			identity.findProvision(options.provision, function(err, provisionData) {
+			identityMgr.findProvision(options.provision, function(err, provisionData) {
 				if (err) {
 					throw err;
 				}
@@ -349,7 +350,8 @@ function deployToDevice(platform, configuration) {
 					log.debug("File is %d bytes", fs.statSync(packageFile).size);
 
 					if(helpers.isiOSPlatform(platform)) {
-						identity.findProvision(options.provision, function(error, identData){
+						var identityMgr = $injector.resolve("identityManager");
+						identityMgr.findProvision(options.provision, function(error, identData){
 							var provisionedDevices = identData.ProvisionedDevices.$values;
 							processDeployToDevice(platform, packageFile, provisionedDevices);
 						});

@@ -1,5 +1,5 @@
 {
-	"TFIS_SERVER": "testtfis.telerik.com",
+	"TFIS_SERVER": "tfis.telerik.com",
 	"ICE_SERVER_PROTO": "http",
 	"ICE_SERVER": "localhost",
 	"DEBUG": true,
