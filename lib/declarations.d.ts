@@ -14,8 +14,13 @@ declare module Server {
 		httpRequest(options): IResponse;
 	}
 
+	interface IServiceContractClientCode {
+		interfaceFile: string;
+		implementationFile: string;
+	}
+
 	interface IServiceContractGenerator {
-		generate(): void;
+		generate(): IServiceContractClientCode;
 	}
 
 	interface IServiceContractProvider {
@@ -28,6 +33,10 @@ declare module Server {
 		findCertificate(identityStr, callback): void;
 		findProvision(provisionStr, callback): void;
 	}
+}
+
+interface ILoginManager {
+	getCookie(): string;
 }
 
 declare module Server.Contract {

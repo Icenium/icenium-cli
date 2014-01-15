@@ -26,6 +26,8 @@ Global Options:
     --path <path>         Specifies the file path to the project. If not specified, ?AppBuilder CLI? searches for the
                           project in the current directory and all directories above it.
 
+--[/]--
+
 --[login]--
 
 Usage:
