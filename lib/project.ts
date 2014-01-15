@@ -429,7 +429,7 @@ function createNewProject(projectName) {
 			})
 			.done();
 	} else {
-		createFromTemplate(projectName);
+		createFromTemplate(projectName, projectDir);
 	}
 }
 
@@ -449,7 +449,7 @@ function createProjectName(projectDir) {
 		});
 }
 
-function createFromTemplate(appname, projectDir?) {
+function createFromTemplate(appname, projectDir) {
 	var templatesDir = path.join(__dirname, "../resources/templates"),
 		template = options.template || config.DEFAULT_PROJECT_TEMPLATE,
 		templateFileName;
