@@ -3,28 +3,19 @@
 "use strict";
 
 import config = require("./config");
-import server = require("./server");
-import login = require("./login");
 import util = require("util");
-import fs = require("fs");
-import path = require("path");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class ServiceProxy implements Server.IServiceProxy {
-	constructor(private $httpClient: Server.IHttpClient) {
+	constructor(private $httpClient: Server.IHttpClient,
+		private $loginManager: ILoginManager) {
 	}
 
 	public call(method: string, path: string, accept: string, body: any, resultStream: WritableStream): any {
 		var headers: any = {
 			"X-Icenium-SolutionSpace": config.SOLUTION_SPACE_NAME,
-			"Cookie": ".ASPXAUTH=" + login.getCookie()
+			"Cookie": ".ASPXAUTH=" + this.$loginManager.getCookie()
 		};
-
-//		if (method !== "POST" && method !== "PUT" && method !== "GET" && method !== "DELETE") {
-//			headers["X-HTTP-Method-Override"] = method;
-//			method = "POST";
-//		}
-
 
 		if (accept) {
 			headers.Accept = accept;
@@ -137,7 +128,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	constructor(private $serviceContractProvider: Server.IServiceContractProvider) {
 	}
 
-	public generate(): void {
+	public generate(): Server.IServiceContractClientCode {
 		var api = this.$serviceContractProvider.getApi();
 
 		var intf = new CodePrinter();
@@ -278,8 +269,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 		intf.writeLine("}");
 
-		fs.writeFileSync(path.join(__dirname, "service-proxy.d.ts"), intf.toString());
-		fs.writeFileSync(path.join(__dirname, "service-proxy.ts"), impl.toString());
+		return {
+			interfaceFile: intf.toString(),
+			implementationFile: impl.toString()
+		};
 	}
 }
 $injector.register("serviceContractGenerator", ServiceContractGenerator);

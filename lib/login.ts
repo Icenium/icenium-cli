@@ -33,18 +33,26 @@ function removeFile(filePath) {
 		.catch(function() {});
 }
 
-export function getCookie() {
-	if (!iceAuthCookie) {
-		var cookieFilePath = getCookieFilePath();
+export class LoginManager implements ILoginManager {
+	public getCookie(): string {
+		if (!iceAuthCookie) {
+			var cookieFilePath = getCookieFilePath();
 
-		if (!fs.existsSync(cookieFilePath)) {
-			throw new Error("error: not logged in.");
+			if (!fs.existsSync(cookieFilePath)) {
+				throw new Error("error: not logged in.");
+			}
+
+			iceAuthCookie = fs.readFileSync(cookieFilePath);
 		}
 
-		iceAuthCookie = fs.readFileSync(cookieFilePath);
+		return iceAuthCookie;
 	}
+}
+$injector.register("loginManager", LoginManager);
 
-	return iceAuthCookie;
+//TODO: _bridge_ remove after refactoring
+export function getCookie(): string {
+	return new LoginManager().getCookie();
 }
 
 function serveLoginFile(relPath) {
