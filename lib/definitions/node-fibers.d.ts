@@ -9,22 +9,19 @@ interface Fiber {
 	throwInto: (ex: any) => any;
 }
 
-interface IFuture {
+interface IFuture<T> {
 	detach(): void;
-	get(): any;
+	get(): T;
 	isResolved (): boolean;
-	proxy(future: IFuture): void;
-	proxyErrors(futureOrList: any): IFuture;
+	proxy<U>(future: IFuture<U>): void;
+	proxyErrors(future: IFuture<any>): IFuture<T>;
+	proxyErrors(futureList: IFuture<any>[]): IFuture<T>;
 	resolver(): Function;
 	resolve(fn: Function): void;
-	resolveSuccess(fn: Function): void;
-	return(result?: any): void;
-	throw (error: any): void;
-	wait (): any;
-}
-
-interface ICallableFuture extends IFuture {
-	(...args: any[]): any;
+	resolveSuccess(fn: (result: T) => void): void;
+	return(result?: T): void;
+	throw(error: any): void;
+	wait(): T;
 }
 
 declare module "fibers" {
@@ -39,25 +36,41 @@ declare module "fibers" {
 export = Fiber;
 }
 
+interface ICallableFuture<T> {
+	(...args: any[]): IFuture<T>;
+}
+
+interface IFutureFactory<T> {
+	(): IFuture<T>;
+}
+
+interface Function {
+	future<T>(...args: any[]): IFutureFactory<T>;
+}
+
 declare module "fibers/future" {
 
-	class Future implements IFuture {
+	class Future<T> implements IFuture<T> {
 		constructor();
 		detach(): void;
-		get(): any;
+		get(): T;
 		isResolved (): boolean;
-		proxy(future: IFuture): void;
-		proxyErrors(futureOrList: any): IFuture;
+		proxy<U>(future: IFuture<U>): void;
+		proxyErrors(future: IFuture<any>): IFuture<T>;
+		proxyErrors(futureList: IFuture<any>[]): IFuture<T>;
 		resolver(): Function;
 		resolve(fn: Function): void;
 		resolveSuccess(fn: Function): void;
-		return(result?: any): void;
+		return(result?: T): void;
 		throw (error: any): void;
-		wait (): any;
+		wait(): T;
 
-		static wait(future: IFuture);
-		static wait(future_list: IFuture[]);
-		static wrap(fn: Function): ICallableFuture;
+		static wait<T>(future: IFuture<T>);
+		static wait(future_list: IFuture<any>[]);
+
+		static wrap<T>(fn: (callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;
+		static wrap<T>(fn: (a: any, callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;
+		static wrap<T>(fn: (a: any, b: any, callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;
 	}
 
 export = Future;

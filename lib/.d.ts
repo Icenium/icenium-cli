@@ -9,7 +9,6 @@
 /// <reference path="config.ts" />
 /// <reference path="declarations.d.ts" />
 /// <reference path="definitions/Q.d.ts" />
-/// <reference path="definitions/async.d.ts" />
 /// <reference path="definitions/commands.d.ts" />
 /// <reference path="definitions/cookie.d.ts" />
 /// <reference path="definitions/log4js.d.ts" />

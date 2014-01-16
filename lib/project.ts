@@ -14,14 +14,19 @@ import helpers = require("./helpers");
 import server = require("./server");
 import querystring = require("querystring");
 import xopen = require("open");
-import async = require("async");
 import devicesService = require("./devices-service");
 import Q = require("q");
+import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import projectNameValidator = require("./validators/project-name-validator");
 
 var cachedProjectDir = "",
 	projectData: any;
+
+//TODO: _bridge_ remove after refactoring
+function getServer(): Server.IServer {
+	return <Server.IServer> $injector.resolve("server");
+}
 
 function hasProject() {
 	var projectDir = getProjectDir();
@@ -86,9 +91,7 @@ function enumerateProjectFiles(excludedProjectDirsAndFiles?) {
 	return projectFiles;
 }
 
-function zipProject(callback) {
-	helpers.ensureCallback(callback, 0);
-
+function zipProject(): IFuture<string> {
 	var tempDir = getTempDir();
 
 	var projectZipFile = path.join(tempDir, "Build.zip");
@@ -97,98 +100,87 @@ function zipProject(callback) {
 	}
 
 	var files = enumerateProjectFiles();
-	helpers.zipFiles(projectZipFile, files,
+	var zipOp = helpers.zipFiles(projectZipFile, files,
 		function(path) {
 			return getProjectRelativePath(path);
-		},
-		function(err) {
-			callback(err, {output: projectZipFile});
 		});
+
+	var result = new Future<string>();
+	zipOp.resolveSuccess(() => result.return(projectZipFile));
+	return result;
 }
 
-function requestCloudBuild(platform, configuration, callback) {
-	if (helpers.isAndroidPlatform(platform)) {
-		platform = "Android";
-	} else if (helpers.isiOSPlatform(platform)) {
-		platform = "iOS";
-	} else {
-		log.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", platform);
-		return;
-	}
+function requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
+	return ((): Project.IBuildResult => {
+		if (helpers.isAndroidPlatform(platform)) {
+			platform = "Android";
+		} else if (helpers.isiOSPlatform(platform)) {
+			platform = "iOS";
+		} else {
+			log.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", platform);
+			return;
+		}
 
-	var buildProperties:any = {
-		Configuration: configuration,
-		Platform: platform,
+		var buildProperties:any = {
+			Configuration: configuration,
+			Platform: platform,
 
-		CorePlugins: projectData.CorePlugins,
-		AppIdentifier: projectData.AppIdentifier,
-		ProjectName: projectData.name,
-		ProjectGuid: projectData.ProjectGuid,
-		FrameworkVersion: projectData.FrameworkVersion,
-		BundleVersion: projectData.BundleVersion,
-		DeviceOrientations: projectData.DeviceOrientations,
-	};
+			CorePlugins: projectData.CorePlugins,
+			AppIdentifier: projectData.AppIdentifier,
+			ProjectName: projectData.name,
+			ProjectGuid: projectData.ProjectGuid,
+			FrameworkVersion: projectData.FrameworkVersion,
+			BundleVersion: projectData.BundleVersion,
+			DeviceOrientations: projectData.DeviceOrientations,
+		};
 
-	if (platform === "Android") {
-		buildProperties.AndroidPermissions = projectData.AndroidPermissions;
-		buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
-		buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
-		buildProperties.AndroidCodesigningIdentity = ""; //TODO: where do you get this from?
+		if (platform === "Android") {
+			buildProperties.AndroidPermissions = projectData.AndroidPermissions;
+			buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
+			buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
+			buildProperties.AndroidCodesigningIdentity = ""; //TODO: where do you get this from?
 
-		beginBuild(buildProperties, callback);
-	} else if (platform === "iOS" ) {
-		buildProperties.iOSDisplayName = projectData.iOSDisplayName;
-		buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
-		buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
-		buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
+			var result = beginBuild(buildProperties).wait();
+			return result;
+		} else if (platform === "iOS" ) {
+			buildProperties.iOSDisplayName = projectData.iOSDisplayName;
+			buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
+			buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
+			buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
 
-		var identityMgr = $injector.resolve("identityManager");
+			var identityMgr = <Server.IIdentityManager> $injector.resolve("identityManager");
 
-		identityMgr.findCertificate(options.certificate, function(err, certificateData) {
-			if (err) {
-				throw err;
-			}
+			var certificateData = identityMgr.findCertificate(options.certificate).wait();
 
 			log.info("Using certificate '%s'", certificateData.Alias);
 
-			identityMgr.findProvision(options.provision, function(err, provisionData) {
-				if (err) {
-					throw err;
-				}
+			var provisionData = identityMgr.findProvision(options.provision).wait();
 
-				log.info("Using mobile provision '%s'", provisionData.Name);
+			log.info("Using mobile provision '%s'", provisionData.Name);
 
-				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
-				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
+			buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
+			buildProperties.iOSCodesigningIdentity = certificateData.Alias;
 
-				beginBuild(buildProperties, function(err, buildResult) {
-					if (!err) {
-						buildResult.provisionType = provisionData.ProvisionType;
-					}
-					callback(err, buildResult);
-				});
-			});
-		});
-	}
+			var buildResult = beginBuild(buildProperties).wait();
+			buildResult.provisionType = provisionData.ProvisionType;
+			return buildResult;
+		}
+	}).future<Project.IBuildResult>()();
 }
 
-function beginBuild(buildProperties, callback) {
-	Object.keys(buildProperties).forEach(function(prop) {
-		if (buildProperties[prop] === undefined) {
-			callback(new Error(util.format("Build property '%s' is undefined.", prop)));
-			return;
-		}
+function beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
+	return ((): Project.IBuildResult => {
+		Object.keys(buildProperties).forEach(function(prop) {
+			if (buildProperties[prop] === undefined) {
+				throw new Error(util.format("Build property '%s' is undefined.", prop));
+			}
 
-		if (_.isArray(buildProperties[prop])) {
-			buildProperties[prop] = buildProperties[prop].join(";");
-		}
-	});
+			if (_.isArray(buildProperties[prop])) {
+				buildProperties[prop] = buildProperties[prop].join(";");
+			}
+		});
 
-	server.buildProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, buildProperties, function(err, result) {
-		if (err) {
-			callback(err);
-			return;
-		}
+		var result = server.buildProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 		if (result.output) {
 			var buildLogFilePath = path.join(getTempDir(), "build.log");
@@ -202,11 +194,11 @@ function beginBuild(buildProperties, callback) {
 
 		log.debug(result.buildResults);
 
-		callback(null, {
+		return {
 			buildProperties: buildProperties,
 			packageDefs: result.buildResults,
-		});
-	});
+		};
+	}).future<Project.IBuildResult>()();
 }
 
 function showPackageQRCodes(packageDefs) {
@@ -240,70 +232,39 @@ function showPackageQRCodes(packageDefs) {
 	}
 }
 
-function build(platform, configuration, showQrCodes, downloadFiles, callback?) {
-	configuration = configuration || "Debug";
-	log.info("Building project for platform '%s', configuration '%s'", platform, configuration);
+function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Server.IPackageDef[]> {
+	return ((): Server.IPackageDef[] => {
+		configuration = configuration || "Debug";
+		log.info("Building project for platform '%s', configuration '%s'", platform, configuration);
 
-	importProject(function(err) {
-		if (err) {
-			throw err;
+		importProject().wait();
+
+		var buildResult = requestCloudBuild(platform, configuration).wait();
+		var packageDefs = buildResult.packageDefs;
+
+		if (showQrCodes && packageDefs.length) {
+			var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
+			packageDefs.forEach(function(def:any) {
+				var liveSyncUrl = server.getLiveSyncUrl(urlKind, <string> def.relativePath, <string> buildResult.buildProperties.LiveSyncToken).wait();
+				def.qrUrl = helpers.createQrUrl(liveSyncUrl);
+
+				log.debug("QR URL is '%s'", def.qrUrl);
+			});
+
+			showPackageQRCodes(packageDefs);
 		}
-		requestCloudBuild(platform, configuration, function(err, buildResult) {
-			if (err) {
-				throw err;
-			}
-			var packageDefs = buildResult.packageDefs;
 
-			if (showQrCodes && packageDefs.length) {
-				async.map(packageDefs,
-					function(def:any, callback) {
-						var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
-						server.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken,
-							function(err, liveSyncUrl) {
-								def.qrUrl = helpers.createQrUrl(liveSyncUrl);
+		if (downloadFiles) {
+			packageDefs.forEach((pkg: Server.IPackageDef) => {
+				var targetFileName = path.join(getTempDir(), path.basename(pkg.solutionPath));
+				server.downloadFile(pkg.solution, pkg.solutionPath, targetFileName).wait();
+				log.info("Download completed: %s", targetFileName);
+				pkg.localFile = targetFileName;
+			});
+		}
 
-								log.debug("QR URL is '%s'", def.qrUrl);
-								callback(err, def);
-							});
-					},
-					function(err, results) {
-						if (err) {
-							throw err;
-						}
-
-						showPackageQRCodes(results);
-					}
-				);
-			}
-
-			if (downloadFiles) {
-				async.each(packageDefs, function(pkg:any, callback) {
-					var filesystemPath = pkg.filesystemPath;
-					var targetFileName = path.join(getTempDir(), path.basename(filesystemPath));
-					server.downloadFile(filesystemPath, targetFileName, function(err) {
-						if (err) {
-							callback(err);
-						} else {
-							log.info("Download completed: %s", targetFileName);
-							pkg.localFile = targetFileName;
-							callback();
-						}
-					});
-				}, function(err) {
-					if (err) {
-						throw err;
-					}
-					if (callback) {
-						callback(null, packageDefs);
-					}
-				});
-			} else {
-				if (callback) {
-					callback(null, packageDefs);
-				}
-			}
-		});
-	});
+		return packageDefs;
+	}).future<Server.IPackageDef[]>()();
 }
 
 function buildCommand(platform, configuration) {
@@ -313,53 +274,41 @@ function buildCommand(platform, configuration) {
 function deployToIon() {
 	log.info("Deploying to Ion");
 
-	importProject(function(err) {
-		if (err) {
-			throw err;
-		}
+	importProject().wait();
 
-		server.getLiveSyncToken(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, function(err, liveSyncToken) {
-			if (err) {
-				throw err;
-			}
+	var liveSyncToken = getServer().cordova.getLiveSyncToken(projectData.name, projectData.name).wait();
 
-			var hostPart = util.format("%s://%s", config.ICE_SERVER_PROTO, config.ICE_SERVER);
-			var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
+	var hostPart = util.format("%s://%s", config.ICE_SERVER_PROTO, config.ICE_SERVER);
+	var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
 
-			log.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
+	log.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
-			showPackageQRCodes([{
-				platform: "Ion",
-				qrUrl: helpers.createQrUrl(fullDownloadPath),
-			}]);
-		});
-	});
+	showPackageQRCodes([{
+		platform: "Ion",
+		qrUrl: helpers.createQrUrl(fullDownloadPath),
+	}]);
 }
 
 function deployToDevice(platform, configuration) {
 	devicesService.hasDevices(platform)
 		.then(function(hasDevices) {
 			if (hasDevices) {
-				build(platform, configuration, false, true, function(err, packageDefs) {
-					if (err) {
-						throw err;
-					}
-					var packageFile = packageDefs[0].localFile;
+				var packageDefs = build(platform, configuration, false, true).wait();
+				var packageFile = packageDefs[0].localFile;
 
-					log.debug("Ready to deploy %s", packageDefs);
-					log.debug("File is %d bytes", fs.statSync(packageFile).size);
+				log.debug("Ready to deploy %s", packageDefs);
+				log.debug("File is %d bytes", fs.statSync(packageFile).size);
 
-					if(helpers.isiOSPlatform(platform)) {
-						var identityMgr = $injector.resolve("identityManager");
-						identityMgr.findProvision(options.provision, function(error, identData){
-							var provisionedDevices = identData.ProvisionedDevices.$values;
-							processDeployToDevice(platform, packageFile, provisionedDevices);
-						});
-					}
-					else {
-						processDeployToDevice(platform, packageFile);
-					}
-				});
+				if(helpers.isiOSPlatform(platform)) {
+					var identityMgr = $injector.resolve("identityManager");
+					identityMgr.findProvision(options.provision, function(error, identData){
+						var provisionedDevices = identData.ProvisionedDevices.$values;
+						processDeployToDevice(platform, packageFile, provisionedDevices);
+					});
+				}
+				else {
+					processDeployToDevice(platform, packageFile);
+				}
 			} else {
 				log.error(util.format("The app cannot be deployed because there are 0 connected %s devices", platform || ""));
 			}
@@ -379,31 +328,20 @@ function processDeployToDevice(platform, packageFile, provisionedDevices?){
 		.done();
 }
 
-function importProject(callback) {
-	var projectDir = getProjectDir();
-	if (!projectDir) {
-		log.fatal("Found nothing to import.");
-		return;
-	}
-
-	zipProject(function(err, result) {
-		if (err) {
-			throw err;
+function importProject(): IFuture<void> {
+	return (() => {
+		var projectDir = getProjectDir();
+		if (!projectDir) {
+			log.fatal("Found nothing to import.");
+			return;
 		}
-		log.debug("zipping completed, result file size: %d", fs.statSync(result.output).size);
 
-		server.importProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, result.output,
-			function(err) {
-				log.trace("Project imported");
-				if (callback) {
-					callback(err);
-				} else {
-					if (err !== null) {
-						throw err;
-					}
-				}
-			});
-	});
+		var projectZipFile = zipProject().wait();
+		log.debug("zipping completed, result file size: %d", fs.statSync(projectZipFile).size);
+
+		getServer().projects.importProject(projectData.name, projectData.name, fs.createReadStream(projectZipFile)).wait();
+		log.trace("Project imported");
+	}).future<void>()();
 }
 
 function saveProject(callback?) {

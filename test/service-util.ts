@@ -2,15 +2,16 @@
 
 import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
+import Future = require("fibers/future");
 var assert:chai.Assert = chai.assert;
 
 class MockHttpClient implements Server.IHttpClient {
 	public options: any;
 	public mockResponse: Server.IResponse;
 
-	httpRequest(options):Server.IResponse {
+	httpRequest(options): IFuture<Server.IResponse> {
 		this.options = options;
-		return this.mockResponse;
+		return Future.wrap<Server.IResponse>((callback) => callback(null, this.mockResponse))();
 	}
 
 	public setResponse(headers: any, body?: any, error?: any) {
@@ -45,7 +46,7 @@ describe("ServiceProxy", function() {
 
 		httpClient.setResponse({});
 
-		var result = proxy.call("GET", "/authenticate", null, null, null);
+		var result = proxy.call("test1", "GET", "/authenticate", null, null, null).wait();
 
 		assert.equal("GET", httpClient.options.method);
 		assert.equal("/api/authenticate", httpClient.options.path);
@@ -61,7 +62,7 @@ describe("ServiceProxy", function() {
 		var proxy = makeProxy();
 		httpClient.setResponse({}, JSON.stringify(expected));
 
-		var result = proxy.call("POST", "/json", "application/json", null, null);
+		var result = proxy.call("test2", "POST", "/json", "application/json", null, null).wait();
 
 		assert.isObject(result);
 		assert.deepEqual(result, expected);
@@ -73,7 +74,7 @@ describe("ServiceProxy", function() {
 
 		var result = new (require("stream").PassThrough)();
 
-		proxy.call("GET", "/package/zip", "application/octet-stream", null, result);
+		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result);
 
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});
@@ -83,7 +84,7 @@ describe("ServiceProxy", function() {
 		httpClient.setResponse({}, null, new Error("404"));
 
 		assert.throws(function() {
-			proxy.call("GET", "/package/zip", "application/json", null, null);
+			proxy.call("test4", "GET", "/package/zip", "application/json", null, null).wait();
 		}, "404");
 	});
 });

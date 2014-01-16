@@ -10,6 +10,7 @@ import querystring = require("querystring");
 import log = require("./logger");
 import config = require("./config");
 import Q = require("q");
+import Future = require("fibers/future");
 
 function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {
 	var contents = fs.readdirSync(directoryPath);
@@ -35,24 +36,6 @@ export function enumerateFilesInDirectorySync(directoryPath, filterCallback?: (f
 	return result;
 }
 
-export function ensureString(string, position = null) {
-	if (typeof string !== "string") {
-		throw new Error(util.format("Expected string as argument at position %d but got '%s'", position, util.inspect(string)));
-	}
-}
-
-export function ensureArray(array, position) {
-	if (Object.prototype.toString.call(array) !== "[object Array]") {
-		throw new Error(util.format("Expected array as argument at position %d but got '%s'", position, util.inspect(array)));
-	}
-}
-
-export function ensureCallback(callback, position) {
-	if (typeof callback !== "function") {
-		throw new Error(util.format("Expected callback as argument at position %d but got '%s'", position, util.inspect(callback)));
-	}
-}
-
 export function createQrUrl(data) {
 	return util.format("http://api.qrserver.com/v1/create-qr-code/?size=%dx%d&qzone=4&data=%s",
 		config.QR_SIZE, config.QR_SIZE, querystring.escape(data));
@@ -60,16 +43,13 @@ export function createQrUrl(data) {
 
 
 //TODO: try 'archiver' module for zipping
-export function zipFiles(zipFile, files, zipPathCallback, callback) {
-	ensureString(zipFile, 0);
-	ensureArray(files, 1);
-	ensureCallback(callback, 2);
-	ensureCallback(callback, 3);
-
+export function zipFiles(zipFile: string, files: string[], zipPathCallback: (path:string) => string): IFuture<void> {
 	var zipstream = require("zipstream");
 	var zip = zipstream.createZip({level: 9});
 	var outFile = fs.createWriteStream(zipFile);
 	zip.pipe(outFile);
+
+	var result = new Future<void>();
 
 	var fileIdx = -1;
 	var zipCallback = function() {
@@ -87,7 +67,7 @@ export function zipFiles(zipFile, files, zipPathCallback, callback) {
 				zipCallback);
 		} else {
 			outFile.on("finish", function() {
-				callback(null);
+				result.return();
 			});
 
 			zip.finalize(function(bytesWritten) {
@@ -97,6 +77,8 @@ export function zipFiles(zipFile, files, zipPathCallback, callback) {
 		}
 	};
 	zipCallback();
+
+	return result;
 }
 
 export function isRequestSuccessful(request) {

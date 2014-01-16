@@ -6,12 +6,18 @@ declare module Server {
 		error?: Error;
 	}
 
+	interface IRequestBodyElement {
+		name: string;
+		value: any;
+		contentType: string;
+	}
+
 	interface IServiceProxy {
-		call(method: string, path: string, accept: string, body: any, resultStream: WritableStream): any;
+		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream): IFuture<T>;
 	}
 
 	interface IHttpClient {
-		httpRequest(options): IResponse;
+		httpRequest(options): IFuture<IResponse>;
 	}
 
 	interface IServiceContractClientCode {
@@ -30,8 +36,21 @@ declare module Server {
 	interface IIdentityManager {
 		listCertificates(): void;
 		listProvisions(): void;
-		findCertificate(identityStr, callback): void;
-		findProvision(provisionStr, callback): void;
+		findCertificate(identityStr): IFuture<any>;
+		findProvision(provisionStr): IFuture<any>;
+	}
+
+	interface IPackageDef {
+		platform: string;
+		solution: string;
+		solutionPath: string;
+		relativePath: string;
+		localFile?: string;
+	}
+
+	interface IBuildResult {
+		buildResults: IPackageDef[];
+		output: string;
 	}
 }
 
@@ -64,5 +83,13 @@ declare module Server.Contract {
 		name: string;
 		endpoint: string;
 		operations: IOperation[];
+	}
+}
+
+declare module Project {
+	interface IBuildResult {
+		buildProperties: any;
+		packageDefs: Server.IPackageDef[];
+		provisionType?: string;
 	}
 }

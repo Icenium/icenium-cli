@@ -3,133 +3,133 @@
 //
 declare module Server {
 	interface IAuthenticationServiceContract {
-		agreeToEula(): void;
-		getLoggedInUser(): any;
-		getTenants(): any;
-		login(simpleWebToken: any): any;
-		logout(): void;
-		removeUserProperty(propertyName: string): any;
-		setActiveTenant(tenantId: string): any;
-		setUserProperty(propertyName: string, value: any): any;
+		agreeToEula(): IFuture<void>;
+		getLoggedInUser(): IFuture<any>;
+		getTenants(): IFuture<any>;
+		login(simpleWebToken: any): IFuture<any>;
+		logout(): IFuture<void>;
+		removeUserProperty(propertyName: string): IFuture<any>;
+		setActiveTenant(tenantId: string): IFuture<any>;
+		setUserProperty(propertyName: string, value: any): IFuture<any>;
 	}
 
 	interface IBuildServiceContract {
-		buildPackage(projectIdentifier: any, projectName: any, archivePackage: any, buildRequest: any): any;
-		buildProject(solutionName: string, projectName: string, buildRequest: any): any;
+		buildPackage(projectIdentifier: any, projectName: any, archivePackage: any, buildRequest: any): IFuture<any>;
+		buildProject(solutionName: string, projectName: string, buildRequest: any): IFuture<any>;
 	}
 
 	interface ICordovaServiceContract {
-		getCordovaVersions(): any;
-		getLiveSyncToken(solutionName: string, projectName: string): any;
-		getLiveSyncUrl(longUrl: string): any;
-		getPlugins(version: string): any;
-		getPluginsPackage($resultStream: WritableStream): void;
-		migrate(solutionName: string, projectName: string, targetVersion: string): any;
+		getCordovaVersions(): IFuture<any>;
+		getLiveSyncToken(solutionName: string, projectName: string): IFuture<any>;
+		getLiveSyncUrl(longUrl: string): IFuture<any>;
+		getPlugins(version: string): IFuture<any>;
+		getPluginsPackage($resultStream: any): IFuture<void>;
+		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any>;
 	}
 
 	interface ICryptographicIdentityStoreServiceContract {
-		generateCertificationRequest(subjectNameValues: any): any;
-		generateSelfSignedIdentity(generationData: any): any;
-		getCertificateRequest(uniqueName: string, $resultStream: WritableStream): void;
-		getCertificateRequests(): any;
-		getIdentities(): any;
-		getIdentity(identityAlias: string, password: string, $resultStream: WritableStream): void;
-		importIdentity(importType: string, password: string, stream: any): any;
-		removeCertificateRequest(uniqueName: string): void;
-		removeIdentity(identityAlias: string): void;
+		generateCertificationRequest(subjectNameValues: any): IFuture<any>;
+		generateSelfSignedIdentity(generationData: any): IFuture<any>;
+		getCertificateRequest(uniqueName: string, $resultStream: any): IFuture<void>;
+		getCertificateRequests(): IFuture<any>;
+		getIdentities(): IFuture<any>;
+		getIdentity(identityAlias: string, password: string, $resultStream: any): IFuture<void>;
+		importIdentity(importType: string, password: string, stream: any): IFuture<any>;
+		removeCertificateRequest(uniqueName: string): IFuture<void>;
+		removeIdentity(identityAlias: string): IFuture<void>;
 	}
 
 	interface IEverliveServiceContract {
-		getAccessToken(): any;
-		getEverliveApplications(accountId: string): any;
+		getAccessToken(): IFuture<any>;
+		getEverliveApplications(accountId: string): IFuture<any>;
 	}
 
 	interface IFileSystemServiceContract {
-		copy(solutionName: string, path: string, destinationSolutionName: any, destination: any): void;
-		createDirectory(solutionName: string, path: string): void;
-		getContent(solutionName: string, path: string, $resultStream: WritableStream): void;
-		getFile(solutionSpaceName: string, solutionName: string, path: string, $resultStream: WritableStream): void;
-		remove(solutionName: string, path: string): void;
-		rename(solutionName: string, path: string, newSolutionName: any, newPath: any): void;
-		save(solutionName: string, path: string, content: any): void;
+		copy(solutionName: string, path: string, destinationSolutionName: any, destination: any): IFuture<void>;
+		createDirectory(solutionName: string, path: string): IFuture<void>;
+		getContent(solutionName: string, path: string, $resultStream: any): IFuture<void>;
+		getFile(solutionSpaceName: string, solutionName: string, path: string, $resultStream: any): IFuture<void>;
+		remove(solutionName: string, path: string): IFuture<void>;
+		rename(solutionName: string, path: string, newSolutionName: any, newPath: any): IFuture<void>;
+		save(solutionName: string, path: string, content: any): IFuture<void>;
 	}
 
 	interface IITMSTransporterServiceContract {
-		getApplicationsReadyForUpload(username: string, password: any): any;
-		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, username: string, password: any, adamId: string): void;
+		getApplicationsReadyForUpload(username: string, password: any): IFuture<any>;
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, username: string, password: any, adamId: string): IFuture<void>;
 	}
 
 	interface IImageServiceContract {
-		resizeImage(solutionName: string, path: string, size: any): void;
+		resizeImage(solutionName: string, path: string, size: any): IFuture<void>;
 	}
 
 	interface IMobileProvisionServiceContract {
-		getProvisions(): any;
-		importProvision(provision: any): any;
-		removeProvision(identifier: string): void;
+		getProvisions(): IFuture<any>;
+		importProvision(provision: any): IFuture<any>;
+		removeProvision(identifier: string): IFuture<void>;
 	}
 
 	interface IProjectServiceContract {
-		canLoadSolution(solutionName: string): any;
-		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): void;
-		createProject(solutionName: string, expansionData: any): void;
-		deleteProject(solutionName: string, projectName: string): void;
-		deleteSolution(solutionName: string): void;
-		getExportedSolution(solutionName: string, $resultStream: WritableStream): void;
-		getItemTemplates(): any;
-		getProjectContents(solutionName: string, projectName: string): any;
-		getProjectTemplates(): any;
-		getSolution(solutionName: string, checkUpgradability: string): any;
-		importPackage(solutionName: string, projectName: string, archivePackage: any, parentIdentifier: string): void;
-		importProject(solutionName: string, projectName: string, package_: any): void;
-		renameProject(solutionName: string, projectName: string, newProjectName: string): void;
-		renameSolution(solutionName: string, newSolutionName: string): void;
-		saveProjectContents(solutionName: string, projectName: string, projectContents: any): void;
-		setProjectProperty(solutionName: string, projectName: string, changeset: any): void;
-		upgradeSolution(solutionName: string): void;
+		canLoadSolution(solutionName: string): IFuture<any>;
+		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<void>;
+		createProject(solutionName: string, expansionData: any): IFuture<void>;
+		deleteProject(solutionName: string, projectName: string): IFuture<void>;
+		deleteSolution(solutionName: string): IFuture<void>;
+		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
+		getItemTemplates(): IFuture<any>;
+		getProjectContents(solutionName: string, projectName: string): IFuture<any>;
+		getProjectTemplates(): IFuture<any>;
+		getSolution(solutionName: string, checkUpgradability: string): IFuture<any>;
+		importPackage(solutionName: string, projectName: string, archivePackage: any, parentIdentifier: string): IFuture<void>;
+		importProject(solutionName: string, projectName: string, package_: any): IFuture<void>;
+		renameProject(solutionName: string, projectName: string, newProjectName: string): IFuture<void>;
+		renameSolution(solutionName: string, newSolutionName: string): IFuture<void>;
+		saveProjectContents(solutionName: string, projectName: string, projectContents: any): IFuture<void>;
+		setProjectProperty(solutionName: string, projectName: string, changeset: any): IFuture<void>;
+		upgradeSolution(solutionName: string): IFuture<void>;
 	}
 
 	interface ISolutionUserSettingsServiceContract {
-		getSettings(solutionName: string): any;
-		getUserSettings($resultStream: WritableStream): void;
-		saveUserSettings(content: any): void;
-		setActiveBuildConfiguration(solutionName: string, buildConfiguration: string): void;
-		setCodesignIdentity(solutionName: string, projectIdentity: string, platform: string, identityAlias: any): void;
-		setMobileProvision(solutionName: string, projectIdentity: string, provisionIdentifier: any): void;
-		updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: any): void;
+		getSettings(solutionName: string): IFuture<any>;
+		getUserSettings($resultStream: any): IFuture<void>;
+		saveUserSettings(content: any): IFuture<void>;
+		setActiveBuildConfiguration(solutionName: string, buildConfiguration: string): IFuture<void>;
+		setCodesignIdentity(solutionName: string, projectIdentity: string, platform: string, identityAlias: any): IFuture<void>;
+		setMobileProvision(solutionName: string, projectIdentity: string, provisionIdentifier: any): IFuture<void>;
+		updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: any): IFuture<void>;
 	}
 
 	interface ITapServiceContract {
-		getExistingClientSolutions(): any;
-		getRemote(solutionName: string): any;
-		getUsersForProject(solutionName: string): any;
-		getWorkspaces(accountId: string): any;
-		initCurrentUserSharedRepository(solutionName: string): void;
-		setRemote(solutionName: string, remoteUrl: any): void;
+		getExistingClientSolutions(): IFuture<any>;
+		getRemote(solutionName: string): IFuture<any>;
+		getUsersForProject(solutionName: string): IFuture<any>;
+		getWorkspaces(accountId: string): IFuture<any>;
+		initCurrentUserSharedRepository(solutionName: string): IFuture<void>;
+		setRemote(solutionName: string, remoteUrl: any): IFuture<void>;
 	}
 
 	interface IVersionControlServiceContract {
-		add(solutionName: string, filePaths: any): void;
-		commit(solutionName: string, filePaths: any, commentText: any): void;
-		getChanges(solutionName: string, versionName: string): any;
-		getCommit(solutionName: string, versionName: string): any;
-		getCommits(solutionName: string, startDate: string, endDate: string): any;
-		getConflicts(solutionName: string, contextSize: string, filePaths: any): any;
-		getContents(solutionName: string, versionName: string, filePath: string): any;
-		getDiff(solutionName: string, versionName: string, otherVersionName: string, contextSize: string, filePaths: any): any;
-		getHistory(solutionName: string, versionName: string, filePath: string): any;
-		getInfo(solutionName: string): any;
-		getRemote(solutionName: string): any;
-		getStatus(solutionName: string, filePaths: any): any;
-		init(solutionName: string): void;
-		move(solutionName: string, oldPaths: any, newPaths: any): void;
-		remove(solutionName: string, filePaths: any): void;
-		reset(solutionName: string, versionName: string, resetMode: string): void;
-		resolve(solutionName: string, versionName: string, filePaths: any): void;
-		revert(solutionName: string, versionName: string, filePaths: any): void;
-		rollback(solutionName: string, versionName: string): void;
-		setRemote(solutionName: string, remoteUrl: any): void;
-		track(solutionName: string): any;
+		add(solutionName: string, filePaths: any): IFuture<void>;
+		commit(solutionName: string, filePaths: any, commentText: any): IFuture<void>;
+		getChanges(solutionName: string, versionName: string): IFuture<any>;
+		getCommit(solutionName: string, versionName: string): IFuture<any>;
+		getCommits(solutionName: string, startDate: string, endDate: string): IFuture<any>;
+		getConflicts(solutionName: string, contextSize: string, filePaths: any): IFuture<any>;
+		getContents(solutionName: string, versionName: string, filePath: string): IFuture<any>;
+		getDiff(solutionName: string, versionName: string, otherVersionName: string, contextSize: string, filePaths: any): IFuture<any>;
+		getHistory(solutionName: string, versionName: string, filePath: string): IFuture<any>;
+		getInfo(solutionName: string): IFuture<any>;
+		getRemote(solutionName: string): IFuture<any>;
+		getStatus(solutionName: string, filePaths: any): IFuture<any>;
+		init(solutionName: string): IFuture<void>;
+		move(solutionName: string, oldPaths: any, newPaths: any): IFuture<void>;
+		remove(solutionName: string, filePaths: any): IFuture<void>;
+		reset(solutionName: string, versionName: string, resetMode: string): IFuture<void>;
+		resolve(solutionName: string, versionName: string, filePaths: any): IFuture<void>;
+		revert(solutionName: string, versionName: string, filePaths: any): IFuture<void>;
+		rollback(solutionName: string, versionName: string): IFuture<void>;
+		setRemote(solutionName: string, remoteUrl: any): IFuture<void>;
+		track(solutionName: string): IFuture<any>;
 	}
 
 	interface IServer {
