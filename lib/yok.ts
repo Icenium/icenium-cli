@@ -149,11 +149,11 @@ export class Yok implements IInjector {
 	}
 
 	private resolveDependency(name: string): IDependency {
-		var mod = this.modules[name];
-		if (mod.require) {
-			require(mod.require);
+		var module = this.modules[name];
+		if (module.require) {
+			require(module.require);
 		}
-		return mod;
+		return module;
 	}
 
 	private createCommandName(name: string) {
