@@ -41,6 +41,9 @@ export function createQrUrl(data) {
 		config.QR_SIZE, config.QR_SIZE, querystring.escape(data));
 }
 
+export function fromWindowsToUnixFilePath(filePath) {
+	return filePath.replace(/\\/g, "/");
+}
 
 //TODO: try 'archiver' module for zipping
 export function zipFiles(zipFile: string, files: string[], zipPathCallback: (path:string) => string): IFuture<void> {

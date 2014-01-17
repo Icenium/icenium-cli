@@ -14,7 +14,6 @@ import util = require("util");
 import helpers = require("./helpers");
 import querystring = require("querystring");
 import xopen = require("open");
-import devicesService = require("./devices-service");
 import Q = require("q");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
@@ -305,7 +304,7 @@ function showPackageQRCodes(packageDefs) {
 	}
 }
 
-function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Server.IPackageDef[]> {
+export function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Server.IPackageDef[]> {
 	return ((): Server.IPackageDef[] => {
 		configuration = configuration || "Debug";
 		log.info("Building project for platform '%s', configuration '%s'", platform, configuration);
@@ -365,45 +364,6 @@ export function deployToIon() {
 	}]);
 }
 
-export function deployToDevice(platform, configuration) {
-	devicesService.hasDevices(platform)
-		.then(function(hasDevices) {
-			if (hasDevices) {
-				var packageDefs = build(platform, configuration, false, true).wait();
-				var packageFile = packageDefs[0].localFile;
-
-				log.debug("Ready to deploy %s", packageDefs);
-				log.debug("File is %d bytes", fs.statSync(packageFile).size);
-
-				if(helpers.isiOSPlatform(platform)) {
-					var identityMgr = $injector.resolve("identityManager");
-					identityMgr.findProvision(options.provision, function(error, identData){
-						var provisionedDevices = identData.ProvisionedDevices.$values;
-						processDeployToDevice(platform, packageFile, provisionedDevices);
-					});
-				}
-				else {
-					processDeployToDevice(platform, packageFile);
-				}
-			} else {
-				log.error(util.format("The app cannot be deployed because there are 0 connected %s devices", platform || ""));
-			}
-		})
-		.done();
-}
-
-function processDeployToDevice(platform, packageFile, provisionedDevices?){
-	var packageName = getProjectData().AppIdentifier;
-	devicesService.deploy(platform, packageFile, packageName, provisionedDevices)
-		.then(function () {
-			log.info(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
-		})
-		.catch(function (error) {
-			log.trace(error);
-		})
-		.done();
-}
-
 export function importProject(): IFuture<void> {
 	return (() => {
 		var projectDir = getProjectDir();
@@ -430,7 +390,7 @@ export function saveProject(callback?) {
 	});
 }
 
-function getProjectData() {
+export function getProjectData() {
 	projectData = JSON.parse(<string> fs.readFileSync(path.join(getProjectDir(), config.PROJECT_FILE_NAME), {encoding: "utf8"}));
 	return projectData;
 }
@@ -598,11 +558,15 @@ function generateProjectGuid() {
 export function isProjectFileExcluded(projectDir, filePath, excludedDirsAndFiles) {
 	var relativeToProjectPath = filePath.substr(projectDir.length + 1);
 	var lowerCasePath = relativeToProjectPath.toLowerCase();
-	for (var key in excludedDirsAndFiles) {
-		if (lowerCasePath.startsWith(excludedDirsAndFiles[key])) {
-			return true;
-		}
-	}
+    if(excludedDirsAndFiles) {
+        var excluded = false;
+        excludedDirsAndFiles.forEach((file) => {
+            if (lowerCasePath.startsWith(file)) {
+                excluded = true;
+            }
+        });
+        return excluded;
+    }
 	return false;
 }
 

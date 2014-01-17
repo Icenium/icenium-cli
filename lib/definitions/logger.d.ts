@@ -3,6 +3,6 @@ interface ILogger {
 	error(formatStr: string, ...args): void;
 	warn(formatStr: string, ...args): void;
 	info(formatStr: string, ...args): void;
-	debug(formatStr: string, ...args): void;
+	debug(formatStr: string, ... args): void;
 	trace(formatStr: string, ...args): void;
 }

@@ -18,11 +18,7 @@ import Fiber = require("fibers");
 		"prop-cat": makeCommand("project", "printProjectProperty"),
 		"update": makeCommand("project", "importProject"),
 		"ion": makeCommand("project", "deployToIon"),
-		"deploy": makeCommand("project", "deployToDevice"),
 		"create": makeCommand("project", "createNewProject"),
-		"sync": makeCommand("sync-service", "sync"),
-		"list-devices": makeCommand("devices-service", "listDevices"),
-		"open-device-log-stream": makeCommand("devices-service", "openDeviceLogStream"),
 		"list-projects": makeCommand("remote-projects", "listProjects"),
 		"export-project": makeCommand("remote-projects", "exportProject")
 	};
