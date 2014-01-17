@@ -16,6 +16,7 @@ Commands:
     deploy                Deploys the project to a connected device.
     update                Synchronizes the project with the cloud to enable LiveSync for remote devices.
     sync                  Synchronizes the latest changes in your project to connected devices.
+    open-device-log-stream Opens the log stream for given device.
     find-plugins          Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin          Imports an Apache Cordova plugin into your project.
     simulate              Runs the current project in the device simulator.
@@ -171,7 +172,7 @@ Options:
 --[/]--
 
 --[sync]--
-usage:
+Usage:
     $ ab sync [<Platform>]
 
 Platform-specific example:
@@ -187,6 +188,14 @@ Options:
         Run list-devices to list all connected devices, grouped by platform.
 
 --[/]--
+
+--[open-device-log-stream]--
+Usage:
+	$ ice open-device-log-stream [--device <id>]
+
+You can choose which device's log stream to open by specifying its index or identifier.
+All devices and their indexes can be seen by running "$ ice list-devices".
+--[/]
 
 --[find-plugins]--
 Usage:
