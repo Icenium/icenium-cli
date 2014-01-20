@@ -8,36 +8,25 @@ import _ = require("underscore");
 import CryptographicIdentity = require("./cryptographic-identity");
 import Provision = require("./provision");
 
+//TODO: _bridge_ remove after refactoring
+function getServer(): Server.IServer {
+	return $injector.resolve("server");
+}
+
 function CryptographicIdentityStoreService() {
 
 }
 
 CryptographicIdentityStoreService.prototype.getAllProvisions = function(callback) {
-	server.getProvisions(function(error, data) {
-		if(error) {
-			throw error;
-		}
-
-		var provisions = _.map(data, function(provisionData){
-			return new Provision(provisionData);
-		});
-
-		callback(error, provisions);
-	});
+	var data = getServer().mobileprovisions.getProvisions().wait();
+	var provisions = _.map(data, (provisionData) => new Provision(provisionData));
+	callback(null, provisions);
 };
 
 CryptographicIdentityStoreService.prototype.getAllIdentities = function(callback) {
-	server.getIdentities(function(error, data){
-		if(error) {
-			throw error;
-		}
-
-		var identities = _.map(data, function(identityData){
-			return new CryptographicIdentity(identityData);
-		});
-
-		callback(error, identities);
-	});
+	var data = getServer().identityStore.getIdentities().wait();
+	var identities = _.map(data, (identityData) => new CryptographicIdentity(identityData));
+	callback(null, identities);
 };
 
 var service = new CryptographicIdentityStoreService();

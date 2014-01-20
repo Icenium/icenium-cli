@@ -4,14 +4,17 @@
 
 import config = require("./config");
 import util = require("util");
+import Future = require("fibers/future");
 var _ = <UnderscoreStatic> require("underscore");
 
-export class ServiceProxy implements Server.IServiceProxy {
+//TODO: append " implements Server.IServiceProxy" when the bug in the TypeScript compiler that prevents it is fixed.
+export class ServiceProxy {
 	constructor(private $httpClient: Server.IHttpClient,
-		private $loginManager: ILoginManager) {
+		private $loginManager: ILoginManager,
+		private $logger: ILogger) {
 	}
 
-	public call(method: string, path: string, accept: string, body: any, resultStream: WritableStream): any {
+	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
 		var headers: any = {
 			"X-Icenium-SolutionSpace": config.SOLUTION_SPACE_NAME,
 			"Cookie": ".ASPXAUTH=" + this.$loginManager.getCookie()
@@ -21,31 +24,41 @@ export class ServiceProxy implements Server.IServiceProxy {
 			headers.Accept = accept;
 		}
 
-		if (_.isArray(body)) {
-			throw new Error("TODO: CustomFormData not implemented");
-		}
-
 		var requestOpts: any = {
 			proto: config.ICE_SERVER_PROTO,
 			host: config.ICE_SERVER,
 			path: "/api" + path,
 			method: method,
 			headers: headers,
-			body: body,
 			pipeTo: resultStream
 		};
 
-		var result = this.$httpClient.httpRequest(requestOpts);
-
-		if (result.error) {
-			throw result.error;
-		} else {
-			if (accept === "application/json") {
-				return JSON.parse(result.body);
-			} else {
-				return result.body;
+		if (bodyValues) {
+			if (bodyValues.length > 1) {
+				throw new Error("TODO: CustomFormData not implemented");
 			}
+
+			var theBody = bodyValues[0];
+			requestOpts.body = theBody.value;
+			requestOpts.headers["Content-Type"] = theBody.contentType;
 		}
+
+		var response = this.$httpClient.httpRequest(requestOpts);
+		var result = new Future<any>();
+		response.resolveSuccess((response) => {
+			this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
+			if (response.error) {
+				result.throw(response.error);
+			} else {
+				if (accept === "application/json") {
+					result.return(JSON.parse(response.body));
+				} else {
+					result.return(response.body);
+				}
+			}
+		});
+
+		return result;
 	}
 }
 $injector.register("serviceProxy", ServiceProxy);
@@ -114,7 +127,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 			method: "GET"
 		};
 
-		var result = this.$httpClient.httpRequest(req);
+		var result = this.$httpClient.httpRequest(req).wait();
 		if (result.error) {
 			throw result.error;
 		} else {
@@ -152,9 +165,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		});
 
 		for (var i = 0; i < api.length; ++i) {
-			intf.writeLine("interface %s {", api[i].name);
-			var className = toClassName(api[i].name);
-			impl.writeLine("export class %s {", className);
+			var intfName = api[i].name;
+			intf.writeLine("interface %s {", intfName);
+			var className = toClassName(intfName);
+			impl.writeLine("export class %s implements Server.%s {", className, intfName);
 			impl.writeLine("constructor(private $serviceProxy: Server.IServiceProxy) {");
 			impl.writeLine("}");
 
@@ -168,14 +182,14 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 				var paramNames = _.map(op.parameters, (p) => escapeKeyword(p.name) + ": " + (p.binding.type === "Body" ? "any" : "string"));
 
 				if (op.responseType === "application/octet-stream") {
-					paramNames.push("$resultStream: WritableStream");
+					paramNames.push("$resultStream: any");
 				}
 
-				var returnsBody = op.responseType && op.responseType !== "application/octet-stream";
+				var returnType = op.responseType && op.responseType !== "application/octet-stream" ? "any" : "void";
 
-				var signature = util.format("%s(%s): %s",
+				var signature = util.format("%s(%s): IFuture<%s>",
 					op.name[0].toLowerCase() + op.name.substr(1),
-					paramNames.join(", "), returnsBody ? "any" : "void");
+					paramNames.join(", "), returnType);
 
 				var actionPath = _.filter(
 					["/" + api[i].endpoint].concat(op.routePrefixes, [op.actionName]),
@@ -209,7 +223,12 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 							break;
 
 						case "Body":
-							bodyParams.push(paramName);
+							var contentType = param.binding.contentType;
+							if (contentType === "application/json") {
+								paramName = util.format("JSON.stringify(%s)", paramName);
+							}
+							bodyParams.push(util.format("{name: '%s', value: %s, contentType: %s}",
+								param.name, paramName, contentType ? quote(contentType) : "null"));
 							break;
 					}
 				}
@@ -230,15 +249,12 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 						_.map(queryParams, (p) => util.format("'%s': %s", p, p)).join(", "));
 				}
 
-				var args = [quote(op.httpMethod), pathVar];
+				var args = [quote(op.name), quote(op.httpMethod), pathVar];
 				args.push(op.responseType ? quote(op.responseType) : "null");
 
 				switch (bodyParams.length) {
 					case 0:
 						args.push("null");
-						break;
-					case 1:
-						args.push(bodyParams[0]);
 						break;
 					default:
 						args.push(util.format("[%s]", bodyParams.join(", ")));
@@ -247,9 +263,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 				args.push(op.responseType === "application/octet-stream" ? "$resultStream" : "null");
 
-				impl.writeLine("%sthis.$serviceProxy.call(%s);",
-					returnsBody ? "return " : "",
-					args.join(", "));
+				impl.writeLine("return this.$serviceProxy.call<%s>(%s);", returnType, args.join(", "));
 				impl.writeLine("}");
 			}
 

@@ -196,7 +196,7 @@ Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 
 --[fetch-plugin]--
 Usage:
-    $ ice fetch-plugin <PluginId> | [<keyword> [ <keyword>]*>]
+    $ ice fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
 
 Imports the specified Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 

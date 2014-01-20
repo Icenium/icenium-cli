@@ -15,7 +15,7 @@ import Future = require("fibers/future");
 import Fiber = require("fibers");
 
 export class HttpClient implements Server.IHttpClient {
-	httpRequest(options): Server.IResponse {
+	httpRequest(options): IFuture<Server.IResponse> {
 		var requestProto =  options.proto || "http";
 		delete options.proto;
 		var body = options.body;
@@ -26,6 +26,8 @@ export class HttpClient implements Server.IHttpClient {
 		var proto = config.PROXY_TO_FIDDLER ? "http" : requestProto;
 		var http = require(proto);
 
+		options.headers = options.headers || {};
+
 		if (config.PROXY_TO_FIDDLER) {
 			options.path = requestProto + "://" + options.host + options.path;
 			options.headers.Host = options.host;
@@ -33,7 +35,7 @@ export class HttpClient implements Server.IHttpClient {
 			options.port = 8888;
 		}
 
-		var result = new Future();
+		var result = new Future<Server.IResponse>();
 
 		var request = http.request(options, function (response) {
 			var data = "";
@@ -83,17 +85,23 @@ export class HttpClient implements Server.IHttpClient {
 			body.pipe(request);
 		}
 
-		return result.wait();
+		return result;
 	}
 }
 $injector.register("httpClient", HttpClient);
 
+//TODO: _bridge_ remove after refactoring
 export function httpRequest(options, callback: (result: Server.IResponse) => void): void {
 	Fiber(function () {
 		var client = new HttpClient();
 		var result = client.httpRequest(options);
-		callback(result);
+		callback(result.wait());
 	}).run();
+}
+
+//TODO: _bridge_ remove after refactoring
+function getServer(): Server.IServer {
+	return <Server.IServer> $injector.resolve("server");
 }
 
 export function authenticate(loginData, callback) {
@@ -171,164 +179,75 @@ export function createAuthenticatedRequestParameters(method): any {
 	};
 }
 
-//function callback(error:Error, response:http.Response)
-export function importProject(solutionName, projectName, solutionSpace, projectZip, callback) {
-	log.info("Importing project %s/%s (%s)", solutionName, projectName, solutionSpace);
-
-	var parameters = createAuthenticatedRequestParameters("POST");
-	parameters.path = util.format("/api/projects/importProject/%s/%s", solutionName, projectName);
-	parameters.headers["Content-Type"] = "application/octet-stream";
-	parameters.headers["Content-Length"] = fs.statSync(projectZip).size;
-	parameters.headers["X-Transfer-Mode"] = "Stream";
-	parameters.setSolutionSpace(solutionSpace);
-	parameters.body = fs.createReadStream(projectZip);
-
-	httpRequest(parameters, function(result) {
-		log.debug("Import HTTP status code: %s", result.response.statusCode);
-
-		if (callback) {
-			callback(result.error, result.response);
-		} else if (result.error) {
-			throw result.error;
-		}
-	});
-}
-
-export function setProjectProperties(solutionName, projectName, solutionSpace, properties, callback) {
-	log.debug("Setting project properties of %s/%s (%s):\n%s", solutionName, projectName, solutionSpace, util.inspect(properties));
-
-	var parameters = createAuthenticatedRequestParameters("PATCH");
-	parameters.path = util.format("/api/projects/%s/%s", solutionName, projectName);
-	parameters.headers["Content-Type"] = "application/json";
-	parameters.setSolutionSpace(solutionSpace);
-	parameters.body = JSON.stringify(properties);
-
-	httpRequest(parameters, function(result) {
-		if (callback) {
-			callback(result.error, result.response);
-		} else if (result.error) {
-			throw result.error;
-		}
-	});
-}
-
-export function getLiveSyncToken(solutionName, projectName, solutionSpace, callback) {
-	log.debug("Getting LiveSync token for %s/%s (%s)", solutionName, projectName, solutionSpace);
-
-	helpers.ensureString(solutionName, 0);
-	helpers.ensureString(projectName, 1);
-	!solutionSpace || helpers.ensureString(solutionSpace, 2);
-	helpers.ensureCallback(callback, 3);
-
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = util.format("/api/cordova/liveSyncToken/%s/%s", solutionName, projectName);
-	parameters.setSolutionSpace(solutionSpace);
-
-	httpRequest(parameters, function(result) {
-		callback(result.error, result.error ? null : JSON.parse(result.body));
-	});
-}
-
-export function getLiveSyncUrl(urlKind, filesystemPath, liveSyncToken, callback) {
-	helpers.ensureString(urlKind, 0);
-
-	urlKind = urlKind.toLowerCase();
-	if (urlKind !== "manifest" && urlKind !== "package") {
-		throw new Error("urlKind must be either 'manifest' or 'package'");
-	}
-
-	var fullDownloadPath = util.format("http://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
-		config.ICE_SERVER, urlKind,
-		querystring.escape(querystring.escape(filesystemPath)),
-		querystring.escape(querystring.escape(liveSyncToken)));
-	log.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
-
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = "/api/cordova/liveSyncUrl?longUrl=" + querystring.escape(fullDownloadPath);
-
-	httpRequest(parameters, function(result) {
-		if (result.error) {
-			callback(result.error);
-			return;
+export function getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
+	return ((): string => {
+		urlKind = urlKind.toLowerCase();
+		if (urlKind !== "manifest" && urlKind !== "package") {
+			throw new Error("urlKind must be either 'manifest' or 'package'");
 		}
 
-		var url = JSON.parse(result.body);
+		var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+			config.ICE_SERVER_PROTO,
+			config.ICE_SERVER, urlKind,
+			querystring.escape(querystring.escape(filesystemPath)),
+			querystring.escape(querystring.escape(liveSyncToken)));
+		log.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
+
+		var url = getServer().cordova.getLiveSyncUrl(fullDownloadPath).wait();
 		if (urlKind === "manifest") {
 			url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
 		}
 
 		log.debug("Device install URL '%s'", url);
-		callback(null, url);
-	});
+
+		return url;
+	}).future<string>()();
 }
 
-export function buildProject(solutionName, projectName, solutionSpace, buildProperties, callback) {
-	log.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+export function buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult> {
+	return ((): Server.IBuildResult => {
+		log.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 
-	projectNameValidator.validateNameAndLogErrorMessage(projectName);
+		projectNameValidator.validateNameAndLogErrorMessage(projectName);
 
-	setProjectProperties(solutionName, projectName, solutionSpace,
-		{ AppIdentifier: buildProperties.AppIdentifier },
-		function() {
-			getLiveSyncToken(solutionName, projectName, solutionSpace, function(err, liveSyncToken) {
-				if (err) {
-					callback(err);
-					return;
-				}
-				buildProperties.LiveSyncToken = liveSyncToken;
+		getServer().projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
 
-				var parameters = createAuthenticatedRequestParameters("POST");
-				parameters.path = util.format("/api/build/%s/%s", solutionName, projectName);
-				parameters.setSolutionSpace(solutionSpace);
-				parameters.headers["Content-Type"] = "application/json";
-				parameters.body = JSON.stringify({Properties: buildProperties});
+		var liveSyncToken = getServer().cordova.getLiveSyncToken(solutionName, projectName).wait();
 
-				httpRequest(parameters, function(result) {
-					var error = result.error;
+		buildProperties.LiveSyncToken = liveSyncToken;
 
-					var body = JSON.parse(result.body);
+		var body = getServer().build.buildProject(solutionName, projectName, {Properties: buildProperties}).wait();
 
-					if (body.Errors.length) {
-						log.error("Build errors: %s", body.Errors);
-					}
-
-					var buildResults = body.ResultsByTarget.Build.Items;
-					buildResults = buildResults.map(function(buildResult) {
-						var fullPath = buildResult.FullPath.replace(/\\/g, "/");
-						var downloadUrl = util.format("raw/%s/%s/%s", solutionName, projectName, fullPath);
-
-						return {
-							platform: buildResult.Platform,
-							filesystemPath: downloadUrl,
-							relativePath: buildResult.FullPath
-						};
-					});
-
-					callback(error, {
-						buildResults: buildResults,
-						output: body.Output
-					});
-				});
-			});
+		if (body.Errors.length) {
+			log.error("Build errors: %s", body.Errors);
 		}
-	);
+
+		var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map(function(buildResult) {
+			var fullPath = buildResult.FullPath.replace(/\\/g, "/");
+			var solutionPath = util.format("%s/%s", projectName, fullPath);
+
+			return {
+				platform: buildResult.Platform,
+				solution: solutionName,
+				solutionPath: solutionPath,
+				relativePath: buildResult.FullPath
+			};
+		});
+
+		return {
+			buildResults: buildResults,
+			output: body.Output
+		};
+	}).future<Server.IBuildResult>()();
 }
 
-export function downloadFile(filesystemPath, resultPath, callback) {
-	log.info("Downloading file '%s' into '%s'", filesystemPath, resultPath);
+export function downloadFile(solutionName, path, resultPath) {
+	log.info("Downloading file '%s/%s' into '%s'", solutionName, path, resultPath);
 
 	//TODO: caching
 	var targetFile = fs.createWriteStream(resultPath);
 
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = "/api/filesystem/" + filesystemPath;
-	parameters.setSolutionSpace(config.SOLUTION_SPACE_NAME);
-	parameters.pipeTo = targetFile;
-	httpRequest(parameters, function(result) {
-		if (callback) {
-			callback(result.error, result.response);
-		}
-	});
+	return getServer().filesystem.getContent(solutionName, path, targetFile);
 }
 
 export function downloadCordovaPlugins(resultPath, callback) {
@@ -343,39 +262,6 @@ export function downloadCordovaPlugins(resultPath, callback) {
 	httpRequest(parameters, function(result) {
 		if (callback) {
 			callback(result.error, result.response);
-		}
-	});
-}
-
-export function getIdentities(callback) {
-	!callback || helpers.ensureCallback(callback, 0);
-
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = "/api/identityStore/identities";
-	httpRequest(parameters, function(result) {
-		var error = result.error;
-		var data = !error ? JSON.parse(result.body).$values : null;
-
-		if (callback) {
-			callback(error, data);
-		} else if (error) {
-			throw error;
-		}
-	});
-}
-
-export function getProvisions(callback) {
-	!callback || helpers.ensureCallback(callback, 0);
-
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = "/api/mobileprovisions";
-
-	httpRequest(parameters, function(result) {
-		var data = !result.error ? JSON.parse(result.body).$values : null;
-		if (callback) {
-			callback(result.error, data);
-		} else if  (result.error) {
-			throw result.error;
 		}
 	});
 }

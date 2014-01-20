@@ -201,11 +201,8 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 		return res;
 	}
 
-	private getFromUriPromise(uri, errorMsg): Q.Promise<string> {
+	private getFromUriPromise(uri: string, errorMsg: string): Q.Promise<string> {
 		var deferred = Q.defer<string>();
-
-		util.ensureString(uri);
-		util.ensureString(errorMsg);
 
 		this.request.get(uri, (error, response, body) => {
 			if (!error && util.isRequestSuccessful(response)) {
@@ -218,10 +215,7 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 		return deferred.promise;
 	}
 
-	private versionCompare(version1, version2) {
-		util.ensureString(version1);
-		util.ensureString(version2);
-
+	private versionCompare(version1: string, version2: string) {
 		var v1array = version1.split("."),
 			v2array = version2.split("."),
 			v1 = {

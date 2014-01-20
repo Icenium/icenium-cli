@@ -54,9 +54,7 @@ export function serveFile(fileName) {
 	};
 }
 
-export function serveText(callback, mimeType) {
-	helpers.ensureCallback(callback, 0);
-	helpers.ensureString(mimeType, 1);
+export function serveText(callback: () => string, mimeType: string) {
 	return function(request, response) {
 		var text = callback();
 		log.debug("Content-Type: '%s', Body: '%s'", mimeType, text);
