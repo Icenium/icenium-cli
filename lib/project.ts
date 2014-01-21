@@ -3,6 +3,7 @@
 "use strict";
 
 import fs = require("fs");
+import xml2js = require("xml2js");
 import path = require("path");
 import unzip = require("unzip");
 import _ = require("underscore");
@@ -27,6 +28,10 @@ export var projectData: any;
 //TODO: _bridge_ remove after refactoring
 function getServer(): Server.IServer {
 	return <Server.IServer> $injector.resolve("server");
+}
+
+function getFs():IFileSystem {
+	return $injector.resolve("fs");
 }
 
 export function hasProject() {
@@ -401,26 +406,19 @@ function createFromTemplate(appname, projectDir) {
 	}
 	projectDir = path.join(projectDir, appname);
 
-	if (options.appid === undefined) {
-		options.appid = generateDefaultAppId(appname);
-		log.warn("--appid was not specified. Defaulting to " + options.appid);
-	}
-
 	projectNameValidator.validateNameAndLogErrorMessage(appname);
-
 	templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
-	if (fs.existsSync(templateFileName)) {
-		createProjectFile(projectDir, appname, {AppIdentifier: options.appid})
-			.then(function() {
-				return extractTemplate(templateFileName, projectDir);
-			})
-			.then(function() {
-				console.log(util.format("%s has been successfully created.", appname));
-			})
-			.catch(function(error) {
-				log.fatal(error.message);
-			})
-			.done();
+	if (getFs().exists(templateFileName).wait()) {
+		try {
+			createTemplateFolder(templateFileName, projectDir).wait();
+			var properties = getProjectProperties(projectDir, appname).wait();
+			createProjectFile(projectDir, properties).wait();
+			removeExtraFiles(projectDir).wait();
+			console.log(util.format("%s has been successfully created.", appname));
+		}
+		catch(error) {
+			log.fatal(error.message);
+		}
 	} else {
 		log.fatal("The requested template " + options.template + " does not exist.");
 		log.fatal("Available templates are:");
@@ -430,55 +428,88 @@ function createFromTemplate(appname, projectDir) {
 	}
 }
 
+function removeExtraFiles(projectDir): IFuture<any> {
+	return ((): any => {
+		var $fs = getFs();
+		var future1 = $fs.deleteFile(path.join(projectDir, "mobile.proj"));
+		var future2 = $fs.deleteFile(path.join(projectDir, "mobile.vstemplate"));
+		Future.wait([future1, future2]);
+	}).future<any>()();
+}
+
+function getProjectProperties(projectDir, appName): IFuture<any> {
+	return ((): any => {
+		var properties: any = {};
+
+		if (options.appid === undefined) {
+			options.appid = generateDefaultAppId(appName);
+			log.warn("--appid was not specified. Defaulting to " + options.appid);
+		}
+
+		var parser = new xml2js.Parser();
+		var contents = getFs().readText(path.join(projectDir, "mobile.proj")).wait();
+
+		var parseString = Future.wrap(function (str, callback) {
+			return parser.parseString(str, callback);
+		})
+
+		var result: any = parseString(contents).wait();
+		var propertyGroup: any = result.Project.PropertyGroup[0];
+
+		properties.AppName = appName;
+		properties.AppIdentifier = options.appid;
+		properties.ProjectGuid = generateProjectGuid();
+		properties.BundleVersion = propertyGroup.BundleVersion[0];
+		properties.CorePlugins = propertyGroup.CorePlugins[0].split(";");
+		properties.DeviceOrientations = propertyGroup.DeviceOrientations[0].split(";");
+		properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
+		properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
+		properties.AndroidPermissions = propertyGroup.AndroidPermissions[0].split(";");
+
+		return properties;
+	}).future<any>()();
+}
+
 function getNewProjectDir() {
 	return options.path || process.cwd();
 }
 
-export function createProjectFile(projectDir, projectName, properties) {
-	return helpers.makeDirIfNotAvailable(projectDir)
-		.then(function() {
-			return helpers.isEmptyDir(projectDir);
-		})
-		.then(function(isProjectDirEmpty) {
-			if (!isProjectDirEmpty) {
-				throw new Error("The specified directory must be empty to create a new project.");
-			}
-		})
-		.then(function() {
-			return setProjectData(projectDir, projectName, properties);
-		});
+export function createProjectFile(projectDir, properties): IFuture<any> {
+	return ((): any => {
+		properties = properties || {};
+
+		cachedProjectDir = projectDir;
+		projectData = JSON.parse(<string> fs.readFileSync(path.join(__dirname, "../resources/default-project.json"), { encoding: "utf8" }));
+		projectData.name = properties.AppName;
+		projectData.iOSDisplayName = properties.AppName;
+		projectData.AppIdentifier = properties.AppIdentifier;
+		projectData.ProjectGuid = properties.ProjectGuid;
+		projectData.BundleVersion = properties.BundleVersion;
+		projectData.CorePlugins = properties.CorePlugins;
+		projectData.DeviceOrientations = properties.DeviceOrientations;
+		projectData.FrameworkVersion = properties.FrameworkVersion;
+		projectData.iOSStatusBarStyle = properties.iOSStatusBarStyle;
+		projectData.AndroidPermissions = properties.AndroidPermissions;
+		saveProject();
+	}).future<any>()();
 }
 
-function extractTemplate(templateFileName, projectDir:string) {
-	var defered = Q.defer<void>();
-	fs.createReadStream(templateFileName)
-		.pipe(unzip.Extract({ path: projectDir}))
-		.on("close", function() {
-			defered.resolve();
-		})
-		.on("error", function(error) {
-			defered.reject(error);
-		});
-	return defered.promise;
+export function createTemplateFolder(templateFileName, projectDir): IFuture<any> {
+	var $fs = getFs();
+	$fs.createDirectory(projectDir).wait();
+	var projectDirFiles = $fs.readDirectory(projectDir).wait();
+	if (projectDirFiles.length != 0) {
+		throw new Error("The specified directory must be empty to create a new project.");
+	}
+
+	return extractTemplate(templateFileName, projectDir);
 }
 
-function setProjectData(projectDir, appName, properties) {
-	properties = typeof properties !== "undefined" ? properties : {};
-
-	cachedProjectDir = projectDir;
-	projectData = JSON.parse(<string> fs.readFileSync(path.join(__dirname, "../resources/default-project.json"), {encoding: "utf8"}));
-	projectData.name = appName;
-	projectData.iOSDisplayName = appName;
-	projectData.AppIdentifier = properties.AppIdentifier || generateDefaultAppId(appName);
-	projectData.ProjectGuid = properties.ProjectGuid || generateProjectGuid();
-	projectData.BundleVersion = properties.BundleVersion || projectData.BundleVersion;
-	projectData.CorePlugins = typeof properties.CorePlugins !== "undefined" ? properties.CorePlugins.split(";") : projectData.CorePlugins;
-	projectData.DeviceOrientations = properties.DeviceOrientations || projectData.DeviceOrientations;
-	projectData.FrameworkVersion = properties.FrameworkVersion || projectData.FrameworkVersion;
-	projectData.iOSStatusBarStyle = properties.iOSStatusBarStyle || projectData.iOSStatusBarStyle;
-	projectData.AndroidPermissions =
-		typeof properties.AndroidPermissions !== "undefined" ? properties.AndroidPermissions.split(";") : projectData.AndroidPermissions;
-	return Q.nfcall(saveProject);
+function extractTemplate(templateFileName, projectDir: string): IFuture<any> {
+	var $fs = getFs();
+	return $fs.futureFromEvent(
+		$fs.createReadStream(templateFileName)
+			.pipe(unzip.Extract({ path: projectDir })), "close");
 }
 
 function generateDefaultAppId(appName) {

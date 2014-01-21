@@ -101,6 +101,7 @@ interface IFileSystem {
 	getFileSize(path: string): IFuture<number>;
 	futureFromEvent(eventEmitter: any, event: string): IFuture<any>;
 	createDirectory(path: string): IFuture<void>;
+	readDirectory(path: string): IFuture<string[]>;
 	readFile(filename: string): IFuture<NodeBuffer>;
 	readText(filename: string, encoding?: string): IFuture<string>;
 	readJson(filename: string, encoding?: string): IFuture<any>;
