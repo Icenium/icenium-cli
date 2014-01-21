@@ -2,14 +2,13 @@
 "use strict";
 
 import path = require("path");
-import fs = require("fs");
 import unzip = require("unzip");
-import _ = require("underscore");
-import Q = require("q");
-import config = require("../config");
+import project = require("../project");
 import options = require("../options");
 import util = require("../helpers");
-import server = require("../server");
+import Future = require("fibers/future");
+import child_process = require("child_process");
+var _ = <UnderscoreStatic> require("underscore");
 
 export class SimulateCommandData implements Commands.ICommandData {
 	constructor() {}
@@ -27,24 +26,19 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 	private PACKAGE_NAME: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
 
-	private exec = require("child_process").exec;
-	private request = require("request");
-	private fstream = require("fstream");
-	private cachedProjectDir = "";
 	private projectData;
-	private simulatorPath;
-	private pluginsPath;
+	private cacheDir: string;
+	private simulatorPath: string;
+	private pluginsPath: string;
+	private serverVersion: string;
 
 	constructor(private simulateCommandDataFactory: SimulateCommandDataFactory,
-		private logger: ILogger) {
-		if (this.getProjectDir()) {
-			try {
-				this.projectData = JSON.parse(fs.readFileSync(path.join(this.getProjectDir(), config.PROJECT_FILE_NAME)).toString());
-			} catch(err) {
-				this.logger.fatal("There was a problem reading the project file. " + err);
-				process.exit(1);
-			}
-		}
+		private $logger: ILogger,
+		private $httpClient: Server.IHttpClient,
+		private $fs: IFileSystem,
+		private $config: any,
+		private $server: Server.IServer) {
+		this.projectData = project.projectData;
 	}
 
 	public getDataFactory(): SimulateCommandDataFactory {
@@ -56,163 +50,107 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 	}
 
 	public execute(data: SimulateCommandData): void {
-		this.run();
+		this.cacheDir = path.join(options["profile-dir"], "Cache");
+
+		var configUri = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + "/configuration.json";
+		this.$logger.debug("Getting server configuration from %s", configUri);
+		var config = JSON.parse(this.$httpClient.httpRequest(configUri).wait().body);
+		this.serverVersion = config.assemblyVersion;
+		this.$logger.debug("Server version: %s", this.serverVersion);
+
+		Future.wait([
+			this.prepareSimulator(),
+			this.prepareCordovaPlugins()
+		]);
+
+		this.runSimulator();
 	}
 
-	private getProjectDir() {
-		if (this.cachedProjectDir !== "") {
-			return this.cachedProjectDir;
-		}
-		this.cachedProjectDir = null;
+	private prepareSimulator(): IFuture<void> {
+		return ((): void => {
+			this.simulatorPath = path.join(this.cacheDir, this.PACKAGE_NAME);
+			this.$fs.createDirectory(this.simulatorPath).wait();
 
-		var projectDir = options.path || path.resolve(".");
-		while (true) {
-			this.logger.trace("Looking for project in '%s'", projectDir);
+			var servicesExtensionsUri = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + "/services/extensions";
+			var serverVersionFile = path.join(this.cacheDir, "server-version.json");
 
-			if (fs.existsSync(path.join(projectDir, config.PROJECT_FILE_NAME))) {
-				this.logger.debug("Project directory is '%s'.", projectDir);
-				this.cachedProjectDir = projectDir;
-				break;
+			this.$logger.trace("Simulator path: %s", this.simulatorPath);
+
+			var cachedVersion  = "0.0.0.0";
+
+
+			if (this.$fs.exists(serverVersionFile).wait()) {
+				cachedVersion = this.$fs.readJson(serverVersionFile).wait().version;
+				this.$logger.debug("Cached version is: %s", cachedVersion);
 			}
 
-			var dir = path.dirname(projectDir);
-			if (dir === projectDir) {
-				this.logger.info("No project found at or above '%s'.", path.resolve("."));
-				break;
-			}
-			projectDir = dir;
-		}
+			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
+				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
+				var extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body),
+					downloadUri = (<any>_.findWhere(extensions["$values"], { Identifier : this.PACKAGE_NAME })).DownloadUri;
 
-		return this.cachedProjectDir;
+				this.$logger.info("Updating simulator package...");
+				this.$logger.debug("Downloading simulator from %s", downloadUri);
+
+				var extractor = unzip.Extract({path: this.simulatorPath});
+				this.$httpClient.httpRequest({
+					url: downloadUri,
+					pipeTo: extractor
+				});
+
+				this.$fs.futureFromEvent(extractor, "close").wait();
+
+				this.$fs.writeJson(serverVersionFile, { version : this.serverVersion }).wait();
+
+				this.$logger.info("Finished updating simulator package.");
+			}
+		}).future<void>()();
 	}
 
-	private run() {
-		// bootstrap - get the server version, check the locally deployed simulator version and if they differ, d/l the server version into a well-known location
-		var configUri = config.ICE_SERVER_PROTO + "://" + config.ICE_SERVER + "/configuration.json",
-			servicesExtensionsUri = config.ICE_SERVER_PROTO + "://" + config.ICE_SERVER + "/services/extensions",
-			cacheDir = path.join(process.env.LOCALAPPDATA, "Telerik/BlackDragon/Cache"),
-			simulatorVersionFile,
-			serverVersion;
+	private prepareCordovaPlugins(): IFuture<void> {
+		return (() => {
+			this.pluginsPath = path.join(this.cacheDir, this.getPluginsDirName(this.serverVersion));
 
-		this.simulatorPath = path.join(cacheDir, this.PACKAGE_NAME),
-			simulatorVersionFile = path.join(this.simulatorPath, "version.json");
+			var pluginsApiEndpoint = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + this.PLUGINS_API_CONTRACT;
 
-		this.getFromUriPromise(configUri, "Could not get server configuration.")
-			.then((body: string): any => {
-				var config = JSON.parse(body),
-					cachedVersion  = "0.0.0.0";
+			if (!this.$fs.exists(this.pluginsPath).wait()) {
+				this.$logger.info("Downloading core Cordova plugins...");
 
-				serverVersion = config.assemblyVersion;
+				this.$fs.createDirectory(this.pluginsPath).wait();
+				var zipPath = path.join(this.pluginsPath, "plugins.zip");
 
-				if (!fs.existsSync(cacheDir)) {
-					fs.mkdirSync(cacheDir);
-				}
-				if (!fs.existsSync(this.simulatorPath)) {
-					fs.mkdirSync(this.simulatorPath);
-				}
-				if (fs.existsSync(simulatorVersionFile)) {
-					cachedVersion = JSON.parse(fs.readFileSync(simulatorVersionFile).toString()).version;
-				}
+				this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
+				var zipFile = this.$fs.createWriteStream(zipPath);
+				this.$server.cordova.getPluginsPackage(zipFile).wait();
 
-				if (this.versionCompare(cachedVersion, serverVersion) === -1) {
-					return this.getFromUriPromise(servicesExtensionsUri, "Could not get server version.")
-						.then((body: string) => {
-							var extensions = JSON.parse(body),
-								downloadUri = (<any>_.findWhere(extensions["$values"], { Identifier : this.PACKAGE_NAME })).DownloadUri,
-								deferred = Q.defer();
+				this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
+				var unzipPlugins = this.$fs.createReadStream(zipPath).pipe(unzip.Extract({path: this.pluginsPath }));
+				this.$fs.futureFromEvent(unzipPlugins, "close").wait();
 
-							this.request.get(downloadUri)
-								.on("response", (response) => {
-									if (util.isRequestSuccessful(response)) {
-										response.pipe(unzip.Extract({path: this.simulatorPath}))
-											.on("close", () => {
-												// save the version of the downloaded binaries
-												var versionJson = JSON.stringify({ version : serverVersion });
-												fs.writeFileSync(simulatorVersionFile, versionJson);
-												deferred.resolve();
-											})
-											.on("error", (err) => {
-												deferred.reject(err);
-											});
-									} else {
-										deferred.reject(new Error("Server returned status " + response.statusCode));
-									}
-								})
-								.on("error", (err) => {
-									deferred.reject(err);
-								});
-							return deferred.promise;
-						});
-				}
-				return true;
-			})
-			.then(() => {
-				var pluginsApiEndpoint = config.ICE_SERVER_PROTO + "://" + config.ICE_SERVER + this.PLUGINS_API_CONTRACT,
-					deferred = Q.defer();
-
-				this.pluginsPath = path.join(cacheDir, this.getPluginsDirName(serverVersion));
-
-				if (!fs.existsSync(this.pluginsPath)) {
-					fs.mkdirSync(this.pluginsPath);
-
-					Q.nfcall(server.downloadCordovaPlugins, this.pluginsPath + "/plugins.zip")
-						.then((response) => {
-							fs.createReadStream(this.pluginsPath + "/plugins.zip")
-								.pipe(unzip.Extract({path: this.pluginsPath }))
-								.on("close", () => {
-									deferred.resolve();
-								});
-						})
-						.catch((err) => {
-							deferred.reject(err);
-						});
-				} else {
-					deferred.resolve();
-				}
-
-				return deferred.promise;
-			})
-			.then(() => {
-				this.runSimulator();
-			})
-			.done();
+				this.$logger.info("Finished downloading plugins.");
+			}
+		}).future<void>()();
 	}
 
 	private runSimulator() {
-		var simulatorBinary = path.join(this.simulatorPath, "Icenium.Simulator.exe"),
-			simulatorParams = '--path "' + this.getProjectDir() + '" ' +
-				'--statusbarstyle "'+ this.projectData.iOSStatusBarStyle + '" ' +
-				'--frameworkversion "' + this.projectData.FrameworkVersion + '" ' +
-				'--orientations "' + this.projectData.DeviceOrientations + '" ' +
-				'--assemblypaths "' + this.simulatorPath + '" ' +
-				'--corepluginspath "' + this.pluginsPath + '" ' +
-				'--plugins "' + this.getPluginsCommandLine() + '"';
+		this.$logger.info("Starting simulator...");
 
-		this.exec(simulatorBinary + ' ' + simulatorParams);
-	}
+		var simulatorBinary = path.join(this.simulatorPath, "Icenium.Simulator.exe");
+		var simulatorParams = [
+			"--path", project.getProjectDir(),
+			"--statusbarstyle", this.projectData.iOSStatusBarStyle,
+			"--frameworkversion", this.projectData.FrameworkVersion,
+			"--orientations", this.projectData.DeviceOrientations.join(";"),
+			"--assemblypaths", this.simulatorPath,
+			"--corepluginspath", this.pluginsPath,
+			"--plugins", this.projectData.CorePlugins.join(";")
+			];
 
-	private getPluginsCommandLine() {
-		var res = "";
-		this.projectData.CorePlugins.forEach((item) => {
-			res += item;
-			res += ";";
-		});
-		res = res.slice(0, -1);
-		return res;
-	}
-
-	private getFromUriPromise(uri: string, errorMsg: string): Q.Promise<string> {
-		var deferred = Q.defer<string>();
-
-		this.request.get(uri, (error, response, body) => {
-			if (!error && util.isRequestSuccessful(response)) {
-				deferred.resolve(body);
-			} else {
-				deferred.reject(new Error(errorMsg + " Error details: " + error));
-			}
-		});
-
-		return deferred.promise;
+		var commandLine = simulatorBinary + ' ' + simulatorParams.join(' ');
+		this.$logger.trace(commandLine);
+		var childProcess = child_process.spawn(simulatorBinary, simulatorParams,
+			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
+		childProcess.unref();
 	}
 
 	private versionCompare(version1: string, version2: string) {
@@ -261,12 +199,12 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 
 	private getPluginsDirName(serverVersion) {
 		var result;
-		if (config.DEBUG) {
+		if (this.$config.DEBUG) {
 			result = this.PLUGINS_PACKAGE_IDENTIFIER;
 		} else {
 			result = this.PLUGINS_PACKAGE_IDENTIFIER + "-" + serverVersion;
 		}
-		this.logger.debug("PLUGINS dir is: " + result);
+		this.$logger.debug("PLUGINS dir is: " + result);
 		return result;
 	}
 }

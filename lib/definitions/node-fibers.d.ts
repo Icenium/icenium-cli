@@ -17,7 +17,7 @@ interface IFuture<T> {
 	proxyErrors(future: IFuture<any>): IFuture<T>;
 	proxyErrors(futureList: IFuture<any>[]): IFuture<T>;
 	resolver(): Function;
-	resolve(fn: Function): void;
+	resolve(fn: (err: any, result?: T) => void): void;
 	resolveSuccess(fn: (result: T) => void): void;
 	return(result?: T): void;
 	throw(error: any): void;

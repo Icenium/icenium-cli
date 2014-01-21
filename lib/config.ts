@@ -69,3 +69,5 @@ export function apply(configName) {
 	mergeConfig(baseConfig, newConfig);
 	saveConfig(baseConfig, "config").done();
 };
+
+$injector.register("config", exports);

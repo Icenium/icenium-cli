@@ -13,9 +13,28 @@ import Url = require("url");
 import projectNameValidator = require("./validators/project-name-validator");
 import Future = require("fibers/future");
 import Fiber = require("fibers");
+var _ = <UnderscoreStatic> require("underscore");
 
 export class HttpClient implements Server.IHttpClient {
 	httpRequest(options): IFuture<Server.IResponse> {
+		if (_.isString(options)) {
+			options = {
+				url: options,
+				method: "GET"
+			}
+		}
+
+		if (options.url) {
+			var urlParts = Url.parse(options.url);
+			if (urlParts.protocol) {
+				options.proto = urlParts.protocol.slice(0, -1);
+			}
+			options.host = urlParts.hostname;
+			options.port = urlParts.port;
+			options.path = urlParts.path;
+			delete options.url;
+		}
+
 		var requestProto =  options.proto || "http";
 		delete options.proto;
 		var body = options.body;
@@ -41,7 +60,11 @@ export class HttpClient implements Server.IHttpClient {
 			var data = "";
 
 			var callback = function(responseResult: Server.IResponse) {
-				result.return(responseResult);
+				if (responseResult.error) {
+					result.throw(responseResult.error);
+				} else {
+					result.return(responseResult);
+				}
 			}
 
 			if (!pipeTo) {
@@ -162,23 +185,6 @@ export function basicLogin(userName, password, callback) {
 	authenticate(loginData, callback);
 }
 
-export function createAuthenticatedRequestParameters(method): any {
-	return {
-		host: config.ICE_SERVER,
-		method: method,
-		headers : {
-			"Cookie": ".ASPXAUTH=" + login.getCookie()
-		},
-
-		setSolutionSpace: function(solutionSpace) {
-			var self = this;
-			if (solutionSpace) {
-				self.headers["X-Icenium-SolutionSpace"] = solutionSpace;
-			}
-		}
-	};
-}
-
 export function getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 	return ((): string => {
 		urlKind = urlKind.toLowerCase();
@@ -248,41 +254,4 @@ export function downloadFile(solutionName, path, resultPath) {
 	var targetFile = fs.createWriteStream(resultPath);
 
 	return getServer().filesystem.getContent(solutionName, path, targetFile);
-}
-
-export function downloadCordovaPlugins(resultPath, callback) {
-	log.info("Downloading Cordova Plugins package into '%s'", resultPath);
-
-	//TODO: caching
-	var targetFile = fs.createWriteStream(resultPath);
-
-	var parameters = createAuthenticatedRequestParameters("GET");
-	parameters.path = "/api/cordova/plugins/package";
-	parameters.pipeTo = targetFile;
-	httpRequest(parameters, function(result) {
-		if (callback) {
-			callback(result.error, result.response);
-		}
-	});
-}
-
-export function downloadUrl(url, resultPath, callback) {
-	log.debug("Downloading URL '%s' to '%s'", url, resultPath);
-
-	var urlObj = Url.parse(url);
-
-	var targetFile = fs.createWriteStream(resultPath);
-	var parameters = {
-		host: urlObj.host,
-		path: urlObj.path,
-		method: "GET",
-		pipeTo: targetFile
-	};
-	httpRequest(parameters, function(result) {
-		var response = result.response;
-		var error = helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode);
-		if (callback) {
-			callback(error, response);
-		}
-	});
 }

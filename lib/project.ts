@@ -20,20 +20,21 @@ import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import projectNameValidator = require("./validators/project-name-validator");
 
-var cachedProjectDir = "",
-	projectData: any;
+var cachedProjectDir = "";
+
+export var projectData: any;
 
 //TODO: _bridge_ remove after refactoring
 function getServer(): Server.IServer {
 	return <Server.IServer> $injector.resolve("server");
 }
 
-function hasProject() {
+export function hasProject() {
 	var projectDir = getProjectDir();
 	return !!projectDir;
 }
 
-function getProjectDir() {
+export function getProjectDir() {
 	if (cachedProjectDir !== "") {
 		return cachedProjectDir;
 	}
@@ -60,7 +61,7 @@ function getProjectDir() {
 	return cachedProjectDir;
 }
 
-function getTempDir() {
+export function getTempDir() {
 	var dir = path.join(getProjectDir(), ".ice");
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
@@ -77,7 +78,7 @@ function getProjectRelativePath(fullPath) {
 	return fullPath.substring(projectDir.length);
 }
 
-function enumerateProjectFiles(excludedProjectDirsAndFiles?) {
+export function enumerateProjectFiles(excludedProjectDirsAndFiles?) {
 	if (!excludedProjectDirsAndFiles) {
 		excludedProjectDirsAndFiles = [".ice"];
 	}
@@ -267,11 +268,11 @@ function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Ser
 	}).future<Server.IPackageDef[]>()();
 }
 
-function buildCommand(platform, configuration) {
+export function buildCommand(platform, configuration) {
 	build(platform, configuration, true, options.download);
 }
 
-function deployToIon() {
+export function deployToIon() {
 	log.info("Deploying to Ion");
 
 	importProject().wait();
@@ -289,7 +290,7 @@ function deployToIon() {
 	}]);
 }
 
-function deployToDevice(platform, configuration) {
+export function deployToDevice(platform, configuration) {
 	devicesService.hasDevices(platform)
 		.then(function(hasDevices) {
 			if (hasDevices) {
@@ -328,7 +329,7 @@ function processDeployToDevice(platform, packageFile, provisionedDevices?){
 		.done();
 }
 
-function importProject(): IFuture<void> {
+export function importProject(): IFuture<void> {
 	return (() => {
 		var projectDir = getProjectDir();
 		if (!projectDir) {
@@ -344,7 +345,7 @@ function importProject(): IFuture<void> {
 	}).future<void>()();
 }
 
-function saveProject(callback?) {
+export function saveProject(callback?) {
 	fs.writeFile(path.join(getProjectDir(), config.PROJECT_FILE_NAME), JSON.stringify(projectData, null, "\t"), function(err) {
 		if (callback) {
 			callback(err);
@@ -359,7 +360,7 @@ function getProjectData() {
 	return projectData;
 }
 
-function createNewProject(projectName) {
+export function createNewProject(projectName) {
 	var projectDir = getNewProjectDir();
 
 	if (projectName === undefined) {
@@ -433,7 +434,7 @@ function getNewProjectDir() {
 	return options.path || process.cwd();
 }
 
-function createProjectFile(projectDir, projectName, properties) {
+export function createProjectFile(projectDir, projectName, properties) {
 	return helpers.makeDirIfNotAvailable(projectDir)
 		.then(function() {
 			return helpers.isEmptyDir(projectDir);
@@ -492,7 +493,7 @@ function generateProjectGuid() {
 	/* jshint +W016 */
 }
 
-function isProjectFileExcluded(projectDir, filePath, excludedDirsAndFiles) {
+export function isProjectFileExcluded(projectDir, filePath, excludedDirsAndFiles) {
 	var relativeToProjectPath = filePath.substr(projectDir.length + 1);
 	var lowerCasePath = relativeToProjectPath.toLowerCase();
 	for (var key in excludedDirsAndFiles) {
@@ -515,7 +516,7 @@ function normalizePropertyName(property) {
 	return propLookup[property.toLowerCase()] || property;
 }
 
-function updateProjectProperty(projectData:any, mode:string, property:string, newValue:any) {
+export function updateProjectProperty(projectData:any, mode:string, property:string, newValue:any) {
 	property = normalizePropertyName(property);
 	var propSchema = helpers.getProjectFileSchema();
 	var propData = propSchema[property];
@@ -603,7 +604,7 @@ function updateProjectPropertyAndSave(mode, args) {
 	saveProject();
 }
 
-function setProjectProperty() {
+export function setProjectProperty() {
 	var args = _.toArray(arguments),
 		property = args[0];
 
@@ -614,15 +615,15 @@ function setProjectProperty() {
 	updateProjectPropertyAndSave("set", _.toArray(arguments));
 }
 
-function addProjectProperty() {
+export function addProjectProperty() {
 	updateProjectPropertyAndSave("add", _.toArray(arguments));
 }
 
-function delProjectProperty() {
+export function delProjectProperty() {
 	updateProjectPropertyAndSave("del", _.toArray(arguments));
 }
 
-function printProjectProperty(property) {
+export function printProjectProperty(property) {
 	ensureProject();
 	property = normalizePropertyName(property);
 
@@ -655,7 +656,7 @@ function printProjectSchemaHelp() {
 	});
 }
 
-function ensureProject() {
+export function ensureProject() {
 	if (!projectData) {
 		helpers.abort("Not in a project folder.");
 	}
@@ -670,21 +671,4 @@ if (getProjectDir()) {
 	}
 }
 
-exports.hasProject = hasProject;
-exports.getProjectDir = getProjectDir;
 exports.project = projectData;
-exports.buildCommand = buildCommand;
-exports.saveProject = saveProject;
-exports.importProject = importProject;
-exports.deployToIon = deployToIon;
-exports.deployToDevice = deployToDevice;
-exports.createNewProject = createNewProject;
-exports.enumerateProjectFiles = enumerateProjectFiles;
-exports.isProjectFileExcluded = isProjectFileExcluded;
-exports.updateProjectProperty = updateProjectProperty;
-exports.setProjectProperty = setProjectProperty;
-exports.addProjectProperty = addProjectProperty;
-exports.delProjectProperty = delProjectProperty;
-exports.printProjectProperty = printProjectProperty;
-exports.ensureProject = ensureProject;
-exports.createProjectFile = createProjectFile;

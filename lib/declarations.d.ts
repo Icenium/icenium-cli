@@ -17,7 +17,8 @@ declare module Server {
 	}
 
 	interface IHttpClient {
-		httpRequest(options): IFuture<IResponse>;
+		httpRequest(url:string): IFuture<IResponse>;
+		httpRequest(options:any): IFuture<IResponse>;
 	}
 
 	interface IServiceContractClientCode {
@@ -92,4 +93,30 @@ declare module Project {
 		packageDefs: Server.IPackageDef[];
 		provisionType?: string;
 	}
+}
+
+interface IFileSystem {
+	exists(path: string): IFuture<boolean>;
+	deleteFile(path: string): IFuture<void>;
+	getFileSize(path: string): IFuture<number>;
+	futureFromEvent(eventEmitter: any, event: string): IFuture<any>;
+	createDirectory(path: string): IFuture<void>;
+	readFile(filename: string): IFuture<NodeBuffer>;
+	readText(filename: string, encoding?: string): IFuture<string>;
+	readJson(filename: string, encoding?: string): IFuture<any>;
+	writeFile(filename: string, data: any, encoding?: string): IFuture<void>;
+	writeJson(filename: string, data: any, encoding?: string): IFuture<void>;
+
+	createReadStream(path: string, options?: {
+		flags?: string;
+		encoding?: string;
+		fd?: string;
+		mode?: number;
+		bufferSize?: number;
+	}): any;
+	createWriteStream(path: string, options?: {
+		flags?: string;
+		encoding?: string;
+		string?: string;
+	}): any;
 }
