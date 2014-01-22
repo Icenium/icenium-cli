@@ -31,9 +31,7 @@
     "ref-struct": "0.0.5",
     "watchr": "2.4.4",
     "valid-url": "1.0.9",
-    "request": "2.29.0",
     "node-uuid": "1.4.1",
-    "fstream": "0.1.25",
     "q": "0.9.7",
     "underscore": "1.5.2",
     "q-io": "1.10.6",
@@ -43,7 +41,8 @@
     "bufferpack": "0.0.6",
     "binary-reader": "0.1.0",
     "hex": "0.0.1",
-    "fibers": "1.0.1"
+    "fibers": "1.0.1",
+    "mkdirp": "0.3.5"
   },
   "analyze": true,
   "devDependencies": {

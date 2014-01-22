@@ -23,6 +23,7 @@
 /// <reference path="definitions/yok.d.ts" />
 /// <reference path="devices-service.ts" />
 /// <reference path="extensions.ts" />
+/// <reference path="file-system.ts" />
 /// <reference path="helpers.ts" />
 /// <reference path="http-server.ts" />
 /// <reference path="ice-cli.ts" />
