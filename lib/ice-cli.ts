@@ -28,13 +28,7 @@ import Fiber = require("fibers");
 	};
 
 	function dispatchCommandInFiber() {
-		Fiber(() => {
-			try {
-				dispatchCommand();
-			} catch(e) {
-				console.log(e);
-			}
-		}).run();
+		Fiber(dispatchCommand).run();
 	}
 
 	function dispatchCommand() {

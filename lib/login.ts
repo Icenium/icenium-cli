@@ -219,7 +219,7 @@ class LoginCommand implements Commands.ICommand<any> {
 	}
 
 	execute(data:any):void {
-		this.$loginManager.login();
+		this.$loginManager.login().wait();
 	}
 }
 $injector.registerCommand("login", LoginCommand);
@@ -237,7 +237,7 @@ class LogoutCommand implements Commands.ICommand<any> {
 	}
 
 	execute(data:any):void {
-		this.$loginManager.logout();
+		this.$loginManager.logout().wait();
 	}
 }
 $injector.registerCommand("logout", LogoutCommand);
@@ -259,7 +259,7 @@ class TelerikLoginCommand implements Commands.ICommand<TelerikLoginCommandData> 
 	}
 
 	execute(data:TelerikLoginCommandData):void {
-		this.$loginManager.basicLogin(data.user, data.password);
+		this.$loginManager.basicLogin(data.user, data.password).wait();
 	}
 }
 $injector.registerCommand("telerik-login", TelerikLoginCommand);

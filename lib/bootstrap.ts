@@ -34,4 +34,4 @@ $injector.require("identityManager", "./identity");
 $injector.requireCommand("list-certificates", "./commands/identity");
 $injector.requireCommand("list-provisions", "./commands/identity");
 
-$injector.require("buildService", "./project")
+$injector.require("buildService", "./project");

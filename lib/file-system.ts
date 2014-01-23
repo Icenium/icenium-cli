@@ -20,7 +20,11 @@ export class FileSystem implements IFileSystem {
 	public deleteFile(path: string): IFuture<void> {
 		var future = new Future<void>();
 		fs.unlink(path, function(err) {
-			future.return(); // ignore error;
+			if (err && err.code !== "ENOENT") {  // ignore "file doesn't exist" error
+				future.throw(err);
+			} else {
+				future.return();
+			}
 		})
 		return future;
 	}
