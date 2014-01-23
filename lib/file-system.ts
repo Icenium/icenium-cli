@@ -63,6 +63,10 @@ export class FileSystem implements IFileSystem {
 		return future;
 	}
 
+	public readDirectory(path: string): IFuture<string[]> {
+		return Future.wrap(fs.readdir)(path);
+	}
+
 	public readFile(filename: string): IFuture<NodeBuffer> {
 		return <IFuture<NodeBuffer>> this._readFile(filename);
 	}
