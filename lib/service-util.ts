@@ -5,20 +5,129 @@
 import config = require("./config");
 import util = require("util");
 import Future = require("fibers/future");
+import cookielib = require("cookie");
+import Url = require("url");
+import helpers = require("./helpers");
 var _ = <UnderscoreStatic> require("underscore");
+
+export class HttpClient implements Server.IHttpClient {
+	constructor(private $logger: ILogger) {}
+
+	httpRequest(options): IFuture<Server.IResponse> {
+		if (_.isString(options)) {
+			options = {
+				url: options,
+				method: "GET"
+			}
+		}
+
+		if (options.url) {
+			var urlParts = Url.parse(options.url);
+			if (urlParts.protocol) {
+				options.proto = urlParts.protocol.slice(0, -1);
+			}
+			options.host = urlParts.hostname;
+			options.port = urlParts.port;
+			options.path = urlParts.path;
+			delete options.url;
+		}
+
+		var requestProto =  options.proto || "http";
+		delete options.proto;
+		var body = options.body;
+		delete options.body;
+		var pipeTo = options.pipeTo;
+		delete options.pipeTo;
+
+		var proto = config.PROXY_TO_FIDDLER ? "http" : requestProto;
+		var http = require(proto);
+
+		options.headers = options.headers || {};
+
+		if (config.PROXY_TO_FIDDLER) {
+			options.path = requestProto + "://" + options.host + options.path;
+			options.headers.Host = options.host;
+			options.host = "127.0.0.1";
+			options.port = 8888;
+		}
+
+		var result = new Future<Server.IResponse>();
+
+		var request = http.request(options, (response) => {
+			var data = "";
+
+			var callback = function(responseResult: Server.IResponse) {
+				if (responseResult.error) {
+					result.throw(responseResult.error);
+				} else {
+					result.return(responseResult);
+				}
+			}
+
+			if (!pipeTo) {
+				response.on("data", (chunk) => {
+					this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
+					data += chunk;
+				});
+			}
+
+			if (pipeTo) {
+				pipeTo.on("finish", () => {
+					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
+					callback({
+						response: response,
+						headers: response.headers
+					});
+				});
+				response.on("end", () => {
+					pipeTo.end();
+				});
+
+				response.pipe(pipeTo);
+			} else {
+				response.on("end", () => {
+					this.$logger.trace("httpRequest: Done. code = %d", response.statusCode);
+					callback({
+						body: data,
+						response: response,
+						headers: response.headers,
+						error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
+					});
+				});
+			}
+		});
+
+		this.$logger.trace("httpRequest: Sending:\n%s", body);
+
+		if (!body || !body.pipe) {
+			request.end(body);
+		} else {
+			body.pipe(request);
+		}
+
+		return result;
+	}
+}
+$injector.register("httpClient", HttpClient);
 
 //TODO: append " implements Server.IServiceProxy" when the bug in the TypeScript compiler that prevents it is fixed.
 export class ServiceProxy {
+	private lastCallCookies: any;
+	private shouldAuthenticate: boolean = true;
+
 	constructor(private $httpClient: Server.IHttpClient,
-		private $loginManager: ILoginManager,
+		private $userDataStore: IUserDataStore,
 		private $logger: ILogger) {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
 		var headers: any = {
-			"X-Icenium-SolutionSpace": config.SOLUTION_SPACE_NAME,
-			"Cookie": ".ASPXAUTH=" + this.$loginManager.getCookie()
+			"X-Icenium-SolutionSpace": config.SOLUTION_SPACE_NAME
 		};
+
+		if (this.shouldAuthenticate) {
+			headers.Cookie = ".ASPXAUTH=" + this.$userDataStore.getCookie().wait();
+		}
 
 		if (accept) {
 			headers.Accept = accept;
@@ -50,6 +159,16 @@ export class ServiceProxy {
 			if (response.error) {
 				result.throw(response.error);
 			} else {
+				var newCookies = response.headers["set-cookie"];
+
+				if (newCookies) {
+					this.lastCallCookies = {};
+					newCookies.forEach((cookieStr: string) => {
+						var parsed = cookielib.parse(cookieStr);
+						Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
+					});
+				}
+
 				if (accept === "application/json") {
 					result.return(JSON.parse(response.body));
 				} else {
@@ -59,6 +178,14 @@ export class ServiceProxy {
 		});
 
 		return result;
+	}
+
+	public getLastRequestCookies(): any {
+		return this.lastCallCookies;
+	}
+
+	public setShouldAuthenticate(shouldAuthenticate: boolean): void {
+		this.shouldAuthenticate = shouldAuthenticate;
 	}
 }
 $injector.register("serviceProxy", ServiceProxy);

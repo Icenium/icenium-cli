@@ -14,6 +14,8 @@ declare module Server {
 
 	interface IServiceProxy {
 		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream): IFuture<T>;
+		getLastRequestCookies(): any;
+		setShouldAuthenticate(shouldAuthenticate: boolean): void;
 	}
 
 	interface IHttpClient {
@@ -55,8 +57,17 @@ declare module Server {
 	}
 }
 
+interface IUserDataStore {
+	getCookie(): IFuture<string>;
+	getUser(): IFuture<any>;
+	setCookie(cookie: string): IFuture<void>;
+	setUser(user: any): IFuture<void>;
+}
+
 interface ILoginManager {
-	getCookie(): string;
+	basicLogin(userName: string, password: string): IFuture<void>;
+	login(): IFuture<void>;
+	logout(): IFuture<void>;
 }
 
 declare module Server.Contract {
@@ -92,6 +103,11 @@ declare module Project {
 		buildProperties: any;
 		packageDefs: Server.IPackageDef[];
 		provisionType?: string;
+	}
+
+	interface IBuildService {
+		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
+		buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult>;
 	}
 }
 

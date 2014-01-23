@@ -59,6 +59,24 @@ function annotate(fn) {
 var _ = <UnderscoreStatic> require("underscore");
 var util = require("util");
 
+
+var indent = "";
+function trace(formatStr: string, ...args: any[]) {
+	formatStr = indent + formatStr;
+	args.unshift(formatStr);
+
+	// uncomment following line when debugging dependency injection
+	//console.log(util.format.apply(null, args));
+}
+
+function pushIndent() {
+	indent += "  ";
+}
+
+function popIndent() {
+	indent = indent.slice(0, -2);
+}
+
 export interface IDependency {
 	require?: string;
 	resolver?: () => any;
@@ -70,6 +88,8 @@ export class Yok implements IInjector {
 	private modules: {
 		[name: string]: IDependency;
 	} = {};
+
+	private resolutionProgress: any = {};
 
 	public requireCommand(name: string, file: string) {
 		this.require(this.createCommandName(name), file);
@@ -87,6 +107,8 @@ export class Yok implements IInjector {
 	}
 
 	public register(name: string, resolver: any): void {
+		trace("registered '%s'", name);
+
 		var dependency = this.modules[name] || {};
 
 		if (_.isFunction(resolver)) {
@@ -131,18 +153,33 @@ export class Yok implements IInjector {
 		if (name[0] === "$") {
 			name = name.substr(1);
 		}
-		var dependency = this.resolveDependency(name);
 
-		if (!dependency) {
-			throw new Error("unable to resolve " + name);
+		if (this.resolutionProgress[name]) {
+			throw new Error(util.format("cyclic dependency detected on dependency '%s'", name));
 		}
+		this.resolutionProgress[name] = true;
 
-		if (!dependency.instance) {
-			if (!dependency.resolver) {
-				throw new Error("no resolver registered for " + name);
+		trace("resolving '%s'", name);
+		pushIndent();
+
+		try {
+			var dependency = this.resolveDependency(name);
+
+			if (!dependency) {
+				throw new Error("unable to resolve " + name);
 			}
 
-			dependency.instance = this.resolveConstructor(dependency.resolver);
+			if (!dependency.instance) {
+				if (!dependency.resolver) {
+					throw new Error("no resolver registered for " + name);
+				}
+
+				dependency.instance = this.resolveConstructor(dependency.resolver);
+			}
+		}
+		finally {
+			popIndent();
+			delete this.resolutionProgress[name];
 		}
 
 		return dependency.instance;

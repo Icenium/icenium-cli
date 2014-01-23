@@ -9,11 +9,8 @@ import Fiber = require("fibers");
 	var options = require("./options");
 
 	var commands = {
-		"login": makeCommand("login", "loginCommand"),
-		"logout": makeCommand("login", "logoutCommand"),
 		"config-reset": makeCommand("config", "reset"),
 		"config-apply": makeCommand("config", "apply"),
-		"telerik-login": makeCommand("login", "telerikLogin"),
 		"build": makeCommand("project", "buildCommand"),
 		"prop-set": makeCommand("project", "setProjectProperty"),
 		"prop-add": makeCommand("project", "addProjectProperty"),
@@ -31,7 +28,13 @@ import Fiber = require("fibers");
 	};
 
 	function dispatchCommandInFiber() {
-		Fiber(() => dispatchCommand()).run();
+		Fiber(() => {
+			try {
+				dispatchCommand();
+			} catch(e) {
+				console.log(e);
+			}
+		}).run();
 	}
 
 	function dispatchCommand() {

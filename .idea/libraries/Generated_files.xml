@@ -5,6 +5,7 @@
         <item url="file://$PROJECT_DIR$/lib/log.js" />
         <item url="file://$PROJECT_DIR$/lib/helpers.js" />
         <item url="file://$PROJECT_DIR$/lib/config.js" />
+        <item url="file://$PROJECT_DIR$/test/mocks.js" />
         <item url="file://$PROJECT_DIR$/lib/extensions.js" />
         <item url="file://$PROJECT_DIR$/test/helpers.js" />
         <item url="file://$PROJECT_DIR$/lib/devices-service.js" />
@@ -12,7 +13,6 @@
         <item url="file://$PROJECT_DIR$/node_modules/grunt-ts/tasks/ts.js" />
         <item url="file://$PROJECT_DIR$/node_modules/grunt-ts/tasks/scratch.js" />
         <item url="file://$PROJECT_DIR$/lib/sync-service.js" />
-        <item url="file://$PROJECT_DIR$/lib/server.js" />
         <item url="file://$PROJECT_DIR$/lib/signing-identity/cryptographic-identity.js" />
         <item url="file://$PROJECT_DIR$/lib/signing-identity/provision.js" />
         <item url="file://$PROJECT_DIR$/lib/options.js" />
@@ -31,6 +31,7 @@
         <item url="file://$PROJECT_DIR$/lib/http-server.js" />
         <item url="file://$PROJECT_DIR$/lib/platforms/app-notifications.js" />
         <item url="file://$PROJECT_DIR$/lib/platforms/android.js" />
+        <item url="file://$PROJECT_DIR$/test/stubs.js" />
         <item url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/mobile-device.js" />
         <item url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/plist-service.js" />
         <item url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/ios-core.js" />
@@ -53,7 +54,6 @@
         <item url="file://$PROJECT_DIR$/lib/validators/ios-deployment-validator.js" />
         <item url="file://$PROJECT_DIR$/lib/validators/project-name-validator.js" />
         <item url="file://$PROJECT_DIR$/lib/validators/validation-result.js" />
-        <item url="file://$PROJECT_DIR$/lib/user.js" />
         <item url="file://$PROJECT_DIR$/lib/identity.js" />
       </sourceFilesUrls>
     </properties>
@@ -66,9 +66,14 @@
       <root url="file://$PROJECT_DIR$/lib/commands/login.js" />
       <root url="file://$PROJECT_DIR$/test/sample.js" />
       <root url="file://$PROJECT_DIR$/test/server.js" />
+      <root url="file://$PROJECT_DIR$/lib/server.js" />
+      <root url="file://$PROJECT_DIR$/lib/user.js" />
+      <root url="file://$PROJECT_DIR$/lib/server.js" />
+      <root url="file://$PROJECT_DIR$/lib/user.js" />
       <root url="file://$PROJECT_DIR$/lib/log.js" />
       <root url="file://$PROJECT_DIR$/lib/helpers.js" />
       <root url="file://$PROJECT_DIR$/lib/help.js" />
+      <root url="file://$PROJECT_DIR$/test/mocks.js" />
       <root url="file://$PROJECT_DIR$/lib/config.js" />
       <root url="file://$PROJECT_DIR$/lib/extensions.js" />
       <root url="file://$PROJECT_DIR$/lib/devices-service.js" />
@@ -77,7 +82,6 @@
       <root url="file://$PROJECT_DIR$/node_modules/grunt-ts/tasks/ts.js" />
       <root url="file://$PROJECT_DIR$/lib/sync-service.js" />
       <root url="file://$PROJECT_DIR$/node_modules/grunt-ts/tasks/scratch.js" />
-      <root url="file://$PROJECT_DIR$/lib/server.js" />
       <root url="file://$PROJECT_DIR$/lib/signing-identity/cryptographic-identity.js" />
       <root url="file://$PROJECT_DIR$/lib/signing-identity/provision.js" />
       <root url="file://$PROJECT_DIR$/lib/signing-identity/cryptographic-identity-store-service.js" />
@@ -97,6 +101,7 @@
       <root url="file://$PROJECT_DIR$/lib/http-server.js" />
       <root url="file://$PROJECT_DIR$/lib/platforms/app-notifications.js" />
       <root url="file://$PROJECT_DIR$/lib/platforms/android.js" />
+      <root url="file://$PROJECT_DIR$/test/stubs.js" />
       <root url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/mobile-device.js" />
       <root url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/plist-service.js" />
       <root url="file://$PROJECT_DIR$/lib/platforms/ios/ios-core/ios-core.js" />
@@ -119,7 +124,6 @@
       <root url="file://$PROJECT_DIR$/lib/validators/ios-deployment-validator.js" />
       <root url="file://$PROJECT_DIR$/lib/validators/project-name-validator.js" />
       <root url="file://$PROJECT_DIR$/lib/validators/validation-result.js" />
-      <root url="file://$PROJECT_DIR$/lib/user.js" />
       <root url="file://$PROJECT_DIR$/lib/identity.js" />
     </CLASSES>
     <SOURCES />
