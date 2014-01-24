@@ -3,9 +3,75 @@
 "use strict";
 
 var assert = require("chai").assert;
+import fs = require("fs");
+import path = require("path");
+import temp = require("temp");
+temp.track();
 
 describe("project", function() {
 	var project = require("./../lib/project");
+
+	before(function (done) {
+		$injector.require("fs", "./file-system");
+		done();
+	});
+
+	describe("createNewProject", function () {
+		it("creates a valid project folder", function () {
+			var options: any = require("./../lib/options");
+			var tempFolder = temp.mkdirSync("template");
+			var projectName = "Test";
+
+			options.path = tempFolder;
+			options.template = "Blank";
+			options.appid = "com.telerik.Test";
+
+			project.createNewProject(projectName);
+
+			var iceproject = fs.readFileSync(path.join(tempFolder, projectName, ".iceproject"));
+			var correctIceProject = fs.readFileSync(path.join(__dirname, "/resources/blank.iceproject"));
+			var testProperties = JSON.parse(iceproject.toString());
+			var correctProperties = JSON.parse(correctIceProject.toString());
+
+			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
+			for (var key in testProperties) {
+				if (key != "ProjectGuid") {
+					assert.deepEqual(testProperties[key], correctProperties[key]);
+				}
+			}
+		});
+	});
+
+	describe("createTemplateFolder", function () {
+		it("creates project folder when folder with that name doesn't exists", function () {
+			var tempFolder = temp.mkdirSync("template");
+			var projectName = "Test";
+			var projectFolder = path.join(tempFolder, projectName);
+
+			project.createTemplateFolder(projectFolder).wait();
+			assert.isTrue(fs.existsSync(projectFolder));
+		});
+
+		it("doesn't fail when folder with that name exists and it's empty", function () {
+			var tempFolder = temp.mkdirSync("template");
+			var projectName = "Test";
+			var projectFolder = path.join(tempFolder, projectName);
+
+			fs.mkdirSync(projectFolder);
+			project.createTemplateFolder(projectFolder).wait();
+			assert.isTrue(fs.existsSync(projectFolder));
+		});
+
+		it("fails when project folder is not empty", function () {
+			var tempFolder = temp.mkdirSync("template");
+			var projectName = "Test";
+			var projectFolder = path.join(tempFolder, projectName);
+
+			fs.mkdirSync(projectFolder);
+			fs.openSync(path.join(projectFolder, "temp"), "a", "0666");
+			assert.throws(function () { project.createTemplateFolder(projectFolder).wait(); });
+		});
+	});
 
 	describe("updateProjectProperty", function() {
 		it("sets unconstrained string property", function() {

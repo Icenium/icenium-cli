@@ -396,7 +396,7 @@ function processDeployToDevice(platform, packageFile, provisionedDevices?){
 	var packageName = getProjectData().AppIdentifier;
 	devicesService.deploy(platform, packageFile, packageName, provisionedDevices)
 		.then(function () {
-			console.log(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
+			log.info(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
 		})
 		.catch(function (error) {
 			log.trace(error);
@@ -421,9 +421,9 @@ export function importProject(): IFuture<void> {
 }
 
 export function saveProject(callback?) {
-	fs.writeFile(path.join(getProjectDir(), config.PROJECT_FILE_NAME), JSON.stringify(projectData, null, "\t"), function(err) {
+	fs.writeFile(path.join(getProjectDir(), config.PROJECT_FILE_NAME), JSON.stringify(projectData, null, "\t"), function(err, data) {
 		if (callback) {
-			callback(err);
+			callback(err, data);
 		} else if (err) {
 			throw err;
 		}
@@ -480,11 +480,12 @@ function createFromTemplate(appname, projectDir) {
 	templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
 	if (getFs().exists(templateFileName).wait()) {
 		try {
-			createTemplateFolder(templateFileName, projectDir).wait();
+			createTemplateFolder(projectDir).wait();
+			extractTemplate(templateFileName, projectDir).wait();
 			var properties = getProjectProperties(projectDir, appname).wait();
 			createProjectFile(projectDir, properties).wait();
 			removeExtraFiles(projectDir).wait();
-			console.log(util.format("%s has been successfully created.", appname));
+			log.info(util.format("%s has been successfully created.", appname));
 		}
 		catch(error) {
 			log.fatal(error.message);
@@ -560,19 +561,19 @@ export function createProjectFile(projectDir, properties): IFuture<any> {
 		projectData.FrameworkVersion = properties.FrameworkVersion;
 		projectData.iOSStatusBarStyle = properties.iOSStatusBarStyle;
 		projectData.AndroidPermissions = properties.AndroidPermissions;
-		saveProject();
+		Future.wrap(saveProject)().wait();
 	}).future<any>()();
 }
 
-export function createTemplateFolder(templateFileName, projectDir): IFuture<any> {
-	var $fs = getFs();
-	$fs.createDirectory(projectDir).wait();
-	var projectDirFiles = $fs.readDirectory(projectDir).wait();
-	if (projectDirFiles.length != 0) {
-		throw new Error("The specified directory must be empty to create a new project.");
-	}
-
-	return extractTemplate(templateFileName, projectDir);
+export function createTemplateFolder(projectDir): IFuture<any> {
+	return ((): any => {
+		var $fs = getFs();
+		$fs.createDirectory(projectDir).wait();
+		var projectDirFiles = $fs.readDirectory(projectDir).wait();
+		if (projectDirFiles.length != 0) {
+			throw new Error("The specified directory must be empty to create a new project.");
+		}
+	}).future<any>()();
 }
 
 function extractTemplate(templateFileName, projectDir: string): IFuture<any> {
@@ -702,7 +703,7 @@ function updateProjectPropertyAndSave(mode, args) {
 	ensureProject();
 
 	updateProjectProperty(projectData, mode, args[0], _.rest(args, 1));
-	saveProject();
+	Future.wrap(saveProject)().wait();
 }
 
 export function setProjectProperty() {
