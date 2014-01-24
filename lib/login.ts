@@ -117,7 +117,7 @@ export class LoginManager implements ILoginManager {
 
 	private authenticate(loginData: any): IFuture<any> {
 		return ((): any => {
-			loginData.wrap_client_id = "uri:ice";
+			loginData.wrap_client_id = this.$config.WRAP_CLIENT_ID;
 
 			var wrapResponse = this.$httpClient.httpRequest({
 				proto: "https",
@@ -165,7 +165,7 @@ export class LoginManager implements ILoginManager {
 
 		var loginConfig:any = {
 			tfisServer: "https://" + this.$config.TFIS_SERVER,
-			clientId: "uri:ice",
+			clientId: this.$config.WRAP_CLIENT_ID,
 			callbackUrl: util.format("%s://%s/Mist/Authentication/RedirectVerification", this.$config.ICE_SERVER_PROTO, this.$config.ICE_SERVER)
 		};
 
