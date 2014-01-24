@@ -141,13 +141,13 @@ export class LoginManager implements ILoginManager {
 			var iceAuthCookie = cookies && cookies[".ASPXAUTH"];
 			this.$logger.debug("Cookie is '%s'", iceAuthCookie);
 
-			if (!iceAuthCookie || !userData) {
-				throw new Error("Login failed.");
-			} else {
-				Future.wait([
+			if (iceAuthCookie && userData) {
+				Future.wait(
 					this.$userDataStore.setCookie(iceAuthCookie),
 					this.$userDataStore.setUser(userData)
-					]);
+				);
+			} else {
+				throw new Error("Login failed.");
 			}
 
 			return userData;
