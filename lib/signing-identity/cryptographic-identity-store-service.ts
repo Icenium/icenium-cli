@@ -2,8 +2,6 @@
 
 "use strict";
 
-import server = require("./../server");
-import Q = require("q");
 import _ = require("underscore");
 import CryptographicIdentity = require("./cryptographic-identity");
 import Provision = require("./provision");

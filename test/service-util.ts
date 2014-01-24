@@ -3,7 +3,29 @@
 import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
+import stubs = require("./stubs");
 var assert:chai.Assert = chai.assert;
+
+$injector.register("logger", stubs.LoggerStub);
+
+class MockUserDataStore implements IUserDataStore {
+	getCookie():IFuture<string> {
+		return (() => "dummy").future<string>()();
+	}
+
+	getUser():IFuture<any> {
+		return undefined;
+	}
+
+	setCookie(cookie:string):IFuture<void> {
+		return undefined;
+	}
+
+	setUser(user):IFuture<void> {
+		return undefined;
+	}
+}
+$injector.register("userDataStore", MockUserDataStore);
 
 class MockHttpClient implements Server.IHttpClient {
 	public options: any;
@@ -24,17 +46,10 @@ class MockHttpClient implements Server.IHttpClient {
 	}
 }
 
+
 var httpClient = new MockHttpClient();
 
 $injector.register("httpClient", httpClient);
-
-class MockLoginManager implements ILoginManager {
-	getCookie():string {
-		return "dummy";
-	}
-}
-
-$injector.register("loginManager", new MockLoginManager());
 
 function makeProxy(): Server.IServiceProxy {
 	return <Server.IServiceProxy> $injector.resolve(ServiceUtil.ServiceProxy);

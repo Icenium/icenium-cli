@@ -34,7 +34,7 @@ export function createServer(configuration): http.Server {
 	});
 }
 
-export function serveFile(fileName) {
+export function serveFile(fileName): (request, response) => void {
 	return function(request, response) {
 		var mimeTypes = {
 			".html": "text/html",

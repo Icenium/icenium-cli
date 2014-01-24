@@ -7,7 +7,6 @@ import Future = require("fibers/future");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class FileSystem implements IFileSystem {
-	private _unlink = Future.wrap<void>(fs.unlink);
 	private _stat = Future.wrap(fs.stat);
 	private _readFile = Future.wrap(fs.readFile);
 	private _writeFile = Future.wrap<void>(fs.writeFile);
@@ -19,7 +18,15 @@ export class FileSystem implements IFileSystem {
 	}
 
 	public deleteFile(path: string): IFuture<void> {
-		return this._unlink(path);
+		var future = new Future<void>();
+		fs.unlink(path, function(err) {
+			if (err && err.code !== "ENOENT") {  // ignore "file doesn't exist" error
+				future.throw(err);
+			} else {
+				future.return();
+			}
+		})
+		return future;
 	}
 
 	public getFileSize(path: string): IFuture<number> {

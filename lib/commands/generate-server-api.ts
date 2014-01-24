@@ -22,8 +22,8 @@ export class GenerateServerApiCommand implements Commands.ICommand<any> {
 
 	execute(data: any):void {
 		var result = this.$serviceContractGenerator.generate();
-		fs.writeFileSync(path.join(__dirname, "../service-proxy.d.ts"), result.interfaceFile);
-		fs.writeFileSync(path.join(__dirname, "../service-proxy.ts"), result.implementationFile);
+		fs.writeFileSync(path.join(__dirname, "../server-api.d.ts"), result.interfaceFile);
+		fs.writeFileSync(path.join(__dirname, "../server-api.ts"), result.implementationFile);
 	}
 }
 

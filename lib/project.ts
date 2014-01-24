@@ -12,7 +12,6 @@ var options:any = require("./options");
 import log = require("./logger");
 import util = require("util");
 import helpers = require("./helpers");
-import server = require("./server");
 import querystring = require("querystring");
 import xopen = require("open");
 import devicesService = require("./devices-service");
@@ -20,6 +19,73 @@ import Q = require("q");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import projectNameValidator = require("./validators/project-name-validator");
+
+export class BuildService implements Project.IBuildService {
+	constructor(private $server: Server.IServer) {}
+
+	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
+		return ((): string => {
+			urlKind = urlKind.toLowerCase();
+			if (urlKind !== "manifest" && urlKind !== "package") {
+				throw new Error("urlKind must be either 'manifest' or 'package'");
+			}
+
+			var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+				config.ICE_SERVER_PROTO,
+				config.ICE_SERVER, urlKind,
+				querystring.escape(querystring.escape(filesystemPath)),
+				querystring.escape(querystring.escape(liveSyncToken)));
+			log.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
+
+			var url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
+			if (urlKind === "manifest") {
+				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
+			}
+
+			log.debug("Device install URL '%s'", url);
+
+			return url;
+		}).future<string>()();
+	}
+
+	public buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult> {
+		return ((): Server.IBuildResult => {
+			log.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+
+			projectNameValidator.validateNameAndLogErrorMessage(projectName);
+
+			this.$server.projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
+
+			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
+
+			buildProperties.LiveSyncToken = liveSyncToken;
+
+			var body = this.$server.build.buildProject(solutionName, projectName, {Properties: buildProperties}).wait();
+
+			if (body.Errors.length) {
+				log.error("Build errors: %s", body.Errors);
+			}
+
+			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map(function(buildResult) {
+				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
+				var solutionPath = util.format("%s/%s", projectName, fullPath);
+
+				return {
+					platform: buildResult.Platform,
+					solution: solutionName,
+					solutionPath: solutionPath,
+					relativePath: buildResult.FullPath
+				};
+			});
+
+			return {
+				buildResults: buildResults,
+				output: body.Output
+			};
+		}).future<Server.IBuildResult>()();
+	}
+}
+$injector.register("buildService", BuildService);
 
 var cachedProjectDir = "";
 
@@ -186,7 +252,8 @@ function beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
 			}
 		});
 
-		var result = server.buildProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, buildProperties).wait();
+		var $buildService: Project.IBuildService = $injector.resolve("buildService");
+		var result = $buildService.buildProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 		if (result.output) {
 			var buildLogFilePath = path.join(getTempDir(), "build.log");
@@ -251,7 +318,8 @@ function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Ser
 		if (showQrCodes && packageDefs.length) {
 			var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
 			packageDefs.forEach(function(def:any) {
-				var liveSyncUrl = server.getLiveSyncUrl(urlKind, <string> def.relativePath, <string> buildResult.buildProperties.LiveSyncToken).wait();
+				var $buildService: Project.IBuildService = $injector.resolve("buildService");
+				var liveSyncUrl = $buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
 				def.qrUrl = helpers.createQrUrl(liveSyncUrl);
 
 				log.debug("QR URL is '%s'", def.qrUrl);
@@ -263,7 +331,9 @@ function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Ser
 		if (downloadFiles) {
 			packageDefs.forEach((pkg: Server.IPackageDef) => {
 				var targetFileName = path.join(getTempDir(), path.basename(pkg.solutionPath));
-				server.downloadFile(pkg.solution, pkg.solutionPath, targetFileName).wait();
+				log.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
+				var targetFile = fs.createWriteStream(targetFileName);
+				getServer().filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
 				log.info("Download completed: %s", targetFileName);
 				pkg.localFile = targetFileName;
 			});

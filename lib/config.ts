@@ -17,6 +17,7 @@ export var TEMPLATE_NAMES;
 export var CORDOVA_PLUGINS_REGISTRY;
 export var DEFAULT_PROJECT_NAME;
 export var CI_LOGGER;
+export var WRAP_CLIENT_ID;
 
 var qfs = require("q-io/fs"),
 	log = null /*don't log in config.js due to cyclic dependency*/;
