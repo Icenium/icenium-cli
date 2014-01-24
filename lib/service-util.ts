@@ -114,6 +114,7 @@ $injector.register("httpClient", HttpClient);
 export class ServiceProxy {
 	private lastCallCookies: any;
 	private shouldAuthenticate: boolean = true;
+	private solutionSpaceName: string;
 
 	constructor(private $httpClient: Server.IHttpClient,
 		private $userDataStore: IUserDataStore,
@@ -122,7 +123,7 @@ export class ServiceProxy {
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
 		var headers: any = {
-			"X-Icenium-SolutionSpace": config.SOLUTION_SPACE_NAME
+			"X-Icenium-SolutionSpace": this.solutionSpaceName || config.SOLUTION_SPACE_NAME
 		};
 
 		if (this.shouldAuthenticate) {
@@ -186,6 +187,10 @@ export class ServiceProxy {
 
 	public setShouldAuthenticate(shouldAuthenticate: boolean): void {
 		this.shouldAuthenticate = shouldAuthenticate;
+	}
+
+	public setSolutionSpaceName(solutionSpaceName: string): void {
+		this.solutionSpaceName = solutionSpaceName;
 	}
 }
 $injector.register("serviceProxy", ServiceProxy);

@@ -64,7 +64,7 @@ export class CordovaPluginsService {
 	}
 
 	private getPluginsDir() {
-		var project = require("../project");
+		var project: Project.IProject = $injector.resolve("project");
 		return path.join(project.getProjectDir(), "plugins");
 	}
 }

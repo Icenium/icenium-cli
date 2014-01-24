@@ -62,7 +62,7 @@ ProjectNameValidator.prototype.validateName = function(name) {
 	return new ValidationResult(null);
 };
 
-ProjectNameValidator.prototype.validateNameAndLogErrorMessage = function(name) {
+ProjectNameValidator.prototype.validate = function(name) {
 	var projectNameValidationResult = this.validateName(name);
 	if(projectNameValidationResult.Error !== null) {
 		throw projectNameValidationResult.Error;
@@ -82,3 +82,5 @@ function isNullOrWhitespace(input) {
 var projectNameValidator = new ProjectNameValidator;
 
 export = projectNameValidator;
+
+$injector.register("projectNameValidator", projectNameValidator);

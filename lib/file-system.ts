@@ -10,6 +10,7 @@ export class FileSystem implements IFileSystem {
 	private _stat = Future.wrap(fs.stat);
 	private _readFile = Future.wrap(fs.readFile);
 	private _writeFile = Future.wrap<void>(fs.writeFile);
+	private _readdir = Future.wrap(fs.readdir);
 
 	public exists(path: string): IFuture<boolean> {
 		var future = new Future<boolean>();
@@ -71,7 +72,7 @@ export class FileSystem implements IFileSystem {
 	}
 
 	public readDirectory(path: string): IFuture<string[]> {
-		return Future.wrap(fs.readdir)(path);
+		return this._readdir(path);
 	}
 
 	public readFile(filename: string): IFuture<NodeBuffer> {
@@ -93,8 +94,15 @@ export class FileSystem implements IFileSystem {
 		return this._writeFile(filename, data, {encoding: encoding});
 	}
 
-	public writeJson(filename: string, data: any, encoding?: string): IFuture<void> {
-		return this.writeFile(filename, JSON.stringify(data), encoding);
+	public writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void> {
+		return this.writeFile(filename, JSON.stringify(data, null, space), encoding);
+	}
+
+	public copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
+		var source = this.createReadStream(sourceFileName);
+		var target = this.createWriteStream(destinationFileName);
+		source.pipe(target);
+		return this.futureFromEvent(target, "finish");
 	}
 
 	public createReadStream(path: string, options?: {

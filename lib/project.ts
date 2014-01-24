@@ -2,26 +2,25 @@
 
 "use strict";
 
-import fs = require("fs");
 import xml2js = require("xml2js");
 import path = require("path");
 import unzip = require("unzip");
 import _ = require("underscore");
-import config = require("./config");
 var options:any = require("./options");
-import log = require("./logger");
 import util = require("util");
 import helpers = require("./helpers");
 import querystring = require("querystring");
 import xopen = require("open");
 import devicesService = require("./devices-service");
-import Q = require("q");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
-import projectNameValidator = require("./validators/project-name-validator");
+import baseCommands = require("./commands/base-commands");
 
 export class BuildService implements Project.IBuildService {
-	constructor(private $server: Server.IServer) {}
+	constructor(private $config,
+		private $logger: ILogger,
+		private $server: Server.IServer,
+		private $projectNameValidator) {}
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -30,19 +29,20 @@ export class BuildService implements Project.IBuildService {
 				throw new Error("urlKind must be either 'manifest' or 'package'");
 			}
 
+			// escape URLs twice to work around a bug in bit.ly
 			var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
-				config.AB_SERVER_PROTO,
-				config.AB_SERVER, urlKind,
+				this.$config.AB_SERVER_PROTO,
+				this.$config.AB_SERVER, urlKind,
 				querystring.escape(querystring.escape(filesystemPath)),
 				querystring.escape(querystring.escape(liveSyncToken)));
-			log.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
+			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
 			var url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
 			if (urlKind === "manifest") {
 				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
 			}
 
-			log.debug("Device install URL '%s'", url);
+			this.$logger.debug("Device install URL '%s'", url);
 
 			return url;
 		}).future<string>()();
@@ -50,9 +50,9 @@ export class BuildService implements Project.IBuildService {
 
 	public buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult> {
 		return ((): Server.IBuildResult => {
-			log.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 
-			projectNameValidator.validateNameAndLogErrorMessage(projectName);
+			this.$projectNameValidator.validate(projectName);
 
 			this.$server.projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
 
@@ -63,7 +63,7 @@ export class BuildService implements Project.IBuildService {
 			var body = this.$server.build.buildProject(solutionName, projectName, {Properties: buildProperties}).wait();
 
 			if (body.Errors.length) {
-				log.error("Build errors: %s", body.Errors);
+				this.$logger.error("Build errors: %s", body.Errors);
 			}
 
 			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map(function(buildResult) {
@@ -87,690 +87,733 @@ export class BuildService implements Project.IBuildService {
 }
 $injector.register("buildService", BuildService);
 
-var cachedProjectDir = "";
+export class Project implements Project.IProject {
+	private cachedProjectDir: string = "";
+	public projectData: any;
 
-export var projectData: any;
-
-//TODO: _bridge_ remove after refactoring
-function getServer(): Server.IServer {
-	return <Server.IServer> $injector.resolve("server");
-}
-
-function getFs():IFileSystem {
-	return $injector.resolve("fs");
-}
-
-export function hasProject() {
-	var projectDir = getProjectDir();
-	return !!projectDir;
-}
-
-export function getProjectDir() {
-	if (cachedProjectDir !== "") {
-		return cachedProjectDir;
+	constructor(private $fs: IFileSystem,
+		private $injector: IInjector,
+		private $config,
+		private $logger: ILogger,
+		private $server: Server.IServer,
+		private $identityManager: Server.IIdentityManager,
+		private $buildService: Project.IBuildService,
+		private $projectNameValidator) {
+		this.readProjectData().wait();
 	}
-	cachedProjectDir = null;
 
-	var projectDir = options.path || path.resolve(".");
-	while (true) {
-		log.trace("Looking for project in '%s'", projectDir);
-
-		if (fs.existsSync(path.join(projectDir, config.PROJECT_FILE_NAME))) {
-			log.debug("Project directory is '%s'.", projectDir);
-			cachedProjectDir = projectDir;
-			break;
+	public getProjectDir(): string {
+		if (this.cachedProjectDir !== "") {
+			return this.cachedProjectDir;
 		}
+		this.cachedProjectDir = null;
 
-		var dir = path.dirname(projectDir);
-		if (dir === projectDir) {
-			log.info("No project found at or above '%s'.", path.resolve("."));
-			break;
-		}
-		projectDir = dir;
-	}
+		var projectDir = options.path || path.resolve(".");
+		while (true) {
+			this.$logger.trace("Looking for project in '%s'", projectDir);
 
-	return cachedProjectDir;
-}
-
-export function getTempDir() {
-	var dir = path.join(getProjectDir(), ".ab");
-	if (!fs.existsSync(dir)) {
-		fs.mkdirSync(dir);
-	}
-	return dir;
-}
-
-function getProjectRelativePath(fullPath) {
-	var projectDir = getProjectDir() + path.sep;
-	if (!fullPath.startsWith(projectDir)) {
-		throw new Error("File is not part of the project.");
-	}
-
-	return fullPath.substring(projectDir.length);
-}
-
-export function enumerateProjectFiles(excludedProjectDirsAndFiles?) {
-	if (!excludedProjectDirsAndFiles) {
-		excludedProjectDirsAndFiles = [".ab", ".abproject"];
-	}
-
-	var projectDir = getProjectDir();
-	var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, function(filePath) {
-		return !excludedProjectDirsAndFiles.contains(path.basename(filePath).toLowerCase());
-	});
-
-	log.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
-	return projectFiles;
-}
-
-function zipProject(): IFuture<string> {
-	var tempDir = getTempDir();
-
-	var projectZipFile = path.join(tempDir, "Build.zip");
-	if (fs.existsSync(projectZipFile)) {
-		fs.unlinkSync(projectZipFile);
-	}
-
-	var files = enumerateProjectFiles();
-	var zipOp = helpers.zipFiles(projectZipFile, files,
-		function(path) {
-			return getProjectRelativePath(path);
-		});
-
-	var result = new Future<string>();
-	zipOp.resolveSuccess(() => result.return(projectZipFile));
-	return result;
-}
-
-function requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
-	return ((): Project.IBuildResult => {
-		if (helpers.isAndroidPlatform(platform)) {
-			platform = "Android";
-		} else if (helpers.isiOSPlatform(platform)) {
-			platform = "iOS";
-		} else {
-			log.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", platform);
-			return;
-		}
-
-		var buildProperties:any = {
-			Configuration: configuration,
-			Platform: platform,
-
-			CorePlugins: projectData.CorePlugins,
-			AppIdentifier: projectData.AppIdentifier,
-			ProjectName: projectData.name,
-			ProjectGuid: projectData.ProjectGuid,
-			FrameworkVersion: projectData.FrameworkVersion,
-			BundleVersion: projectData.BundleVersion,
-			DeviceOrientations: projectData.DeviceOrientations,
-		};
-
-		if (platform === "Android") {
-			buildProperties.AndroidPermissions = projectData.AndroidPermissions;
-			buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
-			buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
-			buildProperties.AndroidCodesigningIdentity = ""; //TODO: where do you get this from?
-
-			var result = beginBuild(buildProperties).wait();
-			return result;
-		} else if (platform === "iOS" ) {
-			buildProperties.iOSDisplayName = projectData.iOSDisplayName;
-			buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
-			buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
-			buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
-
-			var identityMgr = <Server.IIdentityManager> $injector.resolve("identityManager");
-
-			var certificateData = identityMgr.findCertificate(options.certificate).wait();
-
-			log.info("Using certificate '%s'", certificateData.Alias);
-
-			var provisionData = identityMgr.findProvision(options.provision).wait();
-
-			log.info("Using mobile provision '%s'", provisionData.Name);
-
-			buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
-			buildProperties.iOSCodesigningIdentity = certificateData.Alias;
-
-			var buildResult = beginBuild(buildProperties).wait();
-			buildResult.provisionType = provisionData.ProvisionType;
-			return buildResult;
-		}
-	}).future<Project.IBuildResult>()();
-}
-
-function beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
-	return ((): Project.IBuildResult => {
-		Object.keys(buildProperties).forEach(function(prop) {
-			if (buildProperties[prop] === undefined) {
-				throw new Error(util.format("Build property '%s' is undefined.", prop));
+			if (this.$fs.exists(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait()) {
+				this.$logger.debug("Project directory is '%s'.", projectDir);
+				this.cachedProjectDir = projectDir;
+				break;
 			}
 
-			if (_.isArray(buildProperties[prop])) {
-				buildProperties[prop] = buildProperties[prop].join(";");
+			var dir = path.dirname(projectDir);
+			if (dir === projectDir) {
+				this.$logger.info("No project found at or above '%s'.", path.resolve("."));
+				break;
 			}
+			projectDir = dir;
+		}
+
+		return this.cachedProjectDir;
+	}
+
+	private getTempDir(): string {
+		var dir = path.join(this.getProjectDir(), ".ab");
+		this.$fs.createDirectory(dir).wait();
+		return dir;
+	}
+
+	private getProjectRelativePath(fullPath): string {
+		var projectDir = this.getProjectDir() + path.sep;
+		if (!fullPath.startsWith(projectDir)) {
+			throw new Error("File is not part of the project.");
+		}
+
+		return fullPath.substring(projectDir.length);
+	}
+
+	public enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[] {
+		if (!excludedProjectDirsAndFiles) {
+			excludedProjectDirsAndFiles = [".ab", ".abproject"];
+		}
+
+		var projectDir = this.getProjectDir();
+		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, function(filePath) {
+			return !excludedProjectDirsAndFiles.contains(path.basename(filePath).toLowerCase());
 		});
 
-		var $buildService: Project.IBuildService = $injector.resolve("buildService");
-		var result = $buildService.buildProject(projectData.name, projectData.name, config.SOLUTION_SPACE_NAME, buildProperties).wait();
+		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
+		return projectFiles;
+	}
 
-		if (result.output) {
-			var buildLogFilePath = path.join(getTempDir(), "build.log");
-			fs.writeFile(buildLogFilePath, result.output, function (err) {
-				if (err) {
-					throw err;
+	private zipProject(): IFuture<string> {
+		return (() => {
+			var tempDir = this.getTempDir();
+
+			var projectZipFile = path.join(tempDir, "Build.zip");
+			this.$fs.deleteFile(projectZipFile).wait();
+
+			var files = this.enumerateProjectFiles();
+			var zipOp = helpers.zipFiles(projectZipFile, files,
+				(path) => this.getProjectRelativePath(path));
+
+			var result = new Future<string>();
+			zipOp.resolveSuccess(() => result.return(projectZipFile));
+			return result.wait();
+		}).future<string>()();
+	}
+
+	private requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
+		return ((): Project.IBuildResult => {
+			if (helpers.isAndroidPlatform(platform)) {
+				platform = "Android";
+			} else if (helpers.isiOSPlatform(platform)) {
+				platform = "iOS";
+			}
+
+			var buildProperties:any = {
+				Configuration: configuration,
+				Platform: platform,
+
+				CorePlugins: this.projectData.CorePlugins,
+				AppIdentifier: this.projectData.AppIdentifier,
+				ProjectName: this.projectData.name,
+				ProjectGuid: this.projectData.ProjectGuid,
+				FrameworkVersion: this.projectData.FrameworkVersion,
+				BundleVersion: this.projectData.BundleVersion,
+				DeviceOrientations: this.projectData.DeviceOrientations,
+			};
+
+			if (platform === "Android") {
+				buildProperties.AndroidPermissions = this.projectData.AndroidPermissions;
+				buildProperties.AndroidVersionCode = this.projectData.AndroidVersionCode;
+				buildProperties.AndroidHardwareAcceleration = this.projectData.AndroidHardwareAcceleration;
+				buildProperties.AndroidCodesigningIdentity = ""; //TODO: where do you get this from?
+
+				var result = this.beginBuild(buildProperties).wait();
+				return result;
+			} else if (platform === "iOS" ) {
+				buildProperties.iOSDisplayName = this.projectData.iOSDisplayName;
+				buildProperties.iOSDeviceFamily = this.projectData.iOSDeviceFamily;
+				buildProperties.iOSStatusBarStyle = this.projectData.iOSStatusBarStyle;
+				buildProperties.iOSBackgroundMode = this.projectData.iOSBackgroundMode;
+
+				var certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+
+				this.$logger.info("Using certificate '%s'", certificateData.Alias);
+
+				var provisionData = this.$identityManager.findProvision(options.provision).wait();
+
+				this.$logger.info("Using mobile provision '%s'", provisionData.Name);
+
+				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
+				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
+
+				var buildResult = this.beginBuild(buildProperties).wait();
+				buildResult.provisionType = provisionData.ProvisionType;
+				return buildResult;
+			} else {
+				this.$logger.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", platform);
+				return null;
+			}
+		}).future<Project.IBuildResult>()();
+	}
+
+	private beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
+		return ((): Project.IBuildResult => {
+			Object.keys(buildProperties).forEach((prop) => {
+				if (buildProperties[prop] === undefined) {
+					throw new Error(util.format("Build property '%s' is undefined.", prop));
 				}
-				log.info("Build log written to '%s'", buildLogFilePath);
+
+				if (_.isArray(buildProperties[prop])) {
+					buildProperties[prop] = buildProperties[prop].join(";");
+				}
 			});
-		}
 
-		log.debug(result.buildResults);
+			var result = this.$buildService.buildProject(this.projectData.name, this.projectData.name, this.$config.SOLUTION_SPACE_NAME, buildProperties).wait();
 
-		return {
-			buildProperties: buildProperties,
-			packageDefs: result.buildResults,
-		};
-	}).future<Project.IBuildResult>()();
-}
+			if (result.output) {
+				var buildLogFilePath = path.join(this.getTempDir(), "build.log");
+				this.$fs.writeFile(buildLogFilePath, result.output).wait();
+				this.$logger.info("Build log written to '%s'", buildLogFilePath);
+			}
 
-function showPackageQRCodes(packageDefs) {
-	if (!packageDefs.length) {
-		return;
+			this.$logger.debug(result.buildResults);
+
+			return {
+				buildProperties: buildProperties,
+				packageDefs: result.buildResults,
+			};
+		}).future<Project.IBuildResult>()();
 	}
 
-	var templateFiles = helpers.enumerateFilesInDirectorySync(path.join(__dirname, "../resources/qr"));
-	for (var i = 0; i < templateFiles.length; i++) {
-		var srcFile = templateFiles[i];
-		var targetFile = path.join(getTempDir(), path.basename(srcFile));
-		log.debug("Copying '%s' to '%s'", srcFile, targetFile);
+	private showPackageQRCodes(packageDefs): IFuture<void> {
+		return (() => {
+			if (!packageDefs.length) {
+				return;
+			}
 
-		var writeStream = fs.createWriteStream(targetFile);
-		fs.createReadStream(srcFile).pipe(writeStream);
-		if (path.basename(srcFile) === "scan.html") {
-			var htmlTemplate = targetFile;
-			writeStream.on("finish", function() {
-				var htmlTemplateContents = fs.readFileSync(htmlTemplate, {encoding: "utf8"});
-				htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, projectData.name)
-					.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
-				fs.writeFile(htmlTemplate, htmlTemplateContents, function(err) {
-					if (err) {
-						throw err;
-					}
-					log.debug("Updated scan.html");
-					xopen(htmlTemplate);
-				});
+			var templateFiles = helpers.enumerateFilesInDirectorySync(path.join(__dirname, "../resources/qr"));
+			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir(), path.basename(file)));
+
+			var copyOps = _(_.zip(templateFiles, targetFiles)).map((zipped) => {
+				var srcFile = zipped[0];
+				var targetFile = zipped[1];
+				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
+				return this.$fs.copyFile(srcFile, targetFile);
 			});
-		}
+			Future.wait(copyOps);
+
+			var scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
+			var htmlTemplateContents = this.$fs.readText(scanFile).wait();
+			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.projectData.name)
+				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
+			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
+
+			this.$logger.debug("Updated scan.html");
+			xopen(scanFile);
+		}).future<void>()();
 	}
-}
 
-function build(platform, configuration, showQrCodes, downloadFiles): IFuture<Server.IPackageDef[]> {
-	return ((): Server.IPackageDef[] => {
-		configuration = configuration || "Debug";
-		log.info("Building project for platform '%s', configuration '%s'", platform, configuration);
+	private build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]> {
+		return ((): Server.IPackageDef[] => {
+			configuration = configuration || "Debug";
+			this.$logger.info("Building project for platform '%s', configuration '%s'", platform, configuration);
 
-		importProject().wait();
+			this.importProject().wait();
 
-		var buildResult = requestCloudBuild(platform, configuration).wait();
-		var packageDefs = buildResult.packageDefs;
+			var buildResult = this.requestCloudBuild(platform, configuration).wait();
+			var packageDefs = buildResult.packageDefs;
 
-		if (showQrCodes && packageDefs.length) {
-			var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
-			packageDefs.forEach(function(def:any) {
-				var $buildService: Project.IBuildService = $injector.resolve("buildService");
-				var liveSyncUrl = $buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
+			if (showQrCodes && packageDefs.length) {
+				var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
+				packageDefs.forEach((def:any) => {
+					var liveSyncUrl = this.$buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
 				def.qrUrl = helpers.createQrUrl(liveSyncUrl);
 
-				log.debug("QR URL is '%s'", def.qrUrl);
-			});
+					this.$logger.debug("QR URL is '%s'", def.qrUrl);
+				});
 
-			showPackageQRCodes(packageDefs);
-		}
+				this.showPackageQRCodes(packageDefs).wait();
+			}
 
-		if (downloadFiles) {
-			packageDefs.forEach((pkg: Server.IPackageDef) => {
-				var targetFileName = path.join(getTempDir(), path.basename(pkg.solutionPath));
-				log.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
-				var targetFile = fs.createWriteStream(targetFileName);
-				getServer().filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
-				log.info("Download completed: %s", targetFileName);
-				pkg.localFile = targetFileName;
-			});
-		}
+			if (downloadFiles) {
+				packageDefs.forEach((pkg: Server.IPackageDef) => {
+					var targetFileName = path.join(this.getTempDir(), path.basename(pkg.solutionPath));
+					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
+					var targetFile = this.$fs.createWriteStream(targetFileName);
+					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
+					this.$logger.info("Download completed: %s", targetFileName);
+					pkg.localFile = targetFileName;
+				});
+			}
 
-		return packageDefs;
-	}).future<Server.IPackageDef[]>()();
-}
+			return packageDefs;
+		}).future<Server.IPackageDef[]>()();
+	}
 
-export function buildCommand(platform, configuration) {
-	build(platform, configuration, true, options.download);
-}
+	private getBuildConfiguration(): string {
+		return options["no-livesync"] ? "Release" : "Debug";
+	}
 
-export function deployToIon() {
-	log.info("Deploying to Ion");
+	public executeBuild(platform: string): IFuture<void> {
+		return <IFuture<void>> <any> this.build(platform, this.getBuildConfiguration(), true, options.download);
+	}
 
-	importProject().wait();
+	public deployToIon(): IFuture<void> {
+		return (() => {
+			this.$logger.info("Deploying to Ion");
 
-	var liveSyncToken = getServer().cordova.getLiveSyncToken(projectData.name, projectData.name).wait();
+			this.importProject().wait();
 
-	var hostPart = util.format("%s://%s", config.AB_SERVER_PROTO, config.AB_SERVER);
-	var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
+			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.projectData.name, this.projectData.name).wait();
 
-	log.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
+			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
 
-	showPackageQRCodes([{
-		platform: "Ion",
-		qrUrl: helpers.createQrUrl(fullDownloadPath),
-	}]);
-}
+			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
-export function deployToDevice(platform, configuration) {
-	devicesService.hasDevices(platform)
-		.then(function(hasDevices) {
+			this.showPackageQRCodes([{
+				platform: "Ion",
+				qrUrl: helpers.createQrUrl(fullDownloadPath),
+			}]).wait();
+		}).future<void>()();
+	}
+
+	public deployToDevice(platform: string): IFuture<void> {
+		var future = new Future<void>();
+		devicesService.hasDevices(platform)
+			.then((hasDevices) => {
 			if (hasDevices) {
-				var packageDefs = build(platform, configuration, false, true).wait();
+				var packageDefs = this.build(platform, null, false, true).wait();
 				var packageFile = packageDefs[0].localFile;
 
-				log.debug("Ready to deploy %s", packageDefs);
-				log.debug("File is %d bytes", fs.statSync(packageFile).size);
+				this.$logger.debug("Ready to deploy %s", packageDefs);
+				this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
 
 				if(helpers.isiOSPlatform(platform)) {
-					var identityMgr = $injector.resolve("identityManager");
-					identityMgr.findProvision(options.provision, function(error, identData){
-						var provisionedDevices = identData.ProvisionedDevices.$values;
-						processDeployToDevice(platform, packageFile, provisionedDevices);
-					});
-				}
-				else {
-					processDeployToDevice(platform, packageFile);
+					var identData = this.$identityManager.findProvision(options.provision).wait();
+					var provisionedDevices = identData.ProvisionedDevices.$values;
+					this.processDeployToDevice(platform, packageFile, provisionedDevices);
+				} else {
+					this.processDeployToDevice(platform, packageFile);
 				}
 			} else {
-				log.error(util.format("The app cannot be deployed because there are 0 connected %s devices", platform || ""));
+				this.$logger.error(util.format("The app cannot be deployed because there are 0 connected %s devices", platform || ""));
 			}
 		})
-		.done();
-}
+			.then(() => future.return(), (err) => future.throw(err));
+		return future;
+	}
 
-function processDeployToDevice(platform, packageFile, provisionedDevices?){
-	var packageName = getProjectData().AppIdentifier;
-	devicesService.deploy(platform, packageFile, packageName, provisionedDevices)
-		.then(function () {
-			log.info(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
-		})
-		.catch(function (error) {
-			log.trace(error);
-		})
-		.done();
-}
+	private processDeployToDevice(platform, packageFile, provisionedDevices?) {
+		var packageName = this.projectData.AppIdentifier;
+		devicesService.deploy(platform, packageFile, packageName, provisionedDevices)
+			.then(function () {
+				this.$logger.info(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
+			})
+			.catch(function (error) {
+					this.$logger.trace(error);
+			})
+			.done();
+	}
 
-export function importProject(): IFuture<void> {
-	return (() => {
-		var projectDir = getProjectDir();
-		if (!projectDir) {
-			log.fatal("Found nothing to import.");
+	public importProject(): IFuture<void> {
+		return (() => {
+			var projectDir = this.getProjectDir();
+			if (!projectDir) {
+				this.$logger.fatal("Found nothing to import.");
+				return;
+			}
+
+			var projectZipFile = this.zipProject().wait();
+			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait());
+
+			this.$server.projects.importProject(this.projectData.name, this.projectData.name, this.$fs.createReadStream(projectZipFile)).wait();
+			this.$logger.trace("Project imported");
+		}).future<void>()();
+	}
+
+	public saveProject(): IFuture<void> {
+		return this.$fs.writeJson(path.join(this.getProjectDir(), this.$config.PROJECT_FILE_NAME), this.projectData, "\t");
+	}
+
+	private readProjectData(): IFuture<void> {
+		return (() => {
+			var projectDir = this.getProjectDir();
+			if (projectDir) {
+				this.projectData = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
+			}
+		}).future<void>()();
+	}
+
+	public createNewProject(projectName: string): IFuture<void> {
+		return ((): void => {
+			var projectDir = this.getNewProjectDir();
+
+			if (!projectName) {
+				projectName = this.createProjectName(projectDir).wait();
+			}
+			this.createFromTemplate(projectName, projectDir).wait();
+		}).future<void>()();
+	}
+
+	private createProjectName(projectDir): IFuture<string> {
+		return ((): string => {
+			var files = this.$fs.readDirectory(projectDir).wait();
+			var defaultProjectName = this.$config.DEFAULT_PROJECT_NAME;
+
+			files = _.map(files, (f) => path.basename(f));
+
+			if (!_.contains(files, defaultProjectName)) {
+				return defaultProjectName;
+			}
+
+			for (var i = 0; ; ++i) {
+				var nameWithIndex = util.format("%s%s", defaultProjectName, i);
+				if (!_.contains(files, nameWithIndex)) {
+					return nameWithIndex;
+				}
+			}
+		}).future<string>()();
+	}
+
+	private createFromTemplate(appname, projectDir): IFuture<void> {
+		return (() => {
+			var templatesDir = path.join(__dirname, "../resources/templates"),
+			template = options.template || this.$config.DEFAULT_PROJECT_TEMPLATE,
+				templateFileName;
+
+			if (!appname) {
+				this.$logger.fatal("At least appname must be specified!");
+				return;
+			}
+			projectDir = path.join(projectDir, appname);
+
+			this.$projectNameValidator.validate(appname);
+			templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
+			this.$logger.trace("Using template '%s'", templateFileName);
+			if (this.$fs.exists(templateFileName).wait()) {
+				this.$logger.trace("Creating template folder '%s'", projectDir);
+				this.createTemplateFolder(projectDir).wait();
+				this.$logger.trace("Extracting template from '%s'", templateFileName);
+				this.extractTemplate(templateFileName, projectDir).wait();
+				this.$logger.trace("Reading template project properties.");
+				var properties = this.getProjectProperties(projectDir, appname).wait();
+				this.$logger.trace(properties);
+				this.$logger.trace("Creating project file.");
+				this.createProjectFile(projectDir, appname, properties).wait();
+				this.$logger.trace("Removing unnecessary files from template.");
+				this.removeExtraFiles(projectDir).wait();
+
+				this.$logger.info(util.format("%s has been successfully created.", appname));
+			} else {
+				this.$logger.fatal("The requested template " + options.template + " does not exist.");
+				this.$logger.fatal("Available templates are:");
+				this.$config.TEMPLATE_NAMES.forEach(function(item) {
+					this.$logger.fatal(item);
+				});
+			}
+		}).future<void>()();
+	}
+
+	private removeExtraFiles(projectDir): IFuture<any> {
+		return ((): any => {
+			Future.wait(_.map(["mobile.proj", "mobile.vstemplate"],
+				(file) => this.$fs.deleteFile(path.join(projectDir, file))));
+		}).future<any>()();
+	}
+
+	private getProjectProperties(projectDir, appName): IFuture<any> {
+		return ((): any => {
+			var properties: any = {};
+
+			if (options.appid === undefined) {
+				options.appid = this.generateDefaultAppId(appName);
+				this.$logger.warn("--appid was not specified. Defaulting to " + options.appid);
+			}
+
+			var parser = new xml2js.Parser();
+			var contents = this.$fs.readText(path.join(projectDir, "mobile.proj")).wait();
+
+			var parseString = Future.wrap(function (str, callback) {
+				return parser.parseString(str, callback);
+			});
+
+			var result: any = parseString(contents).wait();
+			var propertyGroup: any = result.Project.PropertyGroup[0];
+
+			properties.AppName = appName;
+			properties.AppIdentifier = options.appid;
+			properties.ProjectGuid = this.generateProjectGuid();
+			properties.BundleVersion = propertyGroup.BundleVersion[0];
+			properties.CorePlugins = propertyGroup.CorePlugins[0].split(";");
+			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0].split(";");
+			properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
+			properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
+			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0].split(";");
+
+			return properties;
+		}).future<any>()();
+	}
+
+	private getNewProjectDir() {
+		return options.path || process.cwd();
+	}
+
+	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any> {
+		return ((): any => {
+			properties = properties || {};
+
+			this.$fs.createDirectory(projectDir).wait();
+			this.cachedProjectDir = projectDir;
+			this.projectData = this.$fs.readJson(path.join(__dirname, "../resources/default-project.json")).wait();
+
+			var projectSchema = helpers.getProjectFileSchema();
+			Object.keys(properties).forEach(prop => {
+				if (projectSchema[prop]) {
+					this.projectData[prop] = properties[prop]
+				}
+			});
+
+			this.projectData.name = projectName;
+			if (!this.projectData.iOSDisplayName) {
+				this.projectData.iOSDisplayName = projectName;
+			}
+
+			this.saveProject().wait();
+		}).future<any>()();
+	}
+
+	public createTemplateFolder(projectDir: string): IFuture<any> {
+		return ((): any => {
+			this.$fs.createDirectory(projectDir).wait();
+			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
+			if (projectDirFiles.length != 0) {
+				throw new Error("The specified directory must be empty to create a new project.");
+			}
+		}).future<any>()();
+	}
+
+	private extractTemplate(templateFileName, projectDir: string): IFuture<any> {
+		return this.$fs.futureFromEvent(
+			this.$fs.createReadStream(templateFileName)
+			.pipe(unzip.Extract({ path: projectDir })), "close");
+	}
+
+	private generateDefaultAppId(appName) {
+		return "com.telerik." + appName;
+	}
+
+	private generateProjectGuid() {
+		return require("node-uuid").v4();
+	}
+
+	public isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean {
+		var relativeToProjectPath = filePath.substr(projectDir.length + 1);
+		var lowerCasePath = relativeToProjectPath.toLowerCase();
+		for (var key in excludedDirsAndFiles) {
+			if (lowerCasePath.startsWith(excludedDirsAndFiles[key])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private normalizePropertyName(property) {
+		if (!property) {
+			return property;
+		}
+
+		var propSchema = helpers.getProjectFileSchema();
+		var propLookup = helpers.toHash(propSchema,
+			function(value, key) { return key.toLowerCase(); },
+			function(value, key) { return key; });
+		return propLookup[property.toLowerCase()] || property;
+	}
+
+	public updateProjectProperty(projectData:any, mode:string, property:string, newValue:any) {
+		property = this.normalizePropertyName(property);
+		var propSchema = helpers.getProjectFileSchema();
+		var propData = propSchema[property];
+
+		if (!propData) {
+				this.$logger.fatal("Unrecognized property '%s'", property);
+				this.printProjectSchemaHelp();
 			return;
 		}
 
-		var projectZipFile = zipProject().wait();
-		log.debug("zipping completed, result file size: %d", fs.statSync(projectZipFile).size);
-
-		getServer().projects.importProject(projectData.name, projectData.name, fs.createReadStream(projectZipFile)).wait();
-		log.trace("Project imported");
-	}).future<void>()();
-}
-
-export function saveProject(callback?) {
-	fs.writeFile(path.join(getProjectDir(), config.PROJECT_FILE_NAME), JSON.stringify(projectData, null, "\t"), function(err, data) {
-		if (callback) {
-			callback(err, data);
-		} else if (err) {
-			throw err;
-		}
-	});
-}
-
-function getProjectData() {
-	projectData = JSON.parse(<string> fs.readFileSync(path.join(getProjectDir(), config.PROJECT_FILE_NAME), {encoding: "utf8"}));
-	return projectData;
-}
-
-export function createNewProject(projectName) {
-	var projectDir = getNewProjectDir();
-
-	if (projectName === undefined) {
-		createProjectName(projectDir)
-			.then(function(name) {
-				return createFromTemplate(name, projectDir);
-			})
-			.done();
-	} else {
-		createFromTemplate(projectName, projectDir);
-	}
-}
-
-function createProjectName(projectDir) {
-	return Q.ninvoke(fs, "readdir", projectDir)
-		.then(function(files:string[]) {
-			var defaultProjectName = config.DEFAULT_PROJECT_NAME;
-			var count = _.filter(files, function(file) {
-				return file.startsWith(defaultProjectName);
-			}).length;
-
-			if (count === 0) {
-				return defaultProjectName;
-			} else {
-				return util.format("%s_%s", defaultProjectName, count);
+		if (!propData.flags) {
+			if (newValue.length !== 1) {
+				helpers.abort("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 			}
-		});
-}
-
-function createFromTemplate(appname, projectDir) {
-	var templatesDir = path.join(__dirname, "../resources/templates"),
-		template = options.template || config.DEFAULT_PROJECT_TEMPLATE,
-		templateFileName;
-
-	if (appname === undefined) {
-		log.fatal("At least appname must be specified!");
-		return;
-	}
-	projectDir = path.join(projectDir, appname);
-
-	projectNameValidator.validateNameAndLogErrorMessage(appname);
-	templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
-	if (getFs().exists(templateFileName).wait()) {
-		try {
-			createTemplateFolder(projectDir).wait();
-			extractTemplate(templateFileName, projectDir).wait();
-			var properties = getProjectProperties(projectDir, appname).wait();
-			createProjectFile(projectDir, properties).wait();
-			removeExtraFiles(projectDir).wait();
-			log.info(util.format("%s has been successfully created.", appname));
-		}
-		catch(error) {
-			log.fatal(error.message);
-		}
-	} else {
-		log.fatal("The requested template " + options.template + " does not exist.");
-		log.fatal("Available templates are:");
-		config.TEMPLATE_NAMES.forEach(function(item) {
-			log.fatal(item);
-		});
-	}
-}
-
-function removeExtraFiles(projectDir): IFuture<any> {
-	return ((): any => {
-		var $fs = getFs();
-		var future1 = $fs.deleteFile(path.join(projectDir, "mobile.proj"));
-		var future2 = $fs.deleteFile(path.join(projectDir, "mobile.vstemplate"));
-		Future.wait([future1, future2]);
-	}).future<any>()();
-}
-
-function getProjectProperties(projectDir, appName): IFuture<any> {
-	return ((): any => {
-		var properties: any = {};
-
-		if (options.appid === undefined) {
-			options.appid = generateDefaultAppId(appName);
-			log.warn("--appid was not specified. Defaulting to " + options.appid);
-		}
-
-		var parser = new xml2js.Parser();
-		var contents = getFs().readText(path.join(projectDir, "mobile.proj")).wait();
-
-		var parseString = Future.wrap(function (str, callback) {
-			return parser.parseString(str, callback);
-		})
-
-		var result: any = parseString(contents).wait();
-		var propertyGroup: any = result.Project.PropertyGroup[0];
-
-		properties.AppName = appName;
-		properties.AppIdentifier = options.appid;
-		properties.ProjectGuid = generateProjectGuid();
-		properties.BundleVersion = propertyGroup.BundleVersion[0];
-		properties.CorePlugins = propertyGroup.CorePlugins[0].split(";");
-		properties.DeviceOrientations = propertyGroup.DeviceOrientations[0].split(";");
-		properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
-		properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
-		properties.AndroidPermissions = propertyGroup.AndroidPermissions[0].split(";");
-
-		return properties;
-	}).future<any>()();
-}
-
-function getNewProjectDir() {
-	return options.path || process.cwd();
-}
-
-export function createProjectFile(projectDir, properties): IFuture<any> {
-	return ((): any => {
-		properties = properties || {};
-
-		cachedProjectDir = projectDir;
-		projectData = JSON.parse(<string> fs.readFileSync(path.join(__dirname, "../resources/default-project.json"), { encoding: "utf8" }));
-		projectData.name = properties.AppName;
-		projectData.iOSDisplayName = properties.AppName;
-		projectData.AppIdentifier = properties.AppIdentifier;
-		projectData.ProjectGuid = properties.ProjectGuid;
-		projectData.BundleVersion = properties.BundleVersion;
-		projectData.CorePlugins = properties.CorePlugins;
-		projectData.DeviceOrientations = properties.DeviceOrientations;
-		projectData.FrameworkVersion = properties.FrameworkVersion;
-		projectData.iOSStatusBarStyle = properties.iOSStatusBarStyle;
-		projectData.AndroidPermissions = properties.AndroidPermissions;
-		Future.wrap(saveProject)().wait();
-	}).future<any>()();
-}
-
-export function createTemplateFolder(projectDir): IFuture<any> {
-	return ((): any => {
-		var $fs = getFs();
-		$fs.createDirectory(projectDir).wait();
-		var projectDirFiles = $fs.readDirectory(projectDir).wait();
-		if (projectDirFiles.length != 0) {
-			throw new Error("The specified directory must be empty to create a new project.");
-		}
-	}).future<any>()();
-}
-
-function extractTemplate(templateFileName, projectDir: string): IFuture<any> {
-	var $fs = getFs();
-	return $fs.futureFromEvent(
-		$fs.createReadStream(templateFileName)
-			.pipe(unzip.Extract({ path: projectDir })), "close");
-}
-
-function generateDefaultAppId(appName) {
-	return "com.telerik." + appName;
-}
-
-function generateProjectGuid() {
-	/* jshint -W016 */
-//	var genUUIDv4 = function b(a) { return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b); };
-//	return genUUIDv4();
-	return require("node-uuid").v4();
-	/* jshint +W016 */
-}
-
-export function isProjectFileExcluded(projectDir, filePath, excludedDirsAndFiles) {
-	var relativeToProjectPath = filePath.substr(projectDir.length + 1);
-	var lowerCasePath = relativeToProjectPath.toLowerCase();
-	for (var key in excludedDirsAndFiles) {
-		if (lowerCasePath.startsWith(excludedDirsAndFiles[key])) {
-			return true;
-		}
-	}
-	return false;
-}
-
-function normalizePropertyName(property) {
-	if (!property) {
-		return property;
-	}
-
-	var propSchema = helpers.getProjectFileSchema();
-	var propLookup = helpers.toHash(propSchema,
-		function(value, key) { return key.toLowerCase(); },
-		function(value, key) { return key; });
-	return propLookup[property.toLowerCase()] || property;
-}
-
-export function updateProjectProperty(projectData:any, mode:string, property:string, newValue:any) {
-	property = normalizePropertyName(property);
-	var propSchema = helpers.getProjectFileSchema();
-	var propData = propSchema[property];
-
-	if (!propData) {
-		log.fatal("Unrecognized property '%s'", property);
-		printProjectSchemaHelp();
-		return;
-	}
-
-	if (!propData.flags) {
-		if (newValue.length !== 1) {
-			helpers.abort("Property '%s' is not a collection of flags. Specify only a single property value.", property);
-		}
-		if (mode === "add" || mode === "del") {
-			helpers.abort("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
-		}
-	} else {
-		newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
-	}
-
-	var range = propData.range;
-	if (range) {
-		newValue = _.map(newValue, function(value:string) { return value.toLowerCase(); });
-
-		var validValues;
-		if (_.isArray(range)) {
-			validValues = helpers.toHash(range,
-				function(value) { return value.toLowerCase(); },
-				_.identity);
-
+			if (mode === "add" || mode === "del") {
+				helpers.abort("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
+			}
 		} else {
-			validValues = helpers.toHash(range,
-				function(value, key) { return (value.input || key).toLowerCase(); },
-				function(value, key) { return key; });
+			newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
 		}
 
-		var badValues = _.reject(newValue, function(value) {
-			return validValues[value];
-		});
-		if (badValues.length > 0) {
-			helpers.abort("Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+		var range = propData.range;
+		if (range) {
+			newValue = _.map(newValue, function(value:string) { return value.toLowerCase(); });
+
+			var validValues;
+			if (_.isArray(range)) {
+				validValues = helpers.toHash(range,
+					function(value) { return value.toLowerCase(); },
+					_.identity);
+			} else {
+				validValues = helpers.toHash(range,
+					function(value, key) { return (value.input || key).toLowerCase(); },
+					function(value, key) { return key; });
+			}
+
+			var badValues = _.reject(newValue, function(value) {
+				return validValues[value];
+			});
+			if (badValues.length > 0) {
+				helpers.abort("Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+			}
+
+			newValue = _.map(newValue, function(value) { return validValues[value]; });
 		}
 
-		newValue = _.map(newValue, function(value) { return validValues[value]; });
-	}
+		if (!propData.flags) {
+			newValue = newValue[0];
 
-	if (!propData.flags) {
-		newValue = newValue[0];
+			if (propData.regex) {
+				var matchRegex = new RegExp(propData.regex);
+				if (!matchRegex.test(newValue)) {
+					helpers.abort("Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
+				}
+			}
 
-		if (propData.regex) {
-			var matchRegex = new RegExp(propData.regex);
-			if (!matchRegex.test(newValue)) {
-				helpers.abort("Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
+			if (propData.validator) {
+				var validator = this.$injector.resolve(propData.validator);
+				validator.validate(newValue);
 			}
 		}
-	}
 
-	var propertyValue = projectData[property];
-	if (propData.flags && _.isString(propertyValue)) {
-		propertyValue = propertyValue.split(";");
-	}
-
-	if (mode === "set") {
-		propertyValue = newValue;
-	} else if (mode === "del") {
-		propertyValue = _.difference(propertyValue, newValue);
-	} else if (mode === "add") {
-		propertyValue = _.union(propertyValue, newValue);
-	} else {
-		helpers.abort("Unknown property update mode '%s'", mode);
-	}
-
-	if (propertyValue.sort) {
-		propertyValue.sort();
-	}
-
-	projectData[property] = propertyValue;
-}
-
-function updateProjectPropertyAndSave(mode, args) {
-	ensureProject();
-
-	updateProjectProperty(projectData, mode, args[0], _.rest(args, 1));
-	Future.wrap(saveProject)().wait();
-}
-
-export function setProjectProperty() {
-	var args = _.toArray(arguments),
-		property = args[0];
-
-	if(property === "name") {
-		projectNameValidator.validateNameAndLogErrorMessage(property);
-	}
-
-	updateProjectPropertyAndSave("set", _.toArray(arguments));
-}
-
-export function addProjectProperty() {
-	updateProjectPropertyAndSave("add", _.toArray(arguments));
-}
-
-export function delProjectProperty() {
-	updateProjectPropertyAndSave("del", _.toArray(arguments));
-}
-
-export function printProjectProperty(property) {
-	ensureProject();
-	property = normalizePropertyName(property);
-
-	if (projectData[property]) {
-		console.log(projectData[property]);
-	} else {
-		log.fatal("Unrecognized property '%s'", property);
-		printProjectSchemaHelp();
-	}
-}
-
-function printProjectSchemaHelp() {
-	var schema = helpers.getProjectFileSchema();
-	log.info("Project properties:");
-	_.each(schema, function(value:any, key) {
-		log.info(util.format("  %s - %s", key, value.description));
-		if (value.range) {
-			log.info("    Valid values:");
-			_.each(value.range, function(rangeDesc:any, rangeKey) {
-				var desc = "      " + (_.isArray(value.range) ? rangeDesc : rangeDesc.input || rangeKey);
-				if (rangeDesc.description) {
-					desc += " - " + rangeDesc.description;
-				}
-				log.info(desc);
-			});
+		var propertyValue = projectData[property];
+		if (propData.flags && _.isString(propertyValue)) {
+			propertyValue = propertyValue.split(";");
 		}
-		if (value.regex) {
-			log.info("    Valid values match /" + value.regex.toString() + "/");
+
+		if (mode === "set") {
+			propertyValue = newValue;
+		} else if (mode === "del") {
+			propertyValue = _.difference(propertyValue, newValue);
+		} else if (mode === "add") {
+			propertyValue = _.union(propertyValue, newValue);
+		} else {
+			helpers.abort("Unknown property update mode '%s'", mode);
 		}
-	});
-}
 
-export function ensureProject() {
-	if (!projectData) {
-		helpers.abort("Not in a project folder.");
+		if (propertyValue.sort) {
+			propertyValue.sort();
+		}
+
+		projectData[property] = propertyValue;
+
+		this.printProjectProperty(property);
+	}
+
+	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
+		return (() => {
+			this.ensureProject();
+
+			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues);
+			this.saveProject().wait();
+		}).future<void>()();
+	}
+
+	public printProjectProperty(property: string): void {
+		this.ensureProject();
+		property = this.normalizePropertyName(property);
+
+		if (this.projectData[property]) {
+			this.$logger.out(this.projectData[property]);
+		} else {
+			this.$logger.fatal("Unrecognized property '%s'", property);
+			this.printProjectSchemaHelp();
+		}
+	}
+
+	private printProjectSchemaHelp() {
+		var schema = helpers.getProjectFileSchema();
+		this.$logger.info("Project properties:");
+		_.each(schema, (value:any, key) => {
+			this.$logger.info(util.format("  %s - %s", key, value.description));
+			if (value.range) {
+				this.$logger.info("    Valid values:");
+				_.each(value.range, (rangeDesc:any, rangeKey) => {
+					var desc = "      " + (_.isArray(value.range) ? rangeDesc : rangeDesc.input || rangeKey);
+					if (rangeDesc.description) {
+						desc += " - " + rangeDesc.description;
+					}
+					this.$logger.info(desc);
+				});
+			}
+			if (value.regex) {
+				this.$logger.info("    Valid values match /" + value.regex.toString() + "/");
+			}
+		});
+	}
+
+	private ensureProject() {
+		if (!this.projectData) {
+			helpers.abort("Not in a project folder.");
+		}
+	}
+}
+$injector.register("project", Project);
+
+helpers.registerCommand("project", "build", (project, args) => project.executeBuild(args[0]));
+helpers.registerCommand("project", "ion", (project, args) => project.deployToIon());
+helpers.registerCommand("project", "update", (project, args) => project.importProject());
+helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
+helpers.registerCommand("project", "deploy", (project, args) => project.deployToDevice(args[0]));
+
+class ProjectPropertyCommandData {
+	public propertyName: string;
+	public propertyValues: string[];
+
+	constructor(args: string[]) {
+		this.propertyName = args[0];
+		this.propertyValues = _.rest(args, 1);
 	}
 }
 
-if (getProjectDir()) {
-	try {
-		projectData = JSON.parse(fs.readFileSync(path.join(getProjectDir(), config.PROJECT_FILE_NAME), {encoding: "utf8"}));
-	} catch(err) {
-		log.fatal("There was a problem reading the project file. " + err);
-		process.exit(1);
+class AddProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
+	constructor(private $project: Project.IProject) {
+		super();
+	}
+
+	getDataFactory():Commands.ICommandDataFactory {
+		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
+	}
+
+	execute(data:ProjectPropertyCommandData):void {
+		this.$project.updateProjectPropertyAndSave("add", data.propertyName, data.propertyValues).wait();
 	}
 }
+$injector.registerCommand("prop-add", AddProjectPropertyCommand);
 
-exports.project = projectData;
+class SetProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
+	constructor(private $project: Project.IProject) {
+		super();
+	}
+
+	getDataFactory():Commands.ICommandDataFactory {
+		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
+	}
+
+	execute(data:ProjectPropertyCommandData):void {
+		this.$project.updateProjectPropertyAndSave("set", data.propertyName, data.propertyValues).wait();
+	}
+}
+$injector.registerCommand("prop-set", SetProjectPropertyCommand);
+
+class DeleteProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
+	constructor(private $project: Project.IProject) {
+		super();
+	}
+
+	getDataFactory():Commands.ICommandDataFactory {
+		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
+	}
+
+	execute(data:ProjectPropertyCommandData):void {
+		this.$project.updateProjectPropertyAndSave("del", data.propertyName, data.propertyValues).wait();
+	}
+}
+$injector.registerCommand("prop-del", DeleteProjectPropertyCommand);
+
+class PrintProjectPropertyCommand extends baseCommands.BaseCommand<string> {
+	constructor(private $project: Project.IProject) {
+		super();
+	}
+
+	getDataFactory():Commands.ICommandDataFactory {
+		return { fromCliArguments: (args: string[]) => args[0] };
+	}
+
+	execute(property: string): void {
+		this.$project.printProjectProperty(property);
+	}
+}
+$injector.registerCommand("prop-print", PrintProjectPropertyCommand);

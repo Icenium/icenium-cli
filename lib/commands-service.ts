@@ -8,20 +8,9 @@ export class CommandsService implements ICommandsService {
 	private commands = {
 		"config-reset": this.makeCommand("config", "reset"),
 		"config-apply": this.makeCommand("config", "apply"),
-		"build": this.makeCommand("project", "buildCommand"),
-		"prop-set": this.makeCommand("project", "setProjectProperty"),
-		"prop-add": this.makeCommand("project", "addProjectProperty"),
-		"prop-del": this.makeCommand("project", "delProjectProperty"),
-		"prop-cat": this.makeCommand("project", "printProjectProperty"),
-		"update": this.makeCommand("project", "importProject"),
-		"ion": this.makeCommand("project", "deployToIon"),
-		"deploy": this.makeCommand("project", "deployToDevice"),
-		"create": this.makeCommand("project", "createNewProject"),
 		"sync": this.makeCommand("sync-service", "sync"),
 		"list-devices": this.makeCommand("devices-service", "listDevices"),
 		"open-device-log-stream": this.makeCommand("devices-service", "openDeviceLogStream"),
-		"list-projects": this.makeCommand("remote-projects", "listProjects"),
-		"export-project": this.makeCommand("remote-projects", "exportProject")
 	};
 
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {

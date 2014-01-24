@@ -1,9 +1,11 @@
 {
 	"name": {
-		"description": "The project name identifies this project to the cloud build."
+		"description": "The project name identifies this project to the cloud build.",
+		"validator": "projectNameValidator"
 	},
 	"AppIdentifier": {
-		"description": "The application identifier (or app id) must match the app id property of the iOS mobile provision used for building."
+		"description": "The application identifier (or app id) must match the app id property of the iOS mobile provision used for building.",
+		"regex": "^com\\.[A-Za-z0-9]+\\.[A-Za-z0-9]+$"
 	},
 	"iOSDisplayName": {
 		"description": "The display name in iOS of the app."
