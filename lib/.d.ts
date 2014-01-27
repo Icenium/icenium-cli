@@ -1,5 +1,6 @@
 //grunt-start
 /// <reference path="bootstrap.ts" />
+/// <reference path="commands-service.ts" />
 /// <reference path="commands/fetch-plugin.ts" />
 /// <reference path="commands/find-plugins.ts" />
 /// <reference path="commands/generate-server-api.ts" />
@@ -9,6 +10,7 @@
 /// <reference path="config.ts" />
 /// <reference path="declarations.d.ts" />
 /// <reference path="definitions/Q.d.ts" />
+/// <reference path="definitions/commands-service.d.ts" />
 /// <reference path="definitions/commands.d.ts" />
 /// <reference path="definitions/cookie.d.ts" />
 /// <reference path="definitions/log4js.d.ts" />
