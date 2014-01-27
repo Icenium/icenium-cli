@@ -3,7 +3,7 @@ global.$injector = require("./yok").injector;
 $injector.require("config", "./config");
 $injector.require("fs", "./file-system");
 $injector.require("logger", "./logger");
-$injector.require("commands-service", "./commands-service");
+$injector.require("commandsService", "./commands-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 
 $injector.require("helpCommandDataFactory", "./commands/help");
@@ -14,6 +14,9 @@ $injector.requireCommand("find-plugins", "./commands/find-plugins");
 
 $injector.require("fetchPluginCommandDataFactory", "./commands/fetch-plugin");
 $injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
+
+$injector.require("editConfigurationCommandDataFactory", "./commands/configuration");
+$injector.requireCommand("edit-configuration", "./commands/configuration");
 
 $injector.require("simulateCommandDataFactory", "./commands/simulate");
 $injector.requireCommand("simulate", "./commands/simulate");

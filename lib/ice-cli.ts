@@ -9,7 +9,7 @@ import Fiber = require("fibers");
 	var options = require("./options");
 
 	function getCommandsService():ICommandsService {
-		return $injector.resolve("commands-service");
+		return $injector.resolve("commandsService");
 	}
 
 	function dispatchCommandInFiber() {

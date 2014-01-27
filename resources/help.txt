@@ -21,6 +21,7 @@ Commands:
     simulate              Runs the current project in the device simulator.
     list-projects         Lists all projects of your account.
     export-project        Exports one of your remote projects into a local ice project.
+    edit-configuration    Opens configuration file for editing.
 
 Global Options:
     --path <path>         Specifies the file path to the project. If not specified, ?AppBuilder CLI? searches for the
@@ -233,5 +234,14 @@ All projects and their indexes can be seen by running "$ ice list-projects".
 
 Options:
     --path <path> - Specifies the local path where the chosen project will be exported.
+
+--[/]--
+
+--[edit-configuration]--
+Usage:
+    $ ice edit-configuration <ConfigurationFile>
+
+<ConfigurationFile> can be one of the following: "android-manifest", "android-config", "ios-info" and "ios-config".
+Opens the given file for editing and creates it in your project directory if it didn't already exist.
 
 --[/]--
