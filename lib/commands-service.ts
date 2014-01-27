@@ -92,4 +92,4 @@ export class CommandsService implements ICommandsService {
 		};
 	}
 }
-$injector.register("commands-service", CommandsService);
+$injector.register("commandsService", CommandsService);
