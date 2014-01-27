@@ -1,45 +1,25 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-export class ListCertificatesCommand implements Commands.ICommand<any> {
+import baseCommands = require("./base-commands");
+
+export class ListCertificatesCommand extends baseCommands.BaseParameterlessCommand {
 	constructor(private $identityManager: Server.IIdentityManager){
+		super();
 	}
 
-	getDataFactory():Commands.ICommandDataFactory {
-		return {
-			fromCliArguments: function() {
-				return null;
-			}
-		}
-	}
-
-	canExecute(data:any):boolean {
-		return true;
-	}
-
-	execute(data:any):void {
+	execute():void {
 		this.$identityManager.listCertificates();
 	}
 }
 $injector.registerCommand("list-certificates", ListCertificatesCommand);
 
-export class ListProvisionsCommand implements Commands.ICommand<any> {
+export class ListProvisionsCommand extends baseCommands.BaseParameterlessCommand {
 	constructor(private $identityManager: Server.IIdentityManager){
+		super();
 	}
 
-	getDataFactory():Commands.ICommandDataFactory {
-		return {
-			fromCliArguments: function() {
-				return null;
-			}
-		}
-	}
-
-	canExecute(data:any):boolean {
-		return true;
-	}
-
-	execute(data:any):void {
+	execute():void {
 		this.$identityManager.listProvisions();
 	}
 }

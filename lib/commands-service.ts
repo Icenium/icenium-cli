@@ -1,6 +1,8 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
+import _ = require("underscore");
+
 export class CommandsService implements ICommandsService {
 	private commands = {
 		"config-reset": this.makeCommand("config", "reset"),
@@ -42,7 +44,7 @@ export class CommandsService implements ICommandsService {
 
 	public completeCommand() {
 		var tabtab = require("tabtab");
-		tabtab.complete("ice", function (err, data) {
+		tabtab.complete("ice", (err, data) => {
 			if (err || !data) {
 				return;
 			}
@@ -55,11 +57,10 @@ export class CommandsService implements ICommandsService {
 			} else if (deviceSpecific.contains(data.prev)) {
 				return tabtab.log(["ios", "android"], data);
 			} else {
-				var _ = require("underscore");
 				var propSchema = require("./helpers").getProjectFileSchema();
 				if (propertyCommands.contains(data.prev)) {
 					return tabtab.log(Object.keys(propSchema), data);
-				} else if (_.some(propertyCommands, function (cmd) {
+				} else if (_.some(propertyCommands, (cmd) => {
 					return data.line.indexOf(" " + cmd + " ") >= 0;
 				})) {
 					var parseResult = /prop-[^ ]+ ([^ ]+) /.exec(data.line);
@@ -70,7 +71,7 @@ export class CommandsService implements ICommandsService {
 							if (range) {
 								if (!_.isArray(range)) {
 									var helpers = require("./helpers");
-									range = _.map(range, function (value, key) {
+									range = _.map(range, (value: { input }, key) => {
 										return value.input || key;
 									});
 								}
@@ -79,15 +80,22 @@ export class CommandsService implements ICommandsService {
 						}
 					}
 				}
-				return tabtab.log(Object.keys(this.commands), data);
+				return tabtab.log(this.getAvailableCommands(), data);
 			}
 		});
 
 		return true;
 	}
 
+	private getAvailableCommands(): string[] {
+		var legacyCommandsNames = <_.List<string>>_.keys(this.commands);
+		var commandsNames = <_.List<string>>$injector.getRegisteredCommandsNames();
+
+		return _.union(legacyCommandsNames, commandsNames);
+	}
+
 	private makeCommand(module, command) {
-		return function () {
+		return () => {
 			return require("./" + module)[command];
 		};
 	}

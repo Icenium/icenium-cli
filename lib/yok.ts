@@ -121,7 +121,7 @@ export class Yok implements IInjector {
 	}
 
 	public resolveCommand(name: string): Commands.ICommand<Commands.ICommandData> {
-			return this.resolve(this.createCommandName(name));
+		return this.resolve(this.createCommandName(name));
 	}
 
 	public resolve(param: any): any {
@@ -191,6 +191,12 @@ export class Yok implements IInjector {
 			require(module.require);
 		}
 		return module;
+	}
+
+	public getRegisteredCommandsNames(): string[] {
+		var modulesNames: string[] = _.keys(this.modules);
+		var commandsNames: string[] = _.filter(modulesNames, (moduleName: string) => moduleName.startsWith(util.format("%s.", this.COMMANDS_NAMESPACE)));
+		return _.map(commandsNames, (commandName: string) => commandName.substr(this.COMMANDS_NAMESPACE.length + 1));
 	}
 
 	private createCommandName(name: string) {
