@@ -2,6 +2,7 @@
 "use strict";
 
 import _ = require("underscore");
+import baseCommands = require("./commands/base-commands");
 
 export class CommandsService implements ICommandsService {
 	private commands = {
@@ -31,15 +32,20 @@ export class CommandsService implements ICommandsService {
 		}
 
 		command = $injector.resolveCommand(commandName);
-		if (command) {
-			var commandData = command.getDataFactory().fromCliArguments(commandArguments);
-			if (command.canExecute(commandData)) {
-				command.execute(commandData);
-			}
-			return true;
+
+		var commandData;
+		if (command instanceof baseCommands.BaseCommand) {
+			commandData = command.getDataFactory().fromCliArguments(commandArguments);
+		} else if (command instanceof baseCommands.BaseParameterlessCommand) {
+			commandData = undefined;
+		} else {
+			return false;
 		}
 
-		return false;
+		if (command.canExecute(commandData)) {
+			command.execute(commandData);
+		}
+		return true;
 	}
 
 	public completeCommand() {
