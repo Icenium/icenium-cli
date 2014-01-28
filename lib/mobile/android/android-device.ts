@@ -88,10 +88,10 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	openDeviceLogStream() {
 		var adbLogcat = child_process.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
-		var grep = child_process.spawn("grep", ["-E", "-i", "telerik|icenium"]);
+		var search = this.spawnTextSearch("telerik|icenium");
 
 		adbLogcat.stdout.on("data", function (data) {
-			grep.stdin.write(data);
+			search.stdin.write(data);
 		});
 
 		adbLogcat.stderr.on("data", function (data) {
@@ -102,23 +102,35 @@ export class AndroidDevice implements Mobile.IDevice {
 			if (code !== 0) {
 				this.logger.trace("ADB process exited with code " + code);
 			}
-			grep.stdin.end();
+			search.stdin.end();
 		});
 
-		grep.stdout.on("data", function (data) {
+		search.stdout.on("data", function (data) {
 			var content = data.toString();
 			console.log(data.toString());
 		});
 
-		grep.stderr.on("data", function (data) {
+		search.stderr.on("data", function (data) {
 			this.logger.trace("grep stderr: " + data);
 		});
 
-		grep.on("close", function (code) {
+		search.on("close", function (code) {
 			if (code !== 0) {
 				this.logger.trace("grep process exited with code " + code);
 			}
 		});
+	}
+
+	private spawnTextSearch(pattern) {
+		if (helpers.isWindows()) {
+			// /r :Uses search strings as regular expressions. Findstr interprets all metacharacters as regular expressions.
+			// /i :Specifies that the search is not to be case-sensitive.
+			return child_process.spawn("findstr", ["/r", "/i", pattern]);
+		} else {
+			// -E :Interpret PATTERN as an extended regular expression.
+			// -i :Ignore case distinctions in both the PATTERN and the input.
+			return child_process.spawn("grep", ["-E", "-i", pattern]);
+		}
 	}
 }
 

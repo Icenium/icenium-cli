@@ -193,3 +193,7 @@ export function registerCommand(module: string, commandName: string, executor: (
 	$injector.registerCommand(commandName, factory);
 }
 
+
+export function isWindows() {
+	return /^win/.test(process.platform);
+}
