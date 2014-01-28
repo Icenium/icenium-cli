@@ -308,7 +308,7 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 $injector.register("houseArrestClient", HouseArrestClient);
 
 export class IOSSyslog {
-	private static bytesToRead = 1024;
+	private static BYTES_TO_READ = 1024;
 	private service;
 	private socket;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
@@ -321,13 +321,13 @@ export class IOSSyslog {
 	}
 
 	public read() {
-		var data = this.socket.read(IOSSyslog.bytesToRead);
+		var data = this.socket.read(IOSSyslog.BYTES_TO_READ);
 		while (data !== null && data !== undefined) {
 			var output = ref.readCString(data, 0);
 			if(this.matchRegex.test(output)) {
 				console.log(output);
 			}
-			data = this.socket.read(IOSSyslog.bytesToRead);
+			data = this.socket.read(IOSSyslog.BYTES_TO_READ);
 		}
 	}
 
