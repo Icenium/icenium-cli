@@ -2,12 +2,12 @@
 "use strict";
 
 import path = require("path");
-import fs = require("fs");
 import ref = require("ref");
 import ffi = require("ffi");
 import struct = require("ref-struct");
 import bufferpack = require("bufferpack");
 import plistlib = require("plistlib");
+import helpers = require("./../../helpers");
 
 export class CoreTypes {
 	public static pointerSize = ref.types.size_t.size;
@@ -53,7 +53,10 @@ export class CoreTypes {
 	public static cf_run_loop_timer_callback = ffi.Function("void", [CoreTypes.voidPtr, CoreTypes.voidPtr]);
 }
 
-class IOSCore {
+class IOSCore implements Mobile.IiOSCore {
+
+	constructor(private $fs: IFileSystem) {
+	}
 
 	private cfDictionaryKeyCallBacks = struct({
 		version: CoreTypes.uintType,
@@ -74,18 +77,18 @@ class IOSCore {
 
 	private kCFStringEncodingUTF8 = 0x08000100;
 
-	private appleFolderLocation = new ITunesInstallationInfo().getAppleFolderLocation();
+	private appleFolderLocation = new iTunesInstallationInfo(this.$fs).getAppleFolderLocation();
 	private coreFoundationDir = path.join(this.appleFolderLocation, "Apple Application Support");
 	private coreFoundationDll = path.join(this.coreFoundationDir, "CoreFoundation.dll");
 	private mobileDeviceDir = path.join(this.appleFolderLocation, "Mobile Device Support");
 	private mobileDeviceDll = path.join(this.mobileDeviceDir, "MobileDevice.dll");
 
 	private setPath() {
-		process["env"]["PATH"] = this.coreFoundationDir + ";" + process["env"]["PATH"];
-		process["env"]["PATH"] += ";" + this.mobileDeviceDir;
+		process.env.PATH = this.coreFoundationDir + ";" + process.env.PATH;
+		process.env.PATH += ";" + this.mobileDeviceDir;
 	}
 
-	public getCoreFoundationLibrary(): { [key: string]: any[] } {
+	public getCoreFoundationLibrary(): { } {
 		this.setPath();
 
 		return ffi.Library(this.coreFoundationDll, {
@@ -159,76 +162,76 @@ class IOSCore {
 $injector.register("iOSCore", IOSCore);
 
 export class CoreFoundation implements  Mobile.ICoreFoundation {
-	private coreFoundationLibrary: {[key: string]: any};
+	private coreFoundationLibrary: any;
 	private kCFStringEncodingUTF8 = 0x08000100;
 
-	constructor() {
-		this.coreFoundationLibrary = $injector.resolve("iOSCore").getCoreFoundationLibrary();
+	constructor($iOSCore: Mobile.IiOSCore) {
+		this.coreFoundationLibrary = $iOSCore.getCoreFoundationLibrary();
 	}
 
 	public runLoopRun(): void {
-		this.coreFoundationLibrary["CFRunLoopRun"]();
+		this.coreFoundationLibrary.CFRunLoopRun();
 	}
 
 	public runLoopGetCurrent(): any {
-		return this.coreFoundationLibrary["CFRunLoopGetCurrent"]();
+		return this.coreFoundationLibrary.CFRunLoopGetCurrent();
 	}
 
 	public getkCFRunLoopCommonModes(): NodeBuffer {
-		var modes = this.coreFoundationLibrary["kCFRunLoopCommonModes"];
+		var modes = this.coreFoundationLibrary.kCFRunLoopCommonModes;
 		return modes.deref();
 	}
 
 	public runLoopTimerCreate(allocator: NodeBuffer, fireDate: number, interval: number, flags: number, order: number, callout: NodeBuffer, context: any): NodeBuffer {
-		return this.coreFoundationLibrary["CFRunLoopTimerCreate"](allocator, fireDate, interval, flags, order, callout, context);
+		return this.coreFoundationLibrary.CFRunLoopTimerCreate(allocator, fireDate, interval, flags, order, callout, context);
 	}
 
 	public absoluteTimeGetCurrent(): number {
-		return this.coreFoundationLibrary["CFAbsoluteTimeGetCurrent"]();
+		return this.coreFoundationLibrary.CFAbsoluteTimeGetCurrent();
 	}
 
 	public runLoopAddTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void {
-		this.coreFoundationLibrary["CFRunLoopAddTimer"](r1, timer, mode);
+		this.coreFoundationLibrary.CFRunLoopAddTimer(r1, timer, mode);
 	}
 
 	public runLoopRemoveTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void {
-		this.coreFoundationLibrary["CFRunLoopRemoveTimer"](r1,  timer, mode);
+		this.coreFoundationLibrary.CFRunLoopRemoveTimer(r1,  timer, mode);
 	}
 
 	public runLoopStop(r1: any): void {
-		this.coreFoundationLibrary["CFRunLoopStop"](r1);
+		this.coreFoundationLibrary.CFRunLoopStop(r1);
 	}
 
 	public stringGetCStringPtr(theString: NodeBuffer, encoding: number): any {
-		return this.coreFoundationLibrary["CFStringGetCStringPtr"](theString, encoding);
+		return this.coreFoundationLibrary.CFStringGetCStringPtr(theString, encoding);
 	}
 
 	public stringGetLength(theString: NodeBuffer): number {
-		return this.coreFoundationLibrary["CFStringGetLength"](theString);
+		return this.coreFoundationLibrary.CFStringGetLength(theString);
 	}
 
 	public stringGetCString(theString: NodeBuffer, buffer: any, bufferSize: number, encoding: number): boolean {
-		return this.coreFoundationLibrary["CFStringGetCString"](theString, buffer, bufferSize, encoding);
+		return this.coreFoundationLibrary.CFStringGetCString(theString, buffer, bufferSize, encoding);
 	}
 
 	public stringCreateWithCString(alloc: NodeBuffer, str: string, encoding: number): NodeBuffer {
-		return this.coreFoundationLibrary["CFStringCreateWithCString"](alloc, str, encoding);
+		return this.coreFoundationLibrary.CFStringCreateWithCString(alloc, str, encoding);
 	}
 
 	public dictionaryGetValue(theDict: NodeBuffer, value: NodeBuffer): NodeBuffer {
-		return this.coreFoundationLibrary["CFDictionaryGetValue"](theDict, value);
+		return this.coreFoundationLibrary.CFDictionaryGetValue(theDict, value);
 	}
 
 	public numberGetValue(number: NodeBuffer, theType: number, valuePtr: NodeBuffer): boolean {
-		return this.coreFoundationLibrary["CFNumberGetValue"](number, theType, valuePtr);
+		return this.coreFoundationLibrary.CFNumberGetValue(number, theType, valuePtr);
 	}
 
 	public  getTypeID(type: NodeBuffer): number {
-		return this.coreFoundationLibrary["CFGetTypeID"]();
+		return this.coreFoundationLibrary.CFGetTypeID();
 	}
 
 	public dictionaryGetCount(theDict: NodeBuffer): number {
-		return this.coreFoundationLibrary["CFDictionaryGetCount"](theDict);
+		return this.coreFoundationLibrary.CFDictionaryGetCount(theDict);
     }
 
 	public createCFString(str: string): NodeBuffer {
@@ -260,101 +263,105 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 $injector.register("coreFoundation", CoreFoundation);
 
 export class MobileDevice implements Mobile.IMobileDevice {
-	private mobileDeviceLibrary: {[key: string]: any};
+	private mobileDeviceLibrary: any;
 
-	constructor() {
-		this.mobileDeviceLibrary = $injector.resolve("iOSCore").getMobileDeviceLibrary();
+	constructor($iOSCore: Mobile.IiOSCore) {
+		this.mobileDeviceLibrary = $iOSCore.getMobileDeviceLibrary();
 	}
 
 	public deviceNotificationSubscribe(notificationCallback: NodeBuffer, p1: number, p2: number, p3: number, callbackSignature: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceNotificationSubscribe"](notificationCallback, p1, p2, p3, callbackSignature);
+		return this.mobileDeviceLibrary.AMDeviceNotificationSubscribe(notificationCallback, p1, p2, p3, callbackSignature);
 	}
 
 	public deviceCopyDeviceIdentifier(devicePointer: NodeBuffer): NodeBuffer {
-		return this.mobileDeviceLibrary["AMDeviceCopyDeviceIdentifier"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceCopyDeviceIdentifier(devicePointer);
 	}
 
 	public deviceConnect(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceConnect"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceConnect(devicePointer);
 	}
 
 	public deviceIsPaired(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceIsPaired"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceIsPaired(devicePointer);
 	}
 
 	public devicePair(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDevicePair"](devicePointer);
+		return this.mobileDeviceLibrary.AMDevicePair(devicePointer);
 	}
 
 	public deviceValidatePairing(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceValidatePairing"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceValidatePairing(devicePointer);
 	}
 
 	public deviceStartSession(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceStartSession"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceStartSession(devicePointer);
 	}
 
 	public deviceStopSession(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceStopSession"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceStopSession(devicePointer);
 	}
 
 	public deviceDisconnect(devicePointer: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AMDeviceDisconnect"](devicePointer);
+		return this.mobileDeviceLibrary.AMDeviceDisconnect(devicePointer);
 	}
 
     public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer) {
-		return this.mobileDeviceLibrary["AMDeviceStartService"](devicePointer, serviceName, socketNumber, p1);
+		return this.mobileDeviceLibrary.AMDeviceStartService(devicePointer, serviceName, socketNumber, p1);
 	}
 
 	public afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCConnectionOpen"](service, timeout, afcConnection);
+		return this.mobileDeviceLibrary.AFCConnectionOpen(service, timeout, afcConnection);
 	}
 
 	public afcConnectionClose(afcConnection: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCConnectionClose"](afcConnection);
+		return this.mobileDeviceLibrary.AFCConnectionClose(afcConnection);
 	}
 
 	public afcDirectoryCreate(afcConnection: NodeBuffer, path: string): number {
-		return this.mobileDeviceLibrary["AFCDirectoryCreate"](afcConnection, path);
+		return this.mobileDeviceLibrary.AFCDirectoryCreate(afcConnection, path);
 	}
 
 	public afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, timeout: number, afcFileRef: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCFileRefOpen"](afcConnection, path, mode, timeout, afcFileRef);
+		return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, timeout, afcFileRef);
 	}
 
 	public afcFileRefClose(afcConnection: NodeBuffer, afcFileRef: number): number {
-		return this.mobileDeviceLibrary["AFCFileRefClose"](afcConnection, afcFileRef);
+		return this.mobileDeviceLibrary.AFCFileRefClose(afcConnection, afcFileRef);
 	}
 
 	public afcFileRefWrite(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number {
-		return this.mobileDeviceLibrary["AFCFileRefWrite"](afcConnection, afcFileRef, buffer, byteLength);
+		return this.mobileDeviceLibrary.AFCFileRefWrite(afcConnection, afcFileRef, buffer, byteLength);
 	}
 
 	public afcFileRefRead(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number {
-		return this.mobileDeviceLibrary["AFCFileRefRead"](afcConnection, afcFileRef, buffer, byteLength);
+		return this.mobileDeviceLibrary.AFCFileRefRead(afcConnection, afcFileRef, buffer, byteLength);
 	}
 
 	public afcDirectoryOpen(afcConnection: NodeBuffer, path: string, afcDirectory: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCDirectoryOpen"](afcConnection, path, afcDirectory);
+		return this.mobileDeviceLibrary.AFCDirectoryOpen(afcConnection, path, afcDirectory);
 	}
 
 	public afcDirectoryRead(afcConnection: NodeBuffer, afcDirectory: NodeBuffer,  name: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCDirectoryRead"](afcConnection, afcDirectory, name);
+		return this.mobileDeviceLibrary.AFCDirectoryRead(afcConnection, afcDirectory, name);
 	}
 
 	public afcDirectoryClose(afcConnection: NodeBuffer, afcDirectory: NodeBuffer): number {
-		return this.mobileDeviceLibrary["AFCDirectoryClose"](afcConnection, afcDirectory);
+		return this.mobileDeviceLibrary.AFCDirectoryClose(afcConnection, afcDirectory);
 	}
 }
 $injector.register("mobileDevice", MobileDevice);
 
-class ITunesInstallationInfo {
+class iTunesInstallationInfo {
 	// ITunes and Node.js installation validator
 	private iTunesNotFoundErrorMessage = "iTunes is not installed";
 	private iTunesMismatchNodeBitsErrorMessage = "iTunes mismatch node.js version.";
 
+	constructor(private $fs: IFileSystem) {
+
+	}
+
 	public getAppleFolderLocation(): string {
-		var isWindows64 = process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432");
+		var isWindows64 = helpers.isWindows64();
 		this.validateiTunesInstallation(isWindows64);
 
 		if(isWindows64) {
@@ -362,11 +369,11 @@ class ITunesInstallationInfo {
 				return path.join(process.env["CommonProgramFiles(x86)"], "Apple");
 			}
 			else {
-				return path.join(process.env["CommonProgramW6432"], "Apple");
+				return path.join(process.env.CommonProgramW6432, "Apple");
 			}
 		}
 		else {
-			return path.join(process.env["CommonProgramFiles"], "Apple");
+			return path.join(process.env.CommonProgramFiles, "Apple");
 		}
 	}
 
@@ -381,8 +388,8 @@ class ITunesInstallationInfo {
 	}
 
 	private validateiTunesInstallationForWindows64(): void {
-		var existsPathToAppleFolderW6432 = fs.existsSync(path.join(process.env.CommonProgramW6432, "Apple"));
-		var	existsPathToAppleFolderX86 = fs.existsSync(path.join(process.env["CommonProgramFiles(x86)"], "Apple"));
+		var existsPathToAppleFolderW6432 = this.$fs.exists(path.join(process.env.CommonProgramW6432, "Apple")).wait();
+		var	existsPathToAppleFolderX86 = this.$fs.exists(path.join(process.env["CommonProgramFiles(x86)"], "Apple")).wait();
 
 		if(this.isNodeJs32BitsInstalled()) {
 			if(!existsPathToAppleFolderX86) {
@@ -396,7 +403,7 @@ class ITunesInstallationInfo {
 	}
 
 	private isiTunesInstalled(): boolean {
-		return fs.existsSync(path.join(process.env.CommonProgramFiles, "Apple"));
+		return this.$fs.exists(path.join(process.env.CommonProgramFiles, "Apple")).wait();
 	}
 
 	private isNodeJs32BitsInstalled() : boolean {
@@ -406,15 +413,16 @@ class ITunesInstallationInfo {
 
 export class WinSocketWrapper {
 
-	private winSocketLibrary:{[key:string]: any} = null;
+	private winSocketLibrary: any = null;
 
-	constructor(private socket: number) {
-        this.winSocketLibrary = $injector.resolve("iOSCore").getWinSocketLibrary();
+	constructor(private socket: number,
+		private $iOSCore: Mobile.IiOSCore) {
+        this.winSocketLibrary = $iOSCore.getWinSocketLibrary();
 	}
 
 	public read(bytes: number): NodeBuffer {
 		var data = new Buffer(bytes);
-		var result = this.winSocketLibrary["recv"](this.socket, data, bytes, 0);
+		var result = this.winSocketLibrary.recv(this.socket, data, bytes, 0);
 		if (result < 0) {
 			throw "Error receiving data: " + result;
 		}
@@ -423,11 +431,11 @@ export class WinSocketWrapper {
 	}
 
 	public write(data: string): number {
-		return this.winSocketLibrary["send"](this.socket, data, data.length, 0);
+		return this.winSocketLibrary.send(this.socket, data, data.length, 0);
 	}
 
 	public close(): number {
-		return this.winSocketLibrary["closesocket"](this.socket);
+		return this.winSocketLibrary.closesocket(this.socket);
 	}
 }
 
@@ -435,9 +443,11 @@ export class PlistService {
 	private socket: WinSocketWrapper = null;
 	private service = 0;
 
-	constructor(private iOSDevice: Mobile.IIOSDevice, serviceName: string) {
-		this.service = iOSDevice.startService(serviceName);
-		this.socket = new WinSocketWrapper(this.service);
+	constructor($iOSDevice: Mobile.IIOSDevice,
+				$iOSCore: Mobile.IiOSCore,
+				serviceName: string) {
+		this.service = $iOSDevice.startService(serviceName);
+		this.socket = new WinSocketWrapper(this.service, $iOSCore);
 	}
 
 	public get Service(): number {
@@ -485,6 +495,3 @@ export class PlistService {
 	}
 }
 $injector.register("plistService", PlistService);
-
-
-

@@ -17,12 +17,11 @@ export class OpenDeviceLogStreamCommandDataFactory implements Commands.ICommandD
 $injector.register("openDeviceLogStreamCommandDataFactory", OpenDeviceLogStreamCommandDataFactory);
 
 export class OpenDeviceLogStreamCommand implements Commands.ICommand<OpenDeviceLogStreamCommandData> {
-	constructor(private openDeviceLogStreamCommandDataFactory: OpenDeviceLogStreamCommandDataFactory,
-				private devicesServices: Mobile.IDevicesServices,
-				private logger: ILogger) { }
+	constructor(private $openDeviceLogStreamCommandDataFactory: OpenDeviceLogStreamCommandDataFactory,
+		private $devicesServices: Mobile.IDevicesServices) { }
 
 	public getDataFactory(): OpenDeviceLogStreamCommandDataFactory {
-		return this.openDeviceLogStreamCommandDataFactory;
+		return this.$openDeviceLogStreamCommandDataFactory;
 	}
 
 	public canExecute(): boolean {
@@ -32,9 +31,9 @@ export class OpenDeviceLogStreamCommand implements Commands.ICommand<OpenDeviceL
 	public execute(data: OpenDeviceLogStreamCommandData): void {
 		var action = (device: Mobile.IDevice) =>  { device.openDeviceLogStream(); };
 		if(helpers.isNumber(options.device)) {
-			this.devicesServices.executeOnDevice(action, undefined, parseInt(options.device));
+			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10));
 		} else {
-			this.devicesServices.executeOnDevice(action, options.device);
+			this.$devicesServices.executeOnDevice(action, options.device);
 		}
 	}
 }

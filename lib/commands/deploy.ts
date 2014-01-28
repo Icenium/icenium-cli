@@ -9,8 +9,8 @@ import Future = require("fibers/future");
 
 export class DeployCommandData implements Commands.ICommandData {
 	constructor(private keywords: string[]) { }
-	public get Keywords() {
-		return this.keywords;
+	public get Platform() {
+		return this.keywords[0];
     }
 }
 
@@ -23,12 +23,13 @@ export class DeployCommandDataFactory implements Commands.ICommandDataFactory {
 $injector.register("deployCommandDataFactory", DeployCommandDataFactory);
 
 export class DeployCommand implements Commands.ICommand<DeployCommandData> {
-    constructor(private deployCommandDataFactory: DeployCommandDataFactory,
-				private devicesServices: Mobile.IDevicesServices,
-				private logger: ILogger) { }
+    constructor(private $deployCommandDataFactory: DeployCommandDataFactory,
+		private $devicesServices: Mobile.IDevicesServices,
+		private $logger: ILogger,
+		private $identityManager: Server.IIdentityManager) { }
 
 	public getDataFactory(): DeployCommandDataFactory {
-		return this.deployCommandDataFactory;
+		return this.$deployCommandDataFactory;
 	}
 
 	public canExecute(): boolean {
@@ -36,14 +37,12 @@ export class DeployCommand implements Commands.ICommand<DeployCommandData> {
 	}
 
 	public execute(data: DeployCommandData): void {
-		var platform = data.Keywords.length === 0 ? undefined : data.Keywords[0];
 
-		if (this.devicesServices.hasDevices(platform)) {
+		if (this.$devicesServices.hasDevices(data.Platform)) {
 			var canExecute;
 
-			if(platform === MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS]) {
-				var identityMgr = $injector.resolve("identityManager");
-				var provisionData = identityMgr.findProvision(options["provision"]).wait();
+			if(MobileHelper.isiOSPlatform(data.Platform)) {
+				var provisionData = this.$identityManager.findProvision(options["provision"]).wait();
 				canExecute = (device: Mobile.IDevice): boolean => {
 					var isInProvisionedDevices: boolean = provisionData.ProvisionedDevices !== undefined && provisionData.ProvisionedDevices.contains(device.getIdentifier());
 					if(!isInProvisionedDevices) {
@@ -54,18 +53,18 @@ export class DeployCommand implements Commands.ICommand<DeployCommandData> {
 				}
 			}
 
-			var packageDefs = project.build(platform, null, false, true).wait();
+			var packageDefs = project.build(data.Platform, null, false, true).wait();
 			var packageFile = packageDefs[0].localFile;
 
-			this.logger.debug("Ready to deploy %s", packageDefs);
-			this.logger.debug("File is %d bytes", fs.statSync(packageFile).size);
+			this.$logger.debug("Ready to deploy %s", packageDefs);
+			this.$logger.debug("File is %d bytes", fs.statSync(packageFile).size);
 
 			var packageName = project.getProjectData().AppIdentifier;
 
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => { device.deploy(packageFile, packageName); }).future<void>()();
 			};
-			this.devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
+			this.$devicesServices.executeOnAllConnectedDevices(action, data.Platform, canExecute).wait();
 		}
 	}
 }

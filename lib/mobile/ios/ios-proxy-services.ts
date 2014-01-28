@@ -125,7 +125,7 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	public transferPackage(localFilePath: string, devicePath: string): IFuture<void> {
 		return (() => {
-			if (os.platform() === "win32") {
+			if (helpers.isWindows()) {
 				this.transfer(localFilePath, devicePath).wait();
 			}
 		}).future<void>()();
@@ -143,19 +143,19 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	private transferFile(localFilePath: string, devicePath: string, relativeToProjectBasePath: any): IFuture<void> {
 		return (() => {
-			if (os.platform() === "win32") {
-				var relativeToProjectBasePaths = relativeToProjectBasePath.split("\\");
+			if (helpers.isWindows()) {
+				var relativeToProjectBasePaths = relativeToProjectBasePath.split(path.sep);
 				var fileName = relativeToProjectBasePaths[relativeToProjectBasePaths.length - 1];
 				var targetDirectoryPath = "/Documents";
 
-				for (var i = 0; i < relativeToProjectBasePaths.length; i++) {
-					if (relativeToProjectBasePaths[i] !== "" && i !== (relativeToProjectBasePaths.length - 1)) {
-						targetDirectoryPath = helpers.fromWindowsToUnixFilePath(path.join(targetDirectoryPath, "/", relativeToProjectBasePaths[i]));
+				relativeToProjectBasePaths.forEach((relativeToProjectBasePath: string) => {
+					if (relativeToProjectBasePath !== "" && relativeToProjectBasePath !== fileName) {
+						targetDirectoryPath = helpers.fromWindowsRelativePathToUnix(path.join(targetDirectoryPath, "/", relativeToProjectBasePath));
 						this.mkdir(targetDirectoryPath);
 					}
-				}
+				});
 
-				var targetPath = helpers.fromWindowsToUnixFilePath(path.join(targetDirectoryPath, "/", fileName));
+				var targetPath = helpers.fromWindowsRelativePathToUnix(path.join(targetDirectoryPath, "/", fileName));
 				this.transfer(localFilePath, targetPath).wait();
 			}
 		}).future<void>()();
@@ -166,8 +166,11 @@ export class AfcClient implements Mobile.IAfcClient {
 			var reader = this.$fs.createReadStream(localFilePath);
 			var target = this.open(devicePath, "w");
 
-			reader.on("data", function (data) {
+			reader.on("data", (data) => {
 				target.write(data, data.length);
+			})
+			.on("error", (error) => {
+				throw new Error(error);
 			})
 			.on("end", function () {
 					target.close();
@@ -181,20 +184,21 @@ export class AfcClient implements Mobile.IAfcClient {
 
 export class InstallationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
-				private mobileDevice: Mobile.IMobileDevice,
-				private coreFoundation: Mobile.ICoreFoundation,
+				private $iOSCore: Mobile.IiOSCore,
+				private $mobileDevice: Mobile.IMobileDevice,
+				private $coreFoundation: Mobile.ICoreFoundation,
 				private logger: ILogger,
 				private $fs: IFileSystem) {
 	}
 
 	public deployApplication(packageFile: string) {
 		var afcService = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
-		var afcClient = new AfcClient(afcService, this.mobileDevice, this.$fs);
+		var afcClient = new AfcClient(afcService, this.$mobileDevice, this.$fs);
 
-		var devicePath = helpers.fromWindowsToUnixFilePath(path.join("PublicStaging", _.last(packageFile.split("\\"))));
+		var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", _.last(packageFile.split(path.sep))));
 
 		afcClient.transferPackage(packageFile, devicePath).wait();
-		var plistService = new iOSCore.PlistService(this.device, MobileServices.INSTALLATION_PROXY);
+		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.INSTALLATION_PROXY);
 
 		var plist = {
 			type: "dict",
@@ -227,12 +231,13 @@ export class InstallationProxyClient {
 $injector.register("installationProxyClient", InstallationProxyClient);
 
 export class NotificationProxyClient {
-	constructor(private device: Mobile.IIOSDevice) {
+	constructor(private device: Mobile.IIOSDevice,
+		private $iOSCore: Mobile.IiOSCore ) {
 
 	}
 
 	postNotification(notificationName: string) {
-		var plistService = new iOSCore.PlistService(this.device, MobileServices.NOTIFICATION_PROXY);
+		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.NOTIFICATION_PROXY);
 
 		var result = plistService.sendMessage({
 			type: "dict",
@@ -255,12 +260,13 @@ $injector.register("notificationProxyClient", NotificationProxyClient);
 
 export class HouseArrestClient implements Mobile.IHouseArressClient {
 	constructor(private device: Mobile.IIOSDevice,
-				private mobileDevice: Mobile.IMobileDevice,
-				private $fs: IFileSystem) {
+		private $iOSCore: Mobile.IiOSCore,
+		private $mobileDevice: Mobile.IMobileDevice,
+		private $fs: IFileSystem) {
 	}
 
 	private getAfcClientCore(device, command, applicationIdentifier: string): Mobile.IAfcClient {
-		var plistService = new iOSCore.PlistService(this.device, MobileServices.HOUSE_ARREST);
+		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.HOUSE_ARREST);
 
 		var plist = {
 			type: "dict",
@@ -288,7 +294,7 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 			throw "Unable to start house arrest service";
 		}
 
-		return new AfcClient(plistService.Service, this.mobileDevice, this.$fs);
+		return new AfcClient(plistService.Service, this.$mobileDevice, this.$fs);
 	}
 
 	public getAfcClientForAppDocuments(applicationIdentifier: string): Mobile.IAfcClient {
@@ -302,29 +308,31 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 $injector.register("houseArrestClient", HouseArrestClient);
 
 export class IOSSyslog {
+	private static bytesToRead = 1024;
 	private service;
 	private socket;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
 
 	constructor(private device: Mobile.IIOSDevice,
-				private $fs: IFileSystem) {
+		private $iOSCore: Mobile.IiOSCore,
+		private $fs: IFileSystem) {
 		this.service = device.startService(MobileServices.SYSLOG);
-		this.socket = new iOSCore.WinSocketWrapper(this.service);
+		this.socket = new iOSCore.WinSocketWrapper(this.service, $iOSCore);
 	}
 
 	public read() {
-		var data = this.socket.read(1024);
+		var data = this.socket.read(IOSSyslog.bytesToRead);
 		while (data !== null && data !== undefined) {
 			var output = ref.readCString(data, 0);
 			if(this.matchRegex.test(output)) {
 				console.log(output);
 			}
-			data = this.socket.read(1024);
+			data = this.socket.read(IOSSyslog.bytesToRead);
 		}
 	}
 
 	public disconnect() {
-		if (os.platform() === "win32") {
+		if (helpers.isWindows()) {
 			this.socket.close();
 		}
 	}

@@ -7,8 +7,8 @@ import path = require("path");
 import helpers = require("./../../helpers");
 
 export class AndroidDevice implements Mobile.IDevice {
-	private projectPath = "mnt/sdcard/Icenium/";
-	private refreshWebViewIntentName = "com.telerik.RefreshWebView";
+	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
+	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
 	private exec = Future.wrap( (command: string, callback: (error: any, stdout: NodeBuffer) => void) => {
 		return child_process.exec(command, callback);
 	});
@@ -31,7 +31,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	public getDeviceProjectPath(appIdentifier: string): string {
-		return path.join(this.projectPath, appIdentifier);
+		return path.join(AndroidDevice.PROJECT_PATH, appIdentifier);
 	}
 
 	private composeCommand(command) {
@@ -42,17 +42,21 @@ export class AndroidDevice implements Mobile.IDevice {
 		return result;
 	}
 
-	private startPackageOnDevice(packageName) {
-		var startPackageCommand = this.composeCommand(util.format("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName));
-		var result = this.exec(startPackageCommand).wait();
-		return result[0];
+	private startPackageOnDevice(packageName): IFuture<void> {
+		return(() => {
+			var startPackageCommand = this.composeCommand(util.format("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName));
+			var result = this.exec(startPackageCommand).wait();
+			return result[0];
+		}).future<void>()();
 	}
 
-	deploy(packageFile: string, packageName: string): void {
-		var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
-		this.exec(installCommand).wait();
-		this.startPackageOnDevice(packageName);
-		console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
+	deploy(packageFile: string, packageName: string): IFuture<void> {
+		return(() => {
+			var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
+			this.exec(installCommand).wait();
+			this.startPackageOnDevice(packageName);
+			console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
+		}).future<void>()();
 	}
 
 	private pushFilesOnDevice(localToDevicePaths): IFuture<void> {
@@ -80,10 +84,12 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
-		this.pushFilesOnDevice(localToDevicePaths).wait();
-		this.sendBroadcastToDevice(this.refreshWebViewIntentName).wait();
-		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
+	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
+		return(() => {
+			this.pushFilesOnDevice(localToDevicePaths).wait();
+			this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
+			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
+		}).future<void>()();
 	}
 
 	openDeviceLogStream() {
@@ -133,5 +139,3 @@ export class AndroidDevice implements Mobile.IDevice {
 		}
 	}
 }
-
-$injector.register("androidDevice", AndroidDevice);

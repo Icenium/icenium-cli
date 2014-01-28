@@ -12,9 +12,10 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	private identifier: string = null;
 
 	constructor(private devicePointer,
-				private coreFoundation: Mobile.ICoreFoundation,
-				private mobileDevice: Mobile.IMobileDevice,
-				private logger: ILogger,
+				private $iOSCore: Mobile.IiOSCore,
+				private $coreFoundation: Mobile.ICoreFoundation,
+				private $mobileDevice: Mobile.IMobileDevice,
+				private $logger: ILogger,
 				private $fs: IFileSystem) {
 	}
 
@@ -24,7 +25,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 
 	public getIdentifier(): string {
 		if (this.identifier == null) {
-			this.identifier = this.coreFoundation.convertCFStringToCString(this.mobileDevice.deviceCopyDeviceIdentifier(this.devicePointer));
+			this.identifier = this.$coreFoundation.convertCFStringToCString(this.$mobileDevice.deviceCopyDeviceIdentifier(this.devicePointer));
 		}
 
 		return this.identifier;
@@ -45,23 +46,23 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	private isPaired(): boolean {
-		return this.mobileDevice.deviceIsPaired(this.devicePointer) != 0;
+		return this.$mobileDevice.deviceIsPaired(this.devicePointer) != 0;
 	}
 
 	private pair(): number {
-		var result = this.mobileDevice.devicePair(this.devicePointer);
+		var result = this.$mobileDevice.devicePair(this.devicePointer);
 		this.validateResult(result, "If your phone is locked with a passcode, unlock then reconnect it");
 		return result;
 	}
 
 	private validatePairing() : number{
-		var result = this.mobileDevice.deviceValidatePairing(this.devicePointer);
+		var result = this.$mobileDevice.deviceValidatePairing(this.devicePointer);
 		this.validateResult(result, "Unable to validate pairing");
 		return result;
 	}
 
 	private connect() : number {
-		var result = this.mobileDevice.deviceConnect(this.devicePointer);
+		var result = this.$mobileDevice.deviceConnect(this.devicePointer);
 		this.validateResult(result, "Unable to connect to device");
 
 		if (!this.isPaired()) {
@@ -72,17 +73,17 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	private disconnect() {
-		var result = this.mobileDevice.deviceDisconnect(this.devicePointer);
+		var result = this.$mobileDevice.deviceDisconnect(this.devicePointer);
 		this.validateResult(result, "Unable to disconnect from device");
 	}
 
 	private startSession() {
-		var result = this.mobileDevice.deviceStartSession(this.devicePointer);
+		var result = this.$mobileDevice.deviceStartSession(this.devicePointer);
 		this.validateResult(result, "Unable to start session");
 	}
 
 	private stopSession() {
-			var result = this.mobileDevice.deviceStopSession(this.devicePointer);
+			var result = this.$mobileDevice.deviceStopSession(this.devicePointer);
 			this.validateResult(result, "Unable to stop session");
 	}
 
@@ -92,7 +93,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 			this.startSession();
 			try {
 				var socket = ref.alloc("int");
-				var result = this.mobileDevice.deviceStartService(this.devicePointer, this.coreFoundation.createCFString(serviceName), socket, null);
+				var result = this.$mobileDevice.deviceStartService(this.devicePointer, this.$coreFoundation.createCFString(serviceName), socket, null);
 				this.validateResult(result, "Unable to start service");
 				return ref.deref(socket);
 			} finally {
@@ -104,22 +105,22 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public deploy(packageFile: string, packageName: string): void {
-		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.mobileDevice, this.coreFoundation, this.logger, this.$fs);
+		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$iOSCore, this.$mobileDevice, this.$coreFoundation, this.$logger, this.$fs);
 		installationProxy.deployApplication(packageFile);
 	}
 
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
-		var houseArrestClient: Mobile.IHouseArressClient = new iOSProxyServices.HouseArrestClient(this, this.mobileDevice, this.$fs);
+		var houseArrestClient: Mobile.IHouseArressClient = new iOSProxyServices.HouseArrestClient(this, this.$iOSCore, this.$mobileDevice, this.$fs);
 		var afcClientForAppDocuments: Mobile.IAfcClient = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 		afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
-		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this);
+		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this, this.$iOSCore);
 		notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 	}
 
 	public openDeviceLogStream() {
-		var iOSSyslog = new iOSProxyServices.IOSSyslog(this, this.$fs);
+		var iOSSyslog = new iOSProxyServices.IOSSyslog(this, this.$iOSCore, this.$fs);
 		iOSSyslog.read();
 	}
 }

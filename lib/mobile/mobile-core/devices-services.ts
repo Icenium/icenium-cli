@@ -1,6 +1,5 @@
 ///<reference path="./../../.d.ts"/>
 
-import Q = require("q");
 import Signal = require("./../../events/signal");
 import _ = require("underscore");
 import util = require("util");
@@ -9,12 +8,14 @@ import MobileHelper = require("./../mobile-helper");
 
 export class DevicesServices implements Mobile.IDevicesServices {
 	private devices: { [key: string]: Mobile.IDevice } = {};
-	private platforms: Array<string> = new Array<string>();
-	private missingIdentifierAndIndexErrorMessage = "Please specify --device \<identifier\ or index>. Run $ice list-devices command to see all connected devices";
-	private notFoundDeviceByIdentifierErrorMessage = "Not found device with identifier '%s'";
-	private notFoundDeviceByIndexErrorMessage = "Invalid index %d.";
+	private platforms: string[] = [];
+	private static NOT_SPECIFIED_DEVICE_ERROR_MESSAGE = "Please specify the device (with option --device \<identifier\ or index>). Run $ice list-devices command to see all connected devices";
+	private static NOT_FOUND_DEVICE_BY_IDENTIFIER_ERROR_MESSAGE = "Could not find device with identifier '%s'";
+	private static NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE = "Could not find device with index %d.";
 
-	constructor(private logger: ILogger, private iOSDeviceDiscovery: Mobile.IDeviceDiscovery, private androidDeviceDiscovery: Mobile.IDeviceDiscovery) {
+	constructor(private $logger: ILogger,
+				private $iOSDeviceDiscovery: Mobile.IDeviceDiscovery,
+				private $androidDeviceDiscovery: Mobile.IDeviceDiscovery) {
 		this.attachToDeviceDiscoveryEvents()
 	}
 
@@ -30,7 +31,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		var devicePlatforms = MobileHelper.DevicePlatforms;
 		for (var platform in devicePlatforms) {
 			if(typeof devicePlatforms[platform] === "number") {
-				this.platforms.push(platform.toString().toLowerCase());
+				this.platforms.push(platform.toLowerCase());
 			}
 		}
 
@@ -48,37 +49,38 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	}
 
 	attachToDeviceDiscoveryEvents() {
-		this.iOSDeviceDiscovery.deviceFound.add(this.onDeviceFound, this);
-		this.iOSDeviceDiscovery.deviceLost.add(this.onDeviceLost, this);
+		this.$iOSDeviceDiscovery.deviceFound.add(this.onDeviceFound, this);
+		this.$iOSDeviceDiscovery.deviceLost.add(this.onDeviceLost, this);
 
-		this.androidDeviceDiscovery.deviceFound.add(this.onDeviceFound, this);
-		this.androidDeviceDiscovery.deviceLost.add(this.onDeviceLost, this);
+		this.$androidDeviceDiscovery.deviceFound.add(this.onDeviceFound, this);
+		this.$androidDeviceDiscovery.deviceLost.add(this.onDeviceLost, this);
 	}
 
 	private onDeviceFound(device: Mobile.IDevice): void {
-		this.logger.trace("Found device with identifier '%s'", device.getIdentifier());
+		this.$logger.trace("Found device with identifier '%s'", device.getIdentifier());
 		this.devices[device.getIdentifier()] = device;
 	}
 
 	private onDeviceLost(device: Mobile.IDevice): void {
-		this.logger.trace("Lost device with identifier '%s'", device.getIdentifier());
+		this.$logger.trace("Lost device with identifier '%s'", device.getIdentifier());
 		delete this.devices[device.getIdentifier()];
 	}
 
-	private startLookingForDevices(platform?: string): void {
-		if(platform === undefined) {
-			this.iOSDeviceDiscovery.startLookingForDevices();
-			this.androidDeviceDiscovery.startLookingForDevices();
-		} else if(platform.toLowerCase() === "ios") {
-			this.iOSDeviceDiscovery.startLookingForDevices();
-		} else if(platform.toLowerCase() === "android") {
-			this.androidDeviceDiscovery.startLookingForDevices();
-		}
+	private startLookingForDevices(platform?: string): IFuture<void> {
+		return (() => {
+			if(!platform) {
+				this.$iOSDeviceDiscovery.startLookingForDevices();
+				this.$androidDeviceDiscovery.startLookingForDevices().wait();
+			} else if(MobileHelper.isiOSPlatform(platform)) {
+				this.$iOSDeviceDiscovery.startLookingForDevices();
+			} else if(MobileHelper.isAndroidPlatform(platform)) {
+				this.$androidDeviceDiscovery.startLookingForDevices().wait();
+			}
+		}).future<void>()();
 	}
 
 	private getAllConnectedDevices(platform?: string, timeoutInSeconds?: number): Mobile.IDevice[] {
-		this.startLookingForDevices(platform);
-		if(platform === undefined) {
+		if(!platform) {
 			return this.getDevices();
 		} else {
 			return this.filterDevicesByPlatform(this.getPlatform(platform));
@@ -91,19 +93,19 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	}
 
 	private getDeviceByIdentifier(identifier: string): Mobile.IDevice {
-		var devicesFromSpecifiedPlatform = this.getDevices().filter(function(device: Mobile.IDevice){ return device.getIdentifier() === identifier});
-		if(devicesFromSpecifiedPlatform.length === 0) {
-			throw new Error(util.format(this.notFoundDeviceByIdentifierErrorMessage, identifier));
+		var searchedDevice = _.find(this.getDevices(), (device: Mobile.IDevice) => { return device.getIdentifier() === identifier; });
+		if(!searchedDevice) {
+			throw new Error(util.format(DevicesServices.NOT_FOUND_DEVICE_BY_IDENTIFIER_ERROR_MESSAGE, identifier));
 		}
 
-		return devicesFromSpecifiedPlatform[0];
+		return searchedDevice;
 	}
 
 	public executeOnDevice(action: any, identifier?: string, index?: number): void {
 		this.startLookingForDevices();
 
-		if (identifier === undefined && index === undefined) {
-			console.log(this.missingIdentifierAndIndexErrorMessage);
+		if (!identifier && index === undefined) {
+			console.log(DevicesServices.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
 			return;
 		} else if (identifier) {
 			action(this.getDeviceByIdentifier(identifier));
@@ -114,9 +116,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	public executeOnAllConnectedDevices(action: (dev: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
 		return(() => {
+			this.startLookingForDevices(platform).wait();
 			var allConnectedDevices = this.getAllConnectedDevices(platform);
 			var listers: IFuture<any>[] = _.map(allConnectedDevices, (device: Mobile.IDevice) => {
-				if(canExecute !== undefined) {
+				if(canExecute) {
 					if(canExecute(device)) {
 						return action(device);
 					}
@@ -129,7 +132,6 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 	public hasDevices(platform?: string): boolean {
-
 		if (platform === undefined) {
 			return this.getDevices().length === 0;
 		} else {
@@ -138,13 +140,12 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	}
 
 	private filterDevicesByPlatform(platform: string): Mobile.IDevice[] {
-		return this.getDevices().filter( (device: Mobile.IDevice) => { return device.getPlatform() === platform;});
+		return _.filter(this.getDevices(), (device: Mobile.IDevice) => { return device.getPlatform() === platform; });
 	}
 
-	private validateIndex(index: number, devices: Mobile.IDevice[]= null): void {
-		index = parseInt(index.toString(), 10);
+	private validateIndex(index: number): void {
 		if (index < 0 || index > this.getDevices().length) {
-			throw new Error(util.format(this.notFoundDeviceByIndexErrorMessage, index));
+			throw new Error(util.format(DevicesServices.NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE, index));
 		}
 	}
 }

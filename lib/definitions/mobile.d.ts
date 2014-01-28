@@ -19,13 +19,19 @@ declare module Mobile {
 	interface IDeviceDiscovery {
 		deviceFound: ISignal;
 		deviceLost: ISignal;
-		startLookingForDevices?(): void;
+		startLookingForDevices?(): IFuture<void>;
     }
 
 	interface IDevicesServices {
 		executeOnAllConnectedDevices(action:  (device: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;
 		executeOnDevice(action: any, identifier?: string, index?: number): void;
 		hasDevices(platform?: string): boolean;
+	}
+
+	interface IiOSCore {
+		getCoreFoundationLibrary(): any;
+		getMobileDeviceLibrary(): any;
+		getWinSocketLibrary(): any;
 	}
 
 	interface ICoreFoundation {

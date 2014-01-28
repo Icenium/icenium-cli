@@ -14,6 +14,8 @@ import xopen = require("open");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import baseCommands = require("./commands/base-commands");
+import projectNameValidator = require("./validators/project-name-validator");
+import MobileHelper = require("./mobile/mobile-helper");
 
 export class BuildService implements Project.IBuildService {
 	constructor(private $config,
@@ -176,9 +178,9 @@ export class Project implements Project.IProject {
 
 	private requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
-			if (helpers.isAndroidPlatform(platform)) {
+			if (MobileHelper.isAndroidPlatform(platform)) {
 				platform = "Android";
-			} else if (helpers.isiOSPlatform(platform)) {
+			} else if (MobileHelper.isiOSPlatform(platform)) {
 				platform = "iOS";
 			}
 

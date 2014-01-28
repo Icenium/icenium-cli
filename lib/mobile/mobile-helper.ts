@@ -16,3 +16,11 @@ export class LocalToDevicePathData implements Mobile.ILocalToDevicePathData {
 	getDevicePath(): string { return this.devicePath; }
 	getRelativeToProjectBasePath(): string { return this.relativeToProjectBasePath; }
 }
+
+export function isAndroidPlatform(platform) {
+	return DevicePlatforms[DevicePlatforms.Android].toLowerCase() === platform.toLowerCase();
+}
+
+export function isiOSPlatform(platform) {
+	return DevicePlatforms[DevicePlatforms.iOS].toLowerCase() === platform.toLowerCase();
+}
