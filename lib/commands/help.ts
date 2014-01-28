@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import baseCommands = require("./base-commands");
 import fs = require("fs");
 import path = require("path");
 import util = require("util");
@@ -24,20 +25,17 @@ export class HelpCommandDataFactory implements Commands.ICommandDataFactory {
 }
 $injector.register("helpCommandDataFactory", HelpCommandDataFactory);
 
-export class HelpCommand implements Commands.ICommand<HelpCommandData> {
-	constructor(private helpCommandDataFactory: HelpCommandDataFactory,
+export class HelpCommand extends baseCommands.BaseCommand<HelpCommandData> {
+	constructor(private $helpCommandDataFactory: HelpCommandDataFactory,
 		private logger: ILogger) {
+		super();
 	}
 
 	public getDataFactory(): HelpCommandDataFactory {
-		return this.helpCommandDataFactory;
+		return this.$helpCommandDataFactory;
 	}
 
-	public canExecute(data: HelpCommandData): boolean {
-		return true;
-	}
-
-	public execute(data: HelpCommandData): void {
+	public execute(data: HelpCommandData = null): void {
 		fs.readFile(path.join(__dirname, "../../resources/help.txt"), "utf8", (err, helpContent) => {
 			if (err) {
 				throw err;

@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import baseCommands = require("./base-commands");
 import path = require("path");
 import unzip = require("unzip");
 import project = require("../project");
@@ -10,18 +11,7 @@ import Future = require("fibers/future");
 import child_process = require("child_process");
 var _ = <UnderscoreStatic> require("underscore");
 
-export class SimulateCommandData implements Commands.ICommandData {
-	constructor() {}
-}
-
-export class SimulateCommandDataFactory implements Commands.ICommandDataFactory {
-	public fromCliArguments(args: string[]): SimulateCommandData {
-		return new SimulateCommandData();
-	}
-}
-$injector.register("simulateCommandDataFactory", SimulateCommandDataFactory);
-
-export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
+export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
 	private PACKAGE_NAME: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
@@ -32,24 +22,16 @@ export class SimulateCommand implements Commands.ICommand<SimulateCommandData> {
 	private pluginsPath: string;
 	private serverVersion: string;
 
-	constructor(private simulateCommandDataFactory: SimulateCommandDataFactory,
-		private $logger: ILogger,
+	constructor(private $logger: ILogger,
 		private $httpClient: Server.IHttpClient,
 		private $fs: IFileSystem,
 		private $config: any,
 		private $server: Server.IServer) {
+		super();
 		this.projectData = project.projectData;
 	}
 
-	public getDataFactory(): SimulateCommandDataFactory {
-		return this.simulateCommandDataFactory;
-	}
-
-	public canExecute(data: SimulateCommandData): boolean {
-		return true;
-	}
-
-	public execute(data: SimulateCommandData): void {
+	public execute(): void {
 		this.cacheDir = path.join(options["profile-dir"], "Cache");
 
 		var configUri = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + "/configuration.json";

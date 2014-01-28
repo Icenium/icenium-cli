@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import baseCommands = require("./base-commands");
 import service = require("../services/cordova-plugins");
 import util = require("util");
 import os = require("os");
@@ -21,21 +22,18 @@ export class FindPluginsCommandDataFactory implements Commands.ICommandDataFacto
 }
 $injector.register("findPluginsCommandDataFactory", FindPluginsCommandDataFactory);
 
-export class FindPluginsCommand implements Commands.ICommand<FindPluginsCommandData> {
-	constructor(private findPluginsCommandDataFactory: FindPluginsCommandDataFactory,
-		private cordovaPluginsService: service.CordovaPluginsService) {
+export class FindPluginsCommand extends baseCommands.BaseCommand<FindPluginsCommandData> {
+	constructor(private $findPluginsCommandDataFactory: FindPluginsCommandDataFactory,
+		private $cordovaPluginsService: service.CordovaPluginsService) {
+		super();
 	}
 
 	public getDataFactory(): FindPluginsCommandDataFactory {
-		return this.findPluginsCommandDataFactory;
+		return this.$findPluginsCommandDataFactory;
 	}
 
-	public canExecute(data: FindPluginsCommandData): boolean {
-		return true;
-	}
-
-	public execute(data: FindPluginsCommandData): void {
-		var plugins = this.cordovaPluginsService.getPlugins(data.Keywords);
+	public execute(data: FindPluginsCommandData = null): void {
+		var plugins = this.$cordovaPluginsService.getPlugins(data.Keywords);
 		this.printPlugins(plugins);
 	}
 

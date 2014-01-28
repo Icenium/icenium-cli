@@ -2,6 +2,7 @@
 
 "use strict";
 
+import baseCommands = require("./commands/base-commands");
 import util = require("util");
 import path = require("path");
 import url = require("url");
@@ -206,37 +207,31 @@ export class LoginManager implements ILoginManager {
 }
 $injector.register("loginManager", LoginManager);
 
-class LoginCommand implements Commands.ICommand<any> {
+class LoginCommand extends baseCommands.BaseParameterlessCommand {
 	constructor(private $loginManager: ILoginManager) {
+		super();
 	}
 
 	getDataFactory():Commands.ICommandDataFactory {
 		return { fromCliArguments: () => null };
 	}
 
-	canExecute(data:any):boolean {
-		return true;
-	}
-
-	execute(data:any):void {
+	execute():void {
 		this.$loginManager.login().wait();
 	}
 }
 $injector.registerCommand("login", LoginCommand);
 
-class LogoutCommand implements Commands.ICommand<any> {
+class LogoutCommand extends baseCommands.BaseParameterlessCommand {
 	constructor(private $loginManager: ILoginManager) {
+		super();
 	}
 
 	getDataFactory():Commands.ICommandDataFactory {
 		return { fromCliArguments: () => null };
 	}
 
-	canExecute(data:any):boolean {
-		return true;
-	}
-
-	execute(data:any):void {
+	execute():void {
 		this.$loginManager.logout().wait();
 	}
 }
@@ -246,19 +241,16 @@ class TelerikLoginCommandData {
 	constructor(public user:string, public password:string) {}
 }
 
-class TelerikLoginCommand implements Commands.ICommand<TelerikLoginCommandData> {
+class TelerikLoginCommand extends baseCommands.BaseCommand<TelerikLoginCommandData> {
 	constructor(private $loginManager: ILoginManager) {
+		super();
 	}
 
 	getDataFactory():Commands.ICommandDataFactory {
 		return { fromCliArguments: (args: string[]) => new TelerikLoginCommandData(args[0], args[1]) };
 	}
 
-	canExecute(data:TelerikLoginCommandData):boolean {
-		return true;
-	}
-
-	execute(data:TelerikLoginCommandData):void {
+	execute(data:TelerikLoginCommandData = null):void {
 		this.$loginManager.basicLogin(data.user, data.password).wait();
 	}
 }

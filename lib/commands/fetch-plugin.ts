@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import baseCommands = require("./base-commands");
 import service = require("../services/cordova-plugins");
 import validUrl = require("valid-url");
 import fs = require("fs");
@@ -20,35 +21,32 @@ export class FetchPluginCommandDataFactory implements Commands.ICommandDataFacto
 }
 $injector.register("fetchPluginCommandDataFactory", FetchPluginCommandDataFactory);
 
-export class FetchPluginCommand implements Commands.ICommand<FetchPluginCommandData> {
-	constructor(private fetchPluginCommandDataFactory: FetchPluginCommandDataFactory,
-		private logger: ILogger,
-		private cordovaPluginsService: service.CordovaPluginsService) {
+export class FetchPluginCommand extends baseCommands.BaseCommand<FetchPluginCommandData> {
+	constructor(private $fetchPluginCommandDataFactory: FetchPluginCommandDataFactory,
+		private $logger: ILogger,
+		private $cordovaPluginsService: service.CordovaPluginsService) {
+		super();
 	}
 
 	public getDataFactory(): FetchPluginCommandDataFactory {
-		return this.fetchPluginCommandDataFactory;
+		return this.$fetchPluginCommandDataFactory;
 	}
 
-	public canExecute(data: FetchPluginCommandData): boolean {
-		return true;
-	}
-
-	public execute(data: FetchPluginCommandData): void {
+	public execute(data: FetchPluginCommandData = null): void {
 		if (data.Keywords.length === 0) {
-			this.logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
+			this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
 		} else if (data.Keywords.length === 1 && (this.isLocalPath(data.Keywords[0]) || this.isUrlToRepository(data.Keywords[0]))) {
-			var result = this.cordovaPluginsService.fetch(data.Keywords[0]);
+			var result = this.$cordovaPluginsService.fetch(data.Keywords[0]);
 			console.log(result);
 		} else {
-			var plugins = this.cordovaPluginsService.getPlugins(data.Keywords);
+			var plugins = this.$cordovaPluginsService.getPlugins(data.Keywords);
 			var pluginsCount = Object.keys(plugins).length;
 			if (pluginsCount === 0) {
 				console.log("There are 0 matching plugins.");
 			} else if (pluginsCount > 1) {
 				console.log("There are more then 1 matching plugins.");
 			} else {
-				console.log(this.cordovaPluginsService.fetch(Object.keys(plugins)[0]));
+				console.log(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]));
 			}
 		}
 	}

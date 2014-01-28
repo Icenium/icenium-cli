@@ -10,4 +10,9 @@ declare module Commands {
 		canExecute(data: ICommandData): boolean;
 		execute(data: ICommandData): void;
 	}
+
+	interface IParameterlessCommand {
+		canExecute(): boolean;
+		execute(): void;
+	}
 }

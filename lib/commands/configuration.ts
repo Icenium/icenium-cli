@@ -2,6 +2,7 @@
 
 "use strict";
 
+import baseCommands = require("./base-commands");
 import util = require("util");
 import path = require("path");
 import xopen = require("open");
@@ -36,19 +37,16 @@ export class EditConfigurationCommandDataFactory implements Commands.ICommandDat
 }
 $injector.register("editConfigurationCommandDataFactory", EditConfigurationCommandDataFactory);
 
-export class EditConfigurationCommand implements Commands.ICommand<any> {
+export class EditConfigurationCommand extends baseCommands.BaseCommand<EditConfigurationCommandData> {
 	constructor(private $editConfigurationCommandDataFactory: EditConfigurationCommandDataFactory,
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $commandsService: ICommandsService) {
+		super();
 	}
 
 	public getDataFactory(): EditConfigurationCommandDataFactory {
 		return this.$editConfigurationCommandDataFactory;
-	}
-
-	canExecute(data:any):boolean {
-		return true;
 	}
 
 	execute(data: EditConfigurationCommandData): void {
