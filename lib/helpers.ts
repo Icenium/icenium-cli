@@ -173,3 +173,7 @@ export function nop() {
 export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
+
+export function isWindows() {
+	return /^win/.test(process.platform);
+}
