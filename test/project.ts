@@ -28,10 +28,10 @@ describe("project", function() {
 
 			project.createNewProject(projectName);
 
-			var iceproject = fs.readFileSync(path.join(tempFolder, projectName, ".iceproject"));
-			var correctIceProject = fs.readFileSync(path.join(__dirname, "/resources/blank.iceproject"));
-			var testProperties = JSON.parse(iceproject.toString());
-			var correctProperties = JSON.parse(correctIceProject.toString());
+			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
+			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank.abproject"));
+			var testProperties = JSON.parse(abProject.toString());
+			var correctProperties = JSON.parse(correctABProject.toString());
 
 			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
 			for (var key in testProperties) {

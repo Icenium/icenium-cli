@@ -21,7 +21,7 @@ import Fiber = require("fibers");
 		var commandArguments = getCommandArguments();
 
 		if (!getCommandsService().executeCommand(commandName, commandArguments)) {
-			require("./log").fatal("Unknown command '%s'. Use 'ice help' for help.", commandName);
+			require("./log").fatal("Unknown command '%s'. Use 'ab help' for help.", commandName);
 		}
 
 		return;

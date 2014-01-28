@@ -1,4 +1,5 @@
 //grunt-start
+/// <reference path="ab-cli.ts" />
 /// <reference path="bootstrap.ts" />
 /// <reference path="commands-service.ts" />
 /// <reference path="commands/base-commands.ts" />
@@ -32,7 +33,6 @@
 /// <reference path="file-system.ts" />
 /// <reference path="helpers.ts" />
 /// <reference path="http-server.ts" />
-/// <reference path="ice-cli.ts" />
 /// <reference path="identity.ts" />
 /// <reference path="logger.ts" />
 /// <reference path="login.ts" />

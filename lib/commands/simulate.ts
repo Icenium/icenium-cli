@@ -34,7 +34,7 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 	public execute(): void {
 		this.cacheDir = path.join(options["profile-dir"], "Cache");
 
-		var configUri = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + "/configuration.json";
+		var configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/configuration.json";
 		this.$logger.debug("Getting server configuration from %s", configUri);
 		var config = JSON.parse(this.$httpClient.httpRequest(configUri).wait().body);
 		this.serverVersion = config.assemblyVersion;
@@ -53,7 +53,7 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 			this.simulatorPath = path.join(this.cacheDir, this.PACKAGE_NAME);
 			this.$fs.createDirectory(this.simulatorPath).wait();
 
-			var servicesExtensionsUri = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + "/services/extensions";
+			var servicesExtensionsUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/services/extensions";
 			var serverVersionFile = path.join(this.cacheDir, "server-version.json");
 
 			this.$logger.trace("Simulator path: %s", this.simulatorPath);
@@ -93,7 +93,7 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 		return (() => {
 			this.pluginsPath = path.join(this.cacheDir, this.getPluginsDirName(this.serverVersion));
 
-			var pluginsApiEndpoint = this.$config.ICE_SERVER_PROTO + "://" + this.$config.ICE_SERVER + this.PLUGINS_API_CONTRACT;
+			var pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + this.PLUGINS_API_CONTRACT;
 
 			if (!this.$fs.exists(this.pluginsPath).wait()) {
 				this.$logger.info("Downloading core Cordova plugins...");

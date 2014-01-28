@@ -1,7 +1,7 @@
 --[]--
 
 Usage:
-    $ ice <command> [command parameters] [--command options] [--path <path>]
+    $ ab <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
     help <command>        Shows additional information about the commands in this list.
@@ -20,11 +20,11 @@ Commands:
     fetch-plugin          Imports an Apache Cordova plugin into your project.
     simulate              Runs the current project in the device simulator.
     list-projects         Lists all projects of your account.
-    export-project        Exports one of your remote projects into a local ice project.
+    export-project        Exports one of your remote projects into a local ab project.
     edit-configuration    Opens configuration file for editing.
 
 Global Options:
-    --path <path>         Specifies the file path to the project. If not specified, ?AppBuilder CLI? searches for the
+    --path <path>         Specifies the file path to the project. If not specified, ?Telerik AppBuilder CLI? searches for the
                           project in the current directory and all directories above it.
 
 --[/]--
@@ -32,7 +32,7 @@ Global Options:
 --[login]--
 
 Usage:
-    $ ice login
+    $ ab login
 
 Opens a new browser window in which you can provide your login credentials for Telerik Platform.
 After you have authenticated with Telerik Platform, you can close the browser window and continue your work from the 
@@ -43,7 +43,7 @@ command line.
 --[logout]--
 
 Usage:
-    $ ice logout
+    $ ab logout
 
 Logs you out from Telerik Platform.
 To build, deploy, or synchronize your projects with the cloud, you need to be logged in.
@@ -53,7 +53,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ ice create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ ab create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -65,17 +65,17 @@ Options:
         Everlive, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
     --path - Specifies the path where you want to create the project, if different from the current directory. 
         The directory must be empty.
-        If not specified, ?Icenium CLI? attempts to create the project in the current directory. 
+        If not specified, ?Telerik AppBuilder CLI? attempts to create the project in the current directory. 
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
-        If not specified, ?AppBuilder CLI? sets the application identifier to com.telerik.<App name>
+        If not specified, ?Telerik AppBuilder CLI? sets the application identifier to com.telerik.<App name>
 
 --[/]--
 
 --[list-provisions]--
 Usage:
-    $ ice list-provisions
+    $ ab list-provisions
 
 Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
 you can set the provisioning profile by index or name in the --provision option.
@@ -83,7 +83,7 @@ you can set the provisioning profile by index or name in the --provision option.
 
 --[list-certificates]--
 Usage:
-    $ ice list-certificates
+    $ ab list-certificates
 
 Lists with indexes and names all configured certificates for code signing iOS applications. When building an app, you can
 set the certificate by index or name in the --certificate option.
@@ -91,11 +91,11 @@ set the certificate by index or name in the --certificate option.
 
 --[list-devices]--
 Usage:
-    $ ice list-devices [<Platform>]
+    $ ab list-devices [<Platform>]
 
 Platform-specific examples:
-    $ ice list-devices android
-    $ ice list-devices ios
+    $ ab list-devices android
+    $ ab list-devices ios
 
 Lists with serial number and index all recognized connected devices, grouped by platform.
 
@@ -103,11 +103,11 @@ Lists with serial number and index all recognized connected devices, grouped by 
 
 --[build]--
 Usage:
-    $ ice build <Platform> [--download]
+    $ ab build <Platform> [--download]
 
 Platform-specific examples:
-    $ ice build android
-    $ ice build ios --certificate <index or name> --provision <index or name>
+    $ ab build android
+    $ ab build ios --certificate <index or name> --provision <index or name>
 
 Builds the project for the target platform and produces a QR code for deployment.
 
@@ -117,7 +117,7 @@ Run list-provisions to list available provisioning profiles for code signing iOS
 provisioning profile by index or name.
 
 Options:
-    --download - If specified, downloads the application package to the .ice directory in the project directory, instead
+    --download - If specified, downloads the application package to the .ab directory in the project directory, instead
         of producing a QR code. Set this option when you build with provisioning profile and certificate for iOS 
         development.
     --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
@@ -129,14 +129,14 @@ Options:
 
 --[ion]--
 Usage:
-    $ ice ion
+    $ ab ion
 
 Produces a QR code for deployment in the Telerik AppBuilder companion app.
 --[/]--
 
 --[update]--
 Usage:
-    $ ice update
+    $ ab update
 
 Synchronizes the project with the cloud to enable LiveSync for remote devices. 
 
@@ -147,11 +147,11 @@ To get the latest changes on an Android device, press the Menu button.
 
 --[deploy]--
 Usage:
-    $ ice deploy <Platform>
+    $ ab deploy <Platform>
 
 Platform-specific examples:
-    $ ice deploy android [--device <id>]
-    $ ice deploy ios --certificate <id or name> --provision <id or name>
+    $ ab deploy android [--device <id>]
+    $ ab deploy ios --certificate <id or name> --provision <id or name>
 
 Builds the project for the specified platform and deploys it to a connected device.
 
@@ -172,11 +172,11 @@ Options:
 
 --[sync]--
 usage:
-    $ ice sync [<Platform>]
+    $ ab sync [<Platform>]
 
 Platform-specific example:
-    $ ice sync android [--device <id>] [--live]
-    $ ice sync ios [--device <id>] [--live]
+    $ ab sync android [--device <id>] [--live]
+    $ ab sync ios [--device <id>] [--live]
 
 Synchronizes the latest changes in your project to connected devices.
 
@@ -190,14 +190,14 @@ Options:
 
 --[find-plugins]--
 Usage:
-    $ ice find-plugins [<keyword> [ <keyword>]*>]
+    $ ab find-plugins [<keyword> [ <keyword>]*>]
 
 Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
-    $ ice fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
+    $ ab fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
 
 Imports the specified Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 
@@ -206,7 +206,7 @@ The plugin must be Plugman-compatible.
 
 --[simulate]--
 Usage:
-    $ ice simulate
+    $ ab simulate
 
 Runs the current project in the device simulator.
 
@@ -218,7 +218,7 @@ Options:
 
 --[list-projects]--
 Usage:
-    $ ice list-projects
+    $ ab list-projects
 
 Lists all projects of your account.
 
@@ -226,11 +226,11 @@ Lists all projects of your account.
 
 --[export-project]--
 Usage:
-    $ ice export-project <ProjectIndex> | <ProjectName>
+    $ ab export-project <ProjectIndex> | <ProjectName>
 
-Exports one of your remote projects into a local ice project.
+Exports one of your remote projects into a local ab project.
 You can choose which project to export by specifying its index or name.
-All projects and their indexes can be seen by running "$ ice list-projects".
+All projects and their indexes can be seen by running "$ ab list-projects".
 
 Options:
     --path <path> - Specifies the local path where the chosen project will be exported.
@@ -239,7 +239,7 @@ Options:
 
 --[edit-configuration]--
 Usage:
-    $ ice edit-configuration <ConfigurationFile>
+    $ ab edit-configuration <ConfigurationFile>
 
 <ConfigurationFile> can be one of the following: "android-manifest", "android-config", "ios-info" and "ios-config".
 Opens the given file for editing and creates it in your project directory if it didn't already exist.
