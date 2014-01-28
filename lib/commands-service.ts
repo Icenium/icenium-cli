@@ -33,10 +33,11 @@ export class CommandsService implements ICommandsService {
 
 		command = $injector.resolveCommand(commandName);
 
+		var commandData;
 		if (command instanceof baseCommands.BaseCommand) {
-			var commandData = command.getDataFactory().fromCliArguments(commandArguments);
+			commandData = command.getDataFactory().fromCliArguments(commandArguments);
 		} else if (command instanceof baseCommands.BaseParameterlessCommand) {
-			var commandData = undefined;
+			commandData = undefined;
 		} else {
 			return false;
 		}
