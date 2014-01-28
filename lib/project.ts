@@ -31,8 +31,8 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
-				config.ICE_SERVER_PROTO,
-				config.ICE_SERVER, urlKind,
+				config.AB_SERVER_PROTO,
+				config.AB_SERVER, urlKind,
 				querystring.escape(querystring.escape(filesystemPath)),
 				querystring.escape(querystring.escape(liveSyncToken)));
 			log.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
@@ -133,7 +133,7 @@ export function getProjectDir() {
 }
 
 export function getTempDir() {
-	var dir = path.join(getProjectDir(), ".ice");
+	var dir = path.join(getProjectDir(), ".ab");
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
 	}
@@ -151,7 +151,7 @@ function getProjectRelativePath(fullPath) {
 
 export function enumerateProjectFiles(excludedProjectDirsAndFiles?) {
 	if (!excludedProjectDirsAndFiles) {
-		excludedProjectDirsAndFiles = [".ice"];
+		excludedProjectDirsAndFiles = [".ab", ".abproject"];
 	}
 
 	var projectDir = getProjectDir();
@@ -354,7 +354,7 @@ export function deployToIon() {
 
 	var liveSyncToken = getServer().cordova.getLiveSyncToken(projectData.name, projectData.name).wait();
 
-	var hostPart = util.format("%s://%s", config.ICE_SERVER_PROTO, config.ICE_SERVER);
+	var hostPart = util.format("%s://%s", config.AB_SERVER_PROTO, config.AB_SERVER);
 	var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
 
 	log.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);

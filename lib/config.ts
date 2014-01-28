@@ -5,8 +5,8 @@
 import path = require("path");
 
 export var TFIS_SERVER;
-export var ICE_SERVER_PROTO;
-export var ICE_SERVER;
+export var AB_SERVER_PROTO;
+export var AB_SERVER;
 export var DEBUG;
 export var PROXY_TO_FIDDLER;
 export var PROJECT_FILE_NAME;

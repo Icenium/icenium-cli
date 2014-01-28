@@ -134,8 +134,8 @@ export class ServiceProxy {
 		}
 
 		var requestOpts: any = {
-			proto: config.ICE_SERVER_PROTO,
-			host: config.ICE_SERVER,
+			proto: config.AB_SERVER_PROTO,
+			host: config.AB_SERVER,
 			path: "/api" + path,
 			method: method,
 			headers: headers,
@@ -248,8 +248,8 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 
 	getApi(): Server.Contract.IService[] {
 		var req:any = {
-			proto: config.ICE_SERVER_PROTO,
-			host: config.ICE_SERVER,
+			proto: config.AB_SERVER_PROTO,
+			host: config.AB_SERVER,
 			path: "/api",
 			method: "GET"
 		};

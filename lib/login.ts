@@ -139,12 +139,12 @@ export class LoginManager implements ILoginManager {
 			this.$serviceProxy.setShouldAuthenticate(true);
 
 			var cookies = this.$serviceProxy.getLastRequestCookies();
-			var iceAuthCookie = cookies && cookies[".ASPXAUTH"];
-			this.$logger.debug("Cookie is '%s'", iceAuthCookie);
+			var abAuthCookie = cookies && cookies[".ASPXAUTH"];
+			this.$logger.debug("Cookie is '%s'", abAuthCookie);
 
-			if (iceAuthCookie && userData) {
+			if (abAuthCookie && userData) {
 				Future.wait(
-					this.$userDataStore.setCookie(iceAuthCookie),
+					this.$userDataStore.setCookie(abAuthCookie),
 					this.$userDataStore.setUser(userData)
 				);
 			} else {
@@ -167,7 +167,7 @@ export class LoginManager implements ILoginManager {
 		var loginConfig:any = {
 			tfisServer: "https://" + this.$config.TFIS_SERVER,
 			clientId: this.$config.WRAP_CLIENT_ID,
-			callbackUrl: util.format("%s://%s/Mist/Authentication/RedirectVerification", this.$config.ICE_SERVER_PROTO, this.$config.ICE_SERVER)
+			callbackUrl: util.format("%s://%s/Mist/Authentication/RedirectVerification", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER)
 		};
 
 		var localhostServer = fileSrv.createServer({

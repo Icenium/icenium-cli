@@ -1,5 +1,6 @@
 *.js
 !/*.js
+!bin/ab.js
 *.js.map
 
 lib-cov

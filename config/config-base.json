@@ -1,10 +1,10 @@
 {
 	"TFIS_SERVER": "tfis.telerik.com",
-	"ICE_SERVER_PROTO": "http",
-	"ICE_SERVER": "localhost",
+	"AB_SERVER_PROTO": "http",
+	"AB_SERVER": "localhost",
 	"DEBUG": true,
 	"PROXY_TO_FIDDLER": false,
-	"PROJECT_FILE_NAME": ".iceproject",
+	"PROJECT_FILE_NAME": ".abproject",
 	"SOLUTION_SPACE_NAME": "Private_Build_Folder",
 	"QR_SIZE": 300,
 	"DEFAULT_PROJECT_TEMPLATE": "KendoUI",

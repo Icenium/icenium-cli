@@ -1,4 +1,0 @@
-#!/bin/sh
-
-ICE_DIR="`dirname \"$0\"`"
-node "$ICE_DIR/ice.js" $@

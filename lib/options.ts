@@ -26,7 +26,7 @@ var knownOpts:any = {
 		"t" : ["--template"]
 	},
 	parsed = nopt(knownOpts, shorthands, process.argv, 2),
-	defaultProfileDir = path.join(process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH, ".icenium-cli");
+	defaultProfileDir = path.join(process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH, ".appbuilder-cli");
 
 parsed["profile-dir"] = parsed["profile-dir"] || defaultProfileDir;
 

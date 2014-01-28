@@ -11,7 +11,7 @@
 		fs = require("fs"),
 		util = require("util");
 
-	var excludedProjectDirsAndFiles = [".ice", "app_resources", ".iceproject", "plugins"];
+	var excludedProjectDirsAndFiles = [".ab", "app_resources", ".abproject", "plugins"];
 
 	function sync(platform) {
 		var projectDir = project.getProjectDir();
