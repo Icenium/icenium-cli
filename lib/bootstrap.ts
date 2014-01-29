@@ -2,6 +2,7 @@ global.$injector = require("./yok").injector;
 
 $injector.require("config", "./config");
 $injector.require("fs", "./file-system");
+$injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");

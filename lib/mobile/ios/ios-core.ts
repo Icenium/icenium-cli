@@ -75,7 +75,7 @@ class IOSCore implements Mobile.IiOSCore {
 		equal: CoreTypes.voidPtr
 	});
 
-	public static CFSTRING_ENCODING_UTF8 = 0x08000100;
+	public static kCFStringEncodingUTF8 = 0x08000100;
 
 	private appleFolderLocation = new iTunesInstallationInfo(this.$fs).getAppleFolderLocation();
 	private coreFoundationDir = path.join(this.appleFolderLocation, "Apple Application Support");
@@ -236,18 +236,18 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
     }
 
 	public createCFString(str: string): NodeBuffer {
-		return this.stringCreateWithCString(null, str, IOSCore.CFSTRING_ENCODING_UTF8 );
+		return this.stringCreateWithCString(null, str, IOSCore.kCFStringEncodingUTF8 );
 	}
 
 	public convertCFStringToCString(cfstr) {
 		var result;
 		if (cfstr != null) {
-			result = this.stringGetCStringPtr(cfstr, IOSCore.CFSTRING_ENCODING_UTF8 );
+			result = this.stringGetCStringPtr(cfstr, IOSCore.kCFStringEncodingUTF8 );
 			if (ref.address(result) === 0) {
 				var cfstrLength = this.stringGetLength(cfstr);
 				var length = cfstrLength + 1;
 				var stringBuffer = new Buffer(length);
-				var status = this.stringGetCString(cfstr, stringBuffer, length, IOSCore.CFSTRING_ENCODING_UTF8 );
+				var status = this.stringGetCString(cfstr, stringBuffer, length, IOSCore.kCFStringEncodingUTF8 );
 				if (status) {
 					result = stringBuffer.toString("utf8", 0, cfstrLength);
 				} else {

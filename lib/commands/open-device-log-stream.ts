@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 import options = require("./../options");
 import helpers = require("./../helpers");
+import baseCommands = require("./base-commands");
 
 export class OpenDeviceLogStreamCommandData implements Commands.ICommandData {
 	constructor(private keywords: string[]) { }
@@ -16,24 +17,22 @@ export class OpenDeviceLogStreamCommandDataFactory implements Commands.ICommandD
 }
 $injector.register("openDeviceLogStreamCommandDataFactory", OpenDeviceLogStreamCommandDataFactory);
 
-export class OpenDeviceLogStreamCommand implements Commands.ICommand<OpenDeviceLogStreamCommandData> {
+export class OpenDeviceLogStreamCommand extends baseCommands.BaseCommand<OpenDeviceLogStreamCommandData> {
 	constructor(private $openDeviceLogStreamCommandDataFactory: OpenDeviceLogStreamCommandDataFactory,
-		private $devicesServices: Mobile.IDevicesServices) { }
+		private $devicesServices: Mobile.IDevicesServices) {
+		super();
+	}
 
 	public getDataFactory(): OpenDeviceLogStreamCommandDataFactory {
 		return this.$openDeviceLogStreamCommandDataFactory;
 	}
 
-	public canExecute(): boolean {
-		return true;
-	}
-
 	public execute(data: OpenDeviceLogStreamCommandData): void {
 		var action = (device: Mobile.IDevice) =>  { device.openDeviceLogStream(); };
 		if(helpers.isNumber(options.device)) {
-			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10));
+			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
 		} else {
-			this.$devicesServices.executeOnDevice(action, options.device);
+			this.$devicesServices.executeOnDevice(action, options.device).wait();
 		}
 	}
 }

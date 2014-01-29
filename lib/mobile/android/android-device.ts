@@ -2,20 +2,17 @@
 import MobileHelper = require("./../mobile-helper");
 import util = require("util");
 import Future = require("fibers/future");
-import child_process = require("child_process");
 import path = require("path");
 import helpers = require("./../../helpers");
 
 export class AndroidDevice implements Mobile.IDevice {
 	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
-	private exec = Future.wrap( (command: string, callback: (error: any, stdout: NodeBuffer) => void) => {
-		return child_process.exec(command, callback);
-	});
 
 	constructor(private identifier: string,
-				private adb: string,
-				private logger: ILogger) {
+		private adb: string,
+		private $logger: ILogger,
+		private $childProcess: IChildProcess) {
 	}
 
 	getPlatform(): string {
@@ -45,7 +42,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	private startPackageOnDevice(packageName): IFuture<void> {
 		return(() => {
 			var startPackageCommand = this.composeCommand(util.format("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName));
-			var result = this.exec(startPackageCommand).wait();
+			var result = this.$childProcess.exec(startPackageCommand).wait();
 			return result[0];
 		}).future<void>()();
 	}
@@ -53,7 +50,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	deploy(packageFile: string, packageName: string): IFuture<void> {
 		return(() => {
 			var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
-			this.exec(installCommand).wait();
+			this.$childProcess.exec(installCommand).wait();
 			this.startPackageOnDevice(packageName);
 			console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
@@ -73,14 +70,14 @@ export class AndroidDevice implements Mobile.IDevice {
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<any> {
 		return(() => {
 			var pushFileCommand = this.composeCommand(util.format("push %s %s", localPath, devicePath));
-			var result = this.exec(pushFileCommand).wait();
+			var result = this.$childProcess.exec(pushFileCommand).wait();
 		}).future<any>()();
 	}
 
 	private sendBroadcastToDevice(action): Future<void> {
 		return(() => {
 			var broadcastCommand = this.composeCommand(util.format("shell am broadcast -a \"%s\"", action));
-			var result = this.exec(broadcastCommand).wait();
+			var result = this.$childProcess.exec(broadcastCommand).wait();
 		}).future<void>()();
 	}
 
@@ -93,7 +90,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	openDeviceLogStream() {
-		var adbLogcat = child_process.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
+		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
 		var search = this.spawnTextSearch("telerik|icenium");
 
 		adbLogcat.stdout.on("data", function (data) {
@@ -101,12 +98,12 @@ export class AndroidDevice implements Mobile.IDevice {
 		});
 
 		adbLogcat.stderr.on("data", function (data) {
-			this.logger.trace("ADB logcat stderr: " + data);
+			this.$logger.trace("ADB logcat stderr: " + data);
 		});
 
 		adbLogcat.on("close", function (code) {
 			if (code !== 0) {
-				this.logger.trace("ADB process exited with code " + code);
+				this.$logger.trace("ADB process exited with code " + code);
 			}
 			search.stdin.end();
 		});
@@ -117,12 +114,12 @@ export class AndroidDevice implements Mobile.IDevice {
 		});
 
 		search.stderr.on("data", function (data) {
-			this.logger.trace("grep stderr: " + data);
+			this.$logger.trace("grep stderr: " + data);
 		});
 
 		search.on("close", function (code) {
 			if (code !== 0) {
-				this.logger.trace("grep process exited with code " + code);
+				this.$logger.trace("grep process exited with code " + code);
 			}
 		});
 	}
@@ -131,11 +128,11 @@ export class AndroidDevice implements Mobile.IDevice {
 		if (helpers.isWindows()) {
 			// /r :Uses search strings as regular expressions. Findstr interprets all metacharacters as regular expressions.
 			// /i :Specifies that the search is not to be case-sensitive.
-			return child_process.spawn("findstr", ["/r", "/i", pattern]);
+			return this.$childProcess.spawn("findstr", ["/r", "/i", pattern]);
 		} else {
 			// -E :Interpret PATTERN as an extended regular expression.
 			// -i :Ignore case distinctions in both the PATTERN and the input.
-			return child_process.spawn("grep", ["-E", "-i", pattern]);
+			return this.$childProcess.spawn("grep", ["-E", "-i", pattern]);
 		}
 	}
 }

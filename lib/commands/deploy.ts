@@ -6,6 +6,7 @@ import fs = require("fs");
 import util = require("util");
 import MobileHelper = require("./../mobile/mobile-helper");
 import Future = require("fibers/future");
+import baseCommands = require("./base-commands");
 
 export class DeployCommandData implements Commands.ICommandData {
 	constructor(private keywords: string[]) { }
@@ -22,18 +23,16 @@ export class DeployCommandDataFactory implements Commands.ICommandDataFactory {
 
 $injector.register("deployCommandDataFactory", DeployCommandDataFactory);
 
-export class DeployCommand implements Commands.ICommand<DeployCommandData> {
+export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
     constructor(private $deployCommandDataFactory: DeployCommandDataFactory,
 		private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
-		private $identityManager: Server.IIdentityManager) { }
+		private $identityManager: Server.IIdentityManager) {
+		super();
+	}
 
 	public getDataFactory(): DeployCommandDataFactory {
 		return this.$deployCommandDataFactory;
-	}
-
-	public canExecute(): boolean {
-		return true;
 	}
 
 	public execute(data: DeployCommandData): void {

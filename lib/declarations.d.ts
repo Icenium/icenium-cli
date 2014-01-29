@@ -154,3 +154,8 @@ interface IFileSystem {
 		string?: string;
 	}): any;
 }
+
+interface IChildProcess {
+	exec(command: string): IFuture<any>;
+	spawn(command: string, args?: string[], options?: string[]): any;
+}

@@ -1,6 +1,7 @@
 ///<reference path="../.d.ts"/>
 
 import util = require("util");
+import baseCommands = require("./base-commands");
 
 export class ListDevicesCommandData implements Commands.ICommandData {
 	constructor(private keywords: string[]) { }
@@ -17,16 +18,14 @@ export class ListDevicesCommandDataFactory implements  Commands.ICommandDataFact
 
 $injector.register("listDevicesCommandDataFactory", ListDevicesCommandDataFactory);
 
-export class ListDevicesCommand implements Commands.ICommand<ListDevicesCommandData>  {
+export class ListDevicesCommand extends baseCommands.BaseCommand<ListDevicesCommandData> {
 	constructor(private $listDevicesCommandDataFactory: ListDevicesCommandDataFactory,
-		private $devicesServices: Mobile.IDevicesServices) { }
+		private $devicesServices: Mobile.IDevicesServices) {
+		super();
+	}
 
 	public getDataFactory(): ListDevicesCommandDataFactory {
 		return this.$listDevicesCommandDataFactory;
-	}
-
-	public canExecute(data: ListDevicesCommandData): boolean {
-		return true;
 	}
 
 	public execute(data: ListDevicesCommandData): void {

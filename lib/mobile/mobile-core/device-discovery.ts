@@ -124,24 +124,21 @@ $injector.register("iOSDeviceDiscovery", IOSDeviceDiscovery);
 export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static ADB = path.join(__dirname, "../../../", "/resources/platform-tools/android/adb");
 
-	constructor(private $logger: ILogger) {
+	constructor(private $logger: ILogger,
+		private $childProcess: IChildProcess) {
 		super();
 	}
 
 	private createAndAddDevice(deviceIdentifier): void {
-		var device = new AndroidDevice.AndroidDevice(deviceIdentifier, AndroidDeviceDiscovery.ADB, this.$logger);
+		var device = new AndroidDevice.AndroidDevice(deviceIdentifier, AndroidDeviceDiscovery.ADB, this.$logger, this.$childProcess);
 		this.addDevice(device);
 	}
 
 	public startLookingForDevices(): IFuture<void> {
 		return(()=> {
 
-			var exec = Future.wrap( (command: string, callback: (error: any, stdout: NodeBuffer) => void) => {
-				return child_process.exec(command, callback);
-			});
-
 			var requestAllDevicesCommand = util.format("%s devices", AndroidDeviceDiscovery.ADB);
-			var result = exec(requestAllDevicesCommand).wait();
+			var result = this.$childProcess.exec(requestAllDevicesCommand).wait();
 
 			var devices = result.toString().split(os.EOL).slice(1)
 				.filter( (element) => {

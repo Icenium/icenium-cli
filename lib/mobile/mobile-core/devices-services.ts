@@ -101,17 +101,19 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return searchedDevice;
 	}
 
-	public executeOnDevice(action: any, identifier?: string, index?: number): void {
-		this.startLookingForDevices();
+	public executeOnDevice(action: any, identifier?: string, index?: number): IFuture<void> {
+		return (() => {
+			this.startLookingForDevices().wait();
 
-		if (!identifier && index === undefined) {
-			console.log(DevicesServices.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
-			return;
-		} else if (identifier) {
-			action(this.getDeviceByIdentifier(identifier));
-		} else if (index) {
-			action(this.getDeviceByIndex(index));
-		}
+			if (!identifier && index === undefined) {
+				console.log(DevicesServices.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
+				return;
+			} else if (identifier) {
+				action(this.getDeviceByIdentifier(identifier));
+			} else if (index) {
+				action(this.getDeviceByIndex(index));
+			}
+		}).future<void>()();
 	}
 
 	public executeOnAllConnectedDevices(action: (dev: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
@@ -132,7 +134,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 	public hasDevices(platform?: string): boolean {
-		if (platform === undefined) {
+		if (!platform) {
 			return this.getDevices().length === 0;
 		} else {
 			return this.filterDevicesByPlatform(this.getPlatform(platform)).length === 0;

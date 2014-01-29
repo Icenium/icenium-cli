@@ -8,6 +8,7 @@ import options = require("./../options");
 import helpers = require("./../helpers");
 import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
+import baseCommands = require("./base-commands");
 
 export class SyncCommandData implements Commands.ICommandData {
 	constructor(private keywords: string[]) { }
@@ -23,20 +24,18 @@ export class SyncCommandDataFactory implements Commands.ICommandDataFactory {
 }
 $injector.register("syncCommandDataFactory", SyncCommandDataFactory);
 
-export class SyncCommand implements Commands.ICommand<SyncCommandData> {
+export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
 	private excludedProjectDirsAndFiles = [".ice", "app_resources", ".iceproject", "plugins"];
 
 	constructor(private $syncCommandDataFactory: SyncCommandDataFactory,
 		private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
-		private $fs: IFileSystem) { }
+		private $fs: IFileSystem) {
+		super();
+	}
 
 	public getDataFactory(): SyncCommandDataFactory {
 		return this.$syncCommandDataFactory;
-	}
-
-	public canExecute(): boolean {
-		return true;
 	}
 
 	public execute(data: SyncCommandData): void {
