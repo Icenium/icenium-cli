@@ -4,25 +4,25 @@ Usage:
     $ ab <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
-    help <command>        Shows additional information about the commands in this list.
-    login                 Logs you in Telerik Platform.
-    logout                Logs you out from Telerik Platform
-    create                Creates a new project from template.
-    list-provisions       Lists all configured provisioning profiles for code signing iOS applications.
-    list-certificates     Lists all configured certificates for code signing iOS applications.
-    list-devices          Lists all recognized connected devices.
-    build                 Builds the project and produces a QR code for deploying the application package.
-    ion                   Produces a QR code for deployment in the Telerik AppBuilder companion app.
-    deploy                Deploys the project to a connected device.
-    update                Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    sync                  Synchronizes the latest changes in your project to connected devices.
-    open-device-log-stream Opens the log stream for given device.
-    find-plugins          Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    fetch-plugin          Imports an Apache Cordova plugin into your project.
-    simulate              Runs the current project in the device simulator.
-    list-projects         Lists all projects of your account.
-    export-project        Exports one of your remote projects into a local ab project.
-    edit-configuration    Opens configuration file for editing.
+    help <command>           Shows additional information about the commands in this list.
+    login                    Logs you in Telerik Platform.
+    logout                   Logs you out from Telerik Platform
+    create                   Creates a new project from template.
+    list-provisions          Lists all configured provisioning profiles for code signing iOS applications.
+    list-certificates        Lists all configured certificates for code signing iOS applications.
+    list-devices             Lists all recognized connected devices.
+    build                    Builds the project and produces a QR code for deploying the application package.
+    ion                      Produces a QR code for deployment in the Telerik AppBuilder companion app.
+    deploy                   Deploys the project to a connected device.
+    update                   Synchronizes the project with the cloud to enable LiveSync for remote devices.
+    sync                     Synchronizes the latest changes in your project to connected devices.
+    open-device-log-stream   Opens the log stream for given device.
+    find-plugins             Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    fetch-plugin             Imports an Apache Cordova plugin into your project.
+    simulate                 Runs the current project in the device simulator.
+    list-projects            Lists all projects of your account.
+    export-project           Exports one of your remote projects into a local ab project.
+    edit-configuration       Opens configuration file for editing.
 
 Global Options:
     --path <path>         Specifies the file path to the project. If not specified, ?Telerik AppBuilder CLI? searches for the
@@ -195,7 +195,7 @@ Usage:
 
 You can choose which device's log stream to open by specifying its index or identifier.
 All devices and their indexes can be seen by running "$ ice list-devices".
---[/]
+--[/]--
 
 --[find-plugins]--
 Usage:

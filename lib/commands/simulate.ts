@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import baseCommands = require("./base-commands");
 import path = require("path");
 import unzip = require("unzip");
 import options = require("../options");
@@ -10,7 +9,7 @@ import Future = require("fibers/future");
 import child_process = require("child_process");
 var _ = <UnderscoreStatic> require("underscore");
 
-export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
+export class SimulateCommand implements ICommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
 	private PACKAGE_NAME: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
@@ -27,11 +26,10 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 		private $config: any,
 		private $server: Server.IServer,
 		private $project: Project.IProject) {
-		super();
 		this.projectData = $project.projectData;
 	}
 
-	public execute(): void {
+	public execute(args: string[]): void {
 		this.cacheDir = path.join(options["profile-dir"], "Cache");
 
 		var configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/configuration.json";

@@ -5,36 +5,41 @@
 var options:any = require("./options");
 import log = require("./logger");
 import util = require("util");
+import helpers = require("./helpers");
 
 export class IdentityManager implements Server.IIdentityManager {
 	constructor(private $server: Server.IServer) {
 	}
 
-	public listCertificates(): void {
-		var data = this.$server.identityStore.getIdentities().wait();
+	public listCertificates(): IFuture<any> {
+		return ((): any => {
+			var data = this.$server.identityStore.getIdentities().wait();
 
-		for (var i = 0; i < data.length; i++) {
-			var ident = data[i];
-			console.log(util.format("#%d: '%s'", i + 1, ident.Alias));
-		}
+			for (var i = 0; i < data.length; i++) {
+				var ident = data[i];
+				console.log(util.format("#%d: '%s'", i + 1, ident.Alias));
+			}
+		}).future<any>()();
 	}
 
-	public listProvisions(): void {
-		var data = this.$server.mobileprovisions.getProvisions().wait();
+	public listProvisions(): IFuture<any> {
+		return ((): any => {
+			var data = this.$server.mobileprovisions.getProvisions().wait();
 
-		for (var i = 0; i < data.length; i++) {
-			var provision = data[i];
+			for (var i = 0; i < data.length; i++) {
+				var provision = data[i];
 
-			console.log(util.format("#%d: '%s'; type: %s, App ID: '%s.%s'", i + 1, provision.Name, provision.ProvisionType,
-				provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier));
-			if (options.verbose) {
-				console.log("  Provisioned devices:");
-				var devices = provision.ProvisionedDevices.$values;
-				for (var di = 0; di < devices.length; di++) {
-					console.log("    " + devices[di]);
+				console.log(util.format("#%d: '%s'; type: %s, App ID: '%s.%s'", i + 1, provision.Name, provision.ProvisionType,
+					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier));
+				if (options.verbose) {
+					console.log("  Provisioned devices:");
+					var devices = provision.ProvisionedDevices.$values;
+					for (var di = 0; di < devices.length; di++) {
+						console.log("    " + devices[di]);
+					}
 				}
 			}
-		}
+		}).future<any>()();
 	}
 
 	private findIdentityData(identityStr, data, selector): any {
@@ -85,3 +90,5 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 }
 $injector.register("identityManager", IdentityManager);
+helpers.registerCommand("identityManager", "list-certificates", (identityManager, args) => identityManager.listCertificates());
+helpers.registerCommand("identityManager", "list-provisions", (identityManager, args) => identityManager.listProvisions());

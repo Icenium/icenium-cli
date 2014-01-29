@@ -2,14 +2,13 @@
 
 "use strict";
 
-import baseCommands = require("./base-commands");
 import util = require("util");
 import path = require("path");
 import xopen = require("open");
 import unzip = require("unzip");
 import _ =  require("underscore");
 
-export class EditConfigurationCommandData implements Commands.ICommandData {
+class EditConfigurationCommandData {
 	private static ConfigurationFiles = [
 		{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFileName: "Mobile.Android.ManifestXml.zip" },
 		{ template: "android-config", filepath: "App_Resources/Android/xml/config.xml", templateFileName: "Mobile.Cordova.Android.ConfigXml.zip" },
@@ -30,26 +29,18 @@ export class EditConfigurationCommandData implements Commands.ICommandData {
 	}
 }
 
-export class EditConfigurationCommandDataFactory implements Commands.ICommandDataFactory {
-	public fromCliArguments(args: string[]): EditConfigurationCommandData {
-		return new EditConfigurationCommandData(args);
-	}
-}
-$injector.register("editConfigurationCommandDataFactory", EditConfigurationCommandDataFactory);
-
-export class EditConfigurationCommand extends baseCommands.BaseCommand<EditConfigurationCommandData> {
-	constructor(private $editConfigurationCommandDataFactory: EditConfigurationCommandDataFactory,
-		private $logger: ILogger,
+export class EditConfigurationCommand implements ICommand {
+	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $commandsService: ICommandsService) {
-		super();
 	}
 
-	public getDataFactory(): EditConfigurationCommandDataFactory {
-		return this.$editConfigurationCommandDataFactory;
+	execute(args: string[]): void {
+		var data = new EditConfigurationCommandData(args);
+		this.executeImplementation(data);
 	}
 
-	execute(data: EditConfigurationCommandData): void {
+	private executeImplementation(data: EditConfigurationCommandData): void {
 		if (data.template) {
 			var directory = path.dirname(data.template.filepath);
 			if (!this.$fs.exists(data.template.filepath).wait()) {

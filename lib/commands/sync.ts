@@ -7,60 +7,41 @@ import options = require("./../options");
 import helpers = require("./../helpers");
 import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
-import baseCommands = require("./base-commands");
 
-export class SyncCommandData implements Commands.ICommandData {
-	constructor(private keywords: string[]) { }
-	public get Platform() {
-		return this.keywords[0];
-	}
-}
-
-export class SyncCommandDataFactory implements Commands.ICommandDataFactory {
-	public fromCliArguments(args: string[]): SyncCommandData {
-		return new SyncCommandData(args);
-	}
-}
-$injector.register("syncCommandDataFactory", SyncCommandDataFactory);
-
-export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
+export class SyncCommand implements ICommand {
 	private excludedProjectDirsAndFiles = [".ice", "app_resources", ".iceproject", "plugins"];
 
-	constructor(private $syncCommandDataFactory: SyncCommandDataFactory,
-		private $devicesServices: Mobile.IDevicesServices,
+	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $project: Project.IProject) {
-		super();
 	}
 
-	public getDataFactory(): SyncCommandDataFactory {
-		return this.$syncCommandDataFactory;
-	}
+	public execute(args: string[]): void {
+		var platform = args[0];
 
-	public execute(data: SyncCommandData): void {
-		if (!data.Platform) {
+		if (!platform) {
 			throw new Error("Please specify platform");
 		}
 
 		var projectDir = this.$project.getProjectDir();
 		var appIdentifier = this.$project.projectData().AppIdentifier;
 
-		if(this.$devicesServices.hasDevices(data.Platform)) {
+		if (this.$devicesServices.hasDevices(platform)) {
 			if (options.live) {
-				this.liveSyncDevices(data.Platform, projectDir, appIdentifier);
+				this.liveSyncDevices(platform, projectDir, appIdentifier);
 			} else {
 				if (options.file) {
 					var isExistFile = this.$fs.exists((options.file)).wait();
 					if(isExistFile) {
 						var projectFiles = [path.resolve(options.file)];
-						this.sync(data.Platform, appIdentifier, projectDir, projectFiles);
+						this.sync(platform, appIdentifier, projectDir, projectFiles);
 					} else {
 						console.log(util.format("The file %s does not exist.", options.file));
 					}
 				} else {
 					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
-					this.sync(data.Platform, appIdentifier, projectDir, projectFiles);
+					this.sync(platform, appIdentifier, projectDir, projectFiles);
 				}
 			}
 		}
