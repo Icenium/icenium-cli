@@ -75,7 +75,7 @@ class IOSCore implements Mobile.IiOSCore {
 		equal: CoreTypes.voidPtr
 	});
 
-	private kCFStringEncodingUTF8 = 0x08000100;
+	public static CFSTRING_ENCODING_UTF8 = 0x08000100;
 
 	private appleFolderLocation = new iTunesInstallationInfo(this.$fs).getAppleFolderLocation();
 	private coreFoundationDir = path.join(this.appleFolderLocation, "Apple Application Support");
@@ -84,8 +84,10 @@ class IOSCore implements Mobile.IiOSCore {
 	private mobileDeviceDll = path.join(this.mobileDeviceDir, "MobileDevice.dll");
 
 	private setPath() {
-		process.env.PATH = this.coreFoundationDir + ";" + process.env.PATH;
-		process.env.PATH += ";" + this.mobileDeviceDir;
+		if(helpers.isWindows()) {
+			process.env.PATH = this.coreFoundationDir + ";" + process.env.PATH;
+			process.env.PATH += ";" + this.mobileDeviceDir;
+		}
 	}
 
 	public getCoreFoundationLibrary(): { } {
@@ -163,7 +165,6 @@ $injector.register("iOSCore", IOSCore);
 
 export class CoreFoundation implements  Mobile.ICoreFoundation {
 	private coreFoundationLibrary: any;
-	private kCFStringEncodingUTF8 = 0x08000100;
 
 	constructor($iOSCore: Mobile.IiOSCore) {
 		this.coreFoundationLibrary = $iOSCore.getCoreFoundationLibrary();
@@ -235,18 +236,18 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
     }
 
 	public createCFString(str: string): NodeBuffer {
-		return this.stringCreateWithCString(null, str, this.kCFStringEncodingUTF8);
+		return this.stringCreateWithCString(null, str, IOSCore.CFSTRING_ENCODING_UTF8 );
 	}
 
 	public convertCFStringToCString(cfstr) {
 		var result;
 		if (cfstr != null) {
-			result = this.stringGetCStringPtr(cfstr, this.kCFStringEncodingUTF8);
+			result = this.stringGetCStringPtr(cfstr, IOSCore.CFSTRING_ENCODING_UTF8 );
 			if (ref.address(result) === 0) {
 				var cfstrLength = this.stringGetLength(cfstr);
 				var length = cfstrLength + 1;
 				var stringBuffer = new Buffer(length);
-				var status = this.stringGetCString(cfstr, stringBuffer, length, this.kCFStringEncodingUTF8);
+				var status = this.stringGetCString(cfstr, stringBuffer, length, IOSCore.CFSTRING_ENCODING_UTF8 );
 				if (status) {
 					result = stringBuffer.toString("utf8", 0, cfstrLength);
 				} else {
