@@ -123,7 +123,6 @@ declare module Project {
 		printProjectProperty(property: string): void;
 		createNewProject(projectName: string): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
-		deployToDevice(platform: string): IFuture<void>;
 	}
 }
 

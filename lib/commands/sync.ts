@@ -3,7 +3,6 @@
 import util = require("util");
 import path = require("path");
 import watchr = require("watchr");
-import project = require("./../project");
 import options = require("./../options");
 import helpers = require("./../helpers");
 import _ = require("underscore");
@@ -30,7 +29,8 @@ export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
 	constructor(private $syncCommandDataFactory: SyncCommandDataFactory,
 		private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
-		private $fs: IFileSystem) {
+		private $fs: IFileSystem,
+		private $project: Project.IProject) {
 		super();
 	}
 
@@ -43,8 +43,8 @@ export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
 			throw new Error("Please specify platform");
 		}
 
-		var projectDir = project.getProjectDir();
-		var appIdentifier = project.getProjectData().AppIdentifier;
+		var projectDir = this.$project.getProjectDir();
+		var appIdentifier = this.$project.projectData().AppIdentifier;
 
 		if(this.$devicesServices.hasDevices(data.Platform)) {
 			if (options.live) {
@@ -59,7 +59,7 @@ export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
 						console.log(util.format("The file %s does not exist.", options.file));
 					}
 				} else {
-					var projectFiles = project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
 					this.sync(data.Platform, appIdentifier, projectDir, projectFiles);
 				}
 			}
@@ -96,7 +96,7 @@ export class SyncCommand extends baseCommands.BaseCommand<SyncCommandData> {
 					this.$logger.trace(error);
 				},
 				change: (changeType, filePath) => {
-					if (!project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
+					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace(util.format("Syncing %s", filePath));
 						this.sync(platform, appIdentifier, projectDir, [filePath]);
 					}

@@ -1,6 +1,5 @@
 ///<reference path="../.d.ts"/>
 
-import project = require("./../project");
 import options = require("./../options");
 import fs = require("fs");
 import util = require("util");
@@ -27,7 +26,8 @@ export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
     constructor(private $deployCommandDataFactory: DeployCommandDataFactory,
 		private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
-		private $identityManager: Server.IIdentityManager) {
+		private $identityManager: Server.IIdentityManager,
+		private $project: Project.IProject) {
 		super();
 	}
 
@@ -52,13 +52,13 @@ export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
 				}
 			}
 
-			var packageDefs = project.build(data.Platform, null, false, true).wait();
+			var packageDefs = this.$project.executeBuild(data.Platform).wait();
 			var packageFile = packageDefs[0].localFile;
 
 			this.$logger.debug("Ready to deploy %s", packageDefs);
 			this.$logger.debug("File is %d bytes", fs.statSync(packageFile).size);
 
-			var packageName = project.getProjectData().AppIdentifier;
+			var packageName = this.$project.projectData().AppIdentifier;
 
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => { device.deploy(packageFile, packageName); }).future<void>()();

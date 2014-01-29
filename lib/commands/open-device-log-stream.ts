@@ -19,7 +19,8 @@ $injector.register("openDeviceLogStreamCommandDataFactory", OpenDeviceLogStreamC
 
 export class OpenDeviceLogStreamCommand extends baseCommands.BaseCommand<OpenDeviceLogStreamCommandData> {
 	constructor(private $openDeviceLogStreamCommandDataFactory: OpenDeviceLogStreamCommandDataFactory,
-		private $devicesServices: Mobile.IDevicesServices) {
+		private $devicesServices: Mobile.IDevicesServices,
+		private $logger: ILogger) {
 		super();
 	}
 
@@ -33,7 +34,9 @@ export class OpenDeviceLogStreamCommand extends baseCommands.BaseCommand<OpenDev
 			this.$devicesServices.executeOnDevice(action, options.device).wait();
 		} else if(helpers.isNumber(options.device)) {
 			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
-		} 
+		} else {
+			this.$logger.fatal("Invalid device identifier or index. Run $ice list-devices command to see all connected devices.");
+		}
 	}
 }
 $injector.registerCommand("open-device-log-stream", OpenDeviceLogStreamCommand);
