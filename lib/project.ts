@@ -11,10 +11,11 @@ import util = require("util");
 import helpers = require("./helpers");
 import querystring = require("querystring");
 import xopen = require("open");
-import devicesService = require("./devices-service");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import baseCommands = require("./commands/base-commands");
+import projectNameValidator = require("./validators/project-name-validator");
+import MobileHelper = require("./mobile/mobile-helper");
 
 export class BuildService implements Project.IBuildService {
 	constructor(private $config,
@@ -177,9 +178,9 @@ export class Project implements Project.IProject {
 
 	private requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
-			if (helpers.isAndroidPlatform(platform)) {
+			if (MobileHelper.isAndroidPlatform(platform)) {
 				platform = "Android";
-			} else if (helpers.isiOSPlatform(platform)) {
+			} else if (MobileHelper.isiOSPlatform(platform)) {
 				platform = "iOS";
 			}
 
@@ -351,44 +352,6 @@ export class Project implements Project.IProject {
 				qrUrl: helpers.createQrUrl(fullDownloadPath),
 			}]).wait();
 		}).future<void>()();
-	}
-
-	public deployToDevice(platform: string): IFuture<void> {
-		var future = new Future<void>();
-		devicesService.hasDevices(platform)
-			.then((hasDevices) => {
-			if (hasDevices) {
-				var packageDefs = this.build(platform, null, false, true).wait();
-				var packageFile = packageDefs[0].localFile;
-
-				this.$logger.debug("Ready to deploy %s", packageDefs);
-				this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
-
-				if(helpers.isiOSPlatform(platform)) {
-					var identData = this.$identityManager.findProvision(options.provision).wait();
-					var provisionedDevices = identData.ProvisionedDevices.$values;
-					this.processDeployToDevice(platform, packageFile, provisionedDevices);
-				} else {
-					this.processDeployToDevice(platform, packageFile);
-				}
-			} else {
-				this.$logger.error(util.format("The app cannot be deployed because there are 0 connected %s devices", platform || ""));
-			}
-		})
-			.then(() => future.return(), (err) => future.throw(err));
-		return future;
-	}
-
-	private processDeployToDevice(platform, packageFile, provisionedDevices?) {
-		var packageName = this.projectData.AppIdentifier;
-		devicesService.deploy(platform, packageFile, packageName, provisionedDevices)
-			.then(function () {
-				this.$logger.info(util.format("%s has been successfully installed on all connected %s devices", packageFile, platform));
-			})
-			.catch(function (error) {
-					this.$logger.trace(error);
-			})
-			.done();
 	}
 
 	public importProject(): IFuture<void> {
@@ -585,10 +548,14 @@ export class Project implements Project.IProject {
 	public isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean {
 		var relativeToProjectPath = filePath.substr(projectDir.length + 1);
 		var lowerCasePath = relativeToProjectPath.toLowerCase();
-		for (var key in excludedDirsAndFiles) {
-			if (lowerCasePath.startsWith(excludedDirsAndFiles[key])) {
-				return true;
-			}
+		if(excludedDirsAndFiles) {
+			var excluded = false;
+			excludedDirsAndFiles.forEach((file) => {
+				if (lowerCasePath.startsWith(file)) {
+					excluded = true;
+				}
+			});
+			return excluded;
 		}
 		return false;
 	}

@@ -42,6 +42,9 @@ export function createQrUrl(data) {
 		config.QR_SIZE, config.QR_SIZE, querystring.escape(data));
 }
 
+export function fromWindowsRelativePathToUnix(windowsRelativePath) {
+	return windowsRelativePath.replace(/\\/g, "/");
+}
 
 //TODO: try 'archiver' module for zipping
 export function zipFiles(zipFile: string, files: string[], zipPathCallback: (path:string) => string): IFuture<void> {
@@ -84,14 +87,6 @@ export function zipFiles(zipFile: string, files: string[], zipPathCallback: (pat
 
 export function isRequestSuccessful(request) {
 	return request.statusCode >= 200 && request.statusCode < 300;
-}
-
-export function isAndroidPlatform(platform) {
-	return platform.toLowerCase() === "android";
-}
-
-export function isiOSPlatform(platform) {
-	return platform.toLowerCase() === "ios";
 }
 
 export function getRelativeToRootPath(rootPath, filePath) {
@@ -188,4 +183,13 @@ export function registerCommand(module: string, commandName: string, executor: (
 	};
 
 	$injector.registerCommand(commandName, factory);
+}
+
+
+export function isWindows() {
+	return /^win/.test(process.platform);
+}
+
+export function isWindows64() {
+	return process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
 }
