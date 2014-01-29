@@ -2,6 +2,7 @@
 
 import path = require("path");
 import ValidationResult = require("./validation-result");
+import _ = require("underscore");
 
 var maxFileNameLength = 30,
 	emptyFileNameErrorMessage = "Name cannot be empty.",
@@ -33,15 +34,15 @@ ProjectNameValidator.prototype.validateName = function(name) {
 	else {
 		var extension = path.extname(name);
 		if(extension !== "") {
-			if(invalidFilenames.contains(name.split(".")[1].toUpperCase())) {
+			if(_.contains(invalidFilenames,name.split(".")[1].toUpperCase())) {
 				return new ValidationResult(reservedNameErrorMessage);
 			}
-			else if(invalidExtensions.contains(extension)) {
+			else if(_.contains(invalidExtensions, extension)) {
 				return new ValidationResult(invalidExtensionMessage);
 			}
 		}
 		else if(extension === "") {
-			if(invalidFilenames.contains(name)) {
+			if(_.contains(invalidFilenames, name)) {
 				return new ValidationResult(reservedNameErrorMessage);
 			}
 		}
