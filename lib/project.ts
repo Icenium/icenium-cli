@@ -13,7 +13,6 @@ import querystring = require("querystring");
 import xopen = require("open");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
-import baseCommands = require("./commands/base-commands");
 import projectNameValidator = require("./validators/project-name-validator");
 import MobileHelper = require("./mobile/mobile-helper");
 
@@ -714,73 +713,8 @@ helpers.registerCommand("project", "ion", (project, args) => project.deployToIon
 helpers.registerCommand("project", "update", (project, args) => project.importProject());
 helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
 helpers.registerCommand("project", "deploy", (project, args) => project.deployToDevice(args[0]));
-
-class ProjectPropertyCommandData {
-	public propertyName: string;
-	public propertyValues: string[];
-
-	constructor(args: string[]) {
-		this.propertyName = args[0];
-		this.propertyValues = _.rest(args, 1);
-	}
-}
-
-class AddProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
-	constructor(private $project: Project.IProject) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
-	}
-
-	execute(data:ProjectPropertyCommandData):void {
-		this.$project.updateProjectPropertyAndSave("add", data.propertyName, data.propertyValues).wait();
-	}
-}
-$injector.registerCommand("prop-add", AddProjectPropertyCommand);
-
-class SetProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
-	constructor(private $project: Project.IProject) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
-	}
-
-	execute(data:ProjectPropertyCommandData):void {
-		this.$project.updateProjectPropertyAndSave("set", data.propertyName, data.propertyValues).wait();
-	}
-}
-$injector.registerCommand("prop-set", SetProjectPropertyCommand);
-
-class DeleteProjectPropertyCommand extends baseCommands.BaseCommand<ProjectPropertyCommandData> {
-	constructor(private $project: Project.IProject) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: (args: string[]) => new ProjectPropertyCommandData(args) };
-	}
-
-	execute(data:ProjectPropertyCommandData):void {
-		this.$project.updateProjectPropertyAndSave("del", data.propertyName, data.propertyValues).wait();
-	}
-}
-$injector.registerCommand("prop-del", DeleteProjectPropertyCommand);
-
-class PrintProjectPropertyCommand extends baseCommands.BaseCommand<string> {
-	constructor(private $project: Project.IProject) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: (args: string[]) => args[0] };
-	}
-
-	execute(property: string): void {
-		this.$project.printProjectProperty(property);
-	}
-}
-$injector.registerCommand("prop-print", PrintProjectPropertyCommand);
+_.each(["add", "set", "del"], (operation) => {
+	helpers.registerCommand("project", "prop-" + operation,
+		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
+});
+helpers.registerCommand("project", "prop-print", (project, args) => project.printProjectProperty(args[0]));

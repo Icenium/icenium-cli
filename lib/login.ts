@@ -2,7 +2,6 @@
 
 "use strict";
 
-import baseCommands = require("./commands/base-commands");
 import util = require("util");
 import path = require("path");
 import url = require("url");
@@ -11,6 +10,7 @@ import fileSrv = require("./http-server");
 import options = require("./options");
 import querystring = require("querystring");
 import Future = require("fibers/future");
+import helpers = require("./helpers");
 
 export class UserDataStore implements IUserDataStore {
 	private cookie: string;
@@ -206,52 +206,6 @@ export class LoginManager implements ILoginManager {
 	}
 }
 $injector.register("loginManager", LoginManager);
-
-class LoginCommand extends baseCommands.BaseParameterlessCommand {
-	constructor(private $loginManager: ILoginManager) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: () => null };
-	}
-
-	execute():void {
-		this.$loginManager.login().wait();
-	}
-}
-$injector.registerCommand("login", LoginCommand);
-
-class LogoutCommand extends baseCommands.BaseParameterlessCommand {
-	constructor(private $loginManager: ILoginManager) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: () => null };
-	}
-
-	execute():void {
-		this.$loginManager.logout().wait();
-	}
-}
-$injector.registerCommand("logout", LogoutCommand);
-
-class TelerikLoginCommandData {
-	constructor(public user:string, public password:string) {}
-}
-
-class TelerikLoginCommand extends baseCommands.BaseCommand<TelerikLoginCommandData> {
-	constructor(private $loginManager: ILoginManager) {
-		super();
-	}
-
-	getDataFactory():Commands.ICommandDataFactory {
-		return { fromCliArguments: (args: string[]) => new TelerikLoginCommandData(args[0], args[1]) };
-	}
-
-	execute(data:TelerikLoginCommandData = null):void {
-		this.$loginManager.basicLogin(data.user, data.password).wait();
-	}
-}
-$injector.registerCommand("telerik-login", TelerikLoginCommand);
+helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login());
+helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout());
+helpers.registerCommand("loginManager", "telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]));

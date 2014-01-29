@@ -13,7 +13,7 @@ export class LoggerStub implements ILogger {
 }
 
 export class FileSystemStub implements IFileSystem {
-	exists(path:string):IFuture<boolean> {
+	exists(path: string): IFuture<boolean> {
 		return Future.fromResult(true);
 	}
 

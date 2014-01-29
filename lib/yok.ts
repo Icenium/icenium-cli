@@ -120,8 +120,15 @@ export class Yok implements IInjector {
 		this.modules[name] = dependency;
 	}
 
-	public resolveCommand(name: string): Commands.ICommand<Commands.ICommandData> {
-		return this.resolve(this.createCommandName(name));
+	public resolveCommand(name: string): ICommand {
+		var command: ICommand;
+		try {
+			command = this.resolve(this.createCommandName(name));
+		}
+		catch (error) {
+		}
+
+		return command;
 	}
 
 	public resolve(param: any): any {

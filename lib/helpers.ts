@@ -11,7 +11,6 @@ import log = require("./logger");
 import config = require("./config");
 import Q = require("q");
 import Future = require("fibers/future");
-import baseCommands = require("./commands/base-commands");
 
 function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {
 	var contents = fs.readdirSync(directoryPath);
@@ -168,18 +167,13 @@ export function isStringOptionEmpty(optionValue) {
 }
 
 export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
-	var factory = function(): baseCommands.BaseCommand<any> {
-		var cmd = new baseCommands.BaseCommand<any>();
-		cmd.getDataFactory = (): Commands.ICommandDataFactory => {
-				return { fromCliArguments: (args: string[]) => args };
-			};
-
-		cmd.execute = (args: string[]) => {
-			var mod = $injector.resolve(module);
-			executor(mod, args).wait();
+	var factory = function (): ICommand {
+		return {
+			execute: (args: string[]): void => {
+				var mod = $injector.resolve(module);
+				executor(mod, args).wait();
+			}
 		};
-
-		return cmd;
 	};
 
 	$injector.registerCommand(commandName, factory);

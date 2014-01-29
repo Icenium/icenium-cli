@@ -5,42 +5,20 @@ import fs = require("fs");
 import util = require("util");
 import MobileHelper = require("./../mobile/mobile-helper");
 import Future = require("fibers/future");
-import baseCommands = require("./base-commands");
 
-export class DeployCommandData implements Commands.ICommandData {
-	constructor(private keywords: string[]) { }
-	public get Platform() {
-		return this.keywords[0];
-    }
-}
-
-export class DeployCommandDataFactory implements Commands.ICommandDataFactory {
-	public fromCliArguments(args: string[]): DeployCommandData {
-		return new DeployCommandData(args);
-	}
-}
-
-$injector.register("deployCommandDataFactory", DeployCommandDataFactory);
-
-export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
-    constructor(private $deployCommandDataFactory: DeployCommandDataFactory,
-		private $devicesServices: Mobile.IDevicesServices,
+export class DeployCommand implements ICommand {
+    constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
 		private $identityManager: Server.IIdentityManager,
 		private $project: Project.IProject) {
-		super();
 	}
 
-	public getDataFactory(): DeployCommandDataFactory {
-		return this.$deployCommandDataFactory;
-	}
-
-	public execute(data: DeployCommandData): void {
-
-		if (this.$devicesServices.hasDevices(data.Platform)) {
+	public execute(args: string[]): void {
+		var platform = args[0];
+		if (this.$devicesServices.hasDevices(platform)) {
 			var canExecute;
 
-			if(MobileHelper.isiOSPlatform(data.Platform)) {
+			if (MobileHelper.isiOSPlatform(platform)) {
 				var provisionData = this.$identityManager.findProvision(options["provision"]).wait();
 				canExecute = (device: Mobile.IDevice): boolean => {
 					var isInProvisionedDevices: boolean = provisionData.ProvisionedDevices !== undefined && provisionData.ProvisionedDevices.contains(device.getIdentifier());
@@ -52,7 +30,7 @@ export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
 				}
 			}
 
-			var packageDefs = this.$project.executeBuild(data.Platform).wait();
+			var packageDefs = this.$project.executeBuild(platform).wait();
 			var packageFile = packageDefs[0].localFile;
 
 			this.$logger.debug("Ready to deploy %s", packageDefs);
@@ -63,11 +41,10 @@ export class DeployCommand extends baseCommands.BaseCommand<DeployCommandData> {
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => { device.deploy(packageFile, packageName); }).future<void>()();
 			};
-			this.$devicesServices.executeOnAllConnectedDevices(action, data.Platform, canExecute).wait();
+			this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
 		}
 	}
 }
-
 $injector.registerCommand("deploy", DeployCommand);
 
 

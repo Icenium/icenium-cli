@@ -36,8 +36,8 @@ $injector.requireCommand("logout", "./login");
 $injector.requireCommand("telerik-login", "./login");
 
 $injector.require("identityManager", "./identity");
-$injector.requireCommand("list-certificates", "./commands/identity");
-$injector.requireCommand("list-provisions", "./commands/identity");
+$injector.requireCommand("list-certificates", "./identity");
+$injector.requireCommand("list-provisions", "./identity");
 
 $injector.require("buildService", "./project");
 $injector.require("project", "./project");
