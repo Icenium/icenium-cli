@@ -53,7 +53,8 @@ class RemoteProjectExporter {
 
 	private makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T> {
 		return (() => {
-			var tenantId = this.$userDataStore.getUser().wait().tenant.id;
+			var user = this.$userDataStore.getUser().wait();
+			var tenantId = user.tenant.id;
 			this.$serviceProxy.setSolutionSpaceName(tenantId);
 			try {
 				return call().wait();

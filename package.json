@@ -45,7 +45,10 @@
     "hex": "0.0.1",
     "fibers": "git+https://git@github.com/tailsu/node-fibers.git",
     "mkdirp": "0.3.5",
-    "xml2js": "0.4.1"
+    "xml2js": "0.4.1",
+    "validator": "3.2.1",
+    "prompt": "git+https://git@github.com/Icenium/prompt.git",
+    "moment": "2.5.1"
   },
   "analyze": true,
   "devDependencies": {

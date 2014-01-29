@@ -38,8 +38,8 @@ declare module Server {
 	}
 
 	interface IIdentityManager {
-		listCertificates(): void;
-		listProvisions(): void;
+		listCertificates(): IFuture<any>;
+		listProvisions(): IFuture<any>;
 		findCertificate(identityStr): IFuture<any>;
 		findProvision(provisionStr): IFuture<any>;
 	}
@@ -228,4 +228,13 @@ interface IErrors {
 
 declare enum ErrorCodes {
 	UNKNOWN = 127
+}
+
+interface IPrompter {
+	start(): void;
+	get(schema: IPromptSchema): IFuture<any>;
+	getPassword(prompt: string): IFuture<string>;
+	confirm(prompt: string): IFuture<boolean>;
+	history(name: string): IPromptHistoryValue;
+	override(object: any): void;
 }

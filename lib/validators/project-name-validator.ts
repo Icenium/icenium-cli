@@ -6,7 +6,7 @@ import helpers = require("../helpers");
 import ValidationResult = require("./validation-result");
 
 export class ProjectNameValidator {
-	private static MAX_FILENAME_LENGTH= 30;
+	private static MAX_FILENAME_LENGTH = 30;
 	private static EMPTY_FILENAME_ERROR_MESSAGE = "Name cannot be empty.";
 	private static NOT_VALID_NAME_ERROR_MESSAGE = "Name should contain only the following symbols: A-Z, a-z, 0-9, _, ., +, -, @, $, &, ;, (, ), space, and comma.";
 	private static RESERVED_NAME_ERROR_MESSAGE = "Name is among the reserved names: CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.";

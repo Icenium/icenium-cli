@@ -34,10 +34,6 @@ $injector.requireCommand("login", "./login");
 $injector.requireCommand("logout", "./login");
 $injector.requireCommand("telerik-login", "./login");
 
-$injector.require("identityManager", "./identity");
-$injector.requireCommand("list-certificates", "./identity");
-$injector.requireCommand("list-provisions", "./identity");
-
 $injector.require("buildService", "./project");
 $injector.require("project", "./project");
 $injector.requireCommand("build", "./project");
@@ -81,5 +77,17 @@ $injector.require("iOSDevice", "./mobile/ios/ios-device");
 $injector.require("androidDevice", "./mobile/android/android-device");
 
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
+$injector.require("prompter", "./prompter");
 
 $injector.requireCommand("user", "./commands/user-status");
+
+$injector.require("identityManager", "./commands/cryptographic-identities");
+$injector.requireCommand("list-provisions", "./commands/cryptographic-identities");
+$injector.requireCommand("list-certificates", "./commands/cryptographic-identities");
+$injector.require("selfSignedIdentityValidator", "./validators/cryptographic-identity-validators");
+$injector.requireCommand("create-self-signed-certificate", "./commands/cryptographic-identities");
+$injector.requireCommand("remove-certificate", "./commands/cryptographic-identities");
+$injector.requireCommand("export-certificate", "./commands/cryptographic-identities");
+$injector.require("importCryptographicIdentityValidator", "./validators/cryptographic-identity-validators");
+$injector.requireCommand("import-certificate", "./commands/cryptographic-identities");
+
