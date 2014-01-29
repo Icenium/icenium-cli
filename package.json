@@ -1,23 +1,24 @@
 {
-  "name": "icenium-cli",
+  "name": "appbuilder-cli",
   "preferGlobal": true,
   "version": "0.1.0",
   "author": "Telerik <icenium@telerik.com>",
-  "description": "command line interface to Telerik Icenium",
+  "description": "command line interface to Telerik AppBuilder",
   "bin": {
-    "ice": "./bin/ice.js"
+    "ab": "./bin/ab.js"
   },
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
   },
-  "main": "./lib/ice-cli.js",
+  "main": "./lib/ab-cli.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Icenium/icenium-cli.git"
   },
   "keywords": [
     "cordova",
-    "icenium"
+    "appbuilder",
+    "telerik"
   ],
   "dependencies": {
     "cookie": "0.1.0",
