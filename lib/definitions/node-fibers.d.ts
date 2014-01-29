@@ -75,6 +75,8 @@ declare module "fibers/future" {
 
 		static fromResult<T>(value: T): IFuture<T>;
 		static fromResult(): IFuture<void>;
+
+		static assertNoFutureLeftBehind(): void;
 	}
 
 export = Future;
