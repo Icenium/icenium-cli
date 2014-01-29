@@ -8,9 +8,6 @@ export class CommandsService implements ICommandsService {
 	private commands = {
 		"config-reset": this.makeCommand("config", "reset"),
 		"config-apply": this.makeCommand("config", "apply"),
-		"sync": this.makeCommand("sync-service", "sync"),
-		"list-devices": this.makeCommand("devices-service", "listDevices"),
-		"open-device-log-stream": this.makeCommand("devices-service", "openDeviceLogStream"),
 	};
 
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {

@@ -99,7 +99,6 @@ export class SyncCommand implements Commands.ICommand<SyncCommandData> {
 				change: (changeType, filePath) => {
 					if (!project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace(util.format("Syncing %s", filePath));
-						var successMessage = util.format("%s has been successfully synced.", filePath);
 						this.sync(platform, appIdentifier, projectDir, [filePath]);
 					}
 				},
@@ -107,11 +106,11 @@ export class SyncCommand implements Commands.ICommand<SyncCommandData> {
 					if(error) {
 						throw error;
 					}
-					this.$logger.trace("File system whatchers are stopping.");
+					this.$logger.trace("File system watchers are stopping.");
 					for (var i = 0; i < watchers.length; i++) {
 						watchers[i].close();
 					}
-					this.$logger.trace("File system whatchers are stopped.");
+					this.$logger.trace("File system watchers are stopped.");
 				}
 			}
 		});
