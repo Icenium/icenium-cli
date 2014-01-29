@@ -16,6 +16,8 @@ export interface IPlugin {
 }
 
 export class CordovaPluginsService {
+	constructor(private $project: Project.IProject) {}
+
 	public getPlugins(keywords: string[]): IPlugin[] {
 		this.configure();
 		return this.search(keywords);
@@ -64,8 +66,7 @@ export class CordovaPluginsService {
 	}
 
 	private getPluginsDir() {
-		var project = require("../project");
-		return path.join(project.getProjectDir(), "plugins");
+		return path.join(this.$project.getProjectDir(), "plugins");
 	}
 }
 $injector.register("cordovaPluginsService", CordovaPluginsService);

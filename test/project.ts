@@ -2,18 +2,47 @@
 
 "use strict";
 
-var assert = require("chai").assert;
+import projectlib = require("./../lib/project");
+import fslib = require("./../lib/file-system");
+import yok = require("./../lib/yok");
+import stubs = require("./stubs");
 import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
+var assert = require("chai").assert;
 temp.track();
 
-describe("project", function() {
-	var project = require("./../lib/project");
+var mockProjectNameValidator = {
+	validateCalled: false,
+	validate: () => {
+		mockProjectNameValidator.validateCalled = true;
+		return true;
+	}
+};
 
-	before(function (done) {
-		$injector.require("fs", "./file-system");
-		done();
+function createTestInjector(): IInjector {
+	require("../lib/logger");
+
+	var testInjector = new yok.Yok();
+	testInjector.register("project", projectlib.Project);
+
+	testInjector.register("injector", testInjector);
+	testInjector.register("logger", stubs.LoggerStub);
+	testInjector.register("config", require("../lib/config"));
+	testInjector.register("server", {});
+	testInjector.register("identityManager", {});
+	testInjector.register("buildService", {});
+	testInjector.register("projectNameValidator", mockProjectNameValidator);
+
+	return testInjector;
+}
+
+describe("project integration tests", function() {
+	var project, testInjector;
+	before(() => {
+		testInjector = createTestInjector();
+		testInjector.register("fs", fslib.FileSystem);
+		project = testInjector.resolve("project");
 	});
 
 	describe("createNewProject", function () {
@@ -26,7 +55,7 @@ describe("project", function() {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName);
+			project.createNewProject(projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank.abproject"));
@@ -72,12 +101,28 @@ describe("project", function() {
 			assert.throws(function () { project.createTemplateFolder(projectFolder).wait(); });
 		});
 	});
+});
+
+describe("project unit tests", function() {
+	var project, testInjector;
+	before(() => {
+		testInjector = createTestInjector();
+		testInjector.register("fs", stubs.FileSystemStub);
+		project = testInjector.resolve("project");
+	});
 
 	describe("updateProjectProperty", function() {
 		it("sets unconstrained string property", function() {
+			var projectData = {iOSDisplayName: "wrong"};
+			project.updateProjectProperty(projectData, "set", "iOSDisplayName", ["fine"]);
+			assert.equal("fine", projectData.iOSDisplayName);
+		});
+
+		it("sets string property with custom validator", function() {
 			var projectData = {name: "wrong"};
 			project.updateProjectProperty(projectData, "set", "name", ["fine"]);
 			assert.equal("fine", projectData.name);
+			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", function() {

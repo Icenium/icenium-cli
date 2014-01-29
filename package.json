@@ -8,7 +8,7 @@
     "ice": "./bin/ice.js"
   },
   "scripts": {
-    "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js test/"
+    "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
   },
   "main": "./lib/ice-cli.js",
   "repository": {
@@ -41,7 +41,7 @@
     "bufferpack": "0.0.6",
     "binary-reader": "0.1.0",
     "hex": "0.0.1",
-    "fibers": "1.0.1",
+    "fibers": "git+https://git@github.com/tailsu/node-fibers.git",
     "mkdirp": "0.3.5",
     "xml2js": "0.4.1"
   },
@@ -53,7 +53,7 @@
     "grunt": "0.4.2",
     "grunt-ts": "1.5.1",
     "grunt-contrib-clean": "0.5.0",
-    "mocha-fibers": "1.0.3",
+    "mocha-fibers": "git+https://git@github.com/tailsu/mocha-fibers.git",
     "temp": "0.6.0"
   },
   "bundledDependencies": [],

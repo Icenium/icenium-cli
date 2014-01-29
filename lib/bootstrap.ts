@@ -39,3 +39,17 @@ $injector.requireCommand("list-certificates", "./commands/identity");
 $injector.requireCommand("list-provisions", "./commands/identity");
 
 $injector.require("buildService", "./project");
+$injector.require("project", "./project");
+$injector.requireCommand("build", "./project");
+$injector.requireCommand("ion", "./project");
+$injector.requireCommand("update", "./project");
+$injector.requireCommand("deploy", "./project");
+$injector.requireCommand("create", "./project");
+$injector.requireCommand("prop-add", "./project");
+$injector.requireCommand("prop-set", "./project");
+$injector.requireCommand("prop-del", "./project");
+$injector.requireCommand("prop-print", "./project");
+$injector.require("projectNameValidator", "./validators/project-name-validator");
+
+$injector.requireCommand("list-projects", "./remote-projects");
+$injector.requireCommand("export-project", "./remote-projects");

@@ -16,6 +16,7 @@ declare module Server {
 		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream): IFuture<T>;
 		getLastRequestCookies(): any;
 		setShouldAuthenticate(shouldAuthenticate: boolean): void;
+		setSolutionSpaceName(solutionSpaceName: string): void;
 	}
 
 	interface IHttpClient {
@@ -109,6 +110,21 @@ declare module Project {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult>;
 	}
+
+	interface IProject {
+		projectData: any;
+		getProjectDir(): string;
+		enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[];
+		isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean;
+		executeBuild(platform: string): IFuture<void>;
+		importProject(): IFuture<void>;
+		deployToIon(): IFuture<void>;
+		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
+		printProjectProperty(property: string): void;
+		createNewProject(projectName: string): IFuture<void>;
+		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
+		deployToDevice(platform: string): IFuture<void>;
+	}
 }
 
 interface IFileSystem {
@@ -122,7 +138,8 @@ interface IFileSystem {
 	readText(filename: string, encoding?: string): IFuture<string>;
 	readJson(filename: string, encoding?: string): IFuture<any>;
 	writeFile(filename: string, data: any, encoding?: string): IFuture<void>;
-	writeJson(filename: string, data: any, encoding?: string): IFuture<void>;
+	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void>;
+	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void>;
 
 	createReadStream(path: string, options?: {
 		flags?: string;

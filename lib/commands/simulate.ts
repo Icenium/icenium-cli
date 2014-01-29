@@ -4,7 +4,6 @@
 import baseCommands = require("./base-commands");
 import path = require("path");
 import unzip = require("unzip");
-import project = require("../project");
 import options = require("../options");
 import util = require("../helpers");
 import Future = require("fibers/future");
@@ -26,9 +25,10 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 		private $httpClient: Server.IHttpClient,
 		private $fs: IFileSystem,
 		private $config: any,
-		private $server: Server.IServer) {
+		private $server: Server.IServer,
+		private $project: Project.IProject) {
 		super();
-		this.projectData = project.projectData;
+		this.projectData = $project.projectData;
 	}
 
 	public execute(): void {
@@ -119,7 +119,7 @@ export class SimulateCommand extends baseCommands.BaseParameterlessCommand {
 
 		var simulatorBinary = path.join(this.simulatorPath, "Icenium.Simulator.exe");
 		var simulatorParams = [
-			"--path", project.getProjectDir(),
+			"--path", this.$project.getProjectDir(),
 			"--statusbarstyle", this.projectData.iOSStatusBarStyle,
 			"--frameworkversion", this.projectData.FrameworkVersion,
 			"--orientations", this.projectData.DeviceOrientations.join(";"),

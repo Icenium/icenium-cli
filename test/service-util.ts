@@ -4,9 +4,11 @@ import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
+import yok = require("../lib/yok");
 var assert:chai.Assert = chai.assert;
 
-$injector.register("logger", stubs.LoggerStub);
+var testInjector = new yok.Yok();
+testInjector.register("logger", stubs.LoggerStub);
 
 class MockUserDataStore implements IUserDataStore {
 	getCookie():IFuture<string> {
@@ -25,7 +27,7 @@ class MockUserDataStore implements IUserDataStore {
 		return undefined;
 	}
 }
-$injector.register("userDataStore", MockUserDataStore);
+testInjector.register("userDataStore", MockUserDataStore);
 
 class MockHttpClient implements Server.IHttpClient {
 	public options: any;
@@ -46,13 +48,12 @@ class MockHttpClient implements Server.IHttpClient {
 	}
 }
 
-
 var httpClient = new MockHttpClient();
 
-$injector.register("httpClient", httpClient);
+testInjector.register("httpClient", httpClient);
 
 function makeProxy(): Server.IServiceProxy {
-	return <Server.IServiceProxy> $injector.resolve(ServiceUtil.ServiceProxy);
+	return testInjector.resolve(ServiceUtil.ServiceProxy);
 }
 
 describe("ServiceProxy", function() {

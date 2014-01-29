@@ -3,6 +3,7 @@
 
 import log4js = require("log4js");
 import config = require("./config");
+import util = require("util");
 var options:any = require("./options");
 
 var appenders = [];
@@ -49,6 +50,10 @@ export class Logger implements ILogger {
 
 	trace(...args): void {
 		log4jsLogger.trace.apply(log4jsLogger, args);
+	}
+
+	out(...args): void {
+		console.log(util.format.apply(null, args));
 	}
 }
 $injector.register("logger", Logger);

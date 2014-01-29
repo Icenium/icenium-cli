@@ -187,6 +187,10 @@ export class Yok implements IInjector {
 
 	private resolveDependency(name: string): IDependency {
 		var module = this.modules[name];
+		if (!module) {
+			throw new Error("unable to resolve " + name);
+		}
+
 		if (module.require) {
 			require(module.require);
 		}
