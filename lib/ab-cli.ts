@@ -1,5 +1,6 @@
 ///<reference path=".d.ts"/>
 import Fiber = require("fibers");
+import Future = require("fibers/future");
 
 (function() {
 	"use strict";
@@ -13,7 +14,9 @@ import Fiber = require("fibers");
 	}
 
 	function dispatchCommandInFiber() {
-		Fiber(dispatchCommand).run();
+		var fiber = Fiber(dispatchCommand);
+		global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
+		fiber.run();
 	}
 
 	function dispatchCommand() {
@@ -24,7 +27,7 @@ import Fiber = require("fibers");
 			require("./log").fatal("Unknown command '%s'. Use 'ab help' for help.", commandName);
 		}
 
-		return;
+		Future.assertNoFutureLeftBehind();
 	}
 
 	function getCommandName(): string {
