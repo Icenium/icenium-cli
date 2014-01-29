@@ -136,6 +136,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 
 	public startLookingForDevices(): IFuture<void> {
 		return(()=> {
+			this.ensureAdbServerStarted().wait();
 
 			var requestAllDevicesCommand = util.format("%s devices", AndroidDeviceDiscovery.ADB);
 			var result = this.$childProcess.exec(requestAllDevicesCommand).wait();
@@ -149,6 +150,11 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 					this.createAndAddDevice(identifier);
 				});
 		}).future<void>()();
+	}
+
+	private ensureAdbServerStarted(): IFuture<void> {
+		var startAdbServerCommand = util.format("%s start-server", AndroidDeviceDiscovery.ADB);
+		return this.$childProcess.exec(startAdbServerCommand);
 	}
 }
 $injector.register("androidDeviceDiscovery", AndroidDeviceDiscovery);
