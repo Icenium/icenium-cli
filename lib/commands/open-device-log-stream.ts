@@ -29,11 +29,11 @@ export class OpenDeviceLogStreamCommand extends baseCommands.BaseCommand<OpenDev
 
 	public execute(data: OpenDeviceLogStreamCommandData): void {
 		var action = (device: Mobile.IDevice) =>  { device.openDeviceLogStream(); };
-		if(helpers.isNumber(options.device)) {
-			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
-		} else {
+		if(this.$devicesServices.hasDevice(options.device)) {
 			this.$devicesServices.executeOnDevice(action, options.device).wait();
-		}
+		} else if(helpers.isNumber(options.device)) {
+			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
+		} 
 	}
 }
 $injector.registerCommand("open-device-log-stream", OpenDeviceLogStreamCommand);

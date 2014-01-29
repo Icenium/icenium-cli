@@ -141,6 +141,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}
 	}
 
+	public hasDevice(identifier: string): boolean {
+		return _.some(this.getDevices(), (device: Mobile.IDevice) => { return device.getIdentifier() === identifier });
+	}
+
 	private filterDevicesByPlatform(platform: string): Mobile.IDevice[] {
 		return _.filter(this.getDevices(), (device: Mobile.IDevice) => { return device.getPlatform() === platform; });
 	}

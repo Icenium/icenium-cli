@@ -67,11 +67,11 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 
-	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<any> {
+	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
 		return(() => {
 			var pushFileCommand = this.composeCommand(util.format("push %s %s", localPath, devicePath));
-			var result = this.$childProcess.exec(pushFileCommand).wait();
-		}).future<any>()();
+			this.$childProcess.exec(pushFileCommand).wait();
+		}).future<void>()();
 	}
 
 	private sendBroadcastToDevice(action): Future<void> {
