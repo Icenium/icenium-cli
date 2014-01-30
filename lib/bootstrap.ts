@@ -7,19 +7,14 @@ $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 
-$injector.require("helpCommandDataFactory", "./commands/help");
 $injector.requireCommand("help", "./commands/help");
 
-$injector.require("findPluginsCommandDataFactory", "./commands/find-plugins");
 $injector.requireCommand("find-plugins", "./commands/find-plugins");
 
-$injector.require("fetchPluginCommandDataFactory", "./commands/fetch-plugin");
 $injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
 
-$injector.require("editConfigurationCommandDataFactory", "./commands/configuration");
 $injector.requireCommand("edit-configuration", "./commands/configuration");
 
-$injector.require("simulateCommandDataFactory", "./commands/simulate");
 $injector.requireCommand("simulate", "./commands/simulate");
 
 $injector.require("server", "./server-api");
@@ -54,16 +49,12 @@ $injector.require("projectNameValidator", "./validators/project-name-validator")
 $injector.requireCommand("list-projects", "./remote-projects");
 $injector.requireCommand("export-project", "./remote-projects");
 $injector.require("buildService", "./project");
-$injector.require("listDevicesCommandDataFactory","./commands/list-devices");
 $injector.requireCommand("list-devices", "./commands/list-devices");
 
-$injector.require("deployCommandDataFactory", "./commands/deploy");
 $injector.requireCommand("deploy", "./commands/deploy");
 
-$injector.require("syncCommandDataFactory", "./commands/sync");
 $injector.requireCommand("sync", "./commands/sync");
 
-$injector.require("openDeviceLogStreamCommand", "./commands/open-device-log-stream");
 $injector.requireCommand("open-device-log-stream", "./commands/open-device-log-stream");
 
 $injector.require("iOSCore", "./mobile/ios/ios-core");
