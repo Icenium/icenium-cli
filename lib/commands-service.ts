@@ -4,25 +4,33 @@
 import _ = require("underscore");
 
 export class CommandsService implements ICommandsService {
+	constructor(
+		private $errors: IErrors
+		) {}
+
 	private commands = {
 		"config-reset": this.makeCommand("config", "reset"),
 		"config-apply": this.makeCommand("config", "apply"),
 	};
 
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
-		var command = this.commands[commandName];
-		if (command) {
-			command().apply(null, commandArguments);
-			return true;
-		}
+		return this.$errors.beginCommand(() => {
+			var command = this.commands[commandName];
+			if (command) {
+				command().apply(null, commandArguments);
+				return true;
+			}
 
-		command = $injector.resolveCommand(commandName);
-		if (command) {
-			command.execute(commandArguments);
-			return true;
-		}
-		
-		return false;
+			command = $injector.resolveCommand(commandName);
+			if (command) {
+				command.execute(commandArguments);
+				return true;
+			}
+
+			return false;
+		}, () => {
+			this.executeCommand("help", [commandName]);
+		});
 	}
 
 	public completeCommand() {

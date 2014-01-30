@@ -158,3 +158,14 @@ interface IChildProcess {
 	exec(command: string): IFuture<any>;
 	spawn(command: string, args?: string[], options?: string[]): any;
 }
+
+interface IErrors {
+	fail(formatStr: string, ...args: any[]): void;
+	fail(opts: {formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
+
+	beginCommand(action: () => any, printCommandHelp: () => void): any;
+}
+
+declare enum ErrorCodes {
+	UNKNOWN = 127
+}

@@ -6,32 +6,31 @@ import path = require("path");
 import util = require("util");
 
 export class HelpCommand implements ICommand {
-	constructor(private logger: ILogger) {
-	}
+	constructor(private $logger: ILogger,
+		private $errors: IErrors,
+		private $fs: IFileSystem) {}
 
 	public execute(args: string[]): void {
-		var topic: string;
-		if (args.length == 0) {
-			topic = "";
-		} else {
-			topic = args[0];
-		}
-
-		fs.readFile(path.join(__dirname, "../../resources/help.txt"), "utf8", (err, helpContent) => {
-			if (err) {
-				throw err;
+		(() => {
+			var topic: string;
+			if (args.length == 0) {
+				topic = "";
+			} else {
+				topic = args[0];
 			}
+
+			var helpContent = this.$fs.readText(path.join(__dirname, "../../resources/help.txt")).wait();
 
 			var pattern = util.format("--\\[%s\\]--((.|[\\r\\n])+?)--\\[/\\]--", topic);
 			var regex = new RegExp(pattern);
 
 			var match = regex.exec(helpContent);
 			if (match) {
-				console.log(match[1].trim());
+				this.$logger.out(match[1].trim());
 			} else {
-				this.logger.fatal("Unknown help topic '%s'", topic);
+				this.$errors.fail({ formatStr: "Unknown help topic '%s'", suppressCommandHelp: true }, topic);
 			}
-		});
+		}).future<void>()().wait();
 	}
 }
 $injector.registerCommand("help", HelpCommand);
