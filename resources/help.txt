@@ -104,7 +104,7 @@ Lists with serial number and index all recognized connected devices, grouped by 
 
 --[build]--
 Usage:
-    $ ab build <Platform> [--download]
+    $ ab build <Platform> [--download] [--no-livesync]
 
 Platform-specific examples:
     $ ab build android
@@ -125,6 +125,8 @@ Options:
         app. Must match the specified provisioning profile. You can specify a certificate by index or name.
     --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
         your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
+    --no-livesync - If specified, the app will not support the three-finger tap (iOS) or menu button press (Android)
+        to sync with the cloud.
 
 --[/]--
 
