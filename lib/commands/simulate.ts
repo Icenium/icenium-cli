@@ -23,7 +23,7 @@ export class SimulateCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $httpClient: Server.IHttpClient,
 		private $fs: IFileSystem,
-		private $config: any,
+		private $config: IConfiguration,
 		private $server: Server.IServer,
 		private $project: Project.IProject) {
 		this.projectData = $project.projectData;

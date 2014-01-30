@@ -127,6 +127,7 @@ declare module Project {
 }
 
 interface IFileSystem {
+	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
 	exists(path: string): IFuture<boolean>;
 	deleteFile(path: string): IFuture<void>;
 	getFileSize(path: string): IFuture<number>;
@@ -157,6 +158,26 @@ interface IFileSystem {
 interface IChildProcess {
 	exec(command: string): IFuture<any>;
 	spawn(command: string, args?: string[], options?: string[]): any;
+}
+
+interface IConfiguration {
+	TFIS_SERVER: string;
+	AB_SERVER_PROTO: string;
+	AB_SERVER: string;
+	DEBUG: boolean;
+	PROXY_TO_FIDDLER: boolean;
+	PROJECT_FILE_NAME: string;
+	SOLUTION_SPACE_NAME: string;
+	QR_SIZE: number;
+	DEFAULT_PROJECT_TEMPLATE: string;
+	TEMPLATE_NAMES: string[];
+	CORDOVA_PLUGINS_REGISTRY: string;
+	DEFAULT_PROJECT_NAME: string;
+	CI_LOGGER: boolean;
+	WRAP_CLIENT_ID: string;
+
+	reset(): IFuture<void>;
+	apply(configName: string): IFuture<void>;
 }
 
 interface IErrors {

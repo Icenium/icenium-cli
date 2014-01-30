@@ -75,7 +75,7 @@ $injector.register("userDataStore", UserDataStore);
 
 export class LoginManager implements ILoginManager {
 	constructor(private $logger: ILogger,
-		private $config: any,
+		private $config: IConfiguration,
 		private $httpClient: Server.IHttpClient,
 		private $server: Server.IServer,
 		private $serviceProxy: Server.IServiceProxy,

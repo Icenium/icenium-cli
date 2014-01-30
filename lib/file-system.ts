@@ -12,6 +12,48 @@ export class FileSystem implements IFileSystem {
 	private _writeFile = Future.wrap<void>(fs.writeFile);
 	private _readdir = Future.wrap(fs.readdir);
 
+//TODO: try 'archiver' module for zipping
+	public zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
+		//we are resolving it here instead of in the constructor, because config has dependency on file system and config shouldn't require logger
+		var $logger = $injector.resolve("logger");
+		var zipstream = require("zipstream");
+		var zip = zipstream.createZip({ level: 9 });
+		var outFile = fs.createWriteStream(zipFile);
+		zip.pipe(outFile);
+
+		var result = new Future<void>();
+		outFile.on("error", (err) => result.throw(err));
+
+		var fileIdx = -1;
+		var zipCallback = function () {
+			fileIdx++;
+			if (fileIdx < files.length) {
+				var file = files[fileIdx];
+
+				var relativePath = zipPathCallback(file);
+				relativePath = relativePath.replace(/\\/g, "/");
+				$logger.trace("zipping as '%s' file '%s'", relativePath, file);
+
+				zip.addFile(
+					fs.createReadStream(file),
+					{ name: relativePath },
+					zipCallback);
+			} else {
+				outFile.on("finish", function () {
+					result.return();
+				});
+
+				zip.finalize(function (bytesWritten) {
+					$logger.debug("zipstream: %d bytes written", bytesWritten);
+					outFile.end();
+				});
+			}
+		};
+		zipCallback();
+
+		return result;
+}
+
 	public exists(path: string): IFuture<boolean> {
 		var future = new Future<boolean>();
 		fs.exists(path, (exists: boolean) => future.return(exists));

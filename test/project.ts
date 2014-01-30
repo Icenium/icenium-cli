@@ -29,7 +29,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
-	testInjector.register("config", require("../lib/config"));
+	testInjector.register("config", require("../lib/config").Configuration);
 	testInjector.register("server", {});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
@@ -108,7 +108,9 @@ describe("project unit tests", function() {
 	var project, testInjector;
 	before(() => {
 		testInjector = createTestInjector();
+		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
+		testInjector.resolve("config").PROJECT_FILE_NAME = "";
 		project = testInjector.resolve("project");
 	});
 

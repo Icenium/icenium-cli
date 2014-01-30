@@ -1,6 +1,8 @@
 global.$injector = require("./yok").injector;
 
 $injector.require("config", "./config");
+$injector.requireCommand("config-apply", "./config");
+$injector.requireCommand("config-reset", "./config");
 $injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
 $injector.require("childProcess", "./child-process");
@@ -14,8 +16,7 @@ $injector.requireCommand("find-plugins", "./commands/find-plugins");
 
 $injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
 
-$injector.requireCommand("edit-configuration", "./commands/configuration");
-
+$injector.requireCommand("edit-configuration", "./commands/edit-configuration");
 $injector.requireCommand("simulate", "./commands/simulate");
 
 $injector.require("server", "./server-api");

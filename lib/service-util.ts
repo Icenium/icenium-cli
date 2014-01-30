@@ -2,7 +2,6 @@
 
 "use strict";
 
-import config = require("./config");
 import util = require("util");
 import Future = require("fibers/future");
 import cookielib = require("cookie");
@@ -11,7 +10,8 @@ import helpers = require("./helpers");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class HttpClient implements Server.IHttpClient {
-	constructor(private $logger: ILogger) {}
+	constructor(private $logger: ILogger,
+		private $config: IConfiguration) { }
 
 	httpRequest(options): IFuture<Server.IResponse> {
 		if (_.isString(options)) {
@@ -39,12 +39,12 @@ export class HttpClient implements Server.IHttpClient {
 		var pipeTo = options.pipeTo;
 		delete options.pipeTo;
 
-		var proto = config.PROXY_TO_FIDDLER ? "http" : requestProto;
+		var proto = this.$config.PROXY_TO_FIDDLER ? "http" : requestProto;
 		var http = require(proto);
 
 		options.headers = options.headers || {};
 
-		if (config.PROXY_TO_FIDDLER) {
+		if (this.$config.PROXY_TO_FIDDLER) {
 			options.path = requestProto + "://" + options.host + options.path;
 			options.headers.Host = options.host;
 			options.host = "127.0.0.1";
@@ -118,12 +118,13 @@ export class ServiceProxy {
 
 	constructor(private $httpClient: Server.IHttpClient,
 		private $userDataStore: IUserDataStore,
-		private $logger: ILogger) {
+		private $logger: ILogger,
+		private $config: IConfiguration) {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
 		var headers: any = {
-			"X-Icenium-SolutionSpace": this.solutionSpaceName || config.SOLUTION_SPACE_NAME
+			"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$config.SOLUTION_SPACE_NAME
 		};
 
 		if (this.shouldAuthenticate) {
@@ -135,8 +136,8 @@ export class ServiceProxy {
 		}
 
 		var requestOpts: any = {
-			proto: config.AB_SERVER_PROTO,
-			host: config.AB_SERVER,
+			proto: this.$config.AB_SERVER_PROTO,
+			host: this.$config.AB_SERVER,
 			path: "/api" + path,
 			method: method,
 			headers: headers,
@@ -248,13 +249,14 @@ class CodePrinter {
 }
 
 export class ServiceContractProvider implements Server.IServiceContractProvider {
-	constructor(private $httpClient: Server.IHttpClient) {
+	constructor(private $httpClient: Server.IHttpClient,
+		private $config: IConfiguration) {
 	}
 
 	getApi(): Server.Contract.IService[] {
 		var req:any = {
-			proto: config.AB_SERVER_PROTO,
-			host: config.AB_SERVER,
+			proto: this.$config.AB_SERVER_PROTO,
+			host: this.$config.AB_SERVER,
 			path: "/api",
 			method: "GET"
 		};

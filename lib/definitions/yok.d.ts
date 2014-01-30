@@ -3,7 +3,7 @@ interface IInjector {
 	requireCommand(name: string, file: string): void;
 	resolve(ctor: Function): any;
 	resolve(name: string): any;
-	resolveCommand(name: string): void;
+	resolveCommand(name: string): ICommand;
 	register(name: string, resolver: any): void;
 	registerCommand(name: string, resolver: any): void;
 	getRegisteredCommandsNames(): string[];
