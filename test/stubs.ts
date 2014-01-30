@@ -69,3 +69,18 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 }
+
+export class ErrorsStub implements IErrors {
+	private impl: IErrors = require("../lib/errors").Errors;
+
+	fail(formatStr:string, ...args: any[]): void;
+	fail(opts:{formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
+
+	fail(...args: any[]) {
+		this.impl.fail.apply(this.impl, args);
+	}
+
+	beginCommand(action:() => void, printHelpCommand: () => void) {
+		throw new Error("not supported");
+	}
+}

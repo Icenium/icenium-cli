@@ -19,6 +19,10 @@ interface Function {
 	};
 }
 
+interface Error {
+	stack: string;
+}
+
 function startsWith(prefix) {
 	if (typeof prefix !== "string") {
 		throw new Error("prefix must be string");

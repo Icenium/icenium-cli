@@ -26,6 +26,7 @@ function createTestInjector(): IInjector {
 	var testInjector = new yok.Yok();
 	testInjector.register("project", projectlib.Project);
 
+	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("config", require("../lib/config"));

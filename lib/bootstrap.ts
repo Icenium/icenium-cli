@@ -1,6 +1,7 @@
 global.$injector = require("./yok").injector;
 
 $injector.require("config", "./config");
+$injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
 $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");

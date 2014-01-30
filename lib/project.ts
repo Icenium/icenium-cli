@@ -98,7 +98,8 @@ export class Project implements Project.IProject {
 		private $server: Server.IServer,
 		private $identityManager: Server.IIdentityManager,
 		private $buildService: Project.IBuildService,
-		private $projectNameValidator) {
+		private $projectNameValidator,
+		private $errors: IErrors) {
 		this.readProjectData().wait();
 	}
 
@@ -330,7 +331,13 @@ export class Project implements Project.IProject {
 	}
 
 	public executeBuild(platform: string): IFuture<void> {
-		return <IFuture<void>> <any> this.build(platform, this.getBuildConfiguration(), true, options.download);
+		return (() => {
+			if (!platform || (!MobileHelper.isiOSPlatform(platform) && !MobileHelper.isAndroidPlatform(platform))) {
+				this.$errors.fail("Incorrect platform '%s' specified.", platform);
+			}
+
+			this.build(platform, this.getBuildConfiguration(), true, options.download).wait();
+		}).future<void>()();
 	}
 
 	public deployToIon(): IFuture<void> {

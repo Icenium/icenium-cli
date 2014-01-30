@@ -37,6 +37,7 @@
 /// <reference path="definitions/watchr.ts" />
 /// <reference path="definitions/xml2js.d.ts" />
 /// <reference path="definitions/yok.d.ts" />
+/// <reference path="errors.ts" />
 /// <reference path="events/signal.ts" />
 /// <reference path="extensions.ts" />
 /// <reference path="file-system.ts" />
