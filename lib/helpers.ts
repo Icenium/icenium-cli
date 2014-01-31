@@ -148,6 +148,9 @@ export function isWindows() {
 export function isWindows64() {
 	return process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
 }
+export function stringReplaceAll(string: string, find: string, replace: string): string {
+	return string.split(find).join(replace);
+}
 
 export function isNullOrWhitespace(input: string): boolean {
 
