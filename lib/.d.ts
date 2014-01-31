@@ -54,6 +54,7 @@
 /// <reference path="mobile/mobile-core/device-discovery.ts" />
 /// <reference path="mobile/mobile-core/devices-services.ts" />
 /// <reference path="mobile/mobile-helper.ts" />
+/// <reference path="opener.ts" />
 /// <reference path="options.ts" />
 /// <reference path="platforms.ts" />
 /// <reference path="project.ts" />

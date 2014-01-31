@@ -4,17 +4,17 @@
 
 import util = require("util");
 import path = require("path");
-import xopen = require("open");
 import unzip = require("unzip");
 import _ = require("underscore");
 import helpers = require("../helpers");
+import options = require("../options");
 
-class EditConfigurationCommandData {
-	private static ConfigurationFiles = [
-		{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFileName: "Mobile.Android.ManifestXml.zip" },
-		{ template: "android-config", filepath: "App_Resources/Android/xml/config.xml", templateFileName: "Mobile.Cordova.Android.ConfigXml.zip" },
-		{ template: "ios-info", filepath: "App_Resources/iOS/Info.plist", templateFileName: "Mobile.iOS.InfoPlist.zip" },
-		{ template: "ios-config", filepath: "App_Resources/iOS/config.xml", templateFileName: "Mobile.Cordova.iOS.ConfigXml.zip" },
+export class EditConfigurationCommandData {
+	public static ConfigurationFiles = [
+		{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templatefilepath: "Mobile.Android.ManifestXml.zip" },
+		{ template: "android-config", filepath: "App_Resources/Android/xml/config.xml", templatefilepath: "Mobile.Cordova.Android.ConfigXml.zip" },
+		{ template: "ios-info", filepath: "App_Resources/iOS/Info.plist", templatefilepath: "Mobile.iOS.InfoPlist.zip" },
+		{ template: "ios-config", filepath: "App_Resources/iOS/config.xml", templatefilepath: "Mobile.Cordova.iOS.ConfigXml.zip" },
 	];
 
 	public template: any;
@@ -33,7 +33,8 @@ class EditConfigurationCommandData {
 export class EditConfigurationCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $opener: IOpener) {
 	}
 
 	execute(args: string[]): void {
@@ -46,10 +47,11 @@ export class EditConfigurationCommand implements ICommand {
 	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
 		return (() => {
 			if (data.template) {
-				var directory = path.dirname(data.template.filepath);
-				if (!this.$fs.exists(data.template.filepath).wait()) {
-					this.$logger.info("Creating configuration file: " + data.template.filepath);
-					var templateFilePath = path.join(__dirname, "../../resources/configuration", data.template.templateFileName);
+				var filepath = path.join(options.path, data.template.filepath);
+				var directory = path.dirname(filepath);
+				if (!this.$fs.exists(filepath).wait()) {
+					this.$logger.info("Creating configuration file: " + filepath);
+					var templateFilePath = path.join(__dirname, "../../resources/configuration", data.template.templatefilepath);
 					this.$fs.futureFromEvent(
 						this.$fs.createReadStream(templateFilePath)
 							.pipe(unzip.Extract({ path: directory })), "close").wait();
@@ -57,14 +59,14 @@ export class EditConfigurationCommand implements ICommand {
 					//delete extra file in template zip
 					this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();
 					if (helpers.isWindows()) {
-						var contents = this.$fs.readText(data.template.filepath).wait();
+						var contents = this.$fs.readText(filepath).wait();
 						contents = helpers.stringReplaceAll(contents, "\n", "\r\n");
-						this.$fs.writeFile(data.template.filepath, contents).wait();
+						this.$fs.writeFile(filepath, contents).wait();
 					}
 				}
 
-				this.$logger.info("Opening configuration file: " + data.template.filepath);
-				xopen(data.template.filepath);
+				this.$logger.info("Opening configuration file: " + filepath);
+				this.$opener.open(filepath);
 			}
 			else {
 				if (data.file) {

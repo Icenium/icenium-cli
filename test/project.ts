@@ -29,6 +29,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
+	testInjector.register("opener", stubs.OpenerStub);
 	testInjector.register("config", require("../lib/config").Configuration);
 	testInjector.register("server", {});
 	testInjector.register("identityManager", {});
