@@ -2,13 +2,13 @@
 "use strict";
 
 import log4js = require("log4js");
-import config = require("./config");
 import util = require("util");
 var options:any = require("./options");
 
+var $config = $injector.resolve("config");
 var appenders = [];
 
-if (!config.CI_LOGGER) {
+if (!$config.CI_LOGGER) {
 	appenders.push({
 		type: "console",
 		layout: {
@@ -24,7 +24,7 @@ var log4jsLogger = log4js.getLogger();
 if (options.log !== undefined) {
 	log4jsLogger.setLevel(options.log);
 } else {
-	log4jsLogger.setLevel(config.DEBUG ? "TRACE" : "INFO");
+	log4jsLogger.setLevel($config.DEBUG ? "TRACE" : "INFO");
 }
 
 export class Logger implements ILogger {

@@ -17,7 +17,7 @@ import projectNameValidator = require("./validators/project-name-validator");
 import MobileHelper = require("./mobile/mobile-helper");
 
 export class BuildService implements Project.IBuildService {
-	constructor(private $config,
+	constructor(private $config: IConfiguration,
 		private $logger: ILogger,
 		private $server: Server.IServer,
 		private $projectNameValidator) {}
@@ -93,7 +93,7 @@ export class Project implements Project.IProject {
 
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
-		private $config,
+		private $config: IConfiguration,
 		private $logger: ILogger,
 		private $server: Server.IServer,
 		private $identityManager: Server.IIdentityManager,
@@ -167,7 +167,7 @@ export class Project implements Project.IProject {
 			this.$fs.deleteFile(projectZipFile).wait();
 
 			var files = this.enumerateProjectFiles();
-			var zipOp = helpers.zipFiles(projectZipFile, files,
+			var zipOp = this.$fs.zipFiles(projectZipFile, files,
 				(path) => this.getProjectRelativePath(path));
 
 			var result = new Future<string>();
@@ -674,7 +674,8 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public printProjectProperty(property: string): void {
+	public printProjectProperty(property: string): IFuture<void> {
+		return (() => {
 		this.ensureProject();
 		property = this.normalizePropertyName(property);
 
@@ -684,6 +685,7 @@ export class Project implements Project.IProject {
 			this.$logger.fatal("Unrecognized property '%s'", property);
 			this.printProjectSchemaHelp();
 		}
+		}).future<void>()();
 	}
 
 	private printProjectSchemaHelp() {

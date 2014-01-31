@@ -3,72 +3,76 @@
 "use strict";
 
 import path = require("path");
+import helpers = require("./helpers");
 
-export var TFIS_SERVER;
-export var AB_SERVER_PROTO;
-export var AB_SERVER;
-export var DEBUG;
-export var PROXY_TO_FIDDLER;
-export var PROJECT_FILE_NAME;
-export var SOLUTION_SPACE_NAME;
-export var QR_SIZE;
-export var DEFAULT_PROJECT_TEMPLATE;
-export var TEMPLATE_NAMES;
-export var CORDOVA_PLUGINS_REGISTRY;
-export var DEFAULT_PROJECT_NAME;
-export var CI_LOGGER;
-export var WRAP_CLIENT_ID;
+/*don't require logger in config.js due to cyclic dependency*/;
+export class Configuration implements IConfiguration {
+	TFIS_SERVER: string;
+	AB_SERVER_PROTO: string;
+	AB_SERVER: string;
+	DEBUG :boolean;
+	PROXY_TO_FIDDLER: boolean;
+	PROJECT_FILE_NAME: string;
+	SOLUTION_SPACE_NAME: string;
+	QR_SIZE: number;
+	DEFAULT_PROJECT_TEMPLATE: string;
+	TEMPLATE_NAMES: string[];
+	CORDOVA_PLUGINS_REGISTRY: string;
+	DEFAULT_PROJECT_NAME: string;
+	CI_LOGGER: boolean;
+	WRAP_CLIENT_ID: string;
 
-var qfs = require("q-io/fs"),
-	log = null /*don't log in config.js due to cyclic dependency*/;
+	constructor(private $fs: IFileSystem) {
+		this.mergeConfig(this, this.loadConfig("config").wait());
+	}
 
-function getConfigName(filename) {
-	return path.join(__dirname, "../config/", filename + ".json");
-}
+	private getConfigName(filename: string) : string {
+		return path.join(__dirname, "../config/", filename + ".json");
+	}
 
-function copyFile(from, to) {
-	return qfs.read(from, "b")
-		.then(function (content) {
-			return qfs.write(to, content, "wb");
+	private copyFile(from: string, to: string): IFuture<void> {
+		return this.$fs.copyFile(from, to);
+	}
+
+	private loadConfig(name: string): IFuture<any> {
+		return ((): any => {
+			var configFileName = this.getConfigName(name);
+			return this.$fs.readJson(configFileName).wait();
+		}).future<any>()();
+	}
+
+	private saveConfig(config, name: string): IFuture<any> {
+		var configNoFunctions = {};
+		Object.keys(config).forEach((key) => {
+			var entry = config[key];
+			if (typeof entry !== "function") {
+				configNoFunctions[key] = entry;
+			}
 		});
+
+		var configFileName = this.getConfigName(name);
+		return this.$fs.writeJson(configFileName, configNoFunctions);
+	}
+
+	private mergeConfig(config, mergeFrom) {
+		Object.keys(mergeFrom).forEach((key) => {
+			config[key] = mergeFrom[key];
+		});
+	}
+
+	reset(): IFuture<void> {
+		return this.copyFile(this.getConfigName("config-base"), this.getConfigName("config"));
+	}
+
+	apply(configName: string): IFuture<void> {
+		return ((): any => {
+			var baseConfig = this.loadConfig("config-base").wait();
+			var newConfig = this.loadConfig("config-" + configName).wait();
+			this.mergeConfig(baseConfig, newConfig);
+			this.saveConfig(baseConfig, "config").wait();
+		}).future<void>()();
+	}
 }
-
-function loadConfig(name) {
-	var configFileName = getConfigName(name);
-	return JSON.parse(require("fs").readFileSync(configFileName));
-}
-
-function saveConfig(config, name) {
-	var configNoFunctions = {};
-	Object.keys(config).forEach(function(key) {
-		var entry = config[key];
-		if (typeof entry !== "function") {
-			configNoFunctions[key] = entry;
-		}
-	});
-
-	var configFileName = getConfigName(name);
-	return qfs.write(configFileName, JSON.stringify(configNoFunctions, null, "\t"));
-}
-
-function mergeConfig(config, mergeFrom) {
-	Object.keys(mergeFrom).forEach(function(key) {
-		config[key] = mergeFrom[key];
-	});
-}
-
-mergeConfig(exports, loadConfig("config"));
-
-export function reset() {
-	return copyFile(getConfigName("config-base"), getConfigName("config"))
-		.done();
-};
-
-export function apply(configName) {
-	var baseConfig = loadConfig("config-base");
-	var newConfig = loadConfig("config-" + configName);
-	mergeConfig(baseConfig, newConfig);
-	saveConfig(baseConfig, "config").done();
-};
-
-$injector.register("config", exports);
+$injector.register("config", Configuration);
+helpers.registerCommand("config", "config-reset", (config, args) => config.reset());
+helpers.registerCommand("config", "config-apply", (config, args) => config.apply(args[0]));

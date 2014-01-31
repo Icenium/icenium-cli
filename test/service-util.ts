@@ -56,7 +56,13 @@ function makeProxy(): Server.IServiceProxy {
 	return testInjector.resolve(ServiceUtil.ServiceProxy);
 }
 
-describe("ServiceProxy", function() {
+describe("ServiceProxy", function () {
+
+	before(function () {
+		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("fs", stubs.FileSystemStub);
+		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
+	});
 	it("calls api without arguments and expected return", function() {
 		var proxy = makeProxy();
 

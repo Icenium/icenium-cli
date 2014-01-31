@@ -4,24 +4,10 @@
 import _ = require("underscore");
 
 export class CommandsService implements ICommandsService {
-	constructor(
-		private $errors: IErrors
-		) {}
-
-	private commands = {
-		"config-reset": this.makeCommand("config", "reset"),
-		"config-apply": this.makeCommand("config", "apply"),
-	};
-
+	constructor(private $errors: IErrors) {}
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(() => {
-			var command = this.commands[commandName];
-			if (command) {
-				command().apply(null, commandArguments);
-				return true;
-			}
-
-			command = $injector.resolveCommand(commandName);
+			var command: ICommand = $injector.resolveCommand(commandName);
 			if (command) {
 				command.execute(commandArguments);
 				return true;
@@ -71,24 +57,11 @@ export class CommandsService implements ICommandsService {
 						}
 					}
 				}
-				return tabtab.log(this.getAvailableCommands(), data);
+				return tabtab.log($injector.getRegisteredCommandsNames(), data);
 			}
 		});
 
 		return true;
 	}
-
-	private getAvailableCommands(): string[] {
-		var legacyCommandsNames = <_.List<string>>_.keys(this.commands);
-		var commandsNames = <_.List<string>>$injector.getRegisteredCommandsNames();
-
-		return _.union(legacyCommandsNames, commandsNames);
 	}
-
-	private makeCommand(module, command) {
-		return () => {
-			return require("./" + module)[command];
-		};
-	}
-}
 $injector.register("commandsService", CommandsService);

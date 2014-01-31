@@ -8,7 +8,6 @@ import _ = require("underscore");
 import util = require("util");
 import querystring = require("querystring");
 import log = require("./logger");
-import config = require("./config");
 import Q = require("q");
 import Future = require("fibers/future");
 
@@ -37,51 +36,13 @@ export function enumerateFilesInDirectorySync(directoryPath, filterCallback?: (f
 }
 
 export function createQrUrl(data) {
+	var $config = $injector.resolve("config");
 	return util.format("http://api.qrserver.com/v1/create-qr-code/?size=%dx%d&qzone=4&data=%s",
-		config.QR_SIZE, config.QR_SIZE, querystring.escape(data));
+		$config.QR_SIZE, $config.QR_SIZE, querystring.escape(data));
 }
 
 export function fromWindowsRelativePathToUnix(windowsRelativePath) {
 	return windowsRelativePath.replace(/\\/g, "/");
-}
-
-//TODO: try 'archiver' module for zipping
-export function zipFiles(zipFile: string, files: string[], zipPathCallback: (path:string) => string): IFuture<void> {
-	var zipstream = require("zipstream");
-	var zip = zipstream.createZip({level: 9});
-	var outFile = fs.createWriteStream(zipFile);
-	zip.pipe(outFile);
-
-	var result = new Future<void>();
-
-	var fileIdx = -1;
-	var zipCallback = function() {
-		fileIdx++;
-		if (fileIdx < files.length) {
-			var file = files[fileIdx];
-
-			var relativePath = zipPathCallback(file);
-			relativePath = relativePath.replace(/\\/g, "/");
-			log.trace("zipping as '%s' file '%s'", relativePath, file);
-
-			zip.addFile(
-				fs.createReadStream(file),
-				{name: relativePath},
-				zipCallback);
-		} else {
-			outFile.on("finish", function() {
-				result.return();
-			});
-
-			zip.finalize(function(bytesWritten) {
-				log.debug("zipstream: %d bytes written", bytesWritten);
-				outFile.end();
-			});
-		}
-	};
-	zipCallback();
-
-	return result;
 }
 
 export function isRequestSuccessful(request) {

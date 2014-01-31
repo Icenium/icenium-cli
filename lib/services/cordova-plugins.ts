@@ -3,7 +3,6 @@
 
 import plugman = require("plugman");
 import path = require("path");
-import config = require("../config");
 import util = require("util");
 import os = require("os");
 import _ = require("underscore");
@@ -16,7 +15,8 @@ export interface IPlugin {
 }
 
 export class CordovaPluginsService {
-	constructor(private $project: Project.IProject) {}
+	constructor(private $project: Project.IProject,
+		private $config: IConfiguration) { }
 
 	public getPlugins(keywords: string[]): IPlugin[] {
 		this.configure();
@@ -50,7 +50,7 @@ export class CordovaPluginsService {
 
 	public configure(): void {
 		var future = new Future();
-		var params = ["set", "registry", config.CORDOVA_PLUGINS_REGISTRY];
+		var params = ["set", "registry", this.$config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (result) => {
 			if (this.isError(result)) {
 				future.throw(result);
