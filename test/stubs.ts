@@ -64,6 +64,8 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
+	openFile(filename: string): void { }
+
 	createReadStream(path:string, options?:{flags?: string; encoding?: string; fd?: string; mode?: number; bufferSize?: number}): any {
 		return undefined;
 	}
@@ -86,4 +88,8 @@ export class ErrorsStub implements IErrors {
 	beginCommand(action:() => void, printHelpCommand: () => void) {
 		throw new Error("not supported");
 	}
+}
+
+export class OpenerStub implements IOpener {
+	open(filename: string): void {}
 }

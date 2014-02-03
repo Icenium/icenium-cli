@@ -155,6 +155,10 @@ interface IFileSystem {
 	}): any;
 }
 
+interface IOpener {
+	open(filename: string): void;
+}
+
 interface IChildProcess {
 	exec(command: string): IFuture<any>;
 	spawn(command: string, args?: string[], options?: string[]): any;

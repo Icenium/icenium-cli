@@ -5,7 +5,6 @@
 import util = require("util");
 import path = require("path");
 import url = require("url");
-import xopen = require("open");
 import fileSrv = require("./http-server");
 import options = require("./options");
 import querystring = require("querystring");
@@ -80,7 +79,8 @@ export class LoginManager implements ILoginManager {
 		private $server: Server.IServer,
 		private $serviceProxy: Server.IServiceProxy,
 		private $fs: IFileSystem,
-		private $userDataStore: IUserDataStore) {}
+		private $userDataStore: IUserDataStore,
+		private $opener: IOpener) { }
 
 	public basicLogin(userName: string, password: string): IFuture<void> {
 		var loginData = {
@@ -197,7 +197,7 @@ export class LoginManager implements ILoginManager {
 
 			loginConfig.clientState = host + "completeLogin";
 
-			xopen(host + "login");
+			this.$opener.open(host + "login");
 		});
 
 		localhostServer.listen(0);

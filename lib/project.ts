@@ -10,7 +10,6 @@ var options:any = require("./options");
 import util = require("util");
 import helpers = require("./helpers");
 import querystring = require("querystring");
-import xopen = require("open");
 import Future = require("fibers/future");
 import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import projectNameValidator = require("./validators/project-name-validator");
@@ -20,7 +19,7 @@ export class BuildService implements Project.IBuildService {
 	constructor(private $config: IConfiguration,
 		private $logger: ILogger,
 		private $server: Server.IServer,
-		private $projectNameValidator) {}
+		private $projectNameValidator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -99,7 +98,8 @@ export class Project implements Project.IProject {
 		private $identityManager: Server.IIdentityManager,
 		private $buildService: Project.IBuildService,
 		private $projectNameValidator,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $opener: IOpener) {
 		this.readProjectData().wait();
 	}
 
@@ -285,7 +285,7 @@ export class Project implements Project.IProject {
 			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
 
 			this.$logger.debug("Updated scan.html");
-			xopen(scanFile);
+			this.$opener.open(scanFile);
 		}).future<void>()();
 	}
 
