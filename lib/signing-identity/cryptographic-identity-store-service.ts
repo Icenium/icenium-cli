@@ -3,29 +3,79 @@
 "use strict";
 
 import _ = require("underscore");
-import CryptographicIdentity = require("./cryptographic-identity");
-import Provision = require("./provision");
+import Future = require("fibers/future");
 
-//TODO: _bridge_ remove after refactoring
-function getServer(): Server.IServer {
-	return $injector.resolve("server");
+class Provision implements IProvision {
+	constructor(private provisionData: any) { }
+
+	public get Name(): string {
+		return this.provisionData.Name;
+	}
+
+	public get Identifier(): string {
+		return this.provisionData.Identifier;
+	}
+
+	public get ApplicationIdentifierPrefix(): string {
+		return this.provisionData.ApplicationIdentifierPrefix;
+	}
+
+	public get ApplicationIdentifier(): string {
+		return this.provisionData.ApplicationIdentifier;
+	}
+
+	public get ProvisionType(): string {
+		return this.provisionData.ProvisionType;
+	}
+
+	public get ExpirationDate() {
+		return this.provisionData.ExpirationDate;
+	}
+
+	public get Certificates(): ICryptographicIdentity[] {
+		return this.provisionData.Certificates;
+	}
+
+	public get ProvisionedDevices(): string[] {
+		return this.provisionData.ProvisionedDevices;
+	}
 }
 
-function CryptographicIdentityStoreService() {
+class CryptographicIdentity implements ICryptographicIdentity{
+	constructor(private identityData) { }
 
+	public get Alias(): string {
+		return this.identityData.Alias;
+	}
+
+	public get Attributes(): string[] {
+		return this.identityData.Attributes;
+	}
+
+	public get Type(): string {
+		return this.identityData.$type;
+	}
+
+	public get Certificate() {
+		return this.identityData.Certificate;
+	}
 }
 
-CryptographicIdentityStoreService.prototype.getAllProvisions = function(callback) {
-	var data = getServer().mobileprovisions.getProvisions().wait();
-	var provisions = _.map(data, (provisionData) => new Provision(provisionData));
-	callback(null, provisions);
-};
+export class CryptographicIdentityStoreService implements ICryptographicIdentityStoreService{
+	constructor(private $server: Server.IServer) { }
 
-CryptographicIdentityStoreService.prototype.getAllIdentities = function(callback) {
-	var data = getServer().identityStore.getIdentities().wait();
-	var identities = _.map(data, (identityData) => new CryptographicIdentity(identityData));
-	callback(null, identities);
-};
+	public getAllProvisions(): IFuture<IProvision[]> {
+		return(() => {
+			var data = this.$server.mobileprovisions.getProvisions().wait();
+			return _.map(data, (identityData) => new Provision(identityData));
+		}).future<IProvision[]>()();
+	}
 
-var service = new CryptographicIdentityStoreService();
-export = service;
+	public getAllIdentities(): IFuture<ICryptographicIdentity[]> {
+		return(() => {
+			var data = this.$server.identityStore.getIdentities().wait();
+			return _.map(data, (identityData) => new CryptographicIdentity(identityData));
+		}).future<ICryptographicIdentity[]>()();
+	}
+}
+$injector.register("cryptographicIdentityStoreService", CryptographicIdentityStoreService);
