@@ -105,7 +105,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public deploy(packageFile: string, packageName: string): void {
-		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$iOSCore, this.$mobileDevice, this.$coreFoundation, this.$logger, this.$fs);
+		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$mobileDevice, this.$fs);
 		installationProxy.deployApplication(packageFile);
 	}
 
@@ -114,13 +114,13 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		var afcClientForAppDocuments: Mobile.IAfcClient = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 		afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
-		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this, this.$iOSCore);
+		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this);
 		notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 	}
 
 	public openDeviceLogStream() {
-		var iOSSyslog = new iOSProxyServices.IOSSyslog(this, this.$iOSCore, this.$fs);
+		var iOSSyslog = new iOSProxyServices.IOSSyslog(this);
 		iOSSyslog.read();
 	}
 }
