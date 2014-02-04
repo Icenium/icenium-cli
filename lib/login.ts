@@ -95,10 +95,8 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			this.$logger.debug("Logging out...");
 
-			Future.wait([
-				this.$userDataStore.setCookie(null),
-				this.$userDataStore.setUser(null)
-			]);
+			this.$userDataStore.setCookie(null).wait();
+			this.$userDataStore.setUser(null).wait();
 
 			this.$logger.debug("Logout completed.");
 		}).future<void>()();

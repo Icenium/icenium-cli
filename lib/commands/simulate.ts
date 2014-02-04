@@ -38,10 +38,8 @@ export class SimulateCommand implements ICommand {
 		this.serverVersion = config.assemblyVersion;
 		this.$logger.debug("Server version: %s", this.serverVersion);
 
-		Future.wait([
-			this.prepareSimulator(),
-			this.prepareCordovaPlugins()
-		]);
+		this.prepareSimulator().wait();
+		this.prepareCordovaPlugins().wait();
 
 		this.runSimulator();
 	}
@@ -57,7 +55,6 @@ export class SimulateCommand implements ICommand {
 			this.$logger.trace("Simulator path: %s", this.simulatorPath);
 
 			var cachedVersion  = "0.0.0.0";
-
 
 			if (this.$fs.exists(serverVersionFile).wait()) {
 				cachedVersion = this.$fs.readJson(serverVersionFile).wait().version;
