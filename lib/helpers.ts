@@ -153,9 +153,7 @@ export function stringReplaceAll(string: string, find: string, replace: string):
 }
 
 export function isNullOrWhitespace(input: string): boolean {
-
-	if (input || input === null)
-	{
+	if (!input) {
 		return true;
 	}
 
