@@ -482,10 +482,7 @@ export class PlistService {
 	public sendMessage(data) {
 		var payload = plistlib.toString(data);
 		var message = bufferpack.pack(">i", [payload.length]) + payload;
-		var bytesWritten = this.socket.write(message);
-		if(bytesWritten < 0) {
-
-		}
+		return this.socket.write(message);
 	}
 
 	public disconnect() {

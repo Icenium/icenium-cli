@@ -11,7 +11,6 @@ var assert = require("chai").assert;
 function createTestInjector() : IInjector {
 	var testInjector = new yok.Yok();
 
-	testInjector.register("iOSCore", iOSCoreModule.IOSCore);
 	testInjector.register("coreFoundation", iOSCoreModule.CoreFoundation);
 	testInjector.register("mobileDevice", iOSCoreModule.MobileDevice);
 	testInjector.register("fs", fsLib.FileSystem);
@@ -20,10 +19,9 @@ function createTestInjector() : IInjector {
 }
 
 describe("ios", function(){
-	var testInjector, iOSCore, coreFoundation, plistService;
+	var testInjector, coreFoundation, plistService;
 	before(() => {
 		testInjector = createTestInjector();
-		iOSCore = testInjector.resolve("iOSCore");
 		coreFoundation = testInjector.resolve("coreFoundation");
 		plistService = new iOSCoreModule.PlistService(1234);
 	});
@@ -44,7 +42,9 @@ describe("ios", function(){
 		it("tries to convert empty cfstring", () => {
 			fromCfStringToCString("");
 		});
+	});
 
+	describe("plistService", () => {
 		it("writes buffer to non-existing socket", () => {
 			var writtenBytes = plistService.sendMessage(new Buffer("test"));
 			assert.equal(writtenBytes, -1);
