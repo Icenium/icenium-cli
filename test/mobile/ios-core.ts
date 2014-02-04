@@ -11,6 +11,7 @@ var assert = require("chai").assert;
 function createTestInjector() : IInjector {
 	var testInjector = new yok.Yok();
 
+	testInjector.register("iOSCore", iOSCoreModule.IOSCore);
 	testInjector.register("coreFoundation", iOSCoreModule.CoreFoundation);
 	testInjector.register("mobileDevice", iOSCoreModule.MobileDevice);
 	testInjector.register("fs", fsLib.FileSystem);
