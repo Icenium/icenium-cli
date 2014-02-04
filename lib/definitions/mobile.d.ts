@@ -32,7 +32,6 @@ declare module Mobile {
 	interface IiOSCore {
 		getCoreFoundationLibrary(): any;
 		getMobileDeviceLibrary(): any;
-		getWinSocketLibrary(): any;
 	}
 
 	interface ICoreFoundation {

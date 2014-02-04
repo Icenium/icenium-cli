@@ -53,7 +53,7 @@ export class CoreTypes {
 	public static cf_run_loop_timer_callback = ffi.Function("void", [CoreTypes.voidPtr, CoreTypes.voidPtr]);
 }
 
-class IOSCore implements Mobile.IiOSCore {
+export class IOSCore implements Mobile.IiOSCore {
 
 	constructor(private $fs: IFileSystem) {
 	}
@@ -150,7 +150,7 @@ class IOSCore implements Mobile.IiOSCore {
 		});
 	}
 
-	public getWinSocketLibrary(): {[key: string]: any} {
+	public static getWinSocketLibrary(): {[key: string]: any} {
 		var winSocketDll = path.join(process.env.SystemRoot, "System32", "ws2_32.dll");
 
 		return ffi.Library(winSocketDll, {
@@ -413,12 +413,10 @@ class iTunesInstallationInfo {
 }
 
 export class WinSocketWrapper {
-
 	private winSocketLibrary: any = null;
 
-	constructor(private socket: number,
-		private $iOSCore: Mobile.IiOSCore) {
-        this.winSocketLibrary = $iOSCore.getWinSocketLibrary();
+	constructor(private socket: number) {
+		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
 	public read(bytes: number): NodeBuffer {
@@ -442,13 +440,9 @@ export class WinSocketWrapper {
 
 export class PlistService {
 	private socket: WinSocketWrapper = null;
-	private service = 0;
 
-	constructor($iOSDevice: Mobile.IIOSDevice,
-				$iOSCore: Mobile.IiOSCore,
-				serviceName: string) {
-		this.service = $iOSDevice.startService(serviceName);
-		this.socket = new WinSocketWrapper(this.service, $iOSCore);
+	constructor(private service: number) {
+		this.socket = new WinSocketWrapper(service);
 	}
 
 	public get Service(): number {

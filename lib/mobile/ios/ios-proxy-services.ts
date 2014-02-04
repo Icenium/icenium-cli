@@ -77,10 +77,10 @@ export class AfcClient implements Mobile.IAfcClient {
 	private afcConnection = null;
 
 	constructor(private service: number,
-				private mobileDevice: Mobile.IMobileDevice,
+				private $mobileDevice: Mobile.IMobileDevice,
 				private $fs: IFileSystem) {
 		var afcConnection = ref.alloc(ref.refType(ref.types.void));
-		var result = mobileDevice.afcConnectionOpen(this.service, 0, afcConnection);
+		var result = $mobileDevice.afcConnectionOpen(this.service, 0, afcConnection);
 		if (result !== 0) {
 			throw "Unable to open apple file connection: " + result;
 		}
@@ -89,11 +89,11 @@ export class AfcClient implements Mobile.IAfcClient {
 	}
 
 	open(path: string, mode: string) {
-		return new AfcFile(this.afcConnection, path, mode, this.mobileDevice);
+		return new AfcFile(this.afcConnection, path, mode, this.$mobileDevice);
 	}
 
 	mkdir(path: string) {
-		var result = this.mobileDevice.afcDirectoryCreate(this.afcConnection, path);
+		var result = this.$mobileDevice.afcDirectoryCreate(this.afcConnection, path);
 		if (result !== 0) {
 			throw "Unable to make directory: " + path + " result is: " + result;
 		}
@@ -101,7 +101,7 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	listDir(path: string) {
 		var afcDirectoryRef = ref.alloc(ref.refType(ref.types.void));
-		var result = this.mobileDevice.afcDirectoryOpen(this.afcConnection, path, afcDirectoryRef);
+		var result = this.$mobileDevice.afcDirectoryOpen(this.afcConnection, path, afcDirectoryRef);
 		if (result !== 0) {
 			throw "Unable to open AFC directory: " + path + result;
 		}
@@ -109,7 +109,7 @@ export class AfcClient implements Mobile.IAfcClient {
 		var afcDirectoryValue = ref.deref(afcDirectoryRef);
 		var name = ref.alloc(ref.refType(ref.types.char));
 
-		while (this.mobileDevice.afcDirectoryRead(this.afcConnection, afcDirectoryValue, name) === 0) {
+		while (this.$mobileDevice.afcDirectoryRead(this.afcConnection, afcDirectoryValue, name) === 0) {
 			var value = ref.deref(name);
 			if (ref.address(value) === 0) {
 				break;
@@ -120,7 +120,7 @@ export class AfcClient implements Mobile.IAfcClient {
 			}
 		}
 
-		this.mobileDevice.afcDirectoryClose(this.afcConnection, afcDirectoryValue);
+		this.$mobileDevice.afcDirectoryClose(this.afcConnection, afcDirectoryValue);
 	}
 
 	public transferPackage(localFilePath: string, devicePath: string): IFuture<void> {
@@ -184,12 +184,8 @@ export class AfcClient implements Mobile.IAfcClient {
 
 export class InstallationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
-				private $iOSCore: Mobile.IiOSCore,
-				private $mobileDevice: Mobile.IMobileDevice,
-				private $coreFoundation: Mobile.ICoreFoundation,
-				private logger: ILogger,
-				private $fs: IFileSystem) {
-	}
+		private $mobileDevice: Mobile.IMobileDevice,
+		private $fs: IFileSystem) { }
 
 	public deployApplication(packageFile: string) {
 		var afcService = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
@@ -198,7 +194,8 @@ export class InstallationProxyClient {
 		var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", _.last(packageFile.split(path.sep))));
 
 		afcClient.transferPackage(packageFile, devicePath).wait();
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.INSTALLATION_PROXY);
+		var service =  this.device.startService(MobileServices.INSTALLATION_PROXY);
+		var plistService = new iOSCore.PlistService(service);
 
 		var plist = {
 			type: "dict",
@@ -231,13 +228,11 @@ export class InstallationProxyClient {
 $injector.register("installationProxyClient", InstallationProxyClient);
 
 export class NotificationProxyClient {
-	constructor(private device: Mobile.IIOSDevice,
-		private $iOSCore: Mobile.IiOSCore ) {
-
-	}
+	constructor(private device: Mobile.IIOSDevice) { }
 
 	postNotification(notificationName: string) {
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.NOTIFICATION_PROXY);
+		var service = this.device.startService(MobileServices.NOTIFICATION_PROXY)
+		var plistService = new iOSCore.PlistService(service);
 
 		var result = plistService.sendMessage({
 			type: "dict",
@@ -266,7 +261,8 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 	}
 
 	private getAfcClientCore(device, command, applicationIdentifier: string): Mobile.IAfcClient {
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.HOUSE_ARREST);
+		var service = this.device.startService(MobileServices.HOUSE_ARREST);
+		var plistService = new iOSCore.PlistService(service);
 
 		var plist = {
 			type: "dict",
@@ -313,11 +309,9 @@ export class IOSSyslog {
 	private socket;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
 
-	constructor(private device: Mobile.IIOSDevice,
-		private $iOSCore: Mobile.IiOSCore,
-		private $fs: IFileSystem) {
+	constructor(private device: Mobile.IIOSDevice) {
 		this.service = device.startService(MobileServices.SYSLOG);
-		this.socket = new iOSCore.WinSocketWrapper(this.service, $iOSCore);
+		this.socket = new iOSCore.WinSocketWrapper(this.service);
 	}
 
 	public read() {
