@@ -1,5 +1,5 @@
 //grunt-start
-/// <reference path="ab-cli.ts" />
+/// <reference path="appbuilder-cli.ts" />
 /// <reference path="bootstrap.ts" />
 /// <reference path="child-process.ts" />
 /// <reference path="commands-service.ts" />

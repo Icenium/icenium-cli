@@ -5,12 +5,12 @@
   "author": "Telerik <icenium@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
-    "ab": "./bin/ab.js"
+    "appbuilder": "./bin/appbuilder.js"
   },
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
   },
-  "main": "./lib/ab-cli.js",
+  "main": "./lib/appbuilder-cli.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Icenium/icenium-cli.git"
