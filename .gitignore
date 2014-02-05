@@ -1,6 +1,6 @@
 *.js
 !/*.js
-!bin/ab.js
+!bin/appbuilder.js
 *.js.map
 
 lib-cov
