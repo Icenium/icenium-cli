@@ -1,7 +1,7 @@
 --[]--
 
 Usage:
-    $ ab <command> [command parameters] [--command options] [--path <path>]
+    $ appbuilder <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
     help <command>           Shows additional information about the commands in this list.
@@ -33,7 +33,7 @@ Global Options:
 --[login]--
 
 Usage:
-    $ ab login
+    $ appbuilder login
 
 Opens a new browser window in which you can provide your login credentials for Telerik Platform.
 After you have authenticated with Telerik Platform, you can close the browser window and continue your work from the 
@@ -44,7 +44,7 @@ command line.
 --[logout]--
 
 Usage:
-    $ ab logout
+    $ appbuilder logout
 
 Logs you out from Telerik Platform.
 To build, deploy, or synchronize your projects with the cloud, you need to be logged in.
@@ -54,7 +54,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ ab create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ appbuilder create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -76,7 +76,7 @@ Options:
 
 --[list-provisions]--
 Usage:
-    $ ab list-provisions
+    $ appbuilder list-provisions
 
 Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
 you can set the provisioning profile by index or name in the --provision option.
@@ -84,7 +84,7 @@ you can set the provisioning profile by index or name in the --provision option.
 
 --[list-certificates]--
 Usage:
-    $ ab list-certificates
+    $ appbuilder list-certificates
 
 Lists with indexes and names all configured certificates for code signing iOS applications. When building an app, you can
 set the certificate by index or name in the --certificate option.
@@ -92,11 +92,11 @@ set the certificate by index or name in the --certificate option.
 
 --[list-devices]--
 Usage:
-    $ ab list-devices [<Platform>]
+    $ appbuilder list-devices [<Platform>]
 
 Platform-specific examples:
-    $ ab list-devices android
-    $ ab list-devices ios
+    $ appbuilder list-devices android
+    $ appbuilder list-devices ios
 
 Lists with serial number and index all recognized connected devices, grouped by platform.
 
@@ -104,11 +104,11 @@ Lists with serial number and index all recognized connected devices, grouped by 
 
 --[build]--
 Usage:
-    $ ab build <Platform> [--download] [--no-livesync]
+    $ appbuilder build <Platform> [--download] [--no-livesync]
 
 Platform-specific examples:
-    $ ab build android
-    $ ab build ios --certificate <index or name> --provision <index or name>
+    $ appbuilder build android
+    $ appbuilder build ios --certificate <index or name> --provision <index or name>
 
 Builds the project for the target platform and produces a QR code for deployment.
 
@@ -132,14 +132,14 @@ Options:
 
 --[ion]--
 Usage:
-    $ ab ion
+    $ appbuilder ion
 
 Produces a QR code for deployment in the Telerik AppBuilder companion app.
 --[/]--
 
 --[update]--
 Usage:
-    $ ab update
+    $ appbuilder update
 
 Synchronizes the project with the cloud to enable LiveSync for remote devices. 
 
@@ -150,11 +150,11 @@ To get the latest changes on an Android device, press the Menu button.
 
 --[deploy]--
 Usage:
-    $ ab deploy <Platform>
+    $ appbuilder deploy <Platform>
 
 Platform-specific examples:
-    $ ab deploy android [--device <id>]
-    $ ab deploy ios --certificate <id or name> --provision <id or name>
+    $ appbuilder deploy android [--device <id>]
+    $ appbuilder deploy ios --certificate <id or name> --provision <id or name>
 
 Builds the project for the specified platform and deploys it to a connected device.
 
@@ -175,11 +175,11 @@ Options:
 
 --[sync]--
 Usage:
-    $ ab sync [<Platform>]
+    $ appbuilder sync [<Platform>]
 
 Platform-specific example:
-    $ ab sync android [--device <id>] [--live]
-    $ ab sync ios [--device <id>] [--live]
+    $ appbuilder sync android [--device <id>] [--live]
+    $ appbuilder sync ios [--device <id>] [--live]
 
 Synchronizes the latest changes in your project to connected devices.
 
@@ -193,7 +193,7 @@ Options:
 
 --[open-device-log-stream]--
 Usage:
-	$ ice open-device-log-stream [--device <id>]
+	$ appbuilder open-device-log-stream [--device <id>]
 
 You can choose which device's log stream to open by specifying its index or identifier.
 All devices and their indexes can be seen by running "$ ice list-devices".
@@ -201,14 +201,14 @@ All devices and their indexes can be seen by running "$ ice list-devices".
 
 --[find-plugins]--
 Usage:
-    $ ab find-plugins [<keyword> [ <keyword>]*>]
+    $ appbuilder find-plugins [<keyword> [ <keyword>]*>]
 
 Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
-    $ ab fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
+    $ appbuilder fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
 
 Imports the specified Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 
@@ -217,7 +217,7 @@ The plugin must be Plugman-compatible.
 
 --[simulate]--
 Usage:
-    $ ab simulate
+    $ appbuilder simulate
 
 Runs the current project in the device simulator.
 
@@ -229,7 +229,7 @@ Options:
 
 --[list-projects]--
 Usage:
-    $ ab list-projects
+    $ appbuilder list-projects
 
 Lists all projects of your account.
 
@@ -237,7 +237,7 @@ Lists all projects of your account.
 
 --[export-project]--
 Usage:
-    $ ab export-project <ProjectIndex> | <ProjectName>
+    $ appbuilder export-project <ProjectIndex> | <ProjectName>
 
 Exports one of your remote projects into a local ab project.
 You can choose which project to export by specifying its index or name.
@@ -250,7 +250,7 @@ Options:
 
 --[edit-configuration]--
 Usage:
-    $ ab edit-configuration <ConfigurationFile>
+    $ appbuilder edit-configuration <ConfigurationFile>
 
 <ConfigurationFile> can be one of the following: "android-manifest", "android-config", "ios-info" and "ios-config".
 Opens the given file for editing and creates it in your project directory if it didn't already exist.

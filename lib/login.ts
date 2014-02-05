@@ -189,7 +189,7 @@ export class LoginManager implements ILoginManager {
 			}
 		});
 
-		localhostServer.on("listening", function() {
+		localhostServer.on("listening", () => {
 			var port = localhostServer.address().port;
 			var host = util.format("http://localhost:%s/", port);
 

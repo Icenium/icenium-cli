@@ -1,7 +1,7 @@
 icenium-cli
 ===========
 
-Cross-Platform Command Line Interface for Icenium.
+Cross-Platform Command Line Interface for Telerik AppBuilder.
 
 First steps
 ===
@@ -70,7 +70,7 @@ To run all unit tests, run the following in the console:
    $ npm test
 ```
 
-Before commiting
+Before committing
 ===
 Run the linter:
 
@@ -95,13 +95,13 @@ If you have `icenium-cli` installed with the `-g` option, you can install auto-c
 by executing the following command **in Bash**:
 
 ```
-	$ ice completion >> ~/.bashrc
+	$ appbuilder completion >> ~/.bashrc
 ```
 
 If you don't have `icenium-cli` installed with the `-g` option, the above command becomes:
 
 ```
-	$ node bin/ice completion >> ~/.bashrc
+	$ node bin/appbuilder completion >> ~/.bashrc
 ```
 
 and you must also manually add it to the `PATH` environment variable. Open the `.bashrc`
@@ -123,7 +123,7 @@ After building the packaged module, it is copied to \\telerik.com\Resources\Blac
 Clean install for testing
 ===
 Install prerequisites:
-* Node.js 32-bit - http://nodejs.org/dist/v0.10.23/node-v0.10.23-x86.msi
+* Node.js 32-bit - http://nodejs.org/dist/v0.10.25/node-v0.10.25-x86.msi
 * Python 2.7.6 - http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
 * Git for Windows - http://code.google.com/p/msysgit/downloads/detail?name=Git-1.8.4-preview20130916.exe&can=2&q=full+installer+official+git
 * Visual Studio 2010/2012/2013

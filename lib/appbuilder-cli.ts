@@ -24,7 +24,7 @@ import Future = require("fibers/future");
 		var commandArguments = getCommandArguments();
 
 		if (!getCommandsService().executeCommand(commandName, commandArguments)) {
-			$injector.resolve("logger").fatal("Unknown command '%s'. Use 'ab help' for help.", commandName);
+			$injector.resolve("logger").fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
 		}
 
 		Future.assertNoFutureLeftBehind();

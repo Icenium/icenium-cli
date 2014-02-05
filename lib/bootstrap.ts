@@ -9,6 +9,7 @@ $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
+$injector.require("opener", "./opener");
 
 $injector.requireCommand("help", "./commands/help");
 
@@ -79,5 +80,3 @@ $injector.require("iOSDevice", "./mobile/ios/ios-device");
 $injector.require("androidDevice", "./mobile/android/android-device");
 
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
-
-
