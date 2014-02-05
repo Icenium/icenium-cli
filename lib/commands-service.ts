@@ -21,7 +21,7 @@ export class CommandsService implements ICommandsService {
 
 	public completeCommand() {
 		var tabtab = require("tabtab");
-		tabtab.complete("ab", (err, data) => {
+		tabtab.complete("appbuilder", (err, data) => {
 			if (err || !data) {
 				return;
 			}
