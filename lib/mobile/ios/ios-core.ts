@@ -8,6 +8,7 @@ import struct = require("ref-struct");
 import bufferpack = require("bufferpack");
 import plistlib = require("plistlib");
 import helpers = require("./../../helpers");
+import net = require("net");
 
 export class CoreTypes {
 	public static pointerSize = ref.types.size_t.size;
@@ -54,9 +55,12 @@ export class CoreTypes {
 }
 
 class IOSCore implements Mobile.IiOSCore {
+	private static NOT_INSTALLED_iTUNES_ERROR_MESSAGE = "iTunes is not installed";
+	private static BITNESS_MISMATCH = "iTunes should be the same bitness as Node";
 
-	constructor(private $fs: IFileSystem) {
-	}
+	constructor(private $logger: ILogger,
+		private $fs: IFileSystem,
+		private $errors: IErrors) { }
 
 	private cfDictionaryKeyCallBacks = struct({
 		version: CoreTypes.uintType,
@@ -77,80 +81,110 @@ class IOSCore implements Mobile.IiOSCore {
 
 	public static kCFStringEncodingUTF8 = 0x08000100;
 
-	private appleFolderLocation = new iTunesInstallationInfo(this.$fs).getAppleFolderLocation();
-	private coreFoundationDir = path.join(this.appleFolderLocation, "Apple Application Support");
-	private coreFoundationDll = path.join(this.coreFoundationDir, "CoreFoundation.dll");
-	private mobileDeviceDir = path.join(this.appleFolderLocation, "Mobile Device Support");
-	private mobileDeviceDll = path.join(this.mobileDeviceDir, "MobileDevice.dll");
-
-	private setPath() {
+	private get CoreFoundationDir(): string {
 		if(helpers.isWindows()) {
-			process.env.PATH = this.coreFoundationDir + ";" + process.env.PATH;
-			process.env.PATH += ";" + this.mobileDeviceDir;
+			return path.join(this.CommonProgramFilesPath, "Apple", "Apple Application Support");
+		} else if(helpers.isDarwin()) {
+			return "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
+		} else {
+			this.$logger.fatal("Unsupported platform");
 		}
+
+		return null;
 	}
 
-	public getCoreFoundationLibrary(): { } {
-		this.setPath();
+	private get MobileDeviceDir(): string {
+		if(helpers.isWindows()) {
+			return path.join(this.CommonProgramFilesPath, "Apple", "Mobile Device Support");
+		} else if(helpers.isDarwin()) {
+			return "/System/Library/PrivateFrameworks/MobileDevice.framework/MobileDevice";
+		} else {
+			this.$logger.fatal("Unsupported platform");
+		}
 
-		return ffi.Library(this.coreFoundationDll, {
-			"CFRunLoopRun": ["void", []],
-			"CFRunLoopStop": ["void", [CoreTypes.voidPtr]],
-			"CFRunLoopGetCurrent": [CoreTypes.voidPtr, []],
-			"CFStringCreateWithCString": [CoreTypes.cfStringRef, [CoreTypes.voidPtr, "string", "uint"]],
-			"CFDictionaryGetValue": [CoreTypes.voidPtr, [CoreTypes.cfDictionaryRef, CoreTypes.cfStringRef]],
-			"CFNumberGetValue": [CoreTypes.boolType, [CoreTypes.voidPtr, "uint", CoreTypes.voidPtr]],
-			"CFStringGetCStringPtr": [CoreTypes.charPtr, [CoreTypes.cfStringRef, "uint"]],
-			"CFStringGetCString": [CoreTypes.boolType, [CoreTypes.cfStringRef, CoreTypes.charPtr, "uint", "uint"]],
-			"CFStringGetLength": ["ulong", [CoreTypes.cfStringRef]],
-			"CFDictionaryGetCount": ["int", [CoreTypes.cfDictionaryRef]],
-			"CFDictionaryGetKeysAndValues": ["void", [CoreTypes.cfDictionaryRef, CoreTypes.ptrToVoidPtr, CoreTypes.ptrToVoidPtr]],
-			"CFDictionaryCreate": [CoreTypes.cfDictionaryRef, [CoreTypes.voidPtr, CoreTypes.ptrToVoidPtr, CoreTypes.ptrToVoidPtr, "int", ref.refType(this.cfDictionaryKeyCallBacks), ref.refType(this.cfDictionaryValueCallBacks)]],
-			"kCFTypeDictionaryKeyCallBacks": [this.cfDictionaryKeyCallBacks],
-			"kCFTypeDictionaryValueCallBacks": [this.cfDictionaryValueCallBacks],
-			"CFRunLoopRunInMode": [CoreTypes.intType, [CoreTypes.cfStringRef, CoreTypes.cfTimeInterval, CoreTypes.boolType]],
-			"kCFRunLoopDefaultMode": [CoreTypes.voidPtr],
-			"kCFRunLoopCommonModes": [CoreTypes.voidPtr],
-			"CFRunLoopTimerCreate": [CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.doubleType, CoreTypes.doubleType, CoreTypes.uintType, CoreTypes.uintType, CoreTypes.cf_run_loop_timer_callback, CoreTypes.voidPtr]],
-			"CFRunLoopAddTimer": ["void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]],
-			"CFRunLoopRemoveTimer": ["void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]],
-			"CFAbsoluteTimeGetCurrent": [CoreTypes.doubleType, []],
-			"CFGetTypeID": ['ulong', [CoreTypes.voidPtr]]
-		});
+		return null;
+	}
+
+	private get CommonProgramFilesPath(): string {
+		return helpers.isWindows64() ? (this.is32BitProcess() ? process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramW6432) :
+			process.env.CommonProgramFiles;
+	}
+
+	private is32BitProcess(): boolean {
+		return ref.types.size_t.size === 4;
+	}
+
+	public getCoreFoundationLibrary(): {[key: string]: any} {
+		this.validate();
+
+		if(helpers.isWindows()) {
+			process.env.PATH = this.CoreFoundationDir + ";" + process.env.PATH;
+			process.env.PATH += ";" + this.MobileDeviceDir;
+		}
+
+		var coreFoundationDll = helpers.isWindows() ?  path.join(this.CoreFoundationDir, "CoreFoundation.dll") : this.CoreFoundationDir;
+		var lib = ffi.DynamicLibrary(coreFoundationDll);
+
+		return {
+			"CFRunLoopRun": ffi.ForeignFunction(lib.get("CFRunLoopRun"), "void", []),
+			"CFRunLoopStop": ffi.ForeignFunction(lib.get("CFRunLoopStop"), "void", [CoreTypes.voidPtr]),
+			"CFRunLoopGetCurrent": ffi.ForeignFunction(lib.get("CFRunLoopGetCurrent"), CoreTypes.voidPtr, []),
+			"CFStringCreateWithCString": ffi.ForeignFunction(lib.get("CFStringCreateWithCString"), CoreTypes.cfStringRef, [CoreTypes.voidPtr, "string", "uint"]),
+			"CFDictionaryGetValue": ffi.ForeignFunction(lib.get("CFDictionaryGetValue"), CoreTypes.voidPtr, [CoreTypes.cfDictionaryRef, CoreTypes.cfStringRef]),
+			"CFNumberGetValue": ffi.ForeignFunction(lib.get("CFNumberGetValue"), CoreTypes.boolType, [CoreTypes.voidPtr, "uint", CoreTypes.voidPtr]),
+			"CFStringGetCStringPtr": ffi.ForeignFunction(lib.get("CFStringGetCStringPtr"), CoreTypes.charPtr, [CoreTypes.cfStringRef, "uint"]),
+			"CFStringGetCString": ffi.ForeignFunction(lib.get("CFStringGetCString"), CoreTypes.boolType, [CoreTypes.cfStringRef, CoreTypes.charPtr, "uint", "uint"]),
+			"CFStringGetLength":  ffi.ForeignFunction(lib.get("CFStringGetLength"), "ulong", [CoreTypes.cfStringRef]),
+			"CFDictionaryGetCount": ffi.ForeignFunction(lib.get("CFDictionaryGetCount"), "int", [CoreTypes.cfDictionaryRef]),
+			"CFDictionaryGetKeysAndValues": ffi.ForeignFunction(lib.get("CFDictionaryGetKeysAndValues"), "void", [CoreTypes.cfDictionaryRef, CoreTypes.ptrToVoidPtr, CoreTypes.ptrToVoidPtr]),
+			"CFDictionaryCreate": ffi.ForeignFunction(lib.get("CFDictionaryCreate"), CoreTypes.cfDictionaryRef, [CoreTypes.voidPtr, CoreTypes.ptrToVoidPtr, CoreTypes.ptrToVoidPtr, "int", ref.refType(this.cfDictionaryKeyCallBacks), ref.refType(this.cfDictionaryValueCallBacks)]),
+			"kCFTypeDictionaryKeyCallBacks": lib.get("kCFTypeDictionaryKeyCallBacks"),
+			"kCFTypeDictionaryValueCallBacks": lib.get("kCFTypeDictionaryValueCallBacks"),
+			"CFRunLoopRunInMode": ffi.ForeignFunction(lib.get("CFRunLoopRunInMode"),CoreTypes.intType, [CoreTypes.cfStringRef, CoreTypes.cfTimeInterval, CoreTypes.boolType]),
+			"kCFRunLoopDefaultMode": lib.get("kCFRunLoopDefaultMode"),
+			"kCFRunLoopCommonModes": lib.get("kCFRunLoopCommonModes"),
+			"CFRunLoopTimerCreate": ffi.ForeignFunction(lib.get("CFRunLoopTimerCreate"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.doubleType, CoreTypes.doubleType, CoreTypes.uintType, CoreTypes.uintType, CoreTypes.cf_run_loop_timer_callback, CoreTypes.voidPtr]),
+			"CFRunLoopAddTimer": ffi.ForeignFunction(lib.get("CFRunLoopAddTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
+			"CFRunLoopRemoveTimer": ffi.ForeignFunction(lib.get("CFRunLoopRemoveTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
+			"CFAbsoluteTimeGetCurrent": ffi.ForeignFunction(lib.get("CFAbsoluteTimeGetCurrent"), CoreTypes.doubleType, [])
+		};
 	}
 
 	public getMobileDeviceLibrary(): {[key: string]: any} {
-		return ffi.Library(this.mobileDeviceDll, {
-			"AMDeviceNotificationSubscribe": ["uint", [CoreTypes.am_device_notification_callback, "uint", "uint", "uint", CoreTypes.ptrToVoidPtr]],
-			"AMDeviceConnect": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceIsPaired": ["uint", [CoreTypes.am_device_p]],
-			"AMDevicePair": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceValidatePairing": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceStartSession": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceStopSession": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceDisconnect": ["uint", [CoreTypes.am_device_p]],
-			"AMDeviceStartService": ["uint", [CoreTypes.am_device_p, CoreTypes.cfStringRef, CoreTypes.intPtr, CoreTypes.voidPtr]],
-			"AMDeviceTransferApplication": ["uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]],
-			"AMDeviceInstallApplication": ["uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]],
-			"AMDeviceLookupApplications": ["uint", [CoreTypes.am_device_p, "uint", ref.refType(CoreTypes.cfDictionaryRef)]],
-			"AMDeviceUninstallApplication": ["uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]],
-			"AFCConnectionOpen": ["uint", ["int", "uint", ref.refType(CoreTypes.afcConnectionRef)]],
-			"AFCConnectionClose": ["uint", [CoreTypes.afcConnectionRef]],
-			"AFCDirectoryCreate": ["uint", [CoreTypes.afcConnectionRef, "string"]],
-			"AFCFileRefOpen": ["uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]],
-			"AFCFileRefClose": ["uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef]],
-			"AFCFileRefWrite": ["uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, "uint"]],
-			"AFCFileRefRead": ["uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, CoreTypes.uintPtr]],
-			"AFCDirectoryOpen": [CoreTypes.afcError, [CoreTypes.afcConnectionRef, "string", ref.refType(CoreTypes.afcDirectoryRef)]],
-			"AFCDirectoryRead": [CoreTypes.afcError, [CoreTypes.afcConnectionRef, CoreTypes.afcDirectoryRef, ref.refType(CoreTypes.charPtr)]],
-			"AFCDirectoryClose": [CoreTypes.afcError, [CoreTypes.afcConnectionRef, CoreTypes.afcDirectoryRef]],
-			"AMDeviceCopyDeviceIdentifier": [CoreTypes.cfStringRef, [CoreTypes.am_device_p]],
-			"AMDeviceCopyValue": [CoreTypes.cfStringRef, [CoreTypes.am_device_p, CoreTypes.cfStringRef, CoreTypes.cfStringRef]],
-			"AMDeviceNotificationUnsubscribe": [CoreTypes.intType, [CoreTypes.amDeviceNotificationRef]]
-		});
+		var mobileDeviceDll = helpers.isWindows() ? path.join(this.MobileDeviceDir, "MobileDevice.dll") : this.MobileDeviceDir;
+		var lib = ffi.DynamicLibrary(mobileDeviceDll);
+
+		return  {
+			"AMDeviceNotificationSubscribe": ffi.ForeignFunction(lib.get("AMDeviceNotificationSubscribe"), "uint", [CoreTypes.am_device_notification_callback, "uint", "uint", "uint", CoreTypes.ptrToVoidPtr]),
+			"AMDeviceConnect": ffi.ForeignFunction(lib.get("AMDeviceConnect"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceIsPaired": ffi.ForeignFunction(lib.get("AMDeviceIsPaired"), "uint", [CoreTypes.am_device_p]),
+			"AMDevicePair": ffi.ForeignFunction(lib.get("AMDevicePair"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceValidatePairing": ffi.ForeignFunction(lib.get("AMDeviceValidatePairing"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceStartSession": ffi.ForeignFunction(lib.get("AMDeviceStartSession"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceStopSession": ffi.ForeignFunction(lib.get("AMDeviceStopSession"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceDisconnect": ffi.ForeignFunction(lib.get("AMDeviceDisconnect"), "uint", [CoreTypes.am_device_p]),
+			"AMDeviceStartService": ffi.ForeignFunction(lib.get("AMDeviceStartService"), "uint", [CoreTypes.am_device_p, CoreTypes.cfStringRef, CoreTypes.intPtr, CoreTypes.voidPtr]),
+			"AMDeviceTransferApplication": ffi.ForeignFunction(lib.get("AMDeviceTransferApplication"), "uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]),
+			"AMDeviceInstallApplication": ffi.ForeignFunction(lib.get("AMDeviceInstallApplication"), "uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]),
+			"AMDeviceLookupApplications": ffi.ForeignFunction(lib.get("AMDeviceLookupApplications"), "uint", [CoreTypes.am_device_p, "uint", ref.refType(CoreTypes.cfDictionaryRef)]),
+			"AMDeviceUninstallApplication": ffi.ForeignFunction(lib.get("AMDeviceUninstallApplication"), "uint", ["int", CoreTypes.cfStringRef, CoreTypes.cfDictionaryRef, CoreTypes.am_device_install_application_callback, CoreTypes.voidPtr]),
+			"AFCConnectionOpen": ffi.ForeignFunction(lib.get("AFCConnectionOpen"), "uint", ["int", "uint", ref.refType(CoreTypes.afcConnectionRef)]),
+			"AFCConnectionClose": ffi.ForeignFunction(lib.get("AFCConnectionClose"), "uint", [CoreTypes.afcConnectionRef]),
+			"AFCDirectoryCreate": ffi.ForeignFunction(lib.get("AFCDirectoryCreate"), "uint", [CoreTypes.afcConnectionRef, "string"]),
+			"AFCFileRefOpen": ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]),
+			"AFCFileRefClose": ffi.ForeignFunction(lib.get("AFCFileRefClose"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef]),
+			"AFCFileRefWrite": ffi.ForeignFunction(lib.get("AFCFileRefWrite"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, "uint"]),
+			"AFCFileRefRead": ffi.ForeignFunction(lib.get("AFCFileRefRead"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, CoreTypes.uintPtr]),
+			"AFCDirectoryOpen": ffi.ForeignFunction(lib.get("AFCDirectoryOpen"), CoreTypes.afcError, [CoreTypes.afcConnectionRef, "string", ref.refType(CoreTypes.afcDirectoryRef)]),
+			"AFCDirectoryRead": ffi.ForeignFunction(lib.get("AFCDirectoryRead"), CoreTypes.afcError, [CoreTypes.afcConnectionRef, CoreTypes.afcDirectoryRef, ref.refType(CoreTypes.charPtr)]),
+			"AFCDirectoryClose": ffi.ForeignFunction(lib.get("AFCDirectoryClose"), CoreTypes.afcError, [CoreTypes.afcConnectionRef, CoreTypes.afcDirectoryRef]),
+			"AMDeviceCopyDeviceIdentifier": ffi.ForeignFunction(lib.get("AMDeviceCopyDeviceIdentifier"), CoreTypes.cfStringRef, [CoreTypes.am_device_p]),
+			"AMDeviceCopyValue": ffi.ForeignFunction(lib.get("AMDeviceCopyValue"), CoreTypes.cfStringRef, [CoreTypes.am_device_p, CoreTypes.cfStringRef, CoreTypes.cfStringRef]),
+			"AMDeviceNotificationUnsubscribe": ffi.ForeignFunction(lib.get("AMDeviceNotificationUnsubscribe"), CoreTypes.intType, [CoreTypes.amDeviceNotificationRef])
+		};
 	}
 
-	public getWinSocketLibrary(): {[key: string]: any} {
+	public static getWinSocketLibrary(): {[key: string]: any} {
 		var winSocketDll = path.join(process.env.SystemRoot, "System32", "ws2_32.dll");
 
 		return ffi.Library(winSocketDll, {
@@ -159,6 +193,34 @@ class IOSCore implements Mobile.IiOSCore {
 			"send": ["int", ["uint", "string", "int", "int"]],
 			"setsockopt": ["int", ["uint", "int", "int", CoreTypes.voidPtr, "int"]]
 		});
+	}
+
+	private validate(): void {
+		if(helpers.isWindows64()) {
+			var existsAppleFolder32 = this.$fs.exists(path.join(process.env["CommonProgramFiles(x86)"], "Apple")).wait();
+			var existsAppleFolder64 = this.$fs.exists(path.join(process.env.CommonProgramW6432, "Apple")).wait();
+
+			if(!existsAppleFolder32 && !existsAppleFolder64) {
+				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
+			}
+
+			if((this.is32BitProcess() && !existsAppleFolder32 && existsAppleFolder64) ||
+				!this.is32BitProcess() && !existsAppleFolder64 && existsAppleFolder32) {
+				this.$errors.fail(IOSCore.BITNESS_MISMATCH);
+			}
+
+		} else if(helpers.isWindows32()) {
+			if(!this.$fs.exists(path.join(process.env.CommonProgramFiles)).wait()) {
+				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
+			}
+		} else if(helpers.isDarwin()) {
+			var existsCoreFoundation = this.$fs.exists(this.CoreFoundationDir).wait();
+			var existsMobileDevice = this.$fs.exists(this.MobileDeviceDir).wait();
+
+			if(!existsCoreFoundation || !existsMobileDevice) {
+				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
+			}
+		}
 	}
 }
 $injector.register("iOSCore", IOSCore);
@@ -178,9 +240,24 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return this.coreFoundationLibrary.CFRunLoopGetCurrent();
 	}
 
-	public getkCFRunLoopCommonModes(): NodeBuffer {
-		var modes = this.coreFoundationLibrary.kCFRunLoopCommonModes;
-		return modes.deref();
+	public kCFRunLoopCommonModes(): NodeBuffer {
+		var commonModes = this.coreFoundationLibrary.kCFRunLoopCommonModes;
+		commonModes.type = ref.refType(ref.types.void);
+		return commonModes.deref();
+	}
+
+	public kCFRunLoopDefaultMode(): NodeBuffer {
+		var defaultMode = this.coreFoundationLibrary.kCFRunLoopDefaultMode;
+		defaultMode.type = ref.refType(ref.types.void);
+		return defaultMode.deref();
+	}
+
+	public kCFTypeDictionaryValueCallBacks(): NodeBuffer {
+		return this.coreFoundationLibrary.kCFTypeDictionaryValueCallBacks;
+	}
+
+	public kCFTypeDictionaryKeyCallBacks(): NodeBuffer {
+		return this.coreFoundationLibrary.kCFTypeDictionaryKeyCallBacks;
 	}
 
 	public runLoopTimerCreate(allocator: NodeBuffer, fireDate: number, interval: number, flags: number, order: number, callout: NodeBuffer, context: any): NodeBuffer {
@@ -219,6 +296,10 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return this.coreFoundationLibrary.CFStringCreateWithCString(alloc, str, encoding);
 	}
 
+	public dictionaryCreate(allocator: NodeBuffer, keys: NodeBuffer, values: NodeBuffer, count: number, dictionaryKeyCallbacks: NodeBuffer, dictionaryValueCallbacks: NodeBuffer): NodeBuffer {
+		return this.coreFoundationLibrary.CFDictionaryCreate(allocator, keys, values, count, dictionaryKeyCallbacks, dictionaryValueCallbacks);
+	}
+
 	public dictionaryGetValue(theDict: NodeBuffer, value: NodeBuffer): NodeBuffer {
 		return this.coreFoundationLibrary.CFDictionaryGetValue(theDict, value);
 	}
@@ -233,7 +314,7 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 
 	public dictionaryGetCount(theDict: NodeBuffer): number {
 		return this.coreFoundationLibrary.CFDictionaryGetCount(theDict);
-    }
+	}
 
 	public createCFString(str: string): NodeBuffer {
 		return this.stringCreateWithCString(null, str, IOSCore.kCFStringEncodingUTF8 );
@@ -306,8 +387,16 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AMDeviceDisconnect(devicePointer);
 	}
 
-    public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer) {
+	public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer) {
 		return this.mobileDeviceLibrary.AMDeviceStartService(devicePointer, serviceName, socketNumber, p1);
+	}
+
+	public deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number {
+		return this.mobileDeviceLibrary.AMDeviceTransferApplication(service, packageFile, options, installationCallback, p1);
+	}
+
+	public deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number {
+		return this.mobileDeviceLibrary.AMDeviceInstallApplication(service, packageFile, options, installationCallback, p1);
 	}
 
 	public afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number {
@@ -352,83 +441,32 @@ export class MobileDevice implements Mobile.IMobileDevice {
 }
 $injector.register("mobileDevice", MobileDevice);
 
-class iTunesInstallationInfo {
-	// ITunes and Node.js installation validator
-	private iTunesNotFoundErrorMessage = "iTunes is not installed";
-	private iTunesMismatchNodeBitsErrorMessage = "iTunes mismatch node.js version.";
-
-	constructor(private $fs: IFileSystem) {
-
-	}
-
-	public getAppleFolderLocation(): string {
-		var isWindows64 = helpers.isWindows64();
-		this.validateiTunesInstallation(isWindows64);
-
-		if(isWindows64) {
-			if(this.isNodeJs32BitsInstalled()) {
-				return path.join(process.env["CommonProgramFiles(x86)"], "Apple");
-			}
-			else {
-				return path.join(process.env.CommonProgramW6432, "Apple");
-			}
-		}
-		else {
-			return path.join(process.env.CommonProgramFiles, "Apple");
-		}
-	}
-
-	private validateiTunesInstallation(isWindows64: boolean): void {
-		if(!this.isiTunesInstalled()) {
-			throw new Error(this.iTunesNotFoundErrorMessage);
-		}
-
-		if(isWindows64) {
-			this.validateiTunesInstallationForWindows64();
-		}
-	}
-
-	private validateiTunesInstallationForWindows64(): void {
-		var existsPathToAppleFolderW6432 = this.$fs.exists(path.join(process.env.CommonProgramW6432, "Apple")).wait();
-		var	existsPathToAppleFolderX86 = this.$fs.exists(path.join(process.env["CommonProgramFiles(x86)"], "Apple")).wait();
-
-		if(this.isNodeJs32BitsInstalled()) {
-			if(!existsPathToAppleFolderX86) {
-				throw new Error(this.iTunesMismatchNodeBitsErrorMessage);
-			}
-		} else {
-			if(!existsPathToAppleFolderW6432) {
-				throw new Error(this.iTunesMismatchNodeBitsErrorMessage);
-			}
-		}
-	}
-
-	private isiTunesInstalled(): boolean {
-		return this.$fs.exists(path.join(process.env.CommonProgramFiles, "Apple")).wait();
-	}
-
-	private isNodeJs32BitsInstalled() : boolean {
-		return ref.types.size_t.size == 4;
-	}
-}
-
 export class WinSocketWrapper {
-
 	private winSocketLibrary: any = null;
+	private static BYTES_TO_READ = 1024;
 
 	constructor(private socket: number,
-		private $iOSCore: Mobile.IiOSCore) {
-        this.winSocketLibrary = $iOSCore.getWinSocketLibrary();
+		private $errors: IErrors) {
+		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
 	public read(bytes: number): NodeBuffer {
 		var data = new Buffer(bytes);
 		var result = this.winSocketLibrary.recv(this.socket, data, bytes, 0);
 		if (result < 0) {
-			throw "Error receiving data: " + result;
+			this.$errors.fail("Error receiving data: %s", result);
 		}
 
 		return data;
+	}
+
+	public readAll(printData: any) {
+		var data = this.read(WinSocketWrapper.BYTES_TO_READ);
+		while (data) {
+			printData(data);
+			data = this.read(WinSocketWrapper.BYTES_TO_READ);
+		}
+		this.close();
 	}
 
 	public write(data: string): number {
@@ -441,18 +479,15 @@ export class WinSocketWrapper {
 }
 
 export class PlistService {
-	private socket: WinSocketWrapper = null;
-	private service = 0;
+	private socket: any  = null;
 
-	constructor($iOSDevice: Mobile.IIOSDevice,
-				$iOSCore: Mobile.IiOSCore,
-				serviceName: string) {
-		this.service = $iOSDevice.startService(serviceName);
-		this.socket = new WinSocketWrapper(this.service, $iOSCore);
-	}
-
-	public get Service(): number {
-		return this.service;
+	constructor(private service: number,
+		private $errors: IErrors) {
+		if(helpers.isWindows()) {
+			this.socket = new WinSocketWrapper(this.service, this.$errors);
+		} else if(helpers.isDarwin()) {
+			this.socket = new net.Socket({ fd: this.service.toString() });
+		}
 	}
 
 	public receiveMessage(): string {
@@ -495,4 +530,3 @@ export class PlistService {
 		this.socket.close();
 	}
 }
-$injector.register("plistService", PlistService);

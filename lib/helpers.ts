@@ -146,8 +146,16 @@ export function isWindows() {
 }
 
 export function isWindows64() {
-	return process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
+	return process.arch === "x64" && process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
 }
+export function isWindows32() {
+	return isWindows() && !isWindows64();
+}
+
+export function isDarwin() {
+	return process.platform.toUpperCase() === "DARWIN";
+}
+
 export function stringReplaceAll(string: string, find: string, replace: string): string {
 	return string.split(find).join(replace);
 }

@@ -6,18 +6,18 @@ import _ = require("underscore");
 import iOSProxyServices = require("./ios-proxy-services");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");
+import helpers = require("./../../helpers");
 
 export class IOSDevice implements Mobile.IIOSDevice {
 
 	private identifier: string = null;
+	private voidPtr = ref.refType(ref.types.void);
 
 	constructor(private devicePointer,
-				private $iOSCore: Mobile.IiOSCore,
-				private $coreFoundation: Mobile.ICoreFoundation,
-				private $mobileDevice: Mobile.IMobileDevice,
-				private $logger: ILogger,
-				private $fs: IFileSystem) {
-	}
+		private $coreFoundation: Mobile.ICoreFoundation,
+		private $mobileDevice: Mobile.IMobileDevice,
+		private $fs: IFileSystem,
+		private $errors: IErrors) { }
 
 	public getPlatform(): string {
 		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS].toLowerCase();
@@ -41,7 +41,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 
 	private validateResult(result: number, error: string) {
 		if (result != 0) {
-			throw error;
+			this.$errors.fail(error);
 		}
 	}
 
@@ -105,23 +105,23 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public deploy(packageFile: string, packageName: string): void {
-		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$iOSCore, this.$mobileDevice, this.$coreFoundation, this.$logger, this.$fs);
+		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$coreFoundation, this.$mobileDevice, this.$fs, this.$errors);
 		installationProxy.deployApplication(packageFile);
 	}
 
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
-		var houseArrestClient: Mobile.IHouseArressClient = new iOSProxyServices.HouseArrestClient(this, this.$iOSCore, this.$mobileDevice, this.$fs);
+		var houseArrestClient: Mobile.IHouseArressClient = new iOSProxyServices.HouseArrestClient(this, this.$mobileDevice, this.$fs, this.$errors);
 		var afcClientForAppDocuments: Mobile.IAfcClient = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 		afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
-		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this, this.$iOSCore);
+		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this, this.$errors);
 		notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 	}
 
 	public openDeviceLogStream() {
-		var iOSSyslog = new iOSProxyServices.IOSSyslog(this, this.$iOSCore, this.$fs);
-		iOSSyslog.read();
+		var iOSSystemLog = new iOSProxyServices.IOSSyslog(this, this.$errors);
+		iOSSystemLog.read();
 	}
 }
 
