@@ -35,7 +35,7 @@ export class Configuration implements IConfiguration {
 		if(!this.cachedServerConfiguration) {
 			var configUri = this.AB_SERVER_PROTO + "://" + this.AB_SERVER + "/configuration.json";
 			var httpClient = $injector.resolve("httpClient");
-			this.cachedServerConfiguration = JSON.parse(httpClient.httpRequest(configUri).wait().body);
+			this.cachedServerConfiguration = new ServerConfigurationData(JSON.parse(httpClient.httpRequest(configUri).wait().body));
 		}
 
 		return this.cachedServerConfiguration;
