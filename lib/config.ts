@@ -7,7 +7,8 @@ import helpers = require("./helpers");
 
 /*don't require logger in config.js due to cyclic dependency*/;
 export class Configuration implements IConfiguration {
-	TFIS_SERVER: string;
+	private cachedServerConfiguration: IServerConfigurationData = null;
+
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG :boolean;
@@ -24,6 +25,20 @@ export class Configuration implements IConfiguration {
 
 	constructor(private $fs: IFileSystem) {
 		this.mergeConfig(this, this.loadConfig("config").wait());
+	}
+
+	public get tfisServer(): string {
+		return this.getConfigurationFromServer().stsServer;
+	}
+
+	public getConfigurationFromServer(): IServerConfigurationData {
+		if(!this.cachedServerConfiguration) {
+			var configUri = this.AB_SERVER_PROTO + "://" + this.AB_SERVER + "/configuration.json";
+			var httpClient = $injector.resolve("httpClient");
+			this.cachedServerConfiguration = JSON.parse(httpClient.httpRequest(configUri).wait().body);
+		}
+
+		return this.cachedServerConfiguration;
 	}
 
 	private getConfigName(filename: string) : string {
@@ -76,3 +91,35 @@ export class Configuration implements IConfiguration {
 $injector.register("config", Configuration);
 helpers.registerCommand("config", "config-reset", (config, args) => config.reset());
 helpers.registerCommand("config", "config-apply", (config, args) => config.apply(args[0]));
+
+class ServerConfigurationData {
+	constructor(private json: any) { }
+
+	public get assemblyVersion(): string {
+		return this.json.assemblyVersion;
+	}
+
+	public get applicationName(): string {
+		return this.json.applicationName;
+	}
+
+	public get backendServiceScheme(): string {
+		return this.json.backendServiceScheme;
+	}
+
+	public get stsServer(): string {
+		return this.json.stsServer;
+	}
+
+	public get clientId(): string {
+		return this.json.clientId;
+	}
+
+	public get analyticsAccountCode(): string {
+		return this.json.analyticsAccountCode;
+	}
+
+	public get eqatecProductId(): string {
+		return this.json.eqatecProductId;
+	}
+}
