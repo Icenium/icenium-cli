@@ -140,6 +140,9 @@ export function registerCommand(module: string, commandName: string, executor: (
 	$injector.registerCommand(commandName, factory);
 }
 
+export function isOsX() {
+	return process.platform.toUpperCase() === "DARWIN";
+}
 
 export function isWindows() {
 	return /^win/.test(process.platform);
