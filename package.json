@@ -5,7 +5,7 @@
   "author": "Telerik <icenium@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
-    "appbuilder": "./bin/appbuilder.js"
+    "appbuilder": "./bin/appbuilder"
   },
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
