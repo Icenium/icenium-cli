@@ -5,9 +5,8 @@
 import path = require("path");
 import helpers = require("./helpers");
 
-/*don't require logger in config.js due to cyclic dependency*/;
 export class Configuration implements IConfiguration {
-	TFIS_SERVER: string;
+
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG :boolean;
@@ -22,6 +21,7 @@ export class Configuration implements IConfiguration {
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
 
+	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
 		this.mergeConfig(this, this.loadConfig("config").wait());
 	}

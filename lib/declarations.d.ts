@@ -164,8 +164,17 @@ interface IChildProcess {
 	spawn(command: string, args?: string[], options?: string[]): any;
 }
 
+interface IServerConfigurationData {
+	assemblyVersion: string;
+	applicationName: string;
+	backendServiceScheme: string;
+	stsServer: string;
+	clientId: string;
+	analyticsAccountCode: string;
+	eqatecProductId: string;
+}
+
 interface IConfiguration {
-	TFIS_SERVER: string;
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG: boolean;
@@ -182,6 +191,11 @@ interface IConfiguration {
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
+}
+
+interface IServerConfiguration {
+	tfisServer: IFuture<string>;
+	assemblyVersion: IFuture<string>;
 }
 
 interface IErrors {

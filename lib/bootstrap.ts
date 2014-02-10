@@ -1,5 +1,6 @@
 global.$injector = require("./yok").injector;
 
+$injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.requireCommand("config-apply", "./config");
 $injector.requireCommand("config-reset", "./config");

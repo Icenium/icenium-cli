@@ -75,6 +75,7 @@ $injector.register("userDataStore", UserDataStore);
 export class LoginManager implements ILoginManager {
 	constructor(private $logger: ILogger,
 		private $config: IConfiguration,
+		private $serverConfiguration: IServerConfiguration,
 		private $httpClient: Server.IHttpClient,
 		private $server: Server.IServer,
 		private $serviceProxy: Server.IServiceProxy,
@@ -120,7 +121,7 @@ export class LoginManager implements ILoginManager {
 
 			var wrapResponse = this.$httpClient.httpRequest({
 				proto: "https",
-				host: this.$config.TFIS_SERVER,
+				host: this.$serverConfiguration.tfisServer.wait(),
 				path: "/Authenticate/WRAPv0.9",
 				method: "POST",
 				headers: {
@@ -163,7 +164,7 @@ export class LoginManager implements ILoginManager {
 		this.$logger.debug("Begin browser login.");
 
 		var loginConfig:any = {
-			tfisServer: "https://" + this.$config.TFIS_SERVER,
+			tfisServer: "https://" + this.$serverConfiguration.tfisServer.wait(),
 			clientId: this.$config.WRAP_CLIENT_ID,
 			callbackUrl: util.format("%s://%s/Mist/Authentication/RedirectVerification", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER)
 		};

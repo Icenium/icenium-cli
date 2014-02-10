@@ -24,6 +24,7 @@ export class SimulateCommand implements ICommand {
 		private $httpClient: Server.IHttpClient,
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
+		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer,
 		private $project: Project.IProject) {
 		this.projectData = $project.projectData;
@@ -31,11 +32,7 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): void {
 		this.cacheDir = path.join(options["profile-dir"], "Cache");
-
-		var configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/configuration.json";
-		this.$logger.debug("Getting server configuration from %s", configUri);
-		var config = JSON.parse(this.$httpClient.httpRequest(configUri).wait().body);
-		this.serverVersion = config.assemblyVersion;
+		this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
 		this.$logger.debug("Server version: %s", this.serverVersion);
 
 		this.prepareSimulator().wait();
