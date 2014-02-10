@@ -24,6 +24,7 @@ export class SimulateCommand implements ICommand {
 		private $httpClient: Server.IHttpClient,
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
+		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer,
 		private $project: Project.IProject) {
 		this.projectData = $project.projectData;
@@ -31,7 +32,7 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): void {
 		this.cacheDir = path.join(options["profile-dir"], "Cache");
-		this.serverVersion = this.$config.getConfigurationFromServer().assemblyVersion;
+		this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
 		this.$logger.debug("Server version: %s", this.serverVersion);
 
 		this.prepareSimulator().wait();

@@ -175,7 +175,6 @@ interface IServerConfigurationData {
 }
 
 interface IConfiguration {
-	tfisServer: string;
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG: boolean;
@@ -192,7 +191,11 @@ interface IConfiguration {
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
-	getConfigurationFromServer(): IServerConfigurationData;
+}
+
+interface IServerConfiguration {
+	tfisServer: IFuture<string>;
+	assemblyVersion: IFuture<string>;
 }
 
 interface IErrors {
