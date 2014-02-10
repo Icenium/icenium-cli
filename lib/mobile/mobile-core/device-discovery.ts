@@ -125,11 +125,9 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static get Adb() {
 		if (!AndroidDeviceDiscovery.adb) {
 			if (helpers.isWindows()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, util.format("..%s..%s..%s", path.sep, path.sep, path.sep),
-					util.format("%sresources%splatform-tools%sandroid%swindows%sadb", path.sep, path.sep, path.sep, path.sep, path.sep));
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "windows", "adb");
 			} else if (helpers.isOsX()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, util.format("..%s..%s..%s", path.sep, path.sep, path.sep),
-					util.format("%sresources%splatform-tools%sandroid%sosx%sadb", path.sep, path.sep, path.sep, path.sep, path.sep));
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "osx", "adb");
 			}
 		}
 		return AndroidDeviceDiscovery.adb;

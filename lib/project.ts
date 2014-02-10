@@ -330,14 +330,25 @@ export class Project implements Project.IProject {
 		return options["no-livesync"] ? "Release" : "Debug";
 	}
 
+	public deploy(platform: string): IFuture<Server.IPackageDef[]> {
+		return (() => {
+			this.validatePlatform(platform);
+			var result = this.build(platform, this.getBuildConfiguration(), false, true).wait();
+			return result;
+		}).future<Server.IPackageDef[]>()();
+	}
+
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
-			if (!platform || (!MobileHelper.isiOSPlatform(platform) && !MobileHelper.isAndroidPlatform(platform))) {
-				this.$errors.fail("Incorrect platform '%s' specified.", platform);
-			}
-
+			this.validatePlatform(platform);
 			this.build(platform, this.getBuildConfiguration(), true, options.download).wait();
 		}).future<void>()();
+	}
+
+	private validatePlatform(platform: string): void {
+		if (!platform || (!MobileHelper.isiOSPlatform(platform) && !MobileHelper.isAndroidPlatform(platform))) {
+			this.$errors.fail("Incorrect platform '%s' specified.", platform);
+		}
 	}
 
 	public deployToIon(): IFuture<void> {

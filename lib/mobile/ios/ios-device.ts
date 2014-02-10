@@ -104,9 +104,11 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}
 	}
 
-	public deploy(packageFile: string, packageName: string): void {
-		var installationProxy = this.$injector.resolve(iOSProxyServices.InstallationProxyClient, {device: this });
-		installationProxy.deployApplication(packageFile);
+	public deploy(packageFile: string, packageName: string): IFuture<void> {
+		return (() => {
+			var installationProxy = this.$injector.resolve(iOSProxyServices.InstallationProxyClient, {device: this });
+			installationProxy.deployApplication(packageFile);
+		}).future<void>()();
 	}
 
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
