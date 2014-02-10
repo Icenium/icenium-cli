@@ -138,6 +138,20 @@ In Git Bash:
 
 Restart Git Bash and you're ready to roll.
 
+Developing the CLI on a Mac
+===
+The Ice server can run only on Windows. The steps below will enable you to connect
+a CLI running on your Mac to the Ice server running on the Windows VM.
+
+* Windows: run cmd, execute `ipconfig` and write down the IPv4 address
+* Mac: open terminal and execute `sudo pico /etc/hosts`
+* Mac: add the following line to the end of the file: `icetest.icenium.com 192.168.x.x` where the address is the Windows' IP
+* Mac: Ctrl+O, Enter, Ctrl-X
+* Windows: change the TFIS endpoint in your Ice Web.config to point to localtfis.telerik.com
+* Mac: change the AB_SERVER in config.json to point to icetest.icenium.com
+* Mac: login using your localtfis credentials (can be edited on integrationadmin.telerik.com)
+
+That's it. Don't forget that icetest.icenium.com will henceforth be clobbered on your Mac.
 
 [1]: http://visionmedia.github.io/mocha/#interfaces
 [2]: http://chaijs.com/api/assert/
