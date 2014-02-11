@@ -191,6 +191,10 @@ declare module "ffi" {
 	};
 }
 
+interface NodeBuffer {
+	type: any;
+}
+
 declare module "ref" {
 	export interface Type {
 		/** The size in bytes required to hold this datatype. */

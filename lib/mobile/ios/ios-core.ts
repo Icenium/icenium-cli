@@ -86,8 +86,6 @@ class IOSCore implements Mobile.IiOSCore {
 			return path.join(this.CommonProgramFilesPath, "Apple", "Apple Application Support");
 		} else if(helpers.isDarwin()) {
 			return "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
-		} else {
-			this.$logger.fatal("Unsupported platform");
 		}
 
 		return null;
@@ -98,8 +96,6 @@ class IOSCore implements Mobile.IiOSCore {
 			return path.join(this.CommonProgramFilesPath, "Apple", "Mobile Device Support");
 		} else if(helpers.isDarwin()) {
 			return "/System/Library/PrivateFrameworks/MobileDevice.framework/MobileDevice";
-		} else {
-			this.$logger.fatal("Unsupported platform");
 		}
 
 		return null;
@@ -112,6 +108,12 @@ class IOSCore implements Mobile.IiOSCore {
 
 	private is32BitProcess(): boolean {
 		return ref.types.size_t.size === 4;
+	}
+
+	private getForeignPointer(lib: ffi.DynamicLibrary, name: string, type: ref.Type): NodeBuffer {
+		var pointer = lib.get(name);
+		pointer.type = ref.refType(type);
+		return pointer;
 	}
 
 	public getCoreFoundationLibrary(): {[key: string]: any} {
@@ -141,8 +143,8 @@ class IOSCore implements Mobile.IiOSCore {
 			"kCFTypeDictionaryKeyCallBacks": lib.get("kCFTypeDictionaryKeyCallBacks"),
 			"kCFTypeDictionaryValueCallBacks": lib.get("kCFTypeDictionaryValueCallBacks"),
 			"CFRunLoopRunInMode": ffi.ForeignFunction(lib.get("CFRunLoopRunInMode"),CoreTypes.intType, [CoreTypes.cfStringRef, CoreTypes.cfTimeInterval, CoreTypes.boolType]),
-			"kCFRunLoopDefaultMode": lib.get("kCFRunLoopDefaultMode"),
-			"kCFRunLoopCommonModes": lib.get("kCFRunLoopCommonModes"),
+			"kCFRunLoopDefaultMode": this.getForeignPointer(lib, "kCFRunLoopDefaultMode", ref.types.void),
+			"kCFRunLoopCommonModes": this.getForeignPointer(lib, "kCFRunLoopCommonModes", ref.types.void),
 			"CFRunLoopTimerCreate": ffi.ForeignFunction(lib.get("CFRunLoopTimerCreate"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.doubleType, CoreTypes.doubleType, CoreTypes.uintType, CoreTypes.uintType, CoreTypes.cf_run_loop_timer_callback, CoreTypes.voidPtr]),
 			"CFRunLoopAddTimer": ffi.ForeignFunction(lib.get("CFRunLoopAddTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
 			"CFRunLoopRemoveTimer": ffi.ForeignFunction(lib.get("CFRunLoopRemoveTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
@@ -220,6 +222,8 @@ class IOSCore implements Mobile.IiOSCore {
 			if(!existsCoreFoundation || !existsMobileDevice) {
 				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
 			}
+		} else {
+			this.$errors.fail("Unsupported platform");
 		}
 	}
 }
@@ -241,15 +245,11 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 	}
 
 	public kCFRunLoopCommonModes(): NodeBuffer {
-		var commonModes = this.coreFoundationLibrary.kCFRunLoopCommonModes;
-		commonModes.type = ref.refType(ref.types.void);
-		return commonModes.deref();
+		return this.coreFoundationLibrary.kCFRunLoopCommonModes.deref();
 	}
 
 	public kCFRunLoopDefaultMode(): NodeBuffer {
-		var defaultMode = this.coreFoundationLibrary.kCFRunLoopDefaultMode;
-		defaultMode.type = ref.refType(ref.types.void);
-		return defaultMode.deref();
+		return this.coreFoundationLibrary.kCFRunLoopDefaultMode.deref();
 	}
 
 	public kCFTypeDictionaryValueCallBacks(): NodeBuffer {
@@ -387,16 +387,16 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AMDeviceDisconnect(devicePointer);
 	}
 
-	public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer) {
-		return this.mobileDeviceLibrary.AMDeviceStartService(devicePointer, serviceName, socketNumber, p1);
+	public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer) {
+		return this.mobileDeviceLibrary.AMDeviceStartService(devicePointer, serviceName, socketNumber, null);
 	}
 
-	public deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number {
-		return this.mobileDeviceLibrary.AMDeviceTransferApplication(service, packageFile, options, installationCallback, p1);
+	public deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number {
+		return this.mobileDeviceLibrary.AMDeviceTransferApplication(service, packageFile, options, installationCallback, null);
 	}
 
-	public deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number {
-		return this.mobileDeviceLibrary.AMDeviceInstallApplication(service, packageFile, options, installationCallback, p1);
+	public deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number {
+		return this.mobileDeviceLibrary.AMDeviceInstallApplication(service, packageFile, options, installationCallback, null);
 	}
 
 	public afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number {
@@ -486,7 +486,7 @@ export class PlistService {
 		if(helpers.isWindows()) {
 			this.socket = new WinSocketWrapper(this.service, this.$errors);
 		} else if(helpers.isDarwin()) {
-			this.socket = new net.Socket({ fd: this.service.toString() });
+			this.socket = new net.Socket({ fd: this.service, writeable: true, readable: true });
 		}
 	}
 

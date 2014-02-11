@@ -68,9 +68,9 @@ declare module Mobile {
 		deviceStartSession(devicePointer: NodeBuffer): number;
 		deviceStopSession(devicePointer: NodeBuffer): number;
 		deviceDisconnect(devicePointer: NodeBuffer): number;
-		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer);
-		deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number;
-		deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer, p1: NodeBuffer): number;
+		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer);
+		deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
+		deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
 		afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number;
 		afcConnectionClose(afcConnection: NodeBuffer): number;
 		afcDirectoryCreate(afcConnection: NodeBuffer, path: string): number;

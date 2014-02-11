@@ -54,9 +54,7 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 
 	constructor(private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
-		private $logger: ILogger,
-		private $fs: IFileSystem,
-		private $errors: IErrors) {
+		private $injector: IInjector) {
 		super();
 	}
 
@@ -115,7 +113,7 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 	}
 
 	private createAndAddDevice(devicePointer): void {
-		var device: IOSDevice.IOSDevice = new IOSDevice.IOSDevice(devicePointer, this.$coreFoundation, this.$mobileDevice, this.$fs, this.$errors);
+		var device = this.$injector.resolve(IOSDevice.IOSDevice, {devicePointer: devicePointer});
 		this.addDevice(device);
 	}
 }

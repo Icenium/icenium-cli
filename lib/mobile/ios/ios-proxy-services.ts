@@ -206,7 +206,7 @@ export class InstallationProxyClient {
 		if(helpers.isWindows()) {
 			var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
 			var afcClient = new AfcClient(service, this.$mobileDevice, this.$fs, this.$errors);
-			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", _.last(packageFile.split(path.sep))));
+			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
 			afcClient.transferPackage(packageFile, devicePath).wait();
 			var plistService = new iOSCore.PlistService(service, this.$errors);
@@ -249,13 +249,13 @@ export class InstallationProxyClient {
 			var normalizedPath = path.normalize(packageFile);
 			var resolvedPath = path.resolve(normalizedPath);
 
-			var result = this.$mobileDevice.deviceTransferApplication(afcService, this.$coreFoundation.createCFString(resolvedPath), null, am_device_install_application_callback.toPointer(InstallationProxyClient.transferCallback), null);
+			var result = this.$mobileDevice.deviceTransferApplication(afcService, this.$coreFoundation.createCFString(resolvedPath), null, am_device_install_application_callback.toPointer(InstallationProxyClient.transferCallback));
 			if(result !== 0) {
 				this.$errors.fail("Unable to transfer application: %s ", result);
 			}
 
 			var installationProxyService = this.device.startService(MobileServices.INSTALLATION_PROXY);
-			result = this.$mobileDevice.deviceInstallApplication(installationProxyService, this.$coreFoundation.createCFString(packageFile), options, am_device_install_application_callback.toPointer(InstallationProxyClient.installCallback), null);
+			result = this.$mobileDevice.deviceInstallApplication(installationProxyService, this.$coreFoundation.createCFString(packageFile), options, am_device_install_application_callback.toPointer(InstallationProxyClient.installCallback));
 			if (result !== 0) {
 				this.$errors.fail("Unable to install application: %s", result);
 			}
@@ -347,7 +347,8 @@ export class IOSSyslog {
 	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
 
 	constructor(private device: Mobile.IIOSDevice,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $logger: ILogger) {
 		this.service = device.startService(MobileServices.SYSLOG);
 		if(helpers.isWindows()) {
 			this.socket = new iOSCore.WinSocketWrapper(this.service, $errors);
@@ -360,7 +361,7 @@ export class IOSSyslog {
 		var printData = (data: NodeBuffer) => {
 			var output = ref.readCString(data, 0);
 			if(this.matchRegex.test(output)) {
-				console.log(output);
+				this.$logger.out(output);
 			}
 		};
 
