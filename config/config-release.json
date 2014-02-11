@@ -1,5 +1,4 @@
 {
-	"TFIS_SERVER": "localtfis.telerik.com",
 	"AB_SERVER": "icedev.icenium.com",
 	"AB_SERVER_PROTO": "https",
 	"DEBUG": false
