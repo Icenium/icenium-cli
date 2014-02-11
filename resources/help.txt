@@ -65,7 +65,7 @@ Creates a new project from template.
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates: Blank,
-        Everlive, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
+        Friends, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
     --path - Specifies the path where you want to create the project, if different from the current directory. 
         The directory must be empty.
         If not specified, ?Telerik AppBuilder CLI? attempts to create the project in the current directory. 
