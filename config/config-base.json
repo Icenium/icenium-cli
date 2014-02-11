@@ -1,5 +1,4 @@
 {
-	"TFIS_SERVER": "tfis.telerik.com",
 	"AB_SERVER_PROTO": "http",
 	"AB_SERVER": "localhost",
 	"DEBUG": true,
