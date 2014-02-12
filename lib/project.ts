@@ -543,8 +543,16 @@ export class Project implements Project.IProject {
 			.pipe(unzip.Extract({ path: projectDir })), "close");
 	}
 
-	private generateDefaultAppId(appName) {
-		return "com.telerik." + appName;
+	private generateDefaultAppId(appName: string): string {
+		var projData = {};
+		try {
+			var appId = "com.telerik." + appName;
+			this.updateProjectProperty(projData, "set", "AppIdentifier", [appId]);
+			return appId;
+		} catch (ex) {
+			this.$logger.debug(ex);
+			return "com.telerik.myapp1";
+		}
 	}
 
 	private generateProjectGuid() {
@@ -661,8 +669,6 @@ export class Project implements Project.IProject {
 		}
 
 		projectData[property] = propertyValue;
-
-		this.printProjectProperty(property);
 	}
 
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
@@ -670,21 +676,22 @@ export class Project implements Project.IProject {
 			this.ensureProject();
 
 			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues);
+			this.printProjectProperty(propertyName).wait();
 			this.saveProject().wait();
 		}).future<void>()();
 	}
 
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
-		this.ensureProject();
-		property = this.normalizePropertyName(property);
+			this.ensureProject();
+			property = this.normalizePropertyName(property);
 
-		if (this.projectData[property]) {
-			this.$logger.out(this.projectData[property]);
-		} else {
-			this.$logger.fatal("Unrecognized property '%s'", property);
-			this.printProjectSchemaHelp();
-		}
+			if (this.projectData[property]) {
+				this.$logger.out(this.projectData[property]);
+			} else {
+				this.$logger.fatal("Unrecognized property '%s'", property);
+				this.printProjectSchemaHelp();
+			}
 		}).future<void>()();
 	}
 

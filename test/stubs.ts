@@ -76,7 +76,7 @@ export class FileSystemStub implements IFileSystem {
 }
 
 export class ErrorsStub implements IErrors {
-	private impl: IErrors = require("../lib/errors").Errors;
+	private impl: IErrors = new (require("../lib/errors").Errors)();
 
 	fail(formatStr:string, ...args: any[]): void;
 	fail(opts:{formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
