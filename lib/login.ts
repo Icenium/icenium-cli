@@ -120,7 +120,6 @@ export class LoginManager implements ILoginManager {
 			loginData.wrap_client_id = this.$config.WRAP_CLIENT_ID;
 
 			var wrapResponse = this.$httpClient.httpRequest({
-				rejectUnauthorized: false,
 				proto: "https",
 				host: this.$serverConfiguration.tfisServer.wait(),
 				path: "/Authenticate/WRAPv0.9",
