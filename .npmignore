@@ -5,8 +5,8 @@ lint.*
 .npmignore
 test-reports.xml
 
-bin/ice
-bin/ice.cmd
+bin/appbuilder
+bin/appbuilder.cmd
 
 scratch/
 test/
