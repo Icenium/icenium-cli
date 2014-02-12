@@ -3,13 +3,13 @@
 "use strict";
 
 var options:any = require("./options");
-import log = require("./logger");
 import util = require("util");
 import helpers = require("./helpers");
 
 export class IdentityManager implements Server.IIdentityManager {
-	constructor(private $server: Server.IServer) {
-	}
+	constructor(private $server: Server.IServer,
+		private $logger: ILogger,
+		private $errors: IErrors) {}
 
 	public listCertificates(): IFuture<any> {
 		return ((): any => {
@@ -17,7 +17,11 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			for (var i = 0; i < data.length; i++) {
 				var ident = data[i];
-				console.log(util.format("#%d: '%s'", i + 1, ident.Alias));
+				this.$logger.out(util.format("#%d: '%s'", i + 1, ident.Alias));
+			}
+
+			if (!data.length) {
+				this.$logger.info("No certificates registered."); // TODO: add guidance how to install certificates (when that becomes possible)
 			}
 		}).future<any>()();
 	}
@@ -29,15 +33,19 @@ export class IdentityManager implements Server.IIdentityManager {
 			for (var i = 0; i < data.length; i++) {
 				var provision = data[i];
 
-				console.log(util.format("#%d: '%s'; type: %s, App ID: '%s.%s'", i + 1, provision.Name, provision.ProvisionType,
+				this.$logger.out(util.format("#%d: '%s'; type: %s, App ID: '%s.%s'", i + 1, provision.Name, provision.ProvisionType,
 					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier));
 				if (options.verbose) {
-					console.log("  Provisioned devices:");
+					this.$logger.out("  Provisioned devices:");
 					var devices = provision.ProvisionedDevices.$values;
 					for (var di = 0; di < devices.length; di++) {
-						console.log("    " + devices[di]);
+						this.$logger.out("    " + devices[di]);
 					}
 				}
+			}
+
+			if (!data.length) {
+				this.$logger.info("No mobile provisioning profiles registered."); // TODO: add guidance how to install provisions (when that becomes possible)
 			}
 		}).future<any>()();
 	}
@@ -63,12 +71,13 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public findCertificate(identityStr): IFuture<any> {
 		return ((): any => {
-			log.debug("Looking for certificate '%s'", identityStr);
+			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			var identities = this.$server.identityStore.getIdentities().wait();
 
 			var result = this.findIdentityData(identityStr, identities, (ident) => ident.Alias);
 			if (!result) {
-				throw new Error(util.format("Could not find certificate named '%s' or was not given a valid index. List registered certificates with 'list-certificates' command.", identityStr));
+				this.$errors.fail({formatStr: "Could not find certificate named '%s' or was not given a valid index. List registered certificates with 'list-certificates' command.",
+					suppressCommandHelp: true }, identityStr);
 			} else {
 				return result;
 			}
@@ -77,12 +86,13 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public findProvision(provisionStr): IFuture<any> {
 		return ((): any => {
-			log.debug("Looking for provision '%s'", provisionStr);
+			this.$logger.debug("Looking for provision '%s'", provisionStr);
 			var provisions = this.$server.mobileprovisions.getProvisions().wait();
 			var result = this.findIdentityData(provisionStr, provisions, (ident) => ident.Name);
 
 			if (!result) {
-				throw new Error(util.format("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr));
+				this.$errors.fail({formatStr: "Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.",
+					suppressCommandHelp: true }, provisionStr);
 			} else {
 				return result;
 			}
