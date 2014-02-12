@@ -1,6 +1,7 @@
 ///<reference path="../../.d.ts"/>
 
 import ref = require("ref");
+import ffi = require("ffi");
 import os = require("os");
 import path = require("path");
 import iOSCore = require("./ios-core");
@@ -8,6 +9,7 @@ import Future = require("fibers/future");
 import util = require("util");
 import _ = require("underscore");
 import helpers = require("./../../helpers");
+import net = require("net");
 import MobileHelpers = require("./../mobile-helper");
 
 class MobileServices {
@@ -77,12 +79,13 @@ export class AfcClient implements Mobile.IAfcClient {
 	private afcConnection = null;
 
 	constructor(private service: number,
-				private mobileDevice: Mobile.IMobileDevice,
-				private $fs: IFileSystem) {
+		private mobileDevice: Mobile.IMobileDevice,
+		private $fs: IFileSystem,
+		private $errors: IErrors) {
 		var afcConnection = ref.alloc(ref.refType(ref.types.void));
 		var result = mobileDevice.afcConnectionOpen(this.service, 0, afcConnection);
 		if (result !== 0) {
-			throw "Unable to open apple file connection: " + result;
+			$errors.fail("Unable to open apple file connection: %s", result);
 		}
 
 		this.afcConnection = ref.deref(afcConnection);
@@ -95,7 +98,7 @@ export class AfcClient implements Mobile.IAfcClient {
 	mkdir(path: string) {
 		var result = this.mobileDevice.afcDirectoryCreate(this.afcConnection, path);
 		if (result !== 0) {
-			throw "Unable to make directory: " + path + " result is: " + result;
+			this.$errors.fail("Unable to make directory: %s. Result is %s", path, result);
 		}
 	}
 
@@ -103,7 +106,7 @@ export class AfcClient implements Mobile.IAfcClient {
 		var afcDirectoryRef = ref.alloc(ref.refType(ref.types.void));
 		var result = this.mobileDevice.afcDirectoryOpen(this.afcConnection, path, afcDirectoryRef);
 		if (result !== 0) {
-			throw "Unable to open AFC directory: " + path + result;
+			this.$errors.fail("Unable to open AFC directory: '%s' %s ", path, result);
 		}
 
 		var afcDirectoryValue = ref.deref(afcDirectoryRef);
@@ -170,10 +173,10 @@ export class AfcClient implements Mobile.IAfcClient {
 				target.write(data, data.length);
 			})
 			.on("error", (error) => {
-				throw new Error(error);
+				this.$errors.fail(error);
 			})
 			.on("end", function () {
-					target.close();
+				target.close();
 			});
 
 			this.$fs.futureFromEvent(reader, "close").wait();
@@ -184,60 +187,92 @@ export class AfcClient implements Mobile.IAfcClient {
 
 export class InstallationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
-				private $iOSCore: Mobile.IiOSCore,
-				private $mobileDevice: Mobile.IMobileDevice,
-				private $coreFoundation: Mobile.ICoreFoundation,
-				private logger: ILogger,
-				private $fs: IFileSystem) {
+		private $coreFoundation: Mobile.ICoreFoundation,
+		private $mobileDevice: Mobile.IMobileDevice,
+		private $fs: IFileSystem,
+		private $errors: IErrors) {
+	}
+
+	private static transferCallback() {
+
+	}
+
+	private static installCallback() {
+
 	}
 
 	public deployApplication(packageFile: string) {
-		var afcService = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
-		var afcClient = new AfcClient(afcService, this.$mobileDevice, this.$fs);
 
-		var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", _.last(packageFile.split(path.sep))));
+		if(helpers.isWindows()) {
+			var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
+			var afcClient = new AfcClient(service, this.$mobileDevice, this.$fs, this.$errors);
+			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
-		afcClient.transferPackage(packageFile, devicePath).wait();
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.INSTALLATION_PROXY);
+			afcClient.transferPackage(packageFile, devicePath).wait();
+			var plistService = new iOSCore.PlistService(service, this.$errors);
 
-		var plist = {
-			type: "dict",
-			value: {
-				"Command": {
-					type: "string",
-					value: "Install"
-				},
-				"PackagePath": {
-					type: "string",
-					value: devicePath
-				},
-				"ClientOptions": {
-					type: "dict",
-					value: {}
+			var plist = {
+				type: "dict",
+				value: {
+					"Command": {
+						type: "string",
+						value: "Install"
+					},
+					"PackagePath": {
+						type: "string",
+						value: devicePath
+					},
+					"ClientOptions": {
+						type: "dict",
+						value: {}
+					}
 				}
+			};
+
+			plistService.sendMessage(plist);
+			var reply = plistService.receiveMessage();
+
+			while (reply.indexOf("PercentComplete") > 0) {
+				reply = plistService.receiveMessage();
 			}
-		};
 
-		plistService.sendMessage(plist);
-		var reply = plistService.receiveMessage();
+			console.log("Successfully deployed on device %s", this.device.getIdentifier());
 
-		while (reply.indexOf("PercentComplete") > 0) {
-			reply = plistService.receiveMessage();
+		} else if(helpers.isDarwin()) {
+			var keys = ref.alloc(ref.refType(ref.types.void), this.$coreFoundation.createCFString("PackageType"));
+			var values = ref.alloc(ref.refType(ref.types.void), this.$coreFoundation.createCFString("Developer"));
+			var options = this.$coreFoundation.dictionaryCreate(null, keys, values, 1, this.$coreFoundation.kCFTypeDictionaryKeyCallBacks(), this.$coreFoundation.kCFTypeDictionaryValueCallBacks());
+
+			var am_device_install_application_callback = ffi.Function("void", [ref.refType(ref.types.void), ref.refType(ref.types.void)]);
+
+			var afcService = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
+			var normalizedPath = path.normalize(packageFile);
+			var resolvedPath = path.resolve(normalizedPath);
+
+			var result = this.$mobileDevice.deviceTransferApplication(afcService, this.$coreFoundation.createCFString(resolvedPath), null, am_device_install_application_callback.toPointer(InstallationProxyClient.transferCallback));
+			if(result !== 0) {
+				this.$errors.fail("Unable to transfer application: %s ", result);
+			}
+
+			var installationProxyService = this.device.startService(MobileServices.INSTALLATION_PROXY);
+			result = this.$mobileDevice.deviceInstallApplication(installationProxyService, this.$coreFoundation.createCFString(packageFile), options, am_device_install_application_callback.toPointer(InstallationProxyClient.installCallback));
+			if (result !== 0) {
+				this.$errors.fail("Unable to install application: %s", result);
+			}
 		}
-
-		console.log("Successfully deployed on device %s", this.device.getIdentifier());
 	}
 }
 $injector.register("installationProxyClient", InstallationProxyClient);
 
 export class NotificationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
-		private $iOSCore: Mobile.IiOSCore ) {
+		private $errors: IErrors) {
 
 	}
 
 	postNotification(notificationName: string) {
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.NOTIFICATION_PROXY);
+		var service = this.device.startService(MobileServices.NOTIFICATION_PROXY);
+		var plistService = new iOSCore.PlistService(service, this.$errors);
 
 		var result = plistService.sendMessage({
 			type: "dict",
@@ -256,17 +291,17 @@ export class NotificationProxyClient {
 		return result;
 	}
 }
-$injector.register("notificationProxyClient", NotificationProxyClient);
 
 export class HouseArrestClient implements Mobile.IHouseArressClient {
 	constructor(private device: Mobile.IIOSDevice,
-		private $iOSCore: Mobile.IiOSCore,
 		private $mobileDevice: Mobile.IMobileDevice,
-		private $fs: IFileSystem) {
+		private $fs: IFileSystem,
+		private $errors: IErrors) {
 	}
 
 	private getAfcClientCore(device, command, applicationIdentifier: string): Mobile.IAfcClient {
-		var plistService = new iOSCore.PlistService(this.device, this.$iOSCore, MobileServices.HOUSE_ARREST);
+		var service = this.device.startService(MobileServices.HOUSE_ARREST);
+		var plistService = new iOSCore.PlistService(service, this.$errors);
 
 		var plist = {
 			type: "dict",
@@ -287,14 +322,14 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 		var reply = plistService.receiveMessage();
 
 		if (reply.indexOf("Error") > 0) {
-			console.log(reply);
+			this.$errors.fail(reply);
 		}
 
 		if (reply.indexOf("Status") < 0 || reply.indexOf("Complete") < 0) {
-			throw "Unable to start house arrest service";
+			this.$errors.fail("Unable to start house arrest service");
 		}
 
-		return new AfcClient(plistService.Service, this.$mobileDevice, this.$fs);
+		return new AfcClient(service, this.$mobileDevice, this.$fs, this.$errors);
 	}
 
 	public getAfcClientForAppDocuments(applicationIdentifier: string): Mobile.IAfcClient {
@@ -305,36 +340,49 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 		return this.getAfcClientCore(this.device, "VendContainer", applicationIdentifier);
 	}
 }
-$injector.register("houseArrestClient", HouseArrestClient);
 
 export class IOSSyslog {
-	private static BYTES_TO_READ = 1024;
 	private service;
 	private socket;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
 
 	constructor(private device: Mobile.IIOSDevice,
-		private $iOSCore: Mobile.IiOSCore,
-		private $fs: IFileSystem) {
+		private $errors: IErrors,
+		private $logger: ILogger) {
 		this.service = device.startService(MobileServices.SYSLOG);
-		this.socket = new iOSCore.WinSocketWrapper(this.service, $iOSCore);
+		if(helpers.isWindows()) {
+			this.socket = new iOSCore.WinSocketWrapper(this.service, $errors);
+		} else if(helpers.isDarwin()) {
+			this.socket = new net.Socket({ fd: this.service });
+		}
 	}
 
-	public read() {
-		var data = this.socket.read(IOSSyslog.BYTES_TO_READ);
-		while (data !== null && data !== undefined) {
+	public read(): void {
+		var printData = (data: NodeBuffer) => {
 			var output = ref.readCString(data, 0);
 			if(this.matchRegex.test(output)) {
-				console.log(output);
+				this.$logger.out(output);
 			}
-			data = this.socket.read(IOSSyslog.BYTES_TO_READ);
+		};
+
+		if(helpers.isWindows()) {
+			this.socket.readAll(printData);
+			this.disconnect();
+		} else if(helpers.isDarwin()) {
+			this.socket
+				.on("data", (data) => {
+					printData(data);
+				})
+				.on("end", () => {
+					this.disconnect();
+				})
+				.on("error", (error) => {
+					this.$errors.fail(error);
+				});
 		}
 	}
 
-	public disconnect() {
-		if (helpers.isWindows()) {
-			this.socket.close();
-		}
+	public disconnect(): void {
+		this.socket.close();
 	}
 }
-$injector.register("iOSSyslog", IOSSyslog);

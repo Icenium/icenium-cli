@@ -133,6 +133,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			Future.wait(listers);
 		}).future<void>()();
 	}
+
 	public hasDevices(platform?: string): boolean {
 		if (!platform) {
 			return this.getDevices().length === 0;

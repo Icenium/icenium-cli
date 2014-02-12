@@ -6,18 +6,18 @@ import _ = require("underscore");
 import iOSProxyServices = require("./ios-proxy-services");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");
+import helpers = require("./../../helpers");
 
 export class IOSDevice implements Mobile.IIOSDevice {
 
 	private identifier: string = null;
+	private voidPtr = ref.refType(ref.types.void);
 
 	constructor(private devicePointer,
-				private $iOSCore: Mobile.IiOSCore,
-				private $coreFoundation: Mobile.ICoreFoundation,
-				private $mobileDevice: Mobile.IMobileDevice,
-				private $logger: ILogger,
-				private $fs: IFileSystem) {
-	}
+		private $coreFoundation: Mobile.ICoreFoundation,
+		private $mobileDevice: Mobile.IMobileDevice,
+		private $errors: IErrors,
+		private $injector: IInjector) { }
 
 	public getPlatform(): string {
 		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS].toLowerCase();
@@ -41,7 +41,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 
 	private validateResult(result: number, error: string) {
 		if (result != 0) {
-			throw error;
+			this.$errors.fail(error);
 		}
 	}
 
@@ -93,7 +93,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 			this.startSession();
 			try {
 				var socket = ref.alloc("int");
-				var result = this.$mobileDevice.deviceStartService(this.devicePointer, this.$coreFoundation.createCFString(serviceName), socket, null);
+				var result = this.$mobileDevice.deviceStartService(this.devicePointer, this.$coreFoundation.createCFString(serviceName), socket);
 				this.validateResult(result, "Unable to start service");
 				return ref.deref(socket);
 			} finally {
@@ -105,23 +105,23 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public deploy(packageFile: string, packageName: string): void {
-		var installationProxy = new iOSProxyServices.InstallationProxyClient(this, this.$iOSCore, this.$mobileDevice, this.$coreFoundation, this.$logger, this.$fs);
+		var installationProxy = this.$injector.resolve(iOSProxyServices.InstallationProxyClient, {device: this });
 		installationProxy.deployApplication(packageFile);
 	}
 
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
-		var houseArrestClient: Mobile.IHouseArressClient = new iOSProxyServices.HouseArrestClient(this, this.$iOSCore, this.$mobileDevice, this.$fs);
-		var afcClientForAppDocuments: Mobile.IAfcClient = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
+		var houseArrestClient  = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
+		var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 		afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
-		var notificationProxyClient: Mobile.INotificationProxyClient = new iOSProxyServices.NotificationProxyClient(this, this.$iOSCore);
+		var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
 		notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 	}
 
 	public openDeviceLogStream() {
-		var iOSSyslog = new iOSProxyServices.IOSSyslog(this, this.$iOSCore, this.$fs);
-		iOSSyslog.read();
+		var iOSSystemLog = this.$injector.resolve(iOSProxyServices.IOSSyslog, {device: this});
+		iOSSystemLog.read();
 	}
 }
 

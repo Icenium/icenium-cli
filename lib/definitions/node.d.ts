@@ -645,7 +645,7 @@ declare module "net" {
     }
 
     export var Socket: {
-        new (options?: { fd?: string; type?: string; allowHalfOpen?: boolean; }): NodeSocket;
+        new (options?: { fd?: number; type?: string; allowHalfOpen?: boolean; }): NodeSocket;
     };
 
     export class Server extends NodeSocket {

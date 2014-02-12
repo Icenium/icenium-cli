@@ -52,11 +52,9 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 	private static ADNCI_MSG_CONNECTED: number = 1;
 	private static ADNCI_MSG_DISCONNECTED: number = 2;
 
-	constructor(private $iOSCore: Mobile.IiOSCore,
-		private $coreFoundation: Mobile.ICoreFoundation,
+	constructor(private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
-		private $logger: ILogger,
-		private $fs: IFileSystem) {
+		private $injector: IInjector) {
 		super();
 	}
 
@@ -99,23 +97,23 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 	}
 
 	private startRunLoopWithTimer(timeout: number): void {
-		var kCFRunLoopCommonModes: NodeBuffer = this.$coreFoundation.getkCFRunLoopCommonModes();
+		var kCFRunLoopDefaultMode = this.$coreFoundation.kCFRunLoopDefaultMode();
 		var timer: NodeBuffer = null;
 
 		if(timeout > 0) {
 			timer = this.$coreFoundation.runLoopTimerCreate(null, this.$coreFoundation.absoluteTimeGetCurrent() + timeout, 0, 0, 0, CoreTypes.CoreTypes.cf_run_loop_timer_callback.toPointer(IOSDeviceDiscovery.timerCallback), null);
-			this.$coreFoundation.runLoopAddTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopCommonModes);
+			this.$coreFoundation.runLoopAddTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
 		}
 
 		this.$coreFoundation.runLoopRun();
 
 		if(timeout > 0) {
-			this.$coreFoundation.runLoopRemoveTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopCommonModes);
+			this.$coreFoundation.runLoopRemoveTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
 		}
 	}
 
 	private createAndAddDevice(devicePointer): void {
-		var device: IOSDevice.IOSDevice = new IOSDevice.IOSDevice(devicePointer, this.$iOSCore, this.$coreFoundation, this.$mobileDevice, this.$logger, this.$fs);
+		var device = this.$injector.resolve(IOSDevice.IOSDevice, {devicePointer: devicePointer});
 		this.addDevice(device);
 	}
 }
@@ -125,7 +123,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static ADB = path.join(__dirname, "../../../", "/resources/platform-tools/android/adb");
 
 	constructor(private $logger: ILogger,
-		private $childProcess: IChildProcess) {
+				private $childProcess: IChildProcess) {
 		super();
 	}
 

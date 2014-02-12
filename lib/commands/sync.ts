@@ -25,7 +25,7 @@ export class SyncCommand implements ICommand {
 		}
 
 		var projectDir = this.$project.getProjectDir();
-		var appIdentifier = this.$project.projectData().AppIdentifier;
+		var appIdentifier = this.$project.projectData.AppIdentifier;
 
 		if (this.$devicesServices.hasDevices(platform)) {
 			if (options.live) {

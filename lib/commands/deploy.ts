@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 
 import options = require("./../options");
-import fs = require("fs");
 import util = require("util");
 import MobileHelper = require("./../mobile/mobile-helper");
 import Future = require("fibers/future");
@@ -10,8 +9,8 @@ export class DeployCommand implements ICommand {
     constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
 		private $identityManager: Server.IIdentityManager,
-		private $project: Project.IProject) {
-	}
+		private $fs: IFileSystem,
+		private $project: Project.IProject) { }
 
 	public execute(args: string[]): void {
 		var platform = args[0];
@@ -34,9 +33,9 @@ export class DeployCommand implements ICommand {
 			var packageFile = packageDefs[0].localFile;
 
 			this.$logger.debug("Ready to deploy %s", packageDefs);
-			this.$logger.debug("File is %d bytes", fs.statSync(packageFile).size);
+			this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
 
-			var packageName = this.$project.projectData().AppIdentifier;
+			var packageName = this.$project.projectData.AppIdentifier;
 
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => { device.deploy(packageFile, packageName); }).future<void>()();

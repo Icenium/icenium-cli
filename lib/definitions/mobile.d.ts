@@ -32,7 +32,6 @@ declare module Mobile {
 	interface IiOSCore {
 		getCoreFoundationLibrary(): any;
 		getMobileDeviceLibrary(): any;
-		getWinSocketLibrary(): any;
 	}
 
 	interface ICoreFoundation {
@@ -41,13 +40,17 @@ declare module Mobile {
 		stringCreateWithCString(alloc: NodeBuffer, str: string, encoding: number): NodeBuffer;
 		dictionaryGetValue(theDict: NodeBuffer, value: NodeBuffer): NodeBuffer;
 		numberGetValue(number: NodeBuffer, theType: number, valuePtr: NodeBuffer): boolean;
-		getkCFRunLoopCommonModes(): NodeBuffer;
+		kCFRunLoopCommonModes(): NodeBuffer;
+		kCFRunLoopDefaultMode(): NodeBuffer;
+		kCFTypeDictionaryKeyCallBacks(): NodeBuffer;
+		kCFTypeDictionaryValueCallBacks(): NodeBuffer;
 		runLoopTimerCreate(allocator: NodeBuffer, fireDate: number, interval: number, flags: number, order: number, callout: NodeBuffer, context: any): NodeBuffer;
 		absoluteTimeGetCurrent(): number;
 		runLoopAddTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void;
 		runLoopRemoveTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void;
 		runLoopStop(r1: any): void;
 		convertCFStringToCString(cfstr);
+		dictionaryCreate(allocator: NodeBuffer, keys: NodeBuffer, values: NodeBuffer, count: number, dictionaryKeyCallbacks: NodeBuffer, dictionaryValueCallbacks: NodeBuffer): NodeBuffer;
 		getTypeID(type: NodeBuffer): number;
 		stringGetCString(theString: NodeBuffer, buffer: NodeBuffer, bufferSize: number, encoding: number): boolean;
 		stringGetLength(theString: NodeBuffer): number;
@@ -65,7 +68,9 @@ declare module Mobile {
 		deviceStartSession(devicePointer: NodeBuffer): number;
 		deviceStopSession(devicePointer: NodeBuffer): number;
 		deviceDisconnect(devicePointer: NodeBuffer): number;
-		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer, p1: NodeBuffer);
+		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer);
+		deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
+		deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
 		afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number;
 		afcConnectionClose(afcConnection: NodeBuffer): number;
 		afcDirectoryCreate(afcConnection: NodeBuffer, path: string): number;

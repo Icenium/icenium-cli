@@ -58,6 +58,7 @@ function annotate(fn) {
 
 var _ = <UnderscoreStatic> require("underscore");
 var util = require("util");
+var assert = require("assert");
 
 
 var indent = "";
@@ -131,17 +132,25 @@ export class Yok implements IInjector {
 		return command;
 	}
 
-	public resolve(param: any): any {
+	public resolve(param: any, ctorArguments?: {[key: string]: any}): any {
 		if (_.isFunction(param)) {
-			return this.resolveConstructor(<Function> param);
+			return this.resolveConstructor(<Function> param, ctorArguments);
 		} else {
+			assert.ok(!ctorArguments);
 			return this.resolveByName(<string> param);
 		}
 	}
 
-	private resolveConstructor(ctor: Function): any {
+	private resolveConstructor(ctor: Function, ctorArguments?:  {[key: string]: any}): any {
 		annotate(ctor);
-		var resolvedArgs = ctor.$inject.args.map(paramName => this.resolve(paramName));
+
+		var resolvedArgs = ctor.$inject.args.map(paramName => {
+			if(ctorArguments && ctorArguments.hasOwnProperty(paramName)) {
+				return ctorArguments[paramName];
+			} else {
+				return this.resolve(paramName);
+			}
+		});
 
 		var name = ctor.$inject.name;
 		if (name && name[0] === name[0].toUpperCase()) {
