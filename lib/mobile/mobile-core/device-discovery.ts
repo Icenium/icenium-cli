@@ -11,6 +11,7 @@ import CoreTypes = require("./../ios/ios-core");
 import Signal = require("./../../events/signal");
 import Future = require("fibers/future");
 import child_process = require("child_process");
+import helpers = require("./../../helpers");
 
 export class DeviceDiscovery implements Mobile.IDeviceDiscovery {
 	private devices: {[key: string]: Mobile.IDevice} = {};
@@ -120,15 +121,25 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 $injector.register("iOSDeviceDiscovery", IOSDeviceDiscovery);
 
 export class AndroidDeviceDiscovery extends DeviceDiscovery {
-	private static ADB = path.join(__dirname, "../../../", "/resources/platform-tools/android/adb");
+	private static adb;
+	private static get Adb() {
+		if (!AndroidDeviceDiscovery.adb) {
+			if (helpers.isWindows()) {
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/windows/adb");
+			} else if (helpers.isDarwin()) {
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/osx/adb");
+			}
+		}
+		return AndroidDeviceDiscovery.adb;
+	}
 
-	constructor(private $logger: ILogger,
-				private $childProcess: IChildProcess) {
+	constructor(private $childProcess: IChildProcess,
+		private $injector: IInjector){
 		super();
 	}
 
 	private createAndAddDevice(deviceIdentifier): void {
-		var device = new AndroidDevice.AndroidDevice(deviceIdentifier, AndroidDeviceDiscovery.ADB, this.$logger, this.$childProcess);
+		var device = this.$injector.resolve(AndroidDevice.AndroidDevice, { identifier: deviceIdentifier, adb: AndroidDeviceDiscovery.Adb });
 		this.addDevice(device);
 	}
 
@@ -136,7 +147,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 		return(()=> {
 			this.ensureAdbServerStarted().wait();
 
-			var requestAllDevicesCommand = util.format("%s devices", AndroidDeviceDiscovery.ADB);
+			var requestAllDevicesCommand = util.format("%s devices", AndroidDeviceDiscovery.Adb);
 			var result = this.$childProcess.exec(requestAllDevicesCommand).wait();
 
 			var devices = result.toString().split(os.EOL).slice(1)
@@ -151,7 +162,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	}
 
 	private ensureAdbServerStarted(): IFuture<void> {
-		var startAdbServerCommand = util.format("%s start-server", AndroidDeviceDiscovery.ADB);
+		var startAdbServerCommand = util.format("%s start-server", AndroidDeviceDiscovery.Adb);
 		return this.$childProcess.exec(startAdbServerCommand);
 	}
 }

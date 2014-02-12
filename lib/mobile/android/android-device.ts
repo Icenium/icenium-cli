@@ -51,7 +51,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		return(() => {
 			var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
 			this.$childProcess.exec(installCommand).wait();
-			this.startPackageOnDevice(packageName);
+			this.startPackageOnDevice(packageName).wait();
 			console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
 	}
@@ -66,7 +66,6 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
 		return(() => {
 			var pushFileCommand = this.composeCommand(util.format("push %s %s", localPath, devicePath));
@@ -77,7 +76,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	private sendBroadcastToDevice(action): Future<void> {
 		return(() => {
 			var broadcastCommand = this.composeCommand(util.format("shell am broadcast -a \"%s\"", action));
-			var result = this.$childProcess.exec(broadcastCommand).wait();
+			this.$childProcess.exec(broadcastCommand).wait();
 		}).future<void>()();
 	}
 
@@ -93,7 +92,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
 		var search = this.spawnTextSearch("telerik|icenium");
 
-		adbLogcat.stdout.on("data", function (data) {
+		adbLogcat.stdout.on("data", (data) => {
 			search.stdin.write(data);
 		});
 
@@ -101,23 +100,22 @@ export class AndroidDevice implements Mobile.IDevice {
 			this.$logger.trace("ADB logcat stderr: " + data);
 		});
 
-		adbLogcat.on("close", function (code) {
+		adbLogcat.on("close", (code) => {
 			if (code !== 0) {
 				this.$logger.trace("ADB process exited with code " + code);
 			}
 			search.stdin.end();
 		});
 
-		search.stdout.on("data", function (data) {
-			var content = data.toString();
-			console.log(data.toString());
+		search.stdout.on("data", (data) => {
+			this.$logger.out(data.toString());
 		});
 
-		search.stderr.on("data", function (data) {
+		search.stderr.on("data", (data) => {
 			this.$logger.trace("grep stderr: " + data);
 		});
 
-		search.on("close", function (code) {
+		search.on("close", (code) => {
 			if (code !== 0) {
 				this.$logger.trace("grep process exited with code " + code);
 			}

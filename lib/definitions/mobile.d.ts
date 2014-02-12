@@ -7,7 +7,7 @@ declare module Mobile {
 		getDisplayName(): string;
 		getPlatform(): string;
 		getDeviceProjectPath(appIdentifier: string): string;
-		deploy(packageFile: string, packageName: string): void;
+		deploy(packageFile: string, packageName: string): IFuture<void>;
 		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: string): void;
 		openDeviceLogStream(): void;
 	}
@@ -20,7 +20,7 @@ declare module Mobile {
 		deviceFound: ISignal;
 		deviceLost: ISignal;
 		startLookingForDevices?(): IFuture<void>;
-    }
+	}
 
 	interface IDevicesServices {
 		executeOnAllConnectedDevices(action:  (device: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;

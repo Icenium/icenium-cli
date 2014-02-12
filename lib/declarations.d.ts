@@ -116,6 +116,7 @@ declare module Project {
 		getProjectDir(): string;
 		enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[];
 		isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean;
+		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
 		importProject(): IFuture<void>;
 		deployToIon(): IFuture<void>;
