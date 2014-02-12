@@ -126,7 +126,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 		if (!AndroidDeviceDiscovery.adb) {
 			if (helpers.isWindows()) {
 				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "windows", "adb");
-			} else if (helpers.isOsX()) {
+			} else if (helpers.isDarwin()) {
 				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "osx", "adb");
 			}
 		}

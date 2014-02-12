@@ -140,10 +140,6 @@ export function registerCommand(module: string, commandName: string, executor: (
 	$injector.registerCommand(commandName, factory);
 }
 
-export function isOsX() {
-	return process.platform.toUpperCase() === "DARWIN";
-}
-
 export function isWindows() {
 	return /^win/.test(process.platform);
 }
@@ -151,6 +147,7 @@ export function isWindows() {
 export function isWindows64() {
 	return process.arch === "x64" && process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
 }
+
 export function isWindows32() {
 	return isWindows() && !isWindows64();
 }
