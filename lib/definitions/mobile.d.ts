@@ -56,6 +56,17 @@ declare module Mobile {
 		stringGetLength(theString: NodeBuffer): number;
 		dictionaryGetCount(theDict: NodeBuffer): number;
 		createCFString(str: string): NodeBuffer;
+		dictToPlistEncoding(dict: {[key: string]: {}}, format: number);
+		dictFromPlistEncoding(s, format?: number);
+		dictionaryGetTypeID(): number;
+		stringGetTypeID(): number;
+		dataGetTypeID():  number;
+		numberGetTypeID(): number;
+		booleanGetTypeID(): number;
+		arrayGetTypeID(): number;
+		dateGetTypeID(): number;
+		setGetTypeID(): number;
+		dictionaryGetKeysAndValues(dictionary: NodeBuffer, keys: NodeBuffer, values: NodeBuffer): void;
 	}
 
 	interface IMobileDevice {
@@ -74,7 +85,7 @@ declare module Mobile {
 		afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number;
 		afcConnectionClose(afcConnection: NodeBuffer): number;
 		afcDirectoryCreate(afcConnection: NodeBuffer, path: string): number;
-		afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, timeout: number, afcFileRef: NodeBuffer): number;
+		afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, afcFileRef: NodeBuffer): number;
 		afcFileRefClose(afcConnection: NodeBuffer, afcFileRef: number): number;
 		afcFileRefWrite(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number;
 		afcFileRefRead(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number;
@@ -91,7 +102,7 @@ declare module Mobile {
 
 	interface PlistService {
 		receiveMessage(): string;
-		sendMessage(data): number;
+		sendMessage(data): void;
     }
 
 	interface IInstallationProxyClient {
@@ -115,5 +126,12 @@ declare module Mobile {
 		getLocalPath(): string;
 		getDevicePath(): string;
 		getRelativeToProjectBasePath(): string;
+	}
+
+	interface IiOSDeviceSocket {
+		receiveMessage(): IFuture<string>;
+		readSystemLog(action: (data: string) => void): void;
+		write(message: string): void;
+		close(): void;
 	}
 }
