@@ -61,6 +61,7 @@
 /// <reference path="remote-projects.ts" />
 /// <reference path="server-api.d.ts" />
 /// <reference path="server-api.ts" />
+/// <reference path="server-config.ts" />
 /// <reference path="service-util.ts" />
 /// <reference path="services/cordova-plugins.ts" />
 /// <reference path="signing-identity/cryptographic-identity-store-service.ts" />
