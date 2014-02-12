@@ -1,36 +1,47 @@
 ///<reference path=".d.ts"/>
+
+"use strict";
+
 import Fiber = require("fibers");
 import Future = require("fibers/future");
+import path = require("path");
+import util = require("util");
 
-(function() {
-	"use strict";
-	require("./extensions");
-	require("./bootstrap");
-	var util = require("util");
-	var options = require("./options");
+require("./extensions");
+require("./bootstrap");
+var options = require("./options");
 
-	function getCommandsService():ICommandsService {
-		return $injector.resolve("commandsService");
-	}
+class CommandDispatcher {
+	constructor(private $fs: IFileSystem,
+		private $logger: ILogger,
+		private $injector: IInjector,
+		private $commandsService: ICommandsService) {}
 
-	function dispatchCommandInFiber() {
-		var fiber = Fiber(dispatchCommand);
-		global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
-		fiber.run();
-	}
-
-	function dispatchCommand() {
-		var commandName = getCommandName();
-		var commandArguments = getCommandArguments();
-
-		if (!getCommandsService().executeCommand(commandName, commandArguments)) {
-			$injector.resolve("logger").fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+	public dispatchCommand() {
+		if (options.version) {
+			var pkg: any = this.$fs.readJson(path.join(__dirname, "../package.json")).wait();
+			console.log(pkg.version);
+			return;
 		}
 
-		Future.assertNoFutureLeftBehind();
+		var commandName = this.getCommandName();
+		var commandArguments = this.getCommandArguments();
+
+		if (options.help) {
+			commandArguments.unshift(commandName);
+			commandName = "help";
+		}
+
+		if (!this.$commandsService.executeCommand(commandName, commandArguments)) {
+			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+		}
 	}
 
-	function getCommandName(): string {
+	public completeCommand(): void {
+		this.$commandsService.completeCommand();
+	}
+
+	private getCommandName(): string {
 		var remaining = options.argv.remain;
 		if (remaining.length > 0) {
 			return remaining[0].toLowerCase();
@@ -38,17 +49,23 @@ import Future = require("fibers/future");
 		return "help";
 	}
 
-	function getCommandArguments(): string[] {
+	private getCommandArguments(): string[] {
 		var remaining = options.argv.remain;
 		if (remaining.length > 1) {
 			return remaining.slice(1);
 		}
 		return [];
 	}
+}
 
+var fiber = Fiber(() => {
+	var commandDispatcher = $injector.resolve(CommandDispatcher);
 	if (process.argv[2] === "completion") {
-		getCommandsService().completeCommand();
+		commandDispatcher.completeCommand();
 	} else {
-		dispatchCommandInFiber();
+		commandDispatcher.dispatchCommand();
 	}
-})();
+	Future.assertNoFutureLeftBehind();
+});
+global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
+fiber.run();

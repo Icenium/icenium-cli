@@ -1,7 +1,7 @@
 {
   "name": "appbuilder-cli",
   "preferGlobal": true,
-  "version": "0.1.0",
+  "version": "2.0.0",
   "author": "Telerik <icenium@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
