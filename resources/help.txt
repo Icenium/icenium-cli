@@ -7,6 +7,7 @@ Commands:
     help <command>           Shows additional information about the commands in this list.
     login                    Logs you in Telerik Platform.
     logout                   Logs you out from Telerik Platform
+    user                     Prints information about the currently logged in user.
     create                   Creates a new project from template.
     list-provisions          Lists all configured provisioning profiles for code signing iOS applications.
     list-certificates        Lists all configured certificates for code signing iOS applications.
@@ -255,4 +256,11 @@ Usage:
 <ConfigurationFile> can be one of the following: "android-manifest", "android-config", "ios-info" and "ios-config".
 Opens the given file for editing and creates it in your project directory if it didn't already exist.
 
+--[/]--
+
+--[user]--
+Usage:
+	$ appbuilder user
+
+Prints information about the currently logged in user and details about their license.
 --[/]--

@@ -13,6 +13,7 @@
 /// <reference path="commands/open-device-log-stream.ts" />
 /// <reference path="commands/simulate.ts" />
 /// <reference path="commands/sync.ts" />
+/// <reference path="commands/user-status.ts" />
 /// <reference path="config.ts" />
 /// <reference path="declarations.d.ts" />
 /// <reference path="definitions/Q.d.ts" />
