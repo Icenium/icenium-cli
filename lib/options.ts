@@ -19,7 +19,9 @@ var knownOpts:any = {
 		"live": Boolean,
 		"device": String,
 		"file": String,
-		"no-livesync": String
+		"no-livesync": String,
+		"version": Boolean,
+		"help": Boolean
 	},
 	shorthands = {
 		"v" : ["--verbose"],

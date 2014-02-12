@@ -1,6 +1,7 @@
 ///<reference path=".d.ts"/>
 import Fiber = require("fibers");
 import Future = require("fibers/future");
+import path = require("path");
 
 (function() {
 	"use strict";
@@ -14,20 +15,33 @@ import Future = require("fibers/future");
 	}
 
 	function dispatchCommandInFiber() {
-		var fiber = Fiber(dispatchCommand);
+		var fiber = Fiber(() => {
+			dispatchCommand();
+			Future.assertNoFutureLeftBehind();
+		});
 		global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
 		fiber.run();
 	}
 
 	function dispatchCommand() {
+		if (options.version) {
+			var $fs: IFileSystem = $injector.resolve("fs");
+			var pkg: any = $fs.readJson(path.join(__dirname, "../package.json")).wait();
+			console.log(pkg.version);
+			return;
+		}
+
 		var commandName = getCommandName();
 		var commandArguments = getCommandArguments();
+
+		if (options.help) {
+			commandArguments.unshift(commandName);
+			commandName = "help";
+		}
 
 		if (!getCommandsService().executeCommand(commandName, commandArguments)) {
 			$injector.resolve("logger").fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
 		}
-
-		Future.assertNoFutureLeftBehind();
 	}
 
 	function getCommandName(): string {
