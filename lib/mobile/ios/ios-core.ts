@@ -486,7 +486,7 @@ export class PlistService {
 		if(helpers.isWindows()) {
 			this.socket = new WinSocketWrapper(this.service, this.$errors);
 		} else if(helpers.isDarwin()) {
-			this.socket = new net.Socket({ fd: this.service, writeable: true, readable: true });
+			this.socket = new net.Socket({ fd: this.service });
 		}
 	}
 
