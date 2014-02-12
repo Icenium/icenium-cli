@@ -125,21 +125,21 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static get Adb() {
 		if (!AndroidDeviceDiscovery.adb) {
 			if (helpers.isWindows()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "windows", "adb");
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/windows/adb");
 			} else if (helpers.isDarwin()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, "..", "..", "..", "resources", "platform-tools", "android", "osx", "adb");
+				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/osx/adb");
 			}
 		}
 		return AndroidDeviceDiscovery.adb;
 	}
 
-	constructor(private $logger: ILogger,
-				private $childProcess: IChildProcess) {
+	constructor(private $childProcess: IChildProcess,
+		private $injector: IInjector){
 		super();
 	}
 
 	private createAndAddDevice(deviceIdentifier): void {
-		var device = new AndroidDevice.AndroidDevice(deviceIdentifier, AndroidDeviceDiscovery.Adb, this.$logger, this.$childProcess);
+		var device = this.$injector.resolve(AndroidDevice.AndroidDevice, { identifier: deviceIdentifier, adb: AndroidDeviceDiscovery.Adb });
 		this.addDevice(device);
 	}
 
