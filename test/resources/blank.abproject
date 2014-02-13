@@ -3,7 +3,7 @@
 	"projectVersion": 1,
 	"AppIdentifier": "com.telerik.Test",
 	"ProjectGuid": "",
-	"iOSDisplayName": "Test",
+	"DisplayName": "Test",
 	"BundleVersion": "1.0",
 	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [
@@ -54,6 +54,6 @@
 	"AndroidHardwareAcceleration": "false",
 	"AndroidVersionCode": "1",
 	"iOSStatusBarStyle": "Default",
-	"iOSDeviceFamily": "1;2",
+	"iOSDeviceFamily": ["1", "2"],
 	"iOSBackgroundMode": []
 }

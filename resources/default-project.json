@@ -3,7 +3,7 @@
 	"projectVersion" : 1,
 	"AppIdentifier": "",
 	"ProjectGuid": "",
-	"iOSDisplayName": "",
+	"DisplayName": "",
 	"BundleVersion": "",
 	"FrameworkVersion": "",
 	"CorePlugins": [],
@@ -12,6 +12,6 @@
 	"AndroidHardwareAcceleration": "false",
 	"AndroidVersionCode": "1",
 	"iOSStatusBarStyle": "",
-	"iOSDeviceFamily": "1;2",
+	"iOSDeviceFamily": ["1", "2"],
 	"iOSBackgroundMode": []
 }

@@ -66,8 +66,10 @@ describe("project integration tests", function() {
 
 			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
 			for (var key in testProperties) {
-				if (key != "ProjectGuid") {
+				if (key !== "ProjectGuid") {
 					assert.deepEqual(testProperties[key], correctProperties[key]);
+				} else {
+					assert.ok(testProperties[key]);
 				}
 			}
 		});
@@ -117,9 +119,9 @@ describe("project unit tests", function() {
 
 	describe("updateProjectProperty", function() {
 		it("sets unconstrained string property", function() {
-			var projectData = {iOSDisplayName: "wrong"};
-			project.updateProjectProperty(projectData, "set", "iOSDisplayName", ["fine"]);
-			assert.equal("fine", projectData.iOSDisplayName);
+			var projectData = {DisplayName: "wrong"};
+			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]);
+			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", function() {
