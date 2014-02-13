@@ -12,7 +12,7 @@ import helpers = require("./helpers");
 export function createServer(configuration): http.Server {
 	if (!configuration.catchAll) {
 		configuration.catchAll = function(request, response) {
-			response.writeHead(404);
+			response.statusCode = 404;
 			response.end();
 		};
 	}
@@ -22,15 +22,13 @@ export function createServer(configuration): http.Server {
 
 		log.debug("Serving '%s'", uriPath);
 
+		response.setHeader("Connection", "close");
+
 		if (!configuration.routes[uriPath]) {
 			configuration.catchAll(request, response);
 		} else {
 			configuration.routes[uriPath](request, response);
 		}
-
-		response.on("finish", function() {
-			request.connection.destroy();
-		});
 	});
 }
 
@@ -48,7 +46,8 @@ export function serveFile(fileName): (request, response) => void {
 		log.debug("Returning '%s'", fileName);
 
 		var mimeType = mimeTypes[path.extname(fileName)];
-		response.writeHead(200, {"Content-Type": mimeType});
+		response.statusCode = 200;
+		response.setHeader("Content-Type", mimeType);
 
 		fs.createReadStream(fileName).pipe(response);
 	};
@@ -58,7 +57,14 @@ export function serveText(callback: () => string, mimeType: string) {
 	return function(request, response) {
 		var text = callback();
 		log.debug("Content-Type: '%s', Body: '%s'", mimeType, text);
-		response.writeHead(200, {"Content-Type": mimeType});
+		response.statusCode = 200;
+		response.setHeader("Content-Type", mimeType);
 		response.end(text);
 	};
+}
+
+export function redirect(response, targetUrl: string): void {
+	response.statusCode = 302;
+	response.setHeader("Location", targetUrl);
+	response.end();
 }
