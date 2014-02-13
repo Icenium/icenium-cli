@@ -555,14 +555,11 @@ export class Project implements Project.IProject {
 	}
 
 	private generateDefaultAppId(appName: string): string {
-		var projData = {};
-		try {
-			var appId = "com.telerik." + appName;
-			this.updateProjectProperty(projData, "set", "AppIdentifier", [appId]);
-			return appId;
-		} catch (ex) {
-			this.$logger.debug(ex);
-			return "com.telerik.myapp1";
+		var sanitizedName = _.filter(appName.split(""), (c) => /[a-zA-Z0-9]/.test(c)).join("");
+		if (sanitizedName) {
+			return "com.telerik." + sanitizedName;
+		} else {
+			return "com.telerik.myapp";
 		}
 	}
 
