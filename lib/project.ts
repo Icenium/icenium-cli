@@ -461,11 +461,13 @@ export class Project implements Project.IProject {
 
 				this.$logger.info(util.format("%s has been successfully created.", appname));
 			} else {
-				this.$logger.fatal("The requested template " + options.template + " does not exist.");
-				this.$logger.fatal("Available templates are:");
-				this.$config.TEMPLATE_NAMES.forEach(function(item) {
-					this.$logger.fatal(item);
+				var message =
+					["The requested template " + options.template + " does not exist.",
+					"Available templates are:"];
+				this.$config.TEMPLATE_NAMES.forEach((item) => {
+					message.push("  " + item);
 				});
+				this.$errors.fail({formatStr: message.join("\n"), suppressCommandHelp: true});
 			}
 		}).future<void>()();
 	}
