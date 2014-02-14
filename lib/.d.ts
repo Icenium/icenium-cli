@@ -10,6 +10,7 @@
 /// <reference path="commands/find-plugins.ts" />
 /// <reference path="commands/generate-server-api.ts" />
 /// <reference path="commands/help.ts" />
+/// <reference path="commands/itunes-connect.ts" />
 /// <reference path="commands/list-devices.ts" />
 /// <reference path="commands/open-device-log-stream.ts" />
 /// <reference path="commands/simulate.ts" />

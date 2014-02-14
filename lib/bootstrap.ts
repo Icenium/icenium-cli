@@ -79,7 +79,6 @@ $injector.require("androidDevice", "./mobile/android/android-device");
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
 $injector.require("prompter", "./prompter");
 
-$injector.requireCommand("user", "./commands/user-status");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("list-provisions", "./commands/cryptographic-identities");
@@ -91,3 +90,7 @@ $injector.requireCommand("export-certificate", "./commands/cryptographic-identit
 $injector.require("importCryptographicIdentityValidator", "./validators/cryptographic-identity-validators");
 $injector.requireCommand("import-certificate", "./commands/cryptographic-identities");
 
+$injector.requireCommand("user", "./commands/user-status");
+
+$injector.requireCommand("appstore-list", "./commands/itunes-connect");
+$injector.requireCommand("appstore-upload", "./commands/itunes-connect");
