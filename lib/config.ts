@@ -51,7 +51,7 @@ export class Configuration implements IConfiguration {
 		});
 
 		var configFileName = this.getConfigName(name);
-		return this.$fs.writeJson(configFileName, configNoFunctions);
+		return this.$fs.writeJson(configFileName, configNoFunctions, "\t");
 	}
 
 	private mergeConfig(config, mergeFrom) {

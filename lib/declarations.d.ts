@@ -165,6 +165,24 @@ interface IChildProcess {
 	spawn(command: string, args?: string[], options?: string[]): any;
 }
 
+interface IProjectData {
+	name: string;
+	projectVersion : number;
+	AppIdentifier: string;
+	ProjectGuid: string;
+	DisplayName: string;
+	BundleVersion: string;
+	FrameworkVersion: string;
+	CorePlugins: string[];
+	AndroidPermissions: string[];
+	DeviceOrientations: string[];
+	AndroidHardwareAcceleration: string;
+	AndroidVersionCode: string;
+	iOSStatusBarStyle: string;
+	iOSDeviceFamily: string[];
+	iOSBackgroundMode: string[];
+}
+
 interface IServerConfigurationData {
 	assemblyVersion: string;
 	applicationName: string;

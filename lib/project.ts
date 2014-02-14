@@ -88,7 +88,7 @@ $injector.register("buildService", BuildService);
 
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
-	public projectData: any;
+	public projectData: IProjectData;
 
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
@@ -194,7 +194,7 @@ export class Project implements Project.IProject {
 				ProjectGuid: this.projectData.ProjectGuid,
 				FrameworkVersion: this.projectData.FrameworkVersion,
 				BundleVersion: this.projectData.BundleVersion,
-				DeviceOrientations: this.projectData.DeviceOrientations,
+				DeviceOrientations: this.projectData.DeviceOrientations
 			};
 
 			if (platform === "Android") {
@@ -206,7 +206,7 @@ export class Project implements Project.IProject {
 				var result = this.beginBuild(buildProperties).wait();
 				return result;
 			} else if (platform === "iOS" ) {
-				buildProperties.iOSDisplayName = this.projectData.iOSDisplayName;
+				buildProperties.iOSDisplayName = this.projectData.DisplayName;
 				buildProperties.iOSDeviceFamily = this.projectData.iOSDeviceFamily;
 				buildProperties.iOSStatusBarStyle = this.projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = this.projectData.iOSBackgroundMode;
@@ -303,7 +303,7 @@ export class Project implements Project.IProject {
 				var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
 				packageDefs.forEach((def:any) => {
 					var liveSyncUrl = this.$buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
-				def.qrUrl = helpers.createQrUrl(liveSyncUrl);
+					def.qrUrl = helpers.createQrUrl(liveSyncUrl);
 
 					this.$logger.debug("QR URL is '%s'", def.qrUrl);
 				});
@@ -396,6 +396,12 @@ export class Project implements Project.IProject {
 			var projectDir = this.getProjectDir();
 			if (projectDir) {
 				this.projectData = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
+
+				var blob: any = this.projectData;
+				if (blob.hasOwnProperty("iOSDisplayName")) {
+					blob.DisplayName = blob.iOSDisplayName;
+					delete blob.iOSDisplayName;
+				}
 			}
 		}).future<void>()();
 	}
@@ -516,8 +522,8 @@ export class Project implements Project.IProject {
 		return options.path || process.cwd();
 	}
 
-	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any> {
-		return ((): any => {
+	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<void> {
+		return ((): void => {
 			properties = properties || {};
 
 			this.$fs.createDirectory(projectDir).wait();
@@ -526,18 +532,22 @@ export class Project implements Project.IProject {
 
 			var projectSchema = helpers.getProjectFileSchema();
 			Object.keys(properties).forEach(prop => {
-				if (projectSchema[prop]) {
+				if (projectSchema.hasOwnProperty(prop)) {
 					this.projectData[prop] = properties[prop]
 				}
 			});
 
 			this.projectData.name = projectName;
-			if (!this.projectData.iOSDisplayName) {
-				this.projectData.iOSDisplayName = projectName;
+			if (!this.projectData.DisplayName) {
+				this.projectData.DisplayName = projectName;
+			}
+
+			if (!this.projectData.ProjectGuid) {
+				this.projectData.ProjectGuid = this.generateProjectGuid();
 			}
 
 			this.saveProject().wait();
-		}).future<any>()();
+		}).future<void>()();
 	}
 
 	public createTemplateFolder(projectDir: string): IFuture<any> {
