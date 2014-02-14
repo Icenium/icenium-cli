@@ -341,7 +341,16 @@ export class Project implements Project.IProject {
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
 			this.validatePlatform(platform);
-			this.build(platform, this.getBuildConfiguration(), true, options.download).wait();
+
+			if (options.download && options.companion) {
+				this.$errors.fail("Cannot specify both --download and --companion options.");
+			}
+
+			if (options.companion) {
+				this.deployToIon(platform).wait();
+			} else {
+				this.build(platform, this.getBuildConfiguration(), true, options.download).wait();
+			}
 		}).future<void>()();
 	}
 
@@ -351,9 +360,13 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	public deployToIon(): IFuture<void> {
+	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
-			this.$logger.info("Deploying to Ion");
+			if (platform.toLowerCase() !== "ios") {
+				this.$errors.fail("The companion app is supported only on iOS.");
+			}
+
+			this.$logger.info("Deploying to AppBuilder companion app.");
 
 			this.importProject().wait();
 
@@ -365,8 +378,8 @@ export class Project implements Project.IProject {
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
 			this.showPackageQRCodes([{
-				platform: "Ion",
-				qrUrl: helpers.createQrUrl(fullDownloadPath),
+				platform: "AppBuilder companion app",
+				qrUrl: helpers.createQrUrl(fullDownloadPath)
 			}]).wait();
 		}).future<void>()();
 	}
@@ -735,7 +748,6 @@ export class Project implements Project.IProject {
 $injector.register("project", Project);
 
 helpers.registerCommand("project", "build", (project, args) => project.executeBuild(args[0]));
-helpers.registerCommand("project", "ion", (project, args) => project.deployToIon());
 helpers.registerCommand("project", "update", (project, args) => project.importProject());
 helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
 helpers.registerCommand("project", "deploy", (project, args) => project.deployToDevice(args[0]));
