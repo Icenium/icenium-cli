@@ -13,7 +13,6 @@ Commands:
     list-certificates        Lists all configured certificates for code signing iOS applications.
     list-devices             Lists all recognized connected devices.
     build                    Builds the project and produces a QR code for deploying the application package.
-    ion                      Produces a QR code for deployment in the Telerik AppBuilder companion app.
     deploy                   Deploys the project to a connected device.
     update                   Synchronizes the project with the cloud to enable LiveSync for remote devices.
     sync                     Synchronizes the latest changes in your project to connected devices.
@@ -109,7 +108,7 @@ Usage:
 
 Platform-specific examples:
     $ appbuilder build android
-    $ appbuilder build ios --certificate <index or name> --provision <index or name>
+    $ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
 
 Builds the project for the target platform and produces a QR code for deployment.
 
@@ -118,24 +117,22 @@ by index or name.
 Run list-provisions to list available provisioning profiles for code signing iOS applications. You can specify a 
 provisioning profile by index or name.
 
+You cannot specify both the --companion and --download options.
+
 Options:
     --download - If specified, downloads the application package to the .ab directory in the project directory, instead
-        of producing a QR code. Set this option when you build with provisioning profile and certificate for iOS 
-        development.
-    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
-        app. Must match the specified provisioning profile. You can specify a certificate by index or name.
-    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
-        your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
+        of producing a QR code. Set this option when you want to manually deploy the app package later.
+    --companion - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the
+        companion app, you don't need to specify a certificate or provision.
+    --certificate - Required when building for iOS unless the --companion switch is specified.
+        Sets the certificate that you want to use for code signing your iOS app. Must match the specified
+        provisioning profile. You can specify a certificate by index or name.
+    --provision - Required when building for iOS unless the --companion switch is specified. Sets the provisioning
+        profile that you want to use for code signing your iOS app. Must match the specified certificate. You can
+        specify a provisioning profile by index or name.
     --no-livesync - If specified, the app will not support the three-finger tap (iOS) or menu button press (Android)
         to sync with the cloud.
 
---[/]--
-
---[ion]--
-Usage:
-    $ appbuilder ion
-
-Produces a QR code for deployment in the Telerik AppBuilder companion app.
 --[/]--
 
 --[update]--

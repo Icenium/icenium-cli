@@ -119,7 +119,6 @@ declare module Project {
 		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
 		importProject(): IFuture<void>;
-		deployToIon(): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): void;
 		createNewProject(projectName: string): IFuture<void>;
