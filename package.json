@@ -8,7 +8,8 @@
     "appbuilder": "./bin/appbuilder.js"
   },
   "scripts": {
-    "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
+    "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/",
+    "postinstall": "node postinstall.js"
   },
   "main": "./lib/appbuilder-cli.js",
   "repository": {
