@@ -121,7 +121,7 @@ export class Project implements Project.IProject {
 
 			var dir = path.dirname(projectDir);
 			if (dir === projectDir) {
-				this.$logger.info("No project found at or above '%s'.", path.resolve("."));
+				this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
 				break;
 			}
 			projectDir = dir;
@@ -728,7 +728,7 @@ export class Project implements Project.IProject {
 
 	private ensureProject() {
 		if (!this.projectData) {
-			helpers.abort("Not in a project folder.");
+			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}
 	}
 }
