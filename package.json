@@ -8,6 +8,7 @@
     "appbuilder": "./bin/appbuilder.js"
   },
   "scripts": {
+    "preinstall": "node preinstall.js",
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/"
   },
   "main": "./lib/appbuilder-cli.js",
