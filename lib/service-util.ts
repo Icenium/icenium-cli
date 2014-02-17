@@ -156,11 +156,11 @@ export class ServiceProxy {
 
 		var response = this.$httpClient.httpRequest(requestOpts);
 		var result = new Future<any>();
-		response.resolveSuccess((response) => {
-			this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
-			if (response.error) {
-				result.throw(response.error);
+		response.resolve((err, response?) => {
+			if (err) {
+				result.throw(err);
 			} else {
+				this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
 				var newCookies = response.headers["set-cookie"];
 
 				if (newCookies) {
