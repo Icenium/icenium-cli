@@ -8,7 +8,7 @@ declare module Mobile {
 		getPlatform(): string;
 		getDeviceProjectPath(appIdentifier: string): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
-		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: string): void;
+		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: string): IFuture<void>;
 		openDeviceLogStream(): void;
 	}
 
