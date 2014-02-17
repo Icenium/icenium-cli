@@ -111,14 +111,16 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}).future<void>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): void {
-		var houseArrestClient  = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
-		var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
-		afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
+		return(() => {
+			var houseArrestClient  = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
+			var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
+			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
-		var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
-		notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
-		console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
+			var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
+			notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
+			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
+		}).future<void>()();
 	}
 
 	public openDeviceLogStream() {

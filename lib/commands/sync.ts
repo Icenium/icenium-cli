@@ -52,7 +52,7 @@ export class SyncCommand implements ICommand {
 			return (() => {
 				var platformSpecificProjectPath = device.getDeviceProjectPath(appIdentifier);
 				var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
-				device.sync(localDevicePaths, appIdentifier);
+				device.sync(localDevicePaths, appIdentifier).wait();
 			}).future<void>()();
 		};
 
