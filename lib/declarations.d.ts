@@ -59,6 +59,7 @@ declare module Server {
 }
 
 interface IUserDataStore {
+	hasCookie(): IFuture<boolean>;
 	getCookie(): IFuture<string>;
 	getUser(): IFuture<any>;
 	setCookie(cookie: string): IFuture<void>;
@@ -69,6 +70,8 @@ interface ILoginManager {
 	basicLogin(userName: string, password: string): IFuture<void>;
 	login(): IFuture<void>;
 	logout(): IFuture<void>;
+	isLoggedIn(): IFuture<boolean>;
+	ensureLoggedIn(): IFuture<void>;
 }
 
 declare module Server.Contract {

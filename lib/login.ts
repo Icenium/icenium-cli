@@ -18,6 +18,10 @@ export class UserDataStore implements IUserDataStore {
 	constructor(private $fs: IFileSystem) {
 	}
 
+	public hasCookie(): IFuture<boolean> {
+		return this.checkCookieExists(UserDataStore.getCookieFilePath(), () => this.cookie);
+	}
+
 	public getCookie(): IFuture<string> {
 		return this.readAndCache(UserDataStore.getCookieFilePath(),
 			() => this.cookie,
@@ -48,10 +52,16 @@ export class UserDataStore implements IUserDataStore {
 		}
 	}
 
+	private checkCookieExists<T>(sourceFile: string, getter: () => T) : IFuture<boolean> {
+		return (() => {
+			return (getter() || this.$fs.exists(sourceFile).wait());
+		}).future<boolean>()();
+	}
+
 	private readAndCache<T>(sourceFile: string, getter: () => T, setter: (value: string) => void): IFuture<T> {
 		return (() => {
 			if (!getter()) {
-				if (!this.$fs.exists(sourceFile).wait()) {
+				if (!this.checkCookieExists(sourceFile, getter).wait()) {
 					throw new Error("error: not logged in.");
 				}
 
@@ -107,6 +117,24 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			this.logout().wait();
 
+			this.doLogin().wait();
+		}).future<void>()();
+	}
+
+	public isLoggedIn() : IFuture<boolean> {
+		return this.$userDataStore.hasCookie();
+	}
+
+	public ensureLoggedIn(): IFuture<void> {
+		return (() => {
+			if (!this.isLoggedIn().wait()) {
+				this.doLogin().wait();
+			}
+		}).future<void>()();
+	}
+
+	private doLogin(): IFuture<void> {
+		return (() => {
 			this.$fs.createDirectory(options["profile-dir"]).wait();
 
 			this.loginInBrowser().wait();
