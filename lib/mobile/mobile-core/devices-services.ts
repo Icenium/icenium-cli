@@ -121,7 +121,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			this.startLookingForDevices(platform).wait();
 			var allConnectedDevices = this.getAllConnectedDevices(platform);
 			if(allConnectedDevices.length == 0) {
-				this.$logger.out("Could not find connected devices.");
+				this.$logger.out("No connected devices found.");
 			}
 			var listers: IFuture<any>[] = _.map(allConnectedDevices, (device: Mobile.IDevice) => {
 				if(canExecute) {
