@@ -26,19 +26,24 @@ export class SimulateCommand implements ICommand {
 		private $config: IConfiguration,
 		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer,
-		private $project: Project.IProject) {
+		private $project: Project.IProject,
+		private $loginManager: ILoginManager) {
 		this.projectData = $project.projectData;
 	}
 
 	public execute(args: string[]): void {
-		this.cacheDir = path.join(options["profile-dir"], "Cache");
-		this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
-		this.$logger.debug("Server version: %s", this.serverVersion);
+		(() => {
+			this.cacheDir = path.join(options["profile-dir"], "Cache");
+			this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
+			this.$logger.debug("Server version: %s", this.serverVersion);
 
-		this.prepareSimulator().wait();
-		this.prepareCordovaPlugins().wait();
+			this.$loginManager.ensureLoggedIn().wait();
 
-		this.runSimulator();
+			this.prepareSimulator().wait();
+			this.prepareCordovaPlugins().wait();
+
+			this.runSimulator();
+		}).future<void>()().wait();
 	}
 
 	private prepareSimulator(): IFuture<void> {
@@ -72,7 +77,7 @@ export class SimulateCommand implements ICommand {
 					pipeTo: extractor
 				});
 
-				this.$fs.futureFromEvent(extractor, "close").wait();
+				this.$fs.futureFromEvent(extractor, "finish").wait();
 
 				this.$fs.writeJson(serverVersionFile, { version : this.serverVersion }).wait();
 

@@ -11,6 +11,11 @@ var testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 
 class MockUserDataStore implements IUserDataStore {
+
+	hasCookie(): IFuture<boolean> {
+		return Future.fromResult(false);
+	}
+
 	getCookie():IFuture<string> {
 		return (() => "dummy").future<string>()();
 	}
