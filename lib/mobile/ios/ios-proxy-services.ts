@@ -190,7 +190,8 @@ export class InstallationProxyClient {
 		private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
 		private $fs: IFileSystem,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $injector: IInjector) {
 	}
 
 	private static transferCallback() {
@@ -209,7 +210,7 @@ export class InstallationProxyClient {
 			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
 			afcClient.transferPackage(packageFile, devicePath).wait();
-			var plistService = new iOSCore.PlistService(service, this.$errors);
+			var plistService = this.$injector.resolve(iOSCore.PlistService, {service: this.device.startService(MobileServices.INSTALLATION_PROXY)});
 
 			var plist = {
 				type: "dict",
