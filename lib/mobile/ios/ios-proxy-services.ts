@@ -209,7 +209,7 @@ export class InstallationProxyClient {
 			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
 			afcClient.transferPackage(packageFile, devicePath).wait();
-			var plistService = new iOSCore.PlistService(service, this.$errors);
+			var plistService = new iOSCore.PlistService(this.device.startService((MobileServices.INSTALLATION_PROXY)), this.$errors);
 
 			var plist = {
 				type: "dict",
