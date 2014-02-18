@@ -9,6 +9,7 @@ import stubs = require("./stubs");
 import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
+import options = require("./../lib/options");
 var assert = require("chai").assert;
 temp.track();
 
@@ -35,6 +36,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
 	testInjector.register("projectNameValidator", mockProjectNameValidator);
+	testInjector.register("loginManager", stubs.LoginManager);
 
 	return testInjector;
 }
@@ -209,5 +211,39 @@ describe("project unit tests", function() {
 			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]);
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
+	});
+});
+
+describe("project unit tests (canonical paths)", function() {
+	var project, testInjector;
+	before(() => {
+		testInjector = createTestInjector();
+		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("fs", stubs.FileSystemStub);
+		testInjector.resolve("config").PROJECT_FILE_NAME = "";
+	});
+
+	it("no ending path separator", function() {
+		options.path = "test";
+		var project = testInjector.resolve(projectlib.Project);
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+	});
+
+	it("one ending path separator", function() {
+		options.path = "test" + path.sep;
+		var project = testInjector.resolve(projectlib.Project);
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+	});
+
+	it("multiple ending path separator", function() {
+		options.path = "test" + path.sep + path.sep;
+		var project = testInjector.resolve(projectlib.Project);
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+	});
+
+	it("do not remove separators which are not at the end", function() {
+		options.path = "test" + path.sep + "test" + path.sep;
+		var project = testInjector.resolve(projectlib.Project);
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test" + path.sep + "test"));
 	});
 });
