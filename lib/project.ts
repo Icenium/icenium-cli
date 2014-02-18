@@ -99,7 +99,8 @@ export class Project implements Project.IProject {
 		private $buildService: Project.IBuildService,
 		private $projectNameValidator,
 		private $errors: IErrors,
-		private $opener: IOpener) {
+		private $opener: IOpener,
+		private $loginManager: ILoginManager) {
 		this.readProjectData().wait();
 	}
 
@@ -109,7 +110,7 @@ export class Project implements Project.IProject {
 		}
 		this.cachedProjectDir = null;
 
-		var projectDir = options.path || path.resolve(".");
+		var projectDir = path.resolve(options.path || ".");
 		while (true) {
 			this.$logger.trace("Looking for project in '%s'", projectDir);
 
@@ -342,9 +343,13 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.validatePlatform(platform);
 
+			this.ensureProject();
+
 			if (options.download && options.companion) {
 				this.$errors.fail("Cannot specify both --download and --companion options.");
 			}
+
+			this.$loginManager.ensureLoggedIn().wait();
 
 			if (options.companion) {
 				this.deployToIon(platform).wait();
@@ -391,6 +396,8 @@ export class Project implements Project.IProject {
 				this.$logger.fatal("Found nothing to import.");
 				return;
 			}
+
+			this.$loginManager.ensureLoggedIn().wait();
 
 			var projectZipFile = this.zipProject().wait();
 			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait());
