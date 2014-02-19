@@ -11,7 +11,6 @@ var _ = <UnderscoreStatic> require("underscore");
 
 export class SimulateCommand implements ICommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
-	private PACKAGE_NAME: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
 
 	private projectData;
@@ -27,7 +26,8 @@ export class SimulateCommand implements ICommand {
 		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer,
 		private $project: Project.IProject,
-		private $loginManager: ILoginManager) {
+		private $loginManager: ILoginManager,
+        private $platformServices: ISimulatorPlatformServices) {
 		this.projectData = $project.projectData;
 	}
 
@@ -48,7 +48,7 @@ export class SimulateCommand implements ICommand {
 
 	private prepareSimulator(): IFuture<void> {
 		return ((): void => {
-			this.simulatorPath = path.join(this.cacheDir, this.PACKAGE_NAME);
+			this.simulatorPath = path.join(this.cacheDir, this.$platformServices.getPackageName());
 			this.$fs.createDirectory(this.simulatorPath).wait();
 
 			var servicesExtensionsUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/services/extensions";
@@ -66,7 +66,7 @@ export class SimulateCommand implements ICommand {
 			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
 				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 				var extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body),
-					downloadUri = (<any>_.findWhere(extensions["$values"], { Identifier : this.PACKAGE_NAME })).DownloadUri;
+					downloadUri = (<any>_.findWhere(extensions["$values"], { Identifier : this.$platformServices.getPackageName() })).DownloadUri;
 
 				this.$logger.info("Updating simulator package...");
 				this.$logger.debug("Downloading simulator from %s", downloadUri);
@@ -114,7 +114,6 @@ export class SimulateCommand implements ICommand {
 	private runSimulator() {
 		this.$logger.info("Starting simulator...");
 
-		var simulatorBinary = path.join(this.simulatorPath, "Icenium.Simulator.exe");
 		var simulatorParams = [
 			"--path", this.$project.getProjectDir(),
 			"--statusbarstyle", this.projectData.iOSStatusBarStyle,
@@ -125,11 +124,7 @@ export class SimulateCommand implements ICommand {
 			"--plugins", this.projectData.CorePlugins.join(";")
 			];
 
-		var commandLine = simulatorBinary + ' ' + simulatorParams.join(' ');
-		this.$logger.trace(commandLine);
-		var childProcess = child_process.spawn(simulatorBinary, simulatorParams,
-			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-		childProcess.unref();
+        this.$platformServices.runSimulator(this.simulatorPath, simulatorParams);
 	}
 
 	private versionCompare(version1: string, version2: string) {
@@ -188,3 +183,51 @@ export class SimulateCommand implements ICommand {
 	}
 }
 $injector.registerCommand("simulate", SimulateCommand);
+
+class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
+    private PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
+    private EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
+
+    constructor(private $logger: ILogger) {
+    }
+
+    public getPackageName() : string {
+        return this.PACKAGE_NAME_WIN;
+    }
+
+    public runSimulator(simulatorPath: string, simulatorParams: string[]) {
+        var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_WIN);
+        var commandLine = simulatorBinary + ' ' + simulatorParams.join(' ');
+        this.$logger.trace('Command-line: ' + commandLine);
+        var childProcess = child_process.spawn(simulatorBinary, simulatorParams,
+            { stdio:  ["ignore", "ignore", "ignore"], detached: true });
+        childProcess.unref();
+    }
+}
+
+class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
+    private PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
+    private EXECUTABLE_NAME_MAC = "Icenium.Simulator.app";
+
+    constructor(private $logger: ILogger) {
+    }
+
+    public getPackageName() : string {
+        return this.PACKAGE_NAME_MAC;
+    }
+
+    public runSimulator(simulatorPath: string, simulatorParams: string[]) {
+        var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_MAC);
+        var commandLine = ['-W', simulatorBinary, '--args'].concat(simulatorParams);
+        this.$logger.debug('CommandLine: ' + commandLine);
+        var childProcess = child_process.spawn('open', commandLine,
+            { stdio:  ["ignore", "ignore", "ignore"], detached: true });
+        childProcess.unref();
+    }
+}
+
+if (process.platform === "win32") {
+    $injector.register("platformServices", WinSimulatorPlatformServices);
+} else if (process.platform === "darwin") {
+    $injector.register("platformServices", MacSimulatorPlatformServices);
+}

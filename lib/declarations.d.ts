@@ -240,3 +240,8 @@ interface IPrompter {
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
 }
+
+interface ISimulatorPlatformServices {
+    getPackageName() : string;
+    runSimulator(simulatorPath: string, simulatorParams: string[]);
+}
