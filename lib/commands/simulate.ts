@@ -6,7 +6,6 @@ import unzip = require("unzip");
 import options = require("../options");
 import util = require("../helpers");
 import Future = require("fibers/future");
-import child_process = require("child_process");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class SimulateCommand implements ICommand {
@@ -27,7 +26,7 @@ export class SimulateCommand implements ICommand {
 		private $server: Server.IServer,
 		private $project: Project.IProject,
 		private $loginManager: ILoginManager,
-        private $platformServices: ISimulatorPlatformServices) {
+		private $platformServices: ISimulatorPlatformServices) {
 		this.projectData = $project.projectData;
 	}
 
@@ -66,18 +65,22 @@ export class SimulateCommand implements ICommand {
 			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
 				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 				var extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body),
-					downloadUri = (<any>_.findWhere(extensions["$values"], { Identifier : this.$platformServices.getPackageName() })).DownloadUri;
+					downloadUri = (<any>_.findWhere(extensions["$values"],
+						{ Identifier : this.$platformServices.getPackageName() })).DownloadUri;
 
 				this.$logger.info("Updating simulator package...");
 				this.$logger.debug("Downloading simulator from %s", downloadUri);
 
 				var extractor = unzip.Extract({path: this.simulatorPath});
-				this.$httpClient.httpRequest({
+				var request = this.$httpClient.httpRequest({
 					url: downloadUri,
 					pipeTo: extractor
 				});
 
 				this.$fs.futureFromEvent(extractor, "finish").wait();
+				request.wait(); // silence the assert that all fibers are waited
+
+				this.$platformServices.preparePackage(this.simulatorPath);
 
 				this.$fs.writeJson(serverVersionFile, { version : this.serverVersion }).wait();
 
@@ -124,7 +127,7 @@ export class SimulateCommand implements ICommand {
 			"--plugins", this.projectData.CorePlugins.join(";")
 			];
 
-        this.$platformServices.runSimulator(this.simulatorPath, simulatorParams);
+		this.$platformServices.runSimulator(this.simulatorPath, simulatorParams);
 	}
 
 	private versionCompare(version1: string, version2: string) {
@@ -188,18 +191,20 @@ class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
     private PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
     private EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
 
-    constructor(private $logger: ILogger) {
+    constructor(private $childProcess: IChildProcess) {
     }
 
     public getPackageName() : string {
         return this.PACKAGE_NAME_WIN;
     }
 
+    public preparePackage(simulatorPath: string): void {
+        // nothing to do on Windows platform
+    }
+
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
         var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_WIN);
-        var commandLine = simulatorBinary + ' ' + simulatorParams.join(' ');
-        this.$logger.trace('Command-line: ' + commandLine);
-        var childProcess = child_process.spawn(simulatorBinary, simulatorParams,
+        var childProcess = this.$childProcess.spawn(simulatorBinary, simulatorParams,
             { stdio:  ["ignore", "ignore", "ignore"], detached: true });
         childProcess.unref();
     }
@@ -209,25 +214,33 @@ class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
     private PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
     private EXECUTABLE_NAME_MAC = "Icenium.Simulator.app";
 
-    constructor(private $logger: ILogger) {
+    constructor(private $fs: IFileSystem,
+				private $childProcess: IChildProcess) {
     }
 
     public getPackageName() : string {
         return this.PACKAGE_NAME_MAC;
     }
 
+    // Ugly hack: our build does not package the mac binary file with executable bit set.
+    // we must set it before attempting to start the app bundle
+    // this code should be removed after we change our build
+    public preparePackage(simulatorPath: string): void {
+        var macExecutablePath = path.join(simulatorPath, "/Icenium.Simulator.app/Contents/MacOS/Icenium.Simulator");
+        this.$fs.chmod(macExecutablePath, 0x755).wait();
+    }
+
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
         var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_MAC);
         var commandLine = ['-W', simulatorBinary, '--args'].concat(simulatorParams);
-        this.$logger.debug('CommandLine: ' + commandLine);
-        var childProcess = child_process.spawn('open', commandLine,
+        var childProcess = this.$childProcess.spawn('open', commandLine,
             { stdio:  ["ignore", "ignore", "ignore"], detached: true });
         childProcess.unref();
     }
 }
 
-if (process.platform === "win32") {
+if (util.isWindows()) {
     $injector.register("platformServices", WinSimulatorPlatformServices);
-} else if (process.platform === "darwin") {
+} else if (util.isDarwin()) {
     $injector.register("platformServices", MacSimulatorPlatformServices);
 }

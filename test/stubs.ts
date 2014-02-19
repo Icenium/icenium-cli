@@ -73,6 +73,10 @@ export class FileSystemStub implements IFileSystem {
 	createWriteStream(path:string, options?:{flags?: string; encoding?: string; string?: string}): any {
 		return undefined;
 	}
+
+	chmod(path: string, mode: number): IFuture<any> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
