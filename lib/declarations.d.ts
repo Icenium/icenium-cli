@@ -229,3 +229,8 @@ interface IErrors {
 declare enum ErrorCodes {
 	UNKNOWN = 127
 }
+
+interface ISimulatorPlatformServices {
+    getPackageName() : string;
+    runSimulator(simulatorPath: string, simulatorParams: string[]);
+}

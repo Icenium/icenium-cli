@@ -83,3 +83,5 @@ $injector.require("androidDevice", "./mobile/android/android-device");
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
 
 $injector.requireCommand("user", "./commands/user-status");
+
+$injector.require("platformServices", "./commands/simulate");
