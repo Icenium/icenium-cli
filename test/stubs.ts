@@ -93,3 +93,25 @@ export class ErrorsStub implements IErrors {
 export class OpenerStub implements IOpener {
 	open(filename: string): void {}
 }
+
+export class LoginManager implements ILoginManager {
+	basicLogin(userName: string, password: string): IFuture<void> {
+		return undefined;
+	}
+
+	login(): IFuture<void> {
+		return undefined;
+	}
+
+	logout(): IFuture<void> {
+		return undefined;
+	}
+
+	isLoggedIn(): IFuture<boolean> {
+		return Future.fromResult(false);
+	}
+
+	ensureLoggedIn(): IFuture<void> {
+		return undefined;
+	}
+}
