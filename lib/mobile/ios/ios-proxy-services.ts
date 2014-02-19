@@ -81,7 +81,8 @@ export class AfcClient implements Mobile.IAfcClient {
 	constructor(private service: number,
 		private mobileDevice: Mobile.IMobileDevice,
 		private $fs: IFileSystem,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $logger: ILogger) {
 		var afcConnection = ref.alloc(ref.refType(ref.types.void));
 		var result = mobileDevice.afcConnectionOpen(this.service, 0, afcConnection);
 		if (result !== 0) {
@@ -136,11 +137,9 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	public transferCollection(localToDevicePaths: Mobile.ILocalToDevicePathData[]): IFuture<void> {
 		return (() => {
-			var transfers: IFuture<void>[] = [];
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				transfers.push(this.transferFile(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath(), localToDevicePathData.getRelativeToProjectBasePath()));
+				this.transferFile(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath(), localToDevicePathData.getRelativeToProjectBasePath()).wait();
 			});
-			Future.wait(transfers);
 		}).future<void>()();
 	}
 
@@ -168,9 +167,11 @@ export class AfcClient implements Mobile.IAfcClient {
 		return(() => {
 			var reader = this.$fs.createReadStream(localFilePath);
 			var target = this.open(devicePath, "w");
+			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 
 			reader.on("data", (data) => {
 				target.write(data, data.length);
+				this.$logger.trace("transfer-> localFilePath: '%s', devicePath: '%s', localFilePathSize: '%s', transferred bytes: '%s'", localFilePath, devicePath, localFilePathSize, data.length);
 			})
 			.on("error", (error) => {
 				this.$errors.fail(error);
@@ -189,7 +190,6 @@ export class InstallationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
 		private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
-		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $injector: IInjector) {
 	}
@@ -206,7 +206,7 @@ export class InstallationProxyClient {
 
 		if(helpers.isWindows()) {
 			var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
-			var afcClient = new AfcClient(service, this.$mobileDevice, this.$fs, this.$errors);
+			var afcClient = this.$injector.resolve(AfcClient, {service: service});
 			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
 			afcClient.transferPackage(packageFile, devicePath).wait();
@@ -267,13 +267,13 @@ $injector.register("installationProxyClient", InstallationProxyClient);
 
 export class NotificationProxyClient {
 	constructor(private device: Mobile.IIOSDevice,
-		private $errors: IErrors) {
-
+		private $errors: IErrors,
+		private $injector: IInjector) {
 	}
 
 	postNotification(notificationName: string) {
 		var service = this.device.startService(MobileServices.NOTIFICATION_PROXY);
-		var plistService = new iOSCore.PlistService(service, this.$errors);
+		var plistService = this.$injector.resolve(iOSCore.PlistService, {service: service});
 
 		var result = plistService.sendMessage({
 			type: "dict",
@@ -295,14 +295,13 @@ export class NotificationProxyClient {
 
 export class HouseArrestClient implements Mobile.IHouseArressClient {
 	constructor(private device: Mobile.IIOSDevice,
-		private $mobileDevice: Mobile.IMobileDevice,
-		private $fs: IFileSystem,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $injector: IInjector) {
 	}
 
 	private getAfcClientCore(device, command, applicationIdentifier: string): Mobile.IAfcClient {
 		var service = this.device.startService(MobileServices.HOUSE_ARREST);
-		var plistService = new iOSCore.PlistService(service, this.$errors);
+		var plistService = this.$injector.resolve(iOSCore.PlistService, {service:service});
 
 		var plist = {
 			type: "dict",
@@ -330,7 +329,7 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 			this.$errors.fail("Unable to start house arrest service");
 		}
 
-		return new AfcClient(service, this.$mobileDevice, this.$fs, this.$errors);
+		return this.$injector.resolve(AfcClient, {service: service});
 	}
 
 	public getAfcClientForAppDocuments(applicationIdentifier: string): Mobile.IAfcClient {
@@ -349,10 +348,11 @@ export class IOSSyslog {
 
 	constructor(private device: Mobile.IIOSDevice,
 		private $errors: IErrors,
-		private $logger: ILogger) {
+		private $logger: ILogger,
+		private $injector: IInjector) {
 		this.service = device.startService(MobileServices.SYSLOG);
 		if(helpers.isWindows()) {
-			this.socket = new iOSCore.WinSocketWrapper(this.service, $errors);
+			this.socket = this.$injector.resolve(iOSCore.WinSocketWrapper, {socket: this.service});
 		} else if(helpers.isDarwin()) {
 			this.socket = new net.Socket({ fd: this.service });
 		}

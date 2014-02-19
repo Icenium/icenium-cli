@@ -446,7 +446,7 @@ export class WinSocketWrapper {
 	private static BYTES_TO_READ = 1024;
 
 	constructor(private socket: number,
-		private $errors: IErrors) {
+		private $errors: IErrors){
 		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
@@ -482,9 +482,10 @@ export class PlistService {
 	private socket: any  = null;
 
 	constructor(private service: number,
-		private $errors: IErrors) {
+		private $logger: ILogger,
+		private $injector: IInjector) {
 		if(helpers.isWindows()) {
-			this.socket = new WinSocketWrapper(this.service, this.$errors);
+			this.socket = this.$injector.resolve(WinSocketWrapper, {socket: this.service });
 		} else if(helpers.isDarwin()) {
 			this.socket = new net.Socket({ fd: this.service });
 		}
@@ -523,7 +524,9 @@ export class PlistService {
 	public sendMessage(data) {
 		var payload = plistlib.toString(data);
 		var message = bufferpack.pack(">i", [payload.length]) + payload;
-		return this.socket.write(message);
+		var writtenBytes = this.socket.write(message);
+		this.$logger.trace("PlistService-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
+		return writtenBytes;
 	}
 
 	public disconnect() {

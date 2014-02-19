@@ -58,11 +58,9 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private pushFilesOnDevice(localToDevicePaths): IFuture<void> {
 		return(() => {
-			var transferers: IFuture<any>[] = [];
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				transferers.push(this.pushFileOnDevice(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath()));
+				this.pushFileOnDevice(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath()).wait();
 			});
-			Future.wait(transferers);
 		}).future<void>()();
 	}
 
