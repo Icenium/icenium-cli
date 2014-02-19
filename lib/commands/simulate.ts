@@ -46,6 +46,8 @@ export class SimulateCommand implements ICommand {
 		}).future<void>()().wait();
 	}
 
+	public get requiresActiveAccount(): boolean { return true; }
+
 	private prepareSimulator(): IFuture<void> {
 		return ((): void => {
 			this.simulatorPath = path.join(this.cacheDir, this.PACKAGE_NAME);

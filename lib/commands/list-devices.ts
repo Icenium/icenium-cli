@@ -16,5 +16,7 @@ export class ListDevicesCommand implements ICommand {
 
 		this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
 	}
+
+	public get requiresActiveAccount(): boolean { return true; }
 }
 $injector.registerCommand("list-devices", ListDevicesCommand);

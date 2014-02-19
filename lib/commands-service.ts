@@ -2,14 +2,16 @@
 "use strict";
 
 import _ = require("underscore");
+import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
-	constructor(private $errors: IErrors) {}
+	constructor(private $errors: IErrors,
+		private $tenantValidator: ITenantValidator) { }
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(() => {
 			var command: ICommand = $injector.resolveCommand(commandName);
 			if (command) {
-				command.execute(commandArguments);
+				this.$tenantValidator.executeCommandIfAuthorized(command.requiresActiveAccount, () => command.execute(commandArguments));
 				return true;
 			}
 
@@ -63,5 +65,5 @@ export class CommandsService implements ICommandsService {
 
 		return true;
 	}
-	}
+}
 $injector.register("commandsService", CommandsService);

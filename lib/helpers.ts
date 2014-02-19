@@ -127,13 +127,14 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
+export function registerCommand(module: string, commandName: string, requiresActiveAccount: boolean, executor: (module, args: string[]) => IFuture<void>) {
 	var factory = function (): ICommand {
+		var tenantValidator = $injector.resolve("tenantValidator");
 		return {
 			execute: (args: string[]): void => {
-				var mod = $injector.resolve(module);
-				executor(mod, args).wait();
-			}
+					var mod = $injector.resolve(module);
+					tenantValidator.executeCommandIfAuthorized(requiresActiveAccount, () => executor(mod, args).wait());
+				}
 		};
 	};
 

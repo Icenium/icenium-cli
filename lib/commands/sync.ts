@@ -49,6 +49,8 @@ export class SyncCommand implements ICommand {
 		}).future<void>()().wait();
 	}
 
+	public get requiresActiveAccount(): boolean { return true; }
+
 	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
 		return(() => {
 			var action = (device: Mobile.IDevice): IFuture<void> => {

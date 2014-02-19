@@ -15,6 +15,8 @@ export class FindPluginsCommand implements ICommand {
 		this.printPlugins(plugins);
 	}
 
+	public get requiresActiveAccount(): boolean { return true; }
+
 	private printPlugins(plugins) {
 		_.each(plugins, (plugin) => {
 			var pluginDescription = this.composePluginDescription(plugin);

@@ -74,5 +74,5 @@ export class Configuration implements IConfiguration {
 	}
 }
 $injector.register("config", Configuration);
-helpers.registerCommand("config", "config-reset", (config, args) => config.reset());
-helpers.registerCommand("config", "config-apply", (config, args) => config.apply(args[0]));
+helpers.registerCommand("config", "config-reset", false, (config, args) => config.reset());
+helpers.registerCommand("config", "config-apply", false, (config, args) => config.apply(args[0]));

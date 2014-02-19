@@ -29,6 +29,8 @@ export class FetchPluginCommand implements ICommand {
 		}
 	}
 
+	public get requiresActiveAccount(): boolean { return true; }
+
 	private isLocalPath(pluginId: string): boolean {
 		return fs.existsSync(pluginId);
 	}

@@ -17,6 +17,8 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 			this.$logger.fatal("Invalid device identifier or index. Run $ice list-devices command to see all connected devices.");
 		}
 	}
+
+	public get requiresActiveAccount(): boolean { return true; }
 }
 $injector.registerCommand("open-device-log-stream", OpenDeviceLogStreamCommand);
 

@@ -45,6 +45,8 @@ export class DeployCommand implements ICommand {
 			}
 		}).future<void>()().wait();
 	}
+
+	public get requiresActiveAccount(): boolean { return true; }
 }
 $injector.registerCommand("deploy", DeployCommand);
 

@@ -44,6 +44,8 @@ export class EditConfigurationCommand implements ICommand {
 		}).future<void>()().wait();
 	}
 
+	public get requiresActiveAccount(): boolean { return true; }
+
 	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
 		return (() => {
 			if (data.template) {

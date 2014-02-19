@@ -100,5 +100,5 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 }
 $injector.register("identityManager", IdentityManager);
-helpers.registerCommand("identityManager", "list-certificates", (identityManager, args) => identityManager.listCertificates());
-helpers.registerCommand("identityManager", "list-provisions", (identityManager, args) => identityManager.listProvisions());
+helpers.registerCommand("identityManager", "list-certificates", false, (identityManager, args) => identityManager.listCertificates());
+helpers.registerCommand("identityManager", "list-provisions", false, (identityManager, args) => identityManager.listProvisions());
