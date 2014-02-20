@@ -9,7 +9,7 @@ import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
 
 export class SyncCommand implements ICommand {
-	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".ab", ".abproject", ".DS_Store"];
+	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".ab", ".abproject"];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
@@ -38,7 +38,7 @@ export class SyncCommand implements ICommand {
 							var projectFiles = [path.resolve(options.file)];
 							this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
 						} else {
-							console.log(util.format("The file %s does not exist.", options.file));
+							this.$logger.out(util.format("The file %s does not exist.", options.file));
 						}
 					} else {
 						var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
