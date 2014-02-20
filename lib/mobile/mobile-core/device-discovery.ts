@@ -12,6 +12,7 @@ import Signal = require("./../../events/signal");
 import Future = require("fibers/future");
 import child_process = require("child_process");
 import helpers = require("./../../helpers");
+var options = require("./../../options");
 
 export class DeviceDiscovery implements Mobile.IDeviceDiscovery {
 	private devices: {[key: string]: Mobile.IDevice} = {};
@@ -61,7 +62,7 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 
 	public startLookingForDevices(): void {
 		this.subscribeForNotifications();
-		var defaultTimeoutInSeconds = 4;
+		var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 4;
 		this.startRunLoopWithTimer(defaultTimeoutInSeconds);
 	}
 

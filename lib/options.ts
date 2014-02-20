@@ -21,7 +21,8 @@ var knownOpts:any = {
 		"file": String,
 		"no-livesync": String,
 		"version": Boolean,
-		"help": Boolean
+		"help": Boolean,
+		"timeout": String
 	},
 	shorthands = {
 		"v" : ["--verbose"],
