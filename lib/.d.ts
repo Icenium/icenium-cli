@@ -50,7 +50,6 @@
 /// <reference path="file-system.ts" />
 /// <reference path="helpers.ts" />
 /// <reference path="http-server.ts" />
-/// <reference path="identity.ts" />
 /// <reference path="logger.ts" />
 /// <reference path="login.ts" />
 /// <reference path="mobile/android/android-device.ts" />

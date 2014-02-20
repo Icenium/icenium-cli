@@ -4,6 +4,8 @@
 
 import fs = require("fs");
 import Future = require("fibers/future");
+import path = require("path");
+import util = require("util");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class FileSystem implements IFileSystem {
@@ -172,6 +174,23 @@ export class FileSystem implements IFileSystem {
 
 	private stat(path: string): IFuture<fs.Stats> {
 		return this._stat(path);
+	}
+
+	public getUniqueFileName(baseName: string): IFuture<string> {
+		return ((): string => {
+			if (!this.exists(baseName).wait()) {
+				return baseName;
+			}
+			var extension = path.extname(baseName);
+			var prefix = path.basename(baseName, extension);
+
+			for (var i = 2; ; ++i) {
+				var numberedName = prefix + i + extension;
+				if (!this.exists(numberedName).wait()) {
+					return numberedName;
+				}
+			}
+		}).future<string>()();
 	}
 }
 $injector.register("fs", FileSystem);

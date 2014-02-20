@@ -9,6 +9,7 @@ import util = require("util");
 
 require("./extensions");
 require("./bootstrap");
+require("./errors");
 var options = require("./options");
 
 class CommandDispatcher {

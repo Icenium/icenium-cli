@@ -77,6 +77,10 @@ export class FileSystemStub implements IFileSystem {
 	chmod(path: string, mode: number): IFuture<any> {
 		return undefined;
 	}
+
+	getUniqueFileName(baseName: string): IFuture<string> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
