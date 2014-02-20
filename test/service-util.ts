@@ -37,13 +37,15 @@ testInjector.register("userDataStore", MockUserDataStore);
 class MockHttpClient implements Server.IHttpClient {
 	public options: any;
 	public mockResponse: Server.IResponse;
+	public mockError: any;
 
 	httpRequest(options): IFuture<Server.IResponse> {
 		this.options = options;
-		return Future.wrap<Server.IResponse>((callback) => callback(null, this.mockResponse))();
+		return Future.wrap<Server.IResponse>((callback) => callback(this.mockError, this.mockResponse))();
 	}
 
 	public setResponse(headers: any, body?: any, error?: any) {
+		this.mockError = error;
 		this.mockResponse = {
 			response: {},
 			headers: headers,
