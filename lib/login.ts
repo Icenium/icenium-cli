@@ -218,8 +218,7 @@ export class LoginManager implements ILoginManager {
 
 			var queryParams = {
 				wrap_client_id: this.$config.WRAP_CLIENT_ID,
-				wrap_callback: util.format("%s://%s/Mist/Authentication/RedirectVerification/%s",
-					this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port)
+				wrap_callback: util.format("http://localhost:%s/completeLogin", port)
 			};
 			var loginUrl = util.format("https://%s/Authenticate/WRAPv0.9?%s",
 				this.$serverConfiguration.tfisServer.wait(),
