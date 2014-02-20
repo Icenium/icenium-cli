@@ -4,25 +4,29 @@ Usage:
     $ appbuilder <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
-    help <command>           Shows additional information about the commands in this list.
-    login                    Logs you in Telerik Platform.
-    logout                   Logs you out from Telerik Platform
-    user                     Prints information about the currently logged in user.
-    create                   Creates a new project from template.
-    list-provisions          Lists all configured provisioning profiles for code signing iOS applications.
-    list-certificates        Lists all configured certificates for code signing iOS applications.
-    list-devices             Lists all recognized connected devices.
-    build                    Builds the project and produces a QR code for deploying the application package.
-    deploy                   Deploys the project to a connected device.
-    update                   Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    sync                     Synchronizes the latest changes in your project to connected devices.
-    open-device-log-stream   Opens the log stream for given device.
-    find-plugins             Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    fetch-plugin             Imports an Apache Cordova plugin into your project.
-    simulate                 Runs the current project in the device simulator.
-    list-projects            Lists all projects of your account.
-    export-project           Exports one of your remote projects into a local ab project.
-    edit-configuration       Opens configuration file for editing.
+    help <command>                      Shows additional information about the commands in this list.
+    login                               Logs you in Telerik Platform.
+    logout                              Logs you out from Telerik Platform
+    user                                Prints information about the currently logged in user.
+    create                              Creates a new project from template.
+    list-provisions                     Lists all configured provisioning profiles for code signing iOS applications.
+    list-certificates                   Lists all configured certificates for code signing iOS applications and Android applications.
+    create-self-signed-certificate      Creates self signed certificate for code signing Android applications
+    remove-certificate                  Removes certificate from the server
+    export-certificate                  Exports certificate from the server
+    import-certificate                  Imports certificate to the server
+    list-devices                        Lists all recognized connected devices.
+    build                               Builds the project and produces a QR code for deploying the application package.
+    deploy                              Deploys the project to a connected device.
+    update                              Synchronizes the project with the cloud to enable LiveSync for remote devices.
+    sync                                Synchronizes the latest changes in your project to connected devices.
+    open-device-log-stream              Opens the log stream for given device.
+    find-plugins                        Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    fetch-plugin                        Imports an Apache Cordova plugin into your project.
+    simulate                            Runs the current project in the device simulator.
+    list-projects                       Lists all projects of your account.
+    export-project                      Exports one of your remote projects into a local ab project.
+    edit-configuration                  Opens configuration file for editing.
 
 Global Options:
     --help                Prints help about the command given in the rest of the command line.
@@ -74,22 +78,6 @@ Options:
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
         If not specified, ?Telerik AppBuilder CLI? sets the application identifier to com.telerik.<App name>
 
---[/]--
-
---[list-provisions]--
-Usage:
-    $ appbuilder list-provisions
-
-Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
-you can set the provisioning profile by index or name in the --provision option.
---[/]--
-
---[list-certificates]--
-Usage:
-    $ appbuilder list-certificates
-
-Lists with indexes and names all configured certificates for code signing iOS applications. When building an app, you can
-set the certificate by index or name in the --certificate option.
 --[/]--
 
 --[list-devices]--
@@ -262,4 +250,67 @@ Usage:
 	$ appbuilder user
 
 Prints information about the currently logged in user and details about their license.
+--[/]--
+
+--[list-provisions]--
+Usage:
+    $ appbuilder list-provisions
+
+Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
+you can set the provisioning profile by index or name in the --provision option.
+--[/]--
+
+--[list-certificates]--
+Usage:
+    $ appbuilder list-certificates
+
+Lists with indexes and names all configured certificates for code signing iOS and Android applications. When building an app, you can
+set the certificate by index or name in the --certificate option.
+--[/]--
+
+--[create-self-signed-certificate]--
+Usage:
+    $ appbuilder create-self-signed-certificate [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]
+
+With a certificate, you can build your app and run it on device.
+Depending on the certificate, you can install your app for testing or you can publish it in Google Play.
+If you want to publish your app in Google Play, verify that the certificate expires after October 22, 2033.
+<Purpose> can be 'Generic' or 'GooglePlay'.
+<StartDate> and <EndDate> must have the following format: yyyy-mm-dd.
+
+If you omit any of the parameters to the command then an interactive prompt will be shown prompting you to
+enter the rest of the details of the certificate.
+--[/]--
+
+--[remove-certificate]--
+Usage:
+    $ appbuilder remove-certificate <Name or index>
+
+Remove a certificate from the server by its <Name>. To see the available <Name>s run list-certificates.
+Deleting a certificate cannot be undone.
+Unless you have a backup of the certificate, you will not be able to restore it and update apps already signed and published with it.
+--[/]--
+
+--[export-certificate]--
+Usage:
+    $ appbuilder export-certificate <Name or index> [<Password>]
+
+Export a certificate from the server by its <Name>. To see the available <Name>s run list-certificate.
+You will also have to set a password for the exported certificate.
+
+You will be prompted to enter a password, if you don't specify it on the command line.
+
+Options:
+    --path <path> - Specifies the target path. The default path is the current working directory.
+--[/]--
+
+--[import-certificate]--
+Usage:
+    $ appbuilder import-certificate <CertificateFile> [<Password>]
+
+To add a certificate to the list, import a P12 file that contains an existing certificate or do one of the following:
+* create a self-signed certificate
+* create and complete a pending certificate signing request by importing the matching CER file you created in the iOS Dev Center
+
+You will be prompted to enter a password, if you don't specify it on the command line.
 --[/]--

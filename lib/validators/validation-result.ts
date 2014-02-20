@@ -3,6 +3,8 @@
 "use strict";
 
 export class ValidationResult implements IValidationResult {
+	public static Successful = new ValidationResult(null);
+
 	constructor(private error: string) { }
 
 	public get Error(): string {

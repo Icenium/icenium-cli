@@ -86,6 +86,11 @@ declare class WritableStream extends EventEmitter {
     end(buffer: NodeBuffer): void;
     destroy(): void;
     destroySoon(): void;
+
+	// HACK: process.stdout is incorrectly declared as a WritableStream, instead of as a "tty".WriteStream,
+	// hence the need to add these declarations here.
+	rows: number;
+	columns: number;
 }
 
 declare class ReadableStream extends EventEmitter {

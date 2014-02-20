@@ -21,7 +21,11 @@ interface ICryptographicIdentity {
 	Certificate: any;
 }
 
-interface IValidationResult {
-	Error: string;
-	IsSuccessful: boolean;
+interface ISelfSignedIdentityModel {
+	Name: string;
+	Email: string;
+	Country: string;
+	ForGooglePlayPublishing: string;
+	StartDate: string;
+	EndDate: string;
 }

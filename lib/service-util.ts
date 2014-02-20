@@ -76,7 +76,8 @@ export class HttpClient implements Server.IHttpClient {
 					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
 					callback({
 						response: response,
-						headers: response.headers
+						headers: response.headers,
+						error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
 					});
 				});
 				response.on("end", () => {

@@ -3,7 +3,6 @@
 "use strict";
 
 import ValidationResult = require("./validation-result");
-import CryptographicIdentityStoreService = require("./../signing-identity/cryptographic-identity-store-service");
 import Future = require("fibers/future");
 import helpers = require("./../helpers");
 import util = require("util");
