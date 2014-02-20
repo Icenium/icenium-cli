@@ -17,14 +17,19 @@ interface IAppStoreApplication {
 export class ListApplicationsReadyForUploadCommand implements ICommand {
 	constructor(private $server: Server.IServer,
 		private $logger: ILogger,
+		private $prompter: IPrompter,
 		private $errors: IErrors) {}
 
 	execute(args:string[]):void {
 		(() => {
 			var userName = args[0];
 			var password = args[1];
-			if (!userName || !password) {
-				this.$errors.fail("Missing user name or password.");
+			if (!userName) {
+				this.$errors.fail("Missing user name.");
+			}
+
+			if (!password) {
+				password = this.$prompter.getPassword("Apple ID password").wait();
 			}
 
 			var apps: IAppStoreApplication[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
@@ -33,6 +38,10 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 			apps.forEach((app) => {
 				this.$logger.out("%s %s (%s)", app.Application, app["Version Number"], app.ReservedBundleIdentifier);
 			})
+
+			if (!apps.length) {
+				this.$logger.out("No applications are ready for upload.");
+			}
 		}).future<void>()().wait();
 	}
 }
@@ -42,6 +51,7 @@ export class UploadApplicationCommand implements ICommand {
 	constructor(private $server: Server.IServer,
 		private $logger: ILogger,
 		private $errors: IErrors,
+		private $prompter: IPrompter,
 		private $project: Project.IProject,
 		private $identityManager: Server.IIdentityManager) {}
 
@@ -55,28 +65,29 @@ export class UploadApplicationCommand implements ICommand {
 				this.$errors.fail("No application specified. Specify an application that is ready for upload in iTunes Connect.");
 			}
 
-			if (!userName || !password) {
-				this.$errors.fail("Missing user name or password.");
+			if (!userName) {
+				this.$errors.fail("Missing user name.");
 			}
 
 			this.$project.ensureProject();
+
+			this.$logger.info("Checking provision.");
+			var provision = this.$identityManager.findProvision(options.provision).wait();
+
+			if (provision.ProvisionType !== "AppStore") {
+				this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
+					provision.Name, provision.ProvisionType);
+			}
+
+			if (!password) {
+				password = this.$prompter.getPassword("Apple ID password").wait();
+			}
 
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
 			var apps: IAppStoreApplication[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			var theApp = _.find(apps, (app) => app.Application === application);
 			if (!theApp) {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
-			}
-
-			this.$logger.info("Checking provision.");
-			var provision = this.$identityManager.findProvision(options.provision).wait();
-			if (!provision) {
-				this.$errors.fail("'%s' is not a valid provision name or index.", options.provision);
-			}
-
-			if (provision.ProvisionType !== "AppStore") {
-				this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
-					provision.Name, provision.ProvisionType);
 			}
 
 			this.$logger.info("Building release package.")
@@ -93,6 +104,7 @@ export class UploadApplicationCommand implements ICommand {
 			this.$server.itmstransporter.uploadApplication(projectData.name, projectData.name,
 				projectPath, userName, password, theApp.AppleID.toString()).wait();
 
+			this.$logger.info("Upload complete.")
 		}).future<void>()().wait();
 	}
 }
