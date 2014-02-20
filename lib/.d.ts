@@ -76,6 +76,7 @@
 /// <reference path="validators/cryptographic-identity-validators.ts" />
 /// <reference path="validators/ios-deployment-validator.ts" />
 /// <reference path="validators/project-name-validator.ts" />
+/// <reference path="validators/tenant-validator.ts" />
 /// <reference path="validators/validation-result.ts" />
 /// <reference path="yok.ts" />
 //grunt-end

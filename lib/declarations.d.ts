@@ -240,3 +240,6 @@ interface IPrompter {
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
 }
+
+interface ITenantValidator {
+	executeCommandIfAuthorized(requiresActiveAccount: boolean, action: Function);}

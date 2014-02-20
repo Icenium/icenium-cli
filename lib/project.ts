@@ -764,11 +764,11 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-helpers.registerCommand("project", "build", (project, args) => project.executeBuild(args[0]));
-helpers.registerCommand("project", "update", (project, args) => project.importProject());
-helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
+helpers.registerCommand("project", "build", true, (project, args) => project.executeBuild(args[0]));
+helpers.registerCommand("project", "update", true, (project, args) => project.importProject());
+helpers.registerCommand("project", "create", true, (project, args) => project.createNewProject(args[0]));
 _.each(["add", "set", "del"], (operation) => {
-	helpers.registerCommand("project", "prop-" + operation,
+	helpers.registerCommand("project", "prop-" + operation, false,
 		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
 });
-helpers.registerCommand("project", "prop-print", (project, args) => project.printProjectProperty(args[0]));
+helpers.registerCommand("project", "prop-print", false, (project, args) => project.printProjectProperty(args[0]));
