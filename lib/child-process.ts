@@ -12,7 +12,7 @@ export class ChildProcess implements IChildProcess {
 		return this._exec(command);
 	}
 
-	public spawn(command: string, args?: string[], options?: string[]): any {
+	public spawn(command: string, args?: string[], options?: any): any {
 		return child_process.spawn(command, args, options);
 	}
 }

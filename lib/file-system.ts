@@ -11,6 +11,7 @@ export class FileSystem implements IFileSystem {
 	private _readFile = Future.wrap(fs.readFile);
 	private _writeFile = Future.wrap<void>(fs.writeFile);
 	private _readdir = Future.wrap(fs.readdir);
+	private _chmod = Future.wrap(fs.chmod);
 
 //TODO: try 'archiver' module for zipping
 	public zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
@@ -164,6 +165,10 @@ export class FileSystem implements IFileSystem {
 	}): any {
 		return fs.createWriteStream(path, options);
 	}
+
+	public chmod(path: string, mode: number): IFuture<any> {
+		return this._chmod(path, mode);
+    }
 
 	private stat(path: string): IFuture<fs.Stats> {
 		return this._stat(path);

@@ -94,3 +94,5 @@ $injector.requireCommand("user", "./commands/user-status");
 
 $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
+
+$injector.require("platformServices", "./commands/simulate");

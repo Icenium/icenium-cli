@@ -158,6 +158,8 @@ interface IFileSystem {
 		encoding?: string;
 		string?: string;
 	}): any;
+
+	chmod(path: string, mode: number): IFuture<any>;
 }
 
 interface IOpener {
@@ -166,7 +168,7 @@ interface IOpener {
 
 interface IChildProcess {
 	exec(command: string): IFuture<any>;
-	spawn(command: string, args?: string[], options?: string[]): any;
+	spawn(command: string, args?: string[], options?: any): any;
 }
 
 interface IProjectData {
@@ -239,4 +241,10 @@ interface IPrompter {
 	confirm(prompt: string): IFuture<boolean>;
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
+}
+
+interface ISimulatorPlatformServices {
+	getPackageName() : string;
+	preparePackage(simulatorPath: string): void;
+	runSimulator(simulatorPath: string, simulatorParams: string[]);
 }
