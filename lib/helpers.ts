@@ -8,7 +8,6 @@ import _ = require("underscore");
 import util = require("util");
 import querystring = require("querystring");
 import log = require("./logger");
-import Q = require("q");
 import Future = require("fibers/future");
 
 function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {
@@ -58,10 +57,6 @@ export function isNumber(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-export function abort(...args) {
-	throw new Error(util.format.apply(null, arguments));
-}
-
 export function toHash(collection, keySelector, valueSelector) {
 	var result = {};
 	if (_.isArray(collection)) {
@@ -87,41 +82,6 @@ export function getProjectFileSchema(): any {
 	}
 	return _projectFileSchema;
 }
-
-export function saveFile(filePath, content) {
-	return Q.ninvoke(fs, "writeFile", filePath, content);
-}
-
-export function deleteFile(filePath) {
-	return Q.ninvoke(fs, "unlink", filePath)
-		.catch(function() {});
-}
-
-//TODO: use module mkdirp
-export function makeDirIfNotAvailable(filePath) {
-	return Q.ninvoke(fs, "mkdir", filePath)
-		.catch(function(error) {
-			if (error.code !== "EEXIST") {
-				throw error;
-			}
-		});
-}
-
-export function isEmptyDir(dir) {
-	var defered = Q.defer();
-	fs.readdir(dir, function(error, data) {
-		if (error) {
-			defered.reject(error);
-		} else {
-			defered.resolve(data.length === 0);
-		}
-	});
-	return defered.promise;
-}
-
-export function nop() {
-	return 123;
-};
 
 export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";

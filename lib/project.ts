@@ -639,10 +639,10 @@ export class Project implements Project.IProject {
 
 		if (!propData.flags) {
 			if (newValue.length !== 1) {
-				helpers.abort("Property '%s' is not a collection of flags. Specify only a single property value.", property);
+				this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 			}
 			if (mode === "add" || mode === "del") {
-				helpers.abort("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
+				this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
 			}
 		} else {
 			newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
@@ -667,7 +667,7 @@ export class Project implements Project.IProject {
 				return validValues[value];
 			});
 			if (badValues.length > 0) {
-				helpers.abort("Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+				this.$errors.fail("Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
 			}
 
 			newValue = _.map(newValue, function(value) { return validValues[value]; });
@@ -679,7 +679,7 @@ export class Project implements Project.IProject {
 			if (propData.regex) {
 				var matchRegex = new RegExp(propData.regex);
 				if (!matchRegex.test(newValue)) {
-					helpers.abort("Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
+					this.$errors.fail("Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
 				}
 			}
 
@@ -701,7 +701,7 @@ export class Project implements Project.IProject {
 		} else if (mode === "add") {
 			propertyValue = _.union(propertyValue, newValue);
 		} else {
-			helpers.abort("Unknown property update mode '%s'", mode);
+			this.$errors.fail("Unknown property update mode '%s'", mode);
 		}
 
 		if (propertyValue.sort) {
