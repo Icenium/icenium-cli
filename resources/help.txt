@@ -4,29 +4,33 @@ Usage:
     $ appbuilder <command> [command parameters] [--command options] [--path <path>]
 
 Commands:
-    help <command>                      Shows additional information about the commands in this list.
-    login                               Logs you in Telerik Platform.
-    logout                              Logs you out from Telerik Platform
-    user                                Prints information about the currently logged in user.
-    create                              Creates a new project from template.
-    list-provisions                     Lists all configured provisioning profiles for code signing iOS applications.
-    list-certificates                   Lists all configured certificates for code signing iOS applications and Android applications.
-    create-self-signed-certificate      Creates self signed certificate for code signing Android applications
-    remove-certificate                  Removes certificate from the server
-    export-certificate                  Exports certificate from the server
-    import-certificate                  Imports certificate to the server
-    list-devices                        Lists all recognized connected devices.
-    build                               Builds the project and produces a QR code for deploying the application package.
-    deploy                              Deploys the project to a connected device.
-    update                              Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    sync                                Synchronizes the latest changes in your project to connected devices.
-    open-device-log-stream              Opens the log stream for given device.
-    find-plugins                        Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    fetch-plugin                        Imports an Apache Cordova plugin into your project.
-    simulate                            Runs the current project in the device simulator.
-    list-projects                       Lists all projects of your account.
-    export-project                      Exports one of your remote projects into a local ab project.
-    edit-configuration                  Opens configuration file for editing.
+    help <command>                  Shows additional information about the commands in this list.
+    login                           Logs you in Telerik Platform.
+    logout                          Logs you out from Telerik Platform
+    user                            Prints information about the currently logged in user.
+    create                          Creates a new project from template.
+    list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
+    list-certificates               Lists all configured certificates for code signing iOS applications.
+    list-certificates               Lists all configured certificates for code signing iOS applications and Android applications.
+    create-self-signed-certificate  Creates self signed certificate for code signing Android applications
+    remove-certificate              Removes certificate from the server
+    export-certificate              Exports certificate from the server
+    import-certificate              Imports certificate to the server
+    list-devices                    Lists all recognized connected devices.
+    build                           Builds the project and produces a QR code for deploying the application package.
+    ion                             Produces a QR code for deployment in the Telerik AppBuilder companion app.
+    deploy                          Deploys the project to a connected device.
+    update                          Synchronizes the project with the cloud to enable LiveSync for remote devices.
+    sync                            Synchronizes the latest changes in your project to connected devices.
+    open-device-log-stream          Opens the log stream for given device.
+    find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    fetch-plugin                    Imports an Apache Cordova plugin into your project.
+    simulate                        Runs the current project in the device simulator.
+    list-projects                   Lists all projects of your account.
+    export-project                  Exports one of your remote projects into a local ab project.
+    edit-configuration              Opens configuration file for editing.
+    appstore-list                   Lists all applications in iTunes Connect that are ready for upload.
+    appstore-upload                 Builds the project and uploads the app to iTunes Connect.
 
 Global Options:
     --help                Prints help about the command given in the rest of the command line.
@@ -313,4 +317,41 @@ To add a certificate to the list, import a P12 file that contains an existing ce
 * create and complete a pending certificate signing request by importing the matching CER file you created in the iOS Dev Center
 
 You will be prompted to enter a password, if you don't specify it on the command line.
+--[/]--
+
+--[appstore-list]--
+Usage:
+    $ appbuilder appstore-list <AppleID> [<Password>]
+
+Prints a list of all applications that are ready for upload in iTunes Connect.
+<AppleID> and <Password> are your credentials for logging into iTunes Connect.
+
+The list shows the name, version and application bundle ID of each application.
+The name of an application is passed as the <Application Name> parameter of
+the `appstore-upload` command.
+
+You will be prompted to enter a password, if you don't specify it on the command line.
+--[/]--
+
+--[appstore-upload]--
+Usage:
+    $ appbuilder appstore-upload <Application Name> <AppleID> [<Password>]
+                 --certificate <index or name> --provision <index or name>
+
+Builds the project and uploads the application to iTunes Connect.
+<Application Name> is the name of the application which you are uploading. The exact name can be taken
+from the list printed with the `appstore-list` command.
+<AppleID> and <Password> are your credentials for logging into iTunes Connect.
+
+You can see a list of registered certificated using the `list-certificates` command.
+You can see a list of registered provisions using the `list-provisions` command.
+
+You will be prompted to enter a password, if you don't specify it on the command line.
+
+Options:
+    --certificate - Sets the certificate that you want to use for code signing your iOS
+        app. Must match the specified provisioning profile. You can specify a certificate by index or name.
+    --provision - Sets the provisioning profile that you want to use for code signing
+        your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
+        The provisioning profile must be selected such that it can be used to sign apps for publishing to AppStore.
 --[/]--

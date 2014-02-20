@@ -290,7 +290,7 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]> {
+	public build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]> {
 		return ((): Server.IPackageDef[] => {
 			configuration = configuration || "Debug";
 			this.$logger.info("Building project for platform '%s', configuration '%s'", platform, configuration);
@@ -756,7 +756,7 @@ export class Project implements Project.IProject {
 		});
 	}
 
-	private ensureProject() {
+	public ensureProject() {
 		if (!this.projectData) {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}

@@ -117,10 +117,12 @@ declare module Project {
 	interface IProject {
 		projectData: any;
 		getProjectDir(): string;
+		ensureProject(): void;
 		enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[];
 		isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean;
 		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
+		build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]>;
 		importProject(): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): void;
