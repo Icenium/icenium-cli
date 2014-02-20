@@ -338,7 +338,7 @@ Usage:
     $ appbuilder appstore-upload <Application Name> <AppleID> [<Password>]
                  --certificate <index or name> --provision <index or name>
 
-Builds the project and uploads the app to iTunes Connect.
+Builds the project and uploads the application to iTunes Connect.
 <Application Name> is the name of the application which you are uploading. The exact name can be taken
 from the list printed with the `appstore-list` command.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect.
