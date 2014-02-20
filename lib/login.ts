@@ -187,49 +187,48 @@ export class LoginManager implements ILoginManager {
 	}
 
 	private loginInBrowser(): IFuture<any> {
-		var future = new Future<any>();
+		return (() => {
+			var authComplete = new Future();
 
-		this.$logger.debug("Begin browser login.");
+			this.$logger.info("Launching login page in browser.");
 
-		var loginConfig:any = {
-			tfisServer: "https://" + this.$serverConfiguration.tfisServer.wait(),
-			clientId: this.$config.WRAP_CLIENT_ID,
-			callbackUrl: util.format("%s://%s/Mist/Authentication/RedirectVerification", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER)
-		};
+			var localhostServer = fileSrv.createServer({
+				routes: {
+					"/completeLogin": (request, response) => {
+						var code = url.parse(request.url, true).query.wrap_verification_code;
+						this.$logger.debug("Verification code: '%s'", code);
+						if (code) {
+							LoginManager.serveLoginFile("end.html")(request, response);
 
-		var localhostServer = fileSrv.createServer({
-			routes: {
-				"/login": LoginManager.serveLoginFile("login.html"),
-				"/knockout.js": LoginManager.serveLoginFile("knockout-3.0.0.js"),
-				"/style.css": LoginManager.serveLoginFile("style.css"),
-				"/login-config.js": fileSrv.serveText(function() {
-					return "var loginConfig = " + JSON.stringify(loginConfig);
-				}, "text/javascript"),
-				"/completeLogin": (request, response) => {
-					LoginManager.serveLoginFile("end.html")(request, response);
+							this.$logger.debug("Login complete: " + request.url);
+							localhostServer.close();
 
-					this.$logger.debug("Login complete: " + request.url);
-					localhostServer.close();
-
-					var code = url.parse(request.url, true).query.wrap_verification_code;
-					this.$logger.debug("Verification code: '%s'", code);
-					this.authenticate({ wrap_verification_code: code }).proxy(future);
+							this.authenticate({ wrap_verification_code: code }).proxy(authComplete);
+						} else {
+							fileSrv.redirect(response, loginUrl);
+						}
+					}
 				}
-			}
-		});
+			});
 
-		localhostServer.on("listening", () => {
+			localhostServer.listen(0);
+			this.$fs.futureFromEvent(localhostServer, "listening").wait();
+
 			var port = localhostServer.address().port;
-			var host = util.format("http://localhost:%s/", port);
 
-			loginConfig.clientState = host + "completeLogin";
+			var queryParams = {
+				wrap_client_id: this.$config.WRAP_CLIENT_ID,
+				wrap_callback: util.format("http://localhost:%s/completeLogin", port)
+			};
+			var loginUrl = util.format("https://%s/Authenticate/WRAPv0.9?%s",
+				this.$serverConfiguration.tfisServer.wait(),
+				querystring.stringify(queryParams));
 
-			this.$opener.open(host + "login");
-		});
+			this.$logger.debug("Login URL is '%s'", loginUrl);
+			this.$opener.open(loginUrl);
 
-		localhostServer.listen(0);
-
-		return future;
+			return authComplete.wait();
+		}).future()();
 	}
 }
 $injector.register("loginManager", LoginManager);
