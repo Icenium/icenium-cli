@@ -9,7 +9,7 @@ import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
 
 export class SyncCommand implements ICommand {
-	private excludedProjectDirsAndFiles = [".ice", "app_resources", ".iceproject", "plugins"];
+	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".ab", ".abproject"];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
@@ -18,45 +18,49 @@ export class SyncCommand implements ICommand {
 	}
 
 	public execute(args: string[]): void {
-		var platform = args[0];
+		(() => {
+			var platform = args[0];
 
-		if (!platform) {
-			throw new Error("Please specify platform");
-		}
+			if (!platform) {
+				throw new Error("Please specify platform");
+			}
 
-		var projectDir = this.$project.getProjectDir();
-		var appIdentifier = this.$project.projectData.AppIdentifier;
+			var projectDir = this.$project.getProjectDir();
+			var appIdentifier = this.$project.projectData.AppIdentifier;
 
-		if (this.$devicesServices.hasDevices(platform)) {
-			if (options.live) {
-				this.liveSyncDevices(platform, projectDir, appIdentifier);
-			} else {
-				if (options.file) {
-					var isExistFile = this.$fs.exists((options.file)).wait();
-					if(isExistFile) {
-						var projectFiles = [path.resolve(options.file)];
-						this.sync(platform, appIdentifier, projectDir, projectFiles);
-					} else {
-						console.log(util.format("The file %s does not exist.", options.file));
-					}
+			if (this.$devicesServices.hasDevices(platform)) {
+				if (options.live) {
+					this.liveSyncDevices(platform, projectDir, appIdentifier);
 				} else {
-					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
-					this.sync(platform, appIdentifier, projectDir, projectFiles);
+					if (options.file) {
+						var isExistFile = this.$fs.exists((options.file)).wait();
+						if(isExistFile) {
+							var projectFiles = [path.resolve(options.file)];
+							this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
+						} else {
+							this.$logger.out(util.format("The file %s does not exist.", options.file));
+						}
+					} else {
+						var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+						this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
+					}
 				}
 			}
-		}
+		}).future<void>()().wait();
 	}
 
-	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]) {
-		var action = (device: Mobile.IDevice): IFuture<void> => {
-			return (() => {
-				var platformSpecificProjectPath = device.getDeviceProjectPath(appIdentifier);
-				var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
-				device.sync(localDevicePaths, appIdentifier).wait();
-			}).future<void>()();
-		};
+	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
+		return(() => {
+			var action = (device: Mobile.IDevice): IFuture<void> => {
+				return (() => {
+					var platformSpecificProjectPath = device.getDeviceProjectPath(appIdentifier);
+					var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
+					device.sync(localDevicePaths, appIdentifier).wait();
+				}).future<void>()();
+			};
 
-		this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+			this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+		}).future<void>()();
 	}
 
 	public getLocalToDevicePaths(localProjectPath, projectFiles, deviceProjectPath): MobileHelper.LocalToDevicePathData[] {
