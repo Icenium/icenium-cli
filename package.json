@@ -62,7 +62,7 @@
     "temp": "0.6.0"
   },
   "bundledDependencies": [],
-  "license": "All rights reserved",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=0.10"
   }
