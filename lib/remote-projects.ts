@@ -26,7 +26,7 @@ class RemoteProjectExporter {
 
 	private printProjects(projects) {
 		this.$logger.out("Projects:");
-		projects.forEach(function (project, index) {
+		projects.forEach( (project, index) => {
 			this.$logger.out("#%d: '%s'", index + 1, project.name);
 		});
 	}
@@ -35,7 +35,7 @@ class RemoteProjectExporter {
 		return (() => {
 			var name = this.getProjectName(projectId).wait();
 			var result = this.doExportRemoteProject(name).wait();
-			this.$logger.out(result);
+			this.$logger.info(result);
 		}).future<void>()();
 	}
 
@@ -95,10 +95,6 @@ class RemoteProjectExporter {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
 			var properties = solutionData.Items[0].Properties;
-			properties.CorePlugins = properties.CorePlugins.split(";");
-			properties.DeviceOrientations = properties.DeviceOrientations.split(";");
-			properties.AndroidPermissions = properties.AndroidPermissions.split(";");
-
 			return properties;
 		}).future()();
 	}
