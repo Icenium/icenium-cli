@@ -10,9 +10,11 @@ export class FindPluginsCommand implements ICommand {
 	constructor(private $cordovaPluginsService: service.CordovaPluginsService) {
 	}
 
-	public execute(args: string[]): void {
-		var plugins = this.$cordovaPluginsService.getPlugins(args);
-		this.printPlugins(plugins);
+	public execute(args: string[]): IFuture<void> {
+		return(() => {
+			var plugins = this.$cordovaPluginsService.getPlugins(args);
+			this.printPlugins(plugins);
+		}).future<void>()();
 	}
 
 	private printPlugins(plugins) {

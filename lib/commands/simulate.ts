@@ -30,8 +30,8 @@ export class SimulateCommand implements ICommand {
 		this.projectData = $project.projectData;
 	}
 
-	public execute(args: string[]): void {
-		(() => {
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
 			this.cacheDir = path.join(options["profile-dir"], "Cache");
 			this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
 			this.$logger.debug("Server version: %s", this.serverVersion);
@@ -42,7 +42,7 @@ export class SimulateCommand implements ICommand {
 			this.prepareCordovaPlugins().wait();
 
 			this.runSimulator();
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 
 	private prepareSimulator(): IFuture<void> {

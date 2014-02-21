@@ -12,8 +12,8 @@ export class DeployCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $project: Project.IProject) { }
 
-	public execute(args: string[]): void {
-		(() => {
+	public execute(args: string[]): IFuture<void> {
+		return(() => {
 			var platform = args[0];
 			if (this.$devicesServices.hasDevices(platform)) {
 				var canExecute;
@@ -43,7 +43,7 @@ export class DeployCommand implements ICommand {
 				};
 				this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
 			}
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("deploy", DeployCommand);

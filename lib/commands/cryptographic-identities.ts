@@ -166,8 +166,8 @@ export class CreateSelfSignedIdentity implements ICommand {
 		private $httpClient: Server.IHttpClient,
 		private $errors: IErrors) {}
 
-	execute(args: string[]): void {
-		(() => {
+	execute(args: string[]): IFuture<void> {
+		return(() => {
 
 			var type = args[3];
 			if (type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
@@ -193,7 +193,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			var identityGenerationData = new IdentityGenerationData(this.model);
 			this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
 
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 
 	private getPromptSchema(defaults:any): IFuture<IPromptSchema> {
@@ -338,8 +338,8 @@ export class RemoveCryptographicIdentity implements ICommand {
 		private $prompter: IPrompter,
 		private $identityManager: Server.IIdentityManager) {}
 
-	execute(args: string[]): void {
-		(() => {
+	execute(args: string[]): IFuture<void> {
+		return(() => {
 			if (args.length < 1) {
 				this.$errors.fail("Specify certificate name or index.");
 			}
@@ -350,7 +350,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 			if (this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias)).wait()) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
 			}
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("remove-certificate", RemoveCryptographicIdentity);
@@ -362,8 +362,8 @@ export class ExportCryptographicIdentity implements ICommand {
 		private $fs: IFileSystem,
 		private $errors: IErrors) {}
 
-	execute(args: string[]): void {
-		(() => {
+	execute(args: string[]): IFuture<void> {
+		return(() => {
 			if (args.length < 1) {
 				this.$errors.fail("Specify certificate name and optionally a password.");
 			}
@@ -388,7 +388,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			var targetFile = this.$fs.createWriteStream(targetFileName);
 
 			this.$server.identityStore.getIdentity(name, password, targetFile).wait();
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 
 	private getPath(): string {
@@ -414,8 +414,8 @@ export class ImportCryptographicIdentity implements ICommand {
 		private $errors: IErrors) {
 	}
 
-	execute(args: string[]): void {
-		(() => {
+	execute(args: string[]): IFuture<void> {
+		return(() => {
 			var model = {
 				CertificateFile: args[0],
 				Password: args[1]
@@ -437,7 +437,7 @@ export class ImportCryptographicIdentity implements ICommand {
 			result.forEach((identity) => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
 			});
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("import-certificate", ImportCryptographicIdentity);
