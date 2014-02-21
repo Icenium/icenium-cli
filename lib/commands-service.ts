@@ -9,7 +9,7 @@ export class CommandsService implements ICommandsService {
 		return this.$errors.beginCommand(() => {
 			var command: ICommand = $injector.resolveCommand(commandName);
 			if (command) {
-				command.execute(commandArguments);
+				command.execute(commandArguments).wait();
 				return true;
 			}
 

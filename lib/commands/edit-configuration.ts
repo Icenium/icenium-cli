@@ -37,11 +37,11 @@ export class EditConfigurationCommand implements ICommand {
 		private $opener: IOpener) {
 	}
 
-	execute(args: string[]): void {
-		(() => {
+	execute(args: string[]): IFuture<void> {
+		return(() => {
 			var data = new EditConfigurationCommandData(args);
 			this.executeImplementation(data).wait();
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 
 	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
