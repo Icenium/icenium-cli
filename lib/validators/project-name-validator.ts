@@ -19,7 +19,7 @@ export class ProjectNameValidator {
 	private static INVALID_EXTENSIONS = [];
 
 	private validateName(name: string): ValidationResult.ValidationResult {
-		var validNameRegex = new RegExp("^[a-zA-Z0-9_.+\-@$&;() ,]*$");
+		var validNameRegex = new RegExp("^[a-zA-Z0-9_.+\\-@$&;() ,]*$");
 		var ext = path.extname(name);
 
 		if(helpers.isNullOrWhitespace(name)) {
