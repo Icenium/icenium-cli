@@ -9,6 +9,9 @@ import bufferpack = require("bufferpack");
 import plistlib = require("plistlib");
 import helpers = require("./../../helpers");
 import net = require("net");
+import _ = require("underscore");
+import util = require("util");
+import Future = require("fibers/future");
 
 export class CoreTypes {
 	public static pointerSize = ref.types.size_t.size;
@@ -34,6 +37,9 @@ export class CoreTypes {
 	public static amDeviceRef = CoreTypes.voidPtr;
 	public static amDeviceNotificationRef = CoreTypes.voidPtr;
 	public static cfTimeInterval = ref.types.double;
+	public static kCFPropertyListXMLFormat_v1_0 = 100;
+	public static kCFPropertyListBinaryFormat_v1_0 = 200;
+	public static kCFPropertyListImmutable = 0;
 
 	public static am_device_notification = struct({
 		unknown0: ref.types.uint32,
@@ -148,7 +154,21 @@ class IOSCore implements Mobile.IiOSCore {
 			"CFRunLoopTimerCreate": ffi.ForeignFunction(lib.get("CFRunLoopTimerCreate"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.doubleType, CoreTypes.doubleType, CoreTypes.uintType, CoreTypes.uintType, CoreTypes.cf_run_loop_timer_callback, CoreTypes.voidPtr]),
 			"CFRunLoopAddTimer": ffi.ForeignFunction(lib.get("CFRunLoopAddTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
 			"CFRunLoopRemoveTimer": ffi.ForeignFunction(lib.get("CFRunLoopRemoveTimer"), "void", [CoreTypes.voidPtr, CoreTypes.voidPtr, CoreTypes.cfStringRef]),
-			"CFAbsoluteTimeGetCurrent": ffi.ForeignFunction(lib.get("CFAbsoluteTimeGetCurrent"), CoreTypes.doubleType, [])
+			"CFAbsoluteTimeGetCurrent": ffi.ForeignFunction(lib.get("CFAbsoluteTimeGetCurrent"), CoreTypes.doubleType, []),
+			"CFPropertyListCreateData": ffi.ForeignFunction(lib.get("CFPropertyListCreateData"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.voidPtr, ref.types.long, ref.types.ulong, CoreTypes.voidPtr]),
+			"CFPropertyListCreateWithData": ffi.ForeignFunction(lib.get("CFPropertyListCreateWithData"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.voidPtr, ref.types.ulong, ref.refType(ref.types.long), CoreTypes.voidPtr]),
+			"CFGetTypeID": ffi.ForeignFunction(lib.get("CFGetTypeID"), ref.types.long, [CoreTypes.voidPtr]),
+			"CFStringGetTypeID": ffi.ForeignFunction(lib.get("CFStringGetTypeID"), ref.types.long, []),
+			"CFDictionaryGetTypeID": ffi.ForeignFunction(lib.get("CFDictionaryGetTypeID"), ref.types.long, []),
+			"CFDataGetTypeID": ffi.ForeignFunction(lib.get("CFDataGetTypeID"), ref.types.long, []),
+			"CFNumberGetTypeID": ffi.ForeignFunction(lib.get("CFNumberGetTypeID"), ref.types.long, []),
+			"CFBooleanGetTypeID": ffi.ForeignFunction(lib.get("CFBooleanGetTypeID"), ref.types.long, []),
+			"CFArrayGetTypeID": ffi.ForeignFunction(lib.get("CFArrayGetTypeID"), ref.types.long, []),
+			"CFDateGetTypeID": ffi.ForeignFunction(lib.get("CFDateGetTypeID"), ref.types.long, []),
+			"CFSetGetTypeID": ffi.ForeignFunction(lib.get("CFSetGetTypeID"), ref.types.long, []),
+			"CFDataGetBytePtr": ffi.ForeignFunction(lib.get("CFDataGetBytePtr"), ref.refType(ref.types.uint8), [CoreTypes.voidPtr]),
+			"CFDataGetLength": ffi.ForeignFunction(lib.get("CFDataGetLength"), ref.types.long, [CoreTypes.voidPtr]),
+			"CFDataCreate": ffi.ForeignFunction(lib.get("CFDataCreate"), CoreTypes.voidPtr, [CoreTypes.voidPtr, CoreTypes.voidPtr, ref.types.long])
 		};
 	}
 
@@ -173,7 +193,7 @@ class IOSCore implements Mobile.IiOSCore {
 			"AFCConnectionOpen": ffi.ForeignFunction(lib.get("AFCConnectionOpen"), "uint", ["int", "uint", ref.refType(CoreTypes.afcConnectionRef)]),
 			"AFCConnectionClose": ffi.ForeignFunction(lib.get("AFCConnectionClose"), "uint", [CoreTypes.afcConnectionRef]),
 			"AFCDirectoryCreate": ffi.ForeignFunction(lib.get("AFCDirectoryCreate"), "uint", [CoreTypes.afcConnectionRef, "string"]),
-			"AFCFileRefOpen": ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]),
+			"AFCFileRefOpen": ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", ref.refType(CoreTypes.afcFileRef)]),
 			"AFCFileRefClose": ffi.ForeignFunction(lib.get("AFCFileRefClose"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef]),
 			"AFCFileRefWrite": ffi.ForeignFunction(lib.get("AFCFileRefWrite"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, "uint"]),
 			"AFCFileRefRead": ffi.ForeignFunction(lib.get("AFCFileRefRead"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, CoreTypes.uintPtr]),
@@ -296,6 +316,10 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return this.coreFoundationLibrary.CFStringCreateWithCString(alloc, str, encoding);
 	}
 
+	public createCFString(str: string): NodeBuffer {
+		return this.stringCreateWithCString(null, str, IOSCore.kCFStringEncodingUTF8 );
+	}
+
 	public dictionaryCreate(allocator: NodeBuffer, keys: NodeBuffer, values: NodeBuffer, count: number, dictionaryKeyCallbacks: NodeBuffer, dictionaryValueCallbacks: NodeBuffer): NodeBuffer {
 		return this.coreFoundationLibrary.CFDictionaryCreate(allocator, keys, values, count, dictionaryKeyCallbacks, dictionaryValueCallbacks);
 	}
@@ -304,20 +328,72 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return this.coreFoundationLibrary.CFDictionaryGetValue(theDict, value);
 	}
 
-	public numberGetValue(number: NodeBuffer, theType: number, valuePtr: NodeBuffer): boolean {
-		return this.coreFoundationLibrary.CFNumberGetValue(number, theType, valuePtr);
-	}
-
-	public  getTypeID(type: NodeBuffer): number {
-		return this.coreFoundationLibrary.CFGetTypeID();
-	}
-
 	public dictionaryGetCount(theDict: NodeBuffer): number {
 		return this.coreFoundationLibrary.CFDictionaryGetCount(theDict);
 	}
 
-	public createCFString(str: string): NodeBuffer {
-		return this.stringCreateWithCString(null, str, IOSCore.kCFStringEncodingUTF8 );
+	public dictionaryGetKeysAndValues(dictionary: NodeBuffer, keys: NodeBuffer, values: NodeBuffer): void {
+		this.coreFoundationLibrary.CFDictionaryGetKeysAndValues(dictionary, keys, values);
+	}
+
+	public dictionaryGetTypeID(): number {
+		return this.coreFoundationLibrary.CFDictionaryGetTypeID();
+	}
+
+	public numberGetValue(number: NodeBuffer, theType: number, valuePtr: NodeBuffer): boolean {
+		return this.coreFoundationLibrary.CFNumberGetValue(number, theType, valuePtr);
+	}
+
+	public getTypeID(buffer: NodeBuffer): number {
+		return this.coreFoundationLibrary.CFGetTypeID(buffer);
+	}
+
+	public propertyListCreateData(allocator: NodeBuffer, propertyListRef: NodeBuffer , propertyListFormat: number, optionFlags: number, error: NodeBuffer): NodeBuffer {
+		return this.coreFoundationLibrary.CFPropertyListCreateData(allocator, propertyListRef, propertyListFormat, optionFlags, error);
+	}
+
+	public propertyListCreateWithData(allocator: NodeBuffer, propertyList: NodeBuffer, optionFlags: number, propertyListFormat: NodeBuffer, error: NodeBuffer): NodeBuffer {
+		return this.coreFoundationLibrary.CFPropertyListCreateWithData(allocator, propertyList, optionFlags, propertyListFormat, error);
+	}
+
+	public stringGetTypeID(): number {
+		return this.coreFoundationLibrary.CFStringGetTypeID();
+	}
+
+	public dataGetTypeID():  number {
+		return this.coreFoundationLibrary.CFDataGetTypeID();
+	}
+
+	public numberGetTypeID(): number {
+		return this.coreFoundationLibrary.CFNumberGetTypeID();
+	}
+
+	public booleanGetTypeID(): number {
+		return this.coreFoundationLibrary.CFBooleanGetTypeID();
+	}
+
+	public arrayGetTypeID(): number {
+		return this.coreFoundationLibrary.CFArrayGetTypeID();
+	}
+
+	public dateGetTypeID(): number {
+		return this.coreFoundationLibrary.CFDateGetTypeID();
+	}
+
+	public setGetTypeID(): number {
+		return this.coreFoundationLibrary.CFSetGetTypeID();
+	}
+
+	public dataGetBytePtr(buffer: NodeBuffer): NodeBuffer {
+		return this.coreFoundationLibrary.CFDataGetBytePtr(buffer);
+	}
+
+	public dataGetLength(buffer: NodeBuffer): number {
+		return this.coreFoundationLibrary.CFDataGetLength(buffer);
+	}
+
+	public dataCreate(allocator: NodeBuffer, data: NodeBuffer, length: number) {
+		return this.coreFoundationLibrary.CFDataCreate(allocator, data, length);
 	}
 
 	public convertCFStringToCString(cfstr) {
@@ -340,6 +416,62 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		}
 
 		return result;
+	}
+
+	private cfTypeFrom(value: {[key: string]: any}): NodeBuffer {
+		var keys = _.keys(value);
+		var values = _.values(value);
+
+		var len = keys.length;
+		var keysBuffer = new Buffer(CoreTypes.pointerSize * len);
+		var valuesBuffer = new Buffer(CoreTypes.pointerSize * len);
+
+		var offset = 0;
+
+		for(var i=0; i< len; i++) {
+			var cfKey = this.createCFString(keys[i]);
+			var cfValue =this.createCFString(values[i]);
+
+			ref.writePointer(keysBuffer, offset, cfKey);
+			ref.writePointer(valuesBuffer, offset, cfValue);
+			offset += CoreTypes.pointerSize;
+		}
+
+		return this.dictionaryCreate(null, keysBuffer, valuesBuffer, len, this.kCFTypeDictionaryKeyCallBacks(), this.kCFTypeDictionaryValueCallBacks());
+	}
+
+	private cfTypeTo(value: NodeBuffer): NodeBuffer {
+		var typeId = this.getTypeID(value);
+		var retval: NodeBuffer = null;
+
+		if(typeId === this.dataGetTypeID()) {
+			var len = this.dataGetLength(value);
+			retval = ref.reinterpret(this.dataGetBytePtr(value), len);
+		}
+
+		return retval;
+	}
+
+	public dictToPlistEncoding(dict: {[key: string]: {}}, format: number) {
+
+		var cfDict = this.cfTypeFrom(dict);
+		var cfData = this.propertyListCreateData(null, cfDict, format, 0, null);
+
+		return this.cfTypeTo(cfData);
+	}
+
+	public dictFromPlistEncoding(str: NodeBuffer): NodeBuffer {
+		var retval: NodeBuffer = null;
+
+		var cfData = this.dataCreate(null, str, str.length);
+		if(cfData) {
+			var cfDict = this.propertyListCreateWithData(null, cfData, CoreTypes.kCFPropertyListImmutable, null, null);
+			if(cfDict) {
+				retval = this.cfTypeTo(cfDict);
+			}
+		}
+
+		return retval;
 	}
 }
 $injector.register("coreFoundation", CoreFoundation);
@@ -411,8 +543,8 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AFCDirectoryCreate(afcConnection, path);
 	}
 
-	public afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, timeout: number, afcFileRef: NodeBuffer): number {
-		return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, timeout, afcFileRef);
+	public afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, afcFileRef: NodeBuffer): number {
+		return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, afcFileRef);
 	}
 
 	public afcFileRefClose(afcConnection: NodeBuffer, afcFileRef: number): number {
@@ -441,16 +573,17 @@ export class MobileDevice implements Mobile.IMobileDevice {
 }
 $injector.register("mobileDevice", MobileDevice);
 
-export class WinSocketWrapper {
+class WinSocket implements Mobile.IiOSDeviceSocket {
 	private winSocketLibrary: any = null;
 	private static BYTES_TO_READ = 1024;
 
 	constructor(private socket: number,
-		private $errors: IErrors){
+		private $coreFoundation: Mobile.ICoreFoundation,
+		private $errors: IErrors) {
 		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
-	public read(bytes: number): NodeBuffer {
+	private read(bytes: number): NodeBuffer {
 		var data = new Buffer(bytes);
 		var result = this.winSocketLibrary.recv(this.socket, data, bytes, 0);
 		if (result < 0) {
@@ -460,13 +593,35 @@ export class WinSocketWrapper {
 		return data;
 	}
 
-	public readAll(printData: any) {
-		var data = this.read(WinSocketWrapper.BYTES_TO_READ);
+	public readSystemLog(printData: any) {
+		var data = this.read(WinSocket.BYTES_TO_READ);
 		while (data) {
 			printData(data);
-			data = this.read(WinSocketWrapper.BYTES_TO_READ);
+			data = this.read(WinSocket.BYTES_TO_READ);
 		}
 		this.close();
+	}
+
+	public receiveMessage(): IFuture<string> {
+		var data = this.read(4);
+		var reply = "";
+		var result: NodeBuffer = null;
+
+		if (data !== null && data.length === 4) {
+			var l = bufferpack.unpack(">i", data)[0];
+			var left = l;
+			while (left > 0) {
+				var r = this.read(left);
+				if (r === null) {
+					this.$errors.fail("Unable to read reply");
+				}
+				reply += r;
+				left -= r.length;
+			}
+			result = this.$coreFoundation.dictFromPlistEncoding(reply);
+		}
+
+		return Future.fromResult(result.toString());
 	}
 
 	public write(data: string): number {
@@ -478,55 +633,89 @@ export class WinSocketWrapper {
 	}
 }
 
-export class PlistService {
-	private socket: any  = null;
+class PosixSocket implements Mobile.IiOSDeviceSocket {
+	private socket: net.NodeSocket = null;
 
 	constructor(private service: number,
 		private $logger: ILogger,
+		private $errors: IErrors,
 		private $injector: IInjector) {
 		if(helpers.isWindows()) {
-			this.socket = this.$injector.resolve(WinSocketWrapper, {socket: this.service });
+			this.socket = this.$injector.resolve(WinSocket, {socket: this.service });
 		} else if(helpers.isDarwin()) {
 			this.socket = new net.Socket({ fd: this.service });
 		}
 	}
 
-	public receiveMessage(): string {
-		var data = this.socket.read(4);
-		var reply = "";
+	public receiveMessage(): IFuture<string> {
+		var result = new Future<string>();
 
-		if (data !== null && data.length === 4) {
-			var l = bufferpack.unpack(">i", data)[0];
-			var left = l;
-			while (left > 0) {
-				var r = this.socket.read(left);
-				if (r === null) {
-					throw "Unable to read reply";
-				}
-				reply += r;
-				left -= r.length;
-			}
-		}
+		this.socket
+			.on("data", (data) => {
+				this.$logger.trace("PlistService receiving: '%s'", data);
+				result.return(data.toString());
+			})
+			.on("error", (error) => {
+				result.throw(error);
+			});
 
-		return reply;
+		return result;
 	}
 
-	public receiveAll(condition: boolean): string {
-		var reply = this.receiveMessage();
-
-		while (condition) {
-			reply += "\n" + this.receiveMessage();
-		}
-
-		return reply;
+	public readSystemLog(action: (data: string) => void) {
+		this.socket
+			.on("data", (data) => {
+				action(data);
+			})
+			.on("end", () => {
+				this.close();
+			})
+			.on("error", (error) => {
+				this.$errors.fail(error);
+			});
 	}
 
-	public sendMessage(data) {
-		var payload = plistlib.toString(data);
-		var message = bufferpack.pack(">i", [payload.length]) + payload;
-		var writtenBytes = this.socket.write(message);
-		this.$logger.trace("PlistService-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
-		return writtenBytes;
+	public write(message: string): void {
+		this.socket.write(message);
+	}
+
+	public close(): void {
+		this.socket.destroy();
+	}
+ }
+
+export class PlistService {
+	private socket: Mobile.IiOSDeviceSocket  = null;
+
+	constructor(private service: number,
+		private format: number,
+		private $coreFoundation: Mobile.ICoreFoundation,
+		private $logger: ILogger,
+		private $injector: IInjector) {
+		if(helpers.isWindows()) {
+			this.socket = this.$injector.resolve(WinSocket, {service: this.service});
+		} else if(helpers.isDarwin()) {
+			this.socket = this.$injector.resolve(PosixSocket, {service: this.service });
+		}
+	}
+
+	public receiveMessage(): IFuture<string> {
+		return this.socket.receiveMessage();
+	}
+
+	public readSystemLog(action : any) {
+		this.socket.readSystemLog(action);
+	}
+
+	public sendMessage(msg: {[key: string]: {}}) : void {
+		var data = this.$coreFoundation.dictToPlistEncoding(msg, this.format);
+		var payload = bufferpack.pack(">i", [data.length]);
+
+		this.$logger.trace("PlistService sending: ");
+		this.$logger.trace(data.toString());
+
+		this.socket.write(payload);
+		this.socket.write(data);
 	}
 
 	public disconnect() {

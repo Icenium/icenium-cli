@@ -71,7 +71,6 @@
 /// <reference path="server-config.ts" />
 /// <reference path="service-util.ts" />
 /// <reference path="services/cordova-plugins.ts" />
-/// <reference path="sync-service.ts" />
 /// <reference path="validators/base-validators.ts" />
 /// <reference path="validators/cryptographic-identity-validators.ts" />
 /// <reference path="validators/ios-deployment-validator.ts" />

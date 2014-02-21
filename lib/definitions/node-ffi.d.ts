@@ -191,10 +191,6 @@ declare module "ffi" {
 	};
 }
 
-interface NodeBuffer {
-	type: any;
-}
-
 declare module "ref" {
 	export interface Type {
 		/** The size in bytes required to hold this datatype. */
@@ -435,6 +431,7 @@ interface NodeBuffer {
 	 * @override
 	 */
 	inspect(): string;
+	type: any;
 }
 
 declare module "ref-array" {
@@ -466,6 +463,7 @@ declare module "ref-array" {
 			toJSON(): T[]; inspect(): string; buffer: NodeBuffer; ref(): NodeBuffer; };
 		(data: NodeBuffer, length?: number): { [i: number]: T; length: number; toArray(): T[];
 			toJSON(): T[]; inspect(): string; buffer: NodeBuffer; ref(): NodeBuffer; };
+		address: any;
 	}
 
 	/**
