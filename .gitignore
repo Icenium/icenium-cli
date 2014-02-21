@@ -1,6 +1,7 @@
 *.js
 !/*.js
 !bin/appbuilder.js
+!vendor/*.js
 *.js.map
 
 lib-cov
