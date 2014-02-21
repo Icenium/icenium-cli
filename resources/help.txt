@@ -86,7 +86,7 @@ Options:
 
 --[list-devices]--
 Usage:
-    $ appbuilder list-devices [<Platform>] [--timeout]
+    $ appbuilder list-devices [<Platform>] [--timeout  <Milliseconds>]
 
 Platform-specific examples:
     $ appbuilder list-devices android
