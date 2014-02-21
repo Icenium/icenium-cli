@@ -86,11 +86,16 @@ Options:
 
 --[list-devices]--
 Usage:
-    $ appbuilder list-devices [<Platform>]
+    $ appbuilder list-devices [<Platform>] [--timeout  <Milliseconds>]
 
 Platform-specific examples:
     $ appbuilder list-devices android
     $ appbuilder list-devices ios
+
+Options:
+	--timeout - Sets the time in milliseconds for the operation to search for connected devices before completing.
+	The operation will continue to wait and listen for newly connected devices and will list them
+	after the specified time expires. If not set, the default value is 4000.
 
 Lists with serial number and index all recognized connected devices, grouped by platform.
 
