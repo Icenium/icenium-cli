@@ -14,7 +14,8 @@ class RemoteProjectExporter {
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
 		private $serviceProxy: Server.IServiceProxy,
-		private $project: Project.IProject) {}
+		private $project: Project.IProject,
+		private $errors: IErrors) {}
 
 	public listProjects(): IFuture<void> {
 		return (() => {
@@ -24,9 +25,9 @@ class RemoteProjectExporter {
 	}
 
 	private printProjects(projects) {
-		console.log("Projects:");
-		projects.forEach(function (project, index) {
-			console.log(util.format("#%d: '%s'", index + 1, project.name));
+		this.$logger.out("Projects:");
+		projects.forEach( (project, index) => {
+			this.$logger.out("#%d: '%s'", index + 1, project.name);
 		});
 	}
 
@@ -45,8 +46,8 @@ class RemoteProjectExporter {
 			this.$project.createProjectFile(projectDir, remoteProjectName, properties).wait();
 
 			var projectExtractor = unzip.Extract({ path: projectDir});
-			this.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, projectExtractor));
-			this.$fs.futureFromEvent(projectExtractor, "finish").wait();
+			this.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, projectExtractor)).wait();
+			this.$fs.futureFromEvent(projectExtractor, "close").wait();
 			return util.format("%s has been successfully exported to %s", remoteProjectName, projectDir);
 		}).future<string>()();
 	}
@@ -73,12 +74,12 @@ class RemoteProjectExporter {
 			} else if (helpers.isNumber(projectId)) {
 				var index = parseInt(projectId, 10);
 				if (index < 1 || index > data.length) {
-					throw new Error(util.format("The project index must be between 1 and %s", data.length));
+					this.$errors.fail("The project index must be between 1 and %s", data.length);
 				} else {
 					return data[index - 1].name;
 				}
 			}
-			throw new Error(util.format("The project '%s' was not found.", projectId));
+			this.$errors.fail("The project '%s' was not found.", projectId);
 		}).future<string>()();
 	}
 
@@ -93,7 +94,8 @@ class RemoteProjectExporter {
 	private getProjectProperties(projectName: string): IFuture<any> {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
-			return solutionData.Items[0].Properties;
+			var properties = solutionData.Items[0].Properties;
+			return properties;
 		}).future()();
 	}
 

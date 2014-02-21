@@ -528,11 +528,11 @@ export class Project implements Project.IProject {
 			properties.AppIdentifier = options.appid;
 			properties.ProjectGuid = this.generateProjectGuid();
 			properties.BundleVersion = propertyGroup.BundleVersion[0];
-			properties.CorePlugins = propertyGroup.CorePlugins[0].split(";");
-			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0].split(";");
+			properties.CorePlugins = propertyGroup.CorePlugins[0];
+			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0];
 			properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
 			properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
-			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0].split(";");
+			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0];
 
 			return properties;
 		}).future<any>()();
@@ -553,7 +553,11 @@ export class Project implements Project.IProject {
 			var projectSchema = helpers.getProjectFileSchema();
 			Object.keys(properties).forEach(prop => {
 				if (projectSchema.hasOwnProperty(prop)) {
-					this.projectData[prop] = properties[prop]
+					if(projectSchema[prop].flags) {
+						this.projectData[prop] = properties[prop].split(";");
+					} else {
+						this.projectData[prop] = properties[prop];
+					}
 				}
 			});
 
