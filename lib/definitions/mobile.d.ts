@@ -94,17 +94,6 @@ declare module Mobile {
 		afcDirectoryClose(afcConnection: NodeBuffer, afcdirectory: NodeBuffer): number;
 	}
 
-	interface IWinSocketWrapper {
-		read(bytes: number): NodeBuffer;
-		write(data: string): number;
-		close(): number;
-	}
-
-	interface PlistService {
-		receiveMessage(): string;
-		sendMessage(data): void;
-    }
-
 	interface IInstallationProxyClient {
 		deploy(packageFile: string, packageName: string);
 	}
@@ -131,7 +120,7 @@ declare module Mobile {
 	interface IiOSDeviceSocket {
 		receiveMessage(): IFuture<string>;
 		readSystemLog(action: (data: string) => void): void;
-		write(message: string): void;
+		sendMessage(message: {[key: string]: {}}, format?: number): void;
 		close(): void;
 	}
 }
