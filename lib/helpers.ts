@@ -90,9 +90,9 @@ export function isStringOptionEmpty(optionValue) {
 export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
 	var factory = function (): ICommand {
 		return {
-			execute: (args: string[]): void => {
+			execute: (args: string[]): IFuture<void> => {
 				var mod = $injector.resolve(module);
-				executor(mod, args).wait();
+				return executor(mod, args);
 			}
 		};
 	};

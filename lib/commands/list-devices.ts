@@ -7,8 +7,8 @@ export class ListDevicesCommand implements ICommand {
 		private $logger: ILogger) {
 	}
 
-	public execute(args: string[]): void {
-		(() => {
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
 			var index = 1;
 			var platform = args[0];
 
@@ -17,7 +17,7 @@ export class ListDevicesCommand implements ICommand {
 			};
 
 			this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("list-devices", ListDevicesCommand);

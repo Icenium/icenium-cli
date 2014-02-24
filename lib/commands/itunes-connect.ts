@@ -20,8 +20,8 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 		private $prompter: IPrompter,
 		private $errors: IErrors) {}
 
-	execute(args:string[]):void {
-		(() => {
+	execute(args:string[]): IFuture<void> {
+		return (() => {
 			var userName = args[0];
 			var password = args[1];
 			if (!userName) {
@@ -42,7 +42,7 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 			if (!apps.length) {
 				this.$logger.out("No applications are ready for upload.");
 			}
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("appstore-list", ListApplicationsReadyForUploadCommand);
@@ -55,8 +55,8 @@ export class UploadApplicationCommand implements ICommand {
 		private $project: Project.IProject,
 		private $identityManager: Server.IIdentityManager) {}
 
-	execute(args:string[]):void {
-		(() => {
+	execute(args:string[]): IFuture<void> {
+		return (() => {
 			var application = args[0];
 			var userName = args[1];
 			var password = args[2];
@@ -105,7 +105,7 @@ export class UploadApplicationCommand implements ICommand {
 				projectPath, userName, password, theApp.AppleID.toString()).wait();
 
 			this.$logger.info("Upload complete.")
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("appstore-upload", UploadApplicationCommand);

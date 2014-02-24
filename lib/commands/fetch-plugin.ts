@@ -10,23 +10,25 @@ export class FetchPluginCommand implements ICommand {
 		private $cordovaPluginsService: service.CordovaPluginsService) {
 	}
 
-	public execute(args: string[]): void {
-		if (args.length === 0) {
-			this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
-		} else if (args.length === 1 && (this.isLocalPath(args[0]) || this.isUrlToRepository(args[0]))) {
-			var result = this.$cordovaPluginsService.fetch(args[0]);
-			console.log(result);
-		} else {
-			var plugins = this.$cordovaPluginsService.getPlugins(args);
-			var pluginsCount = Object.keys(plugins).length;
-			if (pluginsCount === 0) {
-				console.log("There are 0 matching plugins.");
-			} else if (pluginsCount > 1) {
-				console.log("There are more then 1 matching plugins.");
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
+			if (args.length === 0) {
+				this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
+			} else if (args.length === 1 && (this.isLocalPath(args[0]) || this.isUrlToRepository(args[0]))) {
+				var result = this.$cordovaPluginsService.fetch(args[0]);
+				console.log(result);
 			} else {
-				console.log(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]));
+				var plugins = this.$cordovaPluginsService.getPlugins(args);
+				var pluginsCount = Object.keys(plugins).length;
+				if (pluginsCount === 0) {
+					console.log("There are 0 matching plugins.");
+				} else if (pluginsCount > 1) {
+					console.log("There are more then 1 matching plugins.");
+				} else {
+					console.log(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]));
+				}
 			}
-		}
+		}).future<void>()();
 	}
 
 	private isLocalPath(pluginId: string): boolean {

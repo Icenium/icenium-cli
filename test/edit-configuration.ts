@@ -37,13 +37,13 @@ describe("edit-configuration", function () {
 	it("throws error when no parameter is given", () => {
 		setTempDir();
 		var command = getEditConfigurationCommand();
-		assert.throws(() => command.execute([]));
+		assert.throws(() => command.execute([]).wait());
 	});
 
 	it("throws error when wrong configuration file is given", () => {
 		setTempDir();
 		var command = getEditConfigurationCommand();
-		assert.throws(() => command.execute(["wrong"]));
+		assert.throws(() => command.execute(["wrong"]).wait());
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
@@ -57,7 +57,7 @@ describe("edit-configuration", function () {
 		var templateFilepath = path.join(tempDir, template.filepath);
 
 		var command = getEditConfigurationCommand();
-		command.execute([template.template]);
+		command.execute([template.template]).wait();
 		assert.equal(openArgument, templateFilepath);
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
@@ -76,7 +76,7 @@ describe("edit-configuration", function () {
 		fs.openSync(templateFilePath, "w", "0666");
 
 		var command = getEditConfigurationCommand();
-		command.execute([template.template]);
+		command.execute([template.template]).wait();
 		assert.equal(openArgument, templateFilePath);
 		assert.isTrue(fs.existsSync(templateFilePath));
 		assert.equal(fs.readFileSync(templateFilePath).toString(), "");

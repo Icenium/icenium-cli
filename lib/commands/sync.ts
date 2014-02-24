@@ -17,8 +17,8 @@ export class SyncCommand implements ICommand {
 		private $project: Project.IProject) {
 	}
 
-	public execute(args: string[]): void {
-		(() => {
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
 			var platform = args[0];
 
 			if (!platform) {
@@ -46,7 +46,7 @@ export class SyncCommand implements ICommand {
 					}
 				}
 			}
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 
 	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {

@@ -10,8 +10,8 @@ export class HelpCommand implements ICommand {
 		private $errors: IErrors,
 		private $fs: IFileSystem) {}
 
-	public execute(args: string[]): void {
-		(() => {
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
 			var topic: string;
 			if (args.length == 0) {
 				topic = "";
@@ -30,7 +30,7 @@ export class HelpCommand implements ICommand {
 			} else {
 				this.$errors.fail({ formatStr: "Unknown help topic '%s'", suppressCommandHelp: true }, topic);
 			}
-		}).future<void>()().wait();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("help", HelpCommand);
