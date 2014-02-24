@@ -14,8 +14,14 @@ import readline = require("readline");
 import stream = require("stream");
 
 class CryptographicIdentityConstants {
-	public static FILE_FORMAT_TYPE = "Pkcs12";
-	public static FILE_FORMAT_EXTENSION = "p12";
+	public static PKCS12_TYPE = "Pkcs12";
+	public static PKCS12_EXTENSION = "p12";
+	public static X509_TYPE = "X509Certificate";
+	public static X509_EXTENSION = "cer";
+	public static ExtensionToTypeMap = {
+		".p12": CryptographicIdentityConstants.PKCS12_TYPE,
+		".cer": CryptographicIdentityConstants.X509_TYPE
+	};
 }
 
 export class CryptographicIdentityStoreService implements ICryptographicIdentityStoreService{
@@ -55,6 +61,9 @@ export class IdentityManager implements Server.IIdentityManager {
 			_.forEach(identities, (identity, index) => {
 				this.$logger.out(util.format("#%d: '%s'", index + 1, identity.Alias));
 			});
+			if (!identities.length) {
+				this.$logger.info("No certificates registered."); // TODO: add guidance how to install certificates (when that becomes possible)
+			}
 		}).future<any>()();
 	}
 
@@ -74,6 +83,10 @@ export class IdentityManager implements Server.IIdentityManager {
 					});
 				}
 			});
+
+			if (!provisions.length) {
+				this.$logger.info("No mobile provisioning profiles registered."); // TODO: add guidance how to install provisions (when that becomes possible)
+			}
 		}).future<any>()();
 	}
 
@@ -143,11 +156,11 @@ class IdentityGenerationData {
 	public constructor(identityModel: ISelfSignedIdentityModel) {
 		this.StartDate = new Date(identityModel.StartDate);
 		this.EndDate = new Date(identityModel.EndDate);
-		this.SubjectNameValues = this.getDistinguishedNameValues(identityModel.Name,
-			identityModel.Email, identityModel.Country);
+		this.SubjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
+			identityModel.Name, identityModel.Email, identityModel.Country);
 	}
 
-	private getDistinguishedNameValues(name: string, email: string, countryCode: string) {
+	public static getDistinguishedNameValues(name: string, email: string, countryCode: string) {
 		var distinguishedNameValues = {};
 		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.CN] = name;
 		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.EmailAddress] = email;
@@ -156,52 +169,29 @@ class IdentityGenerationData {
 	}
 }
 
-export class CreateSelfSignedIdentity implements ICommand {
-	private model: any;
+export interface IIdentityInformation {
+	Name?: string;
+	Email?: string;
+	Country?: string;
+}
 
-	constructor(private $server: Server.IServer,
+export interface IIdentityInformationGatherer {
+	gatherIdentityInformation(defaults: IIdentityInformation): IFuture<IIdentityInformation>;
+}
+
+class IdentityInformationGatherer implements IIdentityInformationGatherer {
+	constructor(
 		private $selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>,
-		private $prompter: IPrompter,
 		private $userDataStore: IUserDataStore,
-		private $httpClient: Server.IHttpClient,
-		private $errors: IErrors) {}
+		private $prompter: IPrompter,
+		private $httpClient: Server.IHttpClient) {}
 
-	execute(args: string[]): void {
-		(() => {
+	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
+		return ((): IIdentityInformation => {
+			var myCountry = this.getDefaultCountry().wait();
 
-			var type = args[3];
-			if (type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
-				this.$errors.fail("Certificate type must be either 'Generic' or 'GooglePlay'");
-			}
-
-			this.model = {
-				Name: args[0],
-				Email: args[1],
-				Country: args[2],
-				ForGooglePlayPublishing: args[3] ? (args[3].toLowerCase() === "googleplay" ? "y" : "n") : undefined,
-				StartDate: args[4],
-				EndDate: args[5]
-			};
-
-			var promptSchema: IPromptSchema = this.getPromptSchema(this.model).wait();
-
-			this.$prompter.start();
-			this.$prompter.override(this.model);
-
-			this.model = this.$prompter.get(promptSchema).wait();
-
-			var identityGenerationData = new IdentityGenerationData(this.model);
-			this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
-
-		}).future<void>()().wait();
-	}
-
-	private getPromptSchema(defaults:any): IFuture<IPromptSchema> {
-		return ((): IPromptSchema => {
 			var user = this.$userDataStore.getUser().wait();
-			var defaultCountry = this.getDefaultCountry().wait();
-
-			var promptSchema:IPromptSchema = {
+			var schema: IPromptSchema = {
 				properties: {
 					Name: {
 						required: true,
@@ -212,15 +202,13 @@ export class CreateSelfSignedIdentity implements ICommand {
 						description: "E-mail",
 						required: true,
 						type: "string",
-						default: () => {
-							return user.email;
-						},
+						default: () => user.email,
 						conform: (value: string) => {
 							var validationResult = this.$selfSignedIdentityValidator.
 								validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
 
 							if (!validationResult.IsSuccessful) {
-								promptSchema.properties["Email"].message = validationResult.Error;
+								schema.properties["Email"].message = validationResult.Error;
 								return false;
 							}
 							return true;
@@ -229,7 +217,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 					Country: {
 						required: true,
 						type: "string",
-						default: () => defaultCountry,
+						default: () => myCountry,
 						conform: (value: string) => {
 							var validationResult = this.$selfSignedIdentityValidator.
 								validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
@@ -239,66 +227,131 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 								message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
 
-								promptSchema.properties["Country"].message = message.join("\n");
-								return false;
-							}
-							return true;
-						}
-					},
-					ForGooglePlayPublishing: {
-						description: "Is for Google Play publishing? (y/n)",
-						required: true,
-						type: "string",
-						default: () => "n",
-						conform: (value: string) => {
-							if (!/^[yn]$/i.test(value)) {
-								promptSchema.properties["ForGooglePlayPublishing"].message = "Choose 'y' (yes) or 'n' (no).";
-								return false;
-							}
-							return true;
-						}
-					},
-					StartDate: {
-						description: "Valid from (yyyy-mm-dd)",
-						required: true,
-						type: "string",
-						default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
-						conform: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.
-								validateProperty(<ISelfSignedIdentityModel>{ StartDate: value }, "StartDate");
-
-							if (!validationResult.IsSuccessful) {
-								promptSchema.properties["StartDate"].message = validationResult.Error;
-								return false;
-							}
-
-							return true;
-						}
-					},
-					EndDate: {
-						description: "Valid until (yyyy-mm-dd)",
-						required: true,
-						type: "string",
-						default: () => this.getDefaultEndDate(this.isForGooglePlay()),
-						conform: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.
-								validateProperty(<ISelfSignedIdentityModel>{
-									ForGooglePlayPublishing: this.isForGooglePlay().toString(),
-									StartDate: defaults["StartData"] || this.getHistoryValue("StartDate"),
-									EndDate: value
-								}, "EndDate");
-
-							if (!validationResult.IsSuccessful) {
-								promptSchema.properties["EndDate"].message = validationResult.Error;
+								schema.properties["Country"].message = message.join("\n");
 								return false;
 							}
 							return true;
 						}
 					}
 				}
+			}
+
+			this.$prompter.start();
+			this.$prompter.override(model);
+			return <IIdentityInformation> this.$prompter.get(schema).wait();
+		}).future<IIdentityInformation>()();
+	}
+
+	private getDefaultCountry(): IFuture<string> {
+		return (() => {
+			var locationResponse: Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
+			var location: any = JSON.parse(locationResponse.body);
+			return location.country_name;
+		}).future<string>()();
+	}
+}
+$injector.register("identityInformationGatherer", IdentityInformationGatherer);
+
+export class CreateSelfSignedIdentity implements ICommand {
+	private model: any;
+
+	constructor(private $server: Server.IServer,
+		private $identityInformationGatherer: IIdentityInformationGatherer,
+		private $selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>,
+		private $prompter: IPrompter,
+		private $logger: ILogger,
+		private $errors: IErrors) {}
+
+	execute(args: string[]): void {
+		(() => {
+			var type = args[3];
+			if (type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
+				this.$errors.fail("Certificate type must be either 'Generic' or 'GooglePlay'");
+			}
+
+			var identityInfo: IIdentityInformation = {
+				Name: args[0],
+				Email: args[1],
+				Country: args[2]
 			};
-			return promptSchema;
-		}).future<IPromptSchema>()();
+
+			identityInfo = this.$identityInformationGatherer.gatherIdentityInformation(identityInfo).wait();
+
+			this.model = {
+				ForGooglePlayPublishing: args[3] ? (args[3].toLowerCase() === "googleplay" ? "y" : "n") : undefined,
+				StartDate: args[4],
+				EndDate: args[5]
+			};
+
+			var promptSchema = this.getPromptSchema(this.model);
+
+			this.$prompter.start();
+			this.$prompter.override(this.model);
+			this.model = this.$prompter.get(promptSchema).wait();
+			_.extend(this.model, identityInfo);
+
+			var identityGenerationData = new IdentityGenerationData(this.model);
+			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
+			this.$logger.info("Created certificated '%s'.", result.Alias);
+		}).future<void>()().wait();
+	}
+
+	private getPromptSchema(defaults:any): IPromptSchema {
+		var promptSchema:IPromptSchema = {
+			properties: {
+				ForGooglePlayPublishing: {
+					description: "Is for Google Play publishing? (y/n)",
+					required: true,
+					type: "string",
+					default: () => "n",
+					conform: (value: string) => {
+						if (!/^[yn]$/i.test(value)) {
+							promptSchema.properties["ForGooglePlayPublishing"].message = "Choose 'y' (yes) or 'n' (no).";
+							return false;
+						}
+						return true;
+					}
+				},
+				StartDate: {
+					description: "Valid from (yyyy-mm-dd)",
+					required: true,
+					type: "string",
+					default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
+					conform: (value: string) => {
+						var validationResult = this.$selfSignedIdentityValidator.
+							validateProperty(<ISelfSignedIdentityModel>{ StartDate: value }, "StartDate");
+
+						if (!validationResult.IsSuccessful) {
+							promptSchema.properties["StartDate"].message = validationResult.Error;
+							return false;
+						}
+
+						return true;
+					}
+				},
+				EndDate: {
+					description: "Valid until (yyyy-mm-dd)",
+					required: true,
+					type: "string",
+					default: () => this.getDefaultEndDate(this.isForGooglePlay()),
+					conform: (value: string) => {
+						var validationResult = this.$selfSignedIdentityValidator.
+							validateProperty(<ISelfSignedIdentityModel>{
+								ForGooglePlayPublishing: this.isForGooglePlay().toString(),
+								StartDate: defaults["StartData"] || this.getHistoryValue("StartDate"),
+								EndDate: value
+							}, "EndDate");
+
+						if (!validationResult.IsSuccessful) {
+							promptSchema.properties["EndDate"].message = validationResult.Error;
+							return false;
+						}
+						return true;
+					}
+				}
+			}
+		};
+		return promptSchema;
 	}
 
 	private isForGooglePlay(): boolean {
@@ -312,14 +365,6 @@ export class CreateSelfSignedIdentity implements ICommand {
 	private getHistoryValue(name: string): any {
 		var entry = this.$prompter.history(name);
 		return entry && entry.value;
-	}
-
-	private getDefaultCountry(): IFuture<string> {
-		return (() => {
-			var locationResponse: Server.IResponse = this.$httpClient.httpRequest("http://api.wipmania.com/json").wait();
-			var location: any = JSON.parse(locationResponse.body);
-			return location.address.country;
-		}).future<string>()();
 	}
 
 	private getDefaultEndDate(forGooglePlayPublishing: boolean): string {
@@ -360,6 +405,7 @@ export class ExportCryptographicIdentity implements ICommand {
 		private $identityManager: Server.IIdentityManager,
 		private $prompter: IPrompter,
 		private $fs: IFileSystem,
+		private $logger: ILogger,
 		private $errors: IErrors) {}
 
 	execute(args: string[]): void {
@@ -375,7 +421,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			var name = identity.Alias;
 
 			var targetFileName = path.join(this.getPath(), util.format("%s.%s", name,
-				CryptographicIdentityConstants.FILE_FORMAT_EXTENSION));
+				CryptographicIdentityConstants.PKCS12_EXTENSION));
 
 			if (this.$fs.exists(targetFileName).wait()) {
 				this.$errors.fail("The target file '%s' already exists.", targetFileName);
@@ -387,6 +433,7 @@ export class ExportCryptographicIdentity implements ICommand {
 
 			var targetFile = this.$fs.createWriteStream(targetFileName);
 
+			this.$logger.info("Exporting certificate to file %s.", targetFileName);
 			this.$server.identityStore.getIdentity(name, password, targetFile).wait();
 		}).future<void>()().wait();
 	}
@@ -408,7 +455,6 @@ $injector.registerCommand("export-certificate", ExportCryptographicIdentity);
 export class ImportCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
-		private $importCryptographicIdentityValidator: IAsyncValidator<any>,
 		private $prompter: IPrompter,
 		private $logger: ILogger,
 		private $errors: IErrors) {
@@ -416,23 +462,31 @@ export class ImportCryptographicIdentity implements ICommand {
 
 	execute(args: string[]): void {
 		(() => {
-			var model = {
-				CertificateFile: args[0],
-				Password: args[1]
-			};
+			var certificateFile = args[0];
+			var password = args[1];
 
-			if (!model.Password) {
-				model.Password = this.$prompter.getPassword("Certificate file password").wait();
+			if (!certificateFile) {
+				this.$errors.fail("No certificate file specified.");
 			}
 
-			var validationResult = this.$importCryptographicIdentityValidator.validate(model).wait();
-			if (!validationResult.IsSuccessful) {
-				this.$errors.fail(validationResult.Error);
+			var extension = path.extname(certificateFile).toLowerCase();
+			if (extension !== ".p12" && extension !== ".cer") {
+				this.$errors.fail("To add a cryptographic identity to the list, import a P12 file " +
+					"that contains an existing cryptographic identity or a CER file that contains the " +
+					"certificate generated from a certificate signing request.")
+			}
+			var importType = CryptographicIdentityConstants.ExtensionToTypeMap[extension];
+
+			if (!this.$fs.exists(certificateFile).wait()) {
+				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
 
-			var targetFile = this.$fs.createReadStream(model.CertificateFile);
-			var result = this.$server.identityStore.importIdentity(CryptographicIdentityConstants.FILE_FORMAT_TYPE,
-				model.Password, targetFile).wait();
+			if (!password) {
+				password = this.$prompter.getPassword("Certificate file password", {allowEmpty: true}).wait();
+			}
+
+			var targetFile = this.$fs.createReadStream(certificateFile);
+			var result = this.$server.identityStore.importIdentity(importType, password, targetFile).wait();
 
 			result.forEach((identity) => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
@@ -441,3 +495,126 @@ export class ImportCryptographicIdentity implements ICommand {
 	}
 }
 $injector.registerCommand("import-certificate", ImportCryptographicIdentity);
+
+class CreateCertificateSigningRequest implements ICommand {
+	constructor(private $server: Server.IServer,
+		private $injector: IInjector,
+		private $identityInformationGatherer: IIdentityInformationGatherer) {}
+
+	execute(args: string[]): void {
+		(() => {
+			var model = {
+				Name: args[0],
+				Email: args[1],
+				Country: args[2]
+			};
+
+			model = this.$identityInformationGatherer.gatherIdentityInformation(model).wait();
+
+			var subjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
+				model.Name, model.Email, model.Country);
+			var certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
+
+			var downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
+			downloader.downloadCertificate(certificateData.UniqueName).wait();
+		}).future<void>()().wait();
+	}
+}
+$injector.registerCommand("create-certificate-request", CreateCertificateSigningRequest);
+
+class ListCertificateSigningRequestsCommand implements ICommand {
+	constructor(private $logger: ILogger,
+		private $server: Server.IServer) {}
+
+	execute(args: string[]): void {
+		(() => {
+			var requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
+			requests = _.sortBy(requests, (req) => req.UniqueName);
+			_.forEach(requests, (req, i, list) => {
+				this.$logger.out("#%s: %s", i + 1, req.Subject);
+			})
+			if (!requests.length) {
+				this.$logger.info("No certificate signing requests.");
+			}
+		}).future<void>()().wait();
+	}
+}
+$injector.registerCommand("list-certificate-requests", ListCertificateSigningRequestsCommand);
+
+interface ICertificateSigningRequest {
+	UniqueName: string;
+	Subject: string;
+}
+
+function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): IFuture<ICertificateSigningRequest> {
+	return ((): ICertificateSigningRequest => {
+		if (indexStr === undefined) {
+			$errors.fail("Specify certificate signing request number to delete.");
+		}
+
+		var requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
+		requests = _.sortBy(requests, (req) => req.UniqueName);
+
+		var index = parseInt(indexStr, 10) - 1;
+		if (index < 0 || index >= requests.length) {
+			$errors.fail("No certificate with number '%s' exists", indexStr);
+		}
+		var req = requests[index];
+		return req;
+	}).future<ICertificateSigningRequest>()();
+}
+
+class RemoveCertificateSigningRequestCommand implements ICommand {
+	constructor(private $logger: ILogger,
+		private $injector: IInjector,
+		private $prompter: IPrompter,
+		private $server: Server.IServer) {}
+
+	execute(args: string[]): void {
+		(() => {
+			var req = this.$injector.resolve(parseCertificateIndex, {indexStr: args[0]}).wait();
+
+			if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
+				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
+				this.$logger.info("Removed certificate request '%s'", req.Subject);
+			}
+		}).future<void>()().wait();
+	}
+}
+$injector.registerCommand("remove-certificate-request", RemoveCertificateSigningRequestCommand);
+
+interface ICertificateDownloader {
+	downloadCertificate(uniqueName: string): IFuture<void>;
+}
+
+class DownloadCertificateSigningRequestCommand implements ICommand, ICertificateDownloader {
+	constructor(private $logger: ILogger,
+		private $injector: IInjector,
+		private $errors: IErrors,
+		private $fs: IFileSystem,
+		private $server: Server.IServer) {}
+
+	execute(args: string[]): void {
+		var req = this.$injector.resolve(parseCertificateIndex, {indexStr: args[0]}).wait();
+		this.downloadCertificate(req.UniqueName).wait();
+	}
+
+	public downloadCertificate(uniqueName: string): IFuture<void> {
+		return ((): void => {
+			var targetFileName = options["save-to"];
+			if (targetFileName) {
+				if (this.$fs.exists(targetFileName).wait()) {
+					this.$errors.fail("The output file already exists.");
+				}
+			} else {
+				targetFileName = this.$fs.getUniqueFileName("certificate_request.csr").wait();
+			}
+
+			var targetFile = this.$fs.createWriteStream(targetFileName);
+			this.$logger.info("Writing certificate signing request to %s", path.resolve(targetFileName));
+			this.$server.identityStore.getCertificateRequest(uniqueName, targetFile).wait();
+			this.$fs.futureFromEvent(targetFile, "finish").wait();
+		}).future<void>()();
+	}
+}
+$injector.registerCommand("download-certificate-request", DownloadCertificateSigningRequestCommand);

@@ -27,7 +27,7 @@ export class Prompter implements IPrompter {
 		return future;
 	}
 
-	public getPassword(prompt: string): IFuture<string> {
+	public getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> {
 		return (() => {
 			var schema: IPromptSchema = {
 				properties: {
@@ -35,11 +35,8 @@ export class Prompter implements IPrompter {
 						description: prompt,
 						type: "string",
 						hidden: true,
-						required: true,
-						message: "Password must be non-empty.",
-						conform: (value: string) => {
-							return value.length > 0;
-						}
+						required: !(options && options.allowEmpty),
+						message: "Password must be non-empty."
 					}
 				}
 			};

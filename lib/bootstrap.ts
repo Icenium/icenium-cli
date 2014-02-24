@@ -87,8 +87,11 @@ $injector.require("selfSignedIdentityValidator", "./validators/cryptographic-ide
 $injector.requireCommand("create-self-signed-certificate", "./commands/cryptographic-identities");
 $injector.requireCommand("remove-certificate", "./commands/cryptographic-identities");
 $injector.requireCommand("export-certificate", "./commands/cryptographic-identities");
-$injector.require("importCryptographicIdentityValidator", "./validators/cryptographic-identity-validators");
 $injector.requireCommand("import-certificate", "./commands/cryptographic-identities");
+$injector.requireCommand("create-certificate-request", "./commands/cryptographic-identities");
+$injector.requireCommand("list-certificate-requests", "./commands/cryptographic-identities");
+$injector.requireCommand("remove-certificate-request", "./commands/cryptographic-identities");
+$injector.requireCommand("download-certificate-request", "./commands/cryptographic-identities");
 
 $injector.requireCommand("user", "./commands/user-status");
 

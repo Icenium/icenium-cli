@@ -360,3 +360,40 @@ Options:
         your iOS app. Must match the specified certificate. You can specify a provisioning profile by index or name.
         The provisioning profile must be selected such that it can be used to sign apps for publishing to AppStore.
 --[/]--
+
+--[create-certificate-request]--
+Usage:
+    $ appbuilder create-certificate-request [<Name> [<Email> [<Country>]]] [--save-to <File>]
+
+Create a certificate signing request (.csr). <Name>, <Email> and <Country> are written into the request
+and will be used to create the actual certificate. If any of these parameters is not provided, an
+interactive prompt will let you enter this data.
+
+Options:
+    --save-to <File> - save the certificate request to the given file. If not specified, a default name will be chosen.
+--[/]--
+
+--[list-certificate-requests]--
+Usage:
+    $ appbuilder list-certificate-requests
+
+Lists all pending certificate signing requests.
+--[/]--
+
+--[remove-certificate-request]--
+Usage:
+    $ appbuilder remove-certificate-request <Index>
+
+Removes a pending certificate signing request. Get the <Index> from the `list-certificate-requests` command.
+--[/]--
+
+--[download-certificate-request]--
+Usage:
+    $ appbuilder download-certificate-request <Index> [--save-to <File>]
+
+Downloads a certificate signing request. Get the <Index> from the `list-certificate-requests` command.
+
+Options:
+    --save-to <File> - save the certificate request to the given file. If not specified, a default name will be chosen.
+--[/]--
+

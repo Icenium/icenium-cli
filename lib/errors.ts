@@ -10,14 +10,14 @@ Exception.prototype = new Error();
 function resolveCallStack(stack: string): string {
 	var stackLines: string[]= stack.split("\n");
 	var parsed = _.map(stackLines, (line): any => {
-		var match = line.match(/^\s*at ([^(]*)\((.*?):([0-9]+):([0-9]+)\)$/);
+		var match = line.match(/^\s*at ([^(]*) \((.*?):([0-9]+):([0-9]+)\)$/);
 		if (match) {
 			return match;
 		}
 
 		match = line.match(/^\s*at (.*?):([0-9]+):([0-9]+)$/);
 		if (match) {
-			match.splice(1, 0, "[anonymous]");
+			match.splice(1, 0, "<anonymous>");
 			return match;
 		}
 
@@ -54,6 +54,11 @@ function resolveCallStack(stack: string): string {
 
 	return remapped.join("\n");
 }
+
+process.on("uncaughtException", function(err) {
+	console.log(resolveCallStack(err.stack));
+	process.exit(ErrorCodes.UNKNOWN);
+});
 
 export class Errors implements IErrors {
 	constructor(

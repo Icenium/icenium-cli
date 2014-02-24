@@ -145,6 +145,7 @@ interface IFileSystem {
 	writeFile(filename: string, data: any, encoding?: string): IFuture<void>;
 	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void>;
 	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void>;
+	getUniqueFileName(baseName: string): IFuture<string>;
 
 	createReadStream(path: string, options?: {
 		flags?: string;
@@ -237,7 +238,7 @@ declare enum ErrorCodes {
 interface IPrompter {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
-	getPassword(prompt: string): IFuture<string>;
+	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
 	confirm(prompt: string): IFuture<boolean>;
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
