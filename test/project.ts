@@ -37,6 +37,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("buildService", {});
 	testInjector.register("projectNameValidator", mockProjectNameValidator);
 	testInjector.register("loginManager", stubs.LoginManager);
+	testInjector.register("userDataStore", {});
 
 	return testInjector;
 }
