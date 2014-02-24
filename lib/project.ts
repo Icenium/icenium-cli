@@ -100,6 +100,7 @@ export class Project implements Project.IProject {
 		private $projectNameValidator,
 		private $errors: IErrors,
 		private $opener: IOpener,
+		private $userDataStore: IUserDataStore,
 		private $loginManager: ILoginManager) {
 		this.readProjectData().wait();
 	}
@@ -460,8 +461,20 @@ export class Project implements Project.IProject {
 	private createFromTemplate(appname, projectDir): IFuture<void> {
 		return (() => {
 			var templatesDir = path.join(__dirname, "../resources/templates"),
-			template = options.template || this.$config.DEFAULT_PROJECT_TEMPLATE,
+				template = options.template || this.$config.DEFAULT_PROJECT_TEMPLATE,
 				templateFileName;
+
+			if (template.toLowerCase() === "kendouidataviz") {
+				this.$loginManager.ensureLoggedIn().wait();
+				var user = this.$userDataStore.getUser().wait();
+				if (!user.tenant.features["Kendo UI DataViz"]) {
+					this.$errors.fail("You cannot create Kendo UI DataViz projects " +
+						"with your current subscription plan. To use this feature, " +
+						"upgrade your subscription plan to Business or greater, " +
+						"or contact the account owner.\n" +
+						"http://www.telerik.com/purchase/platform [Ctrl-Click]");
+				}
+			}
 
 			if (!appname) {
 				this.$logger.fatal("At least appname must be specified!");
