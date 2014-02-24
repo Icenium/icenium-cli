@@ -91,7 +91,7 @@ export class Errors implements IErrors {
 		} catch (ex) {
 			this.$logger.fatal(this.$config.DEBUG
 				? resolveCallStack(ex.stack)
-				: "\x1B[34m" + ex.message + "\x1B[0m");
+				: "\x1B[31;1m" + ex.message + "\x1B[0m");
 
 			if (!ex.suppressCommandHelp) {
 				printCommandHelp();
