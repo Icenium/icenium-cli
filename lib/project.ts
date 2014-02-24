@@ -509,7 +509,7 @@ export class Project implements Project.IProject {
 		return ((): any => {
 			var properties: any = {};
 
-			if (options.appid === undefined) {
+			if (!options.appid) {
 				options.appid = this.generateDefaultAppId(appName);
 				this.$logger.warn("--appid was not specified. Defaulting to " + options.appid);
 			}
@@ -525,7 +525,7 @@ export class Project implements Project.IProject {
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
 			properties.AppName = appName;
-			properties.AppIdentifier = options.appid;
+			properties.AppIdentifier = "";
 			properties.ProjectGuid = this.generateProjectGuid();
 			properties.BundleVersion = propertyGroup.BundleVersion[0];
 			properties.CorePlugins = propertyGroup.CorePlugins[0];
@@ -533,6 +533,8 @@ export class Project implements Project.IProject {
 			properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
 			properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
 			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0];
+
+			this.updateProjectProperty(properties, "set", "AppIdentifier", [options.appid]);
 
 			return properties;
 		}).future<any>()();
@@ -635,6 +637,16 @@ export class Project implements Project.IProject {
 		var propSchema = helpers.getProjectFileSchema();
 		var propData = propSchema[property];
 
+		var validate = (condition: boolean, ...args) => {
+			if(condition) {
+				if(propData.validationMessage) {
+					this.$errors.fail(propData.validationMessage);
+				} else {
+					this.$errors.fail.apply(null, _.rest(args, 0));
+				}
+			}
+		};
+
 		if (!propData) {
 				this.$logger.fatal("Unrecognized property '%s'", property);
 				this.printProjectSchemaHelp();
@@ -670,9 +682,8 @@ export class Project implements Project.IProject {
 			var badValues = _.reject(newValue, function(value) {
 				return validValues[value];
 			});
-			if (badValues.length > 0) {
-				this.$errors.fail("Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
-			}
+
+			validate(badValues.length > 0, "Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
 
 			newValue = _.map(newValue, function(value) { return validValues[value]; });
 		}
@@ -682,9 +693,7 @@ export class Project implements Project.IProject {
 
 			if (propData.regex) {
 				var matchRegex = new RegExp(propData.regex);
-				if (!matchRegex.test(newValue)) {
-					this.$errors.fail("Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
-				}
+				validate(!matchRegex.test(newValue), "Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
 			}
 
 			if (propData.validator) {

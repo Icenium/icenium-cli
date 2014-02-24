@@ -5,7 +5,8 @@
 	},
 	"AppIdentifier": {
 		"description": "The application identifier (or app id) must match the app id property of the iOS mobile provision used for building.",
-		"regex": "^com\\.[A-Za-z0-9]+\\.[A-Za-z0-9]+$"
+		"regex": "^[a-zA-Z]+([a-zA-Z0-9]*)(\\.[a-zA-Z]+([a-zA-Z0-9]*)){2,}$",
+		"validationMessage": "The application identifier must consist of at least three alphanumeric strings separated by a dot. The alphanumeric strings must start with a letter."
 	},
 	"DisplayName": {
 		"description": "The display name of the app."
