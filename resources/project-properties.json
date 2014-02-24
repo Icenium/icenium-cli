@@ -17,7 +17,7 @@
 	},
 	"FrameworkVersion": {
 		"description": "Cordova framework version.",
-		"range": ["3.0.0", "3.2.0"]
+		"range": ["3.2.0"]
 	},
 	"CorePlugins": {
 		"description": "List of core Cordova plugins required by the app.",
