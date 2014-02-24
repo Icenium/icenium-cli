@@ -12,7 +12,8 @@ export class AndroidDevice implements Mobile.IDevice {
 	constructor(private identifier: string,
 		private adb: string,
 		private $logger: ILogger,
-		private $childProcess: IChildProcess) {
+		private $childProcess: IChildProcess,
+		private $errors: IErrors) {
 	}
 
 	getPlatform(): string {
@@ -125,14 +126,18 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	private spawnTextSearch(keywords: string[]) {
+		if (!keywords || keywords.length == 0) {
+			this.$errors.fail("To spawn a text search process you must provide keywords and filter by them.");
+		}
+
 		if (helpers.isWindows()) {
 			// /r :Uses search strings as regular expressions. Findstr interprets all metacharacters as regular expressions.
 			// /i :Specifies that the search is not to be case-sensitive.
-			return this.$childProcess.spawn("findstr", ["/r", "/i", keywords ? keywords.join(" ") : ""]);
+			return this.$childProcess.spawn("findstr", ["/r", "/i", keywords.join(" ")]);
 		} else {
 			// -E :Interpret PATTERN as an extended regular expression.
 			// -i :Ignore case distinctions in both the PATTERN and the input.
-			return this.$childProcess.spawn("grep", ["-E", "-i", keywords ? keywords.join("|") : ""]);
+			return this.$childProcess.spawn("grep", ["-E", "-i", keywords.join("|")]);
 		}
 	}
 }
