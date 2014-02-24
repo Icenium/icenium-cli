@@ -7,7 +7,6 @@ import path = require("path");
 import unzip = require("unzip");
 import _ = require("underscore");
 import helpers = require("../helpers");
-import options = require("../options");
 
 export class EditConfigurationCommandData {
 	public static ConfigurationFiles = [
@@ -34,7 +33,8 @@ export class EditConfigurationCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
-		private $opener: IOpener) {
+		private $opener: IOpener,
+		private $project: Project.IProject) {
 	}
 
 	execute(args: string[]): void {
@@ -47,7 +47,8 @@ export class EditConfigurationCommand implements ICommand {
 	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
 		return (() => {
 			if (data.template) {
-				var filepath = path.join(options.path, data.template.filepath);
+				var projectPath = this.$project.getProjectDir();
+				var filepath = path.join(projectPath, data.template.filepath);
 				var directory = path.dirname(filepath);
 				if (!this.$fs.exists(filepath).wait()) {
 					this.$logger.info("Creating configuration file: " + filepath);
