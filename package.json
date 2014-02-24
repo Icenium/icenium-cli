@@ -59,7 +59,8 @@
     "grunt-ts": "1.5.1",
     "grunt-contrib-clean": "0.5.0",
     "mocha-fibers": "git+https://git@github.com/tailsu/mocha-fibers.git",
-    "temp": "0.6.0"
+    "temp": "0.6.0",
+    "grunt-contrib-watch": "0.5.3"
   },
   "bundledDependencies": [],
   "license": "Apache-2.0",
