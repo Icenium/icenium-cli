@@ -6,7 +6,7 @@ lint.*
 test-reports.xml
 
 bin/appbuilder
-bin/appbuilder.cmd
+bin/*.cmd
 
 scratch/
 test/
