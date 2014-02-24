@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/",
+    "preinstall": "node preinstall.js",
     "postinstall": "node postinstall.js"
   },
   "main": "./lib/appbuilder-cli.js",
@@ -34,9 +35,7 @@
     "watchr": "2.4.4",
     "valid-url": "1.0.9",
     "node-uuid": "1.4.1",
-    "q": "0.9.7",
     "underscore": "1.5.2",
-    "q-io": "1.10.6",
     "tabtab": "git+https://git@github.com/tailsu/node-tabtab.git",
     "plugman": "0.16.0",
     "plistlib": "0.2.1",
@@ -65,6 +64,6 @@
   "bundledDependencies": [],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=0.10"
+    "node": "~0.10.22"
   }
 }
