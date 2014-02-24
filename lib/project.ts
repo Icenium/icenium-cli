@@ -354,7 +354,7 @@ export class Project implements Project.IProject {
 			if (options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
-				this.build(platform, this.getBuildConfiguration(), true, options.download).wait();
+				this.build(platform, this.getBuildConfiguration(), !options.download, options.download).wait();
 			}
 		}).future<void>()();
 	}
