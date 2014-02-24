@@ -193,7 +193,7 @@ Usage:
 	$ appbuilder open-device-log-stream [--device <id>]
 
 You can choose which device's log stream to open by specifying its index or identifier.
-All devices and their indexes can be seen by running "$ ice list-devices".
+Run '$ appbuilder list-devices' command to see all connected devices.
 --[/]--
 
 --[find-plugins]--
