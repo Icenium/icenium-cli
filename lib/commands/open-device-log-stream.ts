@@ -4,7 +4,7 @@ import helpers = require("./../helpers");
 
 export class OpenDeviceLogStreamCommand implements ICommand {
 	constructor(private $devicesServices: Mobile.IDevicesServices,
-		private $logger: ILogger) {
+		private $errors: IErrors) {
 	}
 
 	public execute(args: string[]): void {
@@ -14,7 +14,7 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 		} else if(helpers.isNumber(options.device)) {
 			this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
 		} else {
-			this.$logger.fatal("Invalid device identifier or index. Run $ice list-devices command to see all connected devices.");
+			this.$errors.fail("Invalid device identifier or index");
 		}
 	}
 }
