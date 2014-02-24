@@ -1,12 +1,12 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import fs = require("fs");
 import path = require("path");
 import util = require("util");
 
 export class HelpCommand implements ICommand {
 	constructor(private $logger: ILogger,
+		private $injector: IInjector,
 		private $errors: IErrors,
 		private $fs: IFileSystem) {}
 
@@ -26,7 +26,21 @@ export class HelpCommand implements ICommand {
 
 			var match = regex.exec(helpContent);
 			if (match) {
-				this.$logger.out(match[1].trim());
+				var helpText = match[1].trim();
+
+				var substitutionPoint;
+				while (substitutionPoint = helpText.match(/#{([^.]+)\.([^}]+)}/)) {
+					this.$logger.trace(substitutionPoint);
+
+					var module = this.$injector.resolve(substitutionPoint[1]);
+					var data = module[substitutionPoint[2]].apply(module) || "";
+
+					var pointStart = substitutionPoint.index;
+					var pointEnd = pointStart + substitutionPoint[0].length;
+					helpText = helpText.substr(0, pointStart) + data + helpText.substr(pointEnd);
+				}
+
+				this.$logger.out(helpText);
 			} else {
 				this.$errors.fail({ formatStr: "Unknown help topic '%s'", suppressCommandHelp: true }, topic);
 			}

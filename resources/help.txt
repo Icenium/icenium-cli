@@ -1,34 +1,43 @@
 --[]--
 
 Usage:
-    $ appbuilder <command> [command parameters] [--command options] [--path <path>]
+    $ appbuilder <command> [command parameters] [--command <options>]
 
-Commands:
+General commands:
     help <command>                  Shows additional information about the commands in this list.
     login                           Logs you in Telerik Platform.
-    logout                          Logs you out from Telerik Platform
+    logout                          Logs you out from Telerik Platform.
     user                            Prints information about the currently logged in user.
+
+Project development commands:
     create                          Creates a new project from template.
-    list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
-    list-certificates               Lists all configured certificates for code signing iOS applications.
-    list-certificates               Lists all configured certificates for code signing iOS applications and Android applications.
-    create-self-signed-certificate  Creates self signed certificate for code signing Android applications
-    remove-certificate              Removes certificate from the server
-    export-certificate              Exports certificate from the server
-    import-certificate              Imports certificate to the server
-    list-devices                    Lists all recognized connected devices.
     build                           Builds the project and produces a QR code for deploying the application package.
-    ion                             Produces a QR code for deployment in the Telerik AppBuilder companion app.
     deploy                          Deploys the project to a connected device.
     update                          Synchronizes the project with the cloud to enable LiveSync for remote devices.
     sync                            Synchronizes the latest changes in your project to connected devices.
-    open-device-log-stream          Opens the log stream for given device.
+    simulate                        Runs the current project in the device simulator.
     find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin                    Imports an Apache Cordova plugin into your project.
-    simulate                        Runs the current project in the device simulator.
+    edit-configuration              Opens configuration file for editing.
+    prop-add                        Adds more values to a list project property.
+    prop-set                        Sets a project property.
+    prop-del                        Removes values from a list project property.
+    prop-print                      Prints the value of a project property.
     list-projects                   Lists all projects of your account.
     export-project                  Exports one of your remote projects into a local ab project.
-    edit-configuration              Opens configuration file for editing.
+
+Device commands:
+    list-devices                    Lists all recognized connected devices.
+    open-device-log-stream          Opens the log stream for given device.
+
+Certificate management and publishing commands:
+    list-certificates               Lists all configured certificates for code signing
+                                    iOS applications and Android applications.
+    create-self-signed-certificate  Creates self signed certificate for code signing Android applications.
+    remove-certificate              Removes certificate from the server.
+    export-certificate              Exports certificate from the server.
+    import-certificate              Imports certificate to the server.
+    list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
     appstore-list                   Lists all applications in iTunes Connect that are ready for upload.
     appstore-upload                 Builds the project and uploads the app to iTunes Connect.
 
@@ -397,3 +406,39 @@ Options:
     --save-to <File> - save the certificate request to the given file. If not specified, a default name will be chosen.
 --[/]--
 
+
+--[prop-add]--
+Usage:
+    $ appbuilder prop-add <PropertyName> <value> [value]*
+
+Adds the specified value or list of values to the list property named <PropertyName>.
+
+#{project.getProjectSchemaHelp}
+--[/]--
+
+--[prop-set]--
+Usage:
+    $ appbuilder prop-set <PropertyName> <value> [value]*
+
+Sets the project property named <PropertyName> to the specified value or list of values.
+
+#{project.getProjectSchemaHelp}
+--[/]--
+
+--[prop-del]--
+Usage:
+    $ appbuilder prop-del <PropertyName> <value> [value]*
+
+Removes the given value or list of values from the list property named <PropertyName>.
+
+#{project.getProjectSchemaHelp}
+--[/]--
+
+--[prop-print]--
+Usage:
+    $ appbuilder prop-print <PropertyName>
+
+Prints the value of <PropertyName> for the current project.
+
+#{project.getProjectSchemaHelp}
+--[/]--
