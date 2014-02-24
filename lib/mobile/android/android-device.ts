@@ -47,10 +47,14 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	deploy(packageFile: string, packageName: string): IFuture<void> {
+	public deploy(packageFile: string, packageName: string): IFuture<void> {
 		return(() => {
+			var uninstallCommand = this.composeCommand(util.format("shell pm uninstall %s", packageName))
+			this.$childProcess.exec(uninstallCommand).wait();
+
 			var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
 			this.$childProcess.exec(installCommand).wait();
+
 			this.startPackageOnDevice(packageName).wait();
 			console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
