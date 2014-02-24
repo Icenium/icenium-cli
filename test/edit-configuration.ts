@@ -5,6 +5,7 @@ import fs = require("fs");
 import path = require("path");
 import stubs = require("./stubs");
 import fileSystem = require("../lib/file-system");
+import project = require("../lib/project");
 import options = require("../lib/options");
 import editConfiguration = require("../lib/commands/edit-configuration");
 import yok = require("../lib/yok");
@@ -15,6 +16,9 @@ var assert: chai.Assert = chai.assert;
 var testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("fs", fileSystem.FileSystem);
+testInjector.register("project", {
+	getProjectDir: () => { return options.path; }
+});
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("opener", stubs.OpenerStub);
 
