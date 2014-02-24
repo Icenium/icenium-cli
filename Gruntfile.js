@@ -33,6 +33,26 @@ module.exports = function(grunt) {
 			}
 		},
 
+		watch: {
+			devlib: {
+				files: ['lib/**/*.ts'],
+				tasks: ['ts:devlib'],
+				options: {
+				  atBegin: true,
+				  interrupt: true
+				},
+			},
+
+			devtest: {
+				files: ['test/**/*.ts'],
+				tasks: ['ts:devtest'],
+				options: {
+				  atBegin: true,
+				  interrupt: true
+				},
+			}
+		},
+
 		clean: {
 			src: ["test/**/*.js*", "lib/**/*.js*"]
 		}
@@ -40,6 +60,7 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks("grunt-contrib-clean");
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.registerTask("default", ["ts:devlib", "ts:devtest"]);
 };
