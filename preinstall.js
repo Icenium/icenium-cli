@@ -1,13 +1,13 @@
 var readline = require("readline");
 
+if (process.platform !== "win32") {
+	return;
+}
+
 var rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
-
-if (process.platform !== "win32") {
-	return;
-}
 
 if (process.arch !== "ia32") {
 	console.log("Install the 32-bit version of Node.js before installing AppBuilder CLI.");
