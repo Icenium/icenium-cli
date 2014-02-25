@@ -107,7 +107,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	public deploy(packageFile: string, packageName: string): IFuture<void> {
 		return (() => {
 			var installationProxy = this.$injector.resolve(iOSProxyServices.InstallationProxyClient, {device: this });
-			installationProxy.deployApplication(packageFile);
+			installationProxy.deployApplication(packageFile).wait();
 		}).future<void>()();
 	}
 
@@ -116,9 +116,11 @@ export class IOSDevice implements Mobile.IIOSDevice {
 			var houseArrestClient  = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
 			var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
+			houseArrestClient.closeSocket();
 
 			var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
 			notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
+			notificationProxyClient.closeSocket();
 			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
 	}

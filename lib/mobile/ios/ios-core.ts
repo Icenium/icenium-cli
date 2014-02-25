@@ -193,7 +193,7 @@ class IOSCore implements Mobile.IiOSCore {
 			"AFCConnectionOpen": ffi.ForeignFunction(lib.get("AFCConnectionOpen"), "uint", ["int", "uint", ref.refType(CoreTypes.afcConnectionRef)]),
 			"AFCConnectionClose": ffi.ForeignFunction(lib.get("AFCConnectionClose"), "uint", [CoreTypes.afcConnectionRef]),
 			"AFCDirectoryCreate": ffi.ForeignFunction(lib.get("AFCDirectoryCreate"), "uint", [CoreTypes.afcConnectionRef, "string"]),
-			"AFCFileRefOpen": ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", ref.refType(CoreTypes.afcFileRef)]),
+			"AFCFileRefOpen": helpers.isDarwin() ? ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", ref.refType(CoreTypes.afcFileRef)]) : ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]),
 			"AFCFileRefClose": ffi.ForeignFunction(lib.get("AFCFileRefClose"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef]),
 			"AFCFileRefWrite": ffi.ForeignFunction(lib.get("AFCFileRefWrite"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, "uint"]),
 			"AFCFileRefRead": ffi.ForeignFunction(lib.get("AFCFileRefRead"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, CoreTypes.uintPtr]),
@@ -543,8 +543,12 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AFCDirectoryCreate(afcConnection, path);
 	}
 
-	public afcFileRefOpen(afcConnection: NodeBuffer, path: string, mode: number, afcFileRef: NodeBuffer): number {
-		return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, afcFileRef);
+	public afcFileRefOpen(afcConnection: NodeBuffer, path: string,  mode: number, afcFileRef: NodeBuffer): number {
+		if(helpers.isWindows()) {
+			return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, 0, afcFileRef);
+		} else if(helpers.isDarwin()) {
+			return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, afcFileRef);
+		}
 	}
 
 	public afcFileRefClose(afcConnection: NodeBuffer, afcFileRef: number): number {
@@ -577,15 +581,15 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 	private winSocketLibrary: any = null;
 	private static BYTES_TO_READ = 1024;
 
-	constructor(private socket: number,
-		private $coreFoundation: Mobile.ICoreFoundation,
+	constructor(private service: number,
+		private $logger: ILogger,
 		private $errors: IErrors) {
 		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
 	private read(bytes: number): NodeBuffer {
 		var data = new Buffer(bytes);
-		var result = this.winSocketLibrary.recv(this.socket, data, bytes, 0);
+		var result = this.winSocketLibrary.recv(this.service, data, bytes, 0);
 		if (result < 0) {
 			this.$errors.fail("Error receiving data: %s", result);
 		}
@@ -605,7 +609,6 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 	public receiveMessage(): IFuture<string> {
 		var data = this.read(4);
 		var reply = "";
-		var result: NodeBuffer = null;
 
 		if (data !== null && data.length === 4) {
 			var l = bufferpack.unpack(">i", data)[0];
@@ -618,33 +621,48 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 				reply += r;
 				left -= r.length;
 			}
-			result = this.$coreFoundation.dictFromPlistEncoding(reply);
 		}
 
-		return Future.fromResult(result.toString());
+		return Future.fromResult(reply.toString());
 	}
 
-	public write(data: string): number {
-		return this.winSocketLibrary.send(this.socket, data, data.length, 0);
+	public sendMessage(data: {[key: string]: {}}): void {
+		var payload = plistlib.toString(this.createPlist(data));
+		var message = bufferpack.pack(">i", [payload.length]) + payload;
+		var writtenBytes = this.winSocketLibrary.send(this.service, message, message.length, 0);
+		this.$logger.trace("WinSocket-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
 	}
 
-	public close(): number {
-		return this.winSocketLibrary.closesocket(this.socket);
+	private createPlist(data: {[key: string]: {}}) : {} {
+		var keys = _.keys(data);
+		var values = _.values(data);
+		var plist = {type: "dict", value: {}} ;
+
+		for(var i=0; i<keys.length; i++) {
+			var type = values[i] instanceof Object ? "dict" : "string";
+			var value = type === "dict" ? {} : values[i];
+
+			plist.value[keys[i]] = {type: type, value: value};
+		}
+
+		this.$logger.trace("created plist: '%s'" + plist);
+
+		return plist;
+	}
+
+	public close(): void {
+		this.winSocketLibrary.closesocket(this.service);
 	}
 }
 
 class PosixSocket implements Mobile.IiOSDeviceSocket {
 	private socket: net.NodeSocket = null;
 
-	constructor(private service: number,
+	constructor(service: number,
+		private $coreFoundation: Mobile.ICoreFoundation,
 		private $logger: ILogger,
-		private $errors: IErrors,
-		private $injector: IInjector) {
-		if(helpers.isWindows()) {
-			this.socket = this.$injector.resolve(WinSocket, {socket: this.service });
-		} else if(helpers.isDarwin()) {
-			this.socket = new net.Socket({ fd: this.service });
-		}
+		private $errors: IErrors) {
+		this.socket = new net.Socket({ fd: service });
 	}
 
 	public receiveMessage(): IFuture<string> {
@@ -675,8 +693,15 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 			});
 	}
 
-	public write(message: string): void {
-		this.socket.write(message);
+	public sendMessage(message: {[key: string]: {}}, format?: number): void {
+		var data = this.$coreFoundation.dictToPlistEncoding(message, format);
+		var payload = bufferpack.pack(">i", [data.length]);
+
+		this.$logger.trace("PlistService sending: ");
+		this.$logger.trace(data.toString());
+
+		this.socket.write(payload);
+		this.socket.write(data);
 	}
 
 	public close(): void {
@@ -684,13 +709,11 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 	}
  }
 
-export class PlistService {
+export class PlistService implements Mobile.IiOSDeviceSocket {
 	private socket: Mobile.IiOSDeviceSocket  = null;
 
 	constructor(private service: number,
 		private format: number,
-		private $coreFoundation: Mobile.ICoreFoundation,
-		private $logger: ILogger,
 		private $injector: IInjector) {
 		if(helpers.isWindows()) {
 			this.socket = this.$injector.resolve(WinSocket, {service: this.service});
@@ -703,22 +726,15 @@ export class PlistService {
 		return this.socket.receiveMessage();
 	}
 
-	public readSystemLog(action : any) {
+	public readSystemLog(action: (data: string) => void): any {
 		this.socket.readSystemLog(action);
 	}
 
-	public sendMessage(msg: {[key: string]: {}}) : void {
-		var data = this.$coreFoundation.dictToPlistEncoding(msg, this.format);
-		var payload = bufferpack.pack(">i", [data.length]);
-
-		this.$logger.trace("PlistService sending: ");
-		this.$logger.trace(data.toString());
-
-		this.socket.write(payload);
-		this.socket.write(data);
+	public sendMessage(message: {[key: string]: {}}) : void {
+		this.socket.sendMessage(message, this.format);
 	}
 
-	public disconnect() {
+	public close() {
 		this.socket.close();
 	}
 }
