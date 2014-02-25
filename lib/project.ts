@@ -203,7 +203,14 @@ export class Project implements Project.IProject {
 				buildProperties.AndroidPermissions = this.projectData.AndroidPermissions;
 				buildProperties.AndroidVersionCode = this.projectData.AndroidVersionCode;
 				buildProperties.AndroidHardwareAcceleration = this.projectData.AndroidHardwareAcceleration;
-				buildProperties.AndroidCodesigningIdentity = ""; //TODO: where do you get this from?
+
+				if (options.certificate) {
+					var certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+					buildProperties.AndroidCodesigningIdentity = certificateData.Alias;
+					this.$logger.info("Using certificate '%s'", certificateData.Alias);
+				} else {
+					buildProperties.AndroidCodesigningIdentity = "";
+				}
 
 				var result = this.beginBuild(buildProperties).wait();
 				return result;
