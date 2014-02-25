@@ -123,11 +123,12 @@ export class Yok implements IInjector {
 
 	public resolveCommand(name: string): ICommand {
 		var command: ICommand;
-		try {
-			command = this.resolve(this.createCommandName(name));
+
+		var commandModuleName = this.createCommandName(name);
+		if (!this.modules[commandModuleName]) {
+			return null;
 		}
-		catch (error) {
-		}
+		command = this.resolve(commandModuleName);
 
 		return command;
 	}

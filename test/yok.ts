@@ -114,5 +114,21 @@ describe("yok", function() {
 		var result = injector.resolve(Test);
 
 		assert.equal(result.foo, "foo");
+	});
+
+	it("returns null when it can't resolve a command", function() {
+		var injector = new yok.Yok();
+		var command = injector.resolveCommand("command");
+		assert.isNull(command);
+	})
+
+	it("throws when it can't resolve a registered command", function() {
+		var injector = new yok.Yok();
+
+		function Command(whatever) {}
+
+		injector.registerCommand("command", Command);
+
+		assert.throws(() => injector.resolveCommand("command"));
 	})
 })

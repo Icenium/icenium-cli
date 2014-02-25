@@ -7,13 +7,13 @@ export class CommandsService implements ICommandsService {
 	constructor(private $errors: IErrors) {}
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(() => {
-			var command: ICommand = $injector.resolveCommand(commandName);
+			var command = $injector.resolveCommand(commandName);
 			if (command) {
 				command.execute(commandArguments).wait();
 				return true;
+			} else {
+				return false;
 			}
-
-			return false;
 		}, () => {
 			this.executeCommand("help", [commandName]);
 		});
