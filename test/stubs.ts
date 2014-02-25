@@ -1,6 +1,7 @@
 ///<reference path=".d.ts"/>
 
 import Future = require("fibers/future");
+import util = require("util");
 
 export class LoggerStub implements ILogger {
 	fatal(formatStr: string, ...args): void {}
@@ -9,7 +10,13 @@ export class LoggerStub implements ILogger {
 	info(formatStr: string, ...args): void {}
 	debug(formatStr: string, ...args): void {}
 	trace(formatStr: string, ...args): void {}
-	out(formatStr: string, ...args): void {}
+
+	public output = "";
+
+	out(formatStr: string, ...args): void {
+		args.unshift(formatStr);
+		this.output += util.format.apply(null, args) + "\n";
+	}
 }
 
 export class FileSystemStub implements IFileSystem {

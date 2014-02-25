@@ -768,25 +768,31 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private printProjectSchemaHelp() {
+	public getProjectSchemaHelp(): string {
 		var schema = helpers.getProjectFileSchema();
-		this.$logger.info("Project properties:");
+		var help = ["Project properties:"];
 		_.each(schema, (value:any, key) => {
-			this.$logger.info(util.format("  %s - %s", key, value.description));
+			help.push(util.format("  %s - %s", key, value.description));
 			if (value.range) {
-				this.$logger.info("    Valid values:");
+				help.push("    Valid values:");
 				_.each(value.range, (rangeDesc:any, rangeKey) => {
 					var desc = "      " + (_.isArray(value.range) ? rangeDesc : rangeDesc.input || rangeKey);
 					if (rangeDesc.description) {
 						desc += " - " + rangeDesc.description;
 					}
-					this.$logger.info(desc);
+					help.push(desc);
 				});
 			}
 			if (value.regex) {
-				this.$logger.info("    Valid values match /" + value.regex.toString() + "/");
+				help.push("    Valid values match /" + value.regex.toString() + "/");
 			}
 		});
+
+		return help.join("\n");
+	}
+
+	private printProjectSchemaHelp() {
+		this.$logger.out(this.getProjectSchemaHelp());
 	}
 
 	public ensureProject() {
