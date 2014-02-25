@@ -2,7 +2,7 @@
   "name": "appbuilder-cli",
   "preferGlobal": true,
   "version": "2.0.0",
-  "author": "Telerik <icenium@telerik.com>",
+  "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
     "appbuilder": "./bin/appbuilder.js"
