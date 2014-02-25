@@ -72,6 +72,8 @@ export class Configuration implements IConfiguration {
 			this.saveConfig(baseConfig, "config").wait();
 		}).future<void>()();
 	}
+
+	public version: string = require("../package.json").version;
 }
 $injector.register("config", Configuration);
 helpers.registerCommand("config", "config-reset", (config, args) => config.reset());

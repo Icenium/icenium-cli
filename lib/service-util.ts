@@ -10,8 +10,10 @@ import helpers = require("./helpers");
 var _ = <UnderscoreStatic> require("underscore");
 
 export class HttpClient implements Server.IHttpClient {
+	private defaultUserAgent: string;
+
 	constructor(private $logger: ILogger,
-		private $config: IConfiguration) { }
+		private $config: IConfiguration) {}
 
 	httpRequest(options): IFuture<Server.IResponse> {
 		if (_.isString(options)) {
@@ -43,12 +45,33 @@ export class HttpClient implements Server.IHttpClient {
 		var http = require(proto);
 
 		options.headers = options.headers || {};
+		var headers = options.headers;
 
 		if (this.$config.PROXY_TO_FIDDLER) {
 			options.path = requestProto + "://" + options.host + options.path;
-			options.headers.Host = options.host;
+			headers.Host = options.host;
 			options.host = "127.0.0.1";
 			options.port = 8888;
+		}
+
+		if (!headers.Accept || headers.Accept.indexOf("application/json") < 0) {
+			if (headers.Accept) {
+				headers.Accept += ", ";
+			} else {
+				headers.Accept = "";
+			}
+			headers.Accept += "application/json; charset=UTF-8";
+		}
+
+		if (!headers["User-Agent"]) {
+			if (!this.defaultUserAgent) {
+				this.defaultUserAgent = util.format("AppBuilderCLI/%s (Node.js %s; %s; %s)",
+					this.$config.version,
+					process.versions.node, process.platform, process.arch);
+				this.$logger.debug("User-Agent: %s", this.defaultUserAgent);
+			}
+
+			headers["User-Agent"] = this.defaultUserAgent;
 		}
 
 		var result = new Future<Server.IResponse>();
@@ -56,12 +79,9 @@ export class HttpClient implements Server.IHttpClient {
 		var request = http.request(options, (response) => {
 			var data = "";
 
-			var callback = function(responseResult: Server.IResponse) {
-				if (responseResult.error) {
-					result.throw(responseResult.error);
-				} else {
-					result.return(responseResult);
-				}
+			var successful = helpers.isRequestSuccessful(response);
+			if (!successful) {
+				pipeTo = undefined;
 			}
 
 			if (!pipeTo) {
@@ -74,10 +94,9 @@ export class HttpClient implements Server.IHttpClient {
 			if (pipeTo) {
 				pipeTo.on("finish", () => {
 					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
-					callback({
+					result.return({
 						response: response,
-						headers: response.headers,
-						error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
+						headers: response.headers
 					});
 				});
 				response.on("end", () => {
@@ -88,12 +107,18 @@ export class HttpClient implements Server.IHttpClient {
 			} else {
 				response.on("end", () => {
 					this.$logger.trace("httpRequest: Done. code = %d", response.statusCode);
-					callback({
-						body: data,
-						response: response,
-						headers: response.headers,
-						error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
-					});
+
+					if (successful) {
+						result.return({
+							body: data,
+							response: response,
+							headers: response.headers,
+							error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
+						})
+					} else {
+						var errorMessage = this.getErrorMessage(response, data);
+						result.throw(new Error(errorMessage));
+					}
 				});
 			}
 		});
@@ -107,6 +132,31 @@ export class HttpClient implements Server.IHttpClient {
 		}
 
 		return result;
+	}
+
+	private getErrorMessage(response, body: string): string {
+		if (response.statusCode === 402) {
+			var subscriptionUrl = util.format("%s://%s/account/subscription", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			return util.format("Your subscription has expired. Go to %s [Ctrl-Click] to manage your subscription. Note: After you renew your subscription, " +
+				"log out and log back in for the changes to take effect.", subscriptionUrl);
+		} else {
+			try {
+				var err = JSON.parse(body);
+
+				if (_.isString(err)) {
+					return err;
+				}
+
+				if (err.ExceptionMessage) {
+					return err.ExceptionMessage;
+				}
+				if (err.Message) {
+					return err.Message;
+				}
+			} catch (parsingFailed) {}
+
+			return body;
+		}
 	}
 }
 $injector.register("httpClient", HttpClient);

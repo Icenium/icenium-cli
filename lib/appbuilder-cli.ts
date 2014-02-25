@@ -16,12 +16,12 @@ class CommandDispatcher {
 	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $injector: IInjector,
+		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
 	public dispatchCommand() {
 		if (options.version) {
-			var pkg: any = this.$fs.readJson(path.join(__dirname, "../package.json")).wait();
-			console.log(pkg.version);
+			this.$logger.out(this.$config.version);
 			return;
 		}
 

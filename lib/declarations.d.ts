@@ -217,6 +217,7 @@ interface IConfiguration {
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
+	version: string;
 }
 
 interface IServerConfiguration {
