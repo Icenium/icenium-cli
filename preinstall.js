@@ -18,7 +18,6 @@ var info = [
 	"Before proceeding with the installation, review that you have the following installed:",
 	"",
 	"* Python 2.7.x - http://www.python.org/ftp/python/",
-	"* Git for Windows - http://code.google.com/p/msysgit/downloads/",
 	"* Visual Studio 2010/2012/2013 (with C++ compiler installed) or Windows 7 Platform SDK",
 	""
 ];
