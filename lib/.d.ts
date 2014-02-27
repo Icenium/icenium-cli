@@ -26,6 +26,7 @@
 /// <reference path="definitions/cryptographic-identities.d.ts" />
 /// <reference path="definitions/log4js.d.ts" />
 /// <reference path="definitions/logger.d.ts" />
+/// <reference path="definitions/minimatch.d.ts" />
 /// <reference path="definitions/mobile.d.ts" />
 /// <reference path="definitions/moment.d.ts" />
 /// <reference path="definitions/node-ffi.d.ts" />

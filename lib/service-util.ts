@@ -76,6 +76,8 @@ export class HttpClient implements Server.IHttpClient {
 
 		var result = new Future<Server.IResponse>();
 
+		this.$logger.trace("httpRequest: %s", options);
+
 		var request = http.request(options, (response) => {
 			var data = "";
 

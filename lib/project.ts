@@ -6,6 +6,7 @@ import xml2js = require("xml2js");
 import path = require("path");
 import unzip = require("unzip");
 import _ = require("underscore");
+import minimatch = require("minimatch");
 var options:any = require("./options");
 import util = require("util");
 import helpers = require("./helpers");
@@ -149,12 +150,14 @@ export class Project implements Project.IProject {
 
 	public enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[] {
 		if (!excludedProjectDirsAndFiles) {
-			excludedProjectDirsAndFiles = [".ab", ".abproject"];
+			excludedProjectDirsAndFiles = [".ab", ".abproject", "*.ipa", "*.apk"];
 		}
 
 		var projectDir = this.getProjectDir();
 		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, function(filePath) {
-			return !excludedProjectDirsAndFiles.contains(path.basename(filePath).toLowerCase());
+			return !_.find(excludedProjectDirsAndFiles, (pattern) => {
+				return minimatch(path.relative(projectDir, filePath), pattern);
+			})
 		});
 
 		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
@@ -322,7 +325,7 @@ export class Project implements Project.IProject {
 
 			if (downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					var targetFileName = path.join(this.getTempDir(), path.basename(pkg.solutionPath));
+					var targetFileName = path.join(this.getProjectDir(), path.basename(pkg.solutionPath));
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
 					var targetFile = this.$fs.createWriteStream(targetFileName);
 					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
