@@ -4,6 +4,7 @@ import Future = require("fibers/future");
 import util = require("util");
 
 export class LoggerStub implements ILogger {
+	setLevel(level: string): void {}
 	fatal(formatStr: string, ...args): void {}
 	error(formatStr: string, ...args): void {}
 	warn(formatStr: string, ...args): void {}

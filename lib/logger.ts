@@ -28,6 +28,10 @@ if (options.log !== undefined) {
 }
 
 export class Logger implements ILogger {
+	setLevel(level: string): void {
+		log4jsLogger.setLevel.apply(log4jsLogger, [level]);
+	}
+
 	fatal(...args): void {
 		log4jsLogger.fatal.apply(log4jsLogger, args);
 	}
