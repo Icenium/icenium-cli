@@ -214,6 +214,7 @@ interface IConfiguration {
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
+	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;

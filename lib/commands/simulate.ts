@@ -50,7 +50,6 @@ export class SimulateCommand implements ICommand {
 			this.simulatorPath = path.join(this.cacheDir, this.$platformServices.getPackageName());
 			this.$fs.createDirectory(this.simulatorPath).wait();
 
-			var servicesExtensionsUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/services/extensions";
 			var serverVersionFile = path.join(this.cacheDir, "server-version.json");
 
 			this.$logger.trace("Simulator path: %s", this.simulatorPath);
@@ -63,18 +62,15 @@ export class SimulateCommand implements ICommand {
 			}
 
 			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
-				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
-				var extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body),
-					downloadUri = (<any>_.findWhere(extensions["$values"],
-						{ Identifier : this.$platformServices.getPackageName() })).DownloadUri;
-
+				var downloadUri = this.getSimulatorDownloadUri().wait();
 				this.$logger.info("Updating simulator package...");
 				this.$logger.debug("Downloading simulator from %s", downloadUri);
 
 				var extractor = unzip.Extract({path: this.simulatorPath});
 				var request = this.$httpClient.httpRequest({
 					url: downloadUri,
-					pipeTo: extractor
+					pipeTo: extractor,
+					headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
 				});
 
 				this.$fs.futureFromEvent(extractor, "finish").wait();
@@ -87,6 +83,27 @@ export class SimulateCommand implements ICommand {
 				this.$logger.info("Finished updating simulator package.");
 			}
 		}).future<void>()();
+	}
+
+	private getSimulatorDownloadUri(): IFuture<string> {
+		return (() => {
+			var serverUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER;
+			var downloadUri: string;
+
+			if (this.$config.USE_CDN_FOR_SIMULATOR_DOWNLOAD) {
+				var servicesExtensionsUri =  serverUri + "/services/extensions";
+
+				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
+
+				var extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body);
+				downloadUri = (<any>_.findWhere(extensions["$values"],
+						{ Identifier : this.$platformServices.getPackageName() })).DownloadUri;
+			} else {
+				downloadUri = serverUri + "/ClientBin/" + this.$platformServices.getPackageName() + '.xap';
+			}
+
+			return downloadUri;
+		}).future<string>()();
 	}
 
 	private prepareCordovaPlugins(): IFuture<void> {
