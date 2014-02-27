@@ -170,7 +170,7 @@ Run list-provisions to list available provisioning profiles for code signing iOS
 provisioning profile by index or name.
 
 Options:
-    --device - Specifies the serial number or the index of the connected device on which you want to deploy the app. 
+    --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         Run list-devices to list all connected devices, grouped by platform.
     --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
         app. Must match the specified provisioning profile. You can specify a certificate by index or name.

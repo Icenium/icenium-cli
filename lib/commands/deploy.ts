@@ -6,28 +6,31 @@ import MobileHelper = require("./../mobile/mobile-helper");
 import Future = require("fibers/future");
 
 export class DeployCommand implements ICommand {
-    constructor(private $devicesServices: Mobile.IDevicesServices,
+	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
 		private $identityManager: Server.IIdentityManager,
 		private $fs: IFileSystem,
-		private $project: Project.IProject) { }
+		private $project: Project.IProject,
+		private $errors: IErrors) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var platform = args[0];
 			if (this.$devicesServices.hasDevices(platform)) {
-				var canExecute;
+				var provisionData;
+				if (options.provision) {
+					provisionData = this.$identityManager.findProvision(options.provision).wait();
+				}
 
-				if (MobileHelper.isiOSPlatform(platform)) {
-					var provisionData = this.$identityManager.findProvision(options["provision"]).wait();
-					canExecute = (device: Mobile.IDevice): boolean => {
-						var isInProvisionedDevices: boolean = provisionData.ProvisionedDevices !== undefined && provisionData.ProvisionedDevices.contains(device.getIdentifier());
+				var canExecute = (device: Mobile.IDevice): boolean => {
+					if (MobileHelper.isiOSPlatform(device.getPlatform())) {
+						var isInProvisionedDevices: boolean = provisionData.ProvisionedDevices && provisionData.ProvisionedDevices.contains(device.getIdentifier());
 						if(!isInProvisionedDevices) {
-							throw new Error(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Please use $ ice list-provision -v to list all devices included in provision"));
+							this.$errors.fail("The device with identifier '%s' is not included in provisioned devices for given provision. Please use $ appbuilder list-provision -v to list all devices included in provision",
+								device.getIdentifier());
 						}
-
-						return true;
 					}
+					return true;
 				}
 
 				var packageDefs = this.$project.deploy(platform).wait();
@@ -41,7 +44,12 @@ export class DeployCommand implements ICommand {
 				var action = (device: Mobile.IDevice): IFuture<void> => {
 					return device.deploy(packageFile, packageName);
 				};
-				this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
+
+				if(options.device) {
+					this.$devicesServices.executeOnDevice(action, options.device).wait();
+				} else {
+					this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
+				}
 			}
 		}).future<void>()();
 	}
