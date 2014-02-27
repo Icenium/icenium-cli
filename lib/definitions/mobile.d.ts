@@ -92,6 +92,7 @@ declare module Mobile {
 		afcDirectoryOpen(afcConnection: NodeBuffer, path: string, afcDirectory: NodeBuffer): number;
 		afcDirectoryRead(afcConnection: NodeBuffer, afcdirectory: NodeBuffer,  name: NodeBuffer): number;
 		afcDirectoryClose(afcConnection: NodeBuffer, afcdirectory: NodeBuffer): number;
+		isDataReceivingCompleted(reply: string): boolean;
 	}
 
 	interface IInstallationProxyClient {
@@ -118,7 +119,7 @@ declare module Mobile {
 	}
 
 	interface IiOSDeviceSocket {
-		receiveMessage(): IFuture<string>;
+		receiveMessage(): IFuture<void>;
 		readSystemLog(action: (data: string) => void): void;
 		sendMessage(message: {[key: string]: {}}, format?: number): void;
 		close(): void;

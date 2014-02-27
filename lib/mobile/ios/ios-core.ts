@@ -574,7 +574,12 @@ export class MobileDevice implements Mobile.IMobileDevice {
 	public afcDirectoryClose(afcConnection: NodeBuffer, afcDirectory: NodeBuffer): number {
 		return this.mobileDeviceLibrary.AFCDirectoryClose(afcConnection, afcDirectory);
 	}
-}
+
+	public isDataReceivingCompleted(reply: string): boolean {
+		//TODO: It should be created parser that converts data from socket to valid javascript dictionary
+		return reply.indexOf("Status") >= 0 && reply.indexOf("Complete") >= 0 && reply.indexOf("PercentComplete") < 0;
+	}
+ }
 $injector.register("mobileDevice", MobileDevice);
 
 class WinSocket implements Mobile.IiOSDeviceSocket {
@@ -583,6 +588,7 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 
 	constructor(private service: number,
 		private $logger: ILogger,
+		private $mobileDevice: Mobile.IMobileDevice,
 		private $errors: IErrors) {
 		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
@@ -606,7 +612,17 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 		this.close();
 	}
 
-	public receiveMessage(): IFuture<string> {
+	public receiveMessage(): IFuture<void> {
+		return (() => {
+			var reply = this.receiveMessageHelper();
+
+			if(!this.$mobileDevice.isDataReceivingCompleted(reply)) {
+				reply = this.receiveMessageHelper();
+			}
+		}).future<void>()();
+	}
+
+	public receiveMessageHelper(): string {
 		var data = this.read(4);
 		var reply = "";
 
@@ -625,7 +641,7 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 
 		var result = reply.toString();
 		this.$errors.verifyHeap("receiveMessage");
-		return Future.fromResult(result);
+		return result;
 	}
 
 	public sendMessage(data: {[key: string]: {}}): void {
@@ -665,19 +681,24 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 
 	constructor(service: number,
 		private $coreFoundation: Mobile.ICoreFoundation,
+		private $mobileDevice: Mobile.IMobileDevice,
 		private $logger: ILogger,
 		private $errors: IErrors) {
 		this.socket = new net.Socket({ fd: service });
 	}
 
-	public receiveMessage(): IFuture<string> {
-		var result = new Future<string>();
+	public receiveMessage(): IFuture<void> {
+		var result = new Future<void>();
 
 		this.socket
 			.on("data", (data) => {
 				this.$logger.debug("PlistService receiving: '%s'", data);
 				this.$errors.verifyHeap("receiveMessage");
-				result.return(data.toString());
+				var reply = data.toString();
+
+				if(this.$mobileDevice.isDataReceivingCompleted) {
+					result.return();
+				}
 			})
 			.on("error", (error) => {
 				result.throw(error);
@@ -732,7 +753,7 @@ export class PlistService implements Mobile.IiOSDeviceSocket {
 		}
 	}
 
-	public receiveMessage(): IFuture<string> {
+	public receiveMessage(): IFuture<void> {
 		return this.socket.receiveMessage();
 	}
 

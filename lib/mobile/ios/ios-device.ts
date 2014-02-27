@@ -108,6 +108,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		return (() => {
 			var installationProxy = this.$injector.resolve(iOSProxyServices.InstallationProxyClient, {device: this });
 			installationProxy.deployApplication(packageFile).wait();
+			installationProxy.closeSocket();
 		}).future<void>()();
 	}
 

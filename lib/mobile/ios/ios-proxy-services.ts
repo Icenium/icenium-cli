@@ -185,65 +185,32 @@ export class AfcClient implements Mobile.IAfcClient {
 }
 
 export class InstallationProxyClient {
+	private plistService: Mobile.IiOSDeviceSocket = null;
+
 	constructor(private device: Mobile.IIOSDevice,
-		private $coreFoundation: Mobile.ICoreFoundation,
-		private $mobileDevice: Mobile.IMobileDevice,
-		private $errors: IErrors,
 		private $logger: ILogger,
 		private $injector: IInjector) { }
 
-	private static transferCallback() {
-
-	}
-
-	private static installCallback() {
-
-	}
-
 	public deployApplication(packageFile: string) : IFuture<void>  {
 		return(() => {
-			if(helpers.isWindows()) {
-				var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
-				var afcClient = this.$injector.resolve(AfcClient, {service: service});
-				var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
+			var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
+			var afcClient = this.$injector.resolve(AfcClient, {service: service});
+			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
 
-				afcClient.transferPackage(packageFile, devicePath).wait();
-				var plistService = this.$injector.resolve(iOSCore.PlistService, {service: this.device.startService(MobileServices.INSTALLATION_PROXY), format: iOSCore.CoreTypes.kCFPropertyListBinaryFormat_v1_0});
+			afcClient.transferPackage(packageFile, devicePath).wait();
+			this.plistService = this.$injector.resolve(iOSCore.PlistService, {service: this.device.startService(MobileServices.INSTALLATION_PROXY), format: iOSCore.CoreTypes.kCFPropertyListBinaryFormat_v1_0});
 
-				plistService.sendMessage({
-					Command: "Install",
-					"PackagePath": devicePath,
-					"ClientOptions": {}
-				});
-				var reply = plistService.receiveMessage().wait();
-
-				while (reply.indexOf("PercentComplete") > 0) {
-					reply = plistService.receiveMessage().wait();
-				}
-			} else if(helpers.isDarwin()) {
-				var keys = ref.alloc(ref.refType(ref.types.void), this.$coreFoundation.createCFString("PackageType"));
-				var values = ref.alloc(ref.refType(ref.types.void), this.$coreFoundation.createCFString("Developer"));
-				var options = this.$coreFoundation.dictionaryCreate(null, keys, values, 1, this.$coreFoundation.kCFTypeDictionaryKeyCallBacks(), this.$coreFoundation.kCFTypeDictionaryValueCallBacks());
-
-				var am_device_install_application_callback = ffi.Function("void", [ref.refType(ref.types.void), ref.refType(ref.types.void)]);
-
-				var afcService = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
-				var normalizedPath = path.normalize(packageFile);
-				var resolvedPath = path.resolve(normalizedPath);
-
-				var result = this.$mobileDevice.deviceTransferApplication(afcService, this.$coreFoundation.createCFString(resolvedPath), null, am_device_install_application_callback.toPointer(InstallationProxyClient.transferCallback));
-				if(result !== 0) {
-					this.$errors.fail("Unable to transfer application: %s ", result);
-				}
-
-				var installationProxyService = this.device.startService(MobileServices.INSTALLATION_PROXY);
-				result = this.$mobileDevice.deviceInstallApplication(installationProxyService, this.$coreFoundation.createCFString(packageFile), options, am_device_install_application_callback.toPointer(InstallationProxyClient.installCallback));
-				if (result !== 0) {
-					this.$errors.fail("Unable to install application: %s", result);
-				}
-			}
+			this.plistService.sendMessage({
+				Command: "Install",
+				"PackagePath": devicePath
+			});
+			this.plistService.receiveMessage().wait();
 			this.$logger.info("Successfully deployed on device %s", this.device.getIdentifier());
 		}).future<void>()();
+	}
+
+	public closeSocket() {
+		return this.plistService.close();
 	}
 }
 $injector.register("installationProxyClient", InstallationProxyClient);
@@ -275,7 +242,6 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 	private plistService: Mobile.IiOSDeviceSocket = null;
 
 	constructor(private device: Mobile.IIOSDevice,
-		private $errors: IErrors,
 		private $injector: IInjector) {
 	}
 
@@ -288,15 +254,7 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 			"Identifier": applicationIdentifier
 		});
 
-		var reply = this.plistService.receiveMessage().wait();
-
-		if (reply.indexOf("Error") > 0) {
-			this.$errors.fail(reply);
-		}
-
-		if (reply.indexOf("Status") < 0 || reply.indexOf("Complete") < 0) {
-			this.$errors.fail("Unable to start house arrest service");
-		}
+		this.plistService.receiveMessage().wait();
 
 		return this.$injector.resolve(AfcClient, {service: service});
 	}
