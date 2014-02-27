@@ -5,6 +5,7 @@ import _ = require("underscore");
 import util = require("util");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");
+import helpers = require("./../../helpers");
 
 export class DevicesServices implements Mobile.IDevicesServices {
 	private devices: { [key: string]: Mobile.IDevice } = {};
@@ -14,8 +15,9 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	private static NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE = "Could not find device with index %d.";
 
 	constructor(private $logger: ILogger,
-				private $iOSDeviceDiscovery: Mobile.IDeviceDiscovery,
-				private $androidDeviceDiscovery: Mobile.IDeviceDiscovery) {
+		private $errors: IErrors,
+		private $iOSDeviceDiscovery: Mobile.IDeviceDiscovery,
+		private $androidDeviceDiscovery: Mobile.IDeviceDiscovery) {
 		this.attachToDeviceDiscoveryEvents()
 	}
 
@@ -101,18 +103,30 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return searchedDevice;
 	}
 
-	public executeOnDevice(action: any, identifier?: string, index?: number): IFuture<void> {
+	public executeOnDevice(action: any, deviceOptions: string): IFuture<void> {
 		return (() => {
-			this.startLookingForDevices().wait();
+			this.$logger.debug("executeOnDevice: '%s'", deviceOptions);
 
-			if (!identifier && index === undefined) {
-				console.log(DevicesServices.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
+			if(!deviceOptions) {
+				this.$errors.fail(DevicesServices.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
 				return;
-			} else if (identifier) {
-				action(this.getDeviceByIdentifier(identifier));
-			} else if (index) {
-				action(this.getDeviceByIndex(index));
 			}
+
+			this.startLookingForDevices().wait();
+			var device: Mobile.IDevice = null;
+			if(this.hasDevice(deviceOptions)) {
+				device = this.getDeviceByIdentifier(deviceOptions);
+			} else if(helpers.isNumber(deviceOptions)) {
+				device = this.getDeviceByIndex(parseInt(deviceOptions, 10));
+			} else {
+				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
+			}
+
+			if(!device) {
+				this.$errors.fail("Could not find device");
+			}
+
+			return action(device).wait();
 		}).future<void>()();
 	}
 
