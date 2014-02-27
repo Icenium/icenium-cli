@@ -623,14 +623,18 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 			}
 		}
 
-		return Future.fromResult(reply.toString());
+		var result = reply.toString();
+		this.$errors.verifyHeap("receiveMessage");
+		return Future.fromResult(result);
 	}
 
 	public sendMessage(data: {[key: string]: {}}): void {
 		var payload = plistlib.toString(this.createPlist(data));
 		var message = bufferpack.pack(">i", [payload.length]) + payload;
 		var writtenBytes = this.winSocketLibrary.send(this.service, message, message.length, 0);
-		this.$logger.trace("WinSocket-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
+		this.$logger.debug("WinSocket-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
+
+		this.$errors.verifyHeap("sendMessage");
 	}
 
 	private createPlist(data: {[key: string]: {}}) : {} {
@@ -652,6 +656,7 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 
 	public close(): void {
 		this.winSocketLibrary.closesocket(this.service);
+		this.$errors.verifyHeap("socket close");
 	}
 }
 
@@ -670,7 +675,8 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 
 		this.socket
 			.on("data", (data) => {
-				this.$logger.trace("PlistService receiving: '%s'", data);
+				this.$logger.debug("PlistService receiving: '%s'", data);
+				this.$errors.verifyHeap("receiveMessage");
 				result.return(data.toString());
 			})
 			.on("error", (error) => {
@@ -687,6 +693,7 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 			})
 			.on("end", () => {
 				this.close();
+				this.$errors.verifyHeap("readSystemLog");
 			})
 			.on("error", (error) => {
 				this.$errors.fail(error);
@@ -702,10 +709,13 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 
 		this.socket.write(payload);
 		this.socket.write(data);
+
+		this.$errors.verifyHeap("sendMessage");
 	}
 
 	public close(): void {
 		this.socket.destroy();
+		this.$errors.verifyHeap("socket close");
 	}
  }
 
