@@ -1,4 +1,5 @@
 interface ILogger {
+	setLevel(level: string): void;
 	fatal(formatStr: any, ...args): void;
 	error(formatStr: any, ...args): void;
 	warn(formatStr: any, ...args): void;
