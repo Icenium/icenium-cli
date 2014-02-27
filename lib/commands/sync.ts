@@ -14,16 +14,13 @@ export class SyncCommand implements ICommand {
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
 		private $fs: IFileSystem,
+		private $errors: IErrors,
 		private $project: Project.IProject) {
 	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var platform = args[0];
-
-			if (!platform) {
-				throw new Error("Please specify platform");
-			}
 
 			var projectDir = this.$project.getProjectDir();
 			var appIdentifier = this.$project.projectData.AppIdentifier;
@@ -38,7 +35,7 @@ export class SyncCommand implements ICommand {
 							var projectFiles = [path.resolve(options.file)];
 							this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
 						} else {
-							this.$logger.out(util.format("The file %s does not exist.", options.file));
+							this.$errors.fail("The file %s does not exist.", options.file);
 						}
 					} else {
 						var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
@@ -59,7 +56,11 @@ export class SyncCommand implements ICommand {
 				}).future<void>()();
 			};
 
-			this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+			if(options.device) {
+				this.$devicesServices.executeOnDevice(action, options.device).wait();
+			} else {
+				this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+			}
 		}).future<void>()();
 	}
 
@@ -78,7 +79,7 @@ export class SyncCommand implements ICommand {
 			paths: [projectDir],
 			listeners: {
 				error: (error) => {
-					this.$logger.trace(error);
+					this.$errors.fail(error);
 				},
 				change: (changeType, filePath) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
@@ -88,7 +89,7 @@ export class SyncCommand implements ICommand {
 				},
 				next: (error, watchers) => {
 					if(error) {
-						throw error;
+						this.$errors.fail(error);
 					}
 					this.$logger.trace("File system watchers are stopping.");
 					for (var i = 0; i < watchers.length; i++) {

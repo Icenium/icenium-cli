@@ -9,14 +9,8 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var action = (device: Mobile.IDevice) =>  { device.openDeviceLogStream(); };
-			if(this.$devicesServices.hasDevice(options.device)) {
-				this.$devicesServices.executeOnDevice(action, options.device).wait();
-			} else if(helpers.isNumber(options.device)) {
-				this.$devicesServices.executeOnDevice(action, undefined, parseInt(options.device, 10)).wait();
-			} else {
-				this.$errors.fail("Invalid device identifier or index");
-			}
+			var action = (device: Mobile.IDevice) =>  { return (() => device.openDeviceLogStream()).future<void>()(); };
+			this.$devicesServices.executeOnDevice(action, options.device).wait();
 		}).future<void>()();
 	}
 }
