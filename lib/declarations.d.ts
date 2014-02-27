@@ -230,6 +230,7 @@ interface IErrors {
 	fail(opts: {formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
 
 	beginCommand(action: () => any, printCommandHelp: () => void): any;
+	verifyHeap(message: string): void;
 }
 
 declare enum ErrorCodes {

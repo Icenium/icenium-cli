@@ -100,5 +100,13 @@ export class Errors implements IErrors {
 			process.exit(_.isNumber(ex.errorCode) ? ex.errorCode : ErrorCodes.UNKNOWN);
 		}
 	}
+
+	// If you want to activate this function, start Node with flags --nouse_idle_notification and --expose_gc
+	verifyHeap(message: string): void {
+		if(global.gc) {
+			this.$logger.trace("verifyHeap: '%s'", message);
+			global.gc();
+		}
+	}
 }
 $injector.register("errors", Errors);

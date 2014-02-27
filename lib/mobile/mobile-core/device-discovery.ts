@@ -54,10 +54,16 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 	private static ADNCI_MSG_CONNECTED: number = 1;
 	private static ADNCI_MSG_DISCONNECTED: number = 2;
 
+	private timerCallbackPtr = null;
+	private  notificationCallbackPtr = null;
+
 	constructor(private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
+		private $errors: IErrors,
 		private $injector: IInjector) {
 		super();
+		this.timerCallbackPtr = CoreTypes.CoreTypes.cf_run_loop_timer_callback.toPointer(IOSDeviceDiscovery.timerCallback);
+		this.notificationCallbackPtr = CoreTypes.CoreTypes.am_device_notification_callback.toPointer(IOSDeviceDiscovery.deviceNotificationCallback);
 	}
 
 	public startLookingForDevices(): void {
@@ -86,16 +92,16 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 
 	private validateResult(result: number, error: string) {
 		if(result != 0)  {
-			throw new Error(error);
+			this.$errors.fail(error);
 		}
 	}
 
 	private subscribeForNotifications() {
 		var notifyFunction = ref.alloc(CoreTypes.CoreTypes.amDeviceNotificationRef);
-		var notificationCallback = CoreTypes.CoreTypes.am_device_notification_callback.toPointer(IOSDeviceDiscovery.deviceNotificationCallback);
 
-		var result = this.$mobileDevice.deviceNotificationSubscribe(notificationCallback, 0, 0, 0, notifyFunction);
+		var result = this.$mobileDevice.deviceNotificationSubscribe(this.notificationCallbackPtr, 0, 0, 0, notifyFunction);
 		this.validateResult(result, "Unable to subscribe for notifications");
+		this.$errors.verifyHeap("subscribeForNotifications");
 	}
 
 	private startRunLoopWithTimer(timeout: number): void {
@@ -103,7 +109,8 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 		var timer: NodeBuffer = null;
 
 		if(timeout > 0) {
-			timer = this.$coreFoundation.runLoopTimerCreate(null, this.$coreFoundation.absoluteTimeGetCurrent() + timeout, 0, 0, 0, CoreTypes.CoreTypes.cf_run_loop_timer_callback.toPointer(IOSDeviceDiscovery.timerCallback), null);
+			var currentTime = this.$coreFoundation.absoluteTimeGetCurrent() + timeout;
+			timer = this.$coreFoundation.runLoopTimerCreate(null, currentTime , 0, 0, 0, this.timerCallbackPtr, null);
 			this.$coreFoundation.runLoopAddTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
 		}
 
@@ -112,6 +119,8 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 		if(timeout > 0) {
 			this.$coreFoundation.runLoopRemoveTimer(this.$coreFoundation.runLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
 		}
+
+		this.$errors.verifyHeap("startRunLoopWithTimer");
 	}
 
 	private createAndAddDevice(devicePointer): void {

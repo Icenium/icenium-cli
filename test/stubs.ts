@@ -103,6 +103,10 @@ export class ErrorsStub implements IErrors {
 	beginCommand(action:() => void, printHelpCommand: () => void) {
 		throw new Error("not supported");
 	}
+
+	verifyHeap(message: string): void {
+
+	}
 }
 
 export class OpenerStub implements IOpener {
