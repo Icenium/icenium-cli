@@ -788,7 +788,10 @@ export class Project implements Project.IProject {
 					help.push(desc);
 				});
 			}
-			if (value.regex) {
+			if (value.validationMessage) {
+				help.push("    " + value.validationMessage.replace("\n", "\n    "));
+			}
+			else if (value.regex) {
 				help.push("    Valid values match /" + value.regex.toString() + "/");
 			}
 		});

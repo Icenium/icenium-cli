@@ -13,7 +13,8 @@
 	},
 	"BundleVersion": {
 		"description": "The application (or bundle) version.",
-		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$"
+		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$",
+		"validationMessage": "The version must consist of two or three numbers separated with dots."
 	},
 	"FrameworkVersion": {
 		"description": "Cordova framework version.",
@@ -139,7 +140,8 @@
 	},
 	"AndroidVersionCode": {
 		"description": "Android version code (same as android:versionCode)",
-		"regex": "^\\d+$"
+		"regex": "^\\d+$",
+		"validationMessage": "The Android version code must be a number. See the guidelines for versioning Android applications:\nhttp://developer.android.com/tools/publishing/versioning.html"
 	},
 	"iOSStatusBarStyle": {
 		"description": "iOS status bar style",
