@@ -617,6 +617,9 @@ export class Project implements Project.IProject {
 	private generateDefaultAppId(appName: string): string {
 		var sanitizedName = _.filter(appName.split(""), (c) => /[a-zA-Z0-9]/.test(c)).join("");
 		if (sanitizedName) {
+			if (/^\d+$/.test(sanitizedName)) {
+				sanitizedName = "d" + sanitizedName;
+			}
 			return "com.telerik." + sanitizedName;
 		} else {
 			return "com.telerik.myapp";
