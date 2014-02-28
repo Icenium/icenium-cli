@@ -9,7 +9,7 @@ import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
 
 export class LiveSyncCommand implements ICommand {
-	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".ab", ".abproject"];
+	private excludedProjectDirsAndFiles = ["app_resources", "plugins"];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
@@ -84,7 +84,7 @@ export class LiveSyncCommand implements ICommand {
 				},
 				change: (changeType, filePath) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
-						this.$logger.trace(util.format("Syncing %s", filePath));
+						this.$logger.trace("Syncing %s", filePath);
 						this.sync(platform, appIdentifier, projectDir, [filePath]);
 					}
 				},

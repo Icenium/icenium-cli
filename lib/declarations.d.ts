@@ -118,8 +118,8 @@ declare module Project {
 		projectData: any;
 		getProjectDir(): string;
 		ensureProject(): void;
-		enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[];
-		isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean;
+		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
+		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
 		build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]>;
