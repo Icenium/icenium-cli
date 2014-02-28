@@ -156,7 +156,7 @@ export class Project implements Project.IProject {
 		var projectDir = this.getProjectDir();
 		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, function(filePath) {
 			return !_.find(excludedProjectDirsAndFiles, (pattern) => {
-				return minimatch(path.relative(projectDir, filePath), pattern);
+				return minimatch(path.relative(projectDir, filePath), pattern, {nocase: true});
 			})
 		});
 
