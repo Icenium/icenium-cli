@@ -91,7 +91,23 @@ Options:
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
-        If not specified, ?Telerik AppBuilder CLI? sets the application identifier to com.telerik.<App name>
+        If not specified, the application identifier will be set to com.telerik.<App name>
+
+--[/]--
+
+--[init]--
+
+Usage:
+    $ appbuilder init [--appid <App ID>]
+
+Creates a project in the current folder. If the folder is an existing AppBuilder project (created from
+the Visual Studio Extension or synced from GitHub) the project retains the existing project configuration.
+
+Options:
+    --appid - Sets the application identifier for your app. The application identifier must consist of at least three
+        alphanumeric strings, separated by a dot (.). Each string must start with a letter.
+        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
+        If not specified, the application identifier will be set to com.telerik.<App name>
 
 --[/]--
 

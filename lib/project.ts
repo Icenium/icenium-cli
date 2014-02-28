@@ -428,8 +428,8 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public saveProject(): IFuture<void> {
-		return this.$fs.writeJson(path.join(this.getProjectDir(), this.$config.PROJECT_FILE_NAME), this.projectData, "\t");
+	public saveProject(projectDir: string): IFuture<void> {
+		return this.$fs.writeJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME), this.projectData, "\t");
 	}
 
 	private readProjectData(): IFuture<void> {
@@ -454,8 +454,44 @@ export class Project implements Project.IProject {
 			if (!projectName) {
 				projectName = this.createProjectName(projectDir).wait();
 			}
+
 			this.createFromTemplate(projectName, projectDir).wait();
 		}).future<void>()();
+	}
+
+	public createProjectFileFromExistingProject(): IFuture<void> {
+		return ((): void => {
+			var projectDir = this.getNewProjectDir();
+			var projectFile = path.join(projectDir, this.$config.PROJECT_FILE_NAME);
+			if (this.$fs.exists(projectFile).wait()) {
+				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
+			}
+			var appname = path.basename(projectDir);
+			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
+			if (!properties) {
+				properties = this.alterPropertiesForNewProject({}, appname);
+			}
+
+			this.createProjectFile(projectDir, appname, properties).wait();
+		}).future<void>()();
+	}
+
+	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<any> {
+		return ((): any => {
+			var vseProjectFilepath = path.join(projectDir, appname + ".iceproj");
+			var githubProjectFilepath = path.join(projectDir, appname + ".proj");
+
+			if (this.$fs.exists(vseProjectFilepath).wait()) {
+				return this.getProjectProperties(vseProjectFilepath, appname).wait();
+			}
+
+			if (this.$fs.exists(githubProjectFilepath).wait()) {
+				return this.getProjectProperties(githubProjectFilepath, appname).wait();
+			}
+
+			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");
+			return null;
+		}).future<any>()();
 	}
 
 	private createProjectName(projectDir): IFuture<string> {
@@ -511,7 +547,8 @@ export class Project implements Project.IProject {
 				this.$logger.trace("Extracting template from '%s'", templateFileName);
 				this.extractTemplate(templateFileName, projectDir).wait();
 				this.$logger.trace("Reading template project properties.");
-				var properties = this.getProjectProperties(projectDir, appname).wait();
+				var properties = this.getProjectProperties(path.join(projectDir, "mobile.proj"), appname).wait();
+				properties = this.alterPropertiesForNewProject(properties, appname);
 				this.$logger.trace(properties);
 				this.$logger.trace("Creating project file.");
 				this.createProjectFile(projectDir, appname, properties).wait();
@@ -538,17 +575,12 @@ export class Project implements Project.IProject {
 		}).future<any>()();
 	}
 
-	private getProjectProperties(projectDir, appName): IFuture<any> {
+	private getProjectProperties(projectFile, appName): IFuture<any> {
 		return ((): any => {
 			var properties: any = {};
 
-			if (!options.appid) {
-				options.appid = this.generateDefaultAppId(appName);
-				this.$logger.warn("--appid was not specified. Defaulting to " + options.appid);
-			}
-
 			var parser = new xml2js.Parser();
-			var contents = this.$fs.readText(path.join(projectDir, "mobile.proj")).wait();
+			var contents = this.$fs.readText(projectFile).wait();
 
 			var parseString = Future.wrap(function (str, callback) {
 				return parser.parseString(str, callback);
@@ -557,9 +589,9 @@ export class Project implements Project.IProject {
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			properties.AppName = appName;
-			properties.AppIdentifier = "";
-			properties.ProjectGuid = this.generateProjectGuid();
+			properties.name = propertyGroup.ProjectName[0];
+			properties.AppIdentifier = propertyGroup.AppIdentifier[0];
+			properties.ProjectGuid = propertyGroup.ProjectGuid[0];
 			properties.BundleVersion = propertyGroup.BundleVersion[0];
 			properties.CorePlugins = propertyGroup.CorePlugins[0];
 			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0];
@@ -567,10 +599,21 @@ export class Project implements Project.IProject {
 			properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
 			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0];
 
-			this.updateProjectProperty(properties, "set", "AppIdentifier", [options.appid]);
-
 			return properties;
 		}).future<any>()();
+	}
+
+	private alterPropertiesForNewProject(properties, projectName: string): any {
+		properties.name = projectName;
+		properties.ProjectGuid = this.generateProjectGuid();
+		var appid = options.appid;
+		if (!options.appid) {
+			appid = this.generateDefaultAppId(projectName);
+			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
+		}
+		properties.AppIdentifier = appid;
+
+		return properties;
 	}
 
 	private getNewProjectDir() {
@@ -596,16 +639,13 @@ export class Project implements Project.IProject {
 				}
 			});
 
-			this.projectData.name = projectName;
 			if (!this.projectData.DisplayName) {
-				this.projectData.DisplayName = projectName;
+				this.projectData.DisplayName = this.projectData.name;
 			}
 
-			if (!this.projectData.ProjectGuid) {
-				this.projectData.ProjectGuid = this.generateProjectGuid();
-			}
+			this.updateProjectProperty({}, "set", "AppIdentifier", [this.projectData.AppIdentifier]);
 
-			this.saveProject().wait();
+			this.saveProject(projectDir).wait();
 		}).future<void>()();
 	}
 
@@ -751,7 +791,7 @@ export class Project implements Project.IProject {
 
 			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues);
 			this.printProjectProperty(propertyName).wait();
-			this.saveProject().wait();
+			this.saveProject(this.getProjectDir()).wait();
 		}).future<void>()();
 	}
 
@@ -810,6 +850,7 @@ $injector.register("project", Project);
 helpers.registerCommand("project", "build", (project, args) => project.executeBuild(args[0]));
 helpers.registerCommand("project", "cloud-sync", (project, args) => project.importProject());
 helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
+helpers.registerCommand("project", "init", (project, args) => project.createProjectFileFromExistingProject());
 _.each(["add", "set", "del"], (operation) => {
 	helpers.registerCommand("project", "prop-" + operation,
 		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
