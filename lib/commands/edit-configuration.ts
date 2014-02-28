@@ -47,6 +47,7 @@ export class EditConfigurationCommand implements ICommand {
 	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
 		return (() => {
 			if (data.template) {
+				this.$project.ensureProject();
 				var projectPath = this.$project.getProjectDir();
 				var filepath = path.join(projectPath, data.template.filepath);
 				var directory = path.dirname(filepath);

@@ -22,6 +22,7 @@ export class SyncCommand implements ICommand {
 		return (() => {
 			var platform = args[0];
 
+			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
 			var appIdentifier = this.$project.projectData.AppIdentifier;
 

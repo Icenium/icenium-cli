@@ -17,7 +17,8 @@ var testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("fs", fileSystem.FileSystem);
 testInjector.register("project", {
-	getProjectDir: () => { return options.path; }
+	getProjectDir: () => { return options.path; },
+	ensureProject: () => {}
 });
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("opener", stubs.OpenerStub);
