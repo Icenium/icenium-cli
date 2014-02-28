@@ -32,6 +32,8 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureProject();
+
 			this.cacheDir = path.join(options["profile-dir"], "Cache");
 			this.serverVersion = this.$serverConfiguration.assemblyVersion.wait();
 			this.$logger.debug("Server version: %s", this.serverVersion);

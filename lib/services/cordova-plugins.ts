@@ -36,6 +36,7 @@ export class CordovaPluginsService {
 	}
 
 	public fetch(pluginId: string): string {
+		this.$project.ensureProject();
 		var future = new Future<string>();
 		plugman.fetch(pluginId, this.getPluginsDir(), false, ".", "HEAD", (result) => {
 			if (this.isError(result)) {

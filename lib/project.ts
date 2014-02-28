@@ -303,6 +303,8 @@ export class Project implements Project.IProject {
 
 	public build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]> {
 		return ((): Server.IPackageDef[] => {
+			this.ensureProject();
+
 			configuration = configuration || "Debug";
 			this.$logger.info("Building project for platform '%s', configuration '%s'", platform, configuration);
 
@@ -345,6 +347,7 @@ export class Project implements Project.IProject {
 	public deploy(platform: string): IFuture<Server.IPackageDef[]> {
 		return (() => {
 			this.validatePlatform(platform);
+			this.ensureProject();
 			var result = this.build(platform, this.getBuildConfiguration(), false, true).wait();
 			return result;
 		}).future<Server.IPackageDef[]>()();
@@ -402,11 +405,7 @@ export class Project implements Project.IProject {
 
 	public importProject(): IFuture<void> {
 		return (() => {
-			var projectDir = this.getProjectDir();
-			if (!projectDir) {
-				this.$logger.fatal("Found nothing to import.");
-				return;
-			}
+			this.ensureProject();
 
 			this.$loginManager.ensureLoggedIn().wait();
 
