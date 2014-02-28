@@ -4,31 +4,23 @@ import options = require("./../options");
 import util = require("util");
 import MobileHelper = require("./../mobile/mobile-helper");
 import Future = require("fibers/future");
+import iOSDeploymentValidatorLib = require("./../validators/ios-deployment-validator");
 
 export class DeployCommand implements ICommand {
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
-		private $identityManager: Server.IIdentityManager,
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
-		private $errors: IErrors) { }
+		private $injector: IInjector) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var platform = args[0];
 			if (this.$devicesServices.hasDevices(platform)) {
-				var provisionData;
-				if (options.provision) {
-					provisionData = this.$identityManager.findProvision(options.provision).wait();
-				}
-
 				var canExecute = (device: Mobile.IDevice): boolean => {
 					if (MobileHelper.isiOSPlatform(device.getPlatform())) {
-						var isInProvisionedDevices: boolean = provisionData.ProvisionedDevices && provisionData.ProvisionedDevices.contains(device.getIdentifier());
-						if(!isInProvisionedDevices) {
-							this.$errors.fail("The device with identifier '%s' is not included in provisioned devices for given provision. Please use $ appbuilder list-provision -v to list all devices included in provision",
-								device.getIdentifier());
-						}
+						var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: packageName, device: device});
+						iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
 					}
 					return true;
 				}

@@ -12,9 +12,9 @@ import util = require("util");
 import helpers = require("./helpers");
 import querystring = require("querystring");
 import Future = require("fibers/future");
-import IOSDeploymentValidator = require("./validators/ios-deployment-validator");
 import projectNameValidator = require("./validators/project-name-validator");
 import MobileHelper = require("./mobile/mobile-helper");
+import iOSDeploymentValidatorLib = require("./validators/ios-deployment-validator");
 
 export class BuildService implements Project.IBuildService {
 	constructor(private $config: IConfiguration,
@@ -232,6 +232,9 @@ export class Project implements Project.IProject {
 				buildProperties.iOSDeviceFamily = this.projectData.iOSDeviceFamily;
 				buildProperties.iOSStatusBarStyle = this.projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = this.projectData.iOSBackgroundMode;
+
+				var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: this.projectData.AppIdentifier, device: undefined});
+				iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
 
 				var certificateData = this.$identityManager.findCertificate(options.certificate).wait();
 

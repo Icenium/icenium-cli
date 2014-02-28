@@ -10,7 +10,7 @@ interface IProvision {
 	ApplicationIdentifier: string;
 	ProvisionType: string;
 	ExpirationDate: any;
-	Certificates: ICryptographicIdentity[];
+	Certificates: string[];
 	ProvisionedDevices: string[];
 }
 
@@ -18,7 +18,7 @@ interface ICryptographicIdentity {
 	Alias: string;
 	Attributes: string[];
 	Type: string;
-	Certificate: any;
+	Certificate: string;
 }
 
 interface ISelfSignedIdentityModel {

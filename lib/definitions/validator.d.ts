@@ -69,3 +69,8 @@ interface IAsyncValidator<Input> {
 	validate(data: Input): IFuture<IValidationResult>;
 	validateProperty(data: Input, propertyName: string): IFuture<IValidationResult>;
 }
+
+interface IiOSDeploymentValidatorModel {
+	provisionOption: string;
+	certificateOption: string;
+}
