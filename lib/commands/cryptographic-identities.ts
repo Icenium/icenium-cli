@@ -548,10 +548,6 @@ interface ICertificateSigningRequest {
 
 function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): IFuture<ICertificateSigningRequest> {
 	return ((): ICertificateSigningRequest => {
-		if (indexStr === undefined) {
-			$errors.fail("Specify certificate signing request number to delete.");
-		}
-
 		var requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
 		requests = _.sortBy(requests, (req) => req.UniqueName);
 
@@ -566,13 +562,19 @@ function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Serv
 
 class RemoveCertificateSigningRequestCommand implements ICommand {
 	constructor(private $logger: ILogger,
+		private $errors: IErrors,
 		private $injector: IInjector,
 		private $prompter: IPrompter,
 		private $server: Server.IServer) {}
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var req = this.$injector.resolve(parseCertificateIndex, {indexStr: args[0]}).wait();
+			var indexStr = args[0];
+			if (!indexStr) {
+				this.$errors.fail("Specify certificate signing request index to delete.");
+			}
+
+			var req = this.$injector.resolve(parseCertificateIndex, {indexStr: indexStr}).wait();
 
 			if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
 				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
@@ -596,7 +598,12 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var req = this.$injector.resolve(parseCertificateIndex, {indexStr: args[0]}).wait();
+			var indexStr = args[0];
+			if (!indexStr) {
+				this.$errors.fail("Specify certificate signing request index to download.");
+			}
+
+			var req = this.$injector.resolve(parseCertificateIndex, {indexStr: indexStr}).wait();
 			this.downloadCertificate(req.UniqueName).wait();
 		}).future<void>()();
 	}
