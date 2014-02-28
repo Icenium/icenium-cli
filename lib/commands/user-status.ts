@@ -32,7 +32,7 @@ export class UserStatusCommand implements ICommand {
 				var padding = _.range(maxPrefixLength - field.length).map((x) => " ").join("");
 				this.$logger.out("%s%s: %s", padding, field, fields[field]);
 			});
-			this.$logger.out("\nView your account at %s://%s/account/subscription [Ctrl-Click]", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			this.$logger.out("\nView your account at %s://%s/account/subscription", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 		}).future<void>()();
 	}
 }

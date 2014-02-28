@@ -482,7 +482,7 @@ export class Project implements Project.IProject {
 						"with your current subscription plan. To use this feature, " +
 						"upgrade your subscription plan to Business or greater, " +
 						"or contact the account owner.\n" +
-						"http://www.telerik.com/purchase/platform [Ctrl-Click]");
+						"http://www.telerik.com/purchase/platform");
 				}
 			}
 
