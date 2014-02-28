@@ -45,4 +45,36 @@ describe("helpers", function() {
 			assert.equal(source, result.two.source);
 		});
 	});
+
+	describe("findByNameOrIndex", function() {
+		it("should find exact name match", function() {
+			var source = [{name: "Foo 1"}, {name: "Foo"}];
+			var result = helpers.findByNameOrIndex("Foo", source, (e) => e.name);
+			assert.equal(result.name, "Foo");
+		});
+
+		it("should find name by prefix", function() {
+			var source = [{name: "AaBb"}, {name: "Bb"}];
+			var result = helpers.findByNameOrIndex("Bb", source, (e) => e.name);
+			assert.equal(result.name, "Bb");
+		});
+
+		it("should not find name by substring", function() {
+			var source = [{name: "Foo 10"}];
+			var result = helpers.findByNameOrIndex("10", source, (e) => e.name);
+			assert.notOk(result);
+		});
+
+		it("should find element by index", function() {
+			var source = [{name: "Foo 2"}, {name: "Foo 3"}, {name: "Foo 4"}];
+			var result = helpers.findByNameOrIndex("2", source, (e) => e.name);
+			assert.equal(result.name, "Foo 3");
+		});
+
+		it("should find element by index with pound sign", function() {
+			var source = [{name: "2"}, {name: "3"}];
+			var result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
+			assert.equal(result.name, "3");
+		})
+	})
 });
