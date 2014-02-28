@@ -8,7 +8,7 @@ import helpers = require("./../helpers");
 import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
 
-export class SyncCommand implements ICommand {
+export class LiveSyncCommand implements ICommand {
 	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".ab", ".abproject"];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
@@ -27,7 +27,7 @@ export class SyncCommand implements ICommand {
 			var appIdentifier = this.$project.projectData.AppIdentifier;
 
 			if (this.$devicesServices.hasDevices(platform)) {
-				if (options.live) {
+				if (options.watch) {
 					this.liveSyncDevices(platform, projectDir, appIdentifier);
 				} else {
 					if (options.file) {
@@ -102,6 +102,6 @@ export class SyncCommand implements ICommand {
 		});
 	}
 }
-$injector.registerCommand("sync", SyncCommand);
+$injector.registerCommand("live-sync", LiveSyncCommand);
 
 

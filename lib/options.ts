@@ -16,7 +16,7 @@ var knownOpts:any = {
 		"template": String,
 		"appid" : String,
 		"deploy": String,
-		"live": Boolean,
+		"watch": Boolean,
 		"device": String,
 		"file": String,
 		"no-livesync": String,
