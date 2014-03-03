@@ -6,12 +6,9 @@ import _ = require("underscore");
 import Future = require("fibers/future");
 import util = require("util");
 import helpers = require("../helpers");
-import log = require("../logger");
 import path = require("path");
 import moment = require("moment");
 import validators = require("../validators/cryptographic-identity-validators");
-import readline = require("readline");
-import stream = require("stream");
 
 class CryptographicIdentityConstants {
 	public static PKCS12_TYPE = "Pkcs12";
@@ -59,10 +56,11 @@ export class IdentityManager implements Server.IIdentityManager {
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
-				this.$logger.out(util.format("#%d: '%s'", index + 1, identity.Alias));
+				this.$logger.out("#%d: '%s'", index + 1, identity.Alias);
 			});
 			if (!identities.length) {
-				this.$logger.info("No certificates registered."); // TODO: add guidance how to install certificates (when that becomes possible)
+				this.$logger.info("No certificates registered. Use the `import-certificate` command " +
+					"or the `create-self-signed-certificate` to register certificates.");
 			}
 		}).future<any>()();
 	}
@@ -73,8 +71,8 @@ export class IdentityManager implements Server.IIdentityManager {
 			provisions = _.sortBy(provisions, (provision) => provision.Name);
 
 			_.forEach(provisions, (provision, provisionIndex) => {
-				this.$logger.out(util.format("#%d: '%s'; type: %s, App ID: '%s.%s'", provisionIndex + 1, provision.Name, provision.ProvisionType,
-					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier));
+				this.$logger.out("#%d: '%s'; type: %s, App ID: '%s.%s'", provisionIndex + 1, provision.Name, provision.ProvisionType,
+					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 				if (options.verbose) {
 					this.$logger.out("  Provisioned devices:");
 					var devices = provision.ProvisionedDevices;
@@ -94,11 +92,11 @@ export class IdentityManager implements Server.IIdentityManager {
 		return ((): any => {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
-			identities = _.sortBy(identities, (identity) => identity.Alias);
 
-			var result = this.findIdentityData(identityStr, identities, (ident) => ident.Alias);
+			var result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if (!result) {
-				this.$errors.fail(util.format("Could not find certificate named '%s' or was not given a valid index. List registered certificates with 'list-certificates' command.", identityStr));
+				this.$errors.fail("Could not find certificate named '%s' or was not given " +
+					"a valid index. List registered certificates with 'list-certificates' command.", identityStr);
 			} else {
 				return result;
 			}
@@ -107,35 +105,16 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public findProvision(provisionStr): IFuture<any> {
 		return ((): any => {
-			log.debug("Looking for provision '%s'", provisionStr);
+			this.$logger.debug("Looking for provision '%s'", provisionStr);
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
-			provisions = _.sortBy(provisions, (provision) => provision.Name);
-			var result = this.findIdentityData(provisionStr, provisions, (ident) => ident.Name);
+			var result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
 			if (!result) {
-				this.$errors.fail(util.format("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr));
+				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr);
 			} else {
 				return result;
 			}
 		}).future<any>()();
-	}
-
-	private findIdentityData<T>(identityStr: string, data: T[], selector: (item: T) => string): T {
-		if (!identityStr) {
-			return undefined;
-		}
-
-		var identityData = _.find(data, (item) => selector(item).indexOf(identityStr) > -1);
-		if (identityData) {
-			return identityData;
-		}
-
-		var index = parseInt(identityStr, 10) - 1;
-		if (index >= 0 && index < data.length) {
-			return data[index];
-		}
-
-		return undefined;
 	}
 }
 $injector.register("identityManager", IdentityManager);

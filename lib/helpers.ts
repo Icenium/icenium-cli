@@ -200,3 +200,27 @@ export function formatListForDisplayInMultipleColumns(list: string[]): string {
 	}
 	return bestFormatting.formatted;
 }
+
+export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (item: T) => string): T {
+	if (!identityStr) {
+		return undefined;
+	}
+
+	data = _.sortBy(data, selector);
+
+	var identityData = _.find(data, (item) => selector(item).indexOf(identityStr) === 0);
+	if (identityData) {
+		return identityData;
+	}
+
+	if (identityStr[0] === "#") {
+		identityStr = identityStr.substr(1);
+	}
+
+	var index = parseInt(identityStr, 10) - 1;
+	if (index >= 0 && index < data.length) {
+		return data[index];
+	}
+
+	return undefined;
+}
