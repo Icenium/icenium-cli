@@ -148,20 +148,31 @@ export class Project implements Project.IProject {
 		return fullPath.substring(projectDir.length);
 	}
 
-	public enumerateProjectFiles(excludedProjectDirsAndFiles?: string[]): string[] {
-		if (!excludedProjectDirsAndFiles) {
-			excludedProjectDirsAndFiles = [".ab", ".abproject", "*.ipa", "*.apk"];
-		}
+	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk"];
+
+	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
+		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
+			concat(additionalExcludedProjectDirsAndFiles || []);
 
 		var projectDir = this.getProjectDir();
-		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, function(filePath) {
-			return !_.find(excludedProjectDirsAndFiles, (pattern) => {
-				return minimatch(path.relative(projectDir, filePath), pattern, {nocase: true});
-			})
+		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath) => {
+			return !this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
 		});
 
 		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
 		return projectFiles;
+	}
+
+	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
+		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
+			concat(additionalExcludedDirsAndFiles || []);
+
+		var relativeToProjectPath = path.relative(projectDir, filePath);
+		return this.isFileExcluded(relativeToProjectPath, excludedProjectDirsAndFiles);
+	}
+
+	private isFileExcluded(path: string, exclusionList: string[]): boolean {
+		return Boolean(_.find(exclusionList, (pattern) => minimatch(path, pattern, {nocase: true})));
 	}
 
 	private zipProject(): IFuture<string> {
@@ -628,21 +639,6 @@ export class Project implements Project.IProject {
 
 	private generateProjectGuid() {
 		return require("node-uuid").v4();
-	}
-
-	public isProjectFileExcluded(projectDir: string, filePath: string, excludedDirsAndFiles: string[]): boolean {
-		var relativeToProjectPath = filePath.substr(projectDir.length + 1);
-		var lowerCasePath = relativeToProjectPath.toLowerCase();
-		if(excludedDirsAndFiles) {
-			var excluded = false;
-			excludedDirsAndFiles.forEach((file) => {
-				if (lowerCasePath.startsWith(file)) {
-					excluded = true;
-				}
-			});
-			return excluded;
-		}
-		return false;
 	}
 
 	private normalizePropertyName(property) {
