@@ -207,7 +207,6 @@ export class Project implements Project.IProject {
 				CorePlugins: this.projectData.CorePlugins,
 				AppIdentifier: this.projectData.AppIdentifier,
 				ProjectName: this.projectData.name,
-				ProjectGuid: this.projectData.ProjectGuid,
 				FrameworkVersion: this.projectData.FrameworkVersion,
 				BundleVersion: this.projectData.BundleVersion,
 				DeviceOrientations: this.projectData.DeviceOrientations
@@ -591,7 +590,6 @@ export class Project implements Project.IProject {
 
 			properties.name = propertyGroup.ProjectName[0];
 			properties.AppIdentifier = propertyGroup.AppIdentifier[0];
-			properties.ProjectGuid = propertyGroup.ProjectGuid[0];
 			properties.BundleVersion = propertyGroup.BundleVersion[0];
 			properties.CorePlugins = propertyGroup.CorePlugins[0];
 			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0];
@@ -605,7 +603,6 @@ export class Project implements Project.IProject {
 
 	private alterPropertiesForNewProject(properties, projectName: string): any {
 		properties.name = projectName;
-		properties.ProjectGuid = this.generateProjectGuid();
 		var appid = options.appid;
 		if (!options.appid) {
 			appid = this.generateDefaultAppId(projectName);
@@ -675,10 +672,6 @@ export class Project implements Project.IProject {
 		} else {
 			return "com.telerik.myapp";
 		}
-	}
-
-	private generateProjectGuid() {
-		return require("node-uuid").v4();
 	}
 
 	private normalizePropertyName(property) {

@@ -176,7 +176,6 @@ interface IProjectData {
 	name: string;
 	projectVersion : number;
 	AppIdentifier: string;
-	ProjectGuid: string;
 	DisplayName: string;
 	BundleVersion: string;
 	FrameworkVersion: string;

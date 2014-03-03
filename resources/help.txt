@@ -11,6 +11,7 @@ General commands:
 
 Project development commands:
     create                          Creates a new project from template.
+    init                            Creates a project in the current folder.
     build                           Builds the project and produces a QR code for deploying the application package.
     deploy                          Deploys the project to a connected device.
     cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
