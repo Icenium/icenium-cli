@@ -127,6 +127,9 @@ Options:
 
 Lists with serial number and index all recognized connected devices, grouped by platform.
 
+If a connected Android device is not shown in the list, make sure that you have the Android USB drivers
+installed and that USB debugging is enabled on the device.
+
 --[/]--
 
 --[build]--
