@@ -38,6 +38,8 @@ Certificate management and publishing commands:
     export-certificate              Exports certificate from the server.
     import-certificate              Imports certificate to the server.
     list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
+    import-provision                Imports a provisioning profile from file.
+    remove-provision                Removes a registered provisioning profile.
     appstore-list                   Lists all applications in iTunes Connect that are ready for upload.
     appstore-upload                 Builds the project and uploads the app to iTunes Connect.
 
@@ -141,6 +143,21 @@ Options:
     --no-livesync - If specified, the app will not support the three-finger tap (iOS) or menu button press (Android)
         to sync with the cloud.
 
+--[/]--
+
+--[import-provision]--
+Usage:
+    $ appbuilder import-provision <File>
+
+Imports the provisioning profile stored in <File>.
+--[/]--
+
+--[remove-provision]--
+Usage:
+    $ appbuilder remove-provision <Name or #Index>
+
+Removes the registered provisioning profile specified by its name or index. Use the `list-provisions`
+command to see a list of registered provisioning profiles.
 --[/]--
 
 --[cloud-sync]--

@@ -620,3 +620,50 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 	}
 }
 $injector.registerCommand("download-certificate-request", DownloadCertificateSigningRequestCommand);
+
+class ImportProvisionCommand implements ICommand {
+	constructor(private $fs: IFileSystem,
+		private $logger: ILogger,
+		private $errors: IErrors,
+		private $server: Server.IServer,
+		private $commandsService: ICommandsService) {}
+
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			var fileName = args[0];
+			if (!fileName) {
+				this.$errors.fail("No file specified.");
+			}
+
+			if (!this.$fs.exists(fileName).wait()) {
+				this.$errors.fail({formatStr: "File '%s' does not exist.", suppressCommandHelp: true}, fileName);
+			}
+
+			var provisionFile = this.$fs.createReadStream(fileName);
+			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
+			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
+
+			this.$commandsService.executeCommand("list-provisions", []);
+		}).future<void>()();
+	}
+}
+$injector.registerCommand("import-provision", ImportProvisionCommand);
+
+class RemoveProvisionCommand implements ICommand {
+	constructor(private $identityManager: Server.IIdentityManager,
+		private $logger: ILogger,
+		private $server: Server.IServer,
+		private $commandsService: ICommandsService) {}
+
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			var provisionData = this.$identityManager.findProvision(args[0]).wait();
+			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
+			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
+
+			this.$commandsService.executeCommand("list-provisions", []);
+		}).future<void>()();
+	}
+}
+$injector.registerCommand("remove-provision", RemoveProvisionCommand);
+
