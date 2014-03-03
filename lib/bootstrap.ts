@@ -38,7 +38,7 @@ $injector.require("buildService", "./project");
 $injector.require("project", "./project");
 $injector.requireCommand("build", "./project");
 $injector.requireCommand("ion", "./project");
-$injector.requireCommand("update", "./project");
+$injector.requireCommand("cloud-sync", "./project");
 $injector.requireCommand("create", "./project");
 $injector.requireCommand("prop-add", "./project");
 $injector.requireCommand("prop-set", "./project");
@@ -53,7 +53,7 @@ $injector.requireCommand("list-devices", "./commands/list-devices");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
-$injector.requireCommand("sync", "./commands/sync");
+$injector.requireCommand("live-sync", "./commands/live-sync");
 
 $injector.requireCommand("open-device-log-stream", "./commands/open-device-log-stream");
 
