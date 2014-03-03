@@ -2,6 +2,7 @@
 
 "use strict";
 
+import rimraf = require("rimraf");
 import xml2js = require("xml2js");
 import path = require("path");
 import unzip = require("unzip");
@@ -554,18 +555,24 @@ export class Project implements Project.IProject {
 			if (this.$fs.exists(templateFileName).wait()) {
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
-				this.$logger.trace("Extracting template from '%s'", templateFileName);
-				this.extractTemplate(templateFileName, projectDir).wait();
-				this.$logger.trace("Reading template project properties.");
-				var properties = this.getProjectProperties(path.join(projectDir, "mobile.proj"), appname).wait();
-				properties = this.alterPropertiesForNewProject(properties, appname);
-				this.$logger.trace(properties);
-				this.$logger.trace("Creating project file.");
-				this.createProjectFile(projectDir, appname, properties).wait();
-				this.$logger.trace("Removing unnecessary files from template.");
-				this.removeExtraFiles(projectDir).wait();
+				try {
+					this.$logger.trace("Extracting template from '%s'", templateFileName);
+					this.extractTemplate(templateFileName, projectDir).wait();
+					this.$logger.trace("Reading template project properties.");
+					var properties = this.getProjectProperties(path.join(projectDir, "mobile.proj"), appname).wait();
+					properties = this.alterPropertiesForNewProject(properties, appname);
+					this.$logger.trace(properties);
+					this.$logger.trace("Creating project file.");
+					this.createProjectFile(projectDir, appname, properties).wait();
+					this.$logger.trace("Removing unnecessary files from template.");
+					this.removeExtraFiles(projectDir).wait();
 
-				this.$logger.info(util.format("%s has been successfully created.", appname));
+					this.$logger.info("%s has been successfully created.", appname);
+				}
+				catch (ex) {
+					Future.wrap(rimraf)(projectDir).wait();
+					throw ex;
+				}
 			} else {
 				var message =
 					["The requested template " + options.template + " does not exist.",
