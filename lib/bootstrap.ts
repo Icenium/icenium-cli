@@ -82,6 +82,8 @@ $injector.require("prompter", "./prompter");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("list-provisions", "./commands/cryptographic-identities");
+$injector.requireCommand("import-provision", "./commands/cryptographic-identities");
+$injector.requireCommand("remove-provision", "./commands/cryptographic-identities");
 $injector.requireCommand("list-certificates", "./commands/cryptographic-identities");
 $injector.require("selfSignedIdentityValidator", "./validators/cryptographic-identity-validators");
 $injector.requireCommand("create-self-signed-certificate", "./commands/cryptographic-identities");
