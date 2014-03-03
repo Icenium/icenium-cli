@@ -69,11 +69,7 @@ describe("project integration tests", function() {
 
 			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
 			for (var key in testProperties) {
-				if (key !== "ProjectGuid") {
-					assert.deepEqual(testProperties[key], correctProperties[key]);
-				} else {
-					assert.ok(testProperties[key]);
-				}
+				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
 	});

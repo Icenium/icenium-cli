@@ -40,6 +40,7 @@ $injector.requireCommand("build", "./project");
 $injector.requireCommand("ion", "./project");
 $injector.requireCommand("cloud-sync", "./project");
 $injector.requireCommand("create", "./project");
+$injector.requireCommand("init", "./project");
 $injector.requireCommand("prop-add", "./project");
 $injector.requireCommand("prop-set", "./project");
 $injector.requireCommand("prop-del", "./project");
