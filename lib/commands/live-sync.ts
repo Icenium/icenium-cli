@@ -21,10 +21,17 @@ export class LiveSyncCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var platform = args[0];
+			var launchCompanion = options.companion;
+			if (!MobileHelper.isiOSPlatform(platform) && launchCompanion) {
+				this.$errors.fail("The AppBuilder Companion app is available only for iOS devices.");
+			}
 
 			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
-			var appIdentifier = this.$project.projectData.AppIdentifier;
+
+			var appIdentifier = !launchCompanion
+				? this.$project.projectData.AppIdentifier
+				: "com.telerik.Icenium";
 
 			if (this.$devicesServices.hasDevices(platform)) {
 				if (options.watch) {

@@ -89,6 +89,7 @@ declare module Mobile {
 		afcFileRefClose(afcConnection: NodeBuffer, afcFileRef: number): number;
 		afcFileRefWrite(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number;
 		afcFileRefRead(afcConnection: NodeBuffer, afcFileRef: number, buffer: NodeBuffer, byteLength: number): number;
+		afcRemovePath(afcConnection: NodeBuffer, path: string): number;
 		afcDirectoryOpen(afcConnection: NodeBuffer, path: string, afcDirectory: NodeBuffer): number;
 		afcDirectoryRead(afcConnection: NodeBuffer, afcdirectory: NodeBuffer,  name: NodeBuffer): number;
 		afcDirectoryClose(afcConnection: NodeBuffer, afcdirectory: NodeBuffer): number;
