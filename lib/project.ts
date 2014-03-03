@@ -471,7 +471,15 @@ export class Project implements Project.IProject {
 				properties = this.alterPropertiesForNewProject({}, appname);
 			}
 
-			this.createProjectFile(projectDir, appname, properties).wait();
+			try {
+				this.createProjectFile(projectDir, appname, properties).wait();
+				this.$logger.info("Successfuly initialised project in the folder!");
+			}
+			catch (ex) {
+				this.$logger.error("There was an error while initialising the project:");
+				throw ex;
+			}
+
 		}).future<void>()();
 	}
 
@@ -620,6 +628,7 @@ export class Project implements Project.IProject {
 	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
+			var updateData;
 
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
@@ -630,17 +639,20 @@ export class Project implements Project.IProject {
 				if (projectSchema.hasOwnProperty(prop)) {
 					if(projectSchema[prop].flags) {
 						this.projectData[prop] = properties[prop].split(";");
+						updateData = this.projectData[prop];
 					} else {
 						this.projectData[prop] = properties[prop];
+						updateData = [this.projectData[prop]];
 					}
+
+					//triggers validation logic
+					this.updateProjectProperty({}, "set", prop, updateData, false);
 				}
 			});
 
 			if (!this.projectData.DisplayName) {
 				this.projectData.DisplayName = this.projectData.name;
 			}
-
-			this.updateProjectProperty({}, "set", "AppIdentifier", [this.projectData.AppIdentifier]);
 
 			this.saveProject(projectDir).wait();
 		}).future<void>()();
@@ -686,7 +698,7 @@ export class Project implements Project.IProject {
 		return propLookup[property.toLowerCase()] || property;
 	}
 
-	public updateProjectProperty(projectData:any, mode:string, property:string, newValue:any) {
+	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) {
 		property = this.normalizePropertyName(property);
 		var propSchema = helpers.getProjectFileSchema();
 		var propData = propSchema[property];
@@ -729,7 +741,16 @@ export class Project implements Project.IProject {
 					_.identity);
 			} else {
 				validValues = helpers.toHash(range,
-					function(value, key) { return (value.input || key).toLowerCase(); },
+					function (value, key) {
+						var result;
+						if (useMapping && value.input) {
+							result = value.input;
+						} else {
+							result = key;
+						}
+
+						return result.toLowerCase();
+					},
 					function(value, key) { return key; });
 			}
 
@@ -782,7 +803,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues);
+			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, true);
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
 		}).future<void>()();
