@@ -102,3 +102,4 @@ $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
 
 $injector.require("platformServices", "./commands/simulate");
+$injector.require("iOSDeploymentValidator", "./validators/ios-deployment-validator");
