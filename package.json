@@ -48,7 +48,8 @@
     "validator": "3.2.1",
     "prompt": "https://github.com/Icenium/prompt/tarball/master",
     "moment": "2.5.1",
-    "minimatch": "0.2.14"
+    "minimatch": "0.2.14",
+	"rimraf": "2.2.6"
   },
   "analyze": true,
   "devDependencies": {

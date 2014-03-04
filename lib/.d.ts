@@ -36,6 +36,7 @@
 /// <reference path="definitions/plistlib.d.ts" />
 /// <reference path="definitions/plugman.d.ts" />
 /// <reference path="definitions/prompt.d.ts" />
+/// <reference path="definitions/rimraf.d.ts" />
 /// <reference path="definitions/sax-js.d.ts" />
 /// <reference path="definitions/signals.d.ts" />
 /// <reference path="definitions/underscore.d.ts" />
