@@ -69,6 +69,10 @@ declare module "fibers/future" {
 		static wait(future_list: IFuture<any>[]);
 		static wait(...future_list: IFuture<any>[]);
 
+		static settle<T>(future: IFuture<T>);
+		static settle(future_list: IFuture<any>[]);
+		static settle(...future_list: IFuture<any>[]);
+
 		static wrap<T>(fn: (callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;
 		static wrap<T>(fn: (a: any, callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;
 		static wrap<T>(fn: (a: any, b: any, callback: (error: Error, result: T) => void) => void): ICallableFuture<T>;

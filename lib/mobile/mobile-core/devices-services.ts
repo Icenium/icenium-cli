@@ -137,16 +137,18 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			if(allConnectedDevices.length == 0) {
 				this.$logger.out("No connected devices found.");
 			}
-			_.map(allConnectedDevices, (device: Mobile.IDevice) => {
-				if(canExecute) {
-					if(canExecute(device)) {
-						return action(device).wait();
-					}
+			var futures = _.map(allConnectedDevices, (device: Mobile.IDevice) => {
+				if (!canExecute || canExecute(device)) {
+					return action(device);
 				} else {
-					return action(device).wait();
+					return Future.fromResult();
 				}
 			});
 
+			_.each(futures, (future) => {
+				Future.settle(future);
+			});
+			Future.wait(futures);
 		}).future<void>()();
 	}
 
