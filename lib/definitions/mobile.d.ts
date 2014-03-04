@@ -24,7 +24,7 @@ declare module Mobile {
 
 	interface IDevicesServices {
 		executeOnAllConnectedDevices(action:  (device: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;
-		executeOnDevice(action: any, deviceOptions: string): IFuture<void>;
+		executeOnDevice(action: any, deviceOptions: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;
 		hasDevices(platform?: string): boolean;
 		hasDevice(identifier: string): boolean;
 	}

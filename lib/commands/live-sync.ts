@@ -21,17 +21,13 @@ export class LiveSyncCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var platform = args[0];
-			var launchCompanion = options.companion;
-			if (!MobileHelper.isiOSPlatform(platform) && launchCompanion) {
-				this.$errors.fail("The AppBuilder Companion app is available only for iOS devices.");
-			}
 
 			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
 
-			var appIdentifier = !launchCompanion
-				? this.$project.projectData.AppIdentifier
-				: "com.telerik.Icenium";
+			var appIdentifier = options.companion
+				? "com.telerik.Icenium"
+				: this.$project.projectData.AppIdentifier;
 
 			if (this.$devicesServices.hasDevices(platform)) {
 				if (options.watch) {
@@ -56,6 +52,15 @@ export class LiveSyncCommand implements ICommand {
 
 	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
 		return(() => {
+
+			var canExecute = (device: Mobile.IDevice): boolean => {
+				if (!MobileHelper.isiOSPlatform(device.getPlatform()) && options.companion) {
+					this.$logger.warn("The AppBuilder Companion app is available only for iOS devices.");
+				}
+
+				return true;
+			}
+
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
 					var platformSpecificProjectPath = device.getDeviceProjectPath(appIdentifier);
@@ -65,9 +70,9 @@ export class LiveSyncCommand implements ICommand {
 			};
 
 			if(options.device) {
-				this.$devicesServices.executeOnDevice(action, options.device).wait();
+				this.$devicesServices.executeOnDevice(action, options.device, canExecute).wait();
 			} else {
-				this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+				this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
 			}
 		}).future<void>()();
 	}
