@@ -4,7 +4,12 @@
 import _ = require("underscore");
 
 export class CommandsService implements ICommandsService {
-	constructor(private $errors: IErrors) {}
+	constructor(private $errors: IErrors) { }
+
+	public allCommands(): string[] {
+		return $injector.getRegisteredCommandsNames();
+	}
+
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(() => {
 			var command = $injector.resolveCommand(commandName);
