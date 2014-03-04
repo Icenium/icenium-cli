@@ -23,6 +23,11 @@
 	"CorePlugins": {
 		"description": "List of core Cordova plugins required by the app.",
 		"range": [
+			"com.phonegap.plugins.barcodescanner",
+			"com.phonegap.plugins.PushPlugin",
+			"com.phonegap.plugins.sqlite",
+			"com.telerik.Cordova-MobileTestingExtension",
+			"com.telerik.plugin.eqatecanalytics",
 			"org.apache.cordova.AudioHandler",
 			"org.apache.cordova.battery-status",
 			"org.apache.cordova.camera",
@@ -37,6 +42,7 @@
 			"org.apache.cordova.geolocation",
 			"org.apache.cordova.globalization",
 			"org.apache.cordova.inappbrowser",
+			"org.apache.cordova.keyboard",
 			"org.apache.cordova.media",
 			"org.apache.cordova.media-capture",
 			"org.apache.cordova.network-information",
