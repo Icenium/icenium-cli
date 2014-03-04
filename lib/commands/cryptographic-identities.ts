@@ -398,8 +398,16 @@ export class ExportCryptographicIdentity implements ICommand {
 
 			var identity = this.$identityManager.findCertificate(nameOrIndex).wait();
 			var name = identity.Alias;
+			var sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
 
-			var targetFileName = path.join(this.getPath(), util.format("%s.%s", name,
+			if (sanitizedName.length == 0) {
+				sanitizedName = "exported_certificate";
+				this.$logger.warn("Certificate name contains only invalid characters: Defaulting to %s!", sanitizedName);
+			} else {
+				sanitizedName = (sanitizedName + "_certificate").trim();
+			}
+
+			var targetFileName = path.join(this.getPath(), util.format("%s.%s", sanitizedName,
 				CryptographicIdentityConstants.PKCS12_EXTENSION));
 
 			if (this.$fs.exists(targetFileName).wait()) {
