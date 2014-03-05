@@ -27,8 +27,12 @@ function updateCallback(error) {
 	}
 }
 
+function getHomePath(fileName) {
+	return path.join(homeDir, fileName);
+}
+
 function updateShellScript(fileName) {
-	var filePath = path.join(homeDir, fileName);
+	var filePath = getHomePath(fileName);
 	
 	var doUpdate = true;
 	if (fs.existsSync(filePath)) {
@@ -47,6 +51,22 @@ function updateShellScript(fileName) {
 // bash - http://www.gnu.org/software/bash/manual/bashref.html#Bash-Startup-Files
 updateShellScript(".profile");
 updateShellScript(".bashrc");
+
+var callProfileScript =
+	"if [ -f ~/.profile ]; then\n" +
+	"		. ~/.profile\n" +
+	"fi\n";
+
+var bashProfileFileName = getHomePath(".bash_profile");
+if (fs.existsSync(bashProfileFileName)) {
+	var contents = fs.readFileSync(bashProfileFileName).toString();
+	if (contents.indexOf(callProfileScript) < 0) {
+		updateShellScript(".bash_profile");
+	}
+} else {
+	outstandingUpdates++;
+	fs.writeFile(bashProfileFileName, callProfileScript, updateCallback);
+}
 
 // zsh - http://www.acm.uiuc.edu/workshops/zsh/startup_files.html
 updateShellScript(".zshrc");
