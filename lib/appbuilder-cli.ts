@@ -6,10 +6,12 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
+import _ = require("underscore");
 
 require("./extensions");
 require("./bootstrap");
 require("./errors");
+var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 var options = require("./options");
 
 class CommandDispatcher {
@@ -35,11 +37,38 @@ class CommandDispatcher {
 
 		if (!this.$commandsService.executeCommand(commandName, commandArguments)) {
 			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+			this.tryToMatchCommand(commandName);
 		}
 	}
 
 	public completeCommand(): void {
 		this.$commandsService.completeCommand();
+	}
+
+	private tryToMatchCommand(commandName): void {
+		var allCommands = this.$commandsService.allCommands();
+		var similarCommands = [];
+		_.each(allCommands, (command) => {
+			var distance = jaroWinklerDistance(commandName, command);
+			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
+				similarCommands.push({ rating: 1, name: command });
+			} else if (distance >= 0.65) {
+				similarCommands.push({ rating: distance, name: command });
+			}
+
+		});
+
+		similarCommands = _.sortBy(similarCommands, (command) => {
+				return -command.rating;
+			}).slice(0, 5);
+
+		if (similarCommands.length > 0) {
+			var message = ["Did you mean?"];
+			_.each(similarCommands, (command) => {
+				message.push("\t" + command.name)
+				});
+			this.$logger.fatal(message.join("\n"));
+		}
 	}
 
 	private getCommandName(): string {
