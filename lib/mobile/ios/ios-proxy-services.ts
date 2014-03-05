@@ -164,6 +164,10 @@ export class AfcClient implements Mobile.IAfcClient {
 	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
 		return(() => {
 			var reader = this.$fs.createReadStream(localFilePath);
+
+			var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
+			this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
+
 			var target = this.open(devicePath, "w");
 			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 

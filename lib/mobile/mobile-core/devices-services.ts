@@ -103,7 +103,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return searchedDevice;
 	}
 
-	public executeOnDevice(action: any, deviceOptions: string): IFuture<void> {
+	public executeOnDevice(action: any, deviceOptions: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
 		return (() => {
 			this.$logger.debug("executeOnDevice: '%s'", deviceOptions);
 
@@ -126,7 +126,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				this.$errors.fail("Could not find device");
 			}
 
-			return action(device).wait();
+			if(!canExecute || canExecute(device)) {
+				return action(device).wait();
+			}
+
 		}).future<void>()();
 	}
 
