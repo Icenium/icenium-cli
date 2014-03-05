@@ -74,11 +74,16 @@ export class IdentityManager implements Server.IIdentityManager {
 				this.$logger.out("#%d: '%s'; type: %s, App ID: '%s.%s'", provisionIndex + 1, provision.Name, provision.ProvisionType,
 					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 				if (options.verbose) {
-					this.$logger.out("  Provisioned devices:");
 					var devices = provision.ProvisionedDevices;
-					_.forEach(provision.ProvisionedDevices, (device, deviceIndex) => {
-						this.$logger.out("    " + devices[deviceIndex])
-					});
+					if (devices && devices.length) {
+						this.$logger.out("  Provisioned device identifiers:");
+						devices.sort();
+						_.forEach(devices, (device, deviceIndex) => {
+							this.$logger.out("    " + devices[deviceIndex])
+						});
+					} else {
+						this.$logger.out("  No provisioned devices.");
+					}
 				}
 			});
 
