@@ -51,9 +51,9 @@ $injector.register("deviceDiscovery", DeviceDiscovery);
 
 export class IOSDeviceDiscovery extends DeviceDiscovery {
 
-	private static ADNCI_MSG_CONNECTED: number = 1;
-	private static ADNCI_MSG_DISCONNECTED: number = 2;
-	private static APPLE_SERVICE_NOT_STARTED_ERROR_CODE = 3892314211;
+	private static ADNCI_MSG_CONNECTED = 1;
+	private static ADNCI_MSG_DISCONNECTED = 2;
+	private static APPLE_SERVICE_NOT_STARTED_ERROR_CODE = 0xE8000063;
 
 	private timerCallbackPtr = null;
 	private  notificationCallbackPtr = null;
