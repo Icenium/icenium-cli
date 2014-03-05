@@ -2,7 +2,8 @@
 "use strict";
 
 export class CommandsService implements ICommandsService {
-	constructor(private $errors: IErrors) { }
+	constructor(private $errors: IErrors,
+		private $analyticsService: IAnalyticsService) { }
 
 	public allCommands(): string[] {
 		return $injector.getRegisteredCommandsNames();
@@ -11,6 +12,9 @@ export class CommandsService implements ICommandsService {
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
 		var command = $injector.resolveCommand(commandName);
 		if (command) {
+			if(!command.isDisabledFeatureTracking) {
+				this.$analyticsService.trackFeature(commandName).wait();
+			}
 			command.execute(commandArguments).wait();
 			return true;
 		} else {
@@ -68,5 +72,5 @@ export class CommandsService implements ICommandsService {
 
 		return true;
 	}
-	}
+}
 $injector.register("commandsService", CommandsService);

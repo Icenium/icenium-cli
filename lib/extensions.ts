@@ -7,6 +7,8 @@ interface String {
 	endsWith(prefix: string): boolean;
 	isEmpty(): boolean;
 	equals(value: string, caseSensitive: boolean): boolean;
+	red;
+	grey;
 }
 
 interface Array {

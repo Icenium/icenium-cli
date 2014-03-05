@@ -81,13 +81,14 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
+export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>, isDisabledFeatureTracking?: boolean) {
 	var factory = function (): ICommand {
 		return {
 			execute: (args: string[]): IFuture<void> => {
 				var mod = $injector.resolve(module);
 				return executor(mod, args);
-			}
+			},
+			isDisabledFeatureTracking: isDisabledFeatureTracking
 		};
 	};
 

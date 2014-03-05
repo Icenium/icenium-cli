@@ -46,7 +46,7 @@ export class Prompter implements IPrompter {
 		}).future<string>()();
 	}
 
-	public confirm(prompt: string): IFuture<boolean> {
+	public confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
 		return ((): boolean => {
 			var schema: IPromptSchema = {
 				properties: {
@@ -55,10 +55,15 @@ export class Prompter implements IPrompter {
 						type: "string",
 						required: true,
 						message: "Enter 'y' (for yes) or 'n' (for no).",
-						conform: (value: string) => /^[yn]$/i.test(value)
+						conform: (value: string) => /^[yn]$/i.test(value),
 					}
 				}
 			};
+
+			if(defaultAction) {
+				schema["properties"]["password"]["default"] = defaultAction;
+			}
+
 			var result = this.get(schema).wait();
 			return result.password.toLowerCase() === "y";
 		}).future<boolean>()();

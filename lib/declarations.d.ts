@@ -262,7 +262,7 @@ interface IPrompter {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
-	confirm(prompt: string): IFuture<boolean>;
+	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean>;
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
 }
@@ -284,4 +284,15 @@ interface IX509CertificateLoader {
 
 interface IQrCodeGenerator {
 	generateDataUri(data: string): string;
+}
+
+interface IAnalyticsService {
+	trackFeature(featureName: string): IFuture<void>;
+	trackException(exception: any, message: string);
+	analyticsCommand(arg: string): void;
+}
+
+interface IUserSettingsService {
+	saveSettings(data: {[key: string]: {}}): IFuture<void>;
+	getValue(propertyName: string): IFuture<any>;
 }
