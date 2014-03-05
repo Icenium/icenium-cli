@@ -8,7 +8,6 @@ import Future = require("fibers/future");
 import helpers = require("./../helpers");
 import util = require("util");
 import _ = require("underscore");
-import moment = require("moment");
 
 export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<IiOSDeploymentValidatorModel> {
 	private static NOT_SPECIFIED_PROVISION_ERROR_MESSAGE = "Please specify the provisioning profile (with option --provision) that should be used when building the project.";
@@ -22,7 +21,8 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	constructor(private appIdentifier: string,
 		private device: Mobile.IDevice,
 		private $identityManager: Server.IIdentityManager,
-		private $logger: ILogger) {
+		private $logger: ILogger,
+		private $x509: IX509CertificateLoader) {
 		super();
 	}
 
@@ -101,14 +101,8 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	}
 
 	private isCertificateExpired(certificate: string): boolean {
-		var x509lib = require("../../vendor/jsrsasign");
-		var x509 = new x509lib.x509();
-		x509.readCertPEM(certificate);
-		var notAfter = x509.getNotAfter();
-
-		this.$logger.trace("timezone: '%s'", notAfter.slice(-1));
-
-		return moment(notAfter, "YYDDMMHHmmss").toDate() <= new Date();
+		var cert = this.$x509.load(certificate);
+		return cert.expiresOn <= new Date();
 	}
 
 	private getRegexPattern(appIdentifier): string {

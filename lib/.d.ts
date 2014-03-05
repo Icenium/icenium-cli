@@ -1,3 +1,4 @@
+
 //grunt-start
 /// <reference path="appbuilder-cli.ts" />
 /// <reference path="bootstrap.ts" />
@@ -77,5 +78,6 @@
 /// <reference path="validators/ios-deployment-validator.ts" />
 /// <reference path="validators/project-name-validator.ts" />
 /// <reference path="validators/validation-result.ts" />
+/// <reference path="x509.ts" />
 /// <reference path="yok.ts" />
 //grunt-end
