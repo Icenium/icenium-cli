@@ -33,10 +33,11 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	private composeCommand(command) {
-		var result = util.format("%s -s %s", this.adb, this.identifier);
+		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
 		if (command && !command.isEmpty()) {
 			result += util.format(" %s", command);
 		}
+
 		return result;
 	}
 
@@ -50,10 +51,10 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	public deploy(packageFile: string, packageName: string): IFuture<void> {
 		return(() => {
-			var uninstallCommand = this.composeCommand(util.format("shell pm uninstall %s", packageName))
+			var uninstallCommand = this.composeCommand(util.format("shell pm uninstall \"%s\"", packageName))
 			this.$childProcess.exec(uninstallCommand).wait();
 
-			var installCommand = this.composeCommand(util.format("install -r %s", packageFile));
+			var installCommand = this.composeCommand(util.format("install -r \"%s\"", packageFile));
 			this.$childProcess.exec(installCommand).wait();
 
 			this.startPackageOnDevice(packageName).wait();
@@ -71,7 +72,7 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
 		return(() => {
-			var pushFileCommand = this.composeCommand(util.format("push %s %s", localPath, devicePath));
+			var pushFileCommand = this.composeCommand(util.format("push \"%s\" \"%s\"", localPath, devicePath));
 			this.$childProcess.exec(pushFileCommand).wait();
 		}).future<void>()();
 	}
