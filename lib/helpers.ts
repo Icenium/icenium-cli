@@ -116,7 +116,7 @@ export function isDarwin() {
 	return process.platform.toUpperCase() === "DARWIN";
 }
 
-export function stringReplaceAll(string: string, find: string, replace: string): string {
+export function stringReplaceAll(string: string, find: any, replace: string): string {
 	return string.split(find).join(replace);
 }
 
