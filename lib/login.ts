@@ -92,7 +92,8 @@ export class LoginManager implements ILoginManager {
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
 		private $opener: IOpener,
-		private $commandsService: ICommandsService) { }
+		private $commandsService: ICommandsService,
+		private $sharedUserSettingsService: IUserSettingsService) { }
 
 	public basicLogin(userName: string, password: string): IFuture<void> {
 		var loginData = {
@@ -109,6 +110,8 @@ export class LoginManager implements ILoginManager {
 
 			this.$userDataStore.setCookie(null).wait();
 			this.$userDataStore.setUser(null).wait();
+
+			this.$sharedUserSettingsService.deleteUserSettingsFile().wait();
 
 			this.$logger.info("Logout completed.");
 		}).future<void>()();

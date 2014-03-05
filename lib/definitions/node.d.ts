@@ -91,6 +91,7 @@ declare class WritableStream extends EventEmitter {
 	// hence the need to add these declarations here.
 	rows: number;
 	columns: number;
+	isTTY: boolean;
 }
 
 declare class ReadableStream extends EventEmitter {
@@ -100,6 +101,10 @@ declare class ReadableStream extends EventEmitter {
     resume(): void;
     destroy(): void;
     pipe(destination: WritableStream, options?: { end?: boolean; }): void;
+
+	// HACK: process.stdin is incorrectly declared as a ReadableStream, instead of as a "tty".ReadStream,
+	// hence the need to add these declarations here.
+	isTTY: boolean;
 }
 
 declare class NodeProcess extends EventEmitter {

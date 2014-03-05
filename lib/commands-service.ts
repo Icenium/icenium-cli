@@ -2,15 +2,19 @@
 "use strict";
 
 export class CommandsService implements ICommandsService {
-	constructor(private $errors: IErrors) { }
+	constructor(private $errors: IErrors,
+		private $analyticsService: IAnalyticsService,
+		private $injector: IInjector) { }
 
 	public allCommands(includeDev: boolean): string[] {
-		return $injector.getRegisteredCommandsNames(includeDev);
+		return this.$injector.getRegisteredCommandsNames(includeDev);
 	}
 
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
-		var command = $injector.resolveCommand(commandName);
+		var command = this.$injector.resolveCommand(commandName);
 		if (command) {
+			this.$analyticsService.checkConsent(commandName).wait();
+			this.$analyticsService.trackFeature(commandName).wait();
 			command.execute(commandArguments).wait();
 			return true;
 		} else {
@@ -21,7 +25,7 @@ export class CommandsService implements ICommandsService {
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(
 			() => this.executeCommandUnchecked(commandName, commandArguments),
-			() => this.executeCommand("help", [commandName]));
+			() => this.executeCommandUnchecked("help", [commandName]));
 	}
 
 	public completeCommand() {
@@ -68,5 +72,5 @@ export class CommandsService implements ICommandsService {
 
 		return true;
 	}
-	}
+}
 $injector.register("commandsService", CommandsService);

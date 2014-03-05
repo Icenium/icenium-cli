@@ -17,8 +17,12 @@ export class Prompter implements IPrompter {
 
 	public get(schema: IPromptSchema): IFuture<any> {
 		var future = new Future;
-		prompt.get(schema, (err: Error, result: any) => {
+		prompt.get(schema, (err: any, result: any) => {
 			if (err) {
+				// the error is normally Ctrl-C:
+				// move the cursor after the prompt (so that the error is not printed right after the user input)
+				console.log("");
+				err.suppressCommandHelp = true;
 				future.throw(err);
 			} else {
 				future.return(result);
@@ -46,21 +50,23 @@ export class Prompter implements IPrompter {
 		}).future<string>()();
 	}
 
-	public confirm(prompt: string): IFuture<boolean> {
+	public confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
 		return ((): boolean => {
 			var schema: IPromptSchema = {
 				properties: {
-					password: {
+					prompt: {
 						description: prompt + " (y/n)",
 						type: "string",
 						required: true,
+						default: defaultAction,
 						message: "Enter 'y' (for yes) or 'n' (for no).",
 						conform: (value: string) => /^[yn]$/i.test(value)
 					}
 				}
 			};
+
 			var result = this.get(schema).wait();
-			return result.password.toLowerCase() === "y";
+			return result.prompt.toLowerCase() === "y";
 		}).future<boolean>()();
 	}
 

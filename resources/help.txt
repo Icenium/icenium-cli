@@ -498,3 +498,18 @@ Shows the value for the selected project property.
 
 #{project.getProjectSchemaHelp}
 --[/]--
+
+--[feature-usage-tracking]--
+Usage:
+    $appbuilder feature-usage-tracking <status|enable|disable>
+
+Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.
+All data gathered is used strictly for improving the product and will never be used to identify or contact you.
+
+Options:
+    status - Shows the current configuration for anonymous usage tracking for the
+             Telerik AppBuilder command-line interface.
+    enable - Enables anonymous usage statistics tracking. All data gathered is used strictly
+             for improving the product and will never be used to identify or contact you.
+    disable - Disables anonymous usage statistics tracking.
+--[/]--

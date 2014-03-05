@@ -91,5 +91,23 @@ describe("helpers", function() {
 		it("should format list of multiple names", function() {
 			assert.equal("foo, bar, baz or jazz", helpers.formatListOfNames(["foo", "bar", "baz", "jazz"]));
 		});
+	});
+
+	describe("mergeRecursive", function() {
+		it("should merge one level objects with different properties", function() {
+			assert.deepEqual({ a: 1, b: 2, c: 3, d: 4 }, helpers.mergeRecursive({a: 1, b: 2}, {c: 3, d: 4}));
+		});
+		it("should merge one level objects with same properties", function() {
+			assert.deepEqual({ a: 10, b: 20, c: 30, d: 40 }, helpers.mergeRecursive({a: 1, b: 2, c: 3, d: 4}, {a: 10, b: 20, c: 30, d: 40}));
+		});
+		it("should merge deep objects", function() {
+			assert.deepEqual({ a: 10, b: {c: 1, d: 2}}, helpers.mergeRecursive({a: 1, b: {c: 1}}, {a: 10, b: {d: 2}}));
+		});
+		it("should merge very deep objects", function() {
+			assert.deepEqual({ a: 10, b: {c: { d: { e: { f: { g: { h: 100}}}}}}}, helpers.mergeRecursive({ a: 10, b: {c: { d: { e: { f: { g: { h: 1}}}}}}}, { a: 10, b: {c: { d: { e: { f: { g: { h: 100}}}}}}}));
+		});
+		it("should merge deep objects with different root property", function() {
+			assert.deepEqual({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}, k: { l: { m: { n: { p: 1}}}}}, helpers.mergeRecursive({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}}, { k: { l: { m: { n: { p: 1}}}}}));
+		});
 	})
 });

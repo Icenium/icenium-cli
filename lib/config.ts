@@ -20,6 +20,7 @@ export class Configuration implements IConfiguration {
 	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
+	ANALYTICS_API_KEY: string;
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {

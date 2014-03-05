@@ -1,5 +1,6 @@
 global._ = require("underscore");
 global.$injector = require("./yok").injector;
+require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
@@ -106,5 +107,10 @@ $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
 
 $injector.requireCommand("dev-prepackage", "./commands/post-install");
-
 $injector.require("platformServices", "./commands/simulate");
+$injector.require("analyticsService", "./services/analytics-service");
+$injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
+$injector.require("sharedUserSettingsService", "./services/user-settings-service");
+
+
+
