@@ -183,14 +183,6 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<string>()();
 	}
 
-	public hasDevices(platform?: string): boolean {
-		if (!platform) {
-			return this.getDevices().length !== 0;
-		} else {
-			return this.filterDevicesByPlatform(this.getPlatform(platform)).length !== 0;
-		}
-	}
-
 	public hasDevice(identifier: string): boolean {
 		return _.some(this.getDevices(), (device: Mobile.IDevice) => { return device.getIdentifier() === identifier });
 	}

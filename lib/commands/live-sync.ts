@@ -29,22 +29,20 @@ export class LiveSyncCommand implements ICommand {
 				? "com.telerik.Icenium"
 				: this.$project.projectData.AppIdentifier;
 
-			if (this.$devicesServices.hasDevices(platform)) {
-				if (options.watch) {
-					this.liveSyncDevices(platform, projectDir, appIdentifier);
-				} else {
-					if (options.file) {
-						var isExistFile = this.$fs.exists((options.file)).wait();
-						if(isExistFile) {
-							var projectFiles = [path.resolve(options.file)];
-							this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
-						} else {
-							this.$errors.fail("The file %s does not exist.", options.file);
-						}
-					} else {
-						var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+			if (options.watch) {
+				this.liveSyncDevices(platform, projectDir, appIdentifier);
+			} else {
+				if (options.file) {
+					var isExistFile = this.$fs.exists((options.file)).wait();
+					if (isExistFile) {
+						var projectFiles = [path.resolve(options.file)];
 						this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
+					} else {
+						this.$errors.fail("The file %s does not exist.", options.file);
 					}
+				} else {
+					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+					this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
 				}
 			}
 		}).future<void>()();
