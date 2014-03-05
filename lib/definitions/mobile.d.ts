@@ -105,13 +105,15 @@ declare module Mobile {
 		postNotification(notificationName: string);
 	}
 
-	interface IHouseArressClient {
+	interface IHouseArrestClient {
 		getAfcClientForAppDocuments(applicationIdentifier: string): Mobile.IAfcClient;
 		getAfcClientForAppContainer(applicationIdentifier: string): Mobile.IAfcClient;
+		closeSocket(): void;
 	}
 
 	interface IAfcClient {
 		transferCollection(localToDevicePaths: Mobile.ILocalToDevicePathData[]): IFuture<void>;
+		deleteFile(devicePath: string): IFuture<void>;
 	}
 
 	interface ILocalToDevicePathData {

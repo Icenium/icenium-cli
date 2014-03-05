@@ -11,10 +11,18 @@ export class DeployCommand implements ICommand {
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
+		private $commandsService: ICommandsService,
 		private $injector: IInjector) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return (() => {
+		return ((): void => {
+			if (options.companion) {
+				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
+					" Use the `live-sync` command instead to avoid this warning.")
+				this.$commandsService.executeCommandUnchecked("live-sync", args);
+				return;
+			}
+
 			var platform = this.$devicesServices.checkPlatformAndDevice(args[0], options.device).wait();
 			if (this.$devicesServices.hasDevices(platform)) {
 				var canExecute = (device: Mobile.IDevice): boolean => {
