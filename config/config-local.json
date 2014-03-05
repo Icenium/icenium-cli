@@ -1,5 +1,5 @@
 {
-	"AB_SERVER": "app.icenium.com",
+	"AB_SERVER": "icelocal.icenium.com",
 	"AB_SERVER_PROTO": "https",
 	"DEBUG": false
 }
