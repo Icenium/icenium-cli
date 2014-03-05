@@ -99,3 +99,13 @@ var fiber = Fiber(() => {
 });
 global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
 fiber.run();
+
+process.on("SIGINT", function() {
+	require("./logger").trace("Gracefully shutting down from SIGINT (Ctrl-C)");
+	process.exit();
+});
+
+process.on("SIGTERM", function() {
+	require("./logger").trace("Gracefully shutting down from SIGTERM");
+	process.exit();
+});
