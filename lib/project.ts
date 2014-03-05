@@ -692,7 +692,7 @@ export class Project implements Project.IProject {
 			}
 			return "com.telerik." + sanitizedName;
 		} else {
-			return "com.telerik.myapp";
+			return "com.telerik.the";
 		}
 	}
 
