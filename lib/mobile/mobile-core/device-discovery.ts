@@ -51,8 +51,9 @@ $injector.register("deviceDiscovery", DeviceDiscovery);
 
 export class IOSDeviceDiscovery extends DeviceDiscovery {
 
-	private static ADNCI_MSG_CONNECTED: number = 1;
-	private static ADNCI_MSG_DISCONNECTED: number = 2;
+	private static ADNCI_MSG_CONNECTED = 1;
+	private static ADNCI_MSG_DISCONNECTED = 2;
+	private static APPLE_SERVICE_NOT_STARTED_ERROR_CODE = 0xE8000063;
 
 	private timerCallbackPtr = null;
 	private  notificationCallbackPtr = null;
@@ -68,7 +69,7 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 
 	public startLookingForDevices(): void {
 		this.subscribeForNotifications();
-		var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 4;
+		var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 1;
 		this.startRunLoopWithTimer(defaultTimeoutInSeconds);
 	}
 
@@ -100,7 +101,8 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 		var notifyFunction = ref.alloc(CoreTypes.CoreTypes.amDeviceNotificationRef);
 
 		var result = this.$mobileDevice.deviceNotificationSubscribe(this.notificationCallbackPtr, 0, 0, 0, notifyFunction);
-		this.validateResult(result, "Unable to subscribe for notifications");
+		var error = IOSDeviceDiscovery.APPLE_SERVICE_NOT_STARTED_ERROR_CODE ? "The device cannot be used because the Apple Mobile Device Service is not started" : "Unable to subscribe for notifications";
+		this.validateResult(result, error);
 		this.$errors.verifyHeap("subscribeForNotifications");
 	}
 
