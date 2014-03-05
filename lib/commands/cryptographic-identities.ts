@@ -48,7 +48,8 @@ $injector.register("cryptographicIdentityStoreService", CryptographicIdentitySto
 export class IdentityManager implements Server.IIdentityManager {
 	constructor(private $cryptographicIdentityStoreService: ICryptographicIdentityStoreService,
 		private $logger: ILogger,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $x509: IX509CertificateLoader) {
 	}
 
 	public listCertificates(): IFuture<any> {
@@ -56,7 +57,9 @@ export class IdentityManager implements Server.IIdentityManager {
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
-				this.$logger.out("#%d: '%s'", index + 1, identity.Alias);
+				var cert = this.$x509.load(identity.Certificate);
+				this.$logger.out("#%d: '%s', expires on %s, issued by %s", index + 1, identity.Alias,
+					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
 			if (!identities.length) {
 				this.$logger.info("No certificates registered. Use the `import-certificate` command " +

@@ -251,3 +251,12 @@ interface ISimulatorPlatformServices {
 	preparePackage(simulatorPath: string): void;
 	runSimulator(simulatorPath: string, simulatorParams: string[]);
 }
+
+interface IX509Certificate {
+	issuerData: any;
+	expiresOn: Date;
+}
+
+interface IX509CertificateLoader {
+	load(certificatePem: string): IX509Certificate;
+}

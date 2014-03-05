@@ -11,6 +11,7 @@ $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("opener", "./opener");
+$injector.require("x509", "./x509");
 
 $injector.requireCommand("help", "./commands/help");
 
