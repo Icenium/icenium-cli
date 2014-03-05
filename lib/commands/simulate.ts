@@ -15,7 +15,7 @@ export class SimulateCommand implements ICommand {
 		"For Mac OS, the device simulator will be shipped with Telerik AppBuilder 2.1.",
 		"For more information about the latest available version,",
 		"go to https://www.npmjs.org/package/appbuilder-cli or",
-		"http://docs.telerik.com/platform/appbuilder/release-notes."].join("\n");
+		"http://docs.telerik.com/platform/appbuilder/release-notes"].join("\n");
 
 	private projectData;
 	private cacheDir: string;
