@@ -25,7 +25,7 @@ Project development commands:
     prop-del                        Removes values from a list project property.
     prop-print                      Prints the value of a project property.
     list-projects                   Lists all projects of your account.
-    export-project                  Exports one of your remote projects into a local ab project.
+    export-project                  Exports one of your remote projects into a local AppBuilder project.
 
 Device commands:
     list-devices                    Lists all recognized connected devices.
@@ -282,9 +282,9 @@ Lists all projects of your account.
 Usage:
     $ appbuilder export-project <ProjectIndex> | <ProjectName>
 
-Exports one of your remote projects into a local ab project.
+Exports one of your remote projects into a local AppBuilder project.
 You can choose which project to export by specifying its index or name.
-All projects and their indexes can be seen by running "$ ab list-projects".
+All projects and their indexes can be seen by running "$ appbuilder list-projects".
 
 Options:
     --path <path> - Specifies the local path where the chosen project will be exported.
