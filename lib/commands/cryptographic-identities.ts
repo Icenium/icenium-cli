@@ -86,7 +86,8 @@ export class IdentityManager implements Server.IIdentityManager {
 			});
 
 			if (!provisions.length) {
-				this.$logger.info("No mobile provisioning profiles registered."); // TODO: add guidance how to install provisions (when that becomes possible)
+				this.$logger.info("No mobile provisioning profiles registered." +
+					" Import provisioning profiles using the `import-provision` command.");
 			}
 		}).future<any>()();
 	}
