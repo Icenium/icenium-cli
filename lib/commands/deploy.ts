@@ -15,7 +15,7 @@ export class DeployCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var platform = args[0];
+			var platform = this.$devicesServices.checkPlatformAndDevice(args[0], options.device).wait();
 			if (this.$devicesServices.hasDevices(platform)) {
 				var canExecute = (device: Mobile.IDevice): boolean => {
 					if (MobileHelper.isiOSPlatform(device.getPlatform())) {

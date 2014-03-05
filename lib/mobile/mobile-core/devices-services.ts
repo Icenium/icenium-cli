@@ -103,6 +103,20 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return searchedDevice;
 	}
 
+	private getDevice(deviceOption: string): Mobile.IDevice {
+		var device: Mobile.IDevice = null;
+
+		if(this.hasDevice(deviceOption)) {
+			device = this.getDeviceByIdentifier(deviceOption);
+		} else if(helpers.isNumber(deviceOption)) {
+			device = this.getDeviceByIndex(parseInt(deviceOption, 10));
+		} else {
+			this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
+		}
+
+		return device;
+	}
+
 	public executeOnDevice(action: any, deviceOptions: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
 		return (() => {
 			this.$logger.debug("executeOnDevice: '%s'", deviceOptions);
@@ -113,14 +127,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			}
 
 			this.startLookingForDevices().wait();
-			var device: Mobile.IDevice = null;
-			if(this.hasDevice(deviceOptions)) {
-				device = this.getDeviceByIdentifier(deviceOptions);
-			} else if(helpers.isNumber(deviceOptions)) {
-				device = this.getDeviceByIndex(parseInt(deviceOptions, 10));
-			} else {
-				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
-			}
+			var device = this.getDevice(deviceOptions);
 
 			if(!device) {
 				this.$errors.fail("Could not find device");
@@ -154,11 +161,33 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 
+	public checkPlatformAndDevice(platform: string, deviceOption: string): IFuture<string> {
+		return(() => {
+			this.startLookingForDevices().wait();
+			var result = "";
+
+			if(platform && deviceOption) {
+				result = this.getDevice(deviceOption).getPlatform();
+				if(result !== this.getPlatform(platform)) {
+					this.$errors.fail("Cannot resolve the specified connected device. The provided platform does not match the provided index or identifier." +
+						"To list currently connected devices and verify that the specified pair of platform and index or identifier exists, run list-devices."				);
+				}
+				this.$logger.warn("Your application will be deployed only on the device specified by the provided index or identifier.");
+			} else if(!platform && deviceOption) {
+				result = this.getDevice(deviceOption).getPlatform();
+			} else if(platform && !deviceOption) {
+				result = this.getPlatform(platform);
+			}
+
+			return result;
+		}).future<string>()();
+	}
+
 	public hasDevices(platform?: string): boolean {
 		if (!platform) {
-			return this.getDevices().length === 0;
+			return this.getDevices().length !== 0;
 		} else {
-			return this.filterDevicesByPlatform(this.getPlatform(platform)).length === 0;
+			return this.filterDevicesByPlatform(this.getPlatform(platform)).length !== 0;
 		}
 	}
 
