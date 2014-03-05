@@ -166,9 +166,13 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 				.filter( (element) => {
 					return element && !element.isEmpty();
 				})
-				.map( (element) => {
-					var identifier = element.split("\t")[0];
-					this.createAndAddDevice(identifier);
+				.map((element) => {
+					var parts = element.split("\t");
+					var identifier = parts[0];
+					var state = parts[1];
+					if (state === "device"/*ready*/) {
+						this.createAndAddDevice(identifier);
+					}
 				});
 		}).future<void>()();
 	}
