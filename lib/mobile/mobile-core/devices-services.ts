@@ -139,15 +139,14 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			}
 			var futures = _.map(allConnectedDevices, (device: Mobile.IDevice) => {
 				if (!canExecute || canExecute(device)) {
-					return action(device);
+					var future = action(device);
+					Future.settle(future);
+					return future;
 				} else {
 					return Future.fromResult();
 				}
 			});
 
-			_.each(futures, (future) => {
-				Future.settle(future);
-			});
 			Future.wait(futures);
 		}).future<void>()();
 	}
