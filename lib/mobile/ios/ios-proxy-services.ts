@@ -143,11 +143,9 @@ export class AfcClient implements Mobile.IAfcClient {
 		}).future<void>()();
 	}
 
-	public deleteFile(devicePath: string): IFuture<void> {
-		return (() => {
-			var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
-			this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
-		}).future<void>()();
+	public deleteFile(devicePath: string): void {
+		var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
+		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
 	}
 
 	private transferFile(localFilePath: string, relativeToProjectBasePath: any): IFuture<void> {
@@ -173,7 +171,7 @@ export class AfcClient implements Mobile.IAfcClient {
 			var reader = this.$fs.createReadStream(localFilePath);
 			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 
-			this.deleteFile(devicePath).wait();
+			this.deleteFile(devicePath);
 
 			var target = this.open(devicePath, "w");
 

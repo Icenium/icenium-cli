@@ -113,7 +113,7 @@ declare module Mobile {
 
 	interface IAfcClient {
 		transferCollection(localToDevicePaths: Mobile.ILocalToDevicePathData[]): IFuture<void>;
-		deleteFile(devicePath: string): IFuture<void>;
+		deleteFile(devicePath: string): void;
 	}
 
 	interface ILocalToDevicePathData {

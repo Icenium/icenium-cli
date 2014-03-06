@@ -119,7 +119,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 
 			var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier);
-			afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist").wait();
+			afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist");
 
 			houseArrestClient.closeSocket();
 
