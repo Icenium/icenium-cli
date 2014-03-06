@@ -1,158 +1,200 @@
-icenium-cli
+Cross-Platform Command-Line Interface for Telerik AppBuilder
 ===========
 
-Cross-Platform Command Line Interface for Telerik AppBuilder.
+*Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base.*
 
-First steps
+[![Telerik AppBuilder](ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+
+**Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line.**
+
+The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS and Android from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to App Store or Google Play.
+
+* [Installation](#install "How to install the Telerik AppBuilder CLI")
+* [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
+* [Features](#features "What are the features of the Telerik AppBuilder CLI")
+* [How to Contribute](#contribute "How to contribute to the Telerik AppBuilder CLI")
+* [More About Telerik AppBuilder](#more-appbuilder "Get the other Telerik AppBuilder clients and tools")
+* [License](#license "Licensing information about the Telerik AppBuilder CLI")
+
+<a id="install"></a>
+Installation
 ===
-You must have Python 2.7.x installed. Don't install 3.x as it won't work!
 
-After cloning the repository, run:
+Latest version: Telerik AppBuilder 2.0  
+Build number: 2014.1.313.1  
+Release date: 2014, March 13  
+Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>
 
+### System Requirements
+
+Before installing the Telerik AppBuilder CLI, verify that your system meets the following requirements.
+
+* Windows or OS X Mavericks
+* Node.js 0.10.x (32-bit or 64-bit)
+* *(Required for iOS development)* Latest iTunes (32-bit or 64-bit)
+
+The bitness of Node.js and iTunes must match.
+
+### Install the Telerik AppBuilder CLI
+
+In the command prompt, run the following command.
+
+```bash
+$ npm install appbuilder
 ```
-   $ npm install
-   $ grunt
-```
 
-This will install all project dependencies and compile the TypeScript files to JavaScript.
-
-Life with TypeScript
+<a id="quick-start"></a>
+Quick Start
 ===
-Before everything else: run `$ npm install -g typescript` to install the compiler.
 
-Manual compiling: run `$ grunt` in the project root.
+1. [Log In](#login "Log in the Telerik Platform")
+1. [Create Project](#create "Create a local project")
+1. [Run in Simulator](#simulator "Run in the device simulator")
+1. [Run on Device](#device "Run on device")
+1. [Modify Your Code](#code "Modify your code")
+1. [Get Code Changes in the Simulator and on Device](#livesync "LiveSync changes from your code to your app in the simulator or on device")
+1. [Get Help](#help "List the available commands and options")
 
-Committing: you can commit only .ts files; .js files are git-ignore'd.
+<a id="login"></a>
+**1. Log In the Telerik Platform**
 
-WebStorm integration: enable the TypeScript File Watcher. Uncheck "Immediate file synchronization",
-check "Track root files only". The file watcher will continuously compile your .ts files and report
-any errors as they arise. If often hangs - simply restart WebStorm to fix it. If it "forgets" to recompile
-some change to a file and you need to e.g. debug your code, either make a dummy change to trigger a recompile
-or run `grunt`.
+To connect to your Telerik Platform account, run the following command.
 
-Debugging
+```bash
+$ appbuilder login
+```
+
+A new tab opens in your default browser. Provide your login credentials, confirm the sign in, verify that the following message is present in the command line: `Login completed`, and close the browser tab after the confirmation.
+
+<a id="create"></a>
+**2. Create Project**
+
+To create a new project from the default template, navigate to an empty directory and run the following command. The Telerik AppBuilder CLI creates a new project based on the Kendo UI Mobile template in the current directory.
+
+```bash
+$ appbuilder create MyApp
+```
+
+To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. You can initialize any existing AppBuilder or third-party mobile project, if the project file structure mimics the AppBuilder project file structure. 
+
+```bash
+$ appbuilder init
+```
+
+<a id="simulator"></a>
+**3. Run in Simulator**
+
+To load your newly created project in the simulator, run the following command.
+
+```bash
+appbuilder simulate
+```
+
+The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can change the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
+
+<a id="device"></a>
+**4. Run on Device**
+
+To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and run the following command in the command line. After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment on Android devices. Scan the produced QR code on your device, install the app, and run it.
+
+```bash
+appbuilder build android
+```
+
+To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and run the following command in the command line. After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. 
+
+```bash
+appbuilder build ios --companion
+```
+
+With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
+
+<a id="code"></a>
+**5. Modify Your Code**
+
+Edit your code in your preferred IDE or code editor. Save your changes.
+
+<a id="livesync"></a>
+**6. Get Code Changes in the Simulator and on Device**
+
+In the running device simulator, click **Refresh**. The simulator will load your code changes.
+
+To get changes on the devices on which you deployed your app, run the following command. On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
+
+```bash
+appbuilder cloud-sync
+```
+
+<a id="help"></a>
+**7. List the Available Commands**
+
+To learn what are the available commands, run the following command.
+
+```bash
+appbuilder help
+```
+
+To learn more about a command, run the command with the `--help` option. For example, to show more information about `create`, run the following command.
+
+```bash
+appbuilder create --help
+```
+
+<a id="features"></a>
+Features
 ===
-For debugging try using `node-inspector`. To install it run:
 
-```
-	$ npm install -g node-inspector
-```
+Latest version: Telerik AppBuilder 2.0  
+Build number: 2014.1.313.1  
+Release date: 2014, March 13  
+Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>
 
-Open a new node.js console, run `node-inspector` and leave it running. You don't need to ever restart it or anything.
+#### What you can do with this version of the Telerik AppBuilder CLI
 
-Start `node` with the `--debug-brk` parameter, e.g.:
+* You can log in and log out of the Telerik Platform. You can view your current login information.
+* You can create new projects from template.
+* You can create new projects by cloning your existing projects from the cloud.
+* You can create new projects by cloning the sample apps.
+* You can build applications for iOS and Android and deploy them via QR code or cable connection. 
+* You can build applications for distribution in Apple App Store and Google Play. You can upload your iOS application packages to iTunes Connect.
+* You can load iOS applications in the AppBuilder companion app.
+* You can LiveSync changes wirelessly and via cable connection.
+* You can run your apps in the device simulator on Windows systems.
+* You can debug your code with the built-in debug tools in the device simulator on Windows systems.
+* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
+* You can open the AndroidManifest.xml, Info.plist, and config.xml files for editing.
+* You can configure the project properties for your project.
+* You can view the device log for connected devices.
+* You can manage certificates and provisioning profiles for code signing iOS apps.
+* You can manage certificates for code signing Android apps.
+* You can use the Telerik AppBuilder CLI with your preferred IDE or code editor.
+* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder Sublime package to build and deploy apps straight from Sublime Text 2.
 
-```
-	$ node --debug-brk bin\ice build Android
-```
+#### What you cannot do with this version of the Telerik AppBuilder CLI
 
-Open Chrome, open `127.0.0.1:8080/debug?port=5858` and start debugging.
+* You cannot build, test, deploy, or publish for Windows Phone 8.
+* You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
 
-* Place breakpoints by clicking on the line number
-* Use F10 and F11 to step over and step into
-* Use F8 to continue (like F5 in VS)
-* If you need to place a breakpoint in a file that is not open, then use the navigator in the top-left corner to see all files in the project.
-
-Fiddler
+<a id="contribute" href="#contribute">Contribution</a>
 ===
-To see your HTTP requests in Fiddler, open `config.js` and set the `PROXY_TO_FIDDLER` property to `true`. Don't commit it, though! You may commit Fiddler auto-detection, though :)
 
-Writing unit tests
+To learn how to log a bug that you just discovered, click here.
+
+To learn how to suggest a new feature or improvement, click here.
+
+To learn how to contribute to the code base, click here.
+
+<a id="more-appbuilder"></a>
+More Telerik AppBuilder Tools and Resources
 ===
-To add a test for a new module, do the following:
 
-* add a test file to `test/`, e.g. `test/my-component.js`
-* write the test using [mocha][1]'s BDD interface and [chai][3]'s [assertions][2] (preferably)
+* [Telerik AppBuilder Windows client](http://www.telerik.com/appbuilder/windows-client "The AppBuilder Windows Client"): Lightweight Windows IDE.
+* [Telerik AppBuilder in-browser client](http://www.telerik.com/appbuilder/in-browser-client "The AppBuilder In-Browser Client"): Browser-based IDE that is compatible with most modern web and mobile browsers.
+* [Telerik AppBuilder extension for Visual Studio](http://www.telerik.com/appbuilder/visual-studio-extension "The AppBuilder Extension for Visual Studio"): Extension for the popular Microsoft IDE.
+* [Telerick AppBuilder package for Sublime Text 2](??? "The AppBuilder package for Sublime Text 2"): A package for the popular text editor.
+* [Telerik AppBuilder companion app](http://www.telerik.com/appbuilder/companion-app "The AppBuilder Companion App"): iOS testing utility <a href="https://itunes.apple.com/bg/app/icenium-ion/id527547398" target="_blank">available for free on the App Store</a>.
 
-To run all unit tests, run the following in the console:
-
-```
-   $ npm test
-```
-
-Before committing
+<a id="license" href="#license">License</a>
 ===
-Run the linter:
 
-```
-   $ lint
-```
-
-Correct any warnings from the linter before committing.
-
-Deploying to iOS
-===
-To deploy an application on iOS device, do the following:
-
-* Install iTunes - it should be the same bitness as Node
-
-Enabling command auto-completion in Bash
-===
-You can enable command auto-completion for the Bash and zsh shells. Auto-completion for
-commands as well as options is supported.
-
-If you have `icenium-cli` installed with the `-g` option, you can install auto-completion support
-by executing the following command **in Bash**:
-
-```
-	$ appbuilder completion >> ~/.bashrc
-```
-
-If you don't have `icenium-cli` installed with the `-g` option, the above command becomes:
-
-```
-	$ node bin/appbuilder completion >> ~/.bashrc
-```
-
-and you must also manually add it to the `PATH` environment variable. Open the `.bashrc`
-file in a text editor (in Windows: `$ start ~/.bashrc`) and add the following line anywhere:
-
-```
-	export PATH=$PATH:/c/work/icenium-cli/bin
-```
-
-Change the path to the `icenium-cli` working copy above to match your own. Restart Bash and you're ready to go!
-
-Continuous integration
-===
-The CI task is located on the [Icenium Jenkins server](http://bpc15:8080/job/icenium-cli%20CI%20Build/).
-There you can see the status of the project, the linter statistics and the test run results.
-
-After building the packaged module, it is copied to \\telerik.com\Resources\BlackDragon\Builds\icenium-cli
-
-Clean install for testing
-===
-Install prerequisites:
-* Node.js 32-bit - http://nodejs.org/dist/v0.10.25/node-v0.10.25-x86.msi
-* Python 2.7.6 - http://www.python.org/ftp/python/2.7.6/python-2.7.6.msi
-* Git for Windows - http://code.google.com/p/msysgit/downloads/detail?name=Git-1.8.4-preview20130916.exe&can=2&q=full+installer+official+git
-* Visual Studio 2010/2012/2013
-* Android ADB USB Driver (skip this step if you have installed the Android SDK) - "R:\BlackDragon\Android\Universal ADB driver\UniversalAdbDriverSetup6.msi"
-
-In Git Bash:
-
-```
-	$ npm i -g path/to/icenium-cli-0.1.0.tgz
-	$ ice completion >> ~/.bashrc
-```
-
-Restart Git Bash and you're ready to roll.
-
-Developing the CLI on a Mac
-===
-The Ice server can run only on Windows. The steps below will enable you to connect
-a CLI running on your Mac to the Ice server running on the Windows VM.
-
-* Windows: run cmd, execute `ipconfig` and write down the IPv4 address
-* Mac: open terminal and execute `sudo pico /etc/hosts`
-* Mac: add the following line to the end of the file: `icetest.icenium.com 192.168.x.x` where the address is the Windows' IP
-* Mac: Ctrl+O, Enter, Ctrl-X
-* Windows: change the TFIS endpoint in your Ice Web.config to point to localtfis.telerik.com
-* Mac: change the AB_SERVER in config.json to point to icetest.icenium.com
-* Mac: login using your localtfis credentials (can be edited on integrationadmin.telerik.com)
-
-That's it. Don't forget that icetest.icenium.com will henceforth be clobbered on your Mac.
-
-[1]: http://visionmedia.github.io/mocha/#interfaces
-[2]: http://chaijs.com/api/assert/
-[3]: http://chaijs.com/guide/styles/#assert
+This software is licensed under the Apache 2.0 license, quoted <a href="LICENSE" target="_blank">here</a>.
