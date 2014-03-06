@@ -134,7 +134,6 @@ declare module Project {
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
-		//build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		importProject(): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;

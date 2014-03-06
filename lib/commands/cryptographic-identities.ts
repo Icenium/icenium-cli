@@ -130,15 +130,16 @@ export class IdentityManager implements Server.IIdentityManager {
 		return ((): IProvision => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 
-			for (var kindIndex = 0; kindIndex < provisionKinds.length; ++kindIndex) {
-				for (var provisionIndex = 0; provisionIndex < provisions.length; ++provisionIndex) {
-					if (provisionKinds[kindIndex] === provisions[provisionIndex].ProvisionType) {
-						return provisions[provisionIndex];
-					}
-				}
-			}
+			var provision = _.chain(provisionKinds)
+				.map((kind) => _.find(provisions, (prov) => prov.ProvisionType === kind))
+				.find((prov) => Boolean(prov))
+				.value();
 
-			this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionKinds));
+			if (provision) {
+				return provision;
+			} else {
+				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionKinds));
+			}
 			return null;
 		}).future<IProvision>()();
 	}
@@ -146,21 +147,19 @@ export class IdentityManager implements Server.IIdentityManager {
 	public autoselectCertificate(provisionData: IProvision): IFuture<ICryptographicIdentity> {
 		return ((): ICryptographicIdentity => {
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
-			for (var identityIndex = 0; identityIndex < identities.length; ++identityIndex) {
-				var identity = identities[identityIndex];
-				if (this.isCertificateCompatibleWithProvision(identity, provisionData)) {
-					return identity;
-				}
-			}
+			var identity = _.find(identities, (ident) => this.isCertificateCompatibleWithProvision(ident, provisionData));
 
-			this.$errors.fail("No certificate found compatible with provision '%s' found.", provisionData.Name);
-			return null;
+			if (identity) {
+				return identity;
+			} else {
+				this.$errors.fail("No certificate found compatible with provision '%s' found.", provisionData.Name);
+				return null;
+			}
 		}).future<ICryptographicIdentity>()();
 	}
 
 	public isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean {
-		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, "\r", "");
-		formattedCertificate = helpers.stringReplaceAll(formattedCertificate, "\n", "");
+		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
 
 		return _.some(provision.Certificates, (c) => formattedCertificate.indexOf(c) >= 0);
 	}

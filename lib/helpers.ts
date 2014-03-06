@@ -132,7 +132,7 @@ export function formatListOfNames(names: string[]): string {
 	if (names.length <= 1) {
 		return names[0];
 	} else {
-		return names.slice(0, -1).join(", ") + " or " + names[names.length - 1];
+		return _.initial(names).join(", ") + " or " + names[names.length - 1];
 	}
 }
 
