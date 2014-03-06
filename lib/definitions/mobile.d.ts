@@ -23,11 +23,9 @@ declare module Mobile {
 	}
 
 	interface IDevicesServices {
-		executeOnAllConnectedDevices(action:  (device: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;
-		executeOnDevice(action: any, deviceOptions: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void>;
-		checkPlatformAndDevice(platform: string, deviceOption: string): IFuture<string>;
-		hasDevices(platform?: string): boolean;
-		hasDevice(identifier: string): boolean;
+		execute(action:  (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {[key: string]: boolean}): IFuture<void>;
+		initialize(platform: string, deviceOption: string): IFuture<void>;
+		platform: string;
 	}
 
 	interface IiOSCore {

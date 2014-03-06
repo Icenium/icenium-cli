@@ -11,7 +11,7 @@ export class ListDevicesCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var index = 1;
-			var platform = this.$devicesServices.checkPlatformAndDevice(args[0], undefined).wait();
+			this.$devicesServices.initialize(args[0], undefined).wait();
 
 			var action;
 			if (options.json) {
@@ -25,7 +25,7 @@ export class ListDevicesCommand implements ICommand {
 				};
 			}
 
-			this.$devicesServices.executeOnAllConnectedDevices(action, platform).wait();
+			this.$devicesServices.execute(action, undefined, {"allowNoDevices": true}).wait();
 		}).future<void>()();
 	}
 }
