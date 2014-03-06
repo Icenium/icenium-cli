@@ -138,7 +138,7 @@ export class AfcClient implements Mobile.IAfcClient {
 	public transferCollection(localToDevicePaths: Mobile.ILocalToDevicePathData[]): IFuture<void> {
 		return (() => {
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				this.transferFile(localToDevicePathData.getLocalPath(), localToDevicePathData.getRelativeToProjectBasePath()).wait();
+				this.transfer(localToDevicePathData.getLocalPath(),  path.join("\Documents", localToDevicePathData.getRelativeToProjectBasePath())).wait();
 			});
 		}).future<void>()();
 	}
@@ -147,22 +147,16 @@ export class AfcClient implements Mobile.IAfcClient {
 		var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
 		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
 	}
-
-	private transferFile(localFilePath: string, relativeToProjectBasePath: any): IFuture<void> {
-		return (() => {
-			this.transfer(localFilePath, relativeToProjectBasePath, "/Documents").wait();
-		}).future<void>()();
-	}
-
-	private transfer(localFilePath: string, devicePath: string, initialDevicePath?: string): IFuture<void> {
+	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
 		return(() => {
-			devicePath = this.ensureDeviceFilePathExist(devicePath, initialDevicePath);
+			this.ensureDevicePathExist(path.dirname(devicePath));
 			var reader = this.$fs.createReadStream(localFilePath);
-			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
+			devicePath = helpers.fromWindowsRelativePathToUnix(devicePath);
 
 			this.deleteFile(devicePath);
 
 			var target = this.open(devicePath, "w");
+			var localFilePathSize = this.$fs.getFileSize(localFilePath).wait();
 
 			reader.on("data", (data) => {
 				target.write(data, data.length);
@@ -180,19 +174,16 @@ export class AfcClient implements Mobile.IAfcClient {
 		}).future<void>()();
 	}
 
-	private ensureDeviceFilePathExist(filePath: string, initialDevicePath: string): string {
-		var filePathParts = filePath.split(path.sep);
-		var fileName = path.basename(filePath);
-		var devicePath = initialDevicePath || "";
+	private ensureDevicePathExist(deviceDirPath: string): void {
+		var filePathParts = deviceDirPath.split(path.sep);
+		var currentDevicePath = "";
 
 		filePathParts.forEach((filePathPart: string) => {
-			if (filePathPart !== "" && filePathPart !== fileName) {
-				devicePath = helpers.fromWindowsRelativePathToUnix(path.join(devicePath, filePathPart));
-				this.mkdir(devicePath);
+			if (filePathPart !== "") {
+				currentDevicePath = helpers.fromWindowsRelativePathToUnix(path.join(currentDevicePath, filePathPart));
+				this.mkdir(currentDevicePath);
 			}
 		});
-
-		return helpers.fromWindowsRelativePathToUnix(path.join(devicePath, fileName));
 	}
 }
 

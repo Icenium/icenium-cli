@@ -173,7 +173,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 
-	public initialize(platform: string, deviceOption: string): IFuture<void> {
+	public initialize(platform: string, deviceOption?: string): IFuture<void> {
 		return(() => {
 			if(platform && deviceOption) {
 				this._device = this.getDevice(deviceOption).wait();

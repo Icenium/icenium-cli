@@ -23,8 +23,8 @@ declare module Mobile {
 	}
 
 	interface IDevicesServices {
-		execute(action:  (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {[key: string]: boolean}): IFuture<void>;
-		initialize(platform: string, deviceOption: string): IFuture<void>;
+		execute(action:  (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {allowNoDevices?: boolean}): IFuture<void>;
+		initialize(platform: string, deviceOption?: string): IFuture<void>;
 		platform: string;
 	}
 
