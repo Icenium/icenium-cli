@@ -101,7 +101,8 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 		var notifyFunction = ref.alloc(CoreTypes.CoreTypes.amDeviceNotificationRef);
 
 		var result = this.$mobileDevice.deviceNotificationSubscribe(this.notificationCallbackPtr, 0, 0, 0, notifyFunction);
-		var error = IOSDeviceDiscovery.APPLE_SERVICE_NOT_STARTED_ERROR_CODE ? "The device cannot be used because the Apple Mobile Device Service is not started" : "Unable to subscribe for notifications";
+		var error = IOSDeviceDiscovery.APPLE_SERVICE_NOT_STARTED_ERROR_CODE ?
+			"Cannot run and complete operations on iOS devices because Apple Mobile Device Service is not started. Verify that iTunes is installed and running on your system." : "Unable to subscribe for notifications";
 		this.validateResult(result, error);
 		this.$errors.verifyHeap("subscribeForNotifications");
 	}
