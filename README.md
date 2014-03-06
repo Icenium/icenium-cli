@@ -1,11 +1,11 @@
 Cross-Platform Command-Line Interface for Telerik AppBuilder
 ===========
 
-*Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base.*
+*Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
 [![Telerik AppBuilder](ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
-**Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line.**
+**Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
 The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS and Android from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to App Store or Google Play.
 
@@ -13,7 +13,7 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
 * [How to Contribute](#contribute "How to contribute to the Telerik AppBuilder CLI")
-* [More About Telerik AppBuilder](#more-appbuilder "Get the other Telerik AppBuilder clients and tools")
+* [More Telerik AppBuilder Tools and Resources](#more-appbuilder "Get the other Telerik AppBuilder clients and tools")
 * [License](#license "Licensing information about the Telerik AppBuilder CLI")
 
 <a id="install"></a>
@@ -56,7 +56,7 @@ Quick Start
 1. [Get Help](#help "List the available commands and options")
 
 <a id="login"></a>
-**1. Log In the Telerik Platform**
+**1. Log in the Telerik Platform**
 
 To connect to your Telerik Platform account, run the following command.
 
@@ -67,7 +67,7 @@ $ appbuilder login
 A new tab opens in your default browser. Provide your login credentials, confirm the sign in, verify that the following message is present in the command line: `Login completed`, and close the browser tab after the confirmation.
 
 <a id="create"></a>
-**2. Create Project**
+**2. Create project**
 
 To create a new project from the default template, navigate to an empty directory and run the following command. The Telerik AppBuilder CLI creates a new project based on the Kendo UI Mobile template in the current directory.
 
@@ -82,7 +82,7 @@ $ appbuilder init
 ```
 
 <a id="simulator"></a>
-**3. Run in Simulator**
+**3. Run in simulator**
 
 To load your newly created project in the simulator, run the following command.
 
@@ -93,7 +93,7 @@ appbuilder simulate
 The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can change the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
 
 <a id="device"></a>
-**4. Run on Device**
+**4. Run on device**
 
 To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and run the following command in the command line. After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment on Android devices. Scan the produced QR code on your device, install the app, and run it.
 
@@ -110,23 +110,23 @@ appbuilder build ios --companion
 With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
 
 <a id="code"></a>
-**5. Modify Your Code**
+**5. Modify your code**
 
 Edit your code in your preferred IDE or code editor. Save your changes.
 
 <a id="livesync"></a>
-**6. Get Code Changes in the Simulator and on Device**
+**6. Get code changes in the simulator and on device**
 
 In the running device simulator, click **Refresh**. The simulator will load your code changes.
 
-To get changes on the devices on which you deployed your app, run the following command. On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
+To get changes inside your running app, run the following command. On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
 
 ```bash
 appbuilder cloud-sync
 ```
 
 <a id="help"></a>
-**7. List the Available Commands**
+**7. List the available commands**
 
 To learn what are the available commands, run the following command.
 
@@ -178,11 +178,11 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 <a id="contribute" href="#contribute">Contribution</a>
 ===
 
-To learn how to log a bug that you just discovered, click here.
+To learn how to log a bug that you just discovered, click [here](CONTRIBUTE#bug).
 
-To learn how to suggest a new feature or improvement, click here.
+To learn how to suggest a new feature or improvement, click [here](CONTRIBUTE#request).
 
-To learn how to contribute to the code base, click here.
+To learn how to contribute to the code base, click [here](CONTRIBUTE#contribute).
 
 <a id="more-appbuilder"></a>
 More Telerik AppBuilder Tools and Resources
@@ -193,6 +193,8 @@ More Telerik AppBuilder Tools and Resources
 * [Telerik AppBuilder extension for Visual Studio](http://www.telerik.com/appbuilder/visual-studio-extension "The AppBuilder Extension for Visual Studio"): Extension for the popular Microsoft IDE.
 * [Telerick AppBuilder package for Sublime Text 2](??? "The AppBuilder package for Sublime Text 2"): A package for the popular text editor.
 * [Telerik AppBuilder companion app](http://www.telerik.com/appbuilder/companion-app "The AppBuilder Companion App"): iOS testing utility <a href="https://itunes.apple.com/bg/app/icenium-ion/id527547398" target="_blank">available for free on the App Store</a>.
+* [Telerik AppBuilder documentation](http://docs.telerik.com/platform/appbuilder "The documentation resources for Telerik AppBuilder"): Learn more about what you can do with Telerik AppBuilder.
+* [Telerik AppBuilder web page](http://www.telerik.com/appbuilder "The Telerik AppBuilder web page"): Visit the Telerik AppBuilder web site.
 
 <a id="license" href="#license">License</a>
 ===
