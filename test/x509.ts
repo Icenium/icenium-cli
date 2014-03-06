@@ -11,7 +11,6 @@ var certificatePem = "-----BEGIN CERTIFICATE-----\r\nMIIDGjCCAgKgAwIBAgIIG3bCVtD
 describe("x509", function() {
 	var x509 = require("../lib/x509");
 
-
 	var injector = new yok.Yok();
 	injector.register("injector", injector);
 	injector.register("logger", stubs.LoggerStub);
