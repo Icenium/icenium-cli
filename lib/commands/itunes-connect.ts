@@ -91,7 +91,11 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			this.$logger.info("Building release package.")
-			var buildResult = this.$project.build("iOS", "Release", false, false).wait();
+			var buildResult = this.$project.build({
+				platform: "iOS",
+				configuration: "Release",
+				provisionKind: ["AppStore"]
+			}).wait();
 			if (!buildResult[0] || !buildResult[0].solutionPath) {
 				this.$errors.fail({formatStr: "Build failed.", suppressCommandHelp: true});
 			}

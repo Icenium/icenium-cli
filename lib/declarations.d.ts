@@ -40,8 +40,11 @@ declare module Server {
 	interface IIdentityManager {
 		listCertificates(): IFuture<any>;
 		listProvisions(): IFuture<any>;
-		findCertificate(identityStr): IFuture<any>;
-		findProvision(provisionStr): IFuture<any>;
+		findCertificate(identityStr): IFuture<ICryptographicIdentity>;
+		findProvision(provisionStr): IFuture<IProvision>;
+		autoselectProvision(provisionKinds: string[]): IFuture<IProvision>;
+		autoselectCertificate(provision: IProvision): IFuture<ICryptographicIdentity>;
+		isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean;
 	}
 
 	interface IPackageDef {
@@ -114,6 +117,15 @@ declare module Project {
 		buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult>;
 	}
 
+	interface IBuildSettings {
+		platform: string;
+		configuration?: string;
+		showQrCodes?: boolean;
+		downloadFiles?: boolean;
+
+		provisionKinds?: string[];
+	}
+
 	interface IProject {
 		projectData: any;
 		getProjectDir(): string;
@@ -122,7 +134,8 @@ declare module Project {
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		deploy(platform: string): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
-		build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]>;
+		//build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]>;
+		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		importProject(): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): void;
