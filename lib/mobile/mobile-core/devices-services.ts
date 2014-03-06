@@ -142,7 +142,6 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	public executeOnAllConnectedDevices(action: (dev: Mobile.IDevice) => IFuture<any>, platform?: string, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
 		return(() => {
-			this.startLookingForDevices(platform).wait();
 			var allConnectedDevices = this.getAllConnectedDevices(platform);
 			if(allConnectedDevices.length == 0) {
 				this.$logger.out("No connected devices found.");

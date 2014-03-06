@@ -20,7 +20,7 @@ export class LiveSyncCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var platform = args[0];
+			var platform = this.$devicesServices.checkPlatformAndDevice(args[0], options.device).wait();
 
 			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
