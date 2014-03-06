@@ -41,7 +41,7 @@ class X509Certificate implements IX509Certificate {
 	}
 }
 
-class X509CertificateLoader implements IX509CertificateLoader {
+export class X509CertificateLoader implements IX509CertificateLoader {
 	constructor(private $injector: IInjector) {}
 
 	load(certificatePem:string):IX509Certificate {
