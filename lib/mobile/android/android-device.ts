@@ -3,7 +3,9 @@ import MobileHelper = require("./../mobile-helper");
 import util = require("util");
 import Future = require("fibers/future");
 import path = require("path");
+import byline = require("byline");
 import helpers = require("./../../helpers");
+import _ = require("underscore");
 
 export class AndroidDevice implements Mobile.IDevice {
 	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
@@ -94,11 +96,7 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	openDeviceLogStream() {
 		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
-		var search = this.spawnTextSearch(["telerik","icenium"]);
-
-		adbLogcat.stdout.on("data", (data) => {
-			search.stdin.write(data);
-		});
+		var lineStream = byline(adbLogcat.stdout);
 
 		adbLogcat.stderr.on("data", function (data) {
 			this.$logger.trace("ADB logcat stderr: " + data);
@@ -108,37 +106,35 @@ export class AndroidDevice implements Mobile.IDevice {
 			if (code !== 0) {
 				this.$logger.trace("ADB process exited with code " + code);
 			}
-			search.stdin.end();
 		});
 
-		search.stdout.on("data", (data) => {
-			this.$logger.out(data.toString());
-		});
-
-		search.stderr.on("data", (data) => {
-			this.$logger.trace("text search process stderr: " + data);
-		});
-
-		search.on("close", (code) => {
-			if (code !== 0) {
-				this.$logger.trace("text search process exited with code " + code);
+		lineStream.on('data', (line) => {
+			var lineText = line.toString();
+			var log = this.getConsoleLogFromLine(lineText);
+			if (log) {
+				if (log.tag) {
+					this.$logger.out("%s: %s", log.tag, log.message);
+				} else {
+					this.$logger.out(log.message);
+				}
 			}
 		});
 	}
 
-	private spawnTextSearch(keywords: string[]) {
-		if (!keywords || keywords.length == 0) {
-			this.$errors.fail("To spawn a text search process you must provide keywords and filter by them.");
+	private getConsoleLogFromLine(lineText: String): any {
+		var acceptedTags = ["chromium", "Web Console"];
+
+		//sample line is "I/Web Console(    4438): Received Event: deviceready at file:///storage/emulated/0/Icenium/com.telerik.TestApp/js/index.js:48"
+		var match = lineText.match(/.\/(.+?)\(\s*(\d+?)\): (.*)/);
+		if (match) {
+			if (acceptedTags.indexOf(match[1]) !== -1) {
+				return { tag: match[1], message: match[3] };
+			}
+		}
+		else if (_.any(acceptedTags, (tag) => { return lineText.indexOf(tag) !== -1; })) {
+			return { message: match[3] };
 		}
 
-		if (helpers.isWindows()) {
-			// /r :Uses search strings as regular expressions. Findstr interprets all metacharacters as regular expressions.
-			// /i :Specifies that the search is not to be case-sensitive.
-			return this.$childProcess.spawn("findstr", ["/r", "/i", keywords.join(" ")]);
-		} else {
-			// -E :Interpret PATTERN as an extended regular expression.
-			// -i :Ignore case distinctions in both the PATTERN and the input.
-			return this.$childProcess.spawn("grep", ["-E", "-i", keywords.join("|")]);
-		}
+		return null;
 	}
 }

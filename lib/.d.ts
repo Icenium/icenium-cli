@@ -21,6 +21,7 @@
 /// <reference path="declarations.d.ts" />
 /// <reference path="definitions/Q.d.ts" />
 /// <reference path="definitions/bufferpack.d.ts" />
+/// <reference path="definitions/byline.d.ts" />
 /// <reference path="definitions/commands-service.d.ts" />
 /// <reference path="definitions/commands.d.ts" />
 /// <reference path="definitions/cookie.d.ts" />
