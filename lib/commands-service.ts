@@ -10,18 +10,20 @@ export class CommandsService implements ICommandsService {
 		return $injector.getRegisteredCommandsNames();
 	}
 
+	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
+		var command = $injector.resolveCommand(commandName);
+		if (command) {
+			command.execute(commandArguments).wait();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
-		return this.$errors.beginCommand(() => {
-			var command = $injector.resolveCommand(commandName);
-			if (command) {
-				command.execute(commandArguments).wait();
-				return true;
-			} else {
-				return false;
-			}
-		}, () => {
-			this.executeCommand("help", [commandName]);
-		});
+		return this.$errors.beginCommand(
+			() => this.executeCommandUnchecked(commandName, commandArguments),
+			() => this.executeCommand("help", [commandName]));
 	}
 
 	public completeCommand() {

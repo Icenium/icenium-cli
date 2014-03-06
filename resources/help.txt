@@ -222,15 +222,16 @@ Usage:
 
 Platform-specific example:
     $ appbuilder live-sync android [--device <id>] [--watch]
-    $ appbuilder live-sync ios [--device <id>] [--watch]
+    $ appbuilder live-sync ios [--device <id>] [--watch] [--companion]
 
 Synchronizes the latest changes in your project to connected devices.
 
 Options:
-    --watch - Enables Project LiveSync. When you save changes to the project, changes will be automatically synchronized
+    --watch - When you save changes to the project, changes will be automatically synchronized
         to the connected device.
     --device - Specifies the serial number or the index of the connected device to which you want to synchronize changes. 
         Run list-devices to list all connected devices, grouped by platform.
+    --companion - The project will be synced to the AppBuilder companion app.
 
 --[/]--
 

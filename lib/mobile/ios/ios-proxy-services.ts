@@ -143,6 +143,11 @@ export class AfcClient implements Mobile.IAfcClient {
 		}).future<void>()();
 	}
 
+	public deleteFile(devicePath: string): void {
+		var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
+		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
+	}
+
 	private transferFile(localFilePath: string, relativeToProjectBasePath: any): IFuture<void> {
 		return (() => {
 			var relativeToProjectBasePaths = relativeToProjectBasePath.split(path.sep);
@@ -164,12 +169,11 @@ export class AfcClient implements Mobile.IAfcClient {
 	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
 		return(() => {
 			var reader = this.$fs.createReadStream(localFilePath);
+			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 
-			var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
-			this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
+			this.deleteFile(devicePath);
 
 			var target = this.open(devicePath, "w");
-			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 
 			reader.on("data", (data) => {
 				target.write(data, data.length);
@@ -242,7 +246,7 @@ export class NotificationProxyClient {
 	}
 }
 
-export class HouseArrestClient implements Mobile.IHouseArressClient {
+export class HouseArrestClient implements Mobile.IHouseArrestClient {
 	private plistService: Mobile.IiOSDeviceSocket = null;
 
 	constructor(private device: Mobile.IIOSDevice,
@@ -267,7 +271,7 @@ export class HouseArrestClient implements Mobile.IHouseArressClient {
 		return this.getAfcClientCore("VendDocuments", applicationIdentifier);
 	}
 
-	public getAfcClientForAppContainer(applicationIdentifier: string) {
+	public getAfcClientForAppContainer(applicationIdentifier: string): Mobile.IAfcClient {
 		return this.getAfcClientCore("VendContainer", applicationIdentifier);
 	}
 
