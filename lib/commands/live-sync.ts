@@ -20,7 +20,7 @@ export class LiveSyncCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var platform = args[0];
+			this.$devicesServices.initialize(args[0], options.device).wait();
 
 			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
@@ -29,30 +29,27 @@ export class LiveSyncCommand implements ICommand {
 				? "com.telerik.Icenium"
 				: this.$project.projectData.AppIdentifier;
 
-			if (this.$devicesServices.hasDevices(platform)) {
-				if (options.watch) {
-					this.liveSyncDevices(platform, projectDir, appIdentifier);
-				} else {
-					if (options.file) {
-						var isExistFile = this.$fs.exists((options.file)).wait();
-						if(isExistFile) {
-							var projectFiles = [path.resolve(options.file)];
-							this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
-						} else {
-							this.$errors.fail("The file %s does not exist.", options.file);
-						}
+			if (options.watch) {
+				this.liveSyncDevices(this.$devicesServices.platform, projectDir, appIdentifier);
+			} else {
+				if (options.file) {
+					var isExistFile = this.$fs.exists((options.file)).wait();
+					if(isExistFile) {
+						var projectFiles = [path.resolve(options.file)];
+						this.sync(appIdentifier, projectDir, projectFiles).wait();
 					} else {
-						var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
-						this.sync(platform, appIdentifier, projectDir, projectFiles).wait();
+						this.$errors.fail("The file %s does not exist.", options.file);
 					}
+				} else {
+					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+					this.sync(appIdentifier, projectDir, projectFiles).wait();
 				}
 			}
 		}).future<void>()();
 	}
 
-	private sync(platform: string, appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
+	private sync(appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
 		return(() => {
-
 			var canExecute = (device: Mobile.IDevice): boolean => {
 				if (!MobileHelper.isiOSPlatform(device.getPlatform()) && options.companion) {
 					this.$logger.warn("The AppBuilder Companion app is available only for iOS devices.");
@@ -69,11 +66,7 @@ export class LiveSyncCommand implements ICommand {
 				}).future<void>()();
 			};
 
-			if(options.device) {
-				this.$devicesServices.executeOnDevice(action, options.device, canExecute).wait();
-			} else {
-				this.$devicesServices.executeOnAllConnectedDevices(action, platform, canExecute).wait();
-			}
+			this.$devicesServices.execute(action, canExecute).wait();
 		}).future<void>()();
 	}
 
@@ -97,7 +90,7 @@ export class LiveSyncCommand implements ICommand {
 				change: (changeType, filePath) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
-						this.sync(platform, appIdentifier, projectDir, [filePath]);
+						this.sync(appIdentifier, projectDir, [filePath]);
 					}
 				},
 				next: (error, watchers) => {
