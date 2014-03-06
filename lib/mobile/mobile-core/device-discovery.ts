@@ -151,9 +151,13 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 		super();
 	}
 
-	private createAndAddDevice(deviceIdentifier): void {
-		var device = this.$injector.resolve(AndroidDevice.AndroidDevice, { identifier: deviceIdentifier, adb: AndroidDeviceDiscovery.Adb });
-		this.addDevice(device);
+	private createAndAddDevice(deviceIdentifier): IFuture<void> {
+		return (() => {
+			var device = this.$injector.resolve(AndroidDevice.AndroidDevice, {
+					identifier: deviceIdentifier, adb: AndroidDeviceDiscovery.Adb
+				});
+			this.addDevice(device);
+		}).future<void>()();
 	}
 
 	public startLookingForDevices(): IFuture<void> {
@@ -173,7 +177,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 					var identifier = parts[0];
 					var state = parts[1];
 					if (state === "device"/*ready*/) {
-						this.createAndAddDevice(identifier);
+						this.createAndAddDevice(identifier).wait();
 					}
 				});
 		}).future<void>()();
