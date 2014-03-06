@@ -150,24 +150,13 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	private transferFile(localFilePath: string, relativeToProjectBasePath: any): IFuture<void> {
 		return (() => {
-			var relativeToProjectBasePaths = relativeToProjectBasePath.split(path.sep);
-			var fileName = relativeToProjectBasePaths[relativeToProjectBasePaths.length - 1];
-			var targetDirectoryPath = "/Documents";
-
-			relativeToProjectBasePaths.forEach((relativeToProjectBasePath: string) => {
-				if (relativeToProjectBasePath !== "" && relativeToProjectBasePath !== fileName) {
-					targetDirectoryPath = helpers.fromWindowsRelativePathToUnix(path.join(targetDirectoryPath, relativeToProjectBasePath));
-					this.mkdir(targetDirectoryPath);
-				}
-			});
-
-			var targetPath = helpers.fromWindowsRelativePathToUnix(path.join(targetDirectoryPath, fileName));
-			this.transfer(localFilePath, targetPath).wait();
+			this.transfer(localFilePath, relativeToProjectBasePath, "/Documents").wait();
 		}).future<void>()();
 	}
 
-	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
+	private transfer(localFilePath: string, devicePath: string, initialDevicePath?: string): IFuture<void> {
 		return(() => {
+			devicePath = this.ensureDeviceFilePathExist(devicePath, initialDevicePath);
 			var reader = this.$fs.createReadStream(localFilePath);
 			var localFilePathSize =  this.$fs.getFileSize(localFilePath).wait();
 
@@ -190,6 +179,21 @@ export class AfcClient implements Mobile.IAfcClient {
 
 		}).future<void>()();
 	}
+
+	private ensureDeviceFilePathExist(filePath: string, initialDevicePath: string): string {
+		var filePathParts = filePath.split(path.sep);
+		var fileName = path.basename(filePath);
+		var devicePath = initialDevicePath || "";
+
+		filePathParts.forEach((filePathPart: string) => {
+			if (filePathPart !== "" && filePathPart !== fileName) {
+				devicePath = helpers.fromWindowsRelativePathToUnix(path.join(devicePath, filePathPart));
+				this.mkdir(devicePath);
+			}
+		});
+
+		return helpers.fromWindowsRelativePathToUnix(path.join(devicePath, fileName));
+	}
 }
 
 export class InstallationProxyClient {
@@ -203,14 +207,14 @@ export class InstallationProxyClient {
 		return(() => {
 			var service = this.device.startService(MobileServices.APPLE_FILE_CONNECTION);
 			var afcClient = this.$injector.resolve(AfcClient, {service: service});
-			var devicePath = helpers.fromWindowsRelativePathToUnix(path.join("PublicStaging", path.basename(packageFile)));
+			var devicePath = path.join("PublicStaging", path.basename(packageFile));
 
 			afcClient.transferPackage(packageFile, devicePath).wait();
 			this.plistService = this.$injector.resolve(iOSCore.PlistService, {service: this.device.startService(MobileServices.INSTALLATION_PROXY), format: iOSCore.CoreTypes.kCFPropertyListBinaryFormat_v1_0});
 
 			this.plistService.sendMessage({
 				Command: "Install",
-				"PackagePath": devicePath
+				"PackagePath": helpers.fromWindowsRelativePathToUnix(devicePath)
 			});
 			this.plistService.receiveMessage().wait();
 			this.$logger.info("Successfully deployed on device %s", this.device.getIdentifier());

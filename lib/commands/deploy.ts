@@ -25,6 +25,7 @@ export class DeployCommand implements ICommand {
 
 			this.$devicesServices.initialize(args[0], options.device).wait();
 			var packageName = this.$project.projectData.AppIdentifier;
+			var packageFile: string = null;
 
 			var canExecute = (device: Mobile.IDevice): boolean => {
 				if (MobileHelper.isiOSPlatform(device.getPlatform())) {
@@ -35,11 +36,13 @@ export class DeployCommand implements ICommand {
 			};
 
 			var action = (device: Mobile.IDevice): IFuture<void> => {
-				var packageDefs = this.$project.deploy(this.$devicesServices.platform).wait();
-				var packageFile = packageDefs[0].localFile;
+				if(!packageFile) {
+					var packageDefs = this.$project.deploy(this.$devicesServices.platform).wait();
+					packageFile = packageDefs[0].localFile;
 
-				this.$logger.debug("Ready to deploy %s", packageDefs);
-				this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
+					this.$logger.debug("Ready to deploy %s", packageDefs);
+					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
+				}
 				return device.deploy(packageFile, packageName);
 			};
 
