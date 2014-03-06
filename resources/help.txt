@@ -310,10 +310,14 @@ Prints information about the currently logged in user and details about their li
 
 --[list-provisions]--
 Usage:
-    $ appbuilder list-provisions
+    $ appbuilder list-provisions [-v]
 
 Lists with indexes and names all configured provisioning profiles for code signing iOS applications. When building an app,
 you can set the provisioning profile by index or name in the --provision option.
+
+Options:
+    -v, --verbose - prints list of supported devices for each provision.
+
 --[/]--
 
 --[list-certificates]--
