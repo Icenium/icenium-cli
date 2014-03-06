@@ -6,6 +6,7 @@ import util = require("util");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");
 import helpers = require("./../../helpers");
+var assert = require("assert");
 
 export class DevicesServices implements Mobile.IDevicesServices {
 	private devices: { [key: string]: Mobile.IDevice } = {};
@@ -14,6 +15,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	private static NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE = "Could not find device by specified index %d. To list currently connected devices and verify that the specified index exists, run list-devices.";
 	private _platform: string;
 	private _device: Mobile.IDevice;
+	private _isInitialized = false;
 
 	constructor(private $logger: ILogger,
 		private $errors: IErrors,
@@ -83,6 +85,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			} else if(MobileHelper.isAndroidPlatform(this._platform)) {
 				this.$androidDeviceDiscovery.startLookingForDevices().wait();
 			}
+			this._isInitialized = true;
 		}).future<void>()();
 	}
 
@@ -108,18 +111,21 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return searchedDevice;
 	}
 
-	private getDevice(deviceOption: string): Mobile.IDevice {
-		var device: Mobile.IDevice = null;
+	private getDevice(deviceOption: string): IFuture<Mobile.IDevice> {
+		return (() => {
+			this.startLookingForDevices().wait();
+			var device: Mobile.IDevice = null;
 
-		if(this.hasDevice(deviceOption)) {
-			device = this.getDeviceByIdentifier(deviceOption);
-		} else if(helpers.isNumber(deviceOption)) {
-			device = this.getDeviceByIndex(parseInt(deviceOption, 10));
-		} else {
-			this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
-		}
+			if(this.hasDevice(deviceOption)) {
+				device = this.getDeviceByIdentifier(deviceOption);
+			} else if(helpers.isNumber(deviceOption)) {
+				device = this.getDeviceByIndex(parseInt(deviceOption, 10));
+			} else {
+				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
+			}
 
-		return device;
+			return device;
+		}).future<Mobile.IDevice>()();
 	}
 
 	private executeOnDevice(action: any, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
@@ -149,6 +155,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	public execute(action: (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {[key: string]: boolean}): IFuture<void> {
 		return (() => {
+			assert.ok(this._isInitialized, "Devices services not initialized!");
 			if(this.hasDevices()) {
 				if(this._device) {
 					this.executeOnDevice(action, canExecute).wait();
@@ -169,7 +176,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	public initialize(platform: string, deviceOption: string): IFuture<void> {
 		return(() => {
 			if(platform && deviceOption) {
-				this._device = this.getDevice(deviceOption);
+				this._device = this.getDevice(deviceOption).wait();
 				this._platform = this._device.getPlatform();
 				if(this._platform !== this.getPlatform(platform)) {
 					this.$errors.fail("Cannot resolve the specified connected device. The provided platform does not match the provided index or identifier." +
@@ -177,13 +184,14 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				}
 				this.$logger.warn("Your application will be deployed only on the device specified by the provided index or identifier.");
 			} else if(!platform && deviceOption) {
-				this._device = this.getDevice(deviceOption);
+				this._device = this.getDevice(deviceOption).wait();
 				this._platform = this._device.getPlatform();
 			} else if(platform && !deviceOption) {
 				this._platform = this.getPlatform(platform);
+				this.startLookingForDevices().wait();
+			} else if(!platform && !deviceOption) {
+				this.startLookingForDevices().wait();
 			}
-
-			this.startLookingForDevices().wait();
 		}).future<void>()();
 	}
 

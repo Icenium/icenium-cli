@@ -14,7 +14,7 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 			if(!options.device) {
 				this.$errors.fail(OpenDeviceLogStreamCommand.NOT_SPECIFIED_DEVICE_ERROR_MESSAGE);
 			}
-
+			this.$devicesServices.initialize(undefined, options.device).wait();
 			var action = (device: Mobile.IDevice) =>  { return (() => device.openDeviceLogStream()).future<void>()(); };
 			this.$devicesServices.execute(action).wait();
 		}).future<void>()();
