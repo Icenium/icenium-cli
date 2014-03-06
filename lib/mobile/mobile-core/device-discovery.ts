@@ -167,6 +167,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 					return element && !element.isEmpty();
 				})
 				.map((element) => {
+					// http://developer.android.com/tools/help/adb.html#devicestatus
 					var parts = element.split("\t");
 					var identifier = parts[0];
 					var state = parts[1];
