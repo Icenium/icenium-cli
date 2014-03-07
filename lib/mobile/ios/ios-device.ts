@@ -35,6 +35,18 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		return this.getIdentifier();
 	}
 
+	public getModel(): string {
+		return "";
+	}
+
+	public getVersion(): string {
+		return "";
+	}
+
+	public getVendor(): string {
+		return "Apple";
+	}
+
 	public getDeviceProjectPath(appIdentifier: string): string {
 		return "/Documents/";
 	}

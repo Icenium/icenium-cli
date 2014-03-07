@@ -17,7 +17,14 @@ export class ListDevicesCommand implements ICommand {
 			if (options.json) {
 				this.$logger.setLevel("ERROR");
 				action = (device: Mobile.IDevice): IFuture<void> => {
-					return (() => { this.$logger.out(JSON.stringify({ identifier: device.getIdentifier(), platform: device.getPlatform() })) }).future<void>()();
+					return (() => { this.$logger.out(JSON.stringify({
+							identifier: device.getIdentifier(),
+							platform: device.getPlatform(),
+							model: device.getModel(),
+							name: device.getDisplayName(),
+							version: device.getVersion(),
+							vendor: device.getVendor()
+						}))}).future<void>()();
 				};
 			} else {
 				action = (device: Mobile.IDevice): IFuture<void> => {

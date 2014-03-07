@@ -11,23 +11,61 @@ export class AndroidDevice implements Mobile.IDevice {
 	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
 
-	constructor(private identifier: string,
-		private adb: string,
-		private $logger: ILogger,
-		private $childProcess: IChildProcess,
-		private $errors: IErrors) {
+	private model: string;
+	private name: string;
+	private version: string;
+	private vendor: string;
+
+	constructor(private identifier: string, private adb: string, private $logger: ILogger,
+		private $childProcess: IChildProcess, private $errors: IErrors) {
+		var details = this.getDeviceDetails().wait();
+		this.model = details.model;
+		this.name = details.name;
+		this.version = details.release;
+		this.vendor = details.vendor;
 	}
 
-	getPlatform(): string {
+	private getDeviceDetails(): IFuture<any> {
+		return (() => {
+			var requestDeviceDetailsCommand = this.composeCommand("shell cat /system/build.prop");
+			var details = this.$childProcess.exec(requestDeviceDetailsCommand).wait();
+			details = details.split(/\r?\n|\r/);
+
+			var parsedDetails: any = {};
+			details.forEach((value) => {
+				//sample line is "ro.build.version.release=4.4"
+				var match = /(?:ro\.build\.version|ro\.product)\.(.+)=(.+)/.exec(value)
+				if (match) {
+					parsedDetails[match[1]] = match[2];
+				}
+			});
+
+			return parsedDetails;
+		}).future<any>()();
+	}
+
+	public getPlatform(): string {
 		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android].toLowerCase();
 	}
 
-	getIdentifier(): string {
+	public getIdentifier(): string {
 		return this.identifier;
 	}
 
-	getDisplayName(): string {
-		return this.identifier;
+	public getDisplayName(): string {
+		return this.name;
+	}
+
+	public getModel(): string {
+		return this.model;
+	}
+
+	public getVersion(): string {
+		return this.version;
+	}
+
+	public getVendor(): string {
+		return this.vendor;
 	}
 
 	public getDeviceProjectPath(appIdentifier: string): string {

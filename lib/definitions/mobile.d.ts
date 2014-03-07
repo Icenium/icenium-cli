@@ -5,6 +5,9 @@ declare module Mobile {
 	interface IDevice {
 		getIdentifier(): string;
 		getDisplayName(): string;
+		getModel(): string;
+		getVersion(): string;
+		getVendor(): string;
 		getPlatform(): string;
 		getDeviceProjectPath(appIdentifier: string): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
