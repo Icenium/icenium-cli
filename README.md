@@ -177,15 +177,17 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
-* You can use the Telerik AppBuilder CLI with your preferred IDE or code editor.
+* You can develop your hybrid mobile app offline because all project files are stored locally.
+* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite third-party tools on Windows or OS X.
 * You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 to build and deploy apps straight from Sublime Text 2.
-* You can log in and log out of the Telerik Platform. You can view your current login information.
-* You can create new projects from template.
+* You can log in and log out of the Telerik Platform. 
+* You can view your current login information.
+* You can create new projects from the *Blank*, *jQuery Mobile*, *Friends*, *Kendo UI Mobile*, and *Kendo UI DataViz* templates.
 * You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools. 
 * You can create new projects by initializing the AppBuilder sample apps.
 * You can connect iOS and Android devices.
 * You can list connected devices.
-* You view the device log for connected devices.
+* You can view the device log for connected devices.
 * You can build applications for iOS and Android and deploy them via QR code on remote devices.
 * You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
 * You can build applications for distribution in Apple App Store and Google Play. 
@@ -205,7 +207,14 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 * You cannot build, test, deploy, or publish for Windows Phone 8.
 * You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
-* You cannot debug on device.
+* You cannot debug your Android apps while running on a connected device.
+* You cannot debug your iOS apps while running on a connected device.
+* You cannot migrate between Apache Cordova versions.
+* You cannot enable and disable the core Apache Cordova plugins.
+* You cannot enable and disable the integrated Apache Cordova plugins.
+* You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
+* You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
+* You cannot use the AppBuilder version control and storage cloud services.
 
 [Back to Top][1]
 
