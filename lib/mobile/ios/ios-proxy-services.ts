@@ -138,7 +138,7 @@ export class AfcClient implements Mobile.IAfcClient {
 	public transferCollection(localToDevicePaths: Mobile.ILocalToDevicePathData[]): IFuture<void> {
 		return (() => {
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				this.transfer(localToDevicePathData.getLocalPath(),  path.join("\Documents", localToDevicePathData.getRelativeToProjectBasePath())).wait();
+				this.transfer(localToDevicePathData.getLocalPath(),  path.join("/Documents", localToDevicePathData.getRelativeToProjectBasePath())).wait();
 			});
 		}).future<void>()();
 	}
@@ -147,6 +147,7 @@ export class AfcClient implements Mobile.IAfcClient {
 		var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
 		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
 	}
+
 	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
 		return(() => {
 			this.ensureDevicePathExist(path.dirname(devicePath));

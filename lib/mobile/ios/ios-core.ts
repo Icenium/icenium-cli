@@ -701,7 +701,7 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 				this.$errors.verifyHeap("receiveMessage");
 				var reply = data.toString();
 
-				if(this.$mobileDevice.isDataReceivingCompleted) {
+				if(this.$mobileDevice.isDataReceivingCompleted(reply)) {
 					result.return();
 				}
 			})
