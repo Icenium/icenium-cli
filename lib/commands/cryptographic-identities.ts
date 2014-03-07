@@ -9,6 +9,7 @@ import helpers = require("../helpers");
 import path = require("path");
 import moment = require("moment");
 import validators = require("../validators/cryptographic-identity-validators");
+import iosValidators = require("../validators/ios-deployment-validator");
 
 class CryptographicIdentityConstants {
 	public static PKCS12_TYPE = "Pkcs12";
@@ -49,7 +50,8 @@ export class IdentityManager implements Server.IIdentityManager {
 	constructor(private $cryptographicIdentityStoreService: ICryptographicIdentityStoreService,
 		private $logger: ILogger,
 		private $errors: IErrors,
-		private $x509: IX509CertificateLoader) {
+		private $x509: IX509CertificateLoader,
+		private $injector: IInjector) {
 	}
 
 	public listCertificates(): IFuture<any> {
@@ -126,19 +128,23 @@ export class IdentityManager implements Server.IIdentityManager {
 		}).future<any>()();
 	}
 
-	public autoselectProvision(provisionKinds: string[]): IFuture<IProvision> {
+	public autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision> {
 		return ((): IProvision => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 
-			var provision = _.chain(provisionKinds)
-				.map((kind) => _.find(provisions, (prov) => prov.ProvisionType === kind))
+			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
+				{deviceIdentifier: deviceIdentifier, appIdentifier: appIdentifier});
+
+			provisions = _.filter(provisions, (prov) => validator.validateProvision(prov).IsSuccessful);
+			var provision = _.chain(provisionTypes)
+				.map((type) => _.find(provisions, (prov) => prov.ProvisionType === type))
 				.find((prov) => Boolean(prov))
 				.value();
 
 			if (provision) {
 				return provision;
 			} else {
-				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionKinds));
+				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
 			}
 			return null;
 		}).future<IProvision>()();
@@ -147,7 +153,11 @@ export class IdentityManager implements Server.IIdentityManager {
 	public autoselectCertificate(provisionData: IProvision): IFuture<ICryptographicIdentity> {
 		return ((): ICryptographicIdentity => {
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
-			var identity = _.find(identities, (ident) => this.isCertificateCompatibleWithProvision(ident, provisionData));
+
+			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
+				{deviceIdentifier: null, appIdentifier: null});
+
+			var identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().IsSuccessful);
 
 			if (identity) {
 				return identity;

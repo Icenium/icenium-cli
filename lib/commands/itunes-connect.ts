@@ -3,6 +3,7 @@
 "use strict";
 
 import _ = require("underscore");
+import constants = require("../mobile/constants");
 var options:any = require("../options");
 
 interface IAppStoreApplication {
@@ -71,12 +72,14 @@ export class UploadApplicationCommand implements ICommand {
 
 			this.$project.ensureProject();
 
-			this.$logger.info("Checking provision.");
-			var provision = this.$identityManager.findProvision(options.provision).wait();
+			if (options.provision) {
+				this.$logger.info("Checking provision.");
+				var provision = this.$identityManager.findProvision(options.provision).wait();
 
-			if (provision.ProvisionType !== "AppStore") {
-				this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
-					provision.Name, provision.ProvisionType);
+				if (provision.ProvisionType !== constants.ProvisionType.AppStore) {
+					this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
+						provision.Name, provision.ProvisionType);
+				}
 			}
 
 			if (!password) {
@@ -94,7 +97,7 @@ export class UploadApplicationCommand implements ICommand {
 			var buildResult = this.$project.build({
 				platform: "iOS",
 				configuration: "Release",
-				provisionKind: ["AppStore"]
+				provisionTypes: [constants.ProvisionType.AppStore]
 			}).wait();
 			if (!buildResult[0] || !buildResult[0].solutionPath) {
 				this.$errors.fail({formatStr: "Build failed.", suppressCommandHelp: true});
