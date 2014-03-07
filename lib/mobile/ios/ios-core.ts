@@ -61,8 +61,7 @@ export class CoreTypes {
 }
 
 class IOSCore implements Mobile.IiOSCore {
-	private static NOT_INSTALLED_iTUNES_ERROR_MESSAGE = "iTunes is not installed";
-	private static BITNESS_MISMATCH = "iTunes should be the same bitness as Node";
+	private static NOT_INSTALLED_iTUNES_ERROR_MESSAGE = "iTunes is not installed. Install it on your system and run this command again.";
 
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
@@ -108,8 +107,7 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	private get CommonProgramFilesPath(): string {
-		return helpers.isWindows64() ? (this.is32BitProcess() ? process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramW6432) :
-			process.env.CommonProgramFiles;
+		return helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
 	}
 
 	private is32BitProcess(): boolean {
@@ -219,33 +217,26 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	private validate(): void {
-		if(helpers.isWindows64()) {
-			var existsAppleFolder32 = this.$fs.exists(path.join(process.env["CommonProgramFiles(x86)"], "Apple")).wait();
-			var existsAppleFolder64 = this.$fs.exists(path.join(process.env.CommonProgramW6432, "Apple")).wait();
-
-			if(!existsAppleFolder32 && !existsAppleFolder64) {
-				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
-			}
-
-			if((this.is32BitProcess() && !existsAppleFolder32 && existsAppleFolder64) ||
-				!this.is32BitProcess() && !existsAppleFolder64 && existsAppleFolder32) {
-				this.$errors.fail(IOSCore.BITNESS_MISMATCH);
-			}
-
-		} else if(helpers.isWindows32()) {
-			if(!this.$fs.exists(path.join(process.env.CommonProgramFiles)).wait()) {
-				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
-			}
-		} else if(helpers.isDarwin()) {
-			var existsCoreFoundation = this.$fs.exists(this.CoreFoundationDir).wait();
-			var existsMobileDevice = this.$fs.exists(this.MobileDeviceDir).wait();
-
-			if(!existsCoreFoundation || !existsMobileDevice) {
-				this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
-			}
-		} else {
+		if(!this.isSupportedPlatform()) {
 			this.$errors.fail("Unsupported platform");
 		}
+
+		if(helpers.isWindows64()) {
+			if(!this.is32BitProcess()) {
+				this.$errors.fail("To be able to run operations on connected iOS devices, install the 32-bit version of Node.js.");
+			}
+		}
+
+		var existsCoreFoundation = this.$fs.exists(this.CoreFoundationDir).wait();
+		var existsMobileDevice = this.$fs.exists(this.MobileDeviceDir).wait();
+
+		if(!existsCoreFoundation || !existsMobileDevice) {
+			this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
+		}
+	}
+
+	private isSupportedPlatform(): boolean {
+		return helpers.isWindows() || helpers.isDarwin();
 	}
 }
 $injector.register("iOSCore", IOSCore);

@@ -101,11 +101,11 @@ export function registerCommand(module: string, commandName: string, executor: (
 }
 
 export function isWindows() {
-	return /^win/.test(process.platform);
+	return process.platform === "win32";
 }
 
 export function isWindows64() {
-	return process.arch === "x64" && process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")
+	return isWindows() && (process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"));
 }
 
 export function isWindows32() {
