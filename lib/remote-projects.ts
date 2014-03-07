@@ -34,22 +34,31 @@ class RemoteProjectExporter {
 	public exportProject(projectId): IFuture<void> {
 		return (() => {
 			var name = this.getProjectName(projectId).wait();
-			var result = this.doExportRemoteProject(name).wait();
-			this.$logger.info(result);
+			this.doExportRemoteProject(name).wait();
 		}).future<void>()();
 	}
 
-	private doExportRemoteProject(remoteProjectName: string): IFuture<string> {
+	private doExportRemoteProject(remoteProjectName: string): IFuture<void> {
 		return (() => {
 			var projectDir = path.join(this.getProjectDir(), remoteProjectName);
-			var properties = this.getProjectProperties(remoteProjectName).wait();
-			this.$project.createProjectFile(projectDir, remoteProjectName, properties).wait();
+			if (this.$fs.exists(projectDir).wait()) {
+				this.$errors.fail("The folder %s already exists!", projectDir);
+			}
 
-			var projectExtractor = unzip.Extract({ path: projectDir});
+			var projectExtractor = unzip.Extract({ path: projectDir });
 			this.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, projectExtractor)).wait();
 			this.$fs.futureFromEvent(projectExtractor, "close").wait();
-			return util.format("%s has been successfully exported to %s", remoteProjectName, projectDir);
-		}).future<string>()();
+
+			try {
+				var properties = this.getProjectProperties(remoteProjectName).wait();
+				this.$project.createProjectFile(projectDir, remoteProjectName, properties).wait();
+			}
+			catch (ex) {
+				this.$logger.warn("Couldn't create project file: %s", ex.message);
+			}
+
+			this.$logger.info("%s has been successfully exported to %s", remoteProjectName, projectDir);
+		}).future<void>()();
 	}
 
 	private makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T> {
@@ -95,6 +104,7 @@ class RemoteProjectExporter {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
 			var properties = solutionData.Items[0].Properties;
+			properties.name = projectName;
 			return properties;
 		}).future()();
 	}
