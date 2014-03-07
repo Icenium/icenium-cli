@@ -2,10 +2,11 @@
 
 "use strict";
 
+import helpers = require("../lib/helpers");
+
 var assert = require("chai").assert;
 
 describe("helpers", function() {
-	var helpers = require("../lib/helpers");
 	describe("toHash", function() {
 		it("converts array to hash", function() {
 			var source = ["one", "two"];
@@ -76,5 +77,19 @@ describe("helpers", function() {
 			var result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
 			assert.equal(result.name, "3");
 		})
+	});
+
+	describe("formatListOfNames", function() {
+		it("should format one name", function() {
+			assert.equal("foo", helpers.formatListOfNames(["foo"]));
+		});
+
+		it("should format list of two names", function() {
+			assert.equal("foo or bar", helpers.formatListOfNames(["foo", "bar"]));
+		});
+
+		it("should format list of multiple names", function() {
+			assert.equal("foo, bar, baz or jazz", helpers.formatListOfNames(["foo", "bar", "baz", "jazz"]));
+		});
 	})
 });

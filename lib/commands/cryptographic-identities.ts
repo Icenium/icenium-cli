@@ -97,7 +97,7 @@ export class IdentityManager implements Server.IIdentityManager {
 		}).future<any>()();
 	}
 
-	public findCertificate(identityStr): IFuture<any> {
+	public findCertificate(identityStr): IFuture<ICryptographicIdentity> {
 		return ((): any => {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
@@ -112,7 +112,7 @@ export class IdentityManager implements Server.IIdentityManager {
 		}).future<any>()();
 	}
 
-	public findProvision(provisionStr): IFuture<any> {
+	public findProvision(provisionStr): IFuture<IProvision> {
 		return ((): any => {
 			this.$logger.debug("Looking for provision '%s'", provisionStr);
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
@@ -124,6 +124,44 @@ export class IdentityManager implements Server.IIdentityManager {
 				return result;
 			}
 		}).future<any>()();
+	}
+
+	public autoselectProvision(provisionKinds: string[]): IFuture<IProvision> {
+		return ((): IProvision => {
+			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+
+			var provision = _.chain(provisionKinds)
+				.map((kind) => _.find(provisions, (prov) => prov.ProvisionType === kind))
+				.find((prov) => Boolean(prov))
+				.value();
+
+			if (provision) {
+				return provision;
+			} else {
+				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionKinds));
+			}
+			return null;
+		}).future<IProvision>()();
+	}
+
+	public autoselectCertificate(provisionData: IProvision): IFuture<ICryptographicIdentity> {
+		return ((): ICryptographicIdentity => {
+			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			var identity = _.find(identities, (ident) => this.isCertificateCompatibleWithProvision(ident, provisionData));
+
+			if (identity) {
+				return identity;
+			} else {
+				this.$errors.fail("No certificate found compatible with provision '%s' found.", provisionData.Name);
+				return null;
+			}
+		}).future<ICryptographicIdentity>()();
+	}
+
+	public isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean {
+		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
+
+		return _.some(provision.Certificates, (c) => formattedCertificate.indexOf(c) >= 0);
 	}
 }
 $injector.register("identityManager", IdentityManager);

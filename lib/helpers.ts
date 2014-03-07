@@ -57,7 +57,7 @@ export function isNumber(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-export function toHash(collection, keySelector, valueSelector) {
+export function toHash(collection, keySelector, valueSelector): any {
 	var result = {};
 	if (_.isArray(collection)) {
 		for (var i = 0; i < collection.length; ++i) {
@@ -126,6 +126,14 @@ export function isNullOrWhitespace(input: string): boolean {
 	}
 
 	return input.replace(/\s/gi, '').length < 1;
+}
+
+export function formatListOfNames(names: string[]): string {
+	if (names.length <= 1) {
+		return names[0];
+	} else {
+		return _.initial(names).join(", ") + " or " + names[names.length - 1];
+	}
 }
 
 export function getCountries() {

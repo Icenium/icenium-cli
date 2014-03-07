@@ -85,10 +85,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_CERTIFICATE_ERROR_MESSAGE);
 			}
 
-			var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, "\r", "");
-			formattedCertificate = helpers.stringReplaceAll(formattedCertificate, "\n", "");
-
-			if(!_.some(provision.Certificates,(c) => formattedCertificate.indexOf(c) >= 0 )) {
+			if(!this.$identityManager.isCertificateCompatibleWithProvision(certificate, provision)) {
 				return new ValidationResult.ValidationResult("Certificate is not included in provision's certificates");
 			}
 

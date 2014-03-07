@@ -193,17 +193,17 @@ export class Project implements Project.IProject {
 		}).future<string>()();
 	}
 
-	private requestCloudBuild(platform, configuration): IFuture<Project.IBuildResult> {
+	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
-			if (MobileHelper.isAndroidPlatform(platform)) {
-				platform = "Android";
-			} else if (MobileHelper.isiOSPlatform(platform)) {
-				platform = "iOS";
+			if (MobileHelper.isAndroidPlatform(settings.platform)) {
+				settings.platform = "Android";
+			} else if (MobileHelper.isiOSPlatform(settings.platform)) {
+				settings.platform = "iOS";
 			}
 
 			var buildProperties:any = {
-				Configuration: configuration,
-				Platform: platform,
+				Configuration: settings.configuration,
+				Platform: settings.platform,
 
 				CorePlugins: this.projectData.CorePlugins,
 				AppIdentifier: this.projectData.AppIdentifier,
@@ -213,7 +213,7 @@ export class Project implements Project.IProject {
 				DeviceOrientations: this.projectData.DeviceOrientations
 			};
 
-			if (platform === "Android") {
+			if (settings.platform === "Android") {
 				buildProperties.AndroidPermissions = this.projectData.AndroidPermissions;
 				buildProperties.AndroidVersionCode = this.projectData.AndroidVersionCode;
 				buildProperties.AndroidHardwareAcceleration = this.projectData.AndroidHardwareAcceleration;
@@ -228,22 +228,32 @@ export class Project implements Project.IProject {
 
 				var result = this.beginBuild(buildProperties).wait();
 				return result;
-			} else if (platform === "iOS" ) {
+			} else if (settings.platform === "iOS" ) {
 				buildProperties.iOSDisplayName = this.projectData.DisplayName;
 				buildProperties.iOSDeviceFamily = this.projectData.iOSDeviceFamily;
 				buildProperties.iOSStatusBarStyle = this.projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = this.projectData.iOSBackgroundMode;
 
-				var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: this.projectData.AppIdentifier, device: undefined});
-				iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
+				var provisionData: IProvision;
+				if (options.provision) {
+					provisionData = this.$identityManager.findProvision(options.provision).wait();
+				} else {
+					provisionData = this.$identityManager.autoselectProvision(settings.provisionKinds).wait();
+					options.provision = provisionData.Name;
+				}
+				this.$logger.info("Using mobile provision '%s'", provisionData.Name);
 
-				var certificateData = this.$identityManager.findCertificate(options.certificate).wait();
-
+				var certificateData: ICryptographicIdentity;
+				if (options.certificate) {
+					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+				} else {
+					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
+					options.certificate = certificateData.Alias;
+				}
 				this.$logger.info("Using certificate '%s'", certificateData.Alias);
 
-				var provisionData = this.$identityManager.findProvision(options.provision).wait();
-
-				this.$logger.info("Using mobile provision '%s'", provisionData.Name);
+				var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: this.projectData.AppIdentifier, device: undefined});
+				iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
 
 				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
 				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
@@ -252,7 +262,7 @@ export class Project implements Project.IProject {
 				buildResult.provisionType = provisionData.ProvisionType;
 				return buildResult;
 			} else {
-				this.$logger.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", platform);
+				this.$logger.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", settings.platform);
 				return null;
 			}
 		}).future<Project.IBuildResult>()();
@@ -282,7 +292,7 @@ export class Project implements Project.IProject {
 
 			return {
 				buildProperties: buildProperties,
-				packageDefs: result.buildResults,
+				packageDefs: result.buildResults
 			};
 		}).future<Project.IBuildResult>()();
 	}
@@ -315,19 +325,19 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public build(platform: string, configuration: string, showQrCodes: boolean, downloadFiles: boolean): IFuture<Server.IPackageDef[]> {
+	build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
 		return ((): Server.IPackageDef[] => {
 			this.ensureProject();
 
-			configuration = configuration || "Debug";
-			this.$logger.info("Building project for platform '%s', configuration '%s'", platform, configuration);
+			settings.configuration = settings.configuration || "Debug";
+			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);
 
 			this.importProject().wait();
 
-			var buildResult = this.requestCloudBuild(platform, configuration).wait();
+			var buildResult = this.requestCloudBuild(settings).wait();
 			var packageDefs = buildResult.packageDefs;
 
-			if (showQrCodes && packageDefs.length) {
+			if (settings.showQrCodes && packageDefs.length) {
 				var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
 				packageDefs.forEach((def:any) => {
 					var liveSyncUrl = this.$buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
@@ -339,7 +349,7 @@ export class Project implements Project.IProject {
 				this.showPackageQRCodes(packageDefs).wait();
 			}
 
-			if (downloadFiles) {
+			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
 					var targetFileName = path.join(this.getProjectDir(), path.basename(pkg.solutionPath));
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
@@ -362,7 +372,11 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.validatePlatform(platform);
 			this.ensureProject();
-			var result = this.build(platform, this.getBuildConfiguration(), false, true).wait();
+			var result = this.build({platform: platform,
+				configuration: this.getBuildConfiguration(),
+				downloadFiles: true,
+				provisionKind: ["AdHoc", "Development"]
+			}).wait();
 			return result;
 		}).future<Server.IPackageDef[]>()();
 	}
@@ -382,7 +396,18 @@ export class Project implements Project.IProject {
 			if (options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
-				this.build(platform, this.getBuildConfiguration(), !options.download, options.download).wait();
+				var willDownload = options.download;
+				var provisionKinds = ["AdHoc"];
+				if (willDownload) {
+					provisionKinds.push("Development");
+				}
+
+				this.build({platform: platform,
+					configuration: this.getBuildConfiguration(),
+					showQrCodes: !options.download,
+					downloadFiles: options.download,
+					provisionKinds: provisionKinds
+				}).wait();
 			}
 		}).future<void>()();
 	}
