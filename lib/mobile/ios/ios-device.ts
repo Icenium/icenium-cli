@@ -114,13 +114,14 @@ export class IOSDevice implements Mobile.IIOSDevice {
 
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
 		return(() => {
+			//TODO: CloseSocket must be part of afcClient. Refactor it.
 			var houseArrestClient: Mobile.IHouseArrestClient = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
 			var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
 			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
+			houseArrestClient.closeSocket();
 
 			var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier);
 			afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist");
-
 			houseArrestClient.closeSocket();
 
 			var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
