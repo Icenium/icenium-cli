@@ -16,6 +16,7 @@ import Future = require("fibers/future");
 import projectNameValidator = require("./validators/project-name-validator");
 import MobileHelper = require("./mobile/mobile-helper");
 import iOSDeploymentValidatorLib = require("./validators/ios-deployment-validator");
+import constants = require("./mobile/constants");
 
 export class BuildService implements Project.IBuildService {
 	constructor(private $config: IConfiguration,
@@ -234,11 +235,15 @@ export class Project implements Project.IProject {
 				buildProperties.iOSStatusBarStyle = this.projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = this.projectData.iOSBackgroundMode;
 
+				var completeAutoselect = (!options.provision && !options.certificate);
+
 				var provisionData: IProvision;
 				if (options.provision) {
 					provisionData = this.$identityManager.findProvision(options.provision).wait();
 				} else {
-					provisionData = this.$identityManager.autoselectProvision(settings.provisionKinds).wait();
+					var deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
+					provisionData = this.$identityManager.autoselectProvision(
+						this.projectData.AppIdentifier, settings.provisionTypes, deviceIdentifier).wait();
 					options.provision = provisionData.Name;
 				}
 				this.$logger.info("Using mobile provision '%s'", provisionData.Name);
@@ -252,8 +257,14 @@ export class Project implements Project.IProject {
 				}
 				this.$logger.info("Using certificate '%s'", certificateData.Alias);
 
-				var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: this.projectData.AppIdentifier, device: undefined});
-				iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
+				if (!completeAutoselect) {
+					var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
+						appIdentifier: this.projectData.AppIdentifier,
+						deviceIdentifier: settings.device ? settings.device.getIdentifier() : null
+					});
+					iOSDeploymentValidator.throwIfInvalid(
+						{provisionOption: options.provision, certificateOption: options.certificate}).wait();
+				}
 
 				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
 				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
@@ -368,14 +379,15 @@ export class Project implements Project.IProject {
 		return options["no-livesync"] ? "Release" : "Debug";
 	}
 
-	public deploy(platform: string): IFuture<Server.IPackageDef[]> {
+	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
 		return (() => {
 			this.validatePlatform(platform);
 			this.ensureProject();
 			var result = this.build({platform: platform,
 				configuration: this.getBuildConfiguration(),
 				downloadFiles: true,
-				provisionKind: ["AdHoc", "Development"]
+				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
+				device: device
 			}).wait();
 			return result;
 		}).future<Server.IPackageDef[]>()();
@@ -397,16 +409,16 @@ export class Project implements Project.IProject {
 				this.deployToIon(platform).wait();
 			} else {
 				var willDownload = options.download;
-				var provisionKinds = ["AdHoc"];
+				var provisionTypes = [constants.ProvisionType.AdHoc];
 				if (willDownload) {
-					provisionKinds.push("Development");
+					provisionTypes.push(constants.ProvisionType.Development);
 				}
 
 				this.build({platform: platform,
 					configuration: this.getBuildConfiguration(),
 					showQrCodes: !options.download,
 					downloadFiles: options.download,
-					provisionKinds: provisionKinds
+					provisionTypes: provisionTypes
 				}).wait();
 			}
 		}).future<void>()();

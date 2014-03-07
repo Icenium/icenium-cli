@@ -42,7 +42,7 @@ declare module Server {
 		listProvisions(): IFuture<any>;
 		findCertificate(identityStr): IFuture<ICryptographicIdentity>;
 		findProvision(provisionStr): IFuture<IProvision>;
-		autoselectProvision(provisionKinds: string[]): IFuture<IProvision>;
+		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision>;
 		autoselectCertificate(provision: IProvision): IFuture<ICryptographicIdentity>;
 		isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean;
 	}
@@ -123,7 +123,8 @@ declare module Project {
 		showQrCodes?: boolean;
 		downloadFiles?: boolean;
 
-		provisionKinds?: string[];
+		provisionTypes?: string[];
+		device?: Mobile.IDevice;
 	}
 
 	interface IProject {
@@ -132,7 +133,7 @@ declare module Project {
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
-		deploy(platform: string): IFuture<Server.IPackageDef[]>;
+		deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		importProject(): IFuture<void>;

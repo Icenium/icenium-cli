@@ -19,7 +19,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	private static EXPIRED_CERTIFICATE_ERROR_MESSAGE = "Certificate is expired.";
 
 	constructor(private appIdentifier: string,
-		private device: Mobile.IDevice,
+		private deviceIdentifier: string,
 		private $identityManager: Server.IIdentityManager,
 		private $logger: ILogger,
 		private $x509: IX509CertificateLoader) {
@@ -55,7 +55,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		}).future<IValidationResult>()();
 	}
 
-	private validateProvision(provision: IProvision):IValidationResult {
+	public validateProvision(provision: IProvision):IValidationResult {
 		if(!provision) {
 			return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_PROVISION_ERROR_MESSAGE);
 		}
@@ -69,17 +69,17 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 			}
 		}
 
-		if(this.device) {
-			var isInProvisionedDevices = provision.ProvisionedDevices && provision.ProvisionedDevices.contains(this.device.getIdentifier());
+		if(this.deviceIdentifier) {
+			var isInProvisionedDevices = provision.ProvisionedDevices && provision.ProvisionedDevices.contains(this.deviceIdentifier);
 			if(!isInProvisionedDevices) {
-				return new ValidationResult.ValidationResult(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Use $ appbuilder list-provision -v to list all devices included in provision", this.device.getIdentifier()));
+				return new ValidationResult.ValidationResult(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Use $ appbuilder list-provision -v to list all devices included in provision", this.deviceIdentifier));
 			}
 		}
 
 		return new ValidationResult.ValidationResult(null);
 	}
 
-	private validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IFuture<IValidationResult> {
+	public validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IFuture<IValidationResult> {
 		return(() => {
 			if(!certificate) {
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_CERTIFICATE_ERROR_MESSAGE);

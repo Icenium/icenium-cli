@@ -27,17 +27,9 @@ export class DeployCommand implements ICommand {
 			var packageName = this.$project.projectData.AppIdentifier;
 			var packageFile: string = null;
 
-			var canExecute = (device: Mobile.IDevice): boolean => {
-				if (MobileHelper.isiOSPlatform(device.getPlatform())) {
-					var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {appIdentifier: packageName, device: device});
-					iOSDeploymentValidator.throwIfInvalid({provisionOption: options.provision, certificateOption: options.certificate}).wait();
-				}
-				return true;
-			};
-
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				if(!packageFile) {
-					var packageDefs = this.$project.deploy(this.$devicesServices.platform).wait();
+					var packageDefs = this.$project.deploy(this.$devicesServices.platform, device).wait();
 					packageFile = packageDefs[0].localFile;
 
 					this.$logger.debug("Ready to deploy %s", packageDefs);
@@ -46,7 +38,7 @@ export class DeployCommand implements ICommand {
 				return device.deploy(packageFile, packageName);
 			};
 
-			this.$devicesServices.execute(action, canExecute).wait();
+			this.$devicesServices.execute(action).wait();
 
 		}).future<void>()();
 	}
