@@ -7,6 +7,13 @@ import byline = require("byline");
 import helpers = require("./../../helpers");
 import _ = require("underscore");
 
+interface IAndroidDeviceDetails {
+	model: string;
+	name: string
+	release: string;
+	brand: string;
+}
+
 export class AndroidDevice implements Mobile.IDevice {
 	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
@@ -18,14 +25,14 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	constructor(private identifier: string, private adb: string, private $logger: ILogger,
 		private $childProcess: IChildProcess, private $errors: IErrors) {
-		var details = this.getDeviceDetails().wait();
+		var details: IAndroidDeviceDetails = this.getDeviceDetails().wait();
 		this.model = details.model;
 		this.name = details.name;
 		this.version = details.release;
-		this.vendor = details.vendor;
+		this.vendor = details.brand;
 	}
 
-	private getDeviceDetails(): IFuture<any> {
+	private getDeviceDetails(): IFuture<IAndroidDeviceDetails> {
 		return (() => {
 			var requestDeviceDetailsCommand = this.composeCommand("shell cat /system/build.prop");
 			var details = this.$childProcess.exec(requestDeviceDetailsCommand).wait();
@@ -41,7 +48,7 @@ export class AndroidDevice implements Mobile.IDevice {
 			});
 
 			return parsedDetails;
-		}).future<any>()();
+		}).future<IAndroidDeviceDetails>()();
 	}
 
 	public getPlatform(): string {
