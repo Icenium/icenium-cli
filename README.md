@@ -29,11 +29,21 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 Before installing the Telerik AppBuilder CLI, verify that your system meets the following requirements.
 
+*Minimum Software Requirements*
+
 * Windows or OS X Mavericks
 * Node.js 0.10.x (32-bit or 64-bit)
-* *(Required for iOS development)* Latest iTunes (32-bit or 64-bit)
+
+*Additional Software Requirements for iOS Deployment*
+
+* Node.js 0.10.x 32-bit
+* iTunes
 
 The bitness of Node.js and iTunes must match.
+
+*Additional Software Requirements for Android Deployment*
+
+* Any device drivers required by your system to recognize the connected Android device
 
 ### Install the Telerik AppBuilder CLI
 
@@ -42,6 +52,8 @@ In the command prompt, run the following command.
 ```bash
 $ npm install appbuilder
 ```
+
+[Back to Top][1]
 
 <a id="quick-start"></a>
 Quick Start
@@ -117,7 +129,7 @@ Edit your code in your preferred IDE or code editor. Save your changes.
 <a id="livesync"></a>
 **6. Get code changes in the simulator and on device**
 
-In the running device simulator, click **Refresh**. The simulator will load your code changes.
+In the running device simulator, your app refreshes automatically on save.
 
 To get changes inside your running app, run the following command. On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
 
@@ -139,6 +151,8 @@ To learn more about a command, run the command with the `--help` option. For exa
 ```bash
 appbuilder create --help
 ```
+
+[Back to Top][1]
 
 <a id="features"></a>
 Features
@@ -168,14 +182,18 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 * You can manage certificates and provisioning profiles for code signing iOS apps.
 * You can manage certificates for code signing Android apps.
 * You can use the Telerik AppBuilder CLI with your preferred IDE or code editor.
-* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder Sublime package to build and deploy apps straight from Sublime Text 2.
+* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 to build and deploy apps straight from Sublime Text 2.
 
 #### What you cannot do with this version of the Telerik AppBuilder CLI
 
 * You cannot build, test, deploy, or publish for Windows Phone 8.
 * You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
+* You cannot debug on device.
 
-<a id="contribute" href="#contribute">Contribution</a>
+[Back to Top][1]
+
+<a id="contribute" href="#contribute"></a>
+Contribution
 ===
 
 To learn how to log a bug that you just discovered, click [here](CONTRIBUTE#bug).
@@ -183,6 +201,8 @@ To learn how to log a bug that you just discovered, click [here](CONTRIBUTE#bug)
 To learn how to suggest a new feature or improvement, click [here](CONTRIBUTE#request).
 
 To learn how to contribute to the code base, click [here](CONTRIBUTE#contribute).
+
+[Back to Top][1]
 
 <a id="more-appbuilder"></a>
 More Telerik AppBuilder Tools and Resources
@@ -196,7 +216,13 @@ More Telerik AppBuilder Tools and Resources
 * [Telerik AppBuilder documentation](http://docs.telerik.com/platform/appbuilder "The documentation resources for Telerik AppBuilder"): Learn more about what you can do with Telerik AppBuilder.
 * [Telerik AppBuilder web page](http://www.telerik.com/appbuilder "The Telerik AppBuilder web page"): Visit the Telerik AppBuilder web site.
 
+[Back to Top][1]
+
 <a id="license" href="#license">License</a>
 ===
 
 This software is licensed under the Apache 2.0 license, quoted <a href="LICENSE" target="_blank">here</a>.
+
+[Back to Top][1]
+
+[1]: #
