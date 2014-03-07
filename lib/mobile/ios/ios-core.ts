@@ -471,7 +471,8 @@ $injector.register("coreFoundation", CoreFoundation);
 export class MobileDevice implements Mobile.IMobileDevice {
 	private mobileDeviceLibrary: any;
 
-	constructor($iOSCore: Mobile.IiOSCore) {
+	constructor($iOSCore: Mobile.IiOSCore,
+		private $errors: IErrors) {
 		this.mobileDeviceLibrary = $iOSCore.getMobileDeviceLibrary();
 	}
 
@@ -573,6 +574,14 @@ export class MobileDevice implements Mobile.IMobileDevice {
 
 	public isDataReceivingCompleted(reply: string): boolean {
 		//TODO: It should be created parser that converts data from socket to valid javascript dictionary
+		if(reply.indexOf("Error") >= 0) {
+			var openingTag = "<string>";
+			var closingTag = "</string>";
+			if(reply.indexOf(closingTag) >= 0) {
+				this.$errors.fail(reply.substring(reply.indexOf(openingTag) + openingTag.length, reply.indexOf(closingTag)));
+			}
+		}
+
 		return reply.indexOf("Status") >= 0 && reply.indexOf("Complete") >= 0 && reply.indexOf("PercentComplete") < 0;
 	}
  }
@@ -609,9 +618,8 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 	}
 
 	public receiveMessage(): IFuture<void> {
-		return (() => {
+		return(() => {
 			var reply = this.receiveMessageHelper();
-
 			if(!this.$mobileDevice.isDataReceivingCompleted(reply)) {
 				reply = this.receiveMessageHelper();
 			}
@@ -688,13 +696,18 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 
 		this.socket
 			.on("data", (data) => {
-				this.$logger.debug("PlistService receiving: '%s'", data);
+				this.$logger.debug("PosixSocket receiving: '%s'", data);
 				this.$errors.verifyHeap("receiveMessage");
 				var reply = data.toString();
 
-				if(this.$mobileDevice.isDataReceivingCompleted(reply)) {
-					result.return();
+				try {
+					if(this.$mobileDevice.isDataReceivingCompleted(reply)) {
+						result.return();
+					}
+				} catch(ex) {
+					result.throw(ex);
 				}
+
 			})
 			.on("error", (error) => {
 				result.throw(error);
