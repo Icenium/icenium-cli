@@ -29,19 +29,19 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 Before installing the Telerik AppBuilder CLI, verify that your system meets the following requirements.
 
-*Minimum Software Requirements*
+**Minimum Software Requirements**
 
 * Windows or OS X Mavericks
 * Node.js 0.10.x (32-bit or 64-bit)
 
-*Additional Software Requirements for iOS Deployment*
+**Additional Software Requirements for iOS On-Device Deployment**
 
-* Node.js 0.10.x 32-bit
+* Node.js 0.10.x (32-bit)
 * iTunes
 
 The bitness of Node.js and iTunes must match.
 
-*Additional Software Requirements for Android Deployment*
+**Additional Software Requirements for Android On-Device Deployment**
 
 * Any device drivers required by your system to recognize the connected Android device
 
@@ -81,17 +81,21 @@ A new tab opens in your default browser. Provide your login credentials, confirm
 <a id="create"></a>
 **2. Create project**
 
-To create a new project from the default template, navigate to an empty directory and run the following command. The Telerik AppBuilder CLI creates a new project based on the Kendo UI Mobile template in the current directory.
+To create a new project from the default template, navigate to an empty directory and run the following command. 
 
 ```bash
 $ appbuilder create MyApp
 ```
 
-To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. You can initialize any existing AppBuilder or third-party mobile project, if the project file structure mimics the AppBuilder project file structure. 
+The Telerik AppBuilder CLI creates a new project based on the Kendo UI Mobile template in the current directory.
+
+To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
 ```bash
 $ appbuilder init
 ```
+
+The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
 
 <a id="simulator"></a>
 **3. Run in simulator**
@@ -99,25 +103,29 @@ $ appbuilder init
 To load your newly created project in the simulator, run the following command.
 
 ```bash
-appbuilder simulate
+$ appbuilder simulate
 ```
 
-The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can change the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
+The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can adjust the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
 
 <a id="device"></a>
 **4. Run on device**
 
-To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and run the following command in the command line. After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment on Android devices. Scan the produced QR code on your device, install the app, and run it.
+To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and run the following command in the command line. 
 
 ```bash
-appbuilder build android
+$ appbuilder build android
 ```
 
-To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and run the following command in the command line. After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. 
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment on Android devices. Scan the produced QR code on your device, install the app, and run it.
+
+To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and run the following command in the command line. 
 
 ```bash
-appbuilder build ios --companion
+$ appbuilder build ios --companion
 ```
+
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. 
 
 With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
 
@@ -126,30 +134,34 @@ With the Telerik AppBuilder companion app, you can deploy and test your iOS apps
 
 Edit your code in your preferred IDE or code editor. Save your changes.
 
+> In Sublime Text 2, you can install the Telerik AppBuilder package which provides integration with the Telerik AppBuilder CLI. For more information, click <a href="https://sublime.wbond.net/packages/AppBuilder" target="_blank">here</a>. 
+
 <a id="livesync"></a>
 **6. Get code changes in the simulator and on device**
 
 In the running device simulator, your app refreshes automatically on save.
 
-To get changes inside your running app, run the following command. On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
+To get changes inside your running app, run the following command. 
 
 ```bash
-appbuilder cloud-sync
+$ appbuilder cloud-sync
 ```
+
+On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
 
 <a id="help"></a>
 **7. List the available commands**
 
-To learn what are the available commands, run the following command.
+To list the available commands, run the following command.
 
 ```bash
-appbuilder help
+$ appbuilder help
 ```
 
 To learn more about a command, run the command with the `--help` option. For example, to show more information about `create`, run the following command.
 
 ```bash
-appbuilder create --help
+$ appbuilder create --help
 ```
 
 [Back to Top][1]
@@ -165,24 +177,29 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
+* You can use the Telerik AppBuilder CLI with your preferred IDE or code editor.
+* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 to build and deploy apps straight from Sublime Text 2.
 * You can log in and log out of the Telerik Platform. You can view your current login information.
 * You can create new projects from template.
-* You can create new projects by cloning your existing projects from the cloud.
-* You can create new projects by cloning the sample apps.
-* You can build applications for iOS and Android and deploy them via QR code or cable connection. 
-* You can build applications for distribution in Apple App Store and Google Play. You can upload your iOS application packages to iTunes Connect.
+* You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools. 
+* You can create new projects by initializing the AppBuilder sample apps.
+* You can connect iOS and Android devices.
+* You can list connected devices.
+* You view the device log for connected devices.
+* You can build applications for iOS and Android and deploy them via QR code on remote devices.
+* You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
+* You can build applications for distribution in Apple App Store and Google Play. 
+* You can upload your iOS application packages to iTunes Connect.
 * You can load iOS applications in the AppBuilder companion app.
-* You can LiveSync changes wirelessly and via cable connection.
+* You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
+* You can push changes via cable connection to connected devices.
 * You can run your apps in the device simulator on Windows systems.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
-* You can open the AndroidManifest.xml, Info.plist, and config.xml files for editing.
+* You can open the `AndroidManifest.xml`, `Info.plist`, and `config.xml` files for editing.
 * You can configure the project properties for your project.
-* You can view the device log for connected devices.
 * You can manage certificates and provisioning profiles for code signing iOS apps.
 * You can manage certificates for code signing Android apps.
-* You can use the Telerik AppBuilder CLI with your preferred IDE or code editor.
-* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 to build and deploy apps straight from Sublime Text 2.
 
 #### What you cannot do with this version of the Telerik AppBuilder CLI
 
@@ -218,11 +235,12 @@ More Telerik AppBuilder Tools and Resources
 
 [Back to Top][1]
 
-<a id="license" href="#license">License</a>
+<a id="license"></a>
+License
 ===
 
 This software is licensed under the Apache 2.0 license, quoted <a href="LICENSE" target="_blank">here</a>.
 
 [Back to Top][1]
 
-[1]: #
+[1]: #cross-platform-command-line-interface-for-telerik-appbuilder
