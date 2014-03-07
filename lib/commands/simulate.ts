@@ -87,8 +87,8 @@ export class SimulateCommand implements ICommand {
 					headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
 				});
 
-				this.$fs.futureFromEvent(extractor, "finish").wait();
-				request.wait(); // silence the assert that all fibers are waited
+				this.$fs.futureFromEvent(extractor, "close").wait();
+				request.wait();
 
 				this.$platformServices.preparePackage(this.simulatorPath);
 
