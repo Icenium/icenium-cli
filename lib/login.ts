@@ -105,12 +105,12 @@ export class LoginManager implements ILoginManager {
 
 	public logout(): IFuture<void> {
 		return (() => {
-			this.$logger.debug("Logging out...");
+			this.$logger.info("Logging out...");
 
 			this.$userDataStore.setCookie(null).wait();
 			this.$userDataStore.setUser(null).wait();
 
-			this.$logger.debug("Logout completed.");
+			this.$logger.info("Logout completed.");
 		}).future<void>()();
 	}
 
