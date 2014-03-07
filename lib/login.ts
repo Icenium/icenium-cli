@@ -62,7 +62,7 @@ export class UserDataStore implements IUserDataStore {
 		return (() => {
 			if (!getter()) {
 				if (!this.checkCookieExists(sourceFile, getter).wait()) {
-					throw new Error("error: not logged in.");
+					throw new Error("Not logged in.");
 				}
 
 				setter(this.$fs.readText(sourceFile).wait());
@@ -91,7 +91,8 @@ export class LoginManager implements ILoginManager {
 		private $serviceProxy: Server.IServiceProxy,
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
-		private $opener: IOpener) { }
+		private $opener: IOpener,
+		private $commandsService: ICommandsService) { }
 
 	public basicLogin(userName: string, password: string): IFuture<void> {
 		var loginData = {
@@ -140,6 +141,7 @@ export class LoginManager implements ILoginManager {
 			this.loginInBrowser().wait();
 
 			this.$logger.info("Login completed.");
+			this.$commandsService.executeCommand("user", []);
 		}).future<void>()();
 	}
 
