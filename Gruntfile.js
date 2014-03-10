@@ -1,5 +1,10 @@
+var util = require("util");
+
 module.exports = function(grunt) {
 	grunt.initConfig({
+		environment: "local",
+		copyPackageTo: "\\\\telerik.com\\Resources\\BlackDragon\\Builds\\appbuilder-cli",
+
 		pkg: grunt.file.readJSON("package.json"),
 
 		ts: {
@@ -16,16 +21,12 @@ module.exports = function(grunt) {
 				reference: "lib/.d.ts"
 			},
 
-			devtest: {
-				src: ["test/**/*.ts"],
-				options: {
-					sourceMap: true,
-					removeComments: false
-				}
+			devall: {
+				src: ["lib/**/*.ts", "test/**/*.ts"]
 			},
 
-			build: {
-				src: ["lib/**/*.ts"],
+			release_build: {
+				src: ["lib/**/*.ts", "test/**/*.ts"],
 				options: {
 					sourceMap: false,
 					removeComments: true
@@ -34,33 +35,76 @@ module.exports = function(grunt) {
 		},
 
 		watch: {
-			devlib: {
-				files: ['lib/**/*.ts'],
-				tasks: ['ts:devlib'],
+			devall: {
+				files: ["lib/**/*.ts", 'test/**/*.ts'],
+				tasks: ['ts:devall'],
 				options: {
-				  atBegin: true,
-				  interrupt: true
-				},
+					atBegin: true,
+					interrupt: true
+				}
+			}
+		},
+
+		shell: {
+			npm_test: {
+				command: "npm test",
+				options: {
+					stdout: true,
+					stderr: true
+				}
 			},
 
-			devtest: {
-				files: ['test/**/*.ts'],
-				tasks: ['ts:devtest'],
-				options: {
-				  atBegin: true,
-				  interrupt: true
+			ci_unit_tests: {
+				command: [
+					"node bin\\appbuilder.js config-apply cibuild",
+					"call node_modules\\.bin\\mocha.cmd --ui mocha-fibers --recursive --reporter xunit --require test/test-bootstrap.js --timeout 15000 test/ > test-reports.xml"
+				].join("&&")
+			},
+
+			build_package: {
+				command: [
+					"node bin\\appbuilder.js config-apply <%= environment %>",
+					"npm pack"
+				].join("&&")
+			},
+
+			copy_package: {
+				command: function() {
+					var now = new Date().toISOString();
+					var buildNumber = process.env["BUILD_NUMBER"] || "non-ci";
+					var subfolder = util.format("%s %s", now.substr(0, now.indexOf("T")), buildNumber);
+					return util.format("robocopy . \"<%= copyPackageTo %>\\%s\" *.tgz", subfolder);
 				},
+				options: {
+					callback: function(err, stdout, stderr, cb) {
+						// ROBOCOPY exit codes:
+						// http://ss64.com/nt/robocopy-exit.html
+						if (err && err.code >= 8) {
+							grunt.warn(err);
+						}
+						cb();
+					}
+				}
 			}
 		},
 
 		clean: {
-			src: ["test/**/*.js*", "lib/**/*.js*"]
+			src: ["test/**/*.js*", "lib/**/*.js*", "*.tgz"]
 		}
 	});
 
 	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks("grunt-contrib-clean");
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks("grunt-contrib-watch");
+	grunt.loadNpmTasks("grunt-shell");
 
-	grunt.registerTask("default", ["ts:devlib", "ts:devtest"]);
+	grunt.registerTask("test", ["ts:devtest", "shell:npm_test"]);
+	grunt.registerTask("pack", [
+		"ts:release_build",
+		"shell:ci_unit_tests",
+		"shell:build_package",
+		"shell:copy_package"
+	]);
+
+	grunt.registerTask("default", "ts:devlib");
 };
