@@ -99,10 +99,21 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
 
+	grunt.registerTask("set_package_version", function(version) {
+		var fs = require("fs");
+		var buildVersion = version !== undefined ? version : process.env["BUILD_NUMBER"];
+		var packageJson = grunt.file.readJSON("package.json");
+		var version = packageJson.version.split(".");
+		version[3] = buildVersion;
+		packageJson.version = version.join(".");
+		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
+	});
+
 	grunt.registerTask("test", ["ts:devtest", "shell:npm_test"]);
 	grunt.registerTask("pack", [
 		"ts:release_build",
 		"shell:ci_unit_tests",
+		"set_package_version",
 		"shell:build_package",
 		"shell:copy_package"
 	]);
