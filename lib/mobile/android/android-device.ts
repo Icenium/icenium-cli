@@ -79,7 +79,8 @@ export class AndroidDevice implements Mobile.IDevice {
 		return path.join(AndroidDevice.PROJECT_PATH, appIdentifier);
 	}
 
-	private composeCommand(command) {
+	private composeCommand(...args) {
+		var command = util.format.apply(null, args);
 		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
 		if (command && !command.isEmpty()) {
 			result += util.format(" %s", command);
@@ -90,7 +91,7 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private startPackageOnDevice(packageName): IFuture<void> {
 		return(() => {
-			var startPackageCommand = this.composeCommand(util.format("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName));
+			var startPackageCommand = this.composeCommand("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName);
 			var result = this.$childProcess.exec(startPackageCommand).wait();
 			return result[0];
 		}).future<void>()();
@@ -98,14 +99,14 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	public deploy(packageFile: string, packageName: string): IFuture<void> {
 		return(() => {
-			var uninstallCommand = this.composeCommand(util.format("shell pm uninstall \"%s\"", packageName))
+			var uninstallCommand = this.composeCommand("shell pm uninstall \"%s\"", packageName)
 			this.$childProcess.exec(uninstallCommand).wait();
 
-			var installCommand = this.composeCommand(util.format("install -r \"%s\"", packageFile));
+			var installCommand = this.composeCommand("install -r \"%s\"", packageFile);
 			this.$childProcess.exec(installCommand).wait();
 
 			this.startPackageOnDevice(packageName).wait();
-			console.log("Successfully deployed on device with identifier '%s'", this.getIdentifier());
+			this.$logger.info("Successfully deployed on device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
 	}
 
@@ -119,23 +120,40 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
 		return(() => {
-			var pushFileCommand = this.composeCommand(util.format("push \"%s\" \"%s\"", localPath, devicePath));
+			var pushFileCommand = this.composeCommand("push \"%s\" \"%s\"", localPath, devicePath);
 			this.$childProcess.exec(pushFileCommand).wait();
 		}).future<void>()();
 	}
 
-	private sendBroadcastToDevice(action): Future<void> {
-		return(() => {
-			var broadcastCommand = this.composeCommand(util.format("shell am broadcast -a \"%s\"", action));
-			this.$childProcess.exec(broadcastCommand).wait();
-		}).future<void>()();
+	private sendBroadcastToDevice(action, extras = {}): Future<number> {
+		return (() => {
+			var broadcastCommand = this.composeCommand("shell am broadcast -a \"%s\"", action);
+
+			Object.keys(extras).forEach((key) => {
+				broadcastCommand += util.format(" -e \"%s\" \"%s\"", key, extras[key]);
+			});
+
+			var result = this.$childProcess.exec(broadcastCommand).wait();
+			var match = result.match(/Broadcast completed: result=(\d+)/);
+			if (match) {
+				return +match[1];
+			} else {
+				this.$errors.fail("Unable to broadcast to android device:\n%s", result);
+			}
+		}).future<number>()();
 	}
 
 	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
-		return(() => {
-			this.pushFilesOnDevice(localToDevicePaths).wait();
-			this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
-			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
+		return (() => {
+			var isLiveSyncSupported = this.sendBroadcastToDevice("com.telerik.IsLiveSyncSupported", { "app-id": appIdentifier }).wait();
+			
+			if (isLiveSyncSupported == 1) {
+				this.pushFilesOnDevice(localToDevicePaths).wait();
+				this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
+				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());
+			} else {
+				this.$errors.fail({formatStr: "You can't live sync on %s! Deploy the app with live sync enabled and wait for the initial start up before live syncing.", suppressCommandHelp: true }, this.identifier);
+			}
 		}).future<void>()();
 	}
 
