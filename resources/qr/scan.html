@@ -2,6 +2,7 @@
 <head>
 	<title>Deploy $ApplicationName$</title>
 
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,300,700,800" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="style.css"/>
 	<script src="jquery-1.10.2.min.js"></script>
 
@@ -10,15 +11,21 @@
 
 		$(document).ready(function() {
 			var body = $('body');
-			for (var i = 0; i < packages.length; i++) {
-				var pkgDef = packages[i];
-				body.append($("<h2/>").text("Scan the code below to deploy to " + pkgDef.platform));
-				body.append($("<img/>").attr("src", pkgDef.qrUrl));
-			};
+			var pkgDef = packages[0];
+			$(".scan-message").text("Scan the code below to deploy " + pkgDef.solution + " to " + pkgDef.platform);
+			$(".qr-code").attr("src", pkgDef.qrUrl);
 		});
 	</script>
 
 </head>
 <body>
+<div class="container">
+	<div class="header">
+		<div class="logo"></div>
+	</div>
+	<h3 class="scan-message"></h3>
+	<img class="qr-code" />
+	<p>You may close this tab after scanning the code.</p>
+</div>
 </body>
 </html>
