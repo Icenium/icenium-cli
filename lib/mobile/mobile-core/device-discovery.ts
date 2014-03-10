@@ -148,7 +148,7 @@ class ITunesValidator {
 
 	constructor(private $fs: IFileSystem) { }
 
-	public get Error(): IFuture<string> {
+	public getError(): IFuture<string> {
 		return (() => {
 			if(helpers.isWindows64()) {
 				if(process.arch === "x64") {
@@ -173,17 +173,15 @@ class ITunesValidator {
 	}
 }
 
-$injector.register("iOSDeviceDiscovery", ($errors: IErrors, $logger: ILogger, $fs: IFileSystem) => {
+$injector.register("iOSDeviceDiscovery", ($errors: IErrors, $logger: ILogger, $fs: IFileSystem, $injector: IInjector) => {
 	var iTunesValidator = new ITunesValidator($fs);
-	var error = iTunesValidator.Error.wait();
+	var error = iTunesValidator.getError().wait();
 	var result: Mobile.IDeviceDiscovery = null;
 
 	if(error) {
 		result = new IOSDeviceDiscoveryStub($logger, error);
 	} else {
-		var coreFoundation = $injector.resolve("coreFoundation");
-		var mobileDevice = $injector.resolve("mobileDevice");
-		result = new IOSDeviceDiscovery(coreFoundation, mobileDevice, $errors, $injector);
+		result = $injector.resolve(IOSDeviceDiscovery);
 	}
 
 	return result;
