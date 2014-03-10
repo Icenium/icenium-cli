@@ -24,3 +24,13 @@ export function isAndroidPlatform(platform) {
 export function isiOSPlatform(platform) {
 	return DevicePlatforms[DevicePlatforms.iOS].toLowerCase() === platform.toLowerCase();
 }
+
+export function normalizePlatformName(platform: string): string {
+	if (isAndroidPlatform(platform)) {
+		return "Android";
+	} else if (isiOSPlatform(platform)) {
+		return "iOS";
+	}
+
+	return undefined;
+}
