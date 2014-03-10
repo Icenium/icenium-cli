@@ -1,7 +1,3 @@
-//declare module "binary-reader" {
-//	export function open(localFilePath: string);
-//}
-
 declare module "watchr" {
     export interface IWatchData {
         paths: string[];

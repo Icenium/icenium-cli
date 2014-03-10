@@ -1,12 +1,19 @@
 .idea
+.gitattributes
 *.sublime-project
 lint.*
 .jshint*
 .npmignore
 test-reports.xml
+for-developers.md
+Gruntfile.js
+tscommand.tmp.txt
 
 bin/appbuilder
 bin/*.cmd
+
+lib/**/*.ts
+lib/**/*.js.map
 
 scratch/
 test/
