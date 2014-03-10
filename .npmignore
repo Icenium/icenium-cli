@@ -4,6 +4,7 @@
 lint.*
 .jshint*
 .npmignore
+*.tgz
 test-reports.xml
 for-developers.md
 Gruntfile.js
