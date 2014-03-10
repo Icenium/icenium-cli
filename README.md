@@ -207,13 +207,20 @@ To see complete list of the available commands, click <a href="https://github.co
 
 #### What you cannot do with this version of the Telerik AppBuilder CLI
 
+The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
+
 * You cannot build, test, deploy, or publish for Windows Phone 8.
 * You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
 * You cannot debug your Android apps while running on a connected device.
 * You cannot debug your iOS apps while running on a connected device.
 * You cannot migrate between Apache Cordova versions.
-* You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
+* You cannot automatically load and work with projects created with any of the other Telerik AppBuilder clients. You need to store such projects locally and initialize them with the `$ appbuilder init` command.
+* In the other Telerik AppBuilder clients, you cannot automatically load and work with projects created from the Telerik AppBuilder CLI.
+
+The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
+
+* You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
 * You cannot use the AppBuilder version control and storage cloud services.
 
 [Back to Top][1]
