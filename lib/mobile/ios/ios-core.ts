@@ -61,7 +61,6 @@ export class CoreTypes {
 }
 
 class IOSCore implements Mobile.IiOSCore {
-	private static NOT_INSTALLED_iTUNES_ERROR_MESSAGE = "iTunes is not installed. Install it on your system and run this command again.";
 
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
@@ -121,8 +120,6 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	public getCoreFoundationLibrary(): {[key: string]: any} {
-		this.validate();
-
 		if(helpers.isWindows()) {
 			process.env.PATH = this.CoreFoundationDir + ";" + process.env.PATH;
 			process.env.PATH += ";" + this.MobileDeviceDir;
@@ -215,36 +212,13 @@ class IOSCore implements Mobile.IiOSCore {
 			"setsockopt": ["int", ["uint", "int", "int", CoreTypes.voidPtr, "int"]]
 		});
 	}
-
-	private validate(): void {
-		if(!this.isSupportedPlatform()) {
-			this.$errors.fail("Unsupported platform");
-		}
-
-		if(helpers.isWindows64()) {
-			if(!this.is32BitProcess()) {
-				this.$errors.fail("To be able to run operations on connected iOS devices, install the 32-bit version of Node.js.");
-			}
-		}
-
-		var existsCoreFoundation = this.$fs.exists(this.CoreFoundationDir).wait();
-		var existsMobileDevice = this.$fs.exists(this.MobileDeviceDir).wait();
-
-		if(!existsCoreFoundation || !existsMobileDevice) {
-			this.$errors.fail(IOSCore.NOT_INSTALLED_iTUNES_ERROR_MESSAGE);
-		}
-	}
-
-	private isSupportedPlatform(): boolean {
-		return helpers.isWindows() || helpers.isDarwin();
-	}
 }
 $injector.register("iOSCore", IOSCore);
 
 export class CoreFoundation implements  Mobile.ICoreFoundation {
 	private coreFoundationLibrary: any;
 
-	constructor($iOSCore: Mobile.IiOSCore) {
+	constructor($iOSCore: Mobile.IiOSCore){
 		this.coreFoundationLibrary = $iOSCore.getCoreFoundationLibrary();
 	}
 

@@ -49,7 +49,7 @@ export class DeviceDiscovery implements Mobile.IDeviceDiscovery {
 }
 $injector.register("deviceDiscovery", DeviceDiscovery);
 
-export class IOSDeviceDiscovery extends DeviceDiscovery {
+class IOSDeviceDiscovery extends DeviceDiscovery {
 
 	private static ADNCI_MSG_CONNECTED = 1;
 	private static ADNCI_MSG_DISCONNECTED = 2;
@@ -131,7 +131,63 @@ export class IOSDeviceDiscovery extends DeviceDiscovery {
 		this.addDevice(device);
 	}
 }
-$injector.register("iOSDeviceDiscovery", IOSDeviceDiscovery);
+
+class IOSDeviceDiscoveryStub extends DeviceDiscovery {
+	constructor(private $logger: ILogger,
+		private error: string) {
+		super();
+	}
+
+	public startLookingForDevices(): void {
+		this.$logger.warn(this.error);
+	}
+}
+
+class ITunesValidator {
+	private static NOT_INSTALLED_iTUNES_ERROR_MESSAGE = "iTunes is not installed. Install it on your system and run this command again.";
+
+	constructor(private $fs: IFileSystem) { }
+
+	public get Error(): IFuture<string> {
+		return (() => {
+			if(helpers.isWindows64()) {
+				if(process.arch === "x64") {
+					return "To be able to run operations on connected iOS devices, install the 32-bit version of Node.js.";
+				}
+			}
+
+			var commonProgramFiles = helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
+			var coreFoundationDir = path.join(commonProgramFiles, "Apple", "Apple Application Support");
+			var mobileDeviceDir = path.join(commonProgramFiles, "Apple", "Mobile Device Support");
+
+			var existsCoreFoundation = this.$fs.exists(coreFoundationDir).wait();
+			var existsMobileDevice = this.$fs.exists(mobileDeviceDir).wait();
+
+			if(!existsCoreFoundation || !existsMobileDevice) {
+				return ITunesValidator.NOT_INSTALLED_iTUNES_ERROR_MESSAGE;
+			}
+
+			return null;
+
+		}).future<string>()();
+	}
+}
+
+$injector.register("iOSDeviceDiscovery", ($errors: IErrors, $logger: ILogger, $fs: IFileSystem) => {
+	var iTunesValidator = new ITunesValidator($fs);
+	var error = iTunesValidator.Error.wait();
+	var result: Mobile.IDeviceDiscovery = null;
+
+	if(error) {
+		result = new IOSDeviceDiscoveryStub($logger, error);
+	} else {
+		var coreFoundation = $injector.resolve("coreFoundation");
+		var mobileDevice = $injector.resolve("mobileDevice");
+		result = new IOSDeviceDiscovery(coreFoundation, mobileDevice, $errors, $injector);
+	}
+
+	return result;
+});
 
 export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static adb;
