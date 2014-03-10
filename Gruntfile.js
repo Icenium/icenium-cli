@@ -103,9 +103,9 @@ module.exports = function(grunt) {
 		var fs = require("fs");
 		var buildVersion = version !== undefined ? version : process.env["BUILD_NUMBER"];
 		var packageJson = grunt.file.readJSON("package.json");
-		var version = packageJson.version.split(".");
-		version[3] = buildVersion;
-		packageJson.version = version.join(".");
+		var version = packageJson.version.split("-");
+		version[1] = buildVersion;
+		packageJson.version = version.join("-");
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
 
