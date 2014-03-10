@@ -72,11 +72,13 @@ To add a test for a new module, do the following:
 * add a test file to `test/`, e.g. `test/my-component.ts`
 * write the test using [mocha][1]'s BDD interface and [chai][3]'s [assertions][2] (preferably)
 
-To run all unit tests, run the following in the console:
+To compile and run all unit tests, run the following in the console:
 
 ```
-   $ npm test
+   $ grunt test
 ```
+
+Just running the tests is done using `$ npm test`. Just compiling the tests is done using `$ grunt ts:devall`.
 
 Deploying to iOS
 ===
