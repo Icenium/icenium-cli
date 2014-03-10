@@ -74,6 +74,7 @@ declare module Mobile {
 	interface IMobileDevice {
 		deviceNotificationSubscribe(notificationCallback: NodeBuffer, p1: number, p2: number, context: any, callbackSignature: NodeBuffer): number;
 		deviceCopyDeviceIdentifier(devicePointer: NodeBuffer): NodeBuffer;
+		deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer);
 		deviceConnect(devicePointer: NodeBuffer): number;
 		deviceIsPaired(devicePointer: NodeBuffer): number;
 		devicePair(devicePointer: NodeBuffer): number;

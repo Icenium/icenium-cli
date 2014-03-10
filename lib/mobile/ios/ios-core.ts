@@ -458,6 +458,10 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AMDeviceCopyDeviceIdentifier(devicePointer);
 	}
 
+	public deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer) {
+		return this.mobileDeviceLibrary.AMDeviceCopyValue(devicePointer, domain, name);
+	}
+
 	public deviceConnect(devicePointer: NodeBuffer): number {
 		return this.mobileDeviceLibrary.AMDeviceConnect(devicePointer);
 	}

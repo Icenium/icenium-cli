@@ -156,9 +156,17 @@ class ITunesValidator {
 				}
 			}
 
-			var commonProgramFiles = helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
-			var coreFoundationDir = path.join(commonProgramFiles, "Apple", "Apple Application Support");
-			var mobileDeviceDir = path.join(commonProgramFiles, "Apple", "Mobile Device Support");
+			var coreFoundationDir = "";
+			var mobileDeviceDir = "";
+
+			if(helpers.isWindows()) {
+				var commonProgramFiles = helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
+				coreFoundationDir = path.join(commonProgramFiles, "Apple", "Apple Application Support");
+				mobileDeviceDir = path.join(commonProgramFiles, "Apple", "Mobile Device Support");
+			} else if(helpers.isDarwin()) {
+				coreFoundationDir = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
+				mobileDeviceDir = "/System/Library/PrivateFrameworks/MobileDevice.framework/MobileDevice";
+			}
 
 			var existsCoreFoundation = this.$fs.exists(coreFoundationDir).wait();
 			var existsMobileDevice = this.$fs.exists(mobileDeviceDir).wait();
