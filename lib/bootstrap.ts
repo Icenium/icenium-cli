@@ -44,7 +44,8 @@ $injector.requireCommand("create", "./project");
 $injector.requireCommand("init", "./project");
 $injector.requireCommand("prop-add", "./project");
 $injector.requireCommand("prop-set", "./project");
-$injector.requireCommand("prop-del", "./project");
+$injector.requireCommand("prop-rm", "./project");
+$injector.requireCommand("prop-remove", "./project");
 $injector.requireCommand("prop-print", "./project");
 $injector.require("projectNameValidator", "./validators/project-name-validator");
 

@@ -22,7 +22,7 @@ Project development commands:
     edit-configuration              Opens configuration file for editing.
     prop-add                        Adds more values to a list project property.
     prop-set                        Sets a project property.
-    prop-del                        Removes values from a list project property.
+    prop-remove                     Removes values from a list project property.
     prop-print                      Prints the value of a project property.
     list-projects                   Lists all projects of your account.
     export-project                  Exports one of your remote projects into a local AppBuilder project.
@@ -467,11 +467,13 @@ Sets the project property named <PropertyName> to the specified value or list of
 #{project.getProjectSchemaHelp}
 --[/]--
 
---[prop-del]--
+--[prop-remove]--
 Usage:
-    $ appbuilder prop-del <PropertyName> <value> [value]*
+    $ appbuilder prop-remove <PropertyName> <value> [value]*
 
 Removes the given value or list of values from the list property named <PropertyName>.
+
+Alias: prop-rm
 
 #{project.getProjectSchemaHelp}
 --[/]--

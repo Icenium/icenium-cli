@@ -912,8 +912,14 @@ helpers.registerCommand("project", "build", (project, args) => project.executeBu
 helpers.registerCommand("project", "cloud-sync", (project, args) => project.importProject());
 helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
 helpers.registerCommand("project", "init", (project, args) => project.createProjectFileFromExistingProject());
-_.each(["add", "set", "del"], (operation) => {
-	helpers.registerCommand("project", "prop-" + operation,
+_.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
+	var propOperation = operation;
+	if (_.isArray(operation)) {
+		propOperation = operation[1];
+		operation = operation[0];
+	}
+
+	helpers.registerCommand("project", "prop-" + propOperation,
 		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
 });
 helpers.registerCommand("project", "prop-print", (project, args) => project.printProjectProperty(args[0]));
