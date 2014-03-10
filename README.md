@@ -1,4 +1,4 @@
-Cross-Platform Command-Line Interface for Telerik AppBuilder
+Command-Line Interface for Telerik AppBuilder
 ===========
 
 *Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
@@ -32,14 +32,11 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * Windows or OS X Mavericks
-* Node.js 0.10.x (32-bit or 64-bit)
+* Node.js 0.10.22 or later (32-bit)
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
-* Node.js 0.10.x (32-bit)
 * iTunes
-
-The bitness of Node.js and iTunes must match.
 
 **Additional Software Requirements for Android On-Device Deployment**
 
@@ -47,10 +44,12 @@ The bitness of Node.js and iTunes must match.
 
 ### Install the Telerik AppBuilder CLI
 
+The Telerik AppBuilder CLI is available for installing as an npm package.
+
 In the command prompt, run the following command.
 
 ```bash
-$ npm install appbuilder
+$ npm install appbuilder -g
 ```
 
 [Back to Top][1]
@@ -87,7 +86,7 @@ To create a new project from the default template, navigate to an empty director
 $ appbuilder create MyApp
 ```
 
-The Telerik AppBuilder CLI creates a new project based on the Kendo UI Mobile template in the current directory.
+The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI Mobile template.
 
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
@@ -107,6 +106,8 @@ $ appbuilder simulate
 ```
 
 The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can adjust the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
+
+For more information about the Telerik AppBuilder device simulator, see <a href="http://docs.telerik.com/platform/appbuilder/testing-your-app/running-apps-in-simulator/device-simulator" target="_blank">Running Apps in the Device Simulator</a>.
 
 <a id="device"></a>
 **4. Run on device**
@@ -177,16 +178,17 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
-* You can develop your hybrid mobile app offline because all project files are stored locally.
-* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite third-party tools on Windows or OS X.
+To see complete list of the available commands, click <a href="https://github.com/Icenium/icenium-cli/blob/develop/resources/help.txt" target="_blank">here</a> or run `$ appbuilder help` in the command prompt.
+
+* You can develop your hybrid mobile locally and with limited Internet connectivity. 
+* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite development tools on Windows or OS X.
 * You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 to build and deploy apps straight from Sublime Text 2.
 * You can log in and log out of the Telerik Platform. 
 * You can view your current login information.
 * You can create new projects from the *Blank*, *jQuery Mobile*, *Friends*, *Kendo UI Mobile*, and *Kendo UI DataViz* templates.
 * You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools. 
 * You can create new projects by initializing the AppBuilder sample apps.
-* You can connect iOS and Android devices.
-* You can list connected devices.
+* You can list connected iOS and Android devices.
 * You can view the device log for connected devices.
 * You can build applications for iOS and Android and deploy them via QR code on remote devices.
 * You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
@@ -197,7 +199,7 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 * You can push changes via cable connection to connected devices.
 * You can run your apps in the device simulator on Windows systems.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
-* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
+* You can fetch Apache Cordova core and custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
 * You can open the `AndroidManifest.xml`, `Info.plist`, and `config.xml` files for editing.
 * You can configure the project properties for your project.
 * You can manage certificates and provisioning profiles for code signing iOS apps.
@@ -210,8 +212,6 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 * You cannot debug your Android apps while running on a connected device.
 * You cannot debug your iOS apps while running on a connected device.
 * You cannot migrate between Apache Cordova versions.
-* You cannot enable and disable the core Apache Cordova plugins.
-* You cannot enable and disable the integrated Apache Cordova plugins.
 * You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
 * You cannot use the AppBuilder version control and storage cloud services.
@@ -252,4 +252,4 @@ This software is licensed under the Apache 2.0 license, quoted <a href="LICENSE"
 
 [Back to Top][1]
 
-[1]: #cross-platform-command-line-interface-for-telerik-appbuilder
+[1]: #command-line-interface-for-telerik-appbuilder
