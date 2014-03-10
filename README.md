@@ -209,7 +209,8 @@ To see complete list of the available commands, click <a href="https://github.co
 
 The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
 
-* You cannot build, test, deploy, or publish for Windows Phone 8.
+* You cannot build, test, deploy, or publish for Windows Phone 8.<br/>Support for Windows Phone 8 in the Telerik AppBuilder CLI will become available in a future release of Telerik Platform. To build, test, or deploy for Windows Phone 8, use any of the other Telerik AppBuilder clients.
+* You cannot switch your {{tp}} account.
 * You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
 * You cannot debug your Android apps while running on a connected device.
 * You cannot debug your iOS apps while running on a connected device.
