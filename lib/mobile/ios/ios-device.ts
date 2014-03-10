@@ -32,19 +32,29 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public getDisplayName(): string {
-		return this.getIdentifier();
+		return this.getValue("DeviceName");
 	}
 
 	public getModel(): string {
-		return "";
+		return this.getValue("DeviceClass");
 	}
 
 	public getVersion(): string {
-		return "";
+		return this.getValue("ProductVersion");
 	}
 
 	public getVendor(): string {
 		return "Apple";
+	}
+
+	private getValue(value: string): string {
+		this.connect();
+		try {
+			var cfValue =  this.$coreFoundation.createCFString(value);
+			return this.$coreFoundation.convertCFStringToCString(this.$mobileDevice.deviceCopyValue(this.devicePointer, null, cfValue));
+		} finally {
+			this.disconnect();
+		}
 	}
 
 	public getDeviceProjectPath(appIdentifier: string): string {
