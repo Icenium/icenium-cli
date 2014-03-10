@@ -278,7 +278,7 @@ export class HouseArrestClient implements Mobile.IHouseArrestClient {
 
 export class IOSSyslog {
 	private plistService;
-	private matchRegex = new RegExp(".*?((Cordova.{3}|Icenium Ion)\\[\\d+\\] <Warning>: )");
+	private matchRegex = new RegExp(".*?((Cordova.{3}|AppBuilder)\\[\\d+\\] <Warning>: )", 'i');
 
 	constructor(private device: Mobile.IIOSDevice,
 		private $logger: ILogger,
