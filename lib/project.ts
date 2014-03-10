@@ -196,11 +196,7 @@ export class Project implements Project.IProject {
 
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
-			if (MobileHelper.isAndroidPlatform(settings.platform)) {
-				settings.platform = "Android";
-			} else if (MobileHelper.isiOSPlatform(settings.platform)) {
-				settings.platform = "iOS";
-			}
+			settings.platform = MobileHelper.normalizePlatformName(settings.platform);
 
 			var buildProperties:any = {
 				Configuration: settings.configuration,
@@ -432,6 +428,7 @@ export class Project implements Project.IProject {
 
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
+			platform = MobileHelper.normalizePlatformName(platform);
 			if (platform.toLowerCase() !== "ios") {
 				this.$errors.fail("The companion app is supported only on iOS.");
 			}
@@ -448,8 +445,9 @@ export class Project implements Project.IProject {
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
 			this.showPackageQRCodes([{
-				platform: "AppBuilder companion app",
-				qrUrl: helpers.createQrUrl(fullDownloadPath)
+				platform: "AppBuilder companion app for " + platform,
+				qrUrl: helpers.createQrUrl(fullDownloadPath),
+				solution: this.projectData.name
 			}]).wait();
 		}).future<void>()();
 	}
