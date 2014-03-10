@@ -29,10 +29,31 @@ Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-note
 
 Before installing the Telerik AppBuilder CLI, verify that your system meets the following requirements.
 
+#### Windows Systems
+
 **Minimum Software Requirements**
 
-* Windows or OS X Mavericks
+* Windows XP SP3 or later
 * Node.js 0.10.22 or later (32-bit)
+
+> You can download and install Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
+
+**Additional Software Requirements for iOS On-Device Deployment**
+
+* iTunes
+
+**Additional Software Requirements for Android On-Device Deployment**
+
+* Any device drivers required by your system to recognize the connected Android device
+
+#### OS X Systems
+
+**Minimum Software Requirements**
+
+* OS X Mavericks
+* Node.js 0.10.22 or later (32-bit)
+
+> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>. 
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
