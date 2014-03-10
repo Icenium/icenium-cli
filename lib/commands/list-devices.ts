@@ -28,7 +28,7 @@ export class ListDevicesCommand implements ICommand {
 				};
 			} else {
 				action = (device: Mobile.IDevice): IFuture<void> => {
-					return (() => { this.$logger.out("#%d: '%s'", index++, device.getDisplayName(), device.getPlatform()); }).future<void>()();
+					return (() => { this.$logger.out("#%d: '%s'", index++, device.getDisplayName(), device.getPlatform(), device.getIdentifier()); }).future<void>()();
 				};
 			}
 
