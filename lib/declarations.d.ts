@@ -200,6 +200,7 @@ interface IProjectData {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	ignorePaths: string[];
 }
 
 interface IServerConfigurationData {
