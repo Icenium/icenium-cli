@@ -73,8 +73,8 @@ module.exports = function(grunt) {
 					var now = new Date().toISOString();
 					var jobName = process.env["JOB_NAME"] || "local";
 					var buildNumber = process.env["BUILD_NUMBER"] || "non-ci";
-					var subfolder = util.format("%s\\%s #%s", jobName, now.substr(0, now.indexOf("T")), buildNumber);
-					return util.format("robocopy . \"<%= copyPackageTo %>\\%s (<%= deploymentEnvironment %>)\" *.tgz", subfolder);
+					var subfolder = util.format("%s\\<%= deploymentEnvironment %>\\%s #%s", jobName, now.substr(0, now.indexOf("T")), buildNumber);
+					return util.format("robocopy . \"<%= copyPackageTo %>\\%s\" *.tgz", subfolder);
 				},
 				options: {
 					callback: function(err, stdout, stderr, cb) {
