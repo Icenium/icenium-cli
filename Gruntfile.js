@@ -2,7 +2,7 @@ var util = require("util");
 
 module.exports = function(grunt) {
 	grunt.initConfig({
-		environment: "local",
+		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
 		copyPackageTo: "\\\\telerik.com\\Resources\\BlackDragon\\Builds\\appbuilder-cli",
 
 		pkg: grunt.file.readJSON("package.json"),
@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 
 			build_package: {
 				command: [
-					"node bin\\appbuilder.js config-apply <%= environment %>",
+					"node bin\\appbuilder.js config-apply <%= deploymentEnvironment %>",
 					"npm pack"
 				].join("&&")
 			},
