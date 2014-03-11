@@ -13,6 +13,8 @@ tscommand.tmp.txt
 bin/appbuilder
 bin/*.cmd
 
+config/config-*
+
 lib/**/*.ts
 lib/**/*.js.map
 
