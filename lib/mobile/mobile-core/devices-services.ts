@@ -120,7 +120,9 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				device = this.getDeviceByIdentifier(deviceOption);
 			} else if(helpers.isNumber(deviceOption)) {
 				device = this.getDeviceByIndex(parseInt(deviceOption, 10));
-			} else {
+			}
+
+			if(!device) {
 				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
 			}
 
