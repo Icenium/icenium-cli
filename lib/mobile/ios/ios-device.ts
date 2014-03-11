@@ -36,7 +36,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public getModel(): string {
-		return this.getValue("DeviceClass");
+		return this.getValue("ProductType");
 	}
 
 	public getVersion(): string {
@@ -49,10 +49,12 @@ export class IOSDevice implements Mobile.IIOSDevice {
 
 	private getValue(value: string): string {
 		this.connect();
+		this.startSession();
 		try {
 			var cfValue =  this.$coreFoundation.createCFString(value);
 			return this.$coreFoundation.convertCFStringToCString(this.$mobileDevice.deviceCopyValue(this.devicePointer, null, cfValue));
 		} finally {
+			this.stopSession();
 			this.disconnect();
 		}
 	}
