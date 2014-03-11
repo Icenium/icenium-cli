@@ -242,7 +242,7 @@ The following Telerik AppBuilder features are not available in the current relea
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
 
-* You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
+* You cannot use the Data Navigator to review your Telerik Backend Services projects and their resources.
 * You cannot use the AppBuilder version control and storage cloud services.
 
 [Back to Top][1]
