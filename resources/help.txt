@@ -101,13 +101,13 @@ Usage:
     $ appbuilder init [--appid <App ID>]
 
 Initializes an existing project for development in the current directory. If the folder contains an existing AppBuilder project (created with
-the Telerik AppBuilder extension for Visual Studio, synchronized from GitHub, or exported from the cloud), the project retains the existing project configuration.
+the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
 
 Options:
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
-        If not specified, the application identifier will be set to com.telerik.<current directory name>.
+        If not specified, the application identifier is set to com.telerik.<current directory name>.
 
 --[/]--
 
@@ -252,7 +252,7 @@ Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 Usage:
     $ appbuilder fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
 
-Imports the select Apache Cordova plugin into your project. You can specify a plugin by local path,
+Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 
 The plugin must be Plugman-compatible.
 --[/]--
