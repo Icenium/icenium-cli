@@ -283,7 +283,7 @@ Usage:
 
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.
-You can choose which project to export its index or name.
+You can choose which project to export by its index or name.
 Run list-projects to list all projects associated with your Telerik Platform account.
 
 Options:
