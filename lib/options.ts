@@ -19,7 +19,7 @@ var knownOpts:any = {
 		"watch": Boolean,
 		"device": String,
 		"file": String,
-		"no-livesync": String,
+		"livesync": Boolean,
 		"version": Boolean,
 		"help": Boolean,
 		"timeout": String,
