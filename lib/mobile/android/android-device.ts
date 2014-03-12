@@ -52,7 +52,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	public getPlatform(): string {
-		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android].toLowerCase();
+		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android];
 	}
 
 	public getIdentifier(): string {

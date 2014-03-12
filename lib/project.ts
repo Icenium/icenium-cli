@@ -150,7 +150,7 @@ export class Project implements Project.IProject {
 		return fullPath.substring(projectDir.length);
 	}
 
-	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk", "*.xap"];
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
 		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
@@ -268,8 +268,11 @@ export class Project implements Project.IProject {
 				var buildResult = this.beginBuild(buildProperties).wait();
 				buildResult.provisionType = provisionData.ProvisionType;
 				return buildResult;
+			} else if (settings.platform === "WP8") {
+				buildProperties.WP8ProductID = this.projectData.WP8ProductID || MobileHelper.generateWP8ProductID();
+				return this.beginBuild(buildProperties).wait();
 			} else {
-				this.$logger.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", settings.platform);
+				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
 				return null;
 			}
 		}).future<Project.IBuildResult>()();
@@ -377,7 +380,7 @@ export class Project implements Project.IProject {
 
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
 		return (() => {
-			this.validatePlatform(platform);
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 			this.ensureProject();
 			var result = this.build({platform: platform,
 				configuration: this.getBuildConfiguration(),
@@ -391,7 +394,7 @@ export class Project implements Project.IProject {
 
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
-			this.validatePlatform(platform);
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 
 			this.ensureProject();
 
@@ -404,6 +407,11 @@ export class Project implements Project.IProject {
 			if (options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
+				if (!MobileHelper.platformCapabilities[platform].wirelessDeploy && !options.download) {
+					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
+					options.download = true;
+				}
+
 				var willDownload = options.download;
 				var provisionTypes = [constants.ProvisionType.AdHoc];
 				if (willDownload) {
@@ -420,17 +428,11 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private validatePlatform(platform: string): void {
-		if (!platform || (!MobileHelper.isiOSPlatform(platform) && !MobileHelper.isAndroidPlatform(platform))) {
-			this.$errors.fail("Incorrect platform '%s' specified.", platform);
-		}
-	}
-
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
-			platform = MobileHelper.normalizePlatformName(platform);
-			if (platform.toLowerCase() !== "ios") {
-				this.$errors.fail("The companion app is supported only on iOS.");
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
+			if (!MobileHelper.platformCapabilities[platform].companion) {
+				this.$errors.fail("The companion app is not available on %s.", platform);
 			}
 
 			this.$logger.info("Deploying to AppBuilder companion app.");
@@ -697,6 +699,10 @@ export class Project implements Project.IProject {
 
 			if (!this.projectData.DisplayName) {
 				this.projectData.DisplayName = this.projectData.name;
+			}
+
+			if (!this.projectData.WP8ProductID) {
+				this.projectData.WP8ProductID = MobileHelper.generateWP8ProductID();
 			}
 
 			this.saveProject(projectDir).wait();

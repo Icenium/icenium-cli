@@ -67,6 +67,9 @@ describe("project integration tests", function() {
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
+			assert.ok(/\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}/.test(testProperties.WP8ProductID));
+			delete testProperties.WP8ProductID;
+
 			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
 			for (var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);

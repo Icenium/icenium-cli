@@ -40,7 +40,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		var devicePlatforms = MobileHelper.DevicePlatforms;
 		for (var platform in devicePlatforms) {
 			if(typeof devicePlatforms[platform] === "number") {
-				this.platforms.push(platform.toLowerCase());
+				var platformCapabilities = MobileHelper.platformCapabilities[platform];
+				if (platformCapabilities.cableDeploy) {
+					this.platforms.push(platform);
+				}
 			}
 		}
 
@@ -49,12 +52,13 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	private getPlatform(platform: string): string {
 		var allSupportedPlatforms = this.getAllPlatforms();
-		platform = platform.toLowerCase();
-		if(!allSupportedPlatforms.contains(platform)) {
-			this.$errors.fail("The platform %s is not supported", platform);
+		var normalizedPlatform = MobileHelper.validatePlatformName(platform, this.$errors)
+		if(!allSupportedPlatforms.contains(normalizedPlatform)) {
+			this.$errors.fail("Deploying to %s connected devices is not supported. Build the " +
+				"app using the `build` command and deploy the package manually.", normalizedPlatform);
 		}
 
-		return platform;
+		return normalizedPlatform;
 	}
 
 	attachToDeviceDiscoveryEvents() {
@@ -77,6 +81,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	private startLookingForDevices(): IFuture<void> {
 		return (() => {
+			this.$logger.trace("startLookingForDevices; platform is %s", this._platform);
 			if(!this._platform) {
 				this.$iOSDeviceDiscovery.startLookingForDevices();
 				this.$androidDeviceDiscovery.startLookingForDevices().wait();

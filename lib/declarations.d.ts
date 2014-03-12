@@ -200,6 +200,7 @@ interface IProjectData {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	WP8ProductID: string;
 }
 
 interface IServerConfigurationData {
