@@ -130,4 +130,10 @@ declare module Mobile {
 		sendMessage(message: {[key: string]: {}}, format?: number): void;
 		close(): void;
 	}
+
+	interface IPlatformCapabilities {
+		wirelessDeploy: boolean;
+		cableDeploy: boolean;
+		companion: boolean;
+	}
 }

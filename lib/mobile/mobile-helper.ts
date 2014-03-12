@@ -9,7 +9,7 @@ export enum DevicePlatforms {
 	WP8
 }
 
-export var platformCapabilities: {[key: string]: IPlatformCapabilities } = {
+export var platformCapabilities: {[key: string]: Mobile.IPlatformCapabilities } = {
 	iOS: {
 		wirelessDeploy: true,
 		cableDeploy: true,
