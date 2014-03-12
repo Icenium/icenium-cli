@@ -372,7 +372,7 @@ export class Project implements Project.IProject {
 	}
 
 	private getBuildConfiguration(): string {
-		return options["no-livesync"] ? "Release" : "Debug";
+		return options["livesync"] === false ? "Release" : "Debug";
 	}
 
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
