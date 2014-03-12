@@ -20,7 +20,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		private $injector: IInjector) { }
 
 	public getPlatform(): string {
-		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS].toLowerCase();
+		return MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS];
 	}
 
 	public getIdentifier(): string {

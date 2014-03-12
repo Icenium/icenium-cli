@@ -200,6 +200,7 @@ interface IProjectData {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	WP8ProductID: string;
 }
 
 interface IServerConfigurationData {
@@ -272,4 +273,10 @@ interface IX509Certificate {
 
 interface IX509CertificateLoader {
 	load(certificatePem: string): IX509Certificate;
+}
+
+interface IPlatformCapabilities {
+	wirelessDeploy: boolean;
+	cableDeploy: boolean;
+	companion: boolean;
 }

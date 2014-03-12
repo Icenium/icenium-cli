@@ -11,8 +11,7 @@ export class DeployCommand implements ICommand {
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
-		private $commandsService: ICommandsService,
-		private $injector: IInjector) { }
+		private $commandsService: ICommandsService) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
