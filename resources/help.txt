@@ -5,7 +5,7 @@ Usage:
 
 General commands:
     help <command>                  Shows additional information about the commands in this list.
-    login                           Logs you in the Telerik Platform.
+    login                           Logs you in to the Telerik Platform.
     logout                          Logs you out from the Telerik Platform.
     user                            Prints information about the currently logged in user.
 
