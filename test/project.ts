@@ -10,6 +10,7 @@ import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
 import options = require("./../lib/options");
+import helpers = require("../lib/helpers");
 var assert = require("chai").assert;
 temp.track();
 
@@ -67,6 +68,14 @@ describe("project integration tests", function() {
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
+			var projectSchema = helpers.getProjectFileSchema();
+			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
+
+			assert.ok(guidRegex.test(testProperties.WP8ProductID));
+			delete testProperties.WP8ProductID;
+			assert.ok(guidRegex.test(testProperties.WP8PublisherID));
+			delete testProperties.WP8PublisherID;
+
 			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
 			for (var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
@@ -110,9 +119,13 @@ describe("project unit tests", function() {
 	var project, testInjector;
 	before(() => {
 		testInjector = createTestInjector();
-		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
-		testInjector.resolve("config").PROJECT_FILE_NAME = "";
+
+		testInjector.register("config", require("../lib/config").Configuration);
+		var config = testInjector.resolve("config");
+		config.PROJECT_FILE_NAME = "";
+		config.AUTO_UPGRADE_PROJECT_FILE = false;
+
 		project = testInjector.resolve("project");
 	});
 

@@ -113,7 +113,7 @@ module.exports = function(grunt) {
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
 
-	grunt.registerTask("test", ["ts:devtest", "shell:npm_test"]);
+	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
 		"ts:release_build",
 		"shell:ci_unit_tests",

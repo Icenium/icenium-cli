@@ -200,6 +200,13 @@ interface IProjectData {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	WP8ProductID: string;
+	WP8PublisherID: string;
+	WP8Publisher: string;
+	WP8TileTitle: string;
+	WP8Capabilities: string[];
+	WP8Requirements: string[];
+	WP8SupportedResolutions: string[];
 }
 
 interface IServerConfigurationData {
@@ -227,6 +234,7 @@ interface IConfiguration {
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
+	AUTO_UPGRADE_PROJECT_FILE: boolean;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;

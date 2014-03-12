@@ -150,7 +150,7 @@ export class Project implements Project.IProject {
 		return fullPath.substring(projectDir.length);
 	}
 
-	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk", "*.xap"];
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
 		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
@@ -268,8 +268,17 @@ export class Project implements Project.IProject {
 				var buildResult = this.beginBuild(buildProperties).wait();
 				buildResult.provisionType = provisionData.ProvisionType;
 				return buildResult;
+			} else if (settings.platform === "WP8") {
+				buildProperties.WP8ProductID = this.projectData.WP8ProductID || MobileHelper.generateWP8GUID();
+				buildProperties.WP8PublisherID = this.projectData.WP8PublisherID;
+				buildProperties.WP8Publisher = this.projectData.WP8Publisher;
+				buildProperties.WP8TileTitle = this.projectData.WP8TileTitle;
+				buildProperties.WP8Capabilities = this.projectData.WP8Capabilities;
+				buildProperties.WP8Requirements = this.projectData.WP8Requirements;
+				buildProperties.WP8SupportedResolutions = this.projectData.WP8SupportedResolutions;
+				return this.beginBuild(buildProperties).wait();
 			} else {
-				this.$logger.fatal("Unknown platform '%s'. Must be either 'Android' or 'iOS'", settings.platform);
+				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
 				return null;
 			}
 		}).future<Project.IBuildResult>()();
@@ -377,7 +386,7 @@ export class Project implements Project.IProject {
 
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
 		return (() => {
-			this.validatePlatform(platform);
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 			this.ensureProject();
 			var result = this.build({platform: platform,
 				configuration: this.getBuildConfiguration(),
@@ -391,7 +400,7 @@ export class Project implements Project.IProject {
 
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
-			this.validatePlatform(platform);
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 
 			this.ensureProject();
 
@@ -404,6 +413,11 @@ export class Project implements Project.IProject {
 			if (options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
+				if (!MobileHelper.platformCapabilities[platform].wirelessDeploy && !options.download) {
+					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
+					options.download = true;
+				}
+
 				var willDownload = options.download;
 				var provisionTypes = [constants.ProvisionType.AdHoc];
 				if (willDownload) {
@@ -420,17 +434,11 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private validatePlatform(platform: string): void {
-		if (!platform || (!MobileHelper.isiOSPlatform(platform) && !MobileHelper.isAndroidPlatform(platform))) {
-			this.$errors.fail("Incorrect platform '%s' specified.", platform);
-		}
-	}
-
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
-			platform = MobileHelper.normalizePlatformName(platform);
-			if (platform.toLowerCase() !== "ios") {
-				this.$errors.fail("The companion app is supported only on iOS.");
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
+			if (!MobileHelper.platformCapabilities[platform].companion) {
+				this.$errors.fail("The companion app is not available on %s.", platform);
 			}
 
 			this.$logger.info("Deploying to AppBuilder companion app.");
@@ -476,10 +484,8 @@ export class Project implements Project.IProject {
 			if (projectDir) {
 				this.projectData = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
 
-				var blob: any = this.projectData;
-				if (blob.hasOwnProperty("iOSDisplayName")) {
-					blob.DisplayName = blob.iOSDisplayName;
-					delete blob.iOSDisplayName;
+				if (Project.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+					this.saveProject(projectDir).wait();
 				}
 			}
 		}).future<void>()();
@@ -641,14 +647,14 @@ export class Project implements Project.IProject {
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
+			var projectSchema = helpers.getProjectFileSchema();
+			Object.keys(projectSchema).forEach((propertyName) => {
+				if (propertyGroup.hasOwnProperty(propertyName)) {
+					properties[propertyName] = propertyGroup[propertyName][0];
+				}
+			});
+
 			properties.name = propertyGroup.ProjectName[0];
-			properties.AppIdentifier = propertyGroup.AppIdentifier[0];
-			properties.BundleVersion = propertyGroup.BundleVersion[0];
-			properties.CorePlugins = propertyGroup.CorePlugins[0];
-			properties.DeviceOrientations = propertyGroup.DeviceOrientations[0];
-			properties.FrameworkVersion = propertyGroup.FrameworkVersion[0];
-			properties.iOSStatusBarStyle = propertyGroup.iOSStatusBarStyle[0];
-			properties.AndroidPermissions = propertyGroup.AndroidPermissions[0];
 
 			return properties;
 		}).future<any>()();
@@ -695,12 +701,35 @@ export class Project implements Project.IProject {
 				}
 			});
 
-			if (!this.projectData.DisplayName) {
-				this.projectData.DisplayName = this.projectData.name;
-			}
+			Project.completeProjectProperties(this.projectData);
 
 			this.saveProject(projectDir).wait();
 		}).future<void>()();
+	}
+
+	private static completeProjectProperties(properties: any): boolean {
+		var updated = false;
+
+		if (properties.hasOwnProperty("iOSDisplayName")) {
+			properties.DisplayName = properties.iOSDisplayName;
+			delete properties.iOSDisplayName;
+			updated = true;
+		}
+		if (!properties.DisplayName) {
+			properties.DisplayName = properties.name;
+			updated = true;
+		}
+
+		if (!properties.hasOwnProperty("WP8PublisherID")) {
+			properties.WP8PublisherID = MobileHelper.generateWP8GUID();
+			updated = true;
+		}
+		if (!properties.hasOwnProperty("WP8ProductID")) {
+			properties.WP8ProductID = MobileHelper.generateWP8GUID();
+			updated = true;
+		}
+
+		return updated;
 	}
 
 	public createTemplateFolder(projectDir: string): IFuture<any> {

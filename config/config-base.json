@@ -11,5 +11,6 @@
 	"CORDOVA_PLUGINS_REGISTRY": "http://registry.cordova.io",
 	"DEFAULT_PROJECT_NAME": "app",
 	"WRAP_CLIENT_ID": "uri:ice",
-	"USE_CDN_FOR_SIMULATOR_DOWNLOAD": false
+	"USE_CDN_FOR_SIMULATOR_DOWNLOAD": false,
+	"AUTO_UPGRADE_PROJECT_FILE": true
 }

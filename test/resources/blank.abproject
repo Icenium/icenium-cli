@@ -54,5 +54,15 @@
 	"AndroidVersionCode": "1",
 	"iOSStatusBarStyle": "Default",
 	"iOSDeviceFamily": ["1", "2"],
-	"iOSBackgroundMode": []
+	"iOSBackgroundMode": [],
+
+	"WP8TileTitle": "",
+	"WP8Publisher": "",
+	"WP8Capabilities": [],
+	"WP8Requirements": [],
+	"WP8SupportedResolutions": [
+		"ID_RESOLUTION_WVGA",
+		"ID_RESOLUTION_WXGA",
+		"ID_RESOLUTION_HD720P"
+	]
 }

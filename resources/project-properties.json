@@ -173,5 +173,177 @@
 		"description": "List of available iOS services in background mode",
 		"range": ["audio","location","voip","newsstand-content","external-accessory","bluetooth-central","bluetooth-peripheral"],
 		"flags": true
+	},
+
+	"WP8TileTitle": {
+		"description": "The text that appears inside the app's tile on the Windows Phone 8 Start screen."
+	},
+	"WP8Publisher": {
+		"description": "The publisher name of the Windows Phone 8 app. If left empty, then the user account name is used."
+	},
+	"WP8ProductID": {
+		"description": "A GUID string uniquely identifying the application to Windows Phone 8.",
+		"regex": "\\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\}",
+		"validationMessage": "The product ID must be a GUID string enclosed in curly braces."
+	},
+	"WP8PublisherID": {
+		"description": "A GUID string uniquely identifying the publisher to Windows Phone 8.",
+		"regex": "\\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\}",
+		"validationMessage": "The publisher ID must be a GUID string enclosed in curly braces."
+	},
+	"WP8Capabilities": {
+		"description": "List of Windows Phone 8 application capabilities",
+		"flags": true,
+		"range": {
+			"ID_CAP_APPOINTMENTS": {
+				"input": "Appointments",
+				"description": "Provides access to appointment data."
+			},
+			"ID_CAP_CONTACTS": {
+				"input": "Contacts",
+				"description": "Provides access to contacts data."
+			},
+			"ID_CAP_GAMERSERVICES": {
+				"input": "GamerServices",
+				"description": "Provides access to Xbox LIVE services. This capability must be disclosed because an app could share data with Xbox."
+			},
+			"ID_CAP_IDENTITY_DEVICE": {
+				"input": "IdentityDevice",
+				"description": "Provides access to device-specific information such as a unique device ID, or the manufacturer or model name."
+			},
+			"ID_CAP_IDENTITY_USER": {
+				"input": "IdentityUser",
+				"description": "Gives an app the ability to use an anonymous Microsoft account to identify the user."
+			},
+			"ID_CAP_ISV_CAMERA": {
+				"input": "ISVCamera",
+				"description": "Provides access to the rear (primary) camera or front-facing camera."
+			},
+			"ID_CAP_LOCATION": {
+				"input": "Location",
+				"description": "Provides access to location services."
+			},
+			"ID_CAP_MAP": {
+				"input": "Map",
+				"description": "Provides access to mapping functionality."
+			},
+			"ID_CAP_MEDIALIB_AUDIO": {
+				"input": "MedialibAudio",
+				"description": "Provides read-only access to audio items, including lists of audio items and audio item properties such as title and description, in the media library. It also provides the ability to add or delete songs. Delete operations display an additional prompt to the user."
+			},
+			"ID_CAP_MEDIALIB_VIDEO": {
+				"input": "MedialibVideo",
+				"description": "Provides read-only access to video items, including lists of video items, and video item properties in the media library."
+			},
+			"ID_CAP_MEDIALIB_PHOTO": {
+				"input": "MedialibPhoto",
+				"description": "Provides read-only access to photos in the media library, and photo properties, such as category. It also gives an app the ability to save photos in the Camera Roll and Saved Pictures folders."
+			},
+			"ID_CAP_MEDIALIB_PLAYBACK": {
+				"input": "MedialibPlayback",
+				"description": "Provides read/write access to media items that are currently playing. It also gives an app the ability to add media items to the History, Favorites, and New collections. Also supports background and foreground playback from an app’s isolated storage using the MediaElement control."
+			},
+			"ID_CAP_MICROPHONE": {
+				"input": "Microphone",
+				"description": "Provides access to the phone’s microphone. An app with this capability can record without a visual indication that the microphone is recording."
+			},
+			"ID_CAP_NETWORKING": {
+				"input": "Networking",
+				"description": "Provides access to network services. This capability must be disclosed because an app could incur charges when a phone is roaming."
+			},
+			"ID_CAP_PHONEDIALER": {
+				"input": "PhoneDialer",
+				"description": "Provides the ability to use the PhoneCallTask API."
+			},
+			"ID_CAP_PROXIMITY": {
+				"input": "Proximity",
+				"description": "Provides access to Near Field Communication (NFC) services."
+			},
+			"ID_CAP_PUSH_NOTIFICATION": {
+				"input": "PushNotification",
+				"description": "Provides the ability to receive push notifications from an internet service. This capability must be disclosed because an app could incur roaming charges."
+			},
+			"ID_CAP_REMOVABLE_STORAGE": {
+				"input": "RemovableStorage",
+				"description": "Provides access to data storage on an external storage component, such as an SD card."
+			},
+			"ID_CAP_RINGTONE_ADD": {
+				"input": "RingtoneAdd",
+				"description": "Provides the ability to add ringtones to the phone."
+			},
+			"ID_CAP_SENSORS": {
+				"input": "Sensors",
+				"description": "Provides access to any Windows Phone sensor."
+			},
+			"ID_CAP_SPEECH_RECOGNITION": {
+				"input": "SpeechRecognition",
+				"description": "Provides access to speech recognition and text-to-speech (TTS) services."
+			},
+			"ID_CAP_VOIP": {
+				"input": "VOIP",
+				"description": "Provides access to voice over IP (VoIP) calling services."
+			},
+			"ID_CAP_WALLET": {
+				"input": "Wallet",
+				"description": "Provides access to interactions with Wallet such as saving, updating, and deleting deals, membership cards, and payment instruments."
+			},
+			"ID_CAP_WALLET_PAYMENTINSTRUMENTS": {
+				"input": "WalletPaymentInstruments",
+				"description": "Provides access to Wallet payment instruments such as credit and debit cards. Doesn’t grant access to the secure element for secure NFC transactions."
+			},
+			"ID_CAP_WALLET_SECUREELEMENT": {
+				"input": "WalletSecureElement",
+				"description": "Provides access to a Wallet secure element for secure NFC transactions."
+			},
+			"ID_CAP_WEBBROWSERCOMPONENT": {
+				"input": "WebBrowserComponent",
+				"description": "Provides access to a web browser component. This capability must be disclosed because an app could use scripting, which introduces security risks."
+			}
+		}
+	},
+	"WP8Requirements": {
+		"description": "List of hardware requirements imposed on a Windows Phone 8 device before installing.",
+		"flags": true,
+		"range": {
+			"ID_REQ_MEMORY_300": {
+				"input": "Memory300",
+				"description": "For Windows Phone 8, indicates that the app requires more than 180 MB of memory and is not suited for a lower-memory device."
+			},
+			"ID_REQ_FRONTCAMERA": {
+				"input": "FrontCamera",
+				"description": "Indicates that an app requires a front-facing camera to function correctly. Adding this requirement prevents the app from installing on a phone without a front-facing camera."
+			},
+			"ID_REQ_REARCAMERA": {
+				"input": "RearCamera",
+				"description": "Indicates that an app requires a back-facing camera to function correctly. Selecting this option prevents the app from installing on a phone without a back-facing camera."
+			},
+			"ID_REQ_NFC": {
+				"input": "NFC",
+				"description": "Indicates that an app requires a phone with a chip that enables Near Field Communication (NFC) to function correctly. Selecting this option prevents the app from installing on a phone without an NFC chip."
+			},
+			"ID_REQ_MAGNETOMETER": {
+				"input": "Magnetometer",
+				"description": "Indicates that an app requires a phone that contains a compass to function correctly. Selecting this option prevents the app from installing on a phone that doesn’t have a compass."
+			},
+			"ID_REQ_GYROSCOPE": {
+				"input": "Gyroscope",
+				"description": "Indicates that an app requires a phone that contains a gyroscope to function correctly. Selecting this option prevents the app from installing on a phone that doesn’t have a gyroscope."
+			}
+		}
+	},
+	"WP8SupportedResolutions": {
+		"description": "List of supported Windows Phone 8 device display resolutions.",
+		"flags": true,
+		"range": {
+			"ID_RESOLUTION_WVGA": {
+				"input": "WVGA"
+			},
+			"ID_RESOLUTION_WXGA": {
+				"input": "WXGA"
+			},
+			"ID_RESOLUTION_HD720P": {
+				"input": "720p"
+			}
+		}
 	}
 }
