@@ -15,7 +15,7 @@ Project development commands:
     build                           Builds the project and produces a QR code for deploying the application package.
     deploy                          Builds and deploys the project to a connected device.
     cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    live-sync                       Synchronizes the latest changes in your project to connected devices.
+    livesync                        Synchronizes the latest changes in your project to connected devices.
     simulate                        Runs the current project in the device simulator.
     find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin                    Imports an Apache Cordova plugin into your project.
@@ -213,13 +213,13 @@ Options:
 
 --[/]--
 
---[live-sync]--
+--[livesync]--
 Usage:
-    $ appbuilder live-sync [<Platform>]
+    $ appbuilder livesync [<Platform>]
 
 Platform-specific example:
-    $ appbuilder live-sync android [--device <id>] [--watch]
-    $ appbuilder live-sync ios [--device <id>] [--watch] [--companion]
+    $ appbuilder livesync android [--device <id>] [--watch]
+    $ appbuilder livesync ios [--device <id>] [--watch] [--companion]
 
 Synchronizes the latest changes in your project to connected devices.
 
