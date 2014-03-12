@@ -84,8 +84,8 @@ Creates a new project from template.
     opening and closing brackets (()), and comma (,).
 
 Options:
-    --template <Template> - Sets the source template for the project. You can set the following templates: Blank,
-        Friends, JQuery, KendoUI, or KendoUIDataViz. The default value is KendoUI.
+    --template <Template> - Sets the source template for the project. You can use the following templates:
+	#{templatesService.projectTemplatesString}. The default value is KendoUI.
     --path - Specifies the path where you want to create the project, if different from the current directory. 
         The directory must be empty.
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
@@ -300,14 +300,9 @@ Options:
 Usage:
     $ appbuilder edit-configuration <ConfigurationFile>
 
-Opens the selected configuration file for editing and creates it in your project directory, if needed.
-
 <ConfigurationFile> is the configuration file that you want to open. You can select a configuration file
     for editing by setting any of the following values.
-        android-manifest - Opens AndroidManifest.xml for editing and creates it, if needed.
-        android-config - Opens config.xml for Android for editing and creates it, if needed.
-        ios-info - Opens Info.plist for editing and creates it, if needed.
-        ios-config - Opens config.xml for iOS for editing and creates it, if needed.
+#{templatesService.configurationFilesString}
 
 --[/]--
 

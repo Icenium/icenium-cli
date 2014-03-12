@@ -2,6 +2,7 @@
 
 import Future = require("fibers/future");
 import util = require("util");
+import path = require("path");
 
 export class LoggerStub implements ILogger {
 	setLevel(level: string): void {}
@@ -29,6 +30,10 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	deleteFile(path:string):IFuture<void> {
+		return undefined;
+	}
+
+	deleteDirectory(directory: string): IFuture<any> {
 		return undefined;
 	}
 
@@ -132,6 +137,36 @@ export class LoginManager implements ILoginManager {
 	}
 
 	ensureLoggedIn(): IFuture<void> {
+		return undefined;
+	}
+}
+
+export class TemplateServiceStub implements ITemplatesService {
+	get configurationFiles(): IConfigurationFile[] {
+		return [{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFilepath: "Mobile.Android.ManifestXml.zip", helpText: "" }];
+	}
+
+	getTemplateFilename(name: string): string {
+		return util.format("Telerik.Mobile.Cordova.%s.zip", name);
+	}
+
+	projectTemplatesString(): string {
+		return "";
+	}
+
+	get projectTemplatesDir(): string {
+		return path.join(__dirname, "/resources/");
+	}
+
+	get itemTemplatesDir(): string {
+		return path.join(__dirname, "/resources/");
+	}
+
+	downloadProjectTemplates(): IFuture<void> {
+		return undefined;
+	}
+
+	downloadItemTemplates(): IFuture<void> {
 		return undefined;
 	}
 }

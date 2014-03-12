@@ -14,7 +14,6 @@ export class Configuration implements IConfiguration {
 	SOLUTION_SPACE_NAME: string;
 	QR_SIZE: number;
 	DEFAULT_PROJECT_TEMPLATE: string;
-	TEMPLATE_NAMES: string[];
 	CORDOVA_PLUGINS_REGISTRY: string;
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;

@@ -22,6 +22,7 @@ testInjector.register("project", {
 });
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("opener", stubs.OpenerStub);
+testInjector.register("templatesService", stubs.TemplateServiceStub);
 
 function getEditConfigurationCommand() {
 	return testInjector.resolve(editConfiguration.EditConfigurationCommand);
@@ -49,7 +50,7 @@ describe("edit-configuration", function () {
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
 		var tempDir = setTempDir();
-		var template = editConfiguration.EditConfigurationCommandData.ConfigurationFiles[0];
+		var template = testInjector.resolve("templatesService").configurationFiles[0];
 		var openArgument;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
@@ -65,7 +66,7 @@ describe("edit-configuration", function () {
 
 	it("opens and doesn't modify file if correct configuration file is given and it exists", () => {
 		var tempDir = setTempDir();
-		var template = editConfiguration.EditConfigurationCommandData.ConfigurationFiles[0];
+		var template = testInjector.resolve("templatesService").configurationFiles[0];
 		var openArgument;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {

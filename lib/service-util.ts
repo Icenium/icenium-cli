@@ -59,7 +59,7 @@ export class HttpClient implements Server.IHttpClient {
 			} else {
 				headers.Accept = "";
 			}
-			headers.Accept += "application/json; charset=UTF-8";
+			headers.Accept += "application/json; charset=UTF-8, */*;q=0.8";
 		}
 
 		if (!headers["User-Agent"]) {
@@ -75,11 +75,10 @@ export class HttpClient implements Server.IHttpClient {
 
 		var result = new Future<Server.IResponse>();
 
-		this.$logger.trace("httpRequest: %s", options);
+		this.$logger.trace("httpRequest: %s", util.inspect(options));
 
 		var request = http.request(options, (response) => {
 			var data = "";
-
 			var successful = helpers.isRequestSuccessful(response);
 			if (!successful) {
 				pipeTo = undefined;
@@ -99,9 +98,6 @@ export class HttpClient implements Server.IHttpClient {
 						response: response,
 						headers: response.headers
 					});
-				});
-				response.on("end", () => {
-					pipeTo.end();
 				});
 
 				response.pipe(pipeTo);

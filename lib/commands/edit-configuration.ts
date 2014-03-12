@@ -7,52 +7,33 @@ import path = require("path");
 import unzip = require("unzip");
 import helpers = require("../helpers");
 
-export class EditConfigurationCommandData {
-	public static ConfigurationFiles = [
-		{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templatefilepath: "Mobile.Android.ManifestXml.zip" },
-		{ template: "android-config", filepath: "App_Resources/Android/xml/config.xml", templatefilepath: "Mobile.Cordova.Android.ConfigXml.zip" },
-		{ template: "ios-info", filepath: "App_Resources/iOS/Info.plist", templatefilepath: "Mobile.iOS.InfoPlist.zip" },
-		{ template: "ios-config", filepath: "App_Resources/iOS/config.xml", templatefilepath: "Mobile.Cordova.iOS.ConfigXml.zip" },
-	];
-
-	public template: any;
-	public file: string;
-
-	constructor(private args: string[]) {
-		if (args.length != 1) {
-			return;
-		}
-
-		this.file = args[0];
-		this.template = _.findWhere(EditConfigurationCommandData.ConfigurationFiles, { template: this.file });
-	}
-}
-
 export class EditConfigurationCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $opener: IOpener,
-		private $project: Project.IProject) {
+		private $project: Project.IProject,
+		private $templatesService: ITemplatesService) {
 	}
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var data = new EditConfigurationCommandData(args);
-			this.executeImplementation(data).wait();
+			var file = args[0];
+			var template = _.findWhere(this.$templatesService.configurationFiles, { template: file });
+			this.executeImplementation(template, file).wait();
 		}).future<void>()();
 	}
 
-	private executeImplementation(data: EditConfigurationCommandData): IFuture<void> {
+	private executeImplementation(template: IConfigurationFile, file:string): IFuture<void> {
 		return (() => {
-			if (data.template) {
+			if (template) {
 				this.$project.ensureProject();
 				var projectPath = this.$project.getProjectDir();
-				var filepath = path.join(projectPath, data.template.filepath);
+				var filepath = path.join(projectPath, template.filepath);
 				var directory = path.dirname(filepath);
 				if (!this.$fs.exists(filepath).wait()) {
 					this.$logger.info("Creating configuration file: " + filepath);
-					var templateFilePath = path.join(__dirname, "../../resources/configuration", data.template.templatefilepath);
+					var templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
 					this.$fs.futureFromEvent(
 						this.$fs.createReadStream(templateFilePath)
 							.pipe(unzip.Extract({ path: directory })), "close").wait();
@@ -70,8 +51,8 @@ export class EditConfigurationCommand implements ICommand {
 				this.$opener.open(filepath);
 			}
 			else {
-				if (data.file) {
-					this.$errors.fail("There is no matching configuration file for: %s", data.file);
+				if (file) {
+					this.$errors.fail("There is no matching configuration file for: %s", file);
 				}
 				else {
 					this.$errors.fail("You must choose which configuration file to edit!");

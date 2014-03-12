@@ -10,6 +10,7 @@ $injector.require("fs", "./file-system");
 $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
+$injector.require("templatesService", "./templates-service");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
@@ -103,5 +104,7 @@ $injector.requireCommand("user", "./commands/user-status");
 
 $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
+
+$injector.requireCommand("post-install", "./commands/post-install");
 
 $injector.require("platformServices", "./commands/simulate");
