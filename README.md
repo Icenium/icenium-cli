@@ -120,7 +120,7 @@ The Telerik AppBuilder CLI creates the `.abproject` file required for working fr
 <a id="simulator"></a>
 **3. Run in simulator**
 
-To load your newly created project in the simulator, run the following command.
+To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
 ```bash
 $ appbuilder simulate
@@ -133,7 +133,7 @@ For more information about the Telerik AppBuilder device simulator, see <a href=
 <a id="device"></a>
 **4. Run on device**
 
-To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and run the following command in the command line. 
+To run your app on an Android device, install a QR code reader on the device, enable installing apps from unknown sources, and navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
 $ appbuilder build android
@@ -141,7 +141,7 @@ $ appbuilder build android
 
 After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment on Android devices. Scan the produced QR code on your device, install the app, and run it.
 
-To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and run the following command in the command line. 
+To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
 $ appbuilder build ios --companion
@@ -163,7 +163,7 @@ Edit your code in your preferred IDE or code editor. Save your changes.
 
 In the running device simulator, your app refreshes automatically on save.
 
-To get changes inside your running app, run the following command. 
+To get changes inside your running app, navigate to the folder containing your project files and run the following command. 
 
 ```bash
 $ appbuilder cloud-sync
