@@ -126,6 +126,8 @@ To load your newly created project in the simulator, run the following command.
 $ appbuilder simulate
 ```
 
+> Currently the `simulate` command is only supported on Windows. OS X support is coming in a future release.
+
 The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can adjust the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
 
 For more information about the Telerik AppBuilder device simulator, see <a href="http://docs.telerik.com/platform/appbuilder/testing-your-app/running-apps-in-simulator/device-simulator" target="_blank">Running Apps in the Device Simulator</a>.
