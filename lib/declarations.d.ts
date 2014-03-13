@@ -281,3 +281,7 @@ interface IX509Certificate {
 interface IX509CertificateLoader {
 	load(certificatePem: string): IX509Certificate;
 }
+
+interface IQrCodeGenerator {
+	generateDataUri(data: string): string;
+}
