@@ -6,7 +6,6 @@ import path = require("path");
 import helpers = require("./helpers");
 
 export class Configuration implements IConfiguration {
-
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG :boolean;
@@ -21,6 +20,7 @@ export class Configuration implements IConfiguration {
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
+	AUTO_UPGRADE_PROJECT_FILE: boolean;
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {

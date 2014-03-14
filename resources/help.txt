@@ -138,6 +138,7 @@ Usage:
 Platform-specific examples:
     $ appbuilder build android
     $ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
+    $ appbuilder build wp8
 
 Builds the project for the target platform and produces a QR code for deployment.
 
@@ -147,6 +148,9 @@ Run list-provisions to list available provisioning profiles for code signing iOS
 provisioning profile by index or name.
 
 You cannot specify both the --companion and --download options.
+
+When building for Windows Phone 8, the built package is always downloaded, because deployment
+through a QR code is not supported.
 
 Options:
     --download - If set, downloads the application package to the .ab directory in the current directory, instead
