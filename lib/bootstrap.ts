@@ -60,6 +60,7 @@ $injector.requireCommand("live-sync", "./commands/live-sync");
 
 $injector.requireCommand("open-device-log-stream", "./commands/open-device-log-stream");
 
+$injector.require("plistDictionary", "./mobile/ios/plist-dictionary");
 $injector.require("iOSCore", "./mobile/ios/ios-core");
 $injector.require("coreFoundation", "./mobile/ios/ios-core");
 $injector.require("mobileDevice", "./mobile/ios/ios-core");
@@ -73,6 +74,7 @@ $injector.require("signal", "./events/signal");
 $injector.require("deviceFound", "./mobile/mobile-core/device-discovery");
 $injector.require("deviceLost", "./mobile/mobile-core/device-discovery");
 
+$injector.require("usbDeviceDiscovery", "./mobile/mobile-core/usb-device-discovery");
 $injector.require("deviceDiscovery", "./mobile/mobile-core/device-discovery");
 $injector.require("iOSDeviceDiscovery", "./mobile/mobile-core/device-discovery");
 $injector.require("androidDeviceDiscovery", "./mobile/mobile-core/device-discovery");
@@ -81,7 +83,6 @@ $injector.require("androidDevice", "./mobile/android/android-device");
 
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
 $injector.require("prompter", "./prompter");
-
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("list-provisions", "./commands/cryptographic-identities");

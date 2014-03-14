@@ -156,6 +156,7 @@ declare class NodeProcess extends EventEmitter {
     uptime(): number;
     hrtime(): number[];
     hrtime(start: number[]): number[];
+	send(message: any): any;
 }
 
 interface Timer {

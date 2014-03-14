@@ -157,31 +157,33 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	openDeviceLogStream() {
-		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
-		var lineStream = byline(adbLogcat.stdout);
+	openDeviceLogStream(): IFuture<void> {
+		return(() => {
+			var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
+			var lineStream = byline(adbLogcat.stdout);
 
-		adbLogcat.stderr.on("data", function (data) {
-			this.$logger.trace("ADB logcat stderr: " + data);
-		});
+			adbLogcat.stderr.on("data", function (data) {
+				this.$logger.trace("ADB logcat stderr: " + data);
+			});
 
-		adbLogcat.on("close", (code) => {
-			if (code !== 0) {
-				this.$logger.trace("ADB process exited with code " + code);
-			}
-		});
-
-		lineStream.on('data', (line) => {
-			var lineText = line.toString();
-			var log = this.getConsoleLogFromLine(lineText);
-			if (log) {
-				if (log.tag) {
-					this.$logger.out("%s: %s", log.tag, log.message);
-				} else {
-					this.$logger.out(log.message);
+			adbLogcat.on("close", (code) => {
+				if (code !== 0) {
+					this.$logger.trace("ADB process exited with code " + code);
 				}
-			}
-		});
+			});
+
+			lineStream.on('data', (line) => {
+				var lineText = line.toString();
+				var log = this.getConsoleLogFromLine(lineText);
+				if (log) {
+					if (log.tag) {
+						this.$logger.out("%s: %s", log.tag, log.message);
+					} else {
+						this.$logger.out(log.message);
+					}
+				}
+			});
+		}).future<void>()();
 	}
 
 	private getConsoleLogFromLine(lineText: String): any {

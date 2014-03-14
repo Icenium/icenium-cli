@@ -71,6 +71,7 @@ class IOSDeviceDiscovery extends DeviceDiscovery {
 		this.subscribeForNotifications();
 		var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 1;
 		this.startRunLoopWithTimer(defaultTimeoutInSeconds);
+		//			this.$usbDeviceDiscovery.run().wait();
 	}
 
 	private static deviceNotificationCallback(devicePointer?: NodeBuffer, user?: number) : any {

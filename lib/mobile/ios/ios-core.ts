@@ -572,7 +572,8 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 	constructor(private service: number,
 		private $logger: ILogger,
 		private $mobileDevice: Mobile.IMobileDevice,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $plistDictionary: Mobile.IPlistDictionary) {
 		this.winSocketLibrary = IOSCore.getWinSocketLibrary();
 	}
 
@@ -627,29 +628,12 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 	}
 
 	public sendMessage(data: {[key: string]: {}}): void {
-		var payload = plistlib.toString(this.createPlist(data));
+		var payload = plistlib.toString(this.$plistDictionary.createPlist(data));
 		var message = bufferpack.pack(">i", [payload.length]) + payload;
 		var writtenBytes = this.winSocketLibrary.send(this.service, message, message.length, 0);
 		this.$logger.debug("WinSocket-> sending message: '%s', written bytes: '%s'", message, writtenBytes);
 
 		this.$errors.verifyHeap("sendMessage");
-	}
-
-	private createPlist(data: {[key: string]: {}}) : {} {
-		var keys = _.keys(data);
-		var values = _.values(data);
-		var plist = {type: "dict", value: {}} ;
-
-		for(var i=0; i<keys.length; i++) {
-			var type = values[i] instanceof Object ? "dict" : "string";
-			var value = type === "dict" ? {} : values[i];
-
-			plist.value[keys[i]] = {type: type, value: value};
-		}
-
-		this.$logger.trace("created plist: '%s'" + plist);
-
-		return plist;
 	}
 
 	public close(): void {

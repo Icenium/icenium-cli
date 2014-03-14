@@ -12,7 +12,7 @@ declare module Mobile {
 		getDeviceProjectPath(appIdentifier: string): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
 		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: string): IFuture<void>;
-		openDeviceLogStream(): void;
+		openDeviceLogStream(): IFuture<void>;
 	}
 
 	interface IIOSDevice extends IDevice {
@@ -126,8 +126,53 @@ declare module Mobile {
 
 	interface IiOSDeviceSocket {
 		receiveMessage(): IFuture<void>;
-		readSystemLog(action: (data: string) => void): void;
+		readSystemLog(action: (data: string) => void, child?: any): void;
 		sendMessage(message: {[key: string]: {}}, format?: number): void;
 		close(): void;
+	}
+
+	enum MessageType {
+		Result = 1,
+		Connect = 2,
+		Listen = 3,
+		DeviceAdd = 4,
+		DeviceRemove = 5,
+		PList = 8
+	}
+
+	interface IPlistDictionary {
+		createPlist(data: {[key: string]: {}}) : {};
+		buildMessageTemplate(messageType: Mobile.MessageType): {};
+	}
+
+	interface IMessage {
+		Data: {[key: string]: string};
+	}
+
+	interface ICommunicator {
+		connect(): void;
+		startListeningForData(): void;
+		send(dictionary: any): void;
+		responseReceived: ISignal;
+	}
+
+	interface IUsbmuxDevice {
+		DeviceId: number;
+		SerialNumber: string;
+	}
+
+	interface IUsbmuxDeviceListener {
+		startListening(): void;
+	}
+
+	interface IUsbDeviceDiscovery {
+		run(): void;
+		deviceFound: ISignal;
+		deviceLost: ISignal;
+	}
+
+	interface IHeader {
+		Length: number;
+		MessageType: MessageType;
 	}
 }

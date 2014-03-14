@@ -17,6 +17,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
 		private $errors: IErrors,
+		private $logger: ILogger,
 		private $injector: IInjector) { }
 
 	public getPlatform(): string {
@@ -155,9 +156,17 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}).future<void>()();
 	}
 
-	public openDeviceLogStream() {
-		var iOSSystemLog = this.$injector.resolve(iOSProxyServices.IOSSyslog, {device: this});
-		iOSSystemLog.read();
+	public openDeviceLogStream(): IFuture<void>{
+		return(() => {
+			var iOSSystemLog = this.$injector.resolve(iOSProxyServices.IOSSyslog, {device: this});
+			iOSSystemLog.logReceived.add(this.onLogReceived, this);
+
+			iOSSystemLog.read().wait();
+		}).future<void>()();
+	}
+
+	private onLogReceived(message: string) {
+		this.$logger.trace(message);
 	}
 }
 

@@ -11,6 +11,8 @@ import _ = require("underscore");
 import helpers = require("./../../helpers");
 import net = require("net");
 import MobileHelpers = require("./../mobile-helper");
+import Signal = require("./../../events/signal");
+import child_process = require("child_process");
 
 class MobileServices {
 	public static APPLE_FILE_CONNECTION: string = "com.apple.afc";
@@ -280,20 +282,29 @@ export class IOSSyslog {
 	private plistService;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|AppBuilder)\\[\\d+\\] <Warning>: )", 'i');
 
+	public logReceived: ISignal;
+
 	constructor(private device: Mobile.IIOSDevice,
-		private $logger: ILogger,
 		private $injector: IInjector) {
 		this.plistService = this.$injector.resolve(iOSCore.PlistService, {service: this.device.startService(MobileServices.SYSLOG), format: undefined});
+
+		this.logReceived = new Signal.Signal();
 	}
 
-	public read(): void {
-		var printData = (data: NodeBuffer) => {
-			var output = ref.readCString(data, 0);
-			if(this.matchRegex.test(output)) {
-				this.$logger.out(output);
-			}
-		};
+	public read(): IFuture<void> {
+		return(() => {
+			var usbDeviceDiscovery = $injector.resolve("usbDeviceDiscovery");
+			usbDeviceDiscovery.run();
 
-		this.plistService.readSystemLog(printData);
+			var printData = (data: NodeBuffer) => {
+				var output = ref.readCString(data, 0);
+				if(this.matchRegex.test(output)) {
+					this.logReceived.dispatch(output);
+				}
+			};
+
+			this.plistService.readSystemLog(printData);
+
+		}).future<void>()();
 	}
 }

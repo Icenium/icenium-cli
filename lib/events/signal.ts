@@ -477,4 +477,4 @@ export class Signal implements ISignal {
 
 }
 
-$injector.register("signal", Signal);
+//$injector.register("signal", Signal);
