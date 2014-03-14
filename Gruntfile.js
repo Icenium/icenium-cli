@@ -1,9 +1,15 @@
 var util = require("util");
 
+var now = new Date().toISOString();
+
 module.exports = function(grunt) {
 	grunt.initConfig({
-		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
 		copyPackageTo: "\\\\telerik.com\\Resources\\BlackDragon\\Builds\\appbuilder-cli",
+
+		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
+		jobName: process.env["JOB_NAME"] || "local",
+		buildNumber: process.env["BUILD_NUMBER"] || "non-ci",
+		dateString: now.substr(0, now.indexOf("T")),
 
 		pkg: grunt.file.readJSON("package.json"),
 
@@ -66,26 +72,17 @@ module.exports = function(grunt) {
 					"node bin\\appbuilder.js config-apply <%= deploymentEnvironment %>",
 					"npm pack"
 				].join("&&")
-			},
+			}
+		},
 
-			copy_package: {
-				command: function() {
-					var now = new Date().toISOString();
-					var jobName = process.env["JOB_NAME"] || "local";
-					var buildNumber = process.env["BUILD_NUMBER"] || "non-ci";
-					var subfolder = util.format("%s\\<%= deploymentEnvironment %>\\%s #%s", jobName, now.substr(0, now.indexOf("T")), buildNumber);
-					return util.format("robocopy . \"<%= copyPackageTo %>\\%s\" *.tgz", subfolder);
-				},
-				options: {
-					callback: function(err, stdout, stderr, cb) {
-						// ROBOCOPY exit codes:
-						// http://ss64.com/nt/robocopy-exit.html
-						if (err && err.code >= 8) {
-							grunt.warn(err);
-						}
-						cb();
-					}
-				}
+		copy: {
+			package_to_drop_folder: {
+				src: "*.tgz",
+				dest: "<%= copyPackageTo %>/<%= jobName %>/<%= deploymentEnvironment %>/<%= dateString %> #<%= buildNumber %>/"
+			},
+			package_to_qa_drop_folder: {
+				src: "*.tgz",
+				dest: "<%= copyPackageTo %>/<%= jobName %>/<%= deploymentEnvironment %>/appbuilder.tgz"
 			}
 		},
 
@@ -94,10 +91,11 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.loadNpmTasks("grunt-ts");
 	grunt.loadNpmTasks("grunt-contrib-clean");
+	grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
+	grunt.loadNpmTasks("grunt-ts");
 
 	grunt.registerTask("set_package_version", function(version) {
 		var fs = require("fs");
@@ -119,7 +117,8 @@ module.exports = function(grunt) {
 		"shell:ci_unit_tests",
 		"set_package_version",
 		"shell:build_package",
-		"shell:copy_package"
+		"copy:package_to_drop_folder",
+		"copy:package_to_qa_drop_folder"
 	]);
 
 	grunt.registerTask("default", "ts:devlib");
