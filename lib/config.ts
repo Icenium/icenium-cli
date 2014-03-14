@@ -77,5 +77,5 @@ export class Configuration implements IConfiguration {
 	public version: string = require("../package.json").version;
 }
 $injector.register("config", Configuration);
-helpers.registerCommand("config", "config-reset", (config, args) => config.reset());
-helpers.registerCommand("config", "config-apply", (config, args) => config.apply(args[0]));
+helpers.registerCommand("config", "dev-config-reset", (config, args) => config.reset());
+helpers.registerCommand("config", "dev-config-apply", (config, args) => config.apply(args[0]));

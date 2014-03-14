@@ -236,4 +236,4 @@ export class LoginManager implements ILoginManager {
 $injector.register("loginManager", LoginManager);
 helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login());
 helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout());
-helpers.registerCommand("loginManager", "telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]));
+helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]));

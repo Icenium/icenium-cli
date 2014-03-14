@@ -2,8 +2,8 @@ global.$injector = require("./yok").injector;
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
-$injector.requireCommand("config-apply", "./config");
-$injector.requireCommand("config-reset", "./config");
+$injector.requireCommand("dev-config-apply", "./config");
+$injector.requireCommand("dev-config-reset", "./config");
 $injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
 $injector.require("childProcess", "./child-process");
@@ -33,12 +33,11 @@ $injector.require("loginManager", "./login");
 $injector.require("userDataStore", "./login");
 $injector.requireCommand("login", "./login");
 $injector.requireCommand("logout", "./login");
-$injector.requireCommand("telerik-login", "./login");
+$injector.requireCommand("dev-telerik-login", "./login");
 
 $injector.require("buildService", "./project");
 $injector.require("project", "./project");
 $injector.requireCommand("build", "./project");
-$injector.requireCommand("ion", "./project");
 $injector.requireCommand("cloud-sync", "./project");
 $injector.requireCommand("create", "./project");
 $injector.requireCommand("init", "./project");
