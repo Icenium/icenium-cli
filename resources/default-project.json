@@ -57,5 +57,8 @@
 		"1",
 		"2"
 	],
-	"iOSBackgroundMode": []
+	"iOSBackgroundMode": [],
+	"ignorePaths" : [
+		"**/.DS_Store"
+	]
 }

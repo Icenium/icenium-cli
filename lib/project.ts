@@ -184,7 +184,8 @@ export class Project implements Project.IProject {
 			var projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
 
-			var files = this.enumerateProjectFiles();
+			var files = this.excludeIgnoredFiles(this.enumerateProjectFiles());
+
 			var zipOp = this.$fs.zipFiles(projectZipFile, files,
 				(path) => this.getProjectRelativePath(path));
 
@@ -192,6 +193,25 @@ export class Project implements Project.IProject {
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
 			return result.wait();
 		}).future<string>()();
+	}
+
+	private excludeIgnoredFiles(files: string[]) :string[] {
+
+		var ignorePaths = this.projectData.ignorePaths || [];
+
+		var selectedFiles = _.reject(files, (file: string) => {
+			var match = _.select(ignorePaths, (ignorePath: string) => {
+				if (minimatch(file, ignorePath)) {
+					return true;
+				}
+			});
+
+			if (match.length !== 0) {
+				return true;
+			}
+		});
+
+		return selectedFiles;
 	}
 
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
