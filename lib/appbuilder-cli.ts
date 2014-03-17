@@ -46,7 +46,7 @@ class CommandDispatcher {
 	}
 
 	private tryToMatchCommand(commandName): void {
-		var allCommands = this.$commandsService.allCommands();
+		var allCommands = _.reject(this.$commandsService.allCommands(), (command) => command.startsWith("dev-"));
 		var similarCommands = [];
 		_.each(allCommands, (command) => {
 			var distance = jaroWinklerDistance(commandName, command);

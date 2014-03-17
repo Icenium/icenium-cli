@@ -62,14 +62,14 @@ module.exports = function(grunt) {
 
 			ci_unit_tests: {
 				command: [
-					"node bin\\appbuilder.js config-apply cibuild",
+					"node bin\\appbuilder.js dev-config-apply cibuild",
 					"call node_modules\\.bin\\mocha.cmd --ui mocha-fibers --recursive --reporter xunit --require test/test-bootstrap.js --timeout 15000 test/ > test-reports.xml"
 				].join("&&")
 			},
 
 			build_package: {
 				command: [
-					"node bin\\appbuilder.js config-apply <%= deploymentEnvironment %>",
+					"node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>",
 					"npm pack"
 				].join("&&")
 			}
