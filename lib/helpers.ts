@@ -34,12 +34,6 @@ export function enumerateFilesInDirectorySync(directoryPath, filterCallback?: (f
 	return result;
 }
 
-export function createQrUrl(data) {
-	var $config = $injector.resolve("config");
-	return util.format("http://api.qrserver.com/v1/create-qr-code/?size=%dx%d&qzone=4&data=%s",
-		$config.QR_SIZE, $config.QR_SIZE, querystring.escape(data));
-}
-
 export function fromWindowsRelativePathToUnix(windowsRelativePath) {
 	return windowsRelativePath.replace(/\\/g, "/");
 }

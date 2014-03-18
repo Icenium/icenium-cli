@@ -104,6 +104,7 @@ export class Project implements Project.IProject {
 		private $errors: IErrors,
 		private $opener: IOpener,
 		private $userDataStore: IUserDataStore,
+		private $qr: IQrCodeGenerator,
 		private $loginManager: ILoginManager) {
 		this.readProjectData().wait();
 	}
@@ -357,7 +358,7 @@ export class Project implements Project.IProject {
 				var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
 				packageDefs.forEach((def:any) => {
 					var liveSyncUrl = this.$buildService.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
-					def.qrUrl = helpers.createQrUrl(liveSyncUrl);
+					def.qrUrl = this.$qr.generateDataUri(liveSyncUrl);
 
 					this.$logger.debug("QR URL is '%s'", def.qrUrl);
 				});
@@ -454,7 +455,7 @@ export class Project implements Project.IProject {
 
 			this.showPackageQRCodes([{
 				platform: "AppBuilder companion app for " + platform,
-				qrUrl: helpers.createQrUrl(fullDownloadPath),
+				qrUrl: this.$qr.generateDataUri(fullDownloadPath),
 				solution: this.projectData.name
 			}]).wait();
 		}).future<void>()();
