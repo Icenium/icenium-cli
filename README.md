@@ -3,7 +3,7 @@ Command-Line Interface for Telerik AppBuilder
 
 *Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
-[![Telerik AppBuilder](https://github.com/Icenium/icenium-cli/blob/develop/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/develop/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
