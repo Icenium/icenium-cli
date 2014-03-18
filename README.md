@@ -3,7 +3,7 @@ Command-Line Interface for Telerik AppBuilder
 
 *Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
-[![Telerik AppBuilder](ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+[![Telerik AppBuilder](https://github.com/Icenium/icenium-cli/blob/develop/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
@@ -156,7 +156,7 @@ With the Telerik AppBuilder companion app, you can deploy and test your iOS apps
 
 Edit your code in your preferred IDE or code editor. Save your changes.
 
-> In Sublime Text 2, you can install the Telerik AppBuilder package which provides integration with the Telerik AppBuilder CLI. For more information, click <a href="https://sublime.wbond.net/packages/AppBuilder" target="_blank">here</a>. 
+> In Sublime Text 2, you can install the Telerik AppBuilder package which provides integration with the Telerik AppBuilder CLI. For more information, click <a href="https://sublime.wbond.net/packages/Telerik%20AppBuilder" target="_blank">here</a>. 
 
 <a id="livesync"></a>
 **6. Get code changes in the simulator and on device**
@@ -231,7 +231,7 @@ To see complete list of the available commands, click <a href="https://github.co
 The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
 
 * You cannot build, test, deploy, or publish for Windows Phone 8.<br/>Support for Windows Phone 8 in the Telerik AppBuilder CLI will become available in a future release of Telerik Platform. To build, test, or deploy for Windows Phone 8, use any of the other Telerik AppBuilder clients.
-* You cannot switch your {{tp}} account.
+* You cannot switch your Telerik Platform account.
 * You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in the next release of Telerik AppBuilder.
 * You cannot debug your Android apps while running on a connected device.
 * You cannot debug your iOS apps while running on a connected device.
@@ -251,11 +251,11 @@ The following Telerik AppBuilder features are not applicable to the Telerik AppB
 Contribution
 ===
 
-To learn how to log a bug that you just discovered, click [here](CONTRIBUTE#bug).
+To learn how to log a bug that you just discovered, click [here](CONTRIBUTING#bug).
 
-To learn how to suggest a new feature or improvement, click [here](CONTRIBUTE#request).
+To learn how to suggest a new feature or improvement, click [here](CONTRIBUTING#request).
 
-To learn how to contribute to the code base, click [here](CONTRIBUTE#contribute).
+To learn how to contribute to the code base, click [here](CONTRIBUTING#contribute).
 
 [Back to Top][1]
 
@@ -266,7 +266,7 @@ More Telerik AppBuilder Tools and Resources
 * [Telerik AppBuilder Windows client](http://www.telerik.com/appbuilder/windows-client "The AppBuilder Windows Client"): Lightweight Windows IDE.
 * [Telerik AppBuilder in-browser client](http://www.telerik.com/appbuilder/in-browser-client "The AppBuilder In-Browser Client"): Browser-based IDE that is compatible with most modern web and mobile browsers.
 * [Telerik AppBuilder extension for Visual Studio](http://www.telerik.com/appbuilder/visual-studio-extension "The AppBuilder Extension for Visual Studio"): Extension for the popular Microsoft IDE.
-* [Telerik AppBuilder package for Sublime Text 2](??? "The AppBuilder package for Sublime Text 2"): A package for the popular text editor.
+* [Telerik AppBuilder package for Sublime Text 2](http://www.telerik.com/appbuilder/sublime-text-package "The AppBuilder package for Sublime Text 2"): A package for the popular text editor.
 * [Telerik AppBuilder companion app](http://www.telerik.com/appbuilder/companion-app "The AppBuilder Companion App"): iOS testing utility <a href="https://itunes.apple.com/bg/app/icenium-ion/id527547398" target="_blank">available for free on the App Store</a>.
 * [Telerik AppBuilder documentation](http://docs.telerik.com/platform/appbuilder "The documentation resources for Telerik AppBuilder"): Learn more about what you can do with Telerik AppBuilder.
 * [Telerik AppBuilder web page](http://www.telerik.com/appbuilder "The Telerik AppBuilder web page"): Visit the Telerik AppBuilder web site.
