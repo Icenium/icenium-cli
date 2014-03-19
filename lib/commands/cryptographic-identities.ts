@@ -2,7 +2,6 @@
 "use strict";
 
 var options: any = require("../options");
-import _ = require("underscore");
 import Future = require("fibers/future");
 import util = require("util");
 import helpers = require("../helpers");

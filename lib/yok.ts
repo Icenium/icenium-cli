@@ -56,10 +56,8 @@ function annotate(fn) {
 
 //--- end part copied from AngularJS
 
-var _ = <UnderscoreStatic> require("underscore");
 var util = require("util");
 var assert = require("assert");
-
 
 var indent = "";
 function trace(formatStr: string, ...args: any[]) {
@@ -100,7 +98,11 @@ export class Yok implements IInjector {
 		var dependency: IDependency = {
 			require: file
 		};
-		this.modules[name] = dependency;
+		if (!this.modules[name]) {
+			this.modules[name] = dependency;
+		} else {
+			throw new Error(util.format("module '%s' require'd twice.", name));
+		}
 	}
 
 	public registerCommand(name: string, resolver: any): void {
@@ -227,15 +229,3 @@ export class Yok implements IInjector {
 
 export var injector = new Yok();
 injector.register("injector", injector);
-
-
-
-
-
-
-
-
-
-
-
-

@@ -5,7 +5,6 @@ import Future = require("fibers/future");
 import path = require("path");
 import byline = require("byline");
 import helpers = require("./../../helpers");
-import _ = require("underscore");
 
 interface IAndroidDeviceDetails {
 	model: string;

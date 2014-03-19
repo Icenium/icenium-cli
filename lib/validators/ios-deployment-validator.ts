@@ -7,7 +7,6 @@ import BaseValidators = require("./base-validators");
 import Future = require("fibers/future");
 import helpers = require("./../helpers");
 import util = require("util");
-import _ = require("underscore");
 
 export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<IiOSDeploymentValidatorModel> {
 	private static NOT_SPECIFIED_PROVISION_ERROR_MESSAGE = "Please specify the provisioning profile (with option --provision) that should be used when building the project.";

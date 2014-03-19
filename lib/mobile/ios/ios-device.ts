@@ -2,7 +2,6 @@
 
 import ref = require("ref");
 import os = require("os");
-import _ = require("underscore");
 import iOSProxyServices = require("./ios-proxy-services");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");

@@ -5,7 +5,6 @@ import plugman = require("plugman");
 import path = require("path");
 import util = require("util");
 import os = require("os");
-import _ = require("underscore");
 import validUrl = require("valid-url");
 import fs = require("fs");
 import Future = require("fibers/future");

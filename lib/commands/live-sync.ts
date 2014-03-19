@@ -5,7 +5,6 @@ import path = require("path");
 import watchr = require("watchr");
 import options = require("./../options");
 import helpers = require("./../helpers");
-import _ = require("underscore");
 import MobileHelper = require("./../mobile/mobile-helper");
 
 export class LiveSyncCommand implements ICommand {

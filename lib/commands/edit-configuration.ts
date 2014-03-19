@@ -5,7 +5,6 @@
 import util = require("util");
 import path = require("path");
 import unzip = require("unzip");
-import _ = require("underscore");
 import helpers = require("../helpers");
 
 export class EditConfigurationCommandData {

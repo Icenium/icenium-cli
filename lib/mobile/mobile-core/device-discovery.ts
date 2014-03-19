@@ -1,6 +1,5 @@
 ///<reference path="./../../.d.ts"/>
 
-import _ = require("underscore");
 import ref = require("ref");
 import util = require("util");
 import os = require("os");

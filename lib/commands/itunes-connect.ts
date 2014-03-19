@@ -2,7 +2,6 @@
 
 "use strict";
 
-import _ = require("underscore");
 import constants = require("../mobile/constants");
 var options:any = require("../options");
 
@@ -54,6 +53,7 @@ export class UploadApplicationCommand implements ICommand {
 		private $errors: IErrors,
 		private $prompter: IPrompter,
 		private $project: Project.IProject,
+		private $buildService: Project.IBuildService,
 		private $identityManager: Server.IIdentityManager) {}
 
 	execute(args:string[]): IFuture<void> {
@@ -94,7 +94,7 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			this.$logger.info("Building release package.")
-			var buildResult = this.$project.build({
+			var buildResult = this.$buildService.build({
 				platform: "iOS",
 				configuration: "Release",
 				provisionTypes: [constants.ProvisionType.AppStore]

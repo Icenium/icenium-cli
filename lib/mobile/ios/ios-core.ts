@@ -9,7 +9,6 @@ import bufferpack = require("bufferpack");
 import plistlib = require("plistlib");
 import helpers = require("./../../helpers");
 import net = require("net");
-import _ = require("underscore");
 import util = require("util");
 import Future = require("fibers/future");
 

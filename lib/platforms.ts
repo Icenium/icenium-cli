@@ -1,6 +1,5 @@
 ///<reference path=".d.ts"/>
 "use strict";
-import _ = require("underscore");
 
 var platforms: {
 	[index: string]: any;

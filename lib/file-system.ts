@@ -6,7 +6,6 @@ import fs = require("fs");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-var _ = <UnderscoreStatic> require("underscore");
 
 export class FileSystem implements IFileSystem {
 	private _stat = Future.wrap(fs.stat);
