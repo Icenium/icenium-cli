@@ -11,6 +11,7 @@ export class DeployCommand implements ICommand {
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
+		private $buildService: Project.IBuildService,
 		private $commandsService: ICommandsService) { }
 
 	public execute(args: string[]): IFuture<void> {
@@ -29,7 +30,7 @@ export class DeployCommand implements ICommand {
 
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				if(!packageFile) {
-					var packageDefs = this.$project.deploy(this.$devicesServices.platform, device).wait();
+					var packageDefs = this.$buildService.deploy(this.$devicesServices.platform, device).wait();
 					packageFile = packageDefs[0].localFile;
 
 					this.$logger.debug("Ready to deploy %s", packageDefs);

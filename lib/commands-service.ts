@@ -1,8 +1,6 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import _ = require("underscore");
-
 export class CommandsService implements ICommandsService {
 	constructor(private $errors: IErrors) { }
 

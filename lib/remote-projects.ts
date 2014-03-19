@@ -6,7 +6,6 @@ import path = require("path");
 import helpers = require("./helpers");
 import unzip = require("unzip");
 var options:any = require("./options");
-var _ = <UnderscoreStatic> require("underscore");
 
 class RemoteProjectExporter {
 	constructor(private $logger: ILogger,

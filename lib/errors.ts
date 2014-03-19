@@ -2,7 +2,6 @@
 
 import util = require("util");
 import path = require("path");
-import _ = require("underscore");
 
 function Exception() {}
 Exception.prototype = new Error();

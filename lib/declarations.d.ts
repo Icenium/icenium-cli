@@ -115,6 +115,10 @@ declare module Project {
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult>;
+		importProject(): IFuture<void>;
+		executeBuild(platform: string): IFuture<void>;
+		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
+		deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]>;
 	}
 
 	interface IBuildSettings {
@@ -133,10 +137,6 @@ declare module Project {
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
-		deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]>;
-		executeBuild(platform: string): IFuture<void>;
-		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		importProject(): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): void;
 		createNewProject(projectName: string): IFuture<void>;

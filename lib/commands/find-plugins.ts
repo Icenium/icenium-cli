@@ -4,7 +4,6 @@
 import service = require("../services/cordova-plugins");
 import util = require("util");
 import os = require("os");
-import _ = require("underscore");
 
 export class FindPluginsCommand implements ICommand {
 	constructor(private $cordovaPluginsService: service.CordovaPluginsService) {

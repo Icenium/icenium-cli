@@ -2,7 +2,6 @@
 "use strict";
 
 import validator = require("validator");
-import _ = require("underscore");
 import helpers = require("../helpers");
 import ValidationResult = require("./validation-result");
 import BaseValidators = require("./base-validators");

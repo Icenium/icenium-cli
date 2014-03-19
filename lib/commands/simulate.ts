@@ -6,7 +6,6 @@ import unzip = require("unzip");
 import options = require("../options");
 import util = require("../helpers");
 import Future = require("fibers/future");
-var _ = <UnderscoreStatic> require("underscore");
 
 export class SimulateCommand implements ICommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";

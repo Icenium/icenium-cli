@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 
 import path = require("path");
-import _ = require("underscore");
 import helpers = require("../helpers");
 import ValidationResult = require("./validation-result");
 

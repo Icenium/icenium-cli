@@ -1,7 +1,6 @@
 ///<reference path="./../../.d.ts"/>
 
 import Signal = require("./../../events/signal");
-import _ = require("underscore");
 import util = require("util");
 import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");

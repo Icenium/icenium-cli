@@ -3,7 +3,6 @@
 "use strict";
 
 import util = require("util");
-import _ = require("underscore");
 
 export class UserStatusCommand implements ICommand {
 	constructor(private $userDataStore: IUserDataStore,

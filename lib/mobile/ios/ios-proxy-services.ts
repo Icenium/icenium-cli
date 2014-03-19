@@ -7,7 +7,6 @@ import path = require("path");
 import iOSCore = require("./ios-core");
 import Future = require("fibers/future");
 import util = require("util");
-import _ = require("underscore");
 import helpers = require("./../../helpers");
 import net = require("net");
 import MobileHelpers = require("./../mobile-helper");

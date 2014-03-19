@@ -2,7 +2,6 @@
 "use strict";
 
 import ValidationResult = require("./validation-result");
-import _ = require("underscore");
 
 export class BaseValidator<Input> implements IValidator<Input> {
 	public throwIfInvalid(data: Input): void {

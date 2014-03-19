@@ -6,7 +6,6 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import _ = require("underscore");
 
 require("./extensions");
 require("./bootstrap");

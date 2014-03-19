@@ -1,3 +1,4 @@
+global._ = require("underscore");
 global.$injector = require("./yok").injector;
 
 $injector.require("serverConfiguration", "./server-config");
@@ -36,10 +37,11 @@ $injector.requireCommand("login", "./login");
 $injector.requireCommand("logout", "./login");
 $injector.requireCommand("dev-telerik-login", "./login");
 
-$injector.require("buildService", "./project");
+$injector.require("buildService", "./services/build");
+$injector.requireCommand("build", "./services/build");
+$injector.requireCommand("cloud-sync", "./services/build");
+
 $injector.require("project", "./project");
-$injector.requireCommand("build", "./project");
-$injector.requireCommand("cloud-sync", "./project");
 $injector.requireCommand("create", "./project");
 $injector.requireCommand("init", "./project");
 $injector.requireCommand("prop-add", "./project");
@@ -51,7 +53,6 @@ $injector.require("projectNameValidator", "./validators/project-name-validator")
 
 $injector.requireCommand("list-projects", "./remote-projects");
 $injector.requireCommand("export-project", "./remote-projects");
-$injector.require("buildService", "./project");
 $injector.requireCommand("list-devices", "./commands/list-devices");
 
 $injector.requireCommand("deploy", "./commands/deploy");

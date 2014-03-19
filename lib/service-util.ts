@@ -7,7 +7,6 @@ import Future = require("fibers/future");
 import cookielib = require("cookie");
 import Url = require("url");
 import helpers = require("./helpers");
-var _ = <UnderscoreStatic> require("underscore");
 
 export class HttpClient implements Server.IHttpClient {
 	private defaultUserAgent: string;
