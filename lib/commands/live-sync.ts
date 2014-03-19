@@ -31,6 +31,7 @@ export class LiveSyncCommand implements ICommand {
 
 			if (options.watch) {
 				this.liveSyncDevices(this.$devicesServices.platform, projectDir, appIdentifier);
+				helpers.exitOnStdinEnd();
 			} else {
 				if (options.file) {
 					var isExistFile = this.$fs.exists((options.file)).wait();

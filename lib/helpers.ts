@@ -232,3 +232,8 @@ export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (
 
 	return undefined;
 }
+
+export function exitOnStdinEnd(): void {
+	process.stdin.on("data", () => {});
+	process.stdin.on("end", () => process.exit());
+}
