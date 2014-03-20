@@ -312,3 +312,8 @@ interface IX509CertificateLoader {
 interface IQrCodeGenerator {
 	generateDataUri(data: string): string;
 }
+
+interface IResourceLoader {
+	resolvePath(path: string): string;
+	openFile(path: string): any;
+}

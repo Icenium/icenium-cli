@@ -19,7 +19,10 @@ declare module Server {
 	}
 
 	interface ICordovaServiceContract {
+		addPlatform(solutionName: string, projectName: string, platform: string): IFuture<any>;
 		getCordovaVersions(): IFuture<any>;
+		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<any>;
+		getJs(version: string, platform: string, $resultStream: any): IFuture<void>;
 		getLiveSyncToken(solutionName: string, projectName: string): IFuture<any>;
 		getLiveSyncUrl(longUrl: string): IFuture<any>;
 		getPlugins(version: string): IFuture<any>;
@@ -75,6 +78,7 @@ declare module Server {
 		createProject(solutionName: string, expansionData: any): IFuture<void>;
 		deleteProject(solutionName: string, projectName: string): IFuture<void>;
 		deleteSolution(solutionName: string): IFuture<void>;
+		exportSolution(solutionSpaceName: string, solutionName: string, $resultStream: any): IFuture<void>;
 		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
 		getItemTemplates(): IFuture<any>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<any>;
@@ -89,10 +93,15 @@ declare module Server {
 		upgradeSolution(solutionName: string): IFuture<void>;
 	}
 
-	interface ISolutionUserSettingsServiceContract {
-		getSettings(solutionName: string): IFuture<any>;
+	interface IRawSettingsServiceContract {
+		getSolutionUserSettings(solutionName: string, $resultStream: any): IFuture<void>;
 		getUserSettings($resultStream: any): IFuture<void>;
+		saveSolutionUserSettings(solutionName: string, content: any): IFuture<void>;
 		saveUserSettings(content: any): IFuture<void>;
+	}
+
+	interface ISettingsServiceContract {
+		getSettings(solutionName: string): IFuture<any>;
 		setActiveBuildConfiguration(solutionName: string, buildConfiguration: string): IFuture<void>;
 		setCodesignIdentity(solutionName: string, projectIdentity: string, platform: string, identityAlias: any): IFuture<void>;
 		setMobileProvision(solutionName: string, projectIdentity: string, provisionIdentifier: any): IFuture<void>;
@@ -110,18 +119,25 @@ declare module Server {
 
 	interface IVersionControlServiceContract {
 		add(solutionName: string, filePaths: any): IFuture<void>;
+		checkout(solutionName: string, versionName: string, filePaths: any): IFuture<void>;
+		checkoutBranch(solutionName: string, branchName: string, versionName: string, createBranch: string): IFuture<any>;
 		commit(solutionName: string, filePaths: any, commentText: any): IFuture<void>;
+		createBranch(solutionName: string, branchName: string, versionName: string): IFuture<any>;
+		deleteBranch(solutionName: string, branchName: string, forceDelete: string): IFuture<void>;
+		getBranches(solutionName: string): IFuture<any>;
 		getChanges(solutionName: string, versionName: string): IFuture<any>;
 		getCommit(solutionName: string, versionName: string): IFuture<any>;
 		getCommits(solutionName: string, startDate: string, endDate: string): IFuture<any>;
 		getConflicts(solutionName: string, contextSize: string, filePaths: any): IFuture<any>;
 		getContents(solutionName: string, versionName: string, filePath: string): IFuture<any>;
+		getCurrentBranch(solutionName: string): IFuture<any>;
 		getDiff(solutionName: string, versionName: string, otherVersionName: string, contextSize: string, filePaths: any): IFuture<any>;
 		getHistory(solutionName: string, versionName: string, filePath: string): IFuture<any>;
 		getInfo(solutionName: string): IFuture<any>;
 		getRemote(solutionName: string): IFuture<any>;
 		getStatus(solutionName: string, filePaths: any): IFuture<any>;
 		init(solutionName: string): IFuture<void>;
+		merge(solutionName: string, versionName: string): IFuture<any>;
 		move(solutionName: string, oldPaths: any, newPaths: any): IFuture<void>;
 		remove(solutionName: string, filePaths: any): IFuture<void>;
 		reset(solutionName: string, versionName: string, resetMode: string): IFuture<void>;
@@ -143,7 +159,8 @@ declare module Server {
 		images: IImageServiceContract;
 		mobileprovisions: IMobileProvisionServiceContract;
 		projects: IProjectServiceContract;
-		settings: ISolutionUserSettingsServiceContract;
+		rawSettings: IRawSettingsServiceContract;
+		settings: ISettingsServiceContract;
 		tap: ITapServiceContract;
 		versioncontrol: IVersionControlServiceContract;
 	}

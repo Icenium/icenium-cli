@@ -62,8 +62,20 @@ export class CordovaService implements Server.ICordovaServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
 
+	addPlatform(solutionName: string, projectName: string, platform: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('AddPlatform', 'POST', ['/cordova/platforms', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(platform.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
 	getCordovaVersions(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetCordovaVersions', 'GET', '/cordova/versions', 'application/json', null, null);
+	}
+
+	getCurrentPlatforms(solutionName: string, projectName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetCurrentPlatforms', 'GET', ['/cordova/platforms', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
+	getJs(version: string, platform: string, $resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('GetJs', 'GET', ['/cordova', encodeURI(version.replace(/\\/g, '/')), encodeURI(platform.replace(/\\/g, '/')), 'js'].join('/'), 'application/octet-stream', null, $resultStream);
 	}
 
 	getLiveSyncToken(solutionName: string, projectName: string): IFuture<any> {
@@ -244,6 +256,10 @@ export class ProjectService implements Server.IProjectServiceContract {
 		return this.$serviceProxy.call<void>('DeleteSolution', 'DELETE', ['/projects', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 
+	exportSolution(solutionSpaceName: string, solutionName: string, $resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('ExportSolution', 'GET', ['/projects/export', encodeURI(solutionSpaceName.replace(/\\/g, '/')), encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
+	}
+
 	getExportedSolution(solutionName: string, $resultStream: any): IFuture<void> {
 		return this.$serviceProxy.call<void>('GetExportedSolution', 'GET', ['/projects/export', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
 	}
@@ -294,20 +310,34 @@ export class ProjectService implements Server.IProjectServiceContract {
 
 }
 
-export class SolutionUserSettingsService implements Server.ISolutionUserSettingsServiceContract {
+export class RawSettingsService implements Server.IRawSettingsServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	getSolutionUserSettings(solutionName: string, $resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('GetSolutionUserSettings', 'GET', ['/rawSettings/solution', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
+	}
+
+	getUserSettings($resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('GetUserSettings', 'GET', '/rawSettings/currentUser', 'application/octet-stream', null, $resultStream);
+	}
+
+	saveSolutionUserSettings(solutionName: string, content: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('SaveSolutionUserSettings', 'POST', ['/rawSettings/solution', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+
+	saveUserSettings(content: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('SaveUserSettings', 'POST', '/rawSettings/currentUser', null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+
+}
+
+export class SettingsService implements Server.ISettingsServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
 
 	getSettings(solutionName: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetSettings', 'GET', ['/settings/solution', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-
-	getUserSettings($resultStream: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('GetUserSettings', 'GET', '/settings/currentUser', 'application/octet-stream', null, $resultStream);
-	}
-
-	saveUserSettings(content: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('SaveUserSettings', 'POST', '/settings/currentUser', null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
 	}
 
 	setActiveBuildConfiguration(solutionName: string, buildConfiguration: string): IFuture<void> {
@@ -366,8 +396,28 @@ export class VersionControlService implements Server.IVersionControlServiceContr
 		return this.$serviceProxy.call<void>('Add', 'ADD', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'files'].join('/'), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
 	}
 
+	checkout(solutionName: string, versionName: string, filePaths: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('Checkout', 'CHECKOUT', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'files'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+
+	checkoutBranch(solutionName: string, branchName: string, versionName: string, createBranch: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('CheckoutBranch', 'CHECKOUT', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'branches', encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'versionName': versionName, 'createBranch': createBranch }), 'application/json', null, null);
+	}
+
 	commit(solutionName: string, filePaths: any, commentText: any): IFuture<void> {
 		return this.$serviceProxy.call<void>('Commit', 'COMMIT', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}, {name: 'commentText', value: JSON.stringify(commentText), contentType: 'application/json'}], null);
+	}
+
+	createBranch(solutionName: string, branchName: string, versionName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('CreateBranch', 'POST', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'branches', encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), 'application/json', null, null);
+	}
+
+	deleteBranch(solutionName: string, branchName: string, forceDelete: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('DeleteBranch', 'DELETE', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'branches', encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'forceDelete': forceDelete }), null, null, null);
+	}
+
+	getBranches(solutionName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetBranches', 'GET', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'branches'].join('/'), 'application/json', null, null);
 	}
 
 	getChanges(solutionName: string, versionName: string): IFuture<any> {
@@ -388,6 +438,10 @@ export class VersionControlService implements Server.IVersionControlServiceContr
 
 	getContents(solutionName: string, versionName: string, filePath: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetContents', 'GET', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(versionName.replace(/\\/g, '/')), 'contents', encodeURI(filePath.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
+	getCurrentBranch(solutionName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetCurrentBranch', 'GET', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'branch'].join('/'), 'application/json', null, null);
 	}
 
 	getDiff(solutionName: string, versionName: string, otherVersionName: string, contextSize: string, filePaths: any): IFuture<any> {
@@ -412,6 +466,10 @@ export class VersionControlService implements Server.IVersionControlServiceContr
 
 	init(solutionName: string): IFuture<void> {
 		return this.$serviceProxy.call<void>('Init', 'INIT', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+
+	merge(solutionName: string, versionName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('Merge', 'MERGE', ['/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), 'application/json', null, null);
 	}
 
 	move(solutionName: string, oldPaths: any, newPaths: any): IFuture<void> {
@@ -459,7 +517,8 @@ export class Server {
 	public images = $injector.resolve(ImageService);
 	public mobileprovisions = $injector.resolve(MobileProvisionService);
 	public projects = $injector.resolve(ProjectService);
-	public settings = $injector.resolve(SolutionUserSettingsService);
+	public rawSettings = $injector.resolve(RawSettingsService);
+	public settings = $injector.resolve(SettingsService);
 	public tap = $injector.resolve(TapService);
 	public versioncontrol = $injector.resolve(VersionControlService);
 }

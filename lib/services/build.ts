@@ -23,6 +23,7 @@ export class BuildService implements Project.IBuildService {
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
+		private $templatesService: ITemplatesService,
 		private $projectNameValidator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
@@ -278,6 +279,7 @@ export class BuildService implements Project.IBuildService {
 			settings.configuration = settings.configuration || "Debug";
 			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);
 
+			this.ensureAllPlatformAssets().wait();
 			this.importProject().wait();
 
 			var buildResult = this.requestCloudBuild(settings).wait();
@@ -402,6 +404,46 @@ export class BuildService implements Project.IBuildService {
 			this.$server.projects.importProject(this.$project.projectData.name, this.$project.projectData.name,
 				this.$fs.createReadStream(projectZipFile)).wait();
 			this.$logger.trace("Project imported");
+		}).future<void>()();
+	}
+
+	_assetUpdateMessagePrinted = false;
+	private printAssetUpdateMessage() {
+		if (!this._assetUpdateMessagePrinted) {
+			this.$logger.info("Setting up missing asset files. Commit these assets into your source control repository.");
+			this._assetUpdateMessagePrinted = true;
+		}
+	}
+
+	private ensureAllPlatformAssets(): IFuture<void> {
+		return ((): void => {
+			Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
+				this.ensureCordovaJs(platform).wait();
+			})
+
+			var appResourceFiles = helpers.enumerateFilesInDirectorySync(this.$templatesService.appResourcesDir);
+			appResourceFiles.forEach((appResourceFile) => {
+				var relativePath = path.relative(this.$templatesService.appResourcesDir, appResourceFile);
+				var targetFilePath = path.join(this.$project.getProjectDir(), relativePath);
+				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
+				if (!this.$fs.exists(targetFilePath).wait()) {
+					this.printAssetUpdateMessage();
+					this.$logger.trace("File not found, copying %s", appResourceFile);
+					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
+				}
+			});
+		}).future<void>()();
+	}
+
+	private ensureCordovaJs(platform: string): IFuture<void> {
+		return (() => {
+			var cordovaJsFileName = path.join(this.$project.getProjectDir(), util.format("cordova.%s.js", platform).toLowerCase());
+			if (!this.$fs.exists(cordovaJsFileName).wait()) {
+				this.printAssetUpdateMessage();
+				var cordovaJsSourceFilePath = this.$templatesService.buildCordovaJsFilePath(
+					this.$project.projectData.FrameworkVersion, platform);
+				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
+			}
 		}).future<void>()();
 	}
 }
