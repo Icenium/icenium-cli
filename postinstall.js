@@ -70,3 +70,12 @@ if (fs.existsSync(bashProfileFileName)) {
 
 // zsh - http://www.acm.uiuc.edu/workshops/zsh/startup_files.html
 updateShellScript(".zshrc");
+
+var child = child_process.exec("appbuilder post-install", function (error) {
+	if (error) {
+		console.error("Failed to complete all post-install steps.");
+		throw error;
+	}
+});
+
+child.stdout.pipe(process.stdout);

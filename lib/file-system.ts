@@ -6,10 +6,12 @@ import fs = require("fs");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
+import rimraf = require("rimraf");
 
 export class FileSystem implements IFileSystem {
 	private _stat = Future.wrap(fs.stat);
 	private _readFile = Future.wrap(fs.readFile);
+	private _deleteDirectory = Future.wrap(rimraf);
 	private _writeFile = Future.wrap<void>(fs.writeFile);
 	private _readdir = Future.wrap(fs.readdir);
 	private _chmod = Future.wrap(fs.chmod);
@@ -72,6 +74,13 @@ export class FileSystem implements IFileSystem {
 			}
 		})
 		return future;
+	}
+
+	public deleteDirectory(directory: string): IFuture<void> {
+		return (() => {
+			this._deleteDirectory(directory).wait();
+		}).future<void>()();
+		
 	}
 
 	public getFileSize(path: string): IFuture<number> {

@@ -2,7 +2,6 @@
 
 "use strict";
 
-import rimraf = require("rimraf");
 import xml2js = require("xml2js");
 import unzip = require("unzip");
 import minimatch = require("minimatch");
@@ -11,6 +10,7 @@ var options:any = require("./options");
 import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("./helpers");
+import os = require("os");
 import MobileHelper = require("./mobile/mobile-helper");
 
 export class Project implements Project.IProject {
@@ -24,8 +24,9 @@ export class Project implements Project.IProject {
 		private $projectNameValidator,
 		private $errors: IErrors,
 		private $userDataStore: IUserDataStore,
-		private $loginManager: ILoginManager) {
-		this.readProjectData().wait();
+		private $loginManager: ILoginManager,
+		private $templatesService: ITemplatesService) {
+			this.readProjectData().wait();
 	}
 
 	public getProjectDir(): string {
@@ -176,7 +177,7 @@ export class Project implements Project.IProject {
 
 	private createFromTemplate(appname, projectDir): IFuture<void> {
 		return (() => {
-			var templatesDir = path.join(__dirname, "../resources/templates"),
+			var templatesDir = this.$templatesService.projectTemplatesDir,
 				template = options.template || this.$config.DEFAULT_PROJECT_TEMPLATE,
 				templateFileName;
 
@@ -199,7 +200,7 @@ export class Project implements Project.IProject {
 			projectDir = path.join(projectDir, appname);
 
 			this.$projectNameValidator.validate(appname);
-			templateFileName = path.join(templatesDir, "Telerik.Mobile.Cordova." + template + ".zip");
+			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(template));
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if (this.$fs.exists(templateFileName).wait()) {
 				this.$logger.trace("Creating template folder '%s'", projectDir);
@@ -219,17 +220,12 @@ export class Project implements Project.IProject {
 					this.$logger.info("%s has been successfully created.", appname);
 				}
 				catch (ex) {
-					Future.wrap(rimraf)(projectDir).wait();
+					this.$fs.deleteDirectory(projectDir).wait();
 					throw ex;
 				}
 			} else {
-				var message =
-					["The requested template " + options.template + " does not exist.",
-					"Available templates are:"];
-				this.$config.TEMPLATE_NAMES.forEach((item) => {
-					message.push("  " + item);
-				});
-				this.$errors.fail({formatStr: message.join("\n"), suppressCommandHelp: true});
+				var message = util.format("The requested template %s does not exist.%sAvailable templates are: %s", options.template, os.EOL, this.$templatesService.projectTemplatesString());
+				this.$errors.fail({formatStr: message, suppressCommandHelp: true});
 			}
 		}).future<void>()();
 	}

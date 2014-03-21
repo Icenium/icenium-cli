@@ -148,6 +148,7 @@ interface IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
 	exists(path: string): IFuture<boolean>;
 	deleteFile(path: string): IFuture<void>;
+	deleteDirectory(directory: string): IFuture<void>;
 	getFileSize(path: string): IFuture<number>;
 	futureFromEvent(eventEmitter: any, event: string): IFuture<any>;
 	createDirectory(path: string): IFuture<void>;
@@ -228,7 +229,6 @@ interface IConfiguration {
 	SOLUTION_SPACE_NAME: string;
 	QR_SIZE: number;
 	DEFAULT_PROJECT_TEMPLATE: string;
-	TEMPLATE_NAMES: string[];
 	CORDOVA_PLUGINS_REGISTRY: string;
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;
