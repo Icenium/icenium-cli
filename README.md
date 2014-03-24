@@ -247,11 +247,11 @@ The following Telerik AppBuilder features are not applicable to the Telerik AppB
 Contribution
 ===
 
-To learn how to log a bug that you just discovered, click [here](CONTRIBUTING#bug).
+To learn how to log a bug that you just discovered, click [here](CONTRIBUTING.md#report-an-issue).
 
-To learn how to suggest a new feature or improvement, click [here](CONTRIBUTING#request).
+To learn how to suggest a new feature or improvement, click [here](CONTRIBUTING.md#request-a-feature).
 
-To learn how to contribute to the code base, click [here](CONTRIBUTING#contribute).
+To learn how to contribute to the code base, click [here](CONTRIBUTING.md#contribute-to-the-code-base).
 
 [Back to Top][1]
 
