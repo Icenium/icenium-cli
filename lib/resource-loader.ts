@@ -48,10 +48,23 @@ class ResourceDownloader implements IResourceDownloader {
 					var targetFilePath = this.$resources.buildCordovaJsFilePath(version, platform);
 					this.$fs.createDirectory(path.dirname(targetFilePath)).wait();
 					var targetFile = this.$fs.createWriteStream(targetFilePath);
-					this.$server.cordova.getJs(version, platform, targetFile).wait();
+					this.$server.cordova.getJs(version, this.toDevicePlatform(platform), targetFile).wait();
 				});
 			});
 		}).future<void>()();
+	}
+
+	private toDevicePlatform(platform: string): Server.DevicePlatform {
+		switch(platform.toLowerCase()) {
+			case "android":
+				return Server.DevicePlatform.Android;
+			case "ios":
+				return Server.DevicePlatform.iOS;
+			case "wp8":
+				return Server.DevicePlatform.WP8;
+			default:
+				return undefined;
+		}
 	}
 }
 $injector.register("resourceDownloader", ResourceDownloader);

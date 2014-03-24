@@ -38,7 +38,7 @@ declare module Server {
 	}
 
 	interface IServiceContractProvider {
-		getApi(): Server.Contract.IService[];
+		getApi(path?: string): IFuture<Server.SwaggerContract.ISwagger>;
 	}
 
 	interface IIdentityManager {
@@ -108,6 +108,72 @@ declare module Server.Contract {
 		name: string;
 		endpoint: string;
 		operations: IOperation[];
+	}
+}
+
+declare module Server.SwaggerContract {
+	interface ISwagger {
+		apis: ISwaggerApiPath[];
+		models: ISwaggerModels;
+	}
+
+	interface ISwaggerModels {
+		[name: string]: ISwaggerModel;
+	}
+
+	interface ISwaggerModel {
+		id: string;
+		properties: ISwaggerModelProperties;
+	}
+
+	interface ISwaggerModelProperties {
+		[id: string]: ISwaggerModelProperty;
+	}
+
+	interface ISwaggerModelProperty {
+		type: string;
+		items: ISwaggerModelPropertyItems;
+		allowableValues: ISwaggerModelPropertyAllowableValues;
+	}
+
+	interface ISwaggerApiPath {
+		path: string;
+	}
+
+	interface ISwaggerService {
+		basePath: string;
+		resourcePath: string;
+		models: any;
+		apis: ISwaggerApi[];
+	}
+
+	interface ISwaggerApi {
+		path: string;
+		operations: ISwaggerOperation[];
+	}
+
+	interface ISwaggerOperation {
+		httpMethod: string;
+		nickname: string;
+		responseClass: string;
+		parameters: ISwaggerParameter[];
+	}
+
+	interface ISwaggerParameter {
+		required: boolean;
+		name: string;
+		paramType: string;
+		dataType: string;
+		allowableValues: ISwaggerModelPropertyAllowableValues;
+	}
+
+	interface ISwaggerModelPropertyItems {
+		$ref: string;
+	}
+
+	interface ISwaggerModelPropertyAllowableValues {
+		valueType: string;
+		values: string[];
 	}
 }
 
@@ -403,6 +469,7 @@ interface ICancellationService extends IDisposable {
 	begin(name: string): IFuture<void>;
 	end(name: string): void;
 }
+
 interface IServerExtensionsService {
 	prepareExtension(packageName: string): IFuture<void>;
 	getExtensionVersion(packageName: string): string;
@@ -427,3 +494,6 @@ interface ISamplesService {
 	printSamplesInformation(): IFuture<string>;
 }
 
+interface StringMap<T> {
+	[key: string]: T;
+}

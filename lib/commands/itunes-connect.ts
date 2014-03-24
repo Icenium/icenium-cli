@@ -5,20 +5,11 @@
 import constants = require("../mobile/constants");
 var options:any = require("../options");
 
-interface IAppStoreApplication {
-	AppleID: number;
-	ReservedBundleIdentifier: string;
-	Application: string;
-	"SKU Number": string;
-	"Version Number": string;
-	IconURL: string;
-}
-
 export class ListApplicationsReadyForUploadCommand implements ICommand {
 	constructor(private $server: Server.IServer,
-		private $logger: ILogger,
-		private $prompter: IPrompter,
-		private $errors: IErrors) {}
+				private $logger: ILogger,
+				private $prompter: IPrompter,
+				private $errors: IErrors) {}
 
 	execute(args:string[]): IFuture<void> {
 		return (() => {
@@ -32,11 +23,11 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 				password = this.$prompter.getPassword("Apple ID password").wait();
 			}
 
-			var apps: IAppStoreApplication[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
-			apps = _.sortBy(apps, (app) => app.Application);
+			var apps: Server.Application[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			apps = _.sortBy(apps, (app) => app.Name);
 
 			apps.forEach((app) => {
-				this.$logger.out("%s %s (%s)", app.Application, app["Version Number"], app.ReservedBundleIdentifier);
+				this.$logger.out("%s %s (%s)", app.Name, app["Version Number"], app.BundleIdentifier);
 			})
 
 			if (!apps.length) {
@@ -49,12 +40,12 @@ $injector.registerCommand("appstore|list", ListApplicationsReadyForUploadCommand
 
 export class UploadApplicationCommand implements ICommand {
 	constructor(private $server: Server.IServer,
-		private $logger: ILogger,
-		private $errors: IErrors,
-		private $prompter: IPrompter,
-		private $project: Project.IProject,
-		private $buildService: Project.IBuildService,
-		private $identityManager: Server.IIdentityManager) {}
+				private $logger: ILogger,
+				private $errors: IErrors,
+				private $prompter: IPrompter,
+				private $project: Project.IProject,
+				private $buildService: Project.IBuildService,
+				private $identityManager: Server.IIdentityManager) {}
 
 	execute(args:string[]): IFuture<void> {
 		return (() => {
@@ -87,8 +78,8 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
-			var apps: IAppStoreApplication[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
-			var theApp = _.find(apps, (app) => app.Application === application);
+			var apps: Server.Application[] = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			var theApp = _.find(apps, (app) => app.Name === application);
 			if (!theApp) {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
 			}
@@ -109,7 +100,7 @@ export class UploadApplicationCommand implements ICommand {
 
 			var projectData = this.$project.projectData;
 			this.$server.itmstransporter.uploadApplication(projectData.ProjectName, projectData.ProjectName,
-				projectPath, userName, password, theApp.AppleID.toString()).wait();
+				projectPath, theApp.Id, userName, password).wait();
 
 			this.$logger.info("Upload complete.")
 		}).future<void>()();

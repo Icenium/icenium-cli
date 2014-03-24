@@ -61,27 +61,28 @@ export class BuildService implements Project.IBuildService {
 
 			this.$projectNameValidator.validate(projectName);
 
-			this.$server.projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
+			this.$server.projects.setProjectProperty(solutionName, projectName, <StringMap<string>>{ AppIdentifier: buildProperties.AppIdentifier }).wait();
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
 
 			buildProperties.LiveSyncToken = liveSyncToken;
 
-			var body = this.$server.build.buildProject(solutionName, projectName, {Properties: buildProperties}).wait();
+			var body = this.$server.build.buildProject(solutionName, projectName, {Targets: [], Properties: buildProperties}).wait();
 
 			if (body.Errors.length) {
 				this.$logger.error("Build errors: %s", body.Errors);
 			}
 
-			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult) => {
-				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
+			var buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map(function(buildResult) {
+				var fullPath = buildResult.Properties["FullPath"].replace(/\\/g, "/");
+
 				var solutionPath = util.format("%s/%s", projectName, fullPath);
 
 				return {
-					platform: buildResult.Platform,
+					platform: buildResult.Properties["Platform"],
 					solution: solutionName,
 					solutionPath: solutionPath,
-					relativePath: buildResult.FullPath
+					relativePath: buildResult.Properties["FullPath"]
 				};
 			});
 

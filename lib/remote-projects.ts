@@ -114,7 +114,7 @@ class RemoteProjectExporter {
 	}
 
 	private getSolutionData(projectName: string): IFuture<any> {
-		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, "True"));
+		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, true));
 	}
 }
 $injector.register("remoteProjectsExporter", RemoteProjectExporter);

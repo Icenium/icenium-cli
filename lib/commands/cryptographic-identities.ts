@@ -184,29 +184,29 @@ $injector.register("identityManager", IdentityManager);
 helpers.registerCommand("identityManager", "certificate|*list", (identityManager, args) => identityManager.listCertificates());
 helpers.registerCommand('identityManager', "provision|*list", (identityManager, args) => identityManager.listProvisions());
 
-class IdentityGenerationData {
+class IdentityGenerationDataFactory {
 	private static derObjectIdentifierNames = {
 		C: "2.5.4.6",
 		CN: "2.5.4.3",
 		EmailAddress: "1.2.840.113549.1.9.1"
 	};
 
-	public SubjectNameValues;
-	public StartDate: Date;
-	public EndDate: Date;
-
-	public constructor(identityModel: ISelfSignedIdentityModel) {
-		this.StartDate = new Date(identityModel.StartDate);
-		this.EndDate = new Date(identityModel.EndDate);
-		this.SubjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
-			identityModel.Name, identityModel.Email, identityModel.Country);
+	public static create(identityModel: ISelfSignedIdentityModel): Server.IdentityGenerationData {
+		var identityGenerationData = <Server.IdentityGenerationData> {
+			StartDate: new Date(identityModel.StartDate),
+			Attributes: {},
+			EndDate: new Date(identityModel.EndDate),
+			SubjectNameValues: IdentityGenerationDataFactory.getDistinguishedNameValues(
+				identityModel.Name, identityModel.Email, identityModel.Country)
+		};
+		return identityGenerationData;
 	}
 
-	public static getDistinguishedNameValues(name: string, email: string, countryCode: string) {
+	public static getDistinguishedNameValues(name: string, email: string, countryCode: string): any {
 		var distinguishedNameValues = {};
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.CN] = name;
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.EmailAddress] = email;
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.C] = countryCode;
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.CN] = name;
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.EmailAddress] = email;
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.C] = countryCode;
 		return distinguishedNameValues;
 	}
 }
@@ -332,7 +332,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			this.model = this.$prompter.get(promptSchema).wait();
 			_.extend(this.model, identityInfo);
 
-			var identityGenerationData = new IdentityGenerationData(this.model);
+			var identityGenerationData = IdentityGenerationDataFactory.create(this.model);
 			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
 			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
 		}).future<void>()();
@@ -561,7 +561,7 @@ class CreateCertificateSigningRequest implements ICommand {
 
 			model = this.$identityInformationGatherer.gatherIdentityInformation(model).wait();
 
-			var subjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
+			var subjectNameValues = IdentityGenerationDataFactory.getDistinguishedNameValues(
 				model.Name, model.Email, model.Country);
 			var certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
 
