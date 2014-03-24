@@ -3,18 +3,18 @@
 
 import service = require("../services/cordova-plugins");
 import validUrl = require("valid-url");
-import fs = require("fs");
 
 export class FetchPluginCommand implements ICommand {
 	constructor(private $logger: ILogger,
-		private $cordovaPluginsService: service.CordovaPluginsService) {
+				private $fs: IFileSystem,
+				private $cordovaPluginsService: service.CordovaPluginsService) {
 	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if (args.length === 0) {
 				this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
-			} else if (args.length === 1 && (this.isLocalPath(args[0]) || this.isUrlToRepository(args[0]))) {
+			} else if (args.length === 1 && (this.isLocalPath(args[0]).wait() || this.isUrlToRepository(args[0]))) {
 				var result = this.$cordovaPluginsService.fetch(args[0]);
 				console.log(result);
 			} else {
@@ -31,8 +31,8 @@ export class FetchPluginCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private isLocalPath(pluginId: string): boolean {
-		return fs.existsSync(pluginId);
+	private isLocalPath(pluginId: string): IFuture<boolean> {
+		return this.$fs.exists(pluginId);
 	}
 
 	private isUrlToRepository(pluginId: string): boolean {

@@ -6,7 +6,6 @@ import path = require("path");
 import util = require("util");
 import os = require("os");
 import validUrl = require("valid-url");
-import fs = require("fs");
 import Future = require("fibers/future");
 
 export interface IPlugin {
