@@ -5,7 +5,6 @@
 import http = require("http");
 import url = require("url");
 import path = require("path");
-import fs = require("fs");
 import log = require("./logger");
 import helpers = require("./helpers");
 
@@ -49,7 +48,8 @@ export function serveFile(fileName): (request, response) => void {
 		response.statusCode = 200;
 		response.setHeader("Content-Type", mimeType);
 
-		fs.createReadStream(fileName).pipe(response);
+		var $fs = $injector.resolve("fs");
+		$fs.createReadStream(fileName).pipe(response);
 	};
 }
 
