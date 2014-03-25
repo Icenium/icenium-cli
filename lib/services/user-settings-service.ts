@@ -1,22 +1,22 @@
-///<reference path=".d.ts"/>
+///<reference path="../.d.ts"/>
 "use strict";
 
 import path = require("path");
-import options = require("./options");
+import options = require("./../options");
 
 export class UserSettingsService implements IUserSettingsService {
 	private userSettingsFile = null;
 	private userSettingsData = {};
 
 	constructor(private $fs: IFileSystem) {
-		this.userSettingsFile = path.join(options["profile-dir"], "user");
+		this.userSettingsFile = path.join(options["profile-dir"], "user-settings.json");
 	}
 
 	private getUserSettingsFileSchema(): IFuture<any> {
 		return (() => {
-			var data = this.$fs.readText(this.userSettingsFile).wait();
+			var data = this.$fs.readJson(this.userSettingsFile).wait();
 			if(data) {
-				this.userSettingsData = JSON.parse(data);
+				this.userSettingsData = data;
 			}
 
 			return this.userSettingsData;

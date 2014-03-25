@@ -14,16 +14,17 @@ enum AnalyticsCommandType {
 }
 
 export class AnalyticsService implements IAnalyticsService {
-    private _eqatecMonitor: any = null;
+	private _eqatecMonitor: any = null;
 	private static PRODUCT_KEY = "750a46a45109453c8b05b11de0d3a80b";
 
-    constructor(private $config: IConfiguration,
-        private $logger: ILogger,
+	constructor(private $config: IConfiguration,
+		private $logger: ILogger,
+		private $errors: IErrors,
 		private $prompter: IPrompter,
 		private $userSettingsService: IUserSettingsService,
 		private $userDataStore: IUserDataStore) { }
 
-    private start(): IFuture<void> {
+	private start(): IFuture<void> {
 		return(() => {
 			global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 			global.userAgent = this.getUserAgentString();
@@ -36,9 +37,9 @@ export class AnalyticsService implements IAnalyticsService {
 			var trackFeatureUsage = this.$userSettingsService.getValue("TrackFeatureUsage").wait();
 
 			if(trackFeatureUsage === null || trackFeatureUsage === undefined){
-				var message = "We're constantly looking for ways to make" +  " Appbuilder CLI ".red + "better!. May we anonymously report usage statistics to improve the tool over time?";
+				var message = "We're constantly looking for ways to make" +  " Appbuilder CLI ".blue + "better!. May we anonymously report usage statistics to improve the tool over time?";
 
-				trackFeatureUsage = this.$prompter.confirm(message, () => { return "y"; }).wait();
+				trackFeatureUsage = this.$prompter.confirm(message, () =>  "y").wait();
 				this.$userSettingsService.saveSettings({"TrackFeatureUsage": trackFeatureUsage}).wait();
 			}
 
@@ -51,14 +52,18 @@ export class AnalyticsService implements IAnalyticsService {
 				var user = this.$userDataStore.getUser().wait();
 
 				if(user) {
-					this._eqatecMonitor.setInstallationID(user.email.toLowerCase());
+					var guid = this.$userSettingsService.getValue("AnalyticsInstallationID").wait();
+					if(!guid) {
+						guid = require("node-uuid").v4();
+					}
+					this._eqatecMonitor.setInstallationID(guid);
 					this._eqatecMonitor.setUserID(user.uid);
 				}
 
 				this._eqatecMonitor.start();
 			}
 		}).future<void>()();
-    }
+	}
 
 	public trackFeature(featureName: string): IFuture<void> {
 		return(() => {
@@ -67,8 +72,8 @@ export class AnalyticsService implements IAnalyticsService {
 					this.start().wait();
 				}
 
-				var category = options.client || "CLI";
 				if(this._eqatecMonitor) {
+					var category = options.client || "CLI";
 					this._eqatecMonitor.trackFeature(category + "." + featureName);
 				}
 			} catch(e) {
@@ -126,21 +131,29 @@ export class AnalyticsService implements IAnalyticsService {
 
 	public analyticsCommand(arg: string): IFuture<any> {
 		return(() => {
-			if(arg === AnalyticsCommandType[AnalyticsCommandType.status]) {
-				var status = this.status().wait();
-				var statusMessage = status === null ? "undeterminated" : (status ? "enabled" : "disabled");
-				this.$logger.out("The current status of analytics is: '%s'", statusMessage);
-				return status;
-			} else if(arg === AnalyticsCommandType[AnalyticsCommandType.enable]) {
-				this.enableAnalytics().wait();
-				this.$logger.out("The analytics has been successfully enabled");
-			} else if(arg === AnalyticsCommandType[AnalyticsCommandType.disable]) {
-				this.disableAnalytics().wait();
-				this.$logger.out("The analytics has been successfully disabled");
+			switch(arg) {
+				case AnalyticsCommandType[AnalyticsCommandType.status]:
+					var status = this.status().wait();
+					console.log("status: '%s'", status);
+					var statusMessage = status === null ? "undeterminated" : (status ? "enabled" : "disabled");
+					this.$logger.info("The current status of feature usage tracking is: '%s'", statusMessage);
+					return status;
+					break;
+				case AnalyticsCommandType[AnalyticsCommandType.enable]:
+					this.enableAnalytics().wait();
+					this.$logger.info("Feature usage tracking is enabled");
+					break;
+				case  AnalyticsCommandType[AnalyticsCommandType.disable]:
+					this.disableAnalytics().wait();
+					this.$logger.info("Feature usage tracking is disabled");
+					break;
+				default:
+					this.$errors.fail("Invalid parameter. It should be status, enable or disable");
+					break;
 			}
 		}).future<any>()();
 	}
 }
 $injector.register("analyticsService", AnalyticsService);
 
-helpers.registerCommand("analyticsService", "analytics", (analyticsService, args) => analyticsService.analyticsCommand(args[0]), true);
+helpers.registerCommand("analyticsService", "feature-usage-tracking", (analyticsService, args) => analyticsService.analyticsCommand(args[0]), true);

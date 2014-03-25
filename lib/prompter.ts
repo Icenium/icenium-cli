@@ -50,7 +50,7 @@ export class Prompter implements IPrompter {
 		return ((): boolean => {
 			var schema: IPromptSchema = {
 				properties: {
-					password: {
+					prompt: {
 						description: prompt + " (y/n)",
 						type: "string",
 						required: true,
@@ -61,11 +61,11 @@ export class Prompter implements IPrompter {
 			};
 
 			if(defaultAction) {
-				schema["properties"]["password"]["default"] = defaultAction;
+				schema["properties"]["prompt"]["default"] = defaultAction;
 			}
 
 			var result = this.get(schema).wait();
-			return result.password.toLowerCase() === "y";
+			return result.prompt.toLowerCase() === "y";
 		}).future<boolean>()();
 	}
 
