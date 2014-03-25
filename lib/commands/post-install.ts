@@ -5,12 +5,15 @@
 import Future = require("fibers/future");
 
 export class PostInstallCommand implements ICommand {
-	constructor(private $templatesService: ITemplatesService) { }
+	constructor(private $templatesService: ITemplatesService,
+		private $serviceProxy: Server.IServiceProxy) { }
 
 	public execute(args:string[]): IFuture<void> {
 		return (() => {
+			this.$serviceProxy.setShouldAuthenticate(false);
 			this.$templatesService.downloadProjectTemplates().wait();
 			this.$templatesService.downloadItemTemplates().wait();
+			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();
 	}
 }
