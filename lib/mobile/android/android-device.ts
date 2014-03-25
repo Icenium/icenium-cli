@@ -14,7 +14,6 @@ interface IAndroidDeviceDetails {
 }
 
 export class AndroidDevice implements Mobile.IDevice {
-	private static PROJECT_PATH = "mnt/sdcard/Icenium/";
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
 
 	private model: string;
@@ -74,10 +73,6 @@ export class AndroidDevice implements Mobile.IDevice {
 		return this.vendor;
 	}
 
-	public getDeviceProjectPath(appIdentifier: string): string {
-		return path.join(AndroidDevice.PROJECT_PATH, appIdentifier);
-	}
-
 	private composeCommand(...args) {
 		var command = util.format.apply(null, args);
 		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
@@ -124,7 +119,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	private sendBroadcastToDevice(action, extras = {}): Future<number> {
+	public sendBroadcastToDevice(action, extras = {}): IFuture<number> {
 		return (() => {
 			var broadcastCommand = this.composeCommand("shell am broadcast -a \"%s\"", action);
 
@@ -142,11 +137,9 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<number>()();
 	}
 
-	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
+	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
 		return (() => {
-			var isLiveSyncSupported = this.sendBroadcastToDevice("com.telerik.IsLiveSyncSupported", { "app-id": appIdentifier }).wait();
-			
-			if (isLiveSyncSupported == 1) {
+			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
 				this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());

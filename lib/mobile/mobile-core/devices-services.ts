@@ -197,6 +197,15 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				this.startLookingForDevices().wait();
 			} else if(!platform && !deviceOption) {
 				this.startLookingForDevices().wait();
+
+				var devices = this.getDevices();
+				var platforms = _.uniq(_.map(devices, (device) => device.getPlatform()));
+
+				if (platforms.length === 1) {
+					this._platform = platforms[0];
+				} else {
+					this.$errors.fail("Multiple device platforms detected. Specify platform or device on command line.");
+				}
 			}
 		}).future<void>()();
 	}

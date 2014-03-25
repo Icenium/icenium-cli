@@ -136,7 +136,7 @@ Usage:
     $ appbuilder build <Platform> [--download] [--no-livesync]
 
 Platform-specific examples:
-    $ appbuilder build android
+    $ appbuilder build android [--companion]
     $ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
     $ appbuilder build wp8
 
@@ -219,11 +219,11 @@ Options:
 
 --[livesync]--
 Usage:
-    $ appbuilder livesync [<Platform>]
+    $ appbuilder livesync [<Platform>] [--device <id>] [--companion] [--watch]
 
 Platform-specific example:
-    $ appbuilder livesync android [--device <id>] [--watch]
-    $ appbuilder livesync ios [--device <id>] [--watch] [--companion]
+    $ appbuilder livesync android
+    $ appbuilder livesync ios
 
 Synchronizes the latest changes in your project to connected devices.
 

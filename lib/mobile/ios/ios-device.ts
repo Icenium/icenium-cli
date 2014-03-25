@@ -58,10 +58,6 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}
 	}
 
-	public getDeviceProjectPath(appIdentifier: string): string {
-		return "/Documents/";
-	}
-
 	private validateResult(result: number, error: string) {
 		if (result != 0) {
 			this.$errors.fail(error);
@@ -135,15 +131,15 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}).future<void>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: string): IFuture<void> {
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
 		return(() => {
 			//TODO: CloseSocket must be part of afcClient. Refactor it.
 			var houseArrestClient: Mobile.IHouseArrestClient = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
-			var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier);
+			var afcClientForAppDocuments = houseArrestClient.getAfcClientForAppDocuments(appIdentifier.appIdentifier);
 			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 			houseArrestClient.closeSocket();
 
-			var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier);
+			var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier.appIdentifier);
 			afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist");
 			houseArrestClient.closeSocket();
 
