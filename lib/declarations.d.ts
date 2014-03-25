@@ -132,7 +132,7 @@ declare module Project {
 	}
 
 	interface IProject {
-		projectData: any;
+		projectData: IProjectData;
 		getProjectDir(): string;
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
@@ -216,6 +216,8 @@ interface IProjectData {
 	projectVersion : number;
 	AppIdentifier: string;
 	DisplayName: string;
+	Author: string;
+	Description: string;
 	BundleVersion: string;
 	FrameworkVersion: string;
 	CorePlugins: string[];

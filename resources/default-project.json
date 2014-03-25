@@ -3,6 +3,8 @@
 	"projectVersion": 1,
 	"AppIdentifier": null,
 	"DisplayName": null,
+	"Author": "",
+	"Description": "",
 	"BundleVersion": "1.0",
 	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [

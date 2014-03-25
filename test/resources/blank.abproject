@@ -3,6 +3,8 @@
 	"projectVersion": 1,
 	"AppIdentifier": "com.telerik.Test",
 	"DisplayName": "Test",
+	"Author": "",
+	"Description": "",
 	"BundleVersion": "1.0",
 	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [

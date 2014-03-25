@@ -132,6 +132,8 @@ export class BuildService implements Project.IBuildService {
 				CorePlugins: projectData.CorePlugins,
 				AppIdentifier: projectData.AppIdentifier,
 				ProjectName: projectData.name,
+				Author: projectData.Author,
+				Description: projectData.Description,
 				FrameworkVersion: projectData.FrameworkVersion,
 				BundleVersion: projectData.BundleVersion,
 				DeviceOrientations: projectData.DeviceOrientations
