@@ -18,4 +18,4 @@ export class PostInstallCommand implements ICommand {
 	}
 }
 
-$injector.registerCommand("post-install", PostInstallCommand);
+$injector.registerCommand("dev-post-install", PostInstallCommand);
