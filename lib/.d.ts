@@ -1,5 +1,6 @@
 
 //grunt-start
+/// <reference path="analytics-service.ts" />
 /// <reference path="appbuilder-cli.ts" />
 /// <reference path="bootstrap.ts" />
 /// <reference path="child-process.ts" />
@@ -23,6 +24,7 @@
 /// <reference path="definitions/Q.d.ts" />
 /// <reference path="definitions/bufferpack.d.ts" />
 /// <reference path="definitions/byline.d.ts" />
+/// <reference path="definitions/colors.d.ts" />
 /// <reference path="definitions/commands-service.d.ts" />
 /// <reference path="definitions/commands.d.ts" />
 /// <reference path="definitions/cookie.d.ts" />
@@ -79,6 +81,7 @@
 /// <reference path="service-util.ts" />
 /// <reference path="services/build.ts" />
 /// <reference path="services/cordova-plugins.ts" />
+/// <reference path="services/user-settings-service.ts" />
 /// <reference path="templates-service.ts" />
 /// <reference path="validators/base-validators.ts" />
 /// <reference path="validators/cryptographic-identity-validators.ts" />

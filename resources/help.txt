@@ -1,61 +1,61 @@
 --[]--
 
 Usage:
-    $ appbuilder <command> [command parameters] [--command <options>]
+	$ appbuilder <command> [command parameters] [--command <options>]
 
 General commands:
-    help <command>                  Shows additional information about the commands in this list.
-    login                           Logs you in to the Telerik Platform.
-    logout                          Logs you out from the Telerik Platform.
-    user                            Prints information about the currently logged in user.
+	help <command>                  Shows additional information about the commands in this list.
+	login                           Logs you in to the Telerik Platform.
+	logout                          Logs you out from the Telerik Platform.
+	user                            Prints information about the currently logged in user.
 
 Project development commands:
-    create                          Creates a new project from template.
-    init                            Initializes an existing project for development.
-    build                           Builds the project and produces a QR code for deploying the application package.
-    deploy                          Builds and deploys the project to a connected device.
-    cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    livesync                        Synchronizes the latest changes in your project to connected devices.
-    simulate                        Runs the current project in the device simulator.
-    find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    fetch-plugin                    Imports an Apache Cordova plugin into your project.
-    edit-configuration              Opens a configuration file for editing.
-    prop-add                        Enables more options for the selected project property, if the property accepts multiple values.
-    prop-set                        Sets a project property.
-    prop-remove                     Disables options for the selected project property, if the property accepts multiple values.
-    prop-print                      Shows the value of the selected project property.
-    list-projects                   Lists all projects associated with your Telerik Platform account.
-    export-project                  Exports a selected project from the cloud and initializes it for development.
+	create                          Creates a new project from template.
+	init                            Initializes an existing project for development.
+	build                           Builds the project and produces a QR code for deploying the application package.
+	deploy                          Builds and deploys the project to a connected device.
+	cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
+	livesync                        Synchronizes the latest changes in your project to connected devices.
+	simulate                        Runs the current project in the device simulator.
+	find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+	fetch-plugin                    Imports an Apache Cordova plugin into your project.
+	edit-configuration              Opens a configuration file for editing.
+	prop-add                        Enables more options for the selected project property, if the property accepts multiple values.
+	prop-set                        Sets a project property.
+	prop-remove                     Disables options for the selected project property, if the property accepts multiple values.
+	prop-print                      Shows the value of the selected project property.
+	list-projects                   Lists all projects associated with your Telerik Platform account.
+	export-project                  Exports a selected project from the cloud and initializes it for development.
 
 Device commands:
-    list-devices                    Lists all recognized connected devices.
-    open-device-log-stream          Opens the log stream for the selected device.
+	list-devices                    Lists all recognized connected devices.
+	open-device-log-stream          Opens the log stream for the selected device.
 
 Certificate management and publishing commands:
-    list-certificates               Lists all configured certificates for code signing
-                                    iOS and Android applications.
-    create-self-signed-certificate  Creates self-signed certificate for code signing Android applications.
-    remove-certificate              Removes the selected certificate from the server.
-    export-certificate              Exports the selected certificate from the server on your file system.
-    import-certificate              Imports a certificate from your file system to the server.
-    list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
-    import-provision                Imports a provisioning profile from file.
-    remove-provision                Removes a registered provisioning profile.
-    appstore-list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
-    appstore-upload                 Builds the project and uploads the binary to iTunes Connect.
+	list-certificates               Lists all configured certificates for code signing
+									iOS and Android applications.
+	create-self-signed-certificate  Creates self-signed certificate for code signing Android applications.
+	remove-certificate              Removes the selected certificate from the server.
+	export-certificate              Exports the selected certificate from the server on your file system.
+	import-certificate              Imports a certificate from your file system to the server.
+	list-provisions                 Lists all configured provisioning profiles for code signing iOS applications.
+	import-provision                Imports a provisioning profile from file.
+	remove-provision                Removes a registered provisioning profile.
+	appstore-list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+	appstore-upload                 Builds the project and uploads the binary to iTunes Connect.
 
 Global Options:
-    --help                Prints help about the selected command.
-    --path <path>         Specifies the file path to the project. If not set, the project is searched for
-                          in the current directory and all directories above it.
-    --version             Prints the client version and exits.
+	--help                Prints help about the selected command.
+	--path <path>         Specifies the file path to the project. If not set, the project is searched for
+						  in the current directory and all directories above it.
+	--version             Prints the client version and exits.
 
 --[/]--
 
 --[login]--
 
 Usage:
-    $ appbuilder login
+	$ appbuilder login
 
 Opens a new browser window in which you can provide your login credentials for the Telerik Platform.
 After you have authenticated with Telerik Platform, you can close the browser window and continue your work from the 
@@ -66,7 +66,7 @@ command line.
 --[logout]--
 
 Usage:
-    $ appbuilder logout
+	$ appbuilder logout
 
 Logs you out from the Telerik Platform.
 To build, deploy, or synchronize your projects with the cloud, you need to be logged in.
@@ -76,48 +76,48 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ appbuilder create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
+	$ appbuilder create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
-    A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&), semi-colon (;),
-    opening and closing brackets (()), and comma (,).
+	A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&), semi-colon (;),
+	opening and closing brackets (()), and comma (,).
 
 Options:
-    --template <Template> - Sets the source template for the project. You can use the following templates:
+	--template <Template> - Sets the source template for the project. You can use the following templates:
 	#{templatesService.projectTemplatesString}. The default value is KendoUI.
-    --path - Specifies the path where you want to create the project, if different from the current directory. 
-        The directory must be empty.
-    --appid - Sets the application identifier for your app. The application identifier must consist of at least three
-        alphanumeric strings, separated by a dot (.). Each string must start with a letter.
-        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
-        If not specified, the application identifier is set to com.telerik.<App name>.
+	--path - Specifies the path where you want to create the project, if different from the current directory.
+		The directory must be empty.
+	--appid - Sets the application identifier for your app. The application identifier must consist of at least three
+		alphanumeric strings, separated by a dot (.). Each string must start with a letter.
+		The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
+		If not specified, the application identifier is set to com.telerik.<App name>.
 
 --[/]--
 
 --[init]--
 
 Usage:
-    $ appbuilder init [--appid <App ID>]
+	$ appbuilder init [--appid <App ID>]
 
 Initializes an existing project for development in the current directory. If the folder contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
 
 Options:
-    --appid - Sets the application identifier for your app. The application identifier must consist of at least three
-        alphanumeric strings, separated by a dot (.). Each string must start with a letter.
-        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
-        If not specified, the application identifier is set to com.telerik.<current directory name>.
+	--appid - Sets the application identifier for your app. The application identifier must consist of at least three
+		alphanumeric strings, separated by a dot (.). Each string must start with a letter.
+		The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
+		If not specified, the application identifier is set to com.telerik.<current directory name>.
 
 --[/]--
 
 --[list-devices]--
 Usage:
-    $ appbuilder list-devices [<Platform>] [--timeout  <Milliseconds>]
+	$ appbuilder list-devices [<Platform>] [--timeout  <Milliseconds>]
 
 Platform-specific examples:
-    $ appbuilder list-devices android
-    $ appbuilder list-devices ios
+	$ appbuilder list-devices android
+	$ appbuilder list-devices ios
 
 Options:
 	--timeout - Sets the time in milliseconds for the operation to search for connected devices before completing.
@@ -133,12 +133,12 @@ and that USB debugging is enabled on the device.
 
 --[build]--
 Usage:
-    $ appbuilder build <Platform> [--download] [--no-livesync]
+	$ appbuilder build <Platform> [--download] [--no-livesync]
 
 Platform-specific examples:
-    $ appbuilder build android
-    $ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
-    $ appbuilder build wp8
+	$ appbuilder build android
+	$ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
+	$ appbuilder build wp8
 
 Builds the project for the target platform and produces a QR code for deployment.
 
@@ -153,30 +153,30 @@ When building for Windows Phone 8, the built package is always downloaded, becau
 through a QR code is not supported.
 
 Options:
-    --download - If set, downloads the application package to the .ab directory in the current directory, instead
-        of producing a QR code. Set this option if you want to manually deploy the app package later.
-    --companion - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the
-        companion app, you do not need to set a certificate or provision.
-    --certificate - Required when building for iOS unless the --companion switch is specified.
-        Sets the certificate that you want to use for code signing your iOS app. Must match the selected
-        provisioning profile. You can set a certificate by index or name.
-    --provision - Required when building for iOS unless the --companion switch is set. 
-        Sets the provisioning profile that you want to use for code signing your iOS app. Must match the selected 
-        certificate. You can set a provisioning profile by index or name.
-    --no-livesync - If set, disables LiveSync of code changes with the three-finger tap and hold gesture.
+	--download - If set, downloads the application package to the .ab directory in the current directory, instead
+		of producing a QR code. Set this option if you want to manually deploy the app package later.
+	--companion - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the
+		companion app, you do not need to set a certificate or provision.
+	--certificate - Required when building for iOS unless the --companion switch is specified.
+		Sets the certificate that you want to use for code signing your iOS app. Must match the selected
+		provisioning profile. You can set a certificate by index or name.
+	--provision - Required when building for iOS unless the --companion switch is set.
+		Sets the provisioning profile that you want to use for code signing your iOS app. Must match the selected
+		certificate. You can set a provisioning profile by index or name.
+	--no-livesync - If set, disables LiveSync of code changes with the three-finger tap and hold gesture.
 
 --[/]--
 
 --[import-provision]--
 Usage:
-    $ appbuilder import-provision <File>
+	$ appbuilder import-provision <File>
 
 Imports the provisioning profile stored in the selected file.
 --[/]--
 
 --[remove-provision]--
 Usage:
-    $ appbuilder remove-provision <Name or #Index>
+	$ appbuilder remove-provision <Name or #Index>
 
 Removes the registered provisioning profile selected by its name or index. Use the `list-provisions`
 command to see a list of registered provisioning profiles.
@@ -184,7 +184,7 @@ command to see a list of registered provisioning profiles.
 
 --[cloud-sync]--
 Usage:
-    $ appbuilder cloud-sync
+	$ appbuilder cloud-sync
 
 Synchronizes the project with the cloud to enable LiveSync via wireless connection. 
 
@@ -194,11 +194,11 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform>
+	$ appbuilder deploy <Platform>
 
 Platform-specific examples:
-    $ appbuilder deploy android [--device <ID>]
-    $ appbuilder deploy ios --certificate <Name or ID> --provision <Name or ID>
+	$ appbuilder deploy android [--device <ID>]
+	$ appbuilder deploy ios --certificate <Name or ID> --provision <Name or ID>
 
 Builds the project for the selected platform and deploys it to a connected device.
 
@@ -208,32 +208,32 @@ Run list-provisions to list available provisioning profiles for code signing iOS
 provisioning profile by index or name.
 
 Options:
-    --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
-        Run list-devices to list all connected devices, grouped by platform.
-    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
-        app. Must match the selected provisioning profile. You can set a certificate by index or name.
-    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
-        your iOS app. Must match the selected certificate. You can set a provisioning profile by index or name.
+	--device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
+		Run list-devices to list all connected devices, grouped by platform.
+	--certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
+		app. Must match the selected provisioning profile. You can set a certificate by index or name.
+	--provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
+		your iOS app. Must match the selected certificate. You can set a provisioning profile by index or name.
 
 --[/]--
 
 --[livesync]--
 Usage:
-    $ appbuilder livesync [<Platform>]
+	$ appbuilder livesync [<Platform>]
 
 Platform-specific example:
-    $ appbuilder livesync android [--device <id>] [--watch]
-    $ appbuilder livesync ios [--device <id>] [--watch] [--companion]
+	$ appbuilder livesync android [--device <id>] [--watch]
+	$ appbuilder livesync ios [--device <id>] [--watch] [--companion]
 
 Synchronizes the latest changes in your project to connected devices.
 
 Options:
-    --watch - When you save changes to the project, changes are automatically synchronized
-        to the connected device.
-    --device - Specifies the serial number or the index of the connected device to which you want to synchronize changes. 
-        Run list-devices to list all connected devices, grouped by platform.
-    --companion - When you save changes to the project, changes are automatically synchronized
-        to the Telerik AppBuilder companion app.
+	--watch - When you save changes to the project, changes are automatically synchronized
+		to the connected device.
+	--device - Specifies the serial number or the index of the connected device to which you want to synchronize changes.
+		Run list-devices to list all connected devices, grouped by platform.
+	--companion - When you save changes to the project, changes are automatically synchronized
+		to the Telerik AppBuilder companion app.
 
 --[/]--
 
@@ -247,14 +247,14 @@ Run list-devices to list all connected devices, grouped by platform.
 
 --[find-plugins]--
 Usage:
-    $ appbuilder find-plugins [<keyword> [ <keyword>]*>]
+	$ appbuilder find-plugins [<keyword> [ <keyword>]*>]
 
 Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 --[/]--
 
 --[fetch-plugin]--
 Usage:
-    $ appbuilder fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
+	$ appbuilder fetch-plugin <name | path | URL> | [<keyword> [ <keyword>]*>]
 
 Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. 
@@ -263,19 +263,19 @@ The plugin must be Plugman-compatible.
 
 --[simulate]--
 Usage:
-    $ appbuilder simulate
+	$ appbuilder simulate
 
 Runs the current project in the device simulator.
 
 Options:
-    --path <path> - Specifies the path to the project. If not specified, the project is searched
-                    for in the current directory and all directories above it.
+	--path <path> - Specifies the path to the project. If not specified, the project is searched
+					for in the current directory and all directories above it.
 
 --[/]--
 
 --[list-projects]--
 Usage:
-    $ appbuilder list-projects
+	$ appbuilder list-projects
 
 Lists all projects associated with your Telerik Platform account.
 
@@ -283,7 +283,7 @@ Lists all projects associated with your Telerik Platform account.
 
 --[export-project]--
 Usage:
-    $ appbuilder export-project <ProjectIndex> | <ProjectName>
+	$ appbuilder export-project <ProjectIndex> | <ProjectName>
 
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.
@@ -291,17 +291,17 @@ You can choose which project to export by its index or name.
 Run list-projects to list all projects associated with your Telerik Platform account.
 
 Options:
-    --path <path> - Specifies where to export the selected project on your file system. If not set,
-                    exports the project in the current directory.
+	--path <path> - Specifies where to export the selected project on your file system. If not set,
+					exports the project in the current directory.
 
 --[/]--
 
 --[edit-configuration]--
 Usage:
-    $ appbuilder edit-configuration <ConfigurationFile>
+	$ appbuilder edit-configuration <ConfigurationFile>
 
 <ConfigurationFile> is the configuration file that you want to open. You can select a configuration file
-    for editing by setting any of the following values.
+	for editing by setting any of the following values.
 #{templatesService.configurationFilesString}
 
 --[/]--
@@ -315,19 +315,19 @@ Prints information about the currently logged in user and details about their li
 
 --[list-provisions]--
 Usage:
-    $ appbuilder list-provisions [-v]
+	$ appbuilder list-provisions [-v]
 
 Lists all configured provisioning profiles for code signing iOS applications with index and name. When building an app,
 you can set the provisioning profile by index or name in the --provision option.
 
 Options:
-    -v, --verbose - Lists the devices included in the selected provisioning profile.
+	-v, --verbose - Lists the devices included in the selected provisioning profile.
 
 --[/]--
 
 --[list-certificates]--
 Usage:
-    $ appbuilder list-certificates
+	$ appbuilder list-certificates
 
 Lists all configured certificates for code signing iOS and Android applications with index and name. When building an app, you can
 set the certificate by index or name in the --certificate option.
@@ -335,7 +335,7 @@ set the certificate by index or name in the --certificate option.
 
 --[create-self-signed-certificate]--
 Usage:
-    $ appbuilder create-self-signed-certificate [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]
+	$ appbuilder create-self-signed-certificate [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]
 
 Creates a self-signed certificate for code signing Android applications.
 
@@ -344,8 +344,8 @@ If you want to publish your app in Google Play, verify that the certificate expi
 
 <Purpose> is the type of the certificate that you want to create. You can set the following purposes: Generic or GooglePlay.
 <StartDate> and <EndDate> set the validity of the certificate. You must set the start and end date in the
-        following format: yyyy-mm-dd. 
-        If you want to publish your app in Google Play, verify that the end date is greater than 2033-10-22.
+		following format: yyyy-mm-dd.
+		If you want to publish your app in Google Play, verify that the end date is greater than 2033-10-22.
 
 If you do not provide one or more command parameters, an Telerik AppBuilder shows an interactive prompt to let you set the remaining
 certificate details.
@@ -353,18 +353,18 @@ certificate details.
 
 --[remove-certificate]--
 Usage:
-    $ appbuilder remove-certificate <Name or index>
+	$ appbuilder remove-certificate <Name or index>
 
 Removes a selected certificate from the server. 
 
 Run list-certificates to list all available certificates with name and index.
 CAUTION: Deleting a certificate cannot be undone. If you have not backed up the certificate, you will not be able to restore it. You will
-    not be able to update any apps that you have signed and published with the certificate.
+	not be able to update any apps that you have signed and published with the certificate.
 --[/]--
 
 --[export-certificate]--
 Usage:
-    $ appbuilder export-certificate <Name or index> [<Password>]
+	$ appbuilder export-certificate <Name or index> [<Password>]
 
 Exports a selected certificate from the server as a P12 file. You must set a password for the exported file. If you do not set a password,
 Telerik AppBuilder will prompt you to provide a password.
@@ -372,13 +372,13 @@ Telerik AppBuilder will prompt you to provide a password.
 Run list-certificates to list all available certificates for code signing iOS and Android applications.
 
 Options:
-    --path <path> - Specifies where to store the exported certificate. If not specified, stores the exported certificate in the current 
-            directory.
+	--path <path> - Specifies where to store the exported certificate. If not specified, stores the exported certificate in the current
+			directory.
 --[/]--
 
 --[import-certificate]--
 Usage:
-    $ appbuilder import-certificate <CertificateFile> [<Password>]
+	$ appbuilder import-certificate <CertificateFile> [<Password>]
 
 Imports an existing certificate from a P12 file stored on your local file system. If you do not provide the certificate password when
 running the command, Telerik AppBuilder will prompt you to provide it.
@@ -386,12 +386,12 @@ running the command, Telerik AppBuilder will prompt you to provide it.
 
 --[appstore-list]--
 Usage:
-    $ appbuilder appstore-list <AppleID> [<Password>]
+	$ appbuilder appstore-list <AppleID> [<Password>]
 
 Lists all application records in iTunes Connect that are in the Waiting for Upload state. The list contains name, version, and
 bundle ID for each application record.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect. If you do not provide your Apple ID password when
-        running the command, Telerik AppBuilder will prompt you to provide it.
+		running the command, Telerik AppBuilder will prompt you to provide it.
 
 When running appstore-upload, you need to provide the name for the application record.
 
@@ -399,49 +399,49 @@ When running appstore-upload, you need to provide the name for the application r
 
 --[appstore-upload]--
 Usage:
-    $ appbuilder appstore-upload <Application Name> <AppleID> [<Password>]
-                 --certificate <index or name> --provision <index or name>
+	$ appbuilder appstore-upload <Application Name> <AppleID> [<Password>]
+				 --certificate <index or name> --provision <index or name>
 
 Builds the project and uploads the application to iTunes Connect.
 <Application Name> is the name for an application record in the Waiting for Upload state. Run appstore-list to retrieve the names of your application
 records that are in the Waiting for Upload state in iTunes Connect.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect. If you do not provide your Apple ID password when
-        running the command, Telerik AppBuilder will prompt you to provide it.
+		running the command, Telerik AppBuilder will prompt you to provide it.
 
 Run list-certificates to list all available certificates for code signing your apps.
 Run list-provisions to list all available provisioning profiles for code signing your apps.
 
 Options:
-    --certificate - Sets the certificate that you want to use for code signing your iOS
-        app. Must be a production certificate and must match the specified provisioning profile.
-        You can specify a certificate by index or name.
-    --provision - Sets the provisioning profile that you want to use for code signing
-        your iOS app. Must be an AppStore distribution certificate and must match the specified certificate.
-        You can specify a provisioning profile by index or name.
+	--certificate - Sets the certificate that you want to use for code signing your iOS
+		app. Must be a production certificate and must match the specified provisioning profile.
+		You can specify a certificate by index or name.
+	--provision - Sets the provisioning profile that you want to use for code signing
+		your iOS app. Must be an AppStore distribution certificate and must match the specified certificate.
+		You can specify a provisioning profile by index or name.
 --[/]--
 
 --[create-certificate-request]--
 Usage:
-    $ appbuilder create-certificate-request [<Name> [<Email> [<Country>]]] [--save-to <File>]
+	$ appbuilder create-certificate-request [<Name> [<Email> [<Country>]]] [--save-to <File>]
 
 Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
 If you do not provide values for <Name>, <Email> and <Country>, Telerik AppBuilder will prompt you to complete the missing details.
 
 Options:
-    --save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
-            certificate_request.csr.
+	--save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
+			certificate_request.csr.
 --[/]--
 
 --[list-certificate-requests]--
 Usage:
-    $ appbuilder list-certificate-requests
+	$ appbuilder list-certificate-requests
 
 Lists all pending certificate signing requests.
 --[/]--
 
 --[remove-certificate-request]--
 Usage:
-    $ appbuilder remove-certificate-request <Index>
+	$ appbuilder remove-certificate-request <Index>
 
 Removes a pending certificate signing request. 
 
@@ -450,20 +450,20 @@ Run list-certificate-requests to list all pending certificate signing requests.
 
 --[download-certificate-request]--
 Usage:
-    $ appbuilder download-certificate-request <Index> [--save-to <File>]
+	$ appbuilder download-certificate-request <Index> [--save-to <File>]
 
 Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center. 
 
 Run list-certificate-requests to list all pending certificate signing requests. 
 Options:
-    --save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
-            certificate_request.csr.
+	--save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
+			certificate_request.csr.
 --[/]--
 
 
 --[prop-add]--
 Usage:
-    $ appbuilder prop-add <PropertyName> <value> [value]*
+	$ appbuilder prop-add <PropertyName> <value> [value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
 
@@ -472,7 +472,7 @@ Enables more options for the selected project property, if the property accepts 
 
 --[prop-set]--
 Usage:
-    $ appbuilder prop-set <PropertyName> <value> [value]*
+	$ appbuilder prop-set <PropertyName> <value> [value]*
 
 Configures a project property.
 
@@ -481,7 +481,7 @@ Configures a project property.
 
 --[prop-remove]--
 Usage:
-    $ appbuilder prop-remove <PropertyName> <value> [value]*
+	$ appbuilder prop-remove <PropertyName> <value> [value]*
 
 Disables an option for the selected project property, if the property accepts multiple values.
 
@@ -492,9 +492,22 @@ Alias: prop-rm
 
 --[prop-print]--
 Usage:
-    $ appbuilder prop-print <PropertyName>
+	$ appbuilder prop-print <PropertyName>
 
 Shows the value for the selected project property.
 
 #{project.getProjectSchemaHelp}
+--[/]--
+
+--[feature-usage-tracking]--
+Usage:
+	$appbuilder feature-usage-tracking <enable|disable|status>
+
+Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.
+All data gathered is used strictly for improving the product and will never be used to identify or contact you.
+
+Options:
+	status - Shows the current configuration for anonymous usage tracking for the Telerik AppBuilder command-line interface.
+	enable - Enables anonymous usage statistics tracking. All data gathered is used strictly for improving the product and will never be used to identify or contact you.
+	disable - Disables anonymous usage statistics tracking.
 --[/]--

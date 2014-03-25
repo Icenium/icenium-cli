@@ -51,7 +51,8 @@
     "moment": "2.5.1",
     "minimatch": "0.2.14",
     "rimraf": "2.2.6",
-    "byline": "4.1.1"
+    "byline": "4.1.1",
+    "colors": "0.6.2"
   },
   "analyze": true,
   "devDependencies": {

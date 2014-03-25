@@ -46,21 +46,26 @@ export class Prompter implements IPrompter {
 		}).future<string>()();
 	}
 
-	public confirm(prompt: string): IFuture<boolean> {
+	public confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
 		return ((): boolean => {
 			var schema: IPromptSchema = {
 				properties: {
-					password: {
+					prompt: {
 						description: prompt + " (y/n)",
 						type: "string",
 						required: true,
 						message: "Enter 'y' (for yes) or 'n' (for no).",
-						conform: (value: string) => /^[yn]$/i.test(value)
+						conform: (value: string) => /^[yn]$/i.test(value),
 					}
 				}
 			};
+
+			if(defaultAction) {
+				schema["properties"]["prompt"]["default"] = defaultAction;
+			}
+
 			var result = this.get(schema).wait();
-			return result.password.toLowerCase() === "y";
+			return result.prompt.toLowerCase() === "y";
 		}).future<boolean>()();
 	}
 

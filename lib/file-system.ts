@@ -139,7 +139,10 @@ export class FileSystem implements IFileSystem {
 	public readJson(filename: string, encoding?: string): IFuture<any> {
 		return (() => {
 			var data = this.readText(filename, encoding).wait();
-			return JSON.parse(data);
+			if(data) {
+				return JSON.parse(data);
+			}
+			return null;
 		}).future()();
 	}
 
