@@ -29,6 +29,7 @@
     "log4js": "0.6.9",
     "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master",
     "open": "0.0.4",
+    "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",
     "unzip": "0.1.9",
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ffi": "https://github.com/icenium/node-ffi/tarball/master",
