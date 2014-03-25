@@ -25,8 +25,8 @@ $injector.require("qr", "./qr");
 
 $injector.requireCommand(["help", "/?"], "./commands/help");
 
-$injector.requireCommand("find-plugins", "./commands/find-plugins");
-$injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
+$injector.requireCommand("plugin|*find", "./commands/find-plugins");
+$injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");
 $injector.requireCommand("simulate", "./commands/simulate");
@@ -52,22 +52,23 @@ $injector.requireCommand("cloud-sync", "./services/build");
 $injector.require("project", "./project");
 $injector.requireCommand("create", "./project");
 $injector.requireCommand("init", "./project");
-$injector.requireCommand("prop-add", "./project");
-$injector.requireCommand("prop-set", "./project");
-$injector.requireCommand("prop-rm", "./project");
-$injector.requireCommand("prop-remove", "./project");
-$injector.requireCommand("prop-print", "./project");
+$injector.requireCommand("prop|add", "./project");
+$injector.requireCommand("prop|set", "./project");
+$injector.requireCommand("prop|rm", "./project");
+$injector.requireCommand("prop|remove", "./project");
+$injector.requireCommand("prop|*print", "./project");
 $injector.require("projectNameValidator", "./validators/project-name-validator");
 
 $injector.requireCommand("list-projects", "./remote-projects");
 $injector.requireCommand("export-project", "./remote-projects");
-$injector.requireCommand("list-devices", "./commands/list-devices");
+
+$injector.requireCommand("device|*list", "./commands/list-devices");
+$injector.requireCommand("device|log-stream", "./commands/open-device-log-stream");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
 $injector.requireCommand(["livesync", "live-sync"], "./commands/live-sync");
 
-$injector.requireCommand("open-device-log-stream", "./commands/open-device-log-stream");
 
 $injector.require("iOSCore", "./mobile/ios/ios-core");
 $injector.require("coreFoundation", "./mobile/ios/ios-core");
@@ -91,26 +92,25 @@ $injector.require("androidDevice", "./mobile/android/android-device");
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
 $injector.require("prompter", "./prompter");
 
-
 $injector.require("identityManager", "./commands/cryptographic-identities");
-$injector.requireCommand("list-provisions", "./commands/cryptographic-identities");
-$injector.requireCommand("import-provision", "./commands/cryptographic-identities");
-$injector.requireCommand("remove-provision", "./commands/cryptographic-identities");
-$injector.requireCommand("list-certificates", "./commands/cryptographic-identities");
+$injector.requireCommand("provision|*list", "./commands/cryptographic-identities");
+$injector.requireCommand("provision|import", "./commands/cryptographic-identities");
+$injector.requireCommand("provision|remove", "./commands/cryptographic-identities");
 $injector.require("selfSignedIdentityValidator", "./validators/cryptographic-identity-validators");
-$injector.requireCommand("create-self-signed-certificate", "./commands/cryptographic-identities");
-$injector.requireCommand("remove-certificate", "./commands/cryptographic-identities");
-$injector.requireCommand("export-certificate", "./commands/cryptographic-identities");
-$injector.requireCommand("import-certificate", "./commands/cryptographic-identities");
-$injector.requireCommand("create-certificate-request", "./commands/cryptographic-identities");
-$injector.requireCommand("list-certificate-requests", "./commands/cryptographic-identities");
-$injector.requireCommand("remove-certificate-request", "./commands/cryptographic-identities");
-$injector.requireCommand("download-certificate-request", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate|*list", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate|create-self-signed", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate|remove", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate|export", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate|import", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate-request|create", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate-request|*list", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate-request|remove", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate-request|download", "./commands/cryptographic-identities");
 
 $injector.requireCommand("user", "./commands/user-status");
 
-$injector.requireCommand("appstore-list", "./commands/itunes-connect");
-$injector.requireCommand("appstore-upload", "./commands/itunes-connect");
+$injector.requireCommand("appstore|*list", "./commands/itunes-connect");
+$injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 
 $injector.requireCommand("dev-post-install", "./commands/post-install");
 $injector.require("platformServices", "./commands/simulate");

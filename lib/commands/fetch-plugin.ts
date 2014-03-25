@@ -39,4 +39,4 @@ export class FetchPluginCommand implements ICommand {
 		return validUrl.isUri(pluginId);
 	}
 }
-$injector.registerCommand("fetch-plugin", FetchPluginCommand);
+$injector.registerCommand("plugin|fetch", FetchPluginCommand);

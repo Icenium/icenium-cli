@@ -174,8 +174,8 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 }
 $injector.register("identityManager", IdentityManager);
-helpers.registerCommand("identityManager", "list-certificates", (identityManager, args) => identityManager.listCertificates());
-helpers.registerCommand('identityManager', "list-provisions", (identityManager, args) => identityManager.listProvisions());
+helpers.registerCommand("identityManager", "certificate|*list", (identityManager, args) => identityManager.listCertificates());
+helpers.registerCommand('identityManager', "provision|*list", (identityManager, args) => identityManager.listProvisions());
 
 class IdentityGenerationData {
 	private static derObjectIdentifierNames = {
@@ -410,7 +410,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 		return moment().add("years", 1).format(validators.SelfSignedIdentityValidator.DATE_FORMAT);
 	}
 }
-$injector.registerCommand("create-self-signed-certificate", CreateSelfSignedIdentity);
+$injector.registerCommand("certificate|create-self-signed", CreateSelfSignedIdentity);
 
 export class RemoveCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
@@ -433,7 +433,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("remove-certificate", RemoveCryptographicIdentity);
+$injector.registerCommand("certificate|remove", RemoveCryptographicIdentity);
 
 export class ExportCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
@@ -493,7 +493,7 @@ export class ExportCryptographicIdentity implements ICommand {
 		return path;
 	}
 }
-$injector.registerCommand("export-certificate", ExportCryptographicIdentity);
+$injector.registerCommand("certificate|export", ExportCryptographicIdentity);
 
 export class ImportCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
@@ -537,7 +537,7 @@ export class ImportCryptographicIdentity implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("import-certificate", ImportCryptographicIdentity);
+$injector.registerCommand("certificate|import", ImportCryptographicIdentity);
 
 class CreateCertificateSigningRequest implements ICommand {
 	constructor(private $server: Server.IServer,
@@ -563,7 +563,7 @@ class CreateCertificateSigningRequest implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("create-certificate-request", CreateCertificateSigningRequest);
+$injector.registerCommand("certificate-request|create", CreateCertificateSigningRequest);
 
 class ListCertificateSigningRequestsCommand implements ICommand {
 	constructor(private $logger: ILogger,
@@ -582,7 +582,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("list-certificate-requests", ListCertificateSigningRequestsCommand);
+$injector.registerCommand("certificate-request|*list", ListCertificateSigningRequestsCommand);
 
 interface ICertificateSigningRequest {
 	UniqueName: string;
@@ -626,7 +626,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("remove-certificate-request", RemoveCertificateSigningRequestCommand);
+$injector.registerCommand("certificate-request|remove", RemoveCertificateSigningRequestCommand);
 
 interface ICertificateDownloader {
 	downloadCertificate(uniqueName: string): IFuture<void>;
@@ -669,7 +669,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("download-certificate-request", DownloadCertificateSigningRequestCommand);
+$injector.registerCommand("certificate-request|download", DownloadCertificateSigningRequestCommand);
 
 class ImportProvisionCommand implements ICommand {
 	constructor(private $fs: IFileSystem,
@@ -697,7 +697,7 @@ class ImportProvisionCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("import-provision", ImportProvisionCommand);
+$injector.registerCommand("provision|import", ImportProvisionCommand);
 
 class RemoveProvisionCommand implements ICommand {
 	constructor(private $identityManager: Server.IIdentityManager,
@@ -715,5 +715,5 @@ class RemoveProvisionCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("remove-provision", RemoveProvisionCommand);
+$injector.registerCommand("provision|remove", RemoveProvisionCommand);
 
