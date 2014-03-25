@@ -11,6 +11,12 @@
 	"DisplayName": {
 		"description": "The display name of the app."
 	},
+	"Description": {
+		"description": "Application description."
+	},
+	"Author": {
+		"description": "Application author name. If left empty, then the user account name is used."
+	},
 	"BundleVersion": {
 		"description": "The application (or bundle) version.",
 		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$",
