@@ -59,6 +59,7 @@
 /// <reference path="logger.ts" />
 /// <reference path="login.ts" />
 /// <reference path="mobile/android/android-device.ts" />
+/// <reference path="mobile/app-identifier.ts" />
 /// <reference path="mobile/constants.ts" />
 /// <reference path="mobile/ios/ios-core.ts" />
 /// <reference path="mobile/ios/ios-device.ts" />

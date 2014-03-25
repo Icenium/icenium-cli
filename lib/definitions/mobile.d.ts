@@ -9,10 +9,15 @@ declare module Mobile {
 		getVersion(): string;
 		getVendor(): string;
 		getPlatform(): string;
-		getDeviceProjectPath(appIdentifier: string): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
-		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: string): IFuture<void>;
+		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier): IFuture<void>;
 		openDeviceLogStream(): void;
+	}
+
+	interface IAppIdentifier {
+		appIdentifier: string;
+		deviceProjectPath: string;
+		isLiveSyncSupported(device: IDevice): IFuture<boolean>;
 	}
 
 	interface IIOSDevice extends IDevice {

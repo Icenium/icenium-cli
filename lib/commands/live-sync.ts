@@ -3,9 +3,10 @@
 import util = require("util");
 import path = require("path");
 import watchr = require("watchr");
-import options = require("./../options");
+var options: any = require("./../options");
 import helpers = require("./../helpers");
 import MobileHelper = require("./../mobile/mobile-helper");
+import AppIdentifier = require("../mobile/app-identifier");
 
 export class LiveSyncCommand implements ICommand {
 	private excludedProjectDirsAndFiles = ["app_resources", "plugins"];
@@ -20,20 +21,24 @@ export class LiveSyncCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$devicesServices.initialize(args[0], options.device).wait();
+			var platform = this.$devicesServices.platform;
+
+			if (!MobileHelper.platformCapabilities[platform].companion && options.companion) {
+				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
+			}
 
 			this.$project.ensureProject();
 			var projectDir = this.$project.getProjectDir();
 
-			var appIdentifier = options.companion
-				? "com.telerik.Icenium"
-				: this.$project.projectData.AppIdentifier;
+			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
+				this.$project.projectData.AppIdentifier, options.companion);
 
 			if (options.watch) {
-				this.liveSyncDevices(this.$devicesServices.platform, projectDir, appIdentifier);
+				this.liveSyncDevices(platform, projectDir, appIdentifier);
 				helpers.exitOnStdinEnd();
 			} else {
 				if (options.file) {
-					var isExistFile = this.$fs.exists((options.file)).wait();
+					var isExistFile = this.$fs.exists(options.file).wait();
 					if(isExistFile) {
 						var projectFiles = [path.resolve(options.file)];
 						this.sync(appIdentifier, projectDir, projectFiles).wait();
@@ -48,29 +53,21 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private sync(appIdentifier: string, projectDir: string, projectFiles: string[]): IFuture<void> {
+	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
 		return(() => {
-			var canExecute = (device: Mobile.IDevice): boolean => {
-				if (!MobileHelper.isiOSPlatform(device.getPlatform()) && options.companion) {
-					this.$logger.warn("The AppBuilder Companion app is available only for iOS devices.");
-				}
-
-				return true;
-			}
-
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
-					var platformSpecificProjectPath = device.getDeviceProjectPath(appIdentifier);
+					var platformSpecificProjectPath = appIdentifier.deviceProjectPath;
 					var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
 					device.sync(localDevicePaths, appIdentifier).wait();
 				}).future<void>()();
 			};
 
-			this.$devicesServices.execute(action, canExecute).wait();
+			this.$devicesServices.execute(action).wait();
 		}).future<void>()();
 	}
 
-	public getLocalToDevicePaths(localProjectPath, projectFiles, deviceProjectPath): MobileHelper.LocalToDevicePathData[] {
+	public getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
 		var localToDevicePaths = _.map(projectFiles, (projectFile: string) => {
 			var relativeToProjectBasePath: string = helpers.getRelativeToRootPath(localProjectPath, projectFile);
 			var deviceDirPath : string = path.dirname(path.join(deviceProjectPath, relativeToProjectBasePath));
@@ -80,7 +77,7 @@ export class LiveSyncCommand implements ICommand {
 		return localToDevicePaths;
 	}
 
-	private liveSyncDevices(platform, projectDir, appIdentifier) {
+	private liveSyncDevices(platform: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
 		watchr.watch({
 			paths: [projectDir],
 			listeners: {
