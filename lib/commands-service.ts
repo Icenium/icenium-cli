@@ -4,8 +4,18 @@ var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
+	private analyticsService : IAnalyticsService;
+
+	get $analyticsService(): IAnalyticsService {
+		if (!this.analyticsService) {
+			//We need to resolve analyticsService here due to cyclic dependency
+			this.analyticsService = this.$injector.resolve("analyticsService");
+		}
+		return this.analyticsService;
+	}
+
 	constructor(private $errors: IErrors,
-		private $analyticsService: IAnalyticsService,
+		private $logger: ILogger,
 		private $injector: IInjector) { }
 
 	public allCommands(includeDev: boolean): string[] {
@@ -28,6 +38,40 @@ export class CommandsService implements ICommandsService {
 		return this.$errors.beginCommand(
 			() => this.executeCommandUnchecked(commandName, commandArguments),
 			() => this.executeCommandUnchecked("help", [commandName]));
+	}
+
+	public tryToExecuteCommand(commandName: string, commandArguments: string[]): void {
+		if(!this.executeCommand(commandName, commandArguments)) {
+			commandName = this.beautifyCommandName(commandName);
+			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+			this.tryToMatchCommand(commandName);
+		}
+	}
+
+	private tryToMatchCommand(commandName): void {
+		var allCommands = this.allCommands(false);
+		var similarCommands = [];
+		_.each(allCommands, (command) => {
+			var distance = jaroWinklerDistance(commandName, command);
+			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
+				similarCommands.push({ rating: 1, name: this.beautifyCommandName(command) });
+			} else if (distance >= 0.65) {
+				similarCommands.push({ rating: distance, name: this.beautifyCommandName(command) });
+			}
+
+		});
+
+		similarCommands = _.sortBy(similarCommands, (command) => {
+			return -command.rating;
+		}).slice(0, 5);
+
+		if (similarCommands.length > 0) {
+			var message = ["Did you mean?"];
+			_.each(similarCommands, (command) => {
+				message.push("\t" + command.name);
+			});
+			this.$logger.fatal(message.join("\n"));
+		}
 	}
 
 	public tryExecuteCommand(commandName: string, commandArguments: string[]): void {

@@ -284,6 +284,8 @@ Usage:
 
 Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 
+Commands:
+    fetch - Imports an Apache Cordova plugin into your project.
 --[/]--
 
 --[plugin|fetch]--
@@ -571,6 +573,11 @@ Usage:
     $ appbuilder prop print <PropertyName>
 
 Shows the value for the selected project property.
+
+Commands:
+    add - Enables more options for the selected project property, if the property accepts multiple values.
+    set - Sets a project property.
+    remove - Disables options for the selected project property, if the property accepts multiple values.
 
 #{project.getProjectSchemaHelp}
 --[/]--
