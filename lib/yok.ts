@@ -98,10 +98,14 @@ export class Yok implements IInjector {
 	} = {};
 
 	private resolutionProgress: any = {};
+	private hierarchicalCommands: {[key: string]: string[]} = {};
 
 	public requireCommand(names: any, file: string) {
-		forEachName(names, (name) =>{
-			this.require(this.createCommandName(name), file);
+		forEachName(names, (commandName) => {
+			if(this.isDefaultCommand(commandName)) {
+				this.require(this.createCommandName(commandName.split("|")[0]), file);
+			}
+			this.require(this.createCommandName(commandName), file);
 		});
 	}
 
@@ -123,8 +127,52 @@ export class Yok implements IInjector {
 
 	public registerCommand(names: any, resolver: any): void {
 		forEachName(names, (name) => {
+			var commands = name.split("|");
 			this.register(this.createCommandName(name), resolver);
+
+			if(commands.length > 1) {
+				var parentCommandName = commands[0];
+				if(!this.hierarchicalCommands[parentCommandName]) {
+					this.hierarchicalCommands[parentCommandName] = [];
+					this.createHierarchicalCommand(parentCommandName);
+				}
+
+				this.hierarchicalCommands[parentCommandName].push(commands[1]);
+			}
 		});
+	}
+
+	private createHierarchicalCommand(name: string) {
+		var factory = () => {
+			return {
+				execute: (args: string[]): IFuture<void> => {
+					return (() => {
+						var commandsService = $injector.resolve("commandsService");
+						var commandName: string = null;
+
+						if(args.length > 0) {
+							commandName = args[0];
+						} else {
+							var subCommands = this.hierarchicalCommands[name];
+							var defaultCommand = _.find(subCommands, (command) => command.startsWith("*"));
+							commandName = defaultCommand || "help";
+						}
+
+						if(commandName !== "help") {
+							commandName = util.format("%s|%s", name, commandName);
+						}
+
+						commandsService.tryToExecuteCommand(commandName, commandName === "help" ? [name] : _.rest(args));
+					}).future<void>()();
+				}
+			};
+		};
+
+		$injector.registerCommand(name, factory);
+	}
+
+	private isDefaultCommand(commandName: string): boolean {
+		return commandName.indexOf("*") > 0 && commandName.indexOf("|") > 0;
 	}
 
 	public register(name: string, resolver: any, shared: boolean = true): void {

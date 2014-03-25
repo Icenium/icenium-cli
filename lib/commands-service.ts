@@ -1,8 +1,11 @@
 ///<reference path=".d.ts"/>
 "use strict";
+var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
+import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
 	constructor(private $errors: IErrors,
+		private $logger: ILogger,
 		private $analyticsService: IAnalyticsService,
 		private $injector: IInjector) { }
 
@@ -26,6 +29,40 @@ export class CommandsService implements ICommandsService {
 		return this.$errors.beginCommand(
 			() => this.executeCommandUnchecked(commandName, commandArguments),
 			() => this.executeCommandUnchecked("help", [commandName]));
+	}
+
+	public tryToExecuteCommand(commandName: string, commandArguments: string[]): void {
+		if(!this.executeCommand(commandName, commandArguments)) {
+			commandName = this.beautifyCommandName(commandName);
+			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+			this.tryToMatchCommand(commandName);
+		}
+	}
+
+	private tryToMatchCommand(commandName): void {
+		var allCommands = this.allCommands(false);
+		var similarCommands = [];
+		_.each(allCommands, (command) => {
+			var distance = jaroWinklerDistance(commandName, command);
+			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
+				similarCommands.push({ rating: 1, name: this.beautifyCommandName(command) });
+			} else if (distance >= 0.65) {
+				similarCommands.push({ rating: distance, name: this.beautifyCommandName(command) });
+			}
+
+		});
+
+		similarCommands = _.sortBy(similarCommands, (command) => {
+			return -command.rating;
+		}).slice(0, 5);
+
+		if (similarCommands.length > 0) {
+			var message = ["Did you mean?"];
+			_.each(similarCommands, (command) => {
+				message.push("\t" + command.name);
+			});
+			this.$logger.fatal(message.join("\n"));
+		}
 	}
 
 	public completeCommand() {
@@ -71,6 +108,14 @@ export class CommandsService implements ICommandsService {
 		});
 
 		return true;
+	}
+
+	private beautifyCommandName(commandName: string): string {
+		var str = helpers.stringReplaceAll(commandName, "|", " ");
+		if(str.indexOf("*") > 0) {
+			return str.substr(0, str.indexOf(" "));
+		}
+		return str;
 	}
 }
 $injector.register("commandsService", CommandsService);
