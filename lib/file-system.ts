@@ -85,7 +85,7 @@ export class FileSystem implements IFileSystem {
 
 	public getFileSize(path: string): IFuture<number> {
 		return ((): number => {
-			var stat = this.stat(path).wait();
+			var stat = this.getFsStats(path).wait();
 			return stat.size;
 		}).future<number>()();
 	}
@@ -180,7 +180,7 @@ export class FileSystem implements IFileSystem {
 		return this._chmod(path, mode);
     }
 
-	private stat(path: string): IFuture<fs.Stats> {
+	public getFsStats(path: string): IFuture<fs.Stats> {
 		return this._stat(path);
 	}
 
