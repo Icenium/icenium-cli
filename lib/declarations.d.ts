@@ -144,6 +144,30 @@ declare module Project {
 	}
 }
 
+// duplicated from fs.Stats, because I cannot import it here
+interface IFsStats {
+	isFile(): boolean;
+	isDirectory(): boolean;
+	isBlockDevice(): boolean;
+	isCharacterDevice(): boolean;
+	isSymbolicLink(): boolean;
+	isFIFO(): boolean;
+	isSocket(): boolean;
+	dev: number;
+	ino: number;
+	mode: number;
+	nlink: number;
+	uid: number;
+	gid: number;
+	rdev: number;
+	size: number;
+	blksize: number;
+	blocks: number;
+	atime: Date;
+	mtime: Date;
+	ctime: Date;
+}
+
 interface IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
 	exists(path: string): IFuture<boolean>;
@@ -160,6 +184,7 @@ interface IFileSystem {
 	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void>;
 	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void>;
 	getUniqueFileName(baseName: string): IFuture<string>;
+	getFsStats(path: string): IFuture<IFsStats>;
 
 	createReadStream(path: string, options?: {
 		flags?: string;

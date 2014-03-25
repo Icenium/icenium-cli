@@ -10,11 +10,11 @@ import log = require("./logger");
 import Future = require("fibers/future");
 
 function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {
-	var $fs = $injector.resolve("fs");
-	var contents = $fs.readdir(directoryPath).wait();
+	var $fs: IFileSystem = $injector.resolve("fs");
+	var contents = $fs.readDirectory(directoryPath).wait();
 	for (var i = 0; i < contents.length; ++i) {
 		var file = path.join(directoryPath, contents[i]);
-		var stat = $fs.stat(file).wait();
+		var stat = $fs.getFsStats(file).wait();
 		if (filterCallback && !filterCallback(file, stat)) {
 			continue;
 		}
@@ -70,7 +70,7 @@ export function toHash(collection, keySelector, valueSelector): any {
 var _projectFileSchema;
 export function getProjectFileSchema(): any {
 	if (!_projectFileSchema) {
-		var $fs = $injector.resolve("fs");
+		var $fs: IFileSystem = $injector.resolve("fs");
 		var propPath = path.join(__dirname, "../resources/project-properties.json");
 		_projectFileSchema = $fs.readJson(propPath, "utf8").wait();
 	}

@@ -94,6 +94,10 @@ export class FileSystemStub implements IFileSystem {
 	getUniqueFileName(baseName: string): IFuture<string> {
 		return undefined;
 	}
+
+	getFsStats(path: string): IFuture<IFsStats> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
