@@ -333,6 +333,15 @@ export class Project implements Project.IProject {
 			updated = true;
 		}
 
+		if (!properties.hasOwnProperty("Author")) {
+			properties.Author = "";
+			updated = true;
+		}
+		if (!properties.hasOwnProperty("Description")) {
+			properties.Description = "";
+			updated = true;
+		}
+
 		return updated;
 	}
 
