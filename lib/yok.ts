@@ -80,6 +80,7 @@ export interface IDependency {
 	require?: string;
 	resolver?: () => any;
 	instance?: any;
+	shared?: boolean;
 }
 
 export class Yok implements IInjector {
@@ -96,7 +97,8 @@ export class Yok implements IInjector {
 
 	public require(name: string, file: string): void {
 		var dependency: IDependency = {
-			require: file
+			require: file,
+			shared: true
 		};
 		if (!this.modules[name]) {
 			this.modules[name] = dependency;
@@ -109,10 +111,11 @@ export class Yok implements IInjector {
 		this.register(this.createCommandName(name), resolver);
 	}
 
-	public register(name: string, resolver: any): void {
+	public register(name: string, resolver: any, shared: boolean = true): void {
 		trace("registered '%s'", name);
 
 		var dependency = this.modules[name] || {};
+		dependency.shared = shared;
 
 		if (_.isFunction(resolver)) {
 			dependency.resolver = resolver;
@@ -188,7 +191,7 @@ export class Yok implements IInjector {
 				throw new Error("unable to resolve " + name);
 			}
 
-			if (!dependency.instance) {
+			if (!dependency.instance || !dependency.shared) {
 				if (!dependency.resolver) {
 					throw new Error("no resolver registered for " + name);
 				}
