@@ -205,7 +205,7 @@ export class LoginManager implements ILoginManager {
 							this.$logger.debug("Login complete: " + request.url);
 							localhostServer.close();
 
-							this.authenticate({ wrap_verification_code: code }).proxy(authComplete);
+							authComplete.return(code);
 						} else {
 							fileSrv.redirect(response, loginUrl);
 						}
@@ -229,7 +229,8 @@ export class LoginManager implements ILoginManager {
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
 
-			return authComplete.wait();
+			var code = authComplete.wait();
+			return this.authenticate({ wrap_verification_code: code }).wait();
 		}).future()();
 	}
 }
