@@ -76,7 +76,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ appbuilder create [<App name>] [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ appbuilder create <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -85,7 +85,7 @@ Creates a new project from template.
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
-	#{templatesService.projectTemplatesString}. The default value is KendoUI.
+        #{templatesService.projectTemplatesString}. The default value is KendoUI.
     --path - Specifies the path where you want to create the project, if different from the current directory. 
         The directory must be empty.
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
@@ -120,9 +120,9 @@ Platform-specific examples:
     $ appbuilder list-devices ios
 
 Options:
-	--timeout - Sets the time in milliseconds for the operation to search for connected devices before completing.
-	The operation will continue to wait and listen for newly connected devices and will list them
-	after the specified time expires. If not set, the default value is 4000.
+   --timeout - Sets the time in milliseconds for the operation to search for connected devices before completing.
+      The operation will continue to wait and listen for newly connected devices and will list them
+      after the specified time expires. If not set, the default value is 4000.
 
 Lists all recognized connected devices with serial number and index, grouped by platform.
 
@@ -239,7 +239,7 @@ Options:
 
 --[open-device-log-stream]--
 Usage:
-	$ appbuilder open-device-log-stream [--device <id>]
+    $ appbuilder open-device-log-stream [--device <id>]
 
 Opens the device log stream for a selected device. You can select a device by index or identifier.
 Run list-devices to list all connected devices, grouped by platform.
@@ -308,7 +308,7 @@ Usage:
 
 --[user]--
 Usage:
-	$ appbuilder user
+    $ appbuilder user
 
 Prints information about the currently logged in user and details about their license.
 --[/]--
