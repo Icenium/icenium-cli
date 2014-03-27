@@ -8,6 +8,7 @@ lint.*
 test-reports.xml
 for-developers.md
 Gruntfile.js
+BuildPackage.cmd
 tscommand.tmp.txt
 
 bin/appbuilder
@@ -20,3 +21,8 @@ lib/**/*.js.map
 
 scratch/
 test/
+
+resources/App_Resources
+resources/Cordova
+resources/ItemTemplates
+resources/ProjectTemplates

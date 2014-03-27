@@ -113,6 +113,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
+		"clean",
 		"ts:release_build",
 		"shell:ci_unit_tests",
 		"set_package_version",
