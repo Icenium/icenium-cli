@@ -15,6 +15,7 @@ interface IAndroidDeviceDetails {
 
 export class AndroidDevice implements Mobile.IDevice {
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
+	private static CHANGE_LIVESYNC_URL_INTENT_NAME = "com.telerik.ChangeLiveSyncUrl";
 
 	private model: string;
 	private name: string;
@@ -141,6 +142,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		return (() => {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
+				this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: ""}).wait();
 				this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());
 			} else {
