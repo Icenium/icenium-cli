@@ -25,7 +25,7 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 			var userName = args[0];
 			var password = args[1];
 			if (!userName) {
-				this.$errors.fail("Missing user name.");
+				this.$errors.fail("Missing Apple ID.");
 			}
 
 			if (!password) {
