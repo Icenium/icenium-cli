@@ -15,7 +15,7 @@ function invokeGrunt(callback) {
 invokeGrunt(function() {
 	var child = child_process.exec("node bin/appbuilder.js dev-prepackage", function (error) {
 		if (error) {
-			console.error("Failed to complete all pre-packaging steps.");
+			console.error("Failed to complete all pre-publishing steps.");
 			throw error;
 		}
 	});
