@@ -6,6 +6,7 @@ import Future = require("fibers/future");
 import MobileHelper = require("./../mobile-helper");
 import helpers = require("./../../helpers");
 var assert = require("assert");
+import constants = require("../constants");
 
 export class DevicesServices implements Mobile.IDevicesServices {
 	private devices: { [key: string]: Mobile.IDevice } = {};
@@ -134,16 +135,16 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<Mobile.IDevice>()();
 	}
 
-	private executeOnDevice(action: any, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
-		return (() => {
+	private executeOnDevice(action: (dev: Mobile.IDevice) => IFuture<void>, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
+		return ((): void => {
 			if(!canExecute || canExecute(this._device)) {
-				return action(this._device).wait();
+				action(this._device).wait();
 			}
 		}).future<void>()();
 	}
 
-	private executeOnAllConnectedDevices(action: (dev: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
-		return(() => {
+	private executeOnAllConnectedDevices(action: (dev: Mobile.IDevice) => IFuture<void>, canExecute?: (dev: Mobile.IDevice) => boolean): IFuture<void> {
+		return ((): void => {
 			var allConnectedDevices = this.getAllConnectedDevices();
 			var futures = _.map(allConnectedDevices, (device: Mobile.IDevice) => {
 				if (!canExecute || canExecute(device)) {
@@ -159,21 +160,21 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 
-	public execute(action: (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {[key: string]: boolean}): IFuture<void> {
-		return (() => {
+	public execute(action: (device: Mobile.IDevice) => IFuture<void>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {[key: string]: boolean}): IFuture<void> {
+		return ((): void => {
 			assert.ok(this._isInitialized, "Devices services not initialized!");
-			if(this.hasDevices()) {
+			if(this.hasDevices) {
 				if(this._device) {
 					this.executeOnDevice(action, canExecute).wait();
 				} else {
 					this.executeOnAllConnectedDevices(action, canExecute).wait();
 				}
 			} else {
-				var message = "Cannot find connected devices. Reconnect any connected devices, verify that your system recognizes them, and run this command again";
+				var message = constants.ERROR_NO_DEVICES;
 				if(options && options["allowNoDevices"]) {
 					this.$logger.info(message);
 				} else {
-					this.$errors.fail(message);
+					this.$errors.fail({formatStr: message, suppressCommandHelp: true});
 				}
 			}
 		}).future<void>()();
@@ -207,9 +208,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 						this._platform = platforms[0];
 					} else {
 						if (platforms.length === 0) {
-							this.$errors.fail("No connected devices detected.");
+							this.$errors.fail({formatStr: constants.ERROR_NO_DEVICES, suppressCommandHelp: true});
 						} else {
-							this.$errors.fail("Multiple device platforms detected. Specify platform or device on command line.");
+							this.$errors.fail("Multiple device platforms detected (%s). Specify platform or device on command line.",
+								helpers.formatListOfNames(platforms, "and"));
 						}
 					}
 				}
@@ -217,7 +219,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 
-	private hasDevices(): boolean {
+	public get hasDevices(): boolean {
 		if (!this._platform) {
 			return this.getDevices().length !== 0;
 		} else {
