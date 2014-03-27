@@ -7,6 +7,7 @@ var options: any = require("./../options");
 import helpers = require("./../helpers");
 import MobileHelper = require("./../mobile/mobile-helper");
 import AppIdentifier = require("../mobile/app-identifier");
+import constants = require("../mobile/constants");
 
 export class LiveSyncCommand implements ICommand {
 	private excludedProjectDirsAndFiles = ["app_resources", "plugins"];
@@ -25,6 +26,10 @@ export class LiveSyncCommand implements ICommand {
 
 			if (!MobileHelper.platformCapabilities[platform].companion && options.companion) {
 				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
+			}
+
+			if (!this.$devicesServices.hasDevices) {
+				this.$errors.fail({formatStr: constants.ERROR_NO_DEVICES, suppressCommandHelp: true});
 			}
 
 			this.$project.ensureProject();

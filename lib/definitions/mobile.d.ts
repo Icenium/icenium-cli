@@ -30,9 +30,15 @@ declare module Mobile {
 		startLookingForDevices?(): IFuture<void>;
 	}
 
+	interface IDevicesServicesInitializationOptions {
+		skipInferPlatform?: boolean;
+	}
+
 	interface IDevicesServices {
-		execute(action:  (device: Mobile.IDevice) => IFuture<any>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {allowNoDevices?: boolean}): IFuture<void>;
-		initialize(platform: string, deviceOption?: string): IFuture<void>;
+		hasDevices: boolean;
+		deviceCount: number;
+		execute(action: (device: Mobile.IDevice) => IFuture<void>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {allowNoDevices?: boolean}): IFuture<void>;
+		initialize(platform: string, deviceOption?: string, options?: IDevicesServicesInitializationOptions): IFuture<void>;
 		platform: string;
 	}
 

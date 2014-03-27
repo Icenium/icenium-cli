@@ -122,11 +122,11 @@ export function isNullOrWhitespace(input: string): boolean {
 	return input.replace(/\s/gi, '').length < 1;
 }
 
-export function formatListOfNames(names: string[]): string {
+export function formatListOfNames(names: string[], conjunction = "or"): string {
 	if (names.length <= 1) {
 		return names[0];
 	} else {
-		return _.initial(names).join(", ") + " or " + names[names.length - 1];
+		return _.initial(names).join(", ") + " " + conjunction + " " + names[names.length - 1];
 	}
 }
 
