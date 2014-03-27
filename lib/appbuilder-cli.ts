@@ -6,6 +6,7 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
+import queue = require("./queue");
 
 require("./extensions");
 require("./bootstrap");
@@ -87,6 +88,31 @@ class CommandDispatcher {
 	}
 }
 
+class FutureDispatcher implements IFutureDispatcher {
+	private actions: IQueue<any>
+
+	public constructor(private $errors: IErrors) {
+	}
+
+	public run(): void {
+		if (this.actions) {
+			this.$errors.fail("You cannot run a running future dispatcher.")
+		}
+		this.actions = new queue.Queue<any>();
+
+		while(true) {
+			var action = this.actions.dequeue().wait();
+			action.func.apply(action.context, action.args).wait();
+		}
+	}
+
+	public dispatch(func: (...args: any[]) => IFuture<void>, context: any, ...args: any[]) {
+		var action: any = {func: func, context: context, args: args};
+		this.actions.enqueue(action);
+	}
+}
+$injector.register("futureDispatcher", FutureDispatcher, false);
+
 var fiber = Fiber(() => {
 	var commandDispatcher = $injector.resolve(CommandDispatcher);
 	if (process.argv[2] === "completion") {
@@ -98,3 +124,5 @@ var fiber = Fiber(() => {
 });
 global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8
 fiber.run();
+
+
