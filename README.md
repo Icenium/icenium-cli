@@ -9,21 +9,20 @@ Command-Line Interface for Telerik AppBuilder
 
 The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS and Android from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to App Store or Google Play.
 
-* [Installation](#install "How to install the Telerik AppBuilder CLI")
+* [Installation](#installation "How to install the Telerik AppBuilder CLI")
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
-* [How to Contribute](#contribute "How to contribute to the Telerik AppBuilder CLI")
-* [More Telerik AppBuilder Tools and Resources](#more-appbuilder "Get the other Telerik AppBuilder clients and tools")
+* [How to Contribute](#contribution "How to contribute to the Telerik AppBuilder CLI")
+* [More Telerik AppBuilder Tools and Resources](#more-telerik-appbuilder-tools-and-resources "Get the other Telerik AppBuilder clients and tools")
 * [License](#license "Licensing information about the Telerik AppBuilder CLI")
 
-<a id="install"></a>
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.0  
-Build number: 2014.1.313.1  
-Release date: 2014, March 13  
-Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>
+Latest version: Telerik AppBuilder 2.0.1  
+Release date: 2014, March 24  
+
+> Telerik AppBuilder CLI 2.0.1 is a maintenance release. For a complete list of the features available in the last major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>.
 
 ### System Requirements
 
@@ -75,7 +74,6 @@ $ npm install appbuilder -g
 
 [Back to Top][1]
 
-<a id="quick-start"></a>
 Quick Start
 ===
 
@@ -188,14 +186,13 @@ $ appbuilder create --help
 
 [Back to Top][1]
 
-<a id="features"></a>
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.0  
-Build number: 2014.1.313.1  
-Release date: 2014, March 13  
-Release notes: <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>
+Latest version: Telerik AppBuilder 2.0.1  
+Release date: 2014, March 24  
+
+> Telerik AppBuilder CLI 2.0.1 is a maintenance release. For a complete list of the features available in the last major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-0" target="_blank">Telerik AppBuilder 2.0 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -247,19 +244,17 @@ The following Telerik AppBuilder features are not applicable to the Telerik AppB
 
 [Back to Top][1]
 
-<a id="contribute" href="#contribute"></a>
 Contribution
 ===
 
-To learn how to log a bug that you just discovered, click [here](CONTRIBUTING#bug).
+To learn how to log a bug that you just discovered, click [here](CONTRIBUTING.md#report-an-issue).
 
-To learn how to suggest a new feature or improvement, click [here](CONTRIBUTING#request).
+To learn how to suggest a new feature or improvement, click [here](CONTRIBUTING.md#request-a-feature).
 
-To learn how to contribute to the code base, click [here](CONTRIBUTING#contribute).
+To learn how to contribute to the code base, click [here](CONTRIBUTING.md#contribute-to-the-code-base).
 
 [Back to Top][1]
 
-<a id="more-appbuilder"></a>
 More Telerik AppBuilder Tools and Resources
 ===
 
@@ -273,7 +268,6 @@ More Telerik AppBuilder Tools and Resources
 
 [Back to Top][1]
 
-<a id="license"></a>
 License
 ===
 

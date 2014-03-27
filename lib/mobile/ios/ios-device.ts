@@ -31,7 +31,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	}
 
 	public getDisplayName(): string {
-		return this.getValue("DeviceName");
+		return this.getValue("ProductType");
 	}
 
 	public getModel(): string {
