@@ -421,10 +421,12 @@ export class BuildService implements Project.IBuildService {
 				this.ensureCordovaJs(platform).wait();
 			})
 
-			var appResourceFiles = helpers.enumerateFilesInDirectorySync(this.$resources.appResourcesDir);
+			var appResourcesDir = this.$resources.appResourcesDir;
+			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
+			var projectDir = this.$project.getProjectDir();
 			appResourceFiles.forEach((appResourceFile) => {
-				var relativePath = path.relative(this.$resources.appResourcesDir, appResourceFile);
-				var targetFilePath = path.join(this.$project.getProjectDir(), relativePath);
+				var relativePath = path.relative(appResourcesDir, appResourceFile);
+				var targetFilePath = path.join(projectDir, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
