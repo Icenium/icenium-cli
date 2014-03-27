@@ -102,12 +102,11 @@ export class Project implements Project.IProject {
 
 	public createNewProject(projectName: string): IFuture<void> {
 		return ((): void => {
-			var projectDir = this.getNewProjectDir();
-
 			if (!projectName) {
-				projectName = this.createProjectName(projectDir).wait();
+				this.$errors.fail("No project name specified.")
 			}
 
+			var projectDir = this.getNewProjectDir();
 			this.createFromTemplate(projectName, projectDir).wait();
 		}).future<void>()();
 	}
@@ -155,26 +154,6 @@ export class Project implements Project.IProject {
 		}).future<any>()();
 	}
 
-	private createProjectName(projectDir): IFuture<string> {
-		return ((): string => {
-			var files = this.$fs.readDirectory(projectDir).wait();
-			var defaultProjectName = this.$config.DEFAULT_PROJECT_NAME;
-
-			files = _.map(files, (f) => path.basename(f));
-
-			if (!_.contains(files, defaultProjectName)) {
-				return defaultProjectName;
-			}
-
-			for (var i = 0; ; ++i) {
-				var nameWithIndex = util.format("%s%s", defaultProjectName, i);
-				if (!_.contains(files, nameWithIndex)) {
-					return nameWithIndex;
-				}
-			}
-		}).future<string>()();
-	}
-
 	private createFromTemplate(appname, projectDir): IFuture<void> {
 		return (() => {
 			var templatesDir = this.$templatesService.projectTemplatesDir,
@@ -217,7 +196,7 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir).wait();
 
-					this.$logger.info("%s has been successfully created.", appname);
+					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				}
 				catch (ex) {
 					this.$fs.deleteDirectory(projectDir).wait();
