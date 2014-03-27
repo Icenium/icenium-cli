@@ -28,7 +28,11 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return this._platform;
 	}
 
-	public getDevices(): Mobile.IDevice[] {
+	public get deviceCount(): number {
+		return this._device ? 1 : this.getDevices().length;
+	}
+
+	private getDevices(): Mobile.IDevice[] {
 		return _.values(this.devices);
 	}
 

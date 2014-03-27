@@ -36,6 +36,7 @@ declare module Mobile {
 
 	interface IDevicesServices {
 		hasDevices: boolean;
+		deviceCount: number;
 		execute(action: (device: Mobile.IDevice) => IFuture<void>, canExecute?: (dev: Mobile.IDevice) => boolean, options?: {allowNoDevices?: boolean}): IFuture<void>;
 		initialize(platform: string, deviceOption?: string, options?: IDevicesServicesInitializationOptions): IFuture<void>;
 		platform: string;
