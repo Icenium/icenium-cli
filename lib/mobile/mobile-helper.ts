@@ -64,6 +64,10 @@ export function generateWP8GUID() {
 }
 
 export function validatePlatformName(platform: string, $errors: IErrors): string {
+	if (!platform) {
+		$errors.fail("No device platform specified.");
+	}
+
 	var normalizedPlatform = normalizePlatformName(platform);
 	if (!normalizedPlatform) {
 		$errors.fail("'%s' is not a valid device platform. Valid platforms are %s.",
