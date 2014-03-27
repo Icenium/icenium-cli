@@ -23,7 +23,7 @@ export class BuildService implements Project.IBuildService {
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
-		private $templatesService: ITemplatesService,
+		private $resources: IResourceLoader,
 		private $projectNameValidator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
@@ -421,9 +421,9 @@ export class BuildService implements Project.IBuildService {
 				this.ensureCordovaJs(platform).wait();
 			})
 
-			var appResourceFiles = helpers.enumerateFilesInDirectorySync(this.$templatesService.appResourcesDir);
+			var appResourceFiles = helpers.enumerateFilesInDirectorySync(this.$resources.appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
-				var relativePath = path.relative(this.$templatesService.appResourcesDir, appResourceFile);
+				var relativePath = path.relative(this.$resources.appResourcesDir, appResourceFile);
 				var targetFilePath = path.join(this.$project.getProjectDir(), relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
@@ -440,7 +440,7 @@ export class BuildService implements Project.IBuildService {
 			var cordovaJsFileName = path.join(this.$project.getProjectDir(), util.format("cordova.%s.js", platform).toLowerCase());
 			if (!this.$fs.exists(cordovaJsFileName).wait()) {
 				this.printAssetUpdateMessage();
-				var cordovaJsSourceFilePath = this.$templatesService.buildCordovaJsFilePath(
+				var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(
 					this.$project.projectData.FrameworkVersion, platform);
 				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
 			}

@@ -6,6 +6,7 @@ import Future = require("fibers/future");
 
 export class PostInstallCommand implements ICommand {
 	constructor(private $templatesService: ITemplatesService,
+		private $resources: IResourceLoader,
 		private $logger: ILogger,
 		private $serviceProxy: Server.IServiceProxy) { }
 
@@ -20,7 +21,7 @@ export class PostInstallCommand implements ICommand {
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();
 			this.$logger.info("Downloading cordova.js files.");
-			this.$templatesService.downloadCordovaJsFiles().wait();
+			this.$resources.downloadCordovaJsFiles().wait();
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

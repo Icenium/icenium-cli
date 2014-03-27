@@ -314,6 +314,9 @@ interface IQrCodeGenerator {
 }
 
 interface IResourceLoader {
+	appResourcesDir: string;
 	resolvePath(path: string): string;
 	openFile(path: string): any;
+	buildCordovaJsFilePath(version: string, platform: string): string;
+	downloadCordovaJsFiles(): IFuture<void>;
 }

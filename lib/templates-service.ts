@@ -71,14 +71,6 @@ export class TemplatesService implements ITemplatesService {
 		return this.$resources.resolvePath("ItemTemplates");
 	}
 
-	public get appResourcesDir(): string {
-		return this.$resources.resolvePath("App_Resources");
-	}
-
-	public buildCordovaJsFilePath(version: string, platform: string): string {
-		return path.join(this.$resources.resolvePath("Cordova"), version, util.format("cordova.%s.js", platform).toLowerCase());
-	}
-
 	public get configurationFiles(): IConfigurationFile[] {
 		return this.configFiles;
 	}
@@ -129,7 +121,7 @@ export class TemplatesService implements ITemplatesService {
 
 	public unpackAppResources(): IFuture<void> {
 		return (() => {
-			var appResourcesDir = this.appResourcesDir;
+			var appResourcesDir = this.$resources.appResourcesDir;
 			this.$fs.deleteDirectory(appResourcesDir).wait();
 
 			var assetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
@@ -158,22 +150,6 @@ export class TemplatesService implements ITemplatesService {
 				});
 			this.$fs.futureFromEvent(unzipStream, "close").wait();
 			Future.wait(unzipOps);
-		}).future<void>()();
-	}
-
-	public downloadCordovaJsFiles(): IFuture<void> {
-		return (() => {
-			var projectSchema = helpers.getProjectFileSchema();
-			var cordovaVersions = projectSchema.FrameworkVersion.range;
-			var platforms = Object.keys(MobileHelper.platformCapabilities);
-			cordovaVersions.forEach((version) => {
-				platforms.forEach((platform) => {
-					var targetFilePath = this.buildCordovaJsFilePath(version, platform);
-					this.$fs.createDirectory(path.dirname(targetFilePath)).wait();
-					var targetFile = this.$fs.createWriteStream(targetFilePath);
-					this.$server.cordova.getJs(version, platform, targetFile).wait();
-				});
-			});
 		}).future<void>()();
 	}
 
