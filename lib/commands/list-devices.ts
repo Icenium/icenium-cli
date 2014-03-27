@@ -11,7 +11,7 @@ export class ListDevicesCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			var index = 1;
-			this.$devicesServices.initialize(args[0]).wait();
+			this.$devicesServices.initialize(args[0], null, {skipInferPlatform: true}).wait();
 
 			var action;
 			if (options.json) {
