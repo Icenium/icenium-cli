@@ -216,10 +216,14 @@ export class Yok implements IInjector {
 		return module;
 	}
 
-	public getRegisteredCommandsNames(): string[] {
+	public getRegisteredCommandsNames(includeDev: boolean): string[] {
 		var modulesNames: string[] = _.keys(this.modules);
 		var commandsNames: string[] = _.filter(modulesNames, (moduleName: string) => moduleName.startsWith(util.format("%s.", this.COMMANDS_NAMESPACE)));
-		return _.map(commandsNames, (commandName: string) => commandName.substr(this.COMMANDS_NAMESPACE.length + 1));
+		var commands = _.map(commandsNames, (commandName: string) => commandName.substr(this.COMMANDS_NAMESPACE.length + 1));
+		if (!includeDev) {
+			commands = _.reject(commands, (command) => command.startsWith("dev-"));
+		}
+		return commands;
 	}
 
 	private createCommandName(name: string) {

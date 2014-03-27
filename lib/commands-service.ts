@@ -4,8 +4,8 @@
 export class CommandsService implements ICommandsService {
 	constructor(private $errors: IErrors) { }
 
-	public allCommands(): string[] {
-		return $injector.getRegisteredCommandsNames();
+	public allCommands(includeDev: boolean): string[] {
+		return $injector.getRegisteredCommandsNames(includeDev);
 	}
 
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
@@ -62,7 +62,7 @@ export class CommandsService implements ICommandsService {
 						}
 					}
 				}
-				return tabtab.log($injector.getRegisteredCommandsNames(), data);
+				return tabtab.log(this.allCommands(false), data);
 			}
 		});
 

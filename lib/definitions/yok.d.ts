@@ -6,7 +6,7 @@ interface IInjector {
 	resolveCommand(name: string): ICommand;
 	register(name: string, resolver: any): void;
 	registerCommand(name: string, resolver: any): void;
-	getRegisteredCommandsNames(): string[];
+	getRegisteredCommandsNames(includeDev: boolean): string[];
 }
 
 declare var $injector: IInjector;
