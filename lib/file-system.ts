@@ -152,10 +152,13 @@ export class FileSystem implements IFileSystem {
 	}
 
 	public copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
-		var source = this.createReadStream(sourceFileName);
-		var target = this.createWriteStream(destinationFileName);
-		source.pipe(target);
-		return this.futureFromEvent(target, "finish");
+		return (() => {
+			this.createDirectory(path.dirname(destinationFileName)).wait();
+			var source = this.createReadStream(sourceFileName);
+			var target = this.createWriteStream(destinationFileName);
+			source.pipe(target);
+			this.futureFromEvent(target, "finish").wait();
+		}).future<void>()();
 	}
 
 	public createReadStream(path: string, options?: {

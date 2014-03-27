@@ -373,7 +373,7 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	private normalizePropertyName(property) {
+	private normalizePropertyName(property: string): string {
 		if (!property) {
 			return property;
 		}

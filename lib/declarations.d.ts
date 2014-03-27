@@ -312,3 +312,11 @@ interface IX509CertificateLoader {
 interface IQrCodeGenerator {
 	generateDataUri(data: string): string;
 }
+
+interface IResourceLoader {
+	appResourcesDir: string;
+	resolvePath(path: string): string;
+	openFile(path: string): any;
+	buildCordovaJsFilePath(version: string, platform: string): string;
+	downloadCordovaJsFiles(): IFuture<void>;
+}

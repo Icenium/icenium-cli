@@ -146,6 +146,19 @@ export class LoginManager implements ILoginManager {
 }
 
 export class TemplateServiceStub implements ITemplatesService {
+	appResourcesDir:string;
+
+	buildCordovaJsFilePath(version:string, platform:string):string {
+		return undefined;
+	}
+
+	unpackAppResources():IFuture<void> {
+		return undefined;
+	}
+
+	downloadCordovaJsFiles():IFuture<void> {
+		return undefined;
+	}
 	get configurationFiles(): IConfigurationFile[] {
 		return [{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFilepath: "Mobile.Android.ManifestXml.zip", helpText: "" }];
 	}

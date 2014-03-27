@@ -6,6 +6,7 @@ interface ITemplatesService {
 	getTemplateFilename(name: string): string;
 	downloadProjectTemplates(): IFuture<void>;
 	downloadItemTemplates(): IFuture<void>;
+	unpackAppResources(): IFuture<void>;
 }
 
 interface IConfigurationFile {

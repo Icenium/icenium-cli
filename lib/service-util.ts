@@ -7,6 +7,7 @@ import Future = require("fibers/future");
 import cookielib = require("cookie");
 import Url = require("url");
 import helpers = require("./helpers");
+import zlib = require("zlib");
 
 export class HttpClient implements Server.IHttpClient {
 	private defaultUserAgent: string;
@@ -73,22 +74,29 @@ export class HttpClient implements Server.IHttpClient {
 			headers["User-Agent"] = this.defaultUserAgent;
 		}
 
+		if (!headers["Accept-Encoding"]) {
+			headers["Accept-Encoding"] = "gzip,deflate";
+		}
+
 		var result = new Future<Server.IResponse>();
 
 		this.$logger.trace("httpRequest: %s", util.inspect(options));
 
 		var request = http.request(options, (response) => {
-			var data = "";
+			var data = [];
 			var successful = helpers.isRequestSuccessful(response);
 			if (!successful) {
 				pipeTo = undefined;
 			}
 
-			if (!pipeTo) {
-				response.on("data", (chunk) => {
-					this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
-					data += chunk;
-				});
+			var responseStream = response;
+			switch (response.headers['content-encoding']) {
+				case 'gzip':
+					responseStream = responseStream.pipe(zlib.createGunzip());
+					break;
+				case 'deflate':
+					responseStream = responseStream.pipe(zlib.createInflate());
+					break;
 			}
 
 			if (pipeTo) {
@@ -99,21 +107,26 @@ export class HttpClient implements Server.IHttpClient {
 						headers: response.headers
 					});
 				});
-
-				response.pipe(pipeTo);
+				responseStream.pipe(pipeTo);
 			} else {
-				response.on("end", () => {
+				responseStream.on("data", (chunk) => {
+					this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
+					data.push(chunk);
+				});
+
+				responseStream.on("end", () => {
 					this.$logger.trace("httpRequest: Done. code = %d", response.statusCode);
+					var body = data.join("");
 
 					if (successful) {
 						result.return({
-							body: data,
+							body: body,
 							response: response,
 							headers: response.headers,
 							error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
 						})
 					} else {
-						var errorMessage = this.getErrorMessage(response, data);
+						var errorMessage = this.getErrorMessage(response, body);
 						result.throw(new Error(errorMessage));
 					}
 				});
