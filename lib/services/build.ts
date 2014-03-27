@@ -285,13 +285,25 @@ export class BuildService implements Project.IBuildService {
 			var buildResult = this.requestCloudBuild(settings).wait();
 			var packageDefs = buildResult.packageDefs;
 
-			if (settings.showQrCodes && packageDefs.length) {
-				var urlKind = buildResult.provisionType === "AdHoc" ? "manifest" : "package";
-				packageDefs.forEach((def:any) => {
-					var liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, buildResult.buildProperties.LiveSyncToken).wait();
-					def.qrUrl = this.$qr.generateDataUri(liveSyncUrl);
+			if (buildResult.provisionType === constants.ProvisionType.Development && !settings.downloadFiles) {
+				this.$logger.info("Package built with 'Development' provision type. Downloading package, instead of generating QR code.");
+				this.$logger.info("Deploy manually to your device using iTunes.");
+				settings.showQrCodes = false;
+				settings.downloadFiles = true;
+			}
 
-					this.$logger.debug("QR URL is '%s'", def.qrUrl);
+			if (settings.showQrCodes && packageDefs.length) {
+				var urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
+				var liveSyncToken = buildResult.buildProperties.LiveSyncToken;
+				packageDefs.forEach((def:any) => {
+					var liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
+					def.qrUrl = this.$qr.generateDataUri(liveSyncUrl);
+					this.$logger.debug("QR code image is '%s'", def.qrUrl);
+
+					def.packageUrl = (urlKind !== "package")
+						? this.getLiveSyncUrl("package", def.relativePath, liveSyncToken).wait()
+						: liveSyncUrl;
+					this.$logger.debug("Download URL is '%s'", def.packageUrl);
 				});
 
 				this.showPackageQRCodes(packageDefs).wait();

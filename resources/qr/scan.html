@@ -15,6 +15,7 @@
 			$(".solution-name").text(pkgDef.solution);
 			$(".platform-name").text(pkgDef.platform);
 			$(".qr-code").attr("src", pkgDef.qrUrl);
+			$(".download").attr("href", pkgDef.packageUrl);
 		});
 	</script>
 
@@ -25,7 +26,8 @@
 		<div class="logo"></div>
 	</div>
 	<h3>Scan the QR code below to install <span class="solution-name"></span> to <span class="platform-name"></span></h3>
-	<img class="qr-code" />
+	<a class="download"><img class="qr-code" /></a>
+	<p><a class="download">Download</a></p>
 	<p>You may close this tab after scanning the code.</p>
 </div>
 </body>
