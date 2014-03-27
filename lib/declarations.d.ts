@@ -349,3 +349,7 @@ interface IUserSettingsService {
 	userSettingsFilePath?: string;
 }
 
+interface IPathFilteringService {
+	getRulesFromFile(file: string) : string[];
+	filterIgnoredFiles(files: string[], rules: string[]) :string[];
+}

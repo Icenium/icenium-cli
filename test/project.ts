@@ -42,6 +42,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
 	testInjector.register("resources", $injector.resolve("resources"));
+	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
 
 	return testInjector;
 }

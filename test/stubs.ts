@@ -187,3 +187,12 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 }
+
+export class PathFilteringServiceStub implements IPathFilteringService {
+	getRulesFromFile(file: string) : string[] {
+		return [];
+	}
+	filterIgnoredFiles(files: string[], rules: string[]) : string[] {
+		return files;
+	}
+}

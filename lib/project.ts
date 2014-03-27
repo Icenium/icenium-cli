@@ -26,7 +26,8 @@ export class Project implements Project.IProject {
 		private $userDataStore: IUserDataStore,
 		private $loginManager: ILoginManager,
 		private $resources: IResourceLoader,
-		private $templatesService: ITemplatesService) {
+		private $templatesService: ITemplatesService,
+		private $pathFilteringService : IPathFilteringService) {
 			this.readProjectData().wait();
 	}
 
@@ -57,7 +58,7 @@ export class Project implements Project.IProject {
 		return this.cachedProjectDir;
 	}
 
-	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", "*.ipa", "*.apk", "*.xap"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", ".abignore", "*.ipa", "*.apk", "*.xap"];
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
 		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
@@ -67,6 +68,9 @@ export class Project implements Project.IProject {
 		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath) => {
 			return !this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
 		});
+
+		var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), ".abignore"));
+		projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules);
 
 		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
 		return projectFiles;
