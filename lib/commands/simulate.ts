@@ -10,11 +10,6 @@ import Future = require("fibers/future");
 export class SimulateCommand implements ICommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
-	private MACOS_COMING_SOON = [
-		"For Mac OS, the device simulator will be shipped with Telerik AppBuilder 2.1.",
-		"For more information about the latest available version,",
-		"go to https://www.npmjs.org/package/appbuilder or",
-		"http://docs.telerik.com/platform/appbuilder/release-notes"].join("\n");
 
 	private projectData;
 	private cacheDir: string;
@@ -36,13 +31,6 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			// we are shipping our Mac OS simulator very soon
-			// for now, just stop executing on Mac OS
-			if (process.platform !== "win32") {
-				this.$logger.fatal(this.MACOS_COMING_SOON);
-				return;
-			}
-
 			this.$project.ensureProject();
 
 			this.cacheDir = path.join(options["profile-dir"], "Cache");
