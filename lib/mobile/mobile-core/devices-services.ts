@@ -20,7 +20,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		private $errors: IErrors,
 		private $iOSDeviceDiscovery: Mobile.IDeviceDiscovery,
 		private $androidDeviceDiscovery: Mobile.IDeviceDiscovery) {
-		this.attachToDeviceDiscoveryEvents()
+		this.attachToDeviceDiscoveryEvents();
 	}
 
 	public get platform(): string {
@@ -179,7 +179,8 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		}).future<void>()();
 	}
 
-	public initialize(platform: string, deviceOption?: string): IFuture<void> {
+	public initialize(platform: string, deviceOption?: string, options?: Mobile.IDevicesServicesInitializationOptions): IFuture<void> {
+		options = options || {};
 		return(() => {
 			if(platform && deviceOption) {
 				this._device = this.getDevice(deviceOption).wait();
@@ -198,13 +199,19 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			} else if(!platform && !deviceOption) {
 				this.startLookingForDevices().wait();
 
-				var devices = this.getDevices();
-				var platforms = _.uniq(_.map(devices, (device) => device.getPlatform()));
+				if (!options.skipInferPlatform) {
+					var devices = this.getDevices();
+					var platforms = _.uniq(_.map(devices, (device) => device.getPlatform()));
 
-				if (platforms.length === 1) {
-					this._platform = platforms[0];
-				} else {
-					this.$errors.fail("Multiple device platforms detected. Specify platform or device on command line.");
+					if (platforms.length === 1) {
+						this._platform = platforms[0];
+					} else {
+						if (platforms.length === 0) {
+							this.$errors.fail("No connected devices detected.");
+						} else {
+							this.$errors.fail("Multiple device platforms detected. Specify platform or device on command line.");
+						}
+					}
 				}
 			}
 		}).future<void>()();
