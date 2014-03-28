@@ -380,9 +380,7 @@ export class Project implements Project.IProject {
 		};
 
 		if (!propData) {
-				this.$logger.fatal("Unrecognized property '%s'", property);
-				this.printProjectSchemaHelp();
-			return;
+			this.$errors.fail("Unrecognized project property '%s'", property);
 		}
 
 		if (!propData.flags) {
@@ -480,11 +478,14 @@ export class Project implements Project.IProject {
 			this.ensureProject();
 			property = this.normalizePropertyName(property);
 
-			if (this.projectData[property]) {
+			if (this.projectData.hasOwnProperty(property)) {
 				this.$logger.out(this.projectData[property]);
+			} else if (property) {
+				this.$errors.fail("Unrecognized project property '%s'", property);
 			} else {
-				this.$logger.fatal("Unrecognized property '%s'", property);
-				this.printProjectSchemaHelp();
+				Object.keys(this.projectData).forEach((propName) => {
+					this.$logger.out(propName + ": " + this.projectData[propName]);
+				});
 			}
 		}).future<void>()();
 	}
