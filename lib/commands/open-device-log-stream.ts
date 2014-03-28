@@ -12,7 +12,7 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$devicesServices.initialize(undefined, options.device).wait();
+			this.$devicesServices.initialize(undefined, options.device, {skipInferPlatform: true}).wait();
 
 			if (this.$devicesServices.deviceCount !== 1) {
 				this.$commandsService.executeCommand("list-devices", []);
