@@ -209,14 +209,14 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private removeExtraFiles(projectDir): IFuture<any> {
-		return ((): any => {
-			Future.wait(_.map(["mobile.proj", "mobile.vstemplate"],
-				(file) => this.$fs.deleteFile(path.join(projectDir, file))));
-		}).future<any>()();
+	private removeExtraFiles(projectDir: string): IFuture<void> {
+		return ((): void => {
+			_.each(["mobile.proj", "mobile.vstemplate"],
+				(file) => this.$fs.deleteFile(path.join(projectDir, file)).wait());
+		}).future<void>()();
 	}
 
-	private getProjectProperties(projectFile, appName): IFuture<any> {
+	private getProjectProperties(projectFile: string, appName: string): IFuture<any> {
 		return ((): any => {
 			var properties: any = {};
 

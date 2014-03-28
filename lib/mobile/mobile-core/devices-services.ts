@@ -160,7 +160,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				}
 			});
 
-			Future.wait(futures);
+			Future.wait(futures); //SAFE: all futures settled serially by the above Future.settle call
 		}).future<void>()();
 	}
 
