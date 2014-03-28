@@ -320,3 +320,13 @@ interface IResourceLoader {
 	buildCordovaJsFilePath(version: string, platform: string): string;
 	downloadCordovaJsFiles(): IFuture<void>;
 }
+
+interface IQueue<T> {
+	enqueue(item: T): void;
+	dequeue(): IFuture<T>;
+}
+
+interface IFutureDispatcher {
+	run(): void;
+	dispatch(func: (...args: any[]) => IFuture<void>, context: any, ...args: any[]): void;
+}
