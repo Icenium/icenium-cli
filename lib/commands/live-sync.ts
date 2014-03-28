@@ -10,7 +10,7 @@ import AppIdentifier = require("../mobile/app-identifier");
 import constants = require("../mobile/constants");
 
 export class LiveSyncCommand implements ICommand {
-	private excludedProjectDirsAndFiles = ["app_resources", "plugins"];
+	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".*.tmp"];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
