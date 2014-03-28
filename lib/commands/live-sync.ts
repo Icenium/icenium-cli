@@ -38,21 +38,21 @@ export class LiveSyncCommand implements ICommand {
 			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
 				this.$project.projectData.AppIdentifier, options.companion);
 
-			if (options.watch) {
-				this.liveSyncDevices(platform, projectDir, appIdentifier);
-				helpers.exitOnStdinEnd();
-			} else {
-				if (options.file) {
-					var isExistFile = this.$fs.exists(options.file).wait();
-					if(isExistFile) {
-						var projectFiles = [path.resolve(options.file)];
-						this.sync(appIdentifier, projectDir, projectFiles).wait();
-					} else {
-						this.$errors.fail("The file %s does not exist.", options.file);
-					}
-				} else {
-					var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+			if (options.file) {
+				var isExistFile = this.$fs.exists(options.file).wait();
+				if(isExistFile) {
+					var projectFiles = [path.resolve(options.file)];
 					this.sync(appIdentifier, projectDir, projectFiles).wait();
+				} else {
+					this.$errors.fail("The file %s does not exist.", options.file);
+				}
+			} else {
+				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+				this.sync(appIdentifier, projectDir, projectFiles).wait();
+
+				if (options.watch) {
+					this.liveSyncDevices(platform, projectDir, appIdentifier);
+					helpers.exitOnStdinEnd();
 				}
 			}
 		}).future<void>()();
@@ -74,9 +74,9 @@ export class LiveSyncCommand implements ICommand {
 
 	public getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
 		var localToDevicePaths = _.map(projectFiles, (projectFile: string) => {
-			var relativeToProjectBasePath: string = helpers.getRelativeToRootPath(localProjectPath, projectFile);
-			var deviceDirPath : string = path.dirname(path.join(deviceProjectPath, relativeToProjectBasePath));
-			return new MobileHelper.LocalToDevicePathData(projectFile, helpers.fromWindowsRelativePathToUnix(deviceDirPath), relativeToProjectBasePath);
+			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFile);
+			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
+			return new MobileHelper.LocalToDevicePathData(projectFile, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
 		});
 
 		return localToDevicePaths;
@@ -86,6 +86,9 @@ export class LiveSyncCommand implements ICommand {
 		watchr.watch({
 			paths: [projectDir],
 			listeners: {
+//				log: (logLevel, ...args) => {
+//					this.$logger.debug.apply(this.$logger, args);
+//				},
 				error: (error) => {
 					this.$errors.fail(error);
 				},
