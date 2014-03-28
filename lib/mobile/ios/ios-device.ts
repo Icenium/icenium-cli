@@ -131,7 +131,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}).future<void>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, options: Mobile.ISyncOptions = {}): IFuture<void> {
 		return(() => {
 			//TODO: CloseSocket must be part of afcClient. Refactor it.
 			var houseArrestClient: Mobile.IHouseArrestClient = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
@@ -139,13 +139,16 @@ export class IOSDevice implements Mobile.IIOSDevice {
 			afcClientForAppDocuments.transferCollection(localToDevicePaths).wait();
 			houseArrestClient.closeSocket();
 
-			var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier.appIdentifier);
-			afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist");
-			houseArrestClient.closeSocket();
+			if (!options.skipRefresh) {
+				var afcClientForContainer = houseArrestClient.getAfcClientForAppContainer(appIdentifier.appIdentifier);
+				afcClientForContainer.deleteFile("/Library/Preferences/ServerInfo.plist");
+				houseArrestClient.closeSocket();
 
-			var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
-			notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
-			notificationProxyClient.closeSocket();
+				var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
+				notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
+				notificationProxyClient.closeSocket();
+			}
+
 			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
 	}

@@ -10,7 +10,12 @@ import AppIdentifier = require("../mobile/app-identifier");
 import constants = require("../mobile/constants");
 
 export class LiveSyncCommand implements ICommand {
-	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".*.tmp"];
+	private excludedProjectDirsAndFiles = [
+		"app_resources"
+		, "plugins"
+		, "cordova.*.js"
+		, ".*.tmp"
+	];
 
 	constructor(private $devicesServices: Mobile.IDevicesServices,
 		private $logger: ILogger,
@@ -47,6 +52,8 @@ export class LiveSyncCommand implements ICommand {
 					this.$errors.fail("The file %s does not exist.", options.file);
 				}
 			} else {
+				this.uploadCordovaJs(appIdentifier, projectDir, platform).wait();
+
 				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
 
@@ -56,6 +63,18 @@ export class LiveSyncCommand implements ICommand {
 				}
 			}
 		}).future<void>()();
+	}
+
+	private uploadCordovaJs(appIdentifier: Mobile.IAppIdentifier, projectDir: string, platform: string): IFuture<void> {
+		return this.$devicesServices.execute((device) => {
+			return (() => {
+				var cordovaJs = this.getLocalToDevicePaths(projectDir,
+					[path.join(projectDir, util.format("cordova.%s.js", platform))],
+					appIdentifier.deviceProjectPath,
+					(from) => path.join(path.dirname(from), "cordova.js"));
+				device.sync(cordovaJs, appIdentifier, {skipRefresh: true}).wait();
+			}).future<void>()();
+		});
 	}
 
 	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
@@ -72,9 +91,11 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	public getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
+	public getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string, rename?: (from: string) => string): MobileHelper.LocalToDevicePathData[] {
 		var localToDevicePaths = _.map(projectFiles, (projectFile: string) => {
-			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFile);
+			var renamedFile = rename ? rename(projectFile) : projectFile;
+
+			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, renamedFile);
 			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
 			return new MobileHelper.LocalToDevicePathData(projectFile, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
 		});
