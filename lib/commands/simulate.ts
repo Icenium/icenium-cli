@@ -65,8 +65,11 @@ export class SimulateCommand implements ICommand {
 			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
 				var downloadUri = this.getSimulatorDownloadUri().wait();
 				this.$logger.info("Updating simulator package...");
-				this.$logger.debug("Downloading simulator from %s", downloadUri);
 
+				this.$logger.debug("Removing old simulator...");
+				this.$fs.deleteDirectory(this.simulatorPath).wait();
+
+				this.$logger.debug("Downloading simulator from %s", downloadUri);
 				var extractor = unzip.Extract({path: this.simulatorPath});
 				var request = this.$httpClient.httpRequest({
 					url: downloadUri,
