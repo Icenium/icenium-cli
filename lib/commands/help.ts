@@ -12,11 +12,9 @@ export class HelpCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var topic: string;
-			if (args.length == 0) {
+			var topic = (args[0] || "").toLowerCase();
+			if (topic === "help") {
 				topic = "";
-			} else {
-				topic = args[0];
 			}
 
 			var helpContent = this.$fs.readText(path.join(__dirname, "../../resources/help.txt")).wait();
