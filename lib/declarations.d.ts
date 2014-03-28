@@ -317,7 +317,11 @@ interface IResourceLoader {
 	appResourcesDir: string;
 	resolvePath(path: string): string;
 	openFile(path: string): any;
+	readJson(path: string): IFuture<any>;
 	buildCordovaJsFilePath(version: string, platform: string): string;
+}
+
+interface IResourceDownloader {
 	downloadCordovaJsFiles(): IFuture<void>;
 }
 

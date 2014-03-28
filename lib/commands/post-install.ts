@@ -6,7 +6,7 @@ import Future = require("fibers/future");
 
 export class PrepackageCommand implements ICommand {
 	constructor(private $templatesService: ITemplatesService,
-		private $resources: IResourceLoader,
+		private $resourceDownloader: IResourceDownloader,
 		private $logger: ILogger,
 		private $serviceProxy: Server.IServiceProxy) { }
 
@@ -21,7 +21,7 @@ export class PrepackageCommand implements ICommand {
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();
 			this.$logger.info("Downloading cordova.js files.");
-			this.$resources.downloadCordovaJsFiles().wait();
+			this.$resourceDownloader.downloadCordovaJsFiles().wait();
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

@@ -25,6 +25,7 @@ export class Project implements Project.IProject {
 		private $errors: IErrors,
 		private $userDataStore: IUserDataStore,
 		private $loginManager: ILoginManager,
+		private $resources: IResourceLoader,
 		private $templatesService: ITemplatesService) {
 			this.readProjectData().wait();
 	}
@@ -93,7 +94,7 @@ export class Project implements Project.IProject {
 			if (projectDir) {
 				this.projectData = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
 
-				if (Project.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if (this.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
@@ -284,13 +285,13 @@ export class Project implements Project.IProject {
 				}
 			});
 
-			Project.completeProjectProperties(this.projectData);
+			this.completeProjectProperties(this.projectData);
 
 			this.saveProject(projectDir).wait();
 		}).future<void>()();
 	}
 
-	private static completeProjectProperties(properties: any): boolean {
+	private completeProjectProperties(properties: any): boolean {
 		var updated = false;
 
 		if (properties.hasOwnProperty("iOSDisplayName")) {
@@ -303,23 +304,20 @@ export class Project implements Project.IProject {
 			updated = true;
 		}
 
-		if (!properties.hasOwnProperty("WP8PublisherID")) {
-			properties.WP8PublisherID = MobileHelper.generateWP8GUID();
-			updated = true;
-		}
-		if (!properties.hasOwnProperty("WP8ProductID")) {
-			properties.WP8ProductID = MobileHelper.generateWP8GUID();
-			updated = true;
-		}
+		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
+			if (!properties.hasOwnProperty(wp8guid)) {
+				properties[wp8guid] = MobileHelper.generateWP8GUID();
+				updated = true;
+			}
+		});
 
-		if (!properties.hasOwnProperty("Author")) {
-			properties.Author = "";
-			updated = true;
-		}
-		if (!properties.hasOwnProperty("Description")) {
-			properties.Description = "";
-			updated = true;
-		}
+		var defaultProject = this.$resources.readJson("default-project.json").wait();
+		Object.keys(defaultProject).forEach((propName) => {
+			if (!properties.hasOwnProperty(propName)) {
+				properties[propName] = defaultProject[propName];
+				updated = true;
+			}
+		});
 
 		return updated;
 	}
