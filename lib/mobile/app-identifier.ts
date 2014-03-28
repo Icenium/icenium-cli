@@ -3,6 +3,7 @@
 
 import path = require("path");
 import Future = require("fibers/future");
+import helpers = require("../helpers");
 
 var ANDROID_PROJECT_PATH = "mnt/sdcard/Icenium/";
 var ANDROID_CHECK_LIVE_SYNC_INTENT = "com.telerik.IsLiveSyncSupported";
@@ -19,7 +20,7 @@ export class AndroidAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get deviceProjectPath(): string {
-		return path.join(ANDROID_PROJECT_PATH, this.appIdentifier);
+		return helpers.fromWindowsRelativePathToUnix(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
 	}
 
 	isLiveSyncSupported(device: any): IFuture<boolean> {
@@ -36,7 +37,7 @@ export class AndroidCompanionAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get deviceProjectPath(): string {
-		return path.join(ANDROID_PROJECT_PATH, this.appIdentifier);
+		return helpers.fromWindowsRelativePathToUnix(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
 	}
 
 	isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {

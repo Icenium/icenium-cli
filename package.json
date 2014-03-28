@@ -35,7 +35,7 @@
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ffi": "https://github.com/icenium/node-ffi/tarball/master",
     "ref-struct": "0.0.5",
-    "watchr": "2.4.4",
+    "watchr": "2.4.11",
     "valid-url": "1.0.9",
     "node-uuid": "1.4.1",
     "underscore": "1.5.2",
