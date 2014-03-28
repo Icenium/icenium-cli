@@ -18,6 +18,7 @@ $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
 
 $injector.requireCommand("help", "./commands/help");
+$injector.requireCommand("/?", "./commands/help");
 
 $injector.requireCommand("find-plugins", "./commands/find-plugins");
 

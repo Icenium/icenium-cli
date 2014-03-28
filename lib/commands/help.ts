@@ -46,3 +46,4 @@ export class HelpCommand implements ICommand {
 	}
 }
 $injector.registerCommand("help", HelpCommand);
+$injector.registerCommand("/?", HelpCommand);
