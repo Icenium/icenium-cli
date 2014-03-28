@@ -172,10 +172,8 @@ export class LoginManager implements ILoginManager {
 			this.$logger.debug("Cookie is '%s'", abAuthCookie);
 
 			if (abAuthCookie && userData) {
-				Future.wait(
-					this.$userDataStore.setCookie(abAuthCookie),
-					this.$userDataStore.setUser(userData)
-				);
+				this.$userDataStore.setCookie(abAuthCookie).wait();
+				this.$userDataStore.setUser(userData).wait();
 			} else {
 				throw new Error("Login failed.");
 			}

@@ -253,13 +253,12 @@ export class BuildService implements Project.IBuildService {
 			var templateFiles = helpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
 			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir(), path.basename(file)));
 
-			var copyOps = _(_.zip(templateFiles, targetFiles)).map((zipped) => {
+			_(_.zip(templateFiles, targetFiles)).each((zipped) => {
 				var srcFile = zipped[0];
 				var targetFile = zipped[1];
 				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
-				return this.$fs.copyFile(srcFile, targetFile);
+				this.$fs.copyFile(srcFile, targetFile).wait();
 			});
-			Future.wait(copyOps);
 
 			var scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
 			var htmlTemplateContents = this.$fs.readText(scanFile).wait();

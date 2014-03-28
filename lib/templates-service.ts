@@ -149,7 +149,7 @@ export class TemplatesService implements ITemplatesService {
 					});
 				});
 			this.$fs.futureFromEvent(unzipStream, "close").wait();
-			Future.wait(unzipOps);
+			Future.wait(unzipOps); //SAFE: no FiberFuture's created here
 		}).future<void>()();
 	}
 
