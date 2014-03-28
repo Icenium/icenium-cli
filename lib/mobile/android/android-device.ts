@@ -151,12 +151,14 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<number>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, options: Mobile.ISyncOptions = {}): IFuture<void> {
 		return (() => {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
-				this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: ""}).wait();
-				this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
+				if (!options.skipRefresh) {
+					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: ""}).wait();
+					this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
+				}
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());
 			} else {
 				this.$errors.fail({formatStr: "You can't live sync on %s! Deploy the app with live sync enabled and wait for the initial start up before live syncing.", suppressCommandHelp: true }, this.identifier);

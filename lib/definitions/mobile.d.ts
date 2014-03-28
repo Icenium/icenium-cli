@@ -2,6 +2,10 @@
 
 declare module Mobile {
 
+	interface ISyncOptions {
+		skipRefresh?: boolean;
+	}
+
 	interface IDevice {
 		getIdentifier(): string;
 		getDisplayName(): string;
@@ -11,6 +15,7 @@ declare module Mobile {
 		getPlatform(): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
 		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier): IFuture<void>;
+		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier, options: ISyncOptions): IFuture<void>;
 		openDeviceLogStream(): void;
 	}
 
