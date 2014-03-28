@@ -22,8 +22,11 @@ export class AndroidDevice implements Mobile.IDevice {
 	private version: string;
 	private vendor: string;
 
-	constructor(private identifier: string, private adb: string, private $logger: ILogger,
-		private $childProcess: IChildProcess, private $errors: IErrors) {
+	constructor(private identifier: string, private adb: string,
+		private $logger: ILogger,
+		private $fs: IFileSystem,
+		private $childProcess: IChildProcess,
+		private $errors: IErrors) {
 		var details: IAndroidDeviceDetails = this.getDeviceDetails().wait();
 		this.model = details.model;
 		this.name = details.name;
@@ -115,8 +118,18 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
 		return(() => {
-			var pushFileCommand = this.composeCommand("push \"%s\" \"%s\"", localPath, devicePath);
-			this.$childProcess.exec(pushFileCommand).wait();
+			var rmCommand = this.composeCommand('shell rm -r "%s"', devicePath);
+			this.$childProcess.exec(rmCommand).wait();
+
+			if (this.$fs.exists(localPath).wait()) {
+				var isDirectory = this.$fs.getFsStats(localPath).wait().isDirectory();
+
+				var mkdirCommand = this.composeCommand('shell mkdir -p "%s"', isDirectory ? devicePath : path.dirname(devicePath));
+				this.$childProcess.exec(mkdirCommand).wait();
+
+				var pushFileCommand = this.composeCommand('push "%s" "%s"', isDirectory ? path.join(localPath, ".") : localPath, devicePath);
+				this.$childProcess.exec(pushFileCommand).wait();
+			}
 		}).future<void>()();
 	}
 
@@ -138,7 +151,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<number>()();
 	}
 
-	sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
 		return (() => {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
