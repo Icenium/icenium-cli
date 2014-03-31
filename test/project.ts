@@ -41,6 +41,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
+	testInjector.register("resources", $injector.resolve("resources"));
 
 	return testInjector;
 }
