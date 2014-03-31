@@ -76,6 +76,14 @@ function popIndent() {
 	indent = indent.slice(0, -2);
 }
 
+function forEachName(names: any, action: (name: string) => void): void {
+	if (_.isString(names)) {
+		action(names);
+	} else {
+		names.forEach(action);
+	}
+}
+
 export interface IDependency {
 	require?: string;
 	resolver?: () => any;
@@ -90,11 +98,17 @@ export class Yok implements IInjector {
 
 	private resolutionProgress: any = {};
 
-	public requireCommand(name: string, file: string) {
-		this.require(this.createCommandName(name), file);
+	public requireCommand(names: any, file: string) {
+		forEachName(names, (name) =>{
+			this.require(this.createCommandName(name), file);
+		});
 	}
 
-	public require(name: string, file: string): void {
+	public require(names: any, file: string): void {
+		forEachName(names, (name) => this.requireOne(name, file));
+	}
+
+	private requireOne(name: string, file: string): void {
 		var dependency: IDependency = {
 			require: file
 		};
@@ -105,8 +119,10 @@ export class Yok implements IInjector {
 		}
 	}
 
-	public registerCommand(name: string, resolver: any): void {
-		this.register(this.createCommandName(name), resolver);
+	public registerCommand(names: any, resolver: any): void {
+		forEachName(names, (name) => {
+			this.register(this.createCommandName(name), resolver);
+		});
 	}
 
 	public register(name: string, resolver: any): void {
