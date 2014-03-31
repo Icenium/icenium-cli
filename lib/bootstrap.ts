@@ -58,7 +58,7 @@ $injector.requireCommand("list-devices", "./commands/list-devices");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
-$injector.requireCommand("livesync", "./commands/live-sync");
+$injector.requireCommand(["livesync", "live-sync"], "./commands/live-sync");
 
 $injector.requireCommand("open-device-log-stream", "./commands/open-device-log-stream");
 
