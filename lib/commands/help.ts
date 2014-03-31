@@ -45,4 +45,4 @@ export class HelpCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("help", HelpCommand);
+$injector.registerCommand(["help", "/?"], HelpCommand);
