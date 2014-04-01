@@ -45,7 +45,7 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("appstore", ListApplicationsReadyForUploadCommand);
+$injector.registerCommand("appstore|*list", ListApplicationsReadyForUploadCommand);
 
 export class UploadApplicationCommand implements ICommand {
 	constructor(private $server: Server.IServer,

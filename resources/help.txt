@@ -435,14 +435,14 @@ running the command, Telerik AppBuilder will prompt you to provide it.
 
 --[appstore]--
 Usage:
-    $ appbuilder appstore-list <AppleID> [<Password>]
+    $ appbuilder appstore list <AppleID> [<Password>]
 
 Lists all application records in iTunes Connect that are in the Waiting for Upload state. The list contains name, version, and
 bundle ID for each application record.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect. If you do not provide your Apple ID password when
         running the command, Telerik AppBuilder will prompt you to provide it.
 
-When running appstore-upload, you need to provide the name for the application record.
+When running $ appbuilder appstore upload, you need to provide the name for the application record.
 
 --[/]--
 

@@ -43,21 +43,21 @@ export class CommandsService implements ICommandsService {
 
 	public tryToExecuteCommand(commandName: string, commandArguments: string[]): void {
 		if(!this.executeCommand(commandName, commandArguments)) {
-			commandName = this.beautifyCommandName(commandName);
 			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
-			this.tryToMatchCommand(commandName);
+			this.tryMatchCommand(commandName);
 		}
 	}
 
-	private tryToMatchCommand(commandName): void {
+	private tryMatchCommand(commandName: string): void {
 		var allCommands = this.allCommands(false);
 		var similarCommands = [];
 		_.each(allCommands, (command) => {
+			command = this.beautifyCommandName(command);
 			var distance = jaroWinklerDistance(commandName, command);
 			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
-				similarCommands.push({ rating: 1, name: this.beautifyCommandName(command) });
+				similarCommands.push({ rating: 1, name: command });
 			} else if (distance >= 0.65) {
-				similarCommands.push({ rating: distance, name: this.beautifyCommandName(command) });
+				similarCommands.push({ rating: distance, name: command });
 			}
 
 		});
