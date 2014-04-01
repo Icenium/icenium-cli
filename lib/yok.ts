@@ -104,8 +104,9 @@ export class Yok implements IInjector {
 		forEachName(names, (commandName) => {
 			if(this.isDefaultCommand(commandName)) {
 				this.require(this.createCommandName(commandName.split("|")[0]), file);
+			} else {
+				this.require(this.createCommandName(commandName), file);
 			}
-			this.require(this.createCommandName(commandName), file);
 		});
 	}
 
