@@ -16,6 +16,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
 		private $errors: IErrors,
+		private $logger: ILogger,
 		private $injector: IInjector) { }
 
 	public getPlatform(): string {
@@ -147,9 +148,10 @@ export class IOSDevice implements Mobile.IIOSDevice {
 				var notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this});
 				notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 				notificationProxyClient.closeSocket();
+
+				this.$logger.out("Successfully synced device with identifier '%s'", this.getIdentifier());
 			}
 
-			console.log("Successfully synced device with identifier '%s'", this.getIdentifier());
 		}).future<void>()();
 	}
 
