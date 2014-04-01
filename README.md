@@ -95,7 +95,7 @@ Quick Start
 1. [Get Code Changes in the Simulator and on Device](#livesync "LiveSync changes from your code to your app in the simulator or on device")
 1. [Get Help](#help "List the available commands and options")
 
-<a id="login"><b>1. Log in the Telerik Platform</b></a>
+<a name="login"><b>1. Log in the Telerik Platform</b></a>
 
 To connect to your Telerik Platform account, run the following command.
 
@@ -105,7 +105,7 @@ $ appbuilder login
 
 A new tab opens in your default browser. Provide your login credentials, confirm the sign in, verify that the following message is present in the command line: `Login completed`, and close the browser tab after the confirmation.
 
-<a id="create"><b>2. Create project</b></a>
+<a name="create"><b>2. Create project</b></a>
 
 To create a new project from the default template, navigate to an empty directory and run the following command. 
 
@@ -123,7 +123,7 @@ $ appbuilder init
 
 The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
 
-<a id="simulator"><b>3. Run in simulator</b></a>
+<a name="simulator"><b>3. Run in simulator</b></a>
 
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
@@ -135,7 +135,7 @@ The Telerik AppBuilder CLI launches the device simulator. In the device simulato
 
 For more information about the Telerik AppBuilder device simulator, see <a href="http://docs.telerik.com/platform/appbuilder/testing-your-app/running-apps-in-simulator/device-simulator" target="_blank">Running Apps in the Device Simulator</a>.
 
-<a id="device"><b>4. Run on device</b></a>
+<a name="device"><b>4. Run on device</b></a>
 
 To run your app on an Android device, install a QR code reader on the device, install the Telerik AppBuilder companion app, navigate to the folder containing your project files and run the following command in the command line. 
 
@@ -165,13 +165,13 @@ $ appbuilder build wp8
 
 After the operation completes, the Telerik AppBuilder CLI places the application package in the root of your project. You can manually deploy the application package on a Windows Phone 8 device. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>. 
 
-<a id="code"><b>5. Modify your code</b></a>
+<a name="code"><b>5. Modify your code</b></a>
 
 Edit your code in your preferred IDE or code editor. Save your changes.
 
 > In Sublime Text 2 and Sublime Text 3, you can install the Telerik AppBuilder package which provides integration with the Telerik AppBuilder CLI. For more information, click <a href="https://sublime.wbond.net/packages/Telerik%20AppBuilder" target="_blank">here</a>. 
 
-<a id="livesync"><b>6. Get code changes in the simulator and on device</b></a>
+<a name="livesync"><b>6. Get code changes in the simulator and on device</b></a>
 
 In the running device simulator, your app refreshes automatically on save.
 
@@ -183,7 +183,7 @@ $ appbuilder cloud-sync
 
 On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
 
-<a id="help"><b>7. List the available commands</b></a>
+<a name="help"><b>7. List the available commands</b></a>
 
 To list the available commands, run the following command.
 
