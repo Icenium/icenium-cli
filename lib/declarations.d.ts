@@ -317,11 +317,25 @@ interface IResourceLoader {
 	appResourcesDir: string;
 	resolvePath(path: string): string;
 	openFile(path: string): any;
+	readJson(path: string): IFuture<any>;
 	buildCordovaJsFilePath(version: string, platform: string): string;
+}
+
+interface IResourceDownloader {
 	downloadCordovaJsFiles(): IFuture<void>;
 }
 
 interface IJsonFileService {
 	getValue(propertyName: string): IFuture<any>;
 	save(data: {[key: string]: {}}): IFuture<void>;
+}
+
+interface IQueue<T> {
+	enqueue(item: T): void;
+	dequeue(): IFuture<T>;
+}
+
+interface IFutureDispatcher {
+	run(): void;
+	dispatch(action: () => IFuture<void>): void;
 }

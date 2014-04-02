@@ -21,7 +21,8 @@ export class LiveSyncCommand implements ICommand {
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
-		private $project: Project.IProject) {
+		private $project: Project.IProject,
+		private $dispatcher: IFutureDispatcher) {
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -60,6 +61,7 @@ export class LiveSyncCommand implements ICommand {
 				if (options.watch) {
 					this.liveSyncDevices(platform, projectDir, appIdentifier);
 					helpers.exitOnStdinEnd();
+					this.$dispatcher.run();
 				}
 			}
 		}).future<void>()();
@@ -116,7 +118,7 @@ export class LiveSyncCommand implements ICommand {
 				change: (changeType, filePath) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
-						this.sync(appIdentifier, projectDir, [filePath]);
+						this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
 					}
 				},
 				next: (error, watchers) => {

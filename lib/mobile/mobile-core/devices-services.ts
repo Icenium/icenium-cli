@@ -94,7 +94,6 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			} else if(MobileHelper.isAndroidPlatform(this._platform)) {
 				this.$androidDeviceDiscovery.startLookingForDevices().wait();
 			}
-			this._isInitialized = true;
 		}).future<void>()();
 	}
 
@@ -186,6 +185,9 @@ export class DevicesServices implements Mobile.IDevicesServices {
 
 	public initialize(platform: string, deviceOption?: string, options?: Mobile.IDevicesServicesInitializationOptions): IFuture<void> {
 		options = options || {};
+		if (this._isInitialized) {
+			return Future.fromResult();
+		}
 		return(() => {
 			if(platform && deviceOption) {
 				this._device = this.getDevice(deviceOption).wait();
@@ -220,6 +222,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 					}
 				}
 			}
+			this._isInitialized = true;
 		}).future<void>()();
 	}
 
