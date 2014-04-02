@@ -5,18 +5,19 @@ Usage:
 
 General commands:
     help <command>                  Shows additional information about the commands in this list.
-    login                           Logs you in to the Telerik Platform.
+    login                           Logs you in the Telerik Platform.
     logout                          Logs you out from the Telerik Platform.
     user                            Prints information about the currently logged in user.
 
 Project development commands:
     create                          Creates a new project from template.
     init                            Initializes an existing project for development.
-    build                           Builds the project and produces a QR code for deploying the application package.
+    build                           Builds the project and downloads the application package or produces a QR code
+                                    for deploying the application package.
     deploy                          Builds and deploys the project to a connected device.
     cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
     livesync                        Synchronizes the latest changes in your project to connected devices.
-    simulate                        Runs the current project in the device simulator.
+    simulate                        Runs the current project in the device simulator on Windows systems.
     find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -119,15 +120,16 @@ Platform-specific examples:
     $ appbuilder list-devices android
     $ appbuilder list-devices ios
 
+Lists all recognized connected devices with serial number and index, grouped by platform. In this version of the Telerik AppBuilder CLI,
+you can connect only iOS and Android devices.
+
+If a connected Android device is not shown in the list, make sure that you have installed the required Android USB drivers on your system
+and that USB debugging is enabled on the device.
+
 Options:
    --timeout - Sets the time in milliseconds for the operation to search for connected devices before completing.
       The operation will continue to wait and listen for newly connected devices and will list them
       after the specified time expires. If not set, the default value is 4000.
-
-Lists all recognized connected devices with serial number and index, grouped by platform.
-
-If a connected Android device is not shown in the list, make sure that you have installed the Android USB drivers on your system
-and that USB debugging is enabled on the device.
 
 --[/]--
 
@@ -140,7 +142,7 @@ Platform-specific examples:
     $ appbuilder build ios [--certificate <index or name>] [--provision <index or name>] [--companion]
     $ appbuilder build wp8
 
-Builds the project for the target platform and produces a QR code for deployment.
+Builds the project for the target platform and produces an application package or a QR code for deployment.
 
 Run list-certificates to list available certificates for code signing iOS applications. You can specify a certificate
 by index or name.
@@ -149,21 +151,21 @@ provisioning profile by index or name.
 
 You cannot specify both the --companion and --download options.
 
-When building for Windows Phone 8, the built package is always downloaded, because deployment
-through a QR code is not supported.
+When you build for Windows Phone 8, Telerik AppBuilder always downloads the application package. In this version of the
+Telerik AppBuilder CLI, you cannot deploy Windows Phone 8 applications via QR code.
 
 Options:
     --download - If set, downloads the application package to the .ab directory in the current directory, instead
         of producing a QR code. Set this option if you want to manually deploy the app package later.
     --companion - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the
         companion app, you do not need to set a certificate or provision.
-    --certificate - Required when building for iOS unless the --companion switch is specified.
+    --certificate - (Required when building for iOS unless the --companion switch is specified)
         Sets the certificate that you want to use for code signing your iOS app. Must match the selected
         provisioning profile. You can set a certificate by index or name.
-    --provision - Required when building for iOS unless the --companion switch is set. 
+    --provision - (Required when building for iOS unless the --companion switch is set) 
         Sets the provisioning profile that you want to use for code signing your iOS app. Must match the selected 
         certificate. You can set a provisioning profile by index or name.
-    --no-livesync - If set, disables LiveSync of code changes with the three-finger tap and hold gesture.
+    --no-livesync - If set, disables LiveSync with the three-finger tap and hold gesture.
 
 --[/]--
 
@@ -178,8 +180,10 @@ Imports the provisioning profile stored in the selected file.
 Usage:
     $ appbuilder remove-provision <Name or #Index>
 
-Removes the registered provisioning profile selected by its name or index. Use the `list-provisions`
-command to see a list of registered provisioning profiles.
+Removes the registered provisioning profile selected by its name or index. 
+
+Run list-provisions to list available provisioning profiles for code signing iOS applications. You can specify a 
+provisioning profile by index or name.
 --[/]--
 
 --[cloud-sync]--
@@ -200,7 +204,8 @@ Platform-specific examples:
     $ appbuilder deploy android [--device <ID>]
     $ appbuilder deploy ios --certificate <Name or ID> --provision <Name or ID>
 
-Builds the project for the selected platform and deploys it to a connected device.
+Builds the project for the selected platform and deploys it to a connected device. In this version of the Telerik AppBuilder CLI,
+you cannot build and deploy to Windows Phone 8 connected devices.
 
 Run list-certificates to list available certificates for code signing iOS applications. You can specify a certificate
 by index or name.
@@ -210,9 +215,9 @@ provisioning profile by index or name.
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         Run list-devices to list all connected devices, grouped by platform.
-    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your iOS
+    --certificate - (Required when building for iOS) Sets the certificate that you want to use for code signing your iOS
         app. Must match the selected provisioning profile. You can set a certificate by index or name.
-    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
+    --provision - (Required when building for iOS) Sets the provisioning profile that you want to use for code signing
         your iOS app. Must match the selected certificate. You can set a provisioning profile by index or name.
 
 --[/]--
@@ -225,7 +230,8 @@ Platform-specific example:
     $ appbuilder livesync android
     $ appbuilder livesync ios
 
-Synchronizes the latest changes in your project to connected devices.
+Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
+you cannot synchronize changes to Windows Phone 8 connected devices.
 
 Options:
     --watch - When you save changes to the project, changes are automatically synchronized
@@ -241,8 +247,11 @@ Options:
 Usage:
     $ appbuilder open-device-log-stream [--device <id>]
 
-Opens the device log stream for a selected device. You can select a device by index or identifier.
+Opens the device log stream for a selected connected device. You can select a device by index or identifier. In this version
+of the Telerik AppBuilder CLI, you cannot synchronize changes to Windows Phone 8 connected devices.
+
 Run list-devices to list all connected devices, grouped by platform.
+
 --[/]--
 
 --[find-plugins]--
@@ -265,7 +274,9 @@ The plugin must be Plugman-compatible.
 Usage:
     $ appbuilder simulate
 
-Runs the current project in the device simulator.
+Runs the current project in the device simulator. 
+
+In this version of the Telerik AppBuilder CLI, you cannot run your apps in the device simulator on OS X systems. The device simulator will become available for OS X in a future release of Telerik AppBuilder.
 
 Options:
     --path <path> - Specifies the path to the project. If not specified, the project is searched
@@ -288,6 +299,7 @@ Usage:
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.
 You can choose which project to export by its index or name.
+
 Run list-projects to list all projects associated with your Telerik Platform account.
 
 Options:
@@ -310,7 +322,8 @@ Usage:
 Usage:
     $ appbuilder user
 
-Prints information about the currently logged in user and details about their license.
+Prints information about the currently logged in user, including name, email address, 
+subscription plan and license expiration.
 --[/]--
 
 --[list-provisions]--
@@ -347,7 +360,7 @@ If you want to publish your app in Google Play, verify that the certificate expi
         following format: yyyy-mm-dd. 
         If you want to publish your app in Google Play, verify that the end date is greater than 2033-10-22.
 
-If you do not provide one or more command parameters, an Telerik AppBuilder shows an interactive prompt to let you set the remaining
+If you do not provide one or more command parameters, Telerik AppBuilder shows an interactive prompt to let you set the remaining
 certificate details.
 --[/]--
 
@@ -358,8 +371,10 @@ Usage:
 Removes a selected certificate from the server. 
 
 Run list-certificates to list all available certificates with name and index.
+
 CAUTION: Deleting a certificate cannot be undone. If you have not backed up the certificate, you will not be able to restore it. You will
     not be able to update any apps that you have signed and published with the certificate.
+    Run export-certificate to store a copy of the certificate on your local file system.
 --[/]--
 
 --[export-certificate]--
@@ -416,7 +431,7 @@ Options:
         app. Must be a production certificate and must match the specified provisioning profile.
         You can specify a certificate by index or name.
     --provision - Sets the provisioning profile that you want to use for code signing
-        your iOS app. Must be an AppStore distribution certificate and must match the specified certificate.
+        your iOS app. Must be an AppStore distribution provisioning profile and must match the specified certificate.
         You can specify a provisioning profile by index or name.
 --[/]--
 
@@ -454,7 +469,8 @@ Usage:
 
 Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center. 
 
-Run list-certificate-requests to list all pending certificate signing requests. 
+Run list-certificate-requests to list all pending certificate signing requests.
+
 Options:
     --save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
             certificate_request.csr.
