@@ -3,15 +3,14 @@ Contribute to the Telerik AppBuilder Command-Line Interface
 
 *Help us improve the Telerik AppBuilder CLI* 
 
-[![Telerik AppBuilder](ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
-The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS and Android from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to App Store or Google Play.
+The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store or Google Play.
 
 * [Report an Issue](#bug "Learn how to report an issue")
 * [Request a Feature](#request "Learn how to submit a feature or improvement request")
 * [Contribute to the Code Base](#contribute "Learn how to submit your own improvements to the code")
 
-<a id="bug"></a>
 Report an Issue
 ===
 If you find a bug in the source code or a mistake in the documentation, you can submit an issue to our <a href="https://github.com/Icenium/icenium-cli">GitHub Repository</a>.
@@ -28,7 +27,6 @@ If your issue appears to be a bug, and hasn't been reported, open a new issue. T
 
 [Back to Top][1]
 
-<a id="request"></a>
 Request a Feature
 ===
 You can request a new feature by submitting an issue with the *enhancement* label to our <a href="https://github.com/Icenium/icenium-cli">GitHub Repository</a>.
@@ -36,7 +34,6 @@ If you want to implement a new feature yourself, consider submitting it to the <
 
 [Back to Top][1]
 
-<a id="contribute"></a>
 Contribute to the Code Base
 ===
 First, read our <a href="https://github.com/Icenium/icenium-cli/blob/develop/for-developers.md">developers documentation</a>.
