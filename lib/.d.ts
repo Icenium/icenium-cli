@@ -81,6 +81,7 @@
 /// <reference path="service-util.ts" />
 /// <reference path="services/build.ts" />
 /// <reference path="services/cordova-plugins.ts" />
+/// <reference path="services/json-file-service.ts" />
 /// <reference path="templates-service.ts" />
 /// <reference path="validators/base-validators.ts" />
 /// <reference path="validators/cryptographic-identity-validators.ts" />

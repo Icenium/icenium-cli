@@ -320,3 +320,8 @@ interface IResourceLoader {
 	buildCordovaJsFilePath(version: string, platform: string): string;
 	downloadCordovaJsFiles(): IFuture<void>;
 }
+
+interface IJsonFileService {
+	getValue(propertyName: string): IFuture<any>;
+	save(data: {[key: string]: {}}): IFuture<void>;
+}

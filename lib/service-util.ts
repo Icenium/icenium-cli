@@ -8,11 +8,17 @@ import cookielib = require("cookie");
 import Url = require("url");
 import helpers = require("./helpers");
 import zlib = require("zlib");
+import jsonFileServiceLib = require("./services/json-file-service");
+import globalOptions = require("./options");
+import path = require("path");
 
 export class HttpClient implements Server.IHttpClient {
 	private defaultUserAgent: string;
+	private jsonFileService: IJsonFileService = null;
 
 	constructor(private $logger: ILogger,
+		private $injector: IInjector,
+		private $fs: IFileSystem,
 		private $config: IConfiguration) {}
 
 	httpRequest(options): IFuture<Server.IResponse> {
@@ -100,8 +106,11 @@ export class HttpClient implements Server.IHttpClient {
 			}
 
 			if (pipeTo) {
+				this.jsonFileService = this.$injector.resolve(jsonFileServiceLib.JsonFileService, {jsonFileName: path.join(globalOptions["profile-dir"], "cached-server-files.json")});
+
 				pipeTo.on("finish", () => {
 					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
+
 					result.return({
 						response: response,
 						headers: response.headers
@@ -167,6 +176,40 @@ export class HttpClient implements Server.IHttpClient {
 
 			return body;
 		}
+	}
+
+	public tryCacheFilename(filename: string, response: any): IFuture<void> {
+		return(() => {
+			var data: any = null;
+			data.lastModified = response.headers["last-modified"] || null;
+			data.etag = response.headers["etag"] || null;
+
+			if(data.lastModified && data.etag) {
+				this.jsonFileService.save({}[filename] = data).wait();
+			}
+		}).future<void>()();
+	}
+
+	public tryMakeConditionalRequest(filename: string): IFuture<any> {
+		return(() => {
+			var headers: any = {};
+
+			if(this.$fs.exists(filename).wait()) {
+				var fileInfo: any = this.jsonFileService.getValue(filename).wait();
+
+				if(fileInfo) {
+					if(fileInfo.lastModified) {
+						headers["if-modified-since"] = fileInfo.lastModified;
+					}
+					if(fileInfo.etag) {
+						headers["if-none-match"] = fileInfo.etag;
+					}
+				}
+			}
+
+			return headers;
+
+		}).future<void>()();
 	}
 }
 $injector.register("httpClient", HttpClient);

@@ -108,3 +108,4 @@ $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
 $injector.requireCommand("dev-prepackage", "./commands/post-install");
 
 $injector.require("platformServices", "./commands/simulate");
+$injector.require("jsonFileService", "./services/json-file-service");
