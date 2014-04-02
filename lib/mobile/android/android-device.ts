@@ -156,7 +156,7 @@ export class AndroidDevice implements Mobile.IDevice {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
 				if (!options.skipRefresh) {
-					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: ""}).wait();
+					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: "icenium://"}).wait();
 					this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
 				}
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());
