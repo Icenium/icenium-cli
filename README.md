@@ -49,7 +49,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
-> In this version of the Telerik AppBuilder CLI, you cannot build and deploy on connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
 
 #### OS X Systems
 
@@ -70,7 +70,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
-> In this version of the Telerik AppBuilder CLI, you cannot build and deploy on connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
 
 ### Install the Telerik AppBuilder CLI
 
