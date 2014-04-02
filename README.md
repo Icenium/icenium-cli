@@ -125,6 +125,8 @@ The Telerik AppBuilder CLI creates the `.abproject` file required for working fr
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 
+> In this version of the Telerik AppBuilder CLI, you cannot run your apps in the device simulator on OS X systems. The device simulator will become available for OS X in a future release of Telerik AppBuilder.
+
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
 ```bash
@@ -229,8 +231,8 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can load iOS and Android applications in the AppBuilder companion app.
 * You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
 * You can push changes via cable connection to connected devices.
-* You can run your apps in the device simulator.
-* You can debug your code with the built-in debug tools in the device simulator.
+* You can run your apps in the device simulator on Windows systems.
+* You can debug your code with the built-in debug tools in the device simulator on Windows systems.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
 * You can enable and disable the Apache Cordova core and integrated plugins.
 * You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
@@ -244,6 +246,7 @@ The following Telerik AppBuilder features are not available in the current relea
 
 * You cannot deploy your apps on connected Windows Phone 8 devices.
 * You cannot switch your Telerik Platform account.
+* You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in a future release of Telerik AppBuilder.
 * You cannot debug your Android apps while running on a connected device.
 * You cannot debug your iOS apps while running on a connected device.
 * You cannot migrate between Apache Cordova versions.
