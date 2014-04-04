@@ -296,7 +296,6 @@ interface IPrompter {
 
 interface ISimulatorPlatformServices {
 	getPackageName() : string;
-	preparePackage(simulatorPath: string): void;
 	runSimulator(simulatorPath: string, simulatorParams: string[]);
 }
 

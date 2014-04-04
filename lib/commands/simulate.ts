@@ -25,7 +25,8 @@ export class SimulateCommand implements ICommand {
 		private $server: Server.IServer,
 		private $project: Project.IProject,
 		private $loginManager: ILoginManager,
-		private $platformServices: ISimulatorPlatformServices) {
+		private $platformServices: ISimulatorPlatformServices,
+		private $childProcess: IChildProcess) {
 		this.projectData = $project.projectData;
 	}
 
@@ -63,27 +64,36 @@ export class SimulateCommand implements ICommand {
 			}
 
 			if (this.versionCompare(cachedVersion, this.serverVersion) < 0) {
-				var downloadUri = this.getSimulatorDownloadUri().wait();
 				this.$logger.info("Updating simulator package...");
-				this.$logger.debug("Downloading simulator from %s", downloadUri);
-
-				var extractor = unzip.Extract({path: this.simulatorPath});
-				var request = this.$httpClient.httpRequest({
-					url: downloadUri,
-					pipeTo: extractor,
-					headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
-				});
-
-				this.$fs.futureFromEvent(extractor, "close").wait();
-				request.wait();
-
-				this.$platformServices.preparePackage(this.simulatorPath);
-
+				var zipFileName = path.join(this.cacheDir, "simulator.zip");
+				this.downloadSimulator(zipFileName);
+				this.unzipSimulator(zipFileName);
+				this.$fs.deleteFile(zipFileName).wait();
 				this.$fs.writeJson(serverVersionFile, { version : this.serverVersion }).wait();
-
 				this.$logger.info("Finished updating simulator package.");
 			}
 		}).future<void>()();
+	}
+
+	private downloadSimulator(zipFileName: string): void {
+		var downloadUri = this.getSimulatorDownloadUri().wait();
+		this.$logger.debug("Downloading simulator from %s", downloadUri);
+
+		var zipFile = this.$fs.createWriteStream(zipFileName);
+		var request = this.$httpClient.httpRequest({
+			url: downloadUri,
+			pipeTo: zipFile,
+			headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
+		});
+
+		this.$fs.futureFromEvent(zipFile, "finish").wait();
+		request.wait();
+	}
+
+	private unzipSimulator(zipFileName: string): void {
+		var unzipProc = this.$childProcess.spawn('unzip', [zipFileName, '-d', this.simulatorPath],
+			{ stdio: "ignore", detached: true });
+		this.$fs.futureFromEvent(unzipProc, "close").wait();
 	}
 
 	private getSimulatorDownloadUri(): IFuture<string> {
@@ -216,10 +226,6 @@ class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
         return this.PACKAGE_NAME_WIN;
     }
 
-    public preparePackage(simulatorPath: string): void {
-        // nothing to do on Windows platform
-    }
-
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
         var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_WIN);
         var childProcess = this.$childProcess.spawn(simulatorBinary, simulatorParams,
@@ -230,7 +236,8 @@ class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
 
 class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
     private PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
-    private EXECUTABLE_NAME_MAC = "Icenium.Simulator.app";
+	private EXECUTABLE_NAME_MAC = "Icenium.Simulator";
+    private EXECUTABLE_NAME_MAC_APP = this.EXECUTABLE_NAME_MAC + ".app";
 
     constructor(private $fs: IFileSystem,
 				private $childProcess: IChildProcess) {
@@ -240,17 +247,9 @@ class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
         return this.PACKAGE_NAME_MAC;
     }
 
-    // Ugly hack: our build does not package the mac binary file with executable bit set.
-    // we must set it before attempting to start the app bundle
-    // this code should be removed after we change our build
-    public preparePackage(simulatorPath: string): void {
-        var macExecutablePath = path.join(simulatorPath, "/Icenium.Simulator.app/Contents/MacOS/Icenium.Simulator");
-        this.$fs.chmod(macExecutablePath, 0x755).wait();
-    }
-
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
-        var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_MAC);
-        var commandLine = ['-W', simulatorBinary, '--args'].concat(simulatorParams);
+        var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_MAC_APP);
+        var commandLine = [simulatorBinary, '--args'].concat(simulatorParams);
         var childProcess = this.$childProcess.spawn('open', commandLine,
             { stdio:  ["ignore", "ignore", "ignore"], detached: true });
         childProcess.unref();
