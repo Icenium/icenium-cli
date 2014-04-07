@@ -89,7 +89,7 @@ class CommandDispatcher {
 }
 
 class FutureDispatcher implements IFutureDispatcher {
-	private actions: IQueue<any>
+	private actions: IQueue<any>;
 
 	public constructor(private $errors: IErrors) {
 	}

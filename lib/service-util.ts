@@ -14,12 +14,15 @@ import path = require("path");
 
 export class HttpClient implements Server.IHttpClient {
 	private defaultUserAgent: string;
-	private jsonFileService: IJsonFileService = null;
+	private cachedServerFilesService: IJsonFileService = null;
 
 	constructor(private $logger: ILogger,
 		private $injector: IInjector,
 		private $fs: IFileSystem,
-		private $config: IConfiguration) {}
+		private $config: IConfiguration) {
+		this.$fs.createDirectory(globalOptions["profile-dir"]).wait();
+		this.cachedServerFilesService = this.$injector.resolve(jsonFileServiceLib.JsonFileService, {jsonFileName: path.join(globalOptions["profile-dir"], "cached-server-files.json")});
+	}
 
 	httpRequest(options): IFuture<Server.IResponse> {
 		if (_.isString(options)) {
@@ -84,16 +87,41 @@ export class HttpClient implements Server.IHttpClient {
 			headers["Accept-Encoding"] = "gzip,deflate";
 		}
 
-		var result = new Future<Server.IResponse>();
+		if(pipeTo && pipeTo.path) {
+			var pipeToData: any = this.cachedServerFilesService.getValue(pipeTo.path).wait();
+			if(pipeToData) {
+				if(pipeToData.lastModified) {
+					headers["if-modified-since"] = pipeToData.lastModified;
+				}
+				if(pipeToData.etag) {
+					headers["if-none-match"] = pipeToData.etag;
+				}
+			}
+		}
 
 		this.$logger.trace("httpRequest: %s", util.inspect(options));
 
-		var request = http.request(options, (response) => {
+		return (() => {
+			var responseFuture = new Future<any>();
+			var request = http.request(options, (response) => responseFuture.return(response));
+
+			this.$logger.trace("httpRequest: Sending:\n%s", body);
+
+			if (!body || !body.pipe) {
+				request.end(body);
+			} else {
+				body.pipe(request);
+			}
+
+			var response = responseFuture.wait();
+
 			var data = [];
-			var successful = helpers.isRequestSuccessful(response);
+			var successful = helpers.isRequestSuccessful(response, headers);
 			if (!successful) {
 				pipeTo = undefined;
 			}
+
+			var result = new Future<Server.IResponse>();
 
 			var responseStream = response;
 			switch (response.headers['content-encoding']) {
@@ -106,7 +134,11 @@ export class HttpClient implements Server.IHttpClient {
 			}
 
 			if (pipeTo) {
-				this.jsonFileService = this.$injector.resolve(jsonFileServiceLib.JsonFileService, {jsonFileName: path.join(globalOptions["profile-dir"], "cached-server-files.json")});
+				if(response.headers["last-modified"] && response.headers["etag"]) {
+					var dataToSave: any = {};
+					dataToSave[pipeTo.path] = {lastModified: response.headers["last-modified"], etag: response.headers["etag"]};
+					this.cachedServerFilesService.save(dataToSave).wait();
+				}
 
 				pipeTo.on("finish", () => {
 					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
@@ -132,7 +164,7 @@ export class HttpClient implements Server.IHttpClient {
 							body: body,
 							response: response,
 							headers: response.headers,
-							error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
+							error: helpers.isRequestSuccessful(response, headers) ? null : new Error(response.statusCode)
 						})
 					} else {
 						var errorMessage = this.getErrorMessage(response, body);
@@ -140,17 +172,9 @@ export class HttpClient implements Server.IHttpClient {
 					}
 				});
 			}
-		});
 
-		this.$logger.trace("httpRequest: Sending:\n%s", body);
-
-		if (!body || !body.pipe) {
-			request.end(body);
-		} else {
-			body.pipe(request);
-		}
-
-		return result;
+			return result.wait();
+		}).future<Server.IResponse>()();
 	}
 
 	private getErrorMessage(response, body: string): string {
@@ -180,34 +204,6 @@ export class HttpClient implements Server.IHttpClient {
 
 	public tryCacheFilename(filename: string, response: any): IFuture<void> {
 		return(() => {
-			var data: any = null;
-			data.lastModified = response.headers["last-modified"] || null;
-			data.etag = response.headers["etag"] || null;
-
-			if(data.lastModified && data.etag) {
-				this.jsonFileService.save({}[filename] = data).wait();
-			}
-		}).future<void>()();
-	}
-
-	public tryMakeConditionalRequest(filename: string): IFuture<any> {
-		return(() => {
-			var headers: any = {};
-
-			if(this.$fs.exists(filename).wait()) {
-				var fileInfo: any = this.jsonFileService.getValue(filename).wait();
-
-				if(fileInfo) {
-					if(fileInfo.lastModified) {
-						headers["if-modified-since"] = fileInfo.lastModified;
-					}
-					if(fileInfo.etag) {
-						headers["if-none-match"] = fileInfo.etag;
-					}
-				}
-			}
-
-			return headers;
 
 		}).future<void>()();
 	}

@@ -38,8 +38,12 @@ export function fromWindowsRelativePathToUnix(windowsRelativePath) {
 	return windowsRelativePath.replace(/\\/g, "/");
 }
 
-export function isRequestSuccessful(request) {
-	return request.statusCode >= 200 && request.statusCode < 300;
+export function isRequestSuccessful(request, headers) {
+	return (request.statusCode >= 200 && request.statusCode < 300) || isRequestConditional(request, headers);
+}
+
+function isRequestConditional(request, headers) {
+	return headers["if-modified-since"] && headers["if-none-match"] && request.statusCode === 304;
 }
 
 export function getRelativeToRootPath(rootPath, filePath) {
