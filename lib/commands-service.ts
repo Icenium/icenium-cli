@@ -36,11 +36,11 @@ export class CommandsService implements ICommandsService {
 
 			if (data.last.startsWith("--")) {
 				return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
-			} else if (deviceSpecific.contains(data.prev)) {
+			} else if (_.contains(deviceSpecific, data.prev)) {
 				return tabtab.log(["ios", "android"], data);
 			} else {
 				var propSchema = require("./helpers").getProjectFileSchema();
-				if (propertyCommands.contains(data.prev)) {
+				if (_.contains(propertyCommands, data.prev)) {
 					return tabtab.log(Object.keys(propSchema), data);
 				} else if (_.some(propertyCommands, (cmd) => {
 					return data.line.indexOf(" " + cmd + " ") >= 0;

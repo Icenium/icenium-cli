@@ -9,10 +9,6 @@ interface String {
 	equals(value: string, caseSensitive: boolean): boolean;
 }
 
-interface Array {
-	contains(element: any): boolean;
-}
-
 interface Function {
 	$inject: {
 		args: string[];
@@ -59,10 +55,6 @@ String.prototype.startsWith = startsWith;
 String.prototype.endsWith = endsWith;
 String.prototype.isEmpty = isEmpty;
 String.prototype.equals = equals;
-
-Array.prototype.contains = function contains(object) {
-	return this.indexOf(object) >= 0;
-};
 
 (<any>RegExp).escape = function(s) {
 	return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
