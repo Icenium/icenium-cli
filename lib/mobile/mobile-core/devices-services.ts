@@ -57,7 +57,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 	private getPlatform(platform: string): string {
 		var allSupportedPlatforms = this.getAllPlatforms();
 		var normalizedPlatform = MobileHelper.validatePlatformName(platform, this.$errors)
-		if(!allSupportedPlatforms.contains(normalizedPlatform)) {
+		if(!_.contains(allSupportedPlatforms, normalizedPlatform)) {
 			this.$errors.fail("Deploying to %s connected devices is not supported. Build the " +
 				"app using the `build` command and deploy the package manually.", normalizedPlatform);
 		}
