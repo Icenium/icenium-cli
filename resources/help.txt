@@ -198,7 +198,7 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform>
+    $ appbuilder deploy <Platform> [--no-livesync]
 
 Platform-specific examples:
     $ appbuilder deploy android [--device <ID>]
@@ -219,6 +219,7 @@ Options:
         app. Must match the selected provisioning profile. You can set a certificate by index or name.
     --provision - (Required when building for iOS) Sets the provisioning profile that you want to use for code signing
         your iOS app. Must match the selected certificate. You can set a provisioning profile by index or name.
+    --no-livesync - If set, disables LiveSync with the three-finger tap and hold gesture.
 
 --[/]--
 
