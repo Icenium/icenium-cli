@@ -164,6 +164,8 @@ Options:
         Sets the provisioning profile that you want to use for code signing your iOS app. Must match the selected 
         certificate. You can set a provisioning profile by index or name.
     --no-livesync - If set, disables LiveSync of code changes with the three-finger tap and hold gesture.
+    --save-to - If set, downloads the application package to the provided path instead of the .ab directory. Use full 
+        path including fileName and extension.
 
 --[/]--
 

@@ -310,7 +310,15 @@ export class BuildService implements Project.IBuildService {
 
 			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					var targetFileName = path.join(this.$project.getProjectDir(), path.basename(pkg.solutionPath));
+					var targetFileName = "";
+
+					if(options["save-to"]) {
+						targetFileName = options["save-to"];
+					}
+					else {
+						targetFileName = path.join(this.$project.getProjectDir(), path.basename(pkg.solutionPath));
+					}
+
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
 					var targetFile = this.$fs.createWriteStream(targetFileName);
 					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
