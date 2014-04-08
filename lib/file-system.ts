@@ -3,10 +3,12 @@
 "use strict";
 
 import fs = require("fs");
+import unzip = require("unzip");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
 import rimraf = require("rimraf");
+import helpers = require("./helpers");
 
 export class FileSystem implements IFileSystem {
 	private _stat = Future.wrap(fs.stat);
@@ -56,7 +58,21 @@ export class FileSystem implements IFileSystem {
 		zipCallback();
 
 		return result;
-}
+	}
+
+	public unzip(zipFile: string, destination: string): IFuture<void> {
+		if (helpers.isDarwin()) {
+			var $childProcess = $injector.resolve("$childProcess");
+			var unzipProc = $childProcess.spawn('unzip', [zipFile, '-d', destination],
+				{ stdio: "ignore", detached: true });
+			return this.futureFromEvent(unzipProc, "close");
+		}
+		else {
+			return this.futureFromEvent(
+				this.createReadStream(zipFile)
+					.pipe(unzip.Extract({ path: destination })), "close");
+		}
+	}
 
 	public exists(path: string): IFuture<boolean> {
 		var future = new Future<boolean>();

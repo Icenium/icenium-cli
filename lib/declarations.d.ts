@@ -170,6 +170,7 @@ interface IFsStats {
 
 interface IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
+	unzip(zipFile: string, destination: string): IFuture<void>;
 	exists(path: string): IFuture<boolean>;
 	deleteFile(path: string): IFuture<void>;
 	deleteDirectory(directory: string): IFuture<void>;
@@ -260,7 +261,7 @@ interface IConfiguration {
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
-	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
+	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	ANALYTICS_API_KEY: string;
 
@@ -295,10 +296,9 @@ interface IPrompter {
 	override(object: any): void;
 }
 
-interface ISimulatorPlatformServices {
+interface IExtensionPlatformServices {
 	getPackageName() : string;
-	unzipSimulator(zipFileName: string, simulatorPath: string): IFuture<void>;
-	runSimulator(simulatorPath: string, simulatorParams: string[]);
+	runApplication(applicationPath: string, applicationParams: string[]);
 }
 
 interface IX509Certificate {
@@ -349,7 +349,12 @@ interface IUserSettingsService {
 	userSettingsFilePath?: string;
 }
 
-interface IPathFilteringService {
+interface IServerExtensionsService {
+	prepareExtension(packageName: string): IFuture<void>;
+	getExtensionVersion(packageName: string): string;
+	getExtensionPath(packageName: string): string;
+	cacheDir: string;
+}interface IPathFilteringService {
 	getRulesFromFile(file: string) : string[];
 	filterIgnoredFiles(files: string[], rules: string[]) :string[];
 }

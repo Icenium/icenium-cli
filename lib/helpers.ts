@@ -232,6 +232,23 @@ export function exitOnStdinEnd(): void {
 	process.stdin.on("end", () => process.exit());
 }
 
+export function versionCompare(version1: string, version2: string): number {
+	var v1array = _.map(version1.split("."), (x) => parseInt(x, 10)),
+		v2array = _.map(version2.split("."), (x) => parseInt(x, 10));
+
+	if (v1array.length !== v2array.length) {
+		throw new Error("Version strings are not in the same format");
+	}
+
+	for (var i = 0; i < v1array.length; ++i) {
+		if (v1array[i] !== v2array[i]) {
+			return v1array[i] > v2array[i] ? 1 : -1;
+		}
+	} 
+
+	return 0;
+}
+
 export function isInteractive(): boolean {
 	return process.stdout.isTTY && process.stdin.isTTY;
 }

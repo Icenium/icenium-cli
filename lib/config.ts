@@ -18,7 +18,7 @@ export class Configuration implements IConfiguration {
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
-	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
+	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	ANALYTICS_API_KEY: string;
 
