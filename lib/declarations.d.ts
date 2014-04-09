@@ -348,3 +348,8 @@ interface IUserSettingsService {
 	userSettingsFilePath?: string;
 }
 
+interface IJsonFileService {
+	initialize(filePath: string);
+	getValue(propertyName: string): IFuture<any>;
+	save(data: {[key: string]: {}}): IFuture<void>;
+}

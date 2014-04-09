@@ -139,8 +139,6 @@ export class LoginManager implements ILoginManager {
 
 	private doLogin(): IFuture<void> {
 		return (() => {
-			this.$fs.createDirectory(options["profile-dir"]).wait();
-
 			this.loginInBrowser().wait();
 
 			this.$logger.info("Login completed.");
