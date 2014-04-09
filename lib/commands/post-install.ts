@@ -4,7 +4,7 @@
 
 import Future = require("fibers/future");
 
-export class PrepackageCommand implements ICommand {
+export class PostInstallCommand implements ICommand {
 	constructor(private $templatesService: ITemplatesService,
 		private $resourceDownloader: IResourceDownloader,
 		private $logger: ILogger,
@@ -28,4 +28,4 @@ export class PrepackageCommand implements ICommand {
 	}
 }
 
-$injector.registerCommand("dev-prepackage", PrepackageCommand);
+$injector.registerCommand("dev-post-install", PostInstallCommand);
