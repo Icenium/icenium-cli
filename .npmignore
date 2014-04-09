@@ -7,6 +7,7 @@ lint.*
 *.tgz
 test-reports.xml
 for-developers.md
+prepublish.js
 Gruntfile.js
 BuildPackage.cmd
 tscommand.tmp.txt
@@ -21,3 +22,8 @@ lib/**/*.js.map
 
 scratch/
 test/
+
+resources/App_Resources
+resources/Cordova
+resources/ItemTemplates
+resources/ProjectTemplates

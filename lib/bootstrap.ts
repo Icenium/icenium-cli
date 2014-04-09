@@ -107,7 +107,7 @@ $injector.requireCommand("user", "./commands/user-status");
 $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
 
-$injector.requireCommand("dev-prepackage", "./commands/post-install");
+$injector.requireCommand("dev-post-install", "./commands/post-install");
 
 $injector.require("platformServices", "./commands/simulate");
 $injector.require("futureDispatcher", "./appbuilder-cli");
