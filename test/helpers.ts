@@ -110,4 +110,31 @@ describe("helpers", function() {
 			assert.deepEqual({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}, k: { l: { m: { n: { p: 1}}}}}, helpers.mergeRecursive({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}}, { k: { l: { m: { n: { p: 1}}}}}));
 		});
 	})
+
+	describe("versionCompare", function () {
+		it("should throw error on non-matching versions", function () {
+			assert.throws(function () { helpers.versionCompare("1.1.1", "1.1") });
+			assert.throws(function () { helpers.versionCompare("1.1", "1.1.1") });
+		});
+
+		it("should compare in order of subversions", function () {
+			assert.equal(1, helpers.versionCompare("10.1.5", "1.10.5"));
+			assert.equal(-1, helpers.versionCompare("1.10.5", "10.1.5"));
+		});
+
+		it("should compare all subversions if first couple are equal", function () {
+			assert.equal(1, helpers.versionCompare("1.1.10.1.5", "1.1.1.10.5"));
+			assert.equal(-1, helpers.versionCompare("1.1.1.10.5", "1.1.10.1.5"));
+		});
+
+		it("should return zero if versions are equal", function () {
+			var version = "123.456.789";
+			assert.equal(0, helpers.versionCompare(version, version));
+		});
+
+		it("should return correctly for ice server versions", function () {
+			assert.equal(1, helpers.versionCompare("2014.1.403.0", "0.0.0.0"));
+			assert.equal(-1, helpers.versionCompare("2014.1.403.0", "2014.1.601.0"));
+		});
+	})
 });
