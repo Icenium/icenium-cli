@@ -24,7 +24,8 @@ var knownOpts:any = {
 		"help": Boolean,
 		"timeout": String,
 		"save-to": String,
-		"json": Boolean
+		"json": Boolean,
+		"client": String
 	},
 	shorthands = {
 		"v" : ["--verbose"],

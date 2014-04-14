@@ -55,7 +55,19 @@ function resolveCallStack(stack: string): string {
 }
 
 process.on("uncaughtException", function(err) {
-	console.log(resolveCallStack(err.stack));
+	var callstack = err.stack;
+	if (callstack) {
+		callstack = resolveCallStack(callstack);
+	}
+	console.log(callstack || err.toString());
+
+	try {
+		var analyticsService = $injector.resolve("analyticsService");
+		analyticsService.trackException(err, callstack);
+	} catch (e) {
+		console.log("Error while reporting exception: " + e);
+	}
+
 	process.exit(ErrorCodes.UNKNOWN);
 });
 

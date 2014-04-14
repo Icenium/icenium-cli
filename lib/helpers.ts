@@ -231,3 +231,28 @@ export function exitOnStdinEnd(): void {
 	process.stdin.on("data", () => {});
 	process.stdin.on("end", () => process.exit());
 }
+
+export function isInteractive(): boolean {
+	return process.stdout.isTTY && process.stdin.isTTY;
+}
+
+export function toBoolean(str: string) {
+	return str === "true" ? true : false;
+}
+
+export function mergeRecursive(obj1: Object, obj2: Object): Object {
+	for (var p in obj2) {
+		if(!obj1.hasOwnProperty(p)) {
+			obj1[p] = obj2[p];
+			continue;
+		}
+
+		if ( obj2[p].constructor === Object ) {
+			obj1[p] = mergeRecursive(obj1[p], obj2[p]);
+		} else {
+			obj1[p] = obj2[p];
+		}
+	}
+
+	return obj1;
+}

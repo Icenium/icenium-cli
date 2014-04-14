@@ -262,6 +262,7 @@ interface IConfiguration {
 	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_SIMULATOR_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
+	ANALYTICS_API_KEY: string;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
@@ -289,7 +290,7 @@ interface IPrompter {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
-	confirm(prompt: string): IFuture<boolean>;
+	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean>;
 	history(name: string): IPromptHistoryValue;
 	override(object: any): void;
 }
@@ -319,3 +320,17 @@ interface IResourceLoader {
 	buildCordovaJsFilePath(version: string, platform: string): string;
 	downloadCordovaJsFiles(): IFuture<void>;
 }
+
+interface IAnalyticsService {
+	checkConsent(featureName: string): IFuture<void>;
+	trackFeature(featureName: string): IFuture<void>;
+	trackException(exception: any, message: string): IFuture<void>;
+}
+
+interface IUserSettingsService {
+	saveSettings(data: {[key: string]: {}}): IFuture<void>;
+	getValue(propertyName: string): IFuture<any>;
+	deleteUserSettingsFile(): IFuture<void>;
+	userSettingsFilePath?: string;
+}
+
