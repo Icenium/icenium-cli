@@ -17,11 +17,13 @@ var options = require("./options");
 class CommandDispatcher {
 	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
-		private $injector: IInjector,
+		private $errors: IErrors,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
 	public dispatchCommand() {
+		this.createUserProfileDirectory().wait();
+
 		if (options.version) {
 			this.$logger.out(this.$config.version);
 			return;
@@ -85,6 +87,18 @@ class CommandDispatcher {
 			return remaining.slice(1);
 		}
 		return [];
+	}
+
+	private createUserProfileDirectory(): IFuture<void> {
+		return(() => {
+			try {
+				if(!this.$fs.exists(options["profile-dir"]).wait()) {
+					this.$fs.createDirectory(options["profile-dir"]).wait();
+				}
+			} catch(e) {
+				this.$errors.fail("Unable to create user profile directory");
+			}
+		}).future<void>()();
 	}
 }
 

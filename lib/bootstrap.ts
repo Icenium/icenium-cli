@@ -114,3 +114,4 @@ $injector.require("clientSpecificUserSettingsService", "./services/user-settings
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
 $injector.require("futureDispatcher", "./appbuilder-cli");
 
+$injector.require("jsonFileService", "./services/json-file-service");

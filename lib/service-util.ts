@@ -8,12 +8,18 @@ import cookielib = require("cookie");
 import Url = require("url");
 import helpers = require("./helpers");
 import zlib = require("zlib");
+import globalOptions = require("./options");
+import path = require("path");
 
 export class HttpClient implements Server.IHttpClient {
 	private defaultUserAgent: string;
 
 	constructor(private $logger: ILogger,
-		private $config: IConfiguration) {}
+		private $config: IConfiguration,
+		private $jsonFileService: IJsonFileService) {
+		var filePath = path.join(globalOptions["profile-dir"], "cached-server-files.json");
+		this.$jsonFileService.initialize(filePath);
+	}
 
 	httpRequest(options): IFuture<Server.IResponse> {
 		if (_.isString(options)) {
@@ -78,16 +84,41 @@ export class HttpClient implements Server.IHttpClient {
 			headers["Accept-Encoding"] = "gzip,deflate";
 		}
 
-		var result = new Future<Server.IResponse>();
+		if(pipeTo && pipeTo.path) {
+			var pipeToData: any = this.$jsonFileService.getValue(pipeTo.path).wait();
+			if(pipeToData) {
+				if(pipeToData.lastModified) {
+					headers["if-modified-since"] = pipeToData.lastModified;
+				}
+				if(pipeToData.etag) {
+					headers["if-none-match"] = pipeToData.etag;
+				}
+			}
+		}
 
 		this.$logger.trace("httpRequest: %s", util.inspect(options));
 
-		var request = http.request(options, (response) => {
+		return (() => {
+			var responseFuture = new Future<any>();
+			var request = http.request(options, (response) => responseFuture.return(response));
+
+			this.$logger.trace("httpRequest: Sending:\n%s", body);
+
+			if (!body || !body.pipe) {
+				request.end(body);
+			} else {
+				body.pipe(request);
+			}
+
+			var response = responseFuture.wait();
+
 			var data = [];
 			var successful = helpers.isRequestSuccessful(response);
 			if (!successful) {
 				pipeTo = undefined;
 			}
+
+			var result = new Future<Server.IResponse>();
 
 			var responseStream = response;
 			switch (response.headers['content-encoding']) {
@@ -100,6 +131,12 @@ export class HttpClient implements Server.IHttpClient {
 			}
 
 			if (pipeTo) {
+				if(response.headers["last-modified"] || response.headers["etag"]) {
+					var dataToSave: any = {};
+					dataToSave[pipeTo.path] = {lastModified: response.headers["last-modified"], etag: response.headers["etag"]};
+					this.$jsonFileService.save(dataToSave).wait();
+				}
+
 				pipeTo.on("finish", () => {
 					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
 					result.return({
@@ -131,17 +168,9 @@ export class HttpClient implements Server.IHttpClient {
 					}
 				});
 			}
-		});
 
-		this.$logger.trace("httpRequest: Sending:\n%s", body);
-
-		if (!body || !body.pipe) {
-			request.end(body);
-		} else {
-			body.pipe(request);
-		}
-
-		return result;
+			return result.wait();
+		}).future<Server.IResponse>()();
 	}
 
 	private getErrorMessage(response, body: string): string {
