@@ -70,3 +70,24 @@ if (fs.existsSync(bashProfileFileName)) {
 
 // zsh - http://www.acm.uiuc.edu/workshops/zsh/startup_files.html
 updateShellScript(".zshrc");
+
+function invokeGrunt(callback) {
+	if (fs.existsSync("Gruntfile.js")) {
+		var grunt = require("grunt");
+		grunt.cli.tasks = ["ts:devall"];
+		grunt.cli(null, callback);
+	} else {
+		process.nextTick(callback);
+	}
+}
+
+invokeGrunt(function() {
+	var child = child_process.exec("node bin/appbuilder.js dev-post-install", function (error) {
+		if (error) {
+			console.error("Failed to complete all post-install steps.");
+			throw error;
+		}
+	});
+
+	child.stdout.pipe(process.stdout);
+});

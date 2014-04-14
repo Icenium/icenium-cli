@@ -22,3 +22,8 @@ lib/**/*.js.map
 
 scratch/
 test/
+
+resources/App_Resources
+resources/Cordova
+resources/ItemTemplates
+resources/ProjectTemplates

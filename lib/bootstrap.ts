@@ -9,6 +9,7 @@ $injector.requireCommand("dev-config-reset", "./config");
 $injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
 $injector.require("resources", "./resource-loader");
+$injector.require("resourceDownloader", "./resource-loader");
 $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
@@ -106,11 +107,10 @@ $injector.requireCommand("user", "./commands/user-status");
 $injector.requireCommand("appstore-list", "./commands/itunes-connect");
 $injector.requireCommand("appstore-upload", "./commands/itunes-connect");
 
-$injector.requireCommand("dev-prepackage", "./commands/post-install");
+$injector.requireCommand("dev-post-install", "./commands/post-install");
 $injector.require("platformServices", "./commands/simulate");
 $injector.require("analyticsService", "./services/analytics-service");
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
-
-
+$injector.require("futureDispatcher", "./appbuilder-cli");
 

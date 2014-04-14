@@ -75,6 +75,7 @@
 /// <reference path="project.ts" />
 /// <reference path="prompter.ts" />
 /// <reference path="qr.ts" />
+/// <reference path="queue.ts" />
 /// <reference path="remote-projects.ts" />
 /// <reference path="resource-loader.ts" />
 /// <reference path="server-api.d.ts" />

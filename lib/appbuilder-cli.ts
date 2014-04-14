@@ -6,6 +6,7 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
+import queue = require("./queue");
 
 require("./extensions");
 require("./bootstrap");
@@ -86,6 +87,30 @@ class CommandDispatcher {
 		return [];
 	}
 }
+
+class FutureDispatcher implements IFutureDispatcher {
+	private actions: IQueue<any>
+
+	public constructor(private $errors: IErrors) {
+	}
+
+	public run(): void {
+		if (this.actions) {
+			this.$errors.fail("You cannot run a running future dispatcher.")
+		}
+		this.actions = new queue.Queue<any>();
+
+		while(true) {
+			var action = this.actions.dequeue().wait();
+			action().wait();
+		}
+	}
+
+	public dispatch(action: () => IFuture<void>) {
+		this.actions.enqueue(action);
+	}
+}
+$injector.register("dispatcher", FutureDispatcher, false);
 
 var fiber = Fiber(() => {
 	var commandDispatcher = $injector.resolve(CommandDispatcher);
