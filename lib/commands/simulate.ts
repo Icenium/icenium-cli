@@ -11,11 +11,6 @@ import Future = require("fibers/future");
 export class SimulateCommand implements ICommand {
 	private PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
 	private PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
-	private MACOS_COMING_SOON = [
-		"The device simulator for OS X will be shipped in a future release of Telerik AppBuilder.",
-		"For more information about the latest available version,",
-		"go to https://www.npmjs.org/package/appbuilder or",
-		"http://docs.telerik.com/platform/appbuilder/release-notes"].join(os.EOL);
 
 	private projectData;
 	private cacheDir: string;
@@ -38,13 +33,6 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			// we are shipping our Mac OS simulator very soon
-			// until then, do not execute on OS X
-			if (!util.isWindows()) {
-				this.$logger.fatal(this.MACOS_COMING_SOON);
-				return;
-			}
-
 			this.$project.ensureProject();
 
 			this.cacheDir = path.join(options["profile-dir"], "Cache");
@@ -252,7 +240,7 @@ class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
 
 class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
     private PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
-	private EXECUTABLE_NAME_MAC = "Icenium.Simulator";
+	private EXECUTABLE_NAME_MAC = "AppBuilder Simulator";
     private EXECUTABLE_NAME_MAC_APP = this.EXECUTABLE_NAME_MAC + ".app";
 
     constructor(private $fs: IFileSystem,
