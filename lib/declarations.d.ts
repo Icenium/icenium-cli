@@ -297,6 +297,7 @@ interface IPrompter {
 
 interface ISimulatorPlatformServices {
 	getPackageName() : string;
+	unzipSimulator(zipFileName: string, simulatorPath: string): IFuture<void>;
 	runSimulator(simulatorPath: string, simulatorParams: string[]);
 }
 
