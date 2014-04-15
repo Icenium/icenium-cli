@@ -67,7 +67,7 @@ export class SimulateCommand implements ICommand {
 				this.$logger.info("Updating simulator package...");
 				var zipFileName = path.join(this.cacheDir, "simulator.zip");
 				this.downloadSimulator(zipFileName);
-				this.unzipSimulator(zipFileName);
+				this.$platformServices.unzipSimulator(zipFileName, this.simulatorPath).wait();
 				this.$fs.deleteFile(zipFileName).wait();
 				this.$fs.writeJson(serverVersionFile, { version : this.serverVersion }).wait();
 				this.$logger.info("Finished updating simulator package.");
@@ -88,12 +88,6 @@ export class SimulateCommand implements ICommand {
 
 		this.$fs.futureFromEvent(zipFile, "finish").wait();
 		request.wait();
-	}
-
-	private unzipSimulator(zipFileName: string): void {
-		var unzipProc = this.$childProcess.spawn('unzip', [zipFileName, '-d', this.simulatorPath],
-			{ stdio: "ignore", detached: true });
-		this.$fs.futureFromEvent(unzipProc, "close").wait();
 	}
 
 	private getSimulatorDownloadUri(): IFuture<string> {
@@ -219,12 +213,22 @@ class WinSimulatorPlatformServices implements ISimulatorPlatformServices {
     private PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
     private EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
 
-    constructor(private $childProcess: IChildProcess) {
+    constructor(private $fs: IFileSystem,
+				private $childProcess: IChildProcess) {
     }
 
     public getPackageName() : string {
         return this.PACKAGE_NAME_WIN;
     }
+
+	public unzipSimulator(zipFileName: string, simulatorPath: string): IFuture<void> {
+		return (() => {
+			var extractor = unzip.Extract({path: simulatorPath});
+			var zip = this.$fs.createReadStream(zipFileName);
+			zip.pipe(extractor);
+			this.$fs.futureFromEvent(extractor, "close").wait();
+		}).future<void>()();
+	}
 
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
         var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_WIN);
@@ -246,6 +250,14 @@ class MacSimulatorPlatformServices implements ISimulatorPlatformServices {
     public getPackageName() : string {
         return this.PACKAGE_NAME_MAC;
     }
+
+	public unzipSimulator(zipFileName: string, simulatorPath: string): IFuture<void> {
+		return (() => {
+			var unzipProc = this.$childProcess.spawn('unzip', [zipFileName, '-d', simulatorPath],
+				{ stdio: "ignore", detached: true });
+			this.$fs.futureFromEvent(unzipProc, "close").wait();
+		}).future<void>()();
+	}
 
     public runSimulator(simulatorPath: string, simulatorParams: string[]) {
         var simulatorBinary = path.join(simulatorPath, this.EXECUTABLE_NAME_MAC_APP);
