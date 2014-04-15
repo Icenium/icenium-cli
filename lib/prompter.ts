@@ -2,6 +2,7 @@
 
 import Future = require("fibers/future");
 import prompt = require("prompt");
+import helpers = require("./helpers");
 
 export class Prompter implements IPrompter {
 	constructor() {
@@ -9,6 +10,9 @@ export class Prompter implements IPrompter {
 		prompt.delimiter = ":";
 		prompt.colors = false;
 		prompt.isDefaultValueEditable = true;
+		if(helpers.isInteractive()) {
+			process.stdin.setRawMode(true);
+		}
 	}
 
 	public start() {

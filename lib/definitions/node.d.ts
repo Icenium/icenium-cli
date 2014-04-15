@@ -105,6 +105,7 @@ declare class ReadableStream extends EventEmitter {
 	// HACK: process.stdin is incorrectly declared as a ReadableStream, instead of as a "tty".ReadStream,
 	// hence the need to add these declarations here.
 	isTTY: boolean;
+	setRawMode(value: boolean):void;
 }
 
 declare class NodeProcess extends EventEmitter {
