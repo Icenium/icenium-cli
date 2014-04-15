@@ -39,7 +39,7 @@ export function fromWindowsRelativePathToUnix(windowsRelativePath) {
 }
 
 export function isRequestSuccessful(request) {
-	return (request.statusCode >= 200 && request.statusCode < 300) || request.statusCode === 304; // Status code is 304 when the request is conditional
+	return request.statusCode >= 200 && request.statusCode < 300;
 }
 
 export function getRelativeToRootPath(rootPath, filePath) {

@@ -26,7 +26,7 @@ export class AnalyticsService implements IAnalyticsService {
 			try {
 				var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 
-				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null && $injector.resolve("loginManager").isLoggedIn().wait()) {
+				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null) {
 					var message = "Do you want to help us improve " +
 						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
 						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";

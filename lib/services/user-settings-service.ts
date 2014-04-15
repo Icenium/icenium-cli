@@ -117,10 +117,6 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 			this.userSettingsData = this.userSettingsData || {};
 
-			if(!this.userSettingsData.hasOwnProperty(SharedUserSettingsService.SETTINGS_ROOT_TAG)) {
-				this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG] = {};
-			}
-
 			Object.keys(data).forEach(property => {
 				var newPropertyName = property + ".$t";
 				data[newPropertyName] = data[property];
