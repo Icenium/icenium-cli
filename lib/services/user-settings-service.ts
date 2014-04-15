@@ -78,15 +78,25 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 						var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
 						var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 						if(diffDays > 1) {
-							this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
+							this.makeServerRequest().wait();
+						} else {
+							this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
 						}
 					} else {
-						this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
+						this.makeServerRequest().wait();
 					}
-
-					var fileContent = this.$fs.readText(this.userSettingsFile).wait();
-					this.userSettingsData = xmlMapping.tojson(fileContent);
 				}
+			}
+		}).future<void>()();
+	}
+
+	private makeServerRequest(): IFuture<void> {
+		return(() => {
+			try {
+				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
+				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
+			} catch (e) {
+				this.userSettingsData = null;
 			}
 		}).future<void>()();
 	}
@@ -116,6 +126,10 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 			this.loadUserSettingsFile().wait();
 
 			this.userSettingsData = this.userSettingsData || {};
+
+			if(!this.userSettingsData.hasOwnProperty(SharedUserSettingsService.SETTINGS_ROOT_TAG)) {
+				this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG] = {};
+			}
 
 			Object.keys(data).forEach(property => {
 				var newPropertyName = property + ".$t";

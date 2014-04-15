@@ -23,22 +23,18 @@ export class AnalyticsService implements IAnalyticsService {
 
 	public checkConsent(featureName: string): IFuture<void> {
 		return ((): void => {
-			try {
-				var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 
-				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null) {
-					var message = "Do you want to help us improve " +
-						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
-						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
+			if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null && $injector.resolve("loginManager").isLoggedIn().wait()) {
+				var message = "Do you want to help us improve " +
+					"Telerik".white.bold + " " + "AppBuilder".cyan.bold
+					+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
 
-					trackFeatureUsage = this.$prompter.confirm(message, () =>  "y").wait();
-					this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
-				}
-
-				this.trackFeatureUsage = helpers.toBoolean(trackFeatureUsage);
-			} catch(e) {
-				this.$logger.trace("Analytics exception: '%s'", e.toString());
+				trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
+				this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
 			}
+
+			this.trackFeatureUsage = helpers.toBoolean(trackFeatureUsage);
 
 		}).future<void>()();
 	}
