@@ -343,6 +343,7 @@ interface IAnalyticsService {
 }
 
 interface IUserSettingsService {
+	loadUserSettingsFile(): IFuture<void>;
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
 	deleteUserSettingsFile(): IFuture<void>;
