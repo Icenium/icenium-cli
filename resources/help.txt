@@ -8,6 +8,7 @@ General commands:
     login                           Logs you in the Telerik Platform.
     logout                          Logs you out from the Telerik Platform.
     user                            Prints information about the currently logged in user.
+    feature-usage-tracking          Enable/disable anonymous feature usage tracking.
 
 Project development commands:
     create                          Creates a new project from template.
