@@ -357,7 +357,13 @@ interface IServerExtensionsService {
 	getExtensionVersion(packageName: string): string;
 	getExtensionPath(packageName: string): string;
 	cacheDir: string;
-}interface IPathFilteringService {
+}
+
+interface IPathFilteringService {
 	getRulesFromFile(file: string) : string[];
 	filterIgnoredFiles(files: string[], rules: string[]) :string[];
+}
+
+interface ICommandOptions {
+	disableAnalytics?: boolean;
 }
