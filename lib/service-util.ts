@@ -123,11 +123,13 @@ export class HttpClient implements Server.IHttpClient {
 							body: body,
 							response: response,
 							headers: response.headers,
-							error: helpers.isRequestSuccessful(response) ? null : new Error(response.statusCode)
 						})
 					} else {
 						var errorMessage = this.getErrorMessage(response, body);
-						result.throw(new Error(errorMessage));
+						var theError: any = new Error(errorMessage);
+						theError.response = response;
+						theError.body = body;
+						result.throw(theError);
 					}
 				});
 			}
@@ -184,63 +186,72 @@ export class ServiceProxy {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
-		var headers: any = {
-			"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$config.SOLUTION_SPACE_NAME
-		};
+		return <any> (() => {
+			var headers: any = {
+				"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$config.SOLUTION_SPACE_NAME
+			};
 
-		if (this.shouldAuthenticate) {
-			headers.Cookie = ".ASPXAUTH=" + this.$userDataStore.getCookie().wait();
-		}
-
-		if (accept) {
-			headers.Accept = accept;
-		}
-
-		var requestOpts: any = {
-			proto: this.$config.AB_SERVER_PROTO,
-			host: this.$config.AB_SERVER,
-			path: "/api" + path,
-			method: method,
-			headers: headers,
-			pipeTo: resultStream
-		};
-
-		if (bodyValues) {
-			if (bodyValues.length > 1) {
-				throw new Error("TODO: CustomFormData not implemented");
+			if (this.shouldAuthenticate) {
+				headers.Cookie = ".ASPXAUTH=" + this.$userDataStore.getCookie().wait();
 			}
 
-			var theBody = bodyValues[0];
-			requestOpts.body = theBody.value;
-			requestOpts.headers["Content-Type"] = theBody.contentType;
-		}
+			if (accept) {
+				headers.Accept = accept;
+			}
 
-		var response = this.$httpClient.httpRequest(requestOpts);
-		var result = new Future<any>();
-		response.resolve((err, response?) => {
-			if (err) {
-				result.throw(err);
-			} else {
-				this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
-				var newCookies = response.headers["set-cookie"];
+			var requestOpts: any = {
+				proto: this.$config.AB_SERVER_PROTO,
+				host: this.$config.AB_SERVER,
+				path: "/api" + path,
+				method: method,
+				headers: headers,
+				pipeTo: resultStream
+			};
 
-				if (newCookies) {
-					this.lastCallCookies = {};
-					newCookies.forEach((cookieStr: string) => {
-						var parsed = cookielib.parse(cookieStr);
-						Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
-					});
+			if (bodyValues) {
+				if (bodyValues.length > 1) {
+					throw new Error("TODO: CustomFormData not implemented");
 				}
 
-				if (accept === "application/json") {
-					result.return(JSON.parse(response.body));
+				var theBody = bodyValues[0];
+				requestOpts.body = theBody.value;
+				requestOpts.headers["Content-Type"] = theBody.contentType;
+			}
+
+			var response = this.$httpClient.httpRequest(requestOpts);
+			var result = new Future<any>();
+			response.resolve((err, response?) => {
+				if (err) {
+					result.throw(err);
 				} else {
-					result.return(response.body);
-				}
-			}
-		});
+					this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
+					var newCookies = response.headers["set-cookie"];
 
-		return result;
+					if (newCookies) {
+						this.lastCallCookies = {};
+						newCookies.forEach((cookieStr: string) => {
+							var parsed = cookielib.parse(cookieStr);
+							Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
+						});
+					}
+
+					if (accept === "application/json") {
+						result.return(JSON.parse(response.body));
+					} else {
+						result.return(response.body);
+					}
+				}
+			});
+
+			try {
+				return result.wait();
+			} catch (err) {
+				if (err.response && err.response.statusCode === 401) {
+					this.$userDataStore.clearLoginData().wait();
+				}
+				throw err;
+			}
+		}).future()();
 	}
 
 	public getLastRequestCookies(): any {
