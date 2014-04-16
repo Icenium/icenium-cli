@@ -52,6 +52,13 @@ export class UserDataStore implements IUserDataStore {
 		}
 	}
 
+	public clearLoginData(): IFuture<void> {
+		return (() => {
+			this.setCookie(null).wait();
+			this.setUser(null).wait();
+		}).future<void>()();
+	}
+
 	private checkCookieExists<T>(sourceFile: string, getter: () => T) : IFuture<boolean> {
 		return (() => {
 			return (getter() || this.$fs.exists(sourceFile).wait());
@@ -108,8 +115,7 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			this.$logger.info("Logging out...");
 
-			this.$userDataStore.setCookie(null).wait();
-			this.$userDataStore.setUser(null).wait();
+			this.$userDataStore.clearLoginData().wait();
 
 			this.$sharedUserSettingsService.deleteUserSettingsFile().wait();
 

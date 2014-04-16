@@ -67,6 +67,7 @@ interface IUserDataStore {
 	getUser(): IFuture<any>;
 	setCookie(cookie: string): IFuture<void>;
 	setUser(user: any): IFuture<void>;
+	clearLoginData(): IFuture<void>;
 }
 
 interface ILoginManager {
