@@ -170,7 +170,7 @@ interface IFsStats {
 
 interface IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
-	unzip(zipFile: string, destination: string): IFuture<void>;
+	unzip(zipFile: string, destinationDir: string): IFuture<void>;
 	exists(path: string): IFuture<boolean>;
 	deleteFile(path: string): IFuture<void>;
 	deleteDirectory(directory: string): IFuture<void>;

@@ -60,17 +60,17 @@ export class FileSystem implements IFileSystem {
 		return result;
 	}
 
-	public unzip(zipFile: string, destination: string): IFuture<void> {
+	public unzip(zipFile: string, destinationDir: string): IFuture<void> {
 		if (helpers.isDarwin()) {
 			var $childProcess = $injector.resolve("$childProcess");
-			var unzipProc = $childProcess.spawn('unzip', [zipFile, '-d', destination],
+			var unzipProc = $childProcess.spawn('unzip', [zipFile, '-d', destinationDir],
 				{ stdio: "ignore", detached: true });
 			return this.futureFromEvent(unzipProc, "close");
 		}
 		else {
 			return this.futureFromEvent(
 				this.createReadStream(zipFile)
-					.pipe(unzip.Extract({ path: destination })), "close");
+					.pipe(unzip.Extract({ path: destinationDir })), "close");
 		}
 	}
 

@@ -64,7 +64,7 @@ class WinDebuggerPlatformServices implements IExtensionPlatformServices {
 
 		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
 		var childProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
-		childProcess.stdout.pipe(process.stdout);
+		childProcess.stderr.pipe(process.stderr);
 		childProcess.stdin.on("end", () => process.exit());
 		helpers.exitOnStdinEnd();
 		this.$dispatcher.run();
