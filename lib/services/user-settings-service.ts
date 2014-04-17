@@ -78,26 +78,22 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 						var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
 						var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 						if(diffDays > 1) {
-							this.makeServerRequest().wait();
+							this.downloadUserSettings().wait();
 						} else {
 							this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
 						}
 					} else {
-						this.makeServerRequest().wait();
+						this.downloadUserSettings().wait();
 					}
 				}
 			}
 		}).future<void>()();
 	}
 
-	private makeServerRequest(): IFuture<void> {
+	private downloadUserSettings(): IFuture<void> {
 		return(() => {
-			try {
-				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
-				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
-			} catch (e) {
-				this.userSettingsData = null;
-			}
+			this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
+			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
 		}).future<void>()();
 	}
 
@@ -123,7 +119,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 	public saveSettings(data: {[key: string]: {}}): IFuture<void> {
 		return (() => {
-			this.loadUserSettingsFile().wait();
+			this.downloadUserSettings().wait();
 
 			this.userSettingsData = this.userSettingsData || {};
 

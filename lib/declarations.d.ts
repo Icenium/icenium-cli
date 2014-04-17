@@ -350,3 +350,6 @@ interface IUserSettingsService {
 	userSettingsFilePath?: string;
 }
 
+interface ICommandOptions {
+	disableAnalytics?: boolean;
+}
