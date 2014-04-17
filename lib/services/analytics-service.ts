@@ -135,27 +135,12 @@ export class AnalyticsService implements IAnalyticsService {
 		}).future<void>()();
 	}
 
-	private getStatusMessage(): IFuture<string> {
-		return (() => {
-			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
-			if(trackFeatureUsage == null) {
-				return "disabled until confirmed";
-			}
-
-			if(helpers.toBoolean(trackFeatureUsage)) {
-				return "enabled";
-			}
-
-			return"disabled";
-
-		}).future<string>()();
-	}
-
 	public analyticsCommand(arg: string): IFuture<any> {
 		return(() => {
 			switch(arg) {
 				case "status":
-					this.$logger.out("Feature usage tracking is %s.", this.getStatusMessage().wait());
+					var status = this.getStatus().wait();
+					this.$logger.out(this.getStatusMessage(status));
 					break;
 				case "enable":
 					this.enableAnalytics().wait();
@@ -170,6 +155,40 @@ export class AnalyticsService implements IAnalyticsService {
 					break;
 			}
 		}).future<any>()();
+	}
+
+	private getStatus(): IFuture<boolean> {
+		return (() => {
+			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+			if (trackFeatureUsage) {
+				return helpers.toBoolean(trackFeatureUsage);
+			}
+			return undefined;
+		}).future<boolean>()();
+	}
+
+	private getStatusMessage(trackFeatureUsage?: boolean): string {
+		if (options.json) {
+			return this.getJsonStatusMessage(trackFeatureUsage);
+		} else {
+			return this.getHumanReadableStatusMessage(trackFeatureUsage);
+		}
+	}
+
+	private getHumanReadableStatusMessage(trackFeatureUsage?: boolean): string {
+		var status: string;
+		if (trackFeatureUsage) {
+			status = "enabled";
+		} else if (trackFeatureUsage === undefined) {
+			status = "disabled until confirmed";
+		} else {
+			status = "disabled";
+		}
+		return util.format("Feature usage tracking is %s.", status);
+	}
+
+	private getJsonStatusMessage(trackFeatureUsage?: boolean): string {
+		return JSON.stringify({ enabled: trackFeatureUsage !== undefined ? trackFeatureUsage : null });
 	}
 }
 $injector.register("analyticsService", AnalyticsService);
