@@ -163,7 +163,7 @@ export class AnalyticsService implements IAnalyticsService {
 			if (trackFeatureUsage) {
 				return helpers.toBoolean(trackFeatureUsage);
 			}
-			return null;
+			return undefined;
 		}).future<boolean>()();
 	}
 
@@ -179,7 +179,7 @@ export class AnalyticsService implements IAnalyticsService {
 		var status: string;
 		if (trackFeatureUsage) {
 			status = "enabled";
-		} else if (trackFeatureUsage == null) {
+		} else if (trackFeatureUsage === undefined) {
 			status = "disabled until confirmed";
 		} else {
 			status = "disabled";
@@ -188,7 +188,7 @@ export class AnalyticsService implements IAnalyticsService {
 	}
 
 	private getJsonStatusMessage(trackFeatureUsage?: boolean): string {
-		return JSON.stringify({ enabled: trackFeatureUsage });
+		return JSON.stringify({ enabled: trackFeatureUsage !== undefined ? trackFeatureUsage : null });
 	}
 }
 $injector.register("analyticsService", AnalyticsService);
