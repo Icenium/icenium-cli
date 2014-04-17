@@ -11,10 +11,6 @@ testInjector.register("fs", stubs.FileSystemStub);
 testInjector.register("pathFilteringService", pfs.PathFilteringService);
 
 describe("PathFilteringService", () => {
-	//var testInjector;
-	before(() => {
-	});
-
 	it("test ** rule", () => {
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"], ["**/.DS_Store"]);
 		var expected = ["allow", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"];
@@ -30,6 +26,18 @@ describe("PathFilteringService", () => {
 	it("test \\! rule", () => {
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["!z", "allow"], ["\\!z"]);
 		var expected = ["allow"];
+		assert.deepEqual(actual, expected);
+	});
+
+	it("test inclusion rule only", () =>{
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["z", "allow"], ["!z"]);
+		var expected = ["z", "allow"];
+		assert.deepEqual(actual, expected);
+	});
+
+	it("test exclusion by two rules and in subdir", () => {
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["./A/B/file.txt"], ["./A/B/*", "!./A/B/file.txt", "./A/**/*"]);
+		var expected = [];
 		assert.deepEqual(actual, expected);
 	});
 });

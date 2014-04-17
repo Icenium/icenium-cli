@@ -8,12 +8,11 @@ export class PathFilteringService implements IPathFilteringService {
 	constructor(private $fs: IFileSystem) {
 	}
 
-	public getRulesFromFile(file: string) : string[] {
+	public getRulesFromFile(fullFilePath: string) : string[] {
 		var COMMENT_START = '#';
 		var rules = [];
 
 		try {
-			var fullFilePath = file;
 			var fileContent = this.$fs.readText(fullFilePath).wait();
 			rules = _.reject(fileContent.split(os.EOL),
 				(line: string) => line.length === 0 || line[0] === COMMENT_START);
@@ -39,7 +38,7 @@ export class PathFilteringService implements IPathFilteringService {
 					rule = rule.substr(1);
 					var ruleMatched = minimatch(file, rule, {nocase: true});
 					if (ruleMatched) {
-						fileMatched = !fileMatched && ruleMatched; // it must have been skipped by previous exclude patterns
+						fileMatched = ruleMatched;
 					}
 				} else {
 					var options = {nocase: true, nonegate: false};

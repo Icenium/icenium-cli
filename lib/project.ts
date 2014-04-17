@@ -29,7 +29,7 @@ export class Project implements Project.IProject {
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService : IPathFilteringService) {
 			this.readProjectData().wait();
-	}
+		}
 
 	public getProjectDir(): string {
 		if (this.cachedProjectDir !== "") {
@@ -58,7 +58,8 @@ export class Project implements Project.IProject {
 		return this.cachedProjectDir;
 	}
 
-	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", ".abignore", "*.ipa", "*.apk", "*.xap"];
+	private static IGNORE_FILE = ".abignore";
+	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
 		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
@@ -69,7 +70,8 @@ export class Project implements Project.IProject {
 			return !this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
 		});
 
-		var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), ".abignore"));
+		var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), Project.IGNORE_FILE));
+
 		projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules);
 
 		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
