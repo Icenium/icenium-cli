@@ -1,3 +1,7 @@
+interface IDisposable {
+	dispose(): void;
+}
+
 declare module Server {
 	interface IResponse {
 		response: any;
@@ -287,7 +291,7 @@ declare enum ErrorCodes {
 	UNKNOWN = 127
 }
 
-interface IPrompter {
+interface IPrompter extends IDisposable {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
