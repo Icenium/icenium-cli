@@ -54,22 +54,24 @@ function resolveCallStack(stack: string): string {
 	return remapped.join("\n");
 }
 
-process.on("uncaughtException", function(err) {
-	var callstack = err.stack;
-	if (callstack) {
-		callstack = resolveCallStack(callstack);
-	}
-	console.log(callstack || err.toString());
+export function installUncaughtExceptionListener(): void {
+	process.on("uncaughtException", function(err) {
+		var callstack = err.stack;
+		if (callstack) {
+			callstack = resolveCallStack(callstack);
+		}
+		console.log(callstack || err.toString());
 
-	try {
-		var analyticsService = $injector.resolve("analyticsService");
-		analyticsService.trackException(err, callstack);
-	} catch (e) {
-		console.log("Error while reporting exception: " + e);
-	}
+		try {
+			var analyticsService = $injector.resolve("analyticsService");
+			analyticsService.trackException(err, callstack);
+		} catch (e) {
+			console.log("Error while reporting exception: " + e);
+		}
 
-	process.exit(ErrorCodes.UNKNOWN);
-});
+		process.exit(ErrorCodes.UNKNOWN);
+	});
+}
 
 export class Errors implements IErrors {
 	constructor(
