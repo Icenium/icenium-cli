@@ -10,7 +10,8 @@
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/",
     "preinstall": "node preinstall.js",
-    "postinstall": "node postinstall.js"
+    "postinstall": "node postinstall.js",
+    "preuninstall": "node preuninstall.js"
   },
   "main": "./lib/appbuilder-cli.js",
   "repository": {

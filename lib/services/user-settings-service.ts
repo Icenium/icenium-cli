@@ -92,8 +92,16 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 	private downloadUserSettings(): IFuture<void> {
 		return(() => {
-			this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
-			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
+			try {
+				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
+				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
+			} catch(error) {
+				if(error.response && error.response.statusCode === 404) {
+					this.userSettingsData = null;
+				} else {
+					throw error;
+				}
+			}
 		}).future<void>()();
 	}
 
