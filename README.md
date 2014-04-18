@@ -21,10 +21,12 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.1  
-Release date: 2014, April 9  
+Latest version: Telerik AppBuilder 2.1.1  
+Release date: 2014, April 23  
 
-> For a complete list of the features available in Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
+> This is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.1.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1-1" target="_blank">Telerik AppBuilder 2.1.1 Release Notes</a>.
+
+> For a complete list of the features available in the last major release, Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
 
 ### System Requirements
 
@@ -204,10 +206,12 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.1  
-Release date: 2014, April 9  
+Latest version: Telerik AppBuilder 2.1.1  
+Release date: 2014, April 23 
 
-> For a complete list of the features available in Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
+> This is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.1.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1-1" target="_blank">Telerik AppBuilder 2.1.1 Release Notes</a>.
+
+> For a complete list of the features available in the last major release, Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
