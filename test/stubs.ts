@@ -25,6 +25,10 @@ export class FileSystemStub implements IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
 		return undefined;
 	}
+	
+	unzip(zipFile: string, destination: string): IFuture<void> {
+		return undefined;
+	}
 	exists(path: string): IFuture<boolean> {
 		return Future.fromResult(true);
 	}

@@ -4,7 +4,6 @@
 
 import util = require("util");
 import path = require("path");
-import unzip = require("unzip");
 import helpers = require("../helpers");
 
 export class EditConfigurationCommand implements ICommand {
@@ -34,9 +33,7 @@ export class EditConfigurationCommand implements ICommand {
 				if (!this.$fs.exists(filepath).wait()) {
 					this.$logger.info("Creating configuration file: " + filepath);
 					var templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
-					this.$fs.futureFromEvent(
-						this.$fs.createReadStream(templateFilePath)
-							.pipe(unzip.Extract({ path: directory })), "close").wait();
+					this.$fs.unzip(templateFilePath, directory).wait();
 
 					//delete extra file in template zip
 					this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();

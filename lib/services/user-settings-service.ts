@@ -14,7 +14,7 @@ export class ClientSpecificUserSettingsService implements IUserSettingsService {
 
 	constructor(private $fs: IFileSystem) { }
 
-	private loadUserSettingsFile(): IFuture<void> {
+	public loadUserSettingsFile(): IFuture<void> {
 		return (() => {
 			if(!this.userSettingsData) {
 				this.userSettingsFile = path.join(options["profile-dir"], "user-settings.json");
@@ -62,29 +62,27 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer) { }
 
-	public get userSettingsFile(): string {
+	public get userSettingsFilePath(): string {
 		return path.join(options["profile-dir"], "user-settings.xml");
 	}
 
-	private loadUserSettingsFile(): IFuture<void> {
+	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
-			if(!this.userSettingsData) {
-				var loginManager = $injector.resolve("loginManager"); //We need to resolve loginManager here due to cyclic dependency
-				if (loginManager.isLoggedIn().wait()) {
-					this.$fs.createDirectory(options["profile-dir"]).wait();
+			var loginManager = $injector.resolve("loginManager"); //We need to resolve loginManager here due to cyclic dependency
+			if (loginManager.isLoggedIn().wait()) {
+				this.$fs.createDirectory(options["profile-dir"]).wait();
 
-					if(this.$fs.exists(this.userSettingsFile).wait()) {
-						var fileInfo = this.$fs.getFsStats(this.userSettingsFile).wait();
-						var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
-						var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-						if(diffDays > 1) {
-							this.makeServerRequest().wait();
-						} else {
-							this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
-						}
-					} else {
+				if (this.$fs.exists(this.userSettingsFilePath).wait()) {
+					var fileInfo = this.$fs.getFsStats(this.userSettingsFilePath).wait();
+					var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
+					var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+					if(diffDays > 1) {
 						this.makeServerRequest().wait();
+					} else {
+						this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFilePath).wait());
 					}
+				} else {
+					this.makeServerRequest().wait();
 				}
 			}
 		}).future<void>()();
@@ -93,8 +91,8 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	private makeServerRequest(): IFuture<void> {
 		return(() => {
 			try {
-				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFile)).wait();
-				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFile).wait());
+				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFilePath)).wait();
+				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFilePath).wait());
 			} catch (e) {
 				this.userSettingsData = null;
 			}
@@ -142,13 +140,16 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 			var xml = xmlMapping.toxml(this.userSettingsData);
 			this.$server.rawSettings.saveUserSettings(xml).wait();
-			this.$fs.writeFile(this.userSettingsFile, xml).wait();
+
+			if (Object.keys(data).length !== 0) {
+				this.$fs.writeFile(this.userSettingsFilePath, xml).wait();
+			}
 
 		}).future<void>()();
 	}
 
 	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFile);
+		return this.$fs.deleteDirectory(this.userSettingsFilePath);
 	}
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);

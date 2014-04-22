@@ -3,7 +3,6 @@
 "use strict";
 
 import xml2js = require("xml2js");
-import unzip = require("unzip");
 import minimatch = require("minimatch");
 import path = require("path");
 var options:any = require("./options");
@@ -193,7 +192,7 @@ export class Project implements Project.IProject {
 				this.createTemplateFolder(projectDir).wait();
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
-					this.extractTemplate(templateFileName, projectDir).wait();
+					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
 					var properties = this.getProjectProperties(path.join(projectDir, "mobile.proj"), appname).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
@@ -336,12 +335,6 @@ export class Project implements Project.IProject {
 				throw new Error("The specified directory must be empty to create a new project.");
 			}
 		}).future<any>()();
-	}
-
-	private extractTemplate(templateFileName, projectDir: string): IFuture<any> {
-		return this.$fs.futureFromEvent(
-			this.$fs.createReadStream(templateFileName)
-			.pipe(unzip.Extract({ path: projectDir })), "close");
 	}
 
 	private generateDefaultAppId(appName: string): string {

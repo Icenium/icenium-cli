@@ -14,6 +14,7 @@ $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("templatesService", "./templates-service");
+$injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
@@ -26,6 +27,7 @@ $injector.requireCommand("fetch-plugin", "./commands/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");
 $injector.requireCommand("simulate", "./commands/simulate");
+$injector.requireCommand("debug", "./commands/debug");
 
 $injector.require("server", "./server-api");
 $injector.require("httpClient", "./service-util");

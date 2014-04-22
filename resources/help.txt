@@ -18,6 +18,7 @@ Project development commands:
     cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
     livesync                        Synchronizes the latest changes in your project to connected devices.
     simulate                        Runs the current project in the device simulator on Windows systems.
+    debug                           Runs an application allowing you to remotely debug applications on connected devices.
     find-plugins                    Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     fetch-plugin                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -282,6 +283,16 @@ In this version of the Telerik AppBuilder CLI, you cannot run your apps in the d
 Options:
     --path <path> - Specifies the path to the project. If not specified, the project is searched
                     for in the current directory and all directories above it.
+
+--[/]--
+
+--[debug]--
+Usage:
+    $ appbuilder debug
+
+Runs an application allowing you to remotely debug applications on connected devices.
+
+In this version of the Telerik AppBuilder CLI, you cannot debug your apps on OS X systems. The application debugger will become available for OS X in a future release of Telerik AppBuilder.
 
 --[/]--
 
