@@ -14,18 +14,16 @@ export class Prompter implements IPrompter {
 		prompt.colors = false;
 		prompt.isDefaultValueEditable = true;
 
-		if(helpers.isInteractive()) {
+		if (helpers.isInteractive()) {
 			process.stdin.setRawMode(true);
 			process.on("SIGINT", () => process.exit());
 
-			if (helpers.isWindows()) {
-				this.ctrlcReader = readline.createInterface(<any>{
-					input: process.stdin,
-					output: process.stdout
-				});
+			this.ctrlcReader = readline.createInterface(<any>{
+				input: process.stdin,
+				output: process.stdout
+			});
 
-				this.ctrlcReader.on("SIGINT", () => process.emit("SIGINT"));
-			}
+			this.ctrlcReader.on("SIGINT", () => process.emit("SIGINT"));
 		}
 	}
 
