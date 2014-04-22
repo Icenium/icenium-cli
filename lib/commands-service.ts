@@ -25,8 +25,10 @@ export class CommandsService implements ICommandsService {
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
 		var command = this.$injector.resolveCommand(commandName);
 		if (command) {
-			this.$analyticsService.checkConsent(commandName).wait();
-			this.$analyticsService.trackFeature(commandName).wait();
+			if (!command.disableAnalytics) {
+				this.$analyticsService.checkConsent(commandName).wait();
+				this.$analyticsService.trackFeature(commandName).wait();
+			}
 			command.execute(commandArguments).wait();
 			return true;
 		} else {
