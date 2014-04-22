@@ -12,7 +12,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
 
 	constructor(private $fs: IFileSystem) {
-		this.userSettingsFile = path.join(options["profile-dir"], "user-settings.json");
+		this.userSettingsFile = path.join(options["profile-dir"], "local-user-settings.json");
 	}
 
 	public get userSettingsFilePath(): string {
@@ -20,7 +20,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	}
 
 	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFilePath);
+		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }
 $injector.register("clientUserSettingsFileService", ClientUserSettingsFileService);
@@ -77,7 +77,7 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 	}
 
 	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFilePath);
+		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }
 $injector.register("sharedUserSettingsFileService", SharedUserSettingsFileService);

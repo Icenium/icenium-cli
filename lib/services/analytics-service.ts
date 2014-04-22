@@ -7,6 +7,8 @@ import helpers = require("./../helpers");
 import options = require("./../options");
 import os = require("os");
 
+var TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
+
 export class AnalyticsService implements IAnalyticsService {
 	private _eqatecMonitor;
 	private trackFeatureUsage: boolean = false;
@@ -27,20 +29,27 @@ export class AnalyticsService implements IAnalyticsService {
 			var trackFeatureUsage = null;
 
 			if (this.$loginManager.isLoggedIn().wait()) {
-				trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+				trackFeatureUsage = this.$sharedUserSettingsService.getValue(TRACK_FEATURE_USAGE_SETTING_NAME).wait();
 
 				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null) {
 					var message = "Do you want to help us improve " +
 						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
-						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
+						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you."
+						+ " You can also read our official Privacy Policy at http://www.telerik.com/company/privacy-policy.";
 
 					trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
-					this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
+					this.$sharedUserSettingsService.saveSettings(this.createSettingsObject(trackFeatureUsage)).wait();
 				}
 			}
 
 			this.trackFeatureUsage = helpers.toBoolean(trackFeatureUsage);
 		}).future<void>()();
+	}
+
+	private createSettingsObject(trackFeatureUsage: boolean): {[key: string]: {}} {
+		var settingsObject: any = {};
+		settingsObject[TRACK_FEATURE_USAGE_SETTING_NAME] = trackFeatureUsage;
+		return settingsObject;
 	}
 
 	private start(): IFuture<void> {
@@ -167,7 +176,7 @@ export class AnalyticsService implements IAnalyticsService {
 
 	private getStatus(): IFuture<boolean> {
 		return (() => {
-			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+			var trackFeatureUsage = this.$sharedUserSettingsService.getValue(TRACK_FEATURE_USAGE_SETTING_NAME).wait();
 			if (trackFeatureUsage) {
 				return helpers.toBoolean(trackFeatureUsage);
 			}
