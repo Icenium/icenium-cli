@@ -167,6 +167,7 @@ export class AnalyticsService implements IAnalyticsService {
 
 	private getStatus(): IFuture<boolean> {
 		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
 			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 			if (trackFeatureUsage) {
 				return helpers.toBoolean(trackFeatureUsage);
