@@ -19,6 +19,7 @@ errors.installUncaughtExceptionListener();
 
 class CommandDispatcher {
 	constructor(private $logger: ILogger,
+		private $cancellation: ICancellationService,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
@@ -35,6 +36,8 @@ class CommandDispatcher {
 			commandArguments.unshift(commandName);
 			commandName = "help";
 		}
+
+		this.$cancellation.begin("cli");
 
 		this.$commandsService.tryExecuteCommand(commandName, commandArguments);
 	}
