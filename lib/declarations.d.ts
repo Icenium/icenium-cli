@@ -343,11 +343,14 @@ interface IAnalyticsService {
 	trackException(exception: any, message: string): IFuture<void>;
 }
 
+interface IUserSettingsFileService {
+	deleteUserSettingsFile(): IFuture<void>;
+	userSettingsFilePath: string;
+}
+
 interface IUserSettingsService {
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
-	deleteUserSettingsFile(): IFuture<void>;
-	userSettingsFilePath?: string;
 }
 
 interface ICommandOptions {
