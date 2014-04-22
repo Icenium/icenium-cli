@@ -90,6 +90,8 @@ export class UserDataStore implements IUserDataStore {
 $injector.register("userDataStore", UserDataStore);
 
 export class LoginManager implements ILoginManager {
+	public static DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS = 15 * 60 * 1000;
+
 	constructor(private $logger: ILogger,
 		private $config: IConfiguration,
 		private $serverConfiguration: IServerConfiguration,
@@ -235,6 +237,21 @@ export class LoginManager implements ILoginManager {
 
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
+
+			if (!helpers.isInteractive()) {
+				var timeout = options.hasOwnProperty("timeout")
+					? +options.timeout
+					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
+
+				if (timeout > 0) {
+					setTimeout(() => {
+						if (!authComplete.isResolved()) {
+							this.$logger.debug("Aborting login procedure due to inactivity.");
+							process.exit();
+						}
+					}, timeout);
+				}
+			}
 
 			var code = authComplete.wait();
 			return this.authenticate({ wrap_verification_code: code }).wait();
