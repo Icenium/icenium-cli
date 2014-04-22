@@ -10,6 +10,8 @@ interface IInjector {
 	registerCommand(name: string, resolver: any): void;
 	registerCommand(names: string[], resolver: any): void;
 	getRegisteredCommandsNames(includeDev: boolean): string[];
+	isDefaultCommand(commandName: string): boolean;
+	getChildrenCommandsNames(commandName: string): string[];
 }
 
 declare var $injector: IInjector;
