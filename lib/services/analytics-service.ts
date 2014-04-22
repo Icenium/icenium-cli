@@ -24,19 +24,22 @@ export class AnalyticsService implements IAnalyticsService {
 
 	public checkConsent(featureName: string): IFuture<void> {
 		return ((): void => {
-			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+			var trackFeatureUsage = null;
 
-			if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null && $injector.resolve("loginManager").isLoggedIn().wait()) {
-				var message = "Do you want to help us improve " +
-					"Telerik".white.bold + " " + "AppBuilder".cyan.bold
-					+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
+			if (this.$loginManager.isLoggedIn().wait()) {
+				trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 
-				trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
-				this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
+				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null) {
+					var message = "Do you want to help us improve " +
+						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
+						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
+
+					trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
+					this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
+				}
 			}
 
 			this.trackFeatureUsage = helpers.toBoolean(trackFeatureUsage);
-
 		}).future<void>()();
 	}
 
@@ -159,15 +162,11 @@ export class AnalyticsService implements IAnalyticsService {
 	}
 
 	private setAnalytics(enabled: boolean): IFuture<void> {
-		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
-			this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": enabled}).wait();
-		}).future<void>()();
+		return this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": enabled});
 	}
 
 	private getStatus(): IFuture<boolean> {
 		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
 			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 			if (trackFeatureUsage) {
 				return helpers.toBoolean(trackFeatureUsage);
