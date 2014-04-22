@@ -87,6 +87,7 @@
 /// <reference path="services/cordova-plugins.ts" />
 /// <reference path="services/path-filtering.ts" />
 /// <reference path="services/server-extensions.ts" />
+/// <reference path="services/platform-migration.ts" />
 /// <reference path="services/user-settings-service.ts" />
 /// <reference path="templates-service.ts" />
 /// <reference path="validators/base-validators.ts" />
