@@ -12,6 +12,8 @@ interface IInjector extends IDisposable {
 	getRegisteredCommandsNames(includeDev: boolean): string[];
 	dynamicCallRegex: RegExp;
 	dynamicCall(call: string, args?: any[]): any;
+	isDefaultCommand(commandName: string): boolean;
+	getChildrenCommandsNames(commandName: string): string[];
 }
 
 declare var $injector: IInjector;

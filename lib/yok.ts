@@ -101,6 +101,18 @@ export class Yok implements IInjector {
 
 	public requireCommand(names: any, file: string) {
 		forEachName(names, (commandName) => {
+			var commands = commandName.split("|");
+
+			if(commands.length > 1) {
+				var parentCommandName = commands[0];
+
+				if(!this.hierarchicalCommands[parentCommandName]) {
+					this.hierarchicalCommands[parentCommandName] = [];
+				}
+
+				this.hierarchicalCommands[parentCommandName].push(commands[1]);
+			}
+
 			if(this.isDefaultCommand(commandName)) {
 				this.require(this.createCommandName(commandName.split("|")[0]), file);
 			} else {
@@ -131,13 +143,7 @@ export class Yok implements IInjector {
 			this.register(this.createCommandName(name), resolver);
 
 			if(commands.length > 1) {
-				var parentCommandName = commands[0];
-				if(!this.hierarchicalCommands[parentCommandName]) {
-					this.hierarchicalCommands[parentCommandName] = [];
-					this.createHierarchicalCommand(parentCommandName);
-				}
-
-				this.hierarchicalCommands[parentCommandName].push(commands[1]);
+				this.createHierarchicalCommand(commands[0]);
 			}
 		});
 	}
@@ -171,7 +177,7 @@ export class Yok implements IInjector {
 		$injector.registerCommand(name, factory);
 	}
 
-	private isDefaultCommand(commandName: string): boolean {
+	public isDefaultCommand(commandName: string): boolean {
 		return commandName.indexOf("*") > 0 && commandName.indexOf("|") > 0;
 	}
 
@@ -307,6 +313,10 @@ export class Yok implements IInjector {
 			commands = _.reject(commands, (command) => command.startsWith("dev-"));
 		}
 		return commands;
+	}
+
+	public getChildrenCommandsNames(commandName: string): string[] {
+		return this.hierarchicalCommands[commandName];
 	}
 
 	private createCommandName(name: string) {

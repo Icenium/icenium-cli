@@ -52,14 +52,15 @@ export class CommandsService implements ICommandsService {
 		var allCommands = this.allCommands(false);
 		var similarCommands = [];
 		_.each(allCommands, (command) => {
-			command = this.beautifyCommandName(command);
-			var distance = jaroWinklerDistance(commandName, command);
-			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
-				similarCommands.push({ rating: 1, name: command });
-			} else if (distance >= 0.65) {
-				similarCommands.push({ rating: distance, name: command });
+			if(!this.$injector.isDefaultCommand(command)) {
+				command = helpers.stringReplaceAll(command, "|", " ");
+				var distance = jaroWinklerDistance(commandName, command);
+				if (commandName.length > 3 && command.indexOf(commandName) != -1) {
+					similarCommands.push({ rating: 1, name: command });
+				} else if (distance >= 0.65) {
+					similarCommands.push({ rating: distance, name: command });
+				}
 			}
-
 		});
 
 		similarCommands = _.sortBy(similarCommands, (command) => {
@@ -84,11 +85,14 @@ export class CommandsService implements ICommandsService {
 
 			var deviceSpecific = ["build", "deploy"];
 			var propertyCommands = ["prop-cat", "prop-set", "prop-add", "prop-del"];
+			var childrenCommands = this.$injector.getChildrenCommandsNames(data.prev);
 
 			if (data.last.startsWith("--")) {
 				return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
 			} else if (_.contains(deviceSpecific, data.prev)) {
 				return tabtab.log(["ios", "android"], data);
+			} else if(childrenCommands) {
+				return tabtab.log(childrenCommands, data);
 			} else {
 				var propSchema = require("./helpers").getProjectFileSchema();
 				if (_.contains(propertyCommands, data.prev)) {
