@@ -10,6 +10,7 @@ $injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
+$injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("childProcess", "./child-process");
 $injector.require("logger", "./logger");
 $injector.require("commandsService", "./commands-service");

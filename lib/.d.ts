@@ -85,6 +85,7 @@
 /// <reference path="services/analytics-service.ts" />
 /// <reference path="services/build.ts" />
 /// <reference path="services/cordova-plugins.ts" />
+/// <reference path="services/platform-migration.ts" />
 /// <reference path="services/user-settings-service.ts" />
 /// <reference path="templates-service.ts" />
 /// <reference path="validators/base-validators.ts" />
