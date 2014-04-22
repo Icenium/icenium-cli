@@ -4,9 +4,18 @@ var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
+	private analyticsService : IAnalyticsService;
+
+	get $analyticsService(): IAnalyticsService {
+		if (!this.analyticsService) {
+			//We need to resolve analyticsService here due to cyclic dependency
+			this.analyticsService = this.$injector.resolve("analyticsService");
+		}
+		return this.analyticsService;
+	}
+
 	constructor(private $errors: IErrors,
 		private $logger: ILogger,
-		private $analyticsService: IAnalyticsService,
 		private $injector: IInjector) { }
 
 	public allCommands(includeDev: boolean): string[] {
