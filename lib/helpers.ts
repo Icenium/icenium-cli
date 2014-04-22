@@ -274,3 +274,13 @@ export function mergeRecursive(obj1: Object, obj2: Object): Object {
 
 	return obj1;
 }
+
+export function block(operation: () => void): void {
+	if (isInteractive()) {
+		process.stdin.setRawMode(false);
+	}
+	operation();
+	if (isInteractive()) {
+		process.stdin.setRawMode(true);
+	}
+}

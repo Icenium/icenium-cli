@@ -16,14 +16,13 @@ export class Prompter implements IPrompter {
 
 		if (helpers.isInteractive()) {
 			process.stdin.setRawMode(true);
-			process.on("SIGINT", () => process.exit());
 
 			this.ctrlcReader = readline.createInterface(<any>{
 				input: process.stdin,
 				output: process.stdout
 			});
 
-			this.ctrlcReader.on("SIGINT", () => process.emit("SIGINT"));
+			this.ctrlcReader.on("SIGINT", () => process.exit());
 		}
 	}
 
