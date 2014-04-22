@@ -19,7 +19,8 @@ export class AnalyticsService implements IAnalyticsService {
 		private $prompter: IPrompter,
 		private $clientSpecificUserSettingsService: IUserSettingsService,
 		private $sharedUserSettingsService: IUserSettingsService,
-		private $userDataStore: IUserDataStore) { }
+		private $userDataStore: IUserDataStore,
+		private $loginManager: ILoginManager) { }
 
 	public checkConsent(featureName: string): IFuture<void> {
 		return ((): void => {
@@ -121,20 +122,6 @@ export class AnalyticsService implements IAnalyticsService {
 		return userAgentString;
 	}
 
-	private enableAnalytics(): IFuture<void> {
-		return this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": true});
-	}
-
-	private disableAnalytics(): IFuture<void> {
-		return(() => {
-			this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": false}).wait();
-
-			if(this._eqatecMonitor) {
-				this._eqatecMonitor.stop();
-			}
-		}).future<void>()();
-	}
-
 	public analyticsCommand(arg: string): IFuture<any> {
 		return(() => {
 			switch(arg) {
@@ -155,6 +142,27 @@ export class AnalyticsService implements IAnalyticsService {
 					break;
 			}
 		}).future<any>()();
+	}
+
+	private enableAnalytics(): IFuture<void> {
+		return this.setAnalytics(true);
+	}
+
+	private disableAnalytics(): IFuture<void> {
+		return(() => {
+			this.setAnalytics(false).wait();
+
+			if(this._eqatecMonitor) {
+				this._eqatecMonitor.stop();
+			}
+		}).future<void>()();
+	}
+
+	private setAnalytics(enabled: boolean): IFuture<void> {
+		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
+			this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": enabled}).wait();
+		}).future<void>()();
 	}
 
 	private getStatus(): IFuture<boolean> {
