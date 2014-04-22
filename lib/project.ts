@@ -277,8 +277,8 @@ export class Project implements Project.IProject {
 			var projectSchema = helpers.getProjectFileSchema();
 			Object.keys(properties).forEach(prop => {
 				if (projectSchema.hasOwnProperty(prop)) {
-					if(projectSchema[prop].flags) {
-						this.projectData[prop] = properties[prop].split(";");
+					if (projectSchema[prop].flags) {
+						this.projectData[prop] = properties[prop] !== "" ? properties[prop].split(";") : [];
 						updateData = this.projectData[prop];
 					} else {
 						this.projectData[prop] = properties[prop];
@@ -419,7 +419,7 @@ export class Project implements Project.IProject {
 				return validValues[value];
 			});
 
-			validate(badValues.length > 0, "Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+			validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
 
 			newValue = _.map(newValue, function(value) { return validValues[value]; });
 		}
