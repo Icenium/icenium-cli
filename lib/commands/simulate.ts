@@ -27,7 +27,7 @@ export class SimulateCommand implements ICommand {
 		private $project: Project.IProject,
 		private $loginManager: ILoginManager,
 		private $platformServices: ISimulatorPlatformServices,
-		private $childProcess: IChildProcess) {
+		private $platformMigrator: Project.IPlatformMigrator) {
 		this.projectData = $project.projectData;
 	}
 
@@ -43,6 +43,7 @@ export class SimulateCommand implements ICommand {
 
 			this.prepareSimulator().wait();
 			this.prepareCordovaPlugins().wait();
+			this.$platformMigrator.ensureAllPlatformAssets().wait();
 
 			this.runSimulator();
 		}).future<void>()();

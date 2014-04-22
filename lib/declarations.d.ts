@@ -147,6 +147,10 @@ declare module Project {
 		createNewProject(projectName: string): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
 	}
+
+	interface IPlatformMigrator {
+		ensureAllPlatformAssets(): IFuture<void>;
+	}
 }
 
 // duplicated from fs.Stats, because I cannot import it here
