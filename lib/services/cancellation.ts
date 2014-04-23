@@ -51,8 +51,6 @@ export class CancellationService implements ICancellationService {
 
 			if (watcher) {
 				this.watches[name] = watcher;
-			} else {
-				this.$logger.warn("Couldn't start watch on '%s'.", triggerFile);
 			}
 		}).future<void>()();
 	}
