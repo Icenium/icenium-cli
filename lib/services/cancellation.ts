@@ -4,35 +4,55 @@
 import watchr = require("watchr");
 import path = require("path");
 var options: any = require("../options");
+import Future = require("fibers/future");
 
 export class CancellationService implements ICancellationService {
 	private watches = {};
 
 	constructor(private $fs: IFileSystem,
+		private $logger: ILogger,
 		private $errors: IErrors) {
 		this.$fs.createDirectory(CancellationService.killSwitchDir).wait();
 	}
 
-	public begin(name: string): void {
-		var triggerFile = CancellationService.makeKillSwitchFileName(name);
+	public begin(name: string): IFuture<void> {
+		return (() => {
+			var triggerFile = CancellationService.makeKillSwitchFileName(name);
 
-		this.$fs.createWriteStream(triggerFile).end();
+			var stream = this.$fs.createWriteStream(triggerFile);
+			var streamEnd = this.$fs.futureFromEvent(stream, "finish");
+			stream.end();
+			streamEnd.wait();
 
-		var watcher = watchr.watch({
-			path: triggerFile,
-			listeners: {
-				error: (error) => {
-					this.$errors.fail(error);
+			this.$logger.trace("Starting watch on killswitch %s", triggerFile);
+			var watcherInitialized = new Future;
+			watchr.watch({
+				path: triggerFile,
+				listeners: {
+					error: (error) => {
+						this.$errors.fail(error);
+					},
+					change: (changeType, filePath) => {
+						if (changeType === "delete") {
+							process.exit();
+						}
+					}
 				},
-				change: (changeType, filePath) => {
-					if (changeType === "delete") {
-						process.exit();
+				next: (err, watcherInstance) => {
+					if (err) {
+						watcherInitialized.throw(err);
+					} else {
+						watcherInitialized.return(watcherInstance);
 					}
 				}
-			}
-		});
+			});
 
-		this.watches[name] = watcher;
+			var watcher = watcherInitialized.wait();
+
+			if (watcher) {
+				this.watches[name] = watcher;
+			}
+		}).future<void>()();
 	}
 
 	public end(name: string): void {
