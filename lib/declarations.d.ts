@@ -364,3 +364,8 @@ interface IUserSettingsService {
 interface ICommandOptions {
 	disableAnalytics?: boolean;
 }
+
+interface ICancellationService extends IDisposable {
+	begin(name: string): void;
+	end(name: string): void;
+}

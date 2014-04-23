@@ -15,9 +15,9 @@ var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 var options = require("./options");
 
 class CommandDispatcher {
-	constructor(private $fs: IFileSystem,
+	constructor(
 		private $logger: ILogger,
-		private $injector: IInjector,
+		private $cancellation: ICancellationService,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
@@ -34,6 +34,8 @@ class CommandDispatcher {
 			commandArguments.unshift(commandName);
 			commandName = "help";
 		}
+
+		this.$cancellation.begin("cli");
 
 		if (!this.$commandsService.executeCommand(commandName, commandArguments)) {
 			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);

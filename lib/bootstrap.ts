@@ -8,6 +8,7 @@ $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
 $injector.require("errors", "./errors");
 $injector.require("fs", "./file-system");
+$injector.require("cancellation", "./services/cancellation");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
