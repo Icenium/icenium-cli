@@ -79,7 +79,7 @@ export class LiveSyncCommand implements ICommand {
 	}
 
 	private static parsePlatformSpecificFileName(fileName: string): IPlatformSpecificFileName {
-		var platforms = Object.keys(MobileHelper.platformCapabilities).join("|");
+		var platforms = MobileHelper.PlatformNames.join("|");
 		var regex = util.format("^(.+?)\.(%s)(\..+?)$", platforms);
 		var parsed = fileName.match(new RegExp(regex, "i"));
 		if (parsed) {
@@ -88,9 +88,8 @@ export class LiveSyncCommand implements ICommand {
 				onDeviceName: parsed[1] + parsed[3]
 			};
 			return result;
-		} else {
-			return undefined;
 		}
+		return undefined;
 	}
 
 	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
