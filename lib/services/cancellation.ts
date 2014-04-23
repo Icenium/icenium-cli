@@ -4,6 +4,7 @@
 import watchr = require("watchr");
 import path = require("path");
 var options: any = require("../options");
+import Future = require("fibers/future");
 
 export class CancellationService implements ICancellationService {
 	private watches = {};
@@ -24,7 +25,8 @@ export class CancellationService implements ICancellationService {
 			streamEnd.wait();
 
 			this.$logger.trace("Starting watch on killswitch %s", triggerFile);
-			var watcher = watchr.watch({
+			var watcherInitialized = new Future;
+			watchr.watch({
 				path: triggerFile,
 				listeners: {
 					error: (error) => {
@@ -35,8 +37,17 @@ export class CancellationService implements ICancellationService {
 							process.exit();
 						}
 					}
+				},
+				next: (err, watcherInstance) => {
+					if (err) {
+						watcherInitialized.throw(err);
+					} else {
+						watcherInitialized.return(watcherInstance);
+					}
 				}
 			});
+
+			var watcher = watcherInitialized.wait();
 
 			if (watcher) {
 				this.watches[name] = watcher;
