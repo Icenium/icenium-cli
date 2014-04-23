@@ -238,13 +238,15 @@ export class LoginManager implements ILoginManager {
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
 
+			var timeoutID: number = undefined;
+
 			if (!helpers.isInteractive()) {
 				var timeout = options.hasOwnProperty("timeout")
 					? +options.timeout
 					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
 
 				if (timeout > 0) {
-					setTimeout(() => {
+					timeoutID = setTimeout(() => {
 						if (!authComplete.isResolved()) {
 							this.$logger.debug("Aborting login procedure due to inactivity.");
 							process.exit();
@@ -254,6 +256,9 @@ export class LoginManager implements ILoginManager {
 			}
 
 			var code = authComplete.wait();
+			if(timeoutID !== undefined) {
+				clearTimeout(timeoutID);
+			}
 			return this.authenticate({ wrap_verification_code: code }).wait();
 		}).future()();
 	}
