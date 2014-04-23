@@ -9,30 +9,41 @@ export class CancellationService implements ICancellationService {
 	private watches = {};
 
 	constructor(private $fs: IFileSystem,
+		private $logger: ILogger,
 		private $errors: IErrors) {
 		this.$fs.createDirectory(CancellationService.killSwitchDir).wait();
 	}
 
-	public begin(name: string): void {
-		var triggerFile = CancellationService.makeKillSwitchFileName(name);
+	public begin(name: string): IFuture<void> {
+		return (() => {
+			var triggerFile = CancellationService.makeKillSwitchFileName(name);
 
-		this.$fs.createWriteStream(triggerFile).end();
+			var stream = this.$fs.createWriteStream(triggerFile);
+			var streamEnd = this.$fs.futureFromEvent(stream, "finish");
+			stream.end();
+			streamEnd.wait();
 
-		var watcher = watchr.watch({
-			path: triggerFile,
-			listeners: {
-				error: (error) => {
-					this.$errors.fail(error);
-				},
-				change: (changeType, filePath) => {
-					if (changeType === "delete") {
-						process.exit();
+			this.$logger.trace("Starting watch on killswitch %s", triggerFile);
+			var watcher = watchr.watch({
+				path: triggerFile,
+				listeners: {
+					error: (error) => {
+						this.$errors.fail(error);
+					},
+					change: (changeType, filePath) => {
+						if (changeType === "delete") {
+							process.exit();
+						}
 					}
 				}
-			}
-		});
+			});
 
-		this.watches[name] = watcher;
+			if (watcher) {
+				this.watches[name] = watcher;
+			} else {
+				this.$logger.warn("Couldn't start watch on '%s'.", triggerFile);
+			}
+		}).future<void>()();
 	}
 
 	public end(name: string): void {

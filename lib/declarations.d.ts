@@ -380,6 +380,6 @@ interface ICommandOptions {
 }
 
 interface ICancellationService extends IDisposable {
-	begin(name: string): void;
+	begin(name: string): IFuture<void>;
 	end(name: string): void;
 }

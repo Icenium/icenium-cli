@@ -37,7 +37,7 @@ class CommandDispatcher {
 			commandName = "help";
 		}
 
-		this.$cancellation.begin("cli");
+		this.$cancellation.begin("cli").wait();
 
 		this.$commandsService.tryExecuteCommand(commandName, commandArguments);
 	}
