@@ -34,6 +34,7 @@
 			"com.phonegap.plugins.sqlite",
 			"com.telerik.Cordova-MobileTestingExtension",
 			"com.telerik.plugin.eqatecanalytics",
+			"com.telerik.feedback",
 			"org.apache.cordova.AudioHandler",
 			"org.apache.cordova.battery-status",
 			"org.apache.cordova.camera",
