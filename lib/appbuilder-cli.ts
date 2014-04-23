@@ -35,7 +35,7 @@ class CommandDispatcher {
 			commandName = "help";
 		}
 
-		this.$cancellation.begin("cli");
+		this.$cancellation.begin("cli").wait();
 
 		if (!this.$commandsService.executeCommand(commandName, commandArguments)) {
 			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
