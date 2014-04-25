@@ -126,6 +126,7 @@ declare module Project {
 		configuration?: string;
 		showQrCodes?: boolean;
 		downloadFiles?: boolean;
+		downloadedFilePath?: string;
 
 		provisionTypes?: string[];
 		device?: Mobile.IDevice;
