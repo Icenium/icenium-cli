@@ -310,7 +310,9 @@ export class BuildService implements Project.IBuildService {
 
 			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					var targetFileName = path.join(this.$project.getProjectDir(), path.basename(pkg.solutionPath));
+					var targetFileName = settings.downloadedFilePath
+						|| path.join(this.$project.getProjectDir(), path.basename(pkg.solutionPath));
+
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
 					var targetFile = this.$fs.createWriteStream(targetFileName);
 					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
@@ -334,6 +336,7 @@ export class BuildService implements Project.IBuildService {
 			var result = this.build({platform: platform,
 				configuration: this.getBuildConfiguration(),
 				downloadFiles: true,
+				downloadedFilePath: options["save-to"],
 				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
 				device: device
 			}).wait();
@@ -347,8 +350,12 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.ensureProject();
 
+			if (options["save-to"]) {
+				options.download = true;
+			}
+
 			if (options.download && options.companion) {
-				this.$errors.fail("Cannot specify both --download and --companion options.");
+				this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
 			}
 
 			this.$loginManager.ensureLoggedIn().wait();
@@ -371,6 +378,7 @@ export class BuildService implements Project.IBuildService {
 					configuration: this.getBuildConfiguration(),
 					showQrCodes: !options.download,
 					downloadFiles: options.download,
+					downloadedFilePath: options["save-to"],
 					provisionTypes: provisionTypes
 				}).wait();
 			}
