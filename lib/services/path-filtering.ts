@@ -38,7 +38,7 @@ export class PathFilteringService implements IPathFilteringService {
 					rule = rule.substr(1);
 					var ruleMatched = minimatch(file, rule, {nocase: true});
 					if (ruleMatched) {
-						fileMatched = ruleMatched;
+						fileMatched = true;
 					}
 				} else {
 					var options = {nocase: true, nonegate: false};
