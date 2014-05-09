@@ -43,7 +43,7 @@ export class CommandsService implements ICommandsService {
 
 	public tryToExecuteCommand(commandName: string, commandArguments: string[]): void {
 		if(!this.executeCommand(commandName, commandArguments)) {
-			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
+			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", helpers.stringReplaceAll(commandName, "|", " "));
 			this.tryMatchCommand(commandName);
 		}
 	}
