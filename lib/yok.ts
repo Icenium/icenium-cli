@@ -174,7 +174,7 @@ export class Yok implements IInjector {
 							commandName = util.format("%s|%s", name, commandName);
 						}
 
-						commandsService.tryToExecuteCommand(commandName, commandName === "help" ? [name] : _.rest(args));
+						commandsService.tryExecuteCommand(commandName, commandName === "help" ? [name] : _.rest(args));
 					}).future<void>()();
 				}
 			};

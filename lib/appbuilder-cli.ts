@@ -36,7 +36,7 @@ class CommandDispatcher {
 			commandName = "help";
 		}
 
-		this.$commandsService.tryToExecuteCommand(commandName, commandArguments);
+		this.$commandsService.tryExecuteCommand(commandName, commandArguments);
 	}
 
 	public completeCommand(): void {
