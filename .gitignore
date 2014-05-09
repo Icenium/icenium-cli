@@ -16,6 +16,7 @@ lib-cov
 *.tmp
 *.sublime-workspace
 tscommand.tmp.txt
+.tscache/
 
 pids
 logs

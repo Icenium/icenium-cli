@@ -145,11 +145,11 @@ export class FileSystem implements IFileSystem {
 	}
 
 	public readFile(filename: string): IFuture<NodeBuffer> {
-		return <IFuture<NodeBuffer>> this._readFile(filename);
+		return this._readFile(filename);
 	}
 
 	public readText(filename: string, encoding?: string): IFuture<string> {
-		return <IFuture<string>> this._readFile(filename, {encoding: encoding || "utf8"});
+		return <IFuture<string>> <any> this._readFile(filename, {encoding: encoding || "utf8"});
 	}
 
 	public readJson(filename: string, encoding?: string): IFuture<any> {

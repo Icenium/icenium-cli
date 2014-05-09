@@ -137,8 +137,9 @@ class IOSDeviceDiscoveryStub extends DeviceDiscovery {
 		super();
 	}
 
-	public startLookingForDevices(): void {
+	public startLookingForDevices(): IFuture<void> {
 		this.$logger.warn(this.error);
+		return Future.fromResult();
 	}
 }
 

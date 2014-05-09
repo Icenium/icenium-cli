@@ -170,7 +170,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	public isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean {
 		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
 
-		return _.some(provision.Certificates, (c) => formattedCertificate.indexOf(c) >= 0);
+		return _.some(provision.Certificates, (c: string) => formattedCertificate.indexOf(c) >= 0);
 	}
 }
 $injector.register("identityManager", IdentityManager);
@@ -546,7 +546,7 @@ class CreateCertificateSigningRequest implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var model = {
+			var model: IIdentityInformation = {
 				Name: args[0],
 				Email: args[1],
 				Country: args[2]

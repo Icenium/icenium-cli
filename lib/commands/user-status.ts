@@ -26,7 +26,7 @@ export class UserStatusCommand implements ICommand {
 			}
 
 			var fieldNames = Object.keys(fields);
-			var maxPrefixLength = _.max(fieldNames, (name) => name.length).length;
+			var maxPrefixLength = _.max(fieldNames, (name: string) => name.length).length;
 			fieldNames.forEach((field) => {
 				var padding = _.range(maxPrefixLength - field.length).map((x) => " ").join("");
 				this.$logger.out("%s%s: %s", padding, field, fields[field]);
