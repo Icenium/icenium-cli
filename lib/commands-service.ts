@@ -42,7 +42,7 @@ export class CommandsService implements ICommandsService {
 			() => this.executeCommandUnchecked("help", [commandName]));
 	}
 
-	public tryToExecuteCommand(commandName: string, commandArguments: string[]): void {
+	public tryExecuteCommand(commandName: string, commandArguments: string[]): void {
 		if(!this.executeCommand(commandName, commandArguments)) {
 			commandName = this.beautifyCommandName(commandName);
 			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
