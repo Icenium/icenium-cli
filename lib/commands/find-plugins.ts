@@ -37,4 +37,4 @@ export class FindPluginsCommand implements ICommand {
 		return undefined;
 	}
 }
-$injector.registerCommand("plugin|*find", FindPluginsCommand);
+$injector.registerCommand("plugin|find", FindPluginsCommand);

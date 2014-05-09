@@ -20,13 +20,13 @@ Project development commands:
     simulate                        Runs the current project in the device simulator on Windows systems.
     debug                           Runs an application allowing you to remotely debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
-    plugin                          Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
+    prop print                      Shows the value of the selected project property.
     prop add                        Enables more options for the selected project property, if the property accepts multiple values.
     prop set                        Sets a project property.
     prop remove                     Disables options for the selected project property, if the property accepts multiple values.
-    prop print                      Shows the value of the selected project property.
     list-projects                   Lists all projects associated with your Telerik Platform account.
     export-project                  Exports a selected project from the cloud and initializes it for development.
 
@@ -43,7 +43,7 @@ Certificate management and publishing commands:
     provision                       Lists all configured provisioning profiles for code signing iOS applications.
     provision import                Imports a provisioning profile from file.
     provision remove                Removes a registered provisioning profile.
-    appstore                        Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    appstore list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
     appstore upload                 Builds the project and uploads the binary to iTunes Connect.
 
 Global Options:
@@ -138,7 +138,7 @@ If a connected Android device is not shown in the list, make sure that you have 
 and that USB debugging is enabled on the device.
 
 Commands:
-	log-stream - Opens the log stream for the selected device.
+    log-stream - Opens the log stream for the selected device.
 
 --[/]--
 
@@ -269,12 +269,21 @@ Run list-devices to list all connected devices, grouped by platform.
 
 --[plugin]--
 Usage:
-    $ appbuilder plugin find [<keyword> [ <keyword>]*>] [command]
+    $ appbuilder plugin [command]
+
+Commands:
+    find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
+    fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
+            URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry.
+            The plugin must be Plugman-compatible.
+--[/]--
+
+--[plugin|find]--
+Usage:
+    $ appbuilder plugin find [<keyword> [ <keyword>]*>]
 
 Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 
-Commands:
-    fetch - Imports an Apache Cordova plugin into your project.
 --[/]--
 
 --[plugin|fetch]--
@@ -368,15 +377,15 @@ Commands:
 
 --[certificate]--
 Usage:
-	$ appbuilder certificate [command]
+    $ appbuilder certificate [command]
 
 Lists all configured certificates for code signing iOS and Android applications with index and name. When building an app, you can
 set the certificate by index or name in the --certificate option.
 
 Commands:
-	remove - Removes the selected certificate from the server.
-	export - Exports the selected certificate from the server on your file system.
-	import - Imports a certificate from your file system to the server.
+    remove - Removes the selected certificate from the server.
+    export - Exports the selected certificate from the server on your file system.
+    import - Imports a certificate from your file system to the server.
 --[/]--
 
 --[certificate|create-self-signed]--
@@ -433,6 +442,15 @@ running the command, Telerik AppBuilder will prompt you to provide it.
 --[/]--
 
 --[appstore]--
+Usage:
+    $ appbuilder appstore <command>
+
+Commands:
+    list - Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    upload - Builds the project and uploads the binary to iTunes Connect.
+--[/]--
+
+--[appstore|list]--
 Usage:
     $ appbuilder appstore list <AppleID> [<Password>]
 
@@ -509,6 +527,16 @@ Options:
             certificate_request.csr.
 --[/]--
 
+--[prop]--
+Usage:
+    $appbuilder prop <command>
+Commands:
+    print - Shows the value for the selected project property.
+    add - Enables more options for the selected project property, if the property accepts multiple values.
+    set - Sets a project property.
+    remove - Disables options for the selected project property, if the property accepts multiple values.
+--[/]--
+
 --[prop|add]--
 Usage:
     $ appbuilder prop add <PropertyName> <value> [value]*
@@ -538,16 +566,11 @@ Alias: prop-rm
 #{project.getProjectSchemaHelp}
 --[/]--
 
---[prop]--
+--[prop|print]--
 Usage:
-    $ appbuilder prop <PropertyName> [command]
+    $ appbuilder prop print <PropertyName>
 
 Shows the value for the selected project property.
-
-Commands:
-    add - Enables more options for the selected project property, if the property accepts multiple values.
-    set - Sets a project property.
-    remove - Disables options for the selected project property, if the property accepts multiple values.
 
 #{project.getProjectSchemaHelp}
 --[/]--

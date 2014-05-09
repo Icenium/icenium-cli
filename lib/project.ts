@@ -537,4 +537,4 @@ _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	helpers.registerCommand("project", "prop|" + propOperation,
 		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
 });
-helpers.registerCommand("project", "prop|*print", (project, args) => project.printProjectProperty(args[0]));
+helpers.registerCommand("project", "prop|print", (project, args) => project.printProjectProperty(args[0]));

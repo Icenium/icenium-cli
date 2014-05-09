@@ -22,7 +22,7 @@ $injector.require("qr", "./qr");
 
 $injector.requireCommand(["help", "/?"], "./commands/help");
 
-$injector.requireCommand("plugin|*find", "./commands/find-plugins");
+$injector.requireCommand("plugin|find", "./commands/find-plugins");
 $injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");
@@ -53,7 +53,7 @@ $injector.requireCommand("prop|add", "./project");
 $injector.requireCommand("prop|set", "./project");
 $injector.requireCommand("prop|rm", "./project");
 $injector.requireCommand("prop|remove", "./project");
-$injector.requireCommand("prop|*print", "./project");
+$injector.requireCommand("prop|print", "./project");
 $injector.require("projectNameValidator", "./validators/project-name-validator");
 
 $injector.requireCommand("list-projects", "./remote-projects");
@@ -106,7 +106,7 @@ $injector.requireCommand("certificate-request|download", "./commands/cryptograph
 
 $injector.requireCommand("user", "./commands/user-status");
 
-$injector.requireCommand("appstore|*list", "./commands/itunes-connect");
+$injector.requireCommand("appstore|list", "./commands/itunes-connect");
 $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 
 $injector.requireCommand("dev-post-install", "./commands/post-install");

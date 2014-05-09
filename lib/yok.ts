@@ -114,8 +114,8 @@ export class Yok implements IInjector {
 				this.hierarchicalCommands[parentCommandName].push(commands[1]);
 			}
 
-			if(this.isDefaultCommand(commandName)) {
-				this.require(this.createCommandName(commandName.split("|")[0]), file);
+			if(commands.length > 1 && !this.modules[this.createCommandName(commands[0])]) {
+				this.require(this.createCommandName(commands[0]), file);
 			} else {
 				this.require(this.createCommandName(commandName), file);
 			}
@@ -149,6 +149,12 @@ export class Yok implements IInjector {
 		});
 	}
 
+	private getDefaultCommand(name: string) {
+		var subCommands = this.hierarchicalCommands[name];
+		var defaultCommand = _.find(subCommands, (command) => command.startsWith("*"));
+		return defaultCommand;
+	}
+
 	private createHierarchicalCommand(name: string) {
 		var factory = () => {
 			return {
@@ -160,8 +166,7 @@ export class Yok implements IInjector {
 						if(args.length > 0) {
 							commandName = args[0];
 						} else {
-							var subCommands = this.hierarchicalCommands[name];
-							var defaultCommand = _.find(subCommands, (command) => command.startsWith("*"));
+							var defaultCommand = this.getDefaultCommand(name);
 							commandName = defaultCommand || "help";
 						}
 
@@ -204,7 +209,7 @@ export class Yok implements IInjector {
 		if (!this.modules[commandModuleName]) {
 			return null;
 		}
-		command = this.resolve(commandModuleName);
+ 		command = this.resolve(commandModuleName);
 
 		return command;
 	}
