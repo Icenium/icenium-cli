@@ -40,7 +40,7 @@ class CommandDispatcher {
 
 		this.$cancellation.begin("cli").wait();
 
-		this.$commandsService.tryToExecuteCommand(commandName, commandArguments);
+		this.$commandsService.tryExecuteCommand(commandName, commandArguments);
 	}
 
 	public completeCommand(): void {
