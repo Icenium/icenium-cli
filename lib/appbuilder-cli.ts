@@ -11,15 +11,14 @@ import queue = require("./queue");
 require("./extensions");
 require("./bootstrap");
 import errors = require("./errors");
+
 var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 var options = require("./options");
 
 errors.installUncaughtExceptionListener();
 
 class CommandDispatcher {
-	constructor(private $fs: IFileSystem,
-		private $logger: ILogger,
-		private $injector: IInjector,
+	constructor(private $logger: ILogger,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
@@ -37,40 +36,11 @@ class CommandDispatcher {
 			commandName = "help";
 		}
 
-		if (!this.$commandsService.executeCommand(commandName, commandArguments)) {
-			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", commandName);
-			this.tryToMatchCommand(commandName);
-		}
+		this.$commandsService.tryExecuteCommand(commandName, commandArguments);
 	}
 
 	public completeCommand(): void {
 		this.$commandsService.completeCommand();
-	}
-
-	private tryToMatchCommand(commandName): void {
-		var allCommands = this.$commandsService.allCommands(false);
-		var similarCommands = [];
-		_.each(allCommands, (command) => {
-			var distance = jaroWinklerDistance(commandName, command);
-			if (commandName.length > 3 && command.indexOf(commandName) != -1) {
-				similarCommands.push({ rating: 1, name: command });
-			} else if (distance >= 0.65) {
-				similarCommands.push({ rating: distance, name: command });
-			}
-
-		});
-
-		similarCommands = _.sortBy(similarCommands, (command) => {
-				return -command.rating;
-			}).slice(0, 5);
-
-		if (similarCommands.length > 0) {
-			var message = ["Did you mean?"];
-			_.each(similarCommands, (command) => {
-				message.push("\t" + command.name)
-				});
-			this.$logger.fatal(message.join("\n"));
-		}
 	}
 
 	private getCommandName(): string {
