@@ -52,11 +52,15 @@ declare module Server {
 	}
 
 	interface IPackageDef {
-		platform: string;
-		solution: string;
-		solutionPath: string;
-		relativePath: string;
+		platform?: string;
+		solution?: string;
+		solutionPath?: string;
+		relativePath?: string;
 		localFile?: string;
+
+		qrUrl?: string;
+		packageUrl?: string;
+		instruction?: string;
 	}
 
 	interface IBuildResult {

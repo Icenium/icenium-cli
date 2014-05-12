@@ -199,6 +199,8 @@ export class BuildService implements Project.IBuildService {
 				buildResult.provisionType = provisionData.ProvisionType;
 				return buildResult;
 			} else if (settings.platform === "WP8") {
+				var buildCompanyHubApp = !settings.downloadFiles;
+
 				buildProperties.WP8ProductID = projectData.WP8ProductID || MobileHelper.generateWP8GUID();
 				buildProperties.WP8PublisherID = projectData.WP8PublisherID;
 				buildProperties.WP8Publisher = projectData.WP8Publisher;
@@ -206,6 +208,13 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.WP8Capabilities = projectData.WP8Capabilities;
 				buildProperties.WP8Requirements = projectData.WP8Requirements;
 				buildProperties.WP8SupportedResolutions = projectData.WP8SupportedResolutions;
+
+				if (buildCompanyHubApp) {
+					this.$logger.info("The app file will be signed as a Telerik Company Hub app. " +
+						"Use the --download option to avoid the need to sign the application.");
+					buildProperties.WP8CompanyHubApp = true;
+				}
+
 				return this.beginBuild(buildProperties).wait();
 			} else {
 				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
@@ -244,7 +253,7 @@ export class BuildService implements Project.IBuildService {
 		}).future<Project.IBuildResult>()();
 	}
 
-	private showPackageQRCodes(packageDefs): IFuture<void> {
+	private showQRCodes(packageDefs): IFuture<void> {
 		return (() => {
 			if (!packageDefs.length) {
 				return;
@@ -258,6 +267,12 @@ export class BuildService implements Project.IBuildService {
 				var targetFile = zipped[1];
 				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
 				this.$fs.copyFile(srcFile, targetFile).wait();
+			});
+
+			packageDefs.forEach((pkgDef) => {
+				if (!pkgDef.instruction) {
+					pkgDef.instruction = util.format("Scan the QR code below to install %s to %s", pkgDef.solution, pkgDef.platform);
+				}
 			});
 
 			var scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
@@ -305,7 +320,17 @@ export class BuildService implements Project.IBuildService {
 					this.$logger.debug("Download URL is '%s'", def.packageUrl);
 				});
 
-				this.showPackageQRCodes(packageDefs).wait();
+				if (settings.platform === "WP8") {
+					var aetUrl = util.format("%s://%s/api/identityStore/aet", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+					var aetDef = {
+						instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)"),
+						packageUrl: aetUrl,
+						qrUrl: this.$qr.generateDataUri(aetUrl)
+					};
+					packageDefs.push(aetDef);
+				}
+
+				this.showQRCodes(packageDefs).wait();
 			}
 
 			if (settings.downloadFiles) {
@@ -403,7 +428,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
-			this.showPackageQRCodes([{
+			this.showQRCodes([{
 				platform: "AppBuilder companion app for " + platform,
 				qrUrl: this.$qr.generateDataUri(fullDownloadPath),
 				solution: this.$project.projectData.name
