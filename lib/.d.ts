@@ -1,4 +1,3 @@
-
 //grunt-start
 /// <reference path="appbuilder-cli.ts" />
 /// <reference path="bootstrap.ts" />

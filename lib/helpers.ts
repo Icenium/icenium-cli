@@ -170,7 +170,7 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 		list = _.rest(list, rows);
 	}
 
-	var extents = _.map(columnList, (sublist) => _.max(sublist, (element) => element.length).length);
+	var extents = _.map(columnList, (sublist) => _.max(sublist, (element: string) => element.length).length);
 
 	var formattedRows = [];
 	var width: number;

@@ -203,7 +203,7 @@ export class AndroidDevice implements Mobile.IDevice {
 				return { tag: match[1], message: match[3] };
 			}
 		}
-		else if (_.any(acceptedTags, (tag) => { return lineText.indexOf(tag) !== -1; })) {
+		else if (_.any(acceptedTags, (tag: string) => { return lineText.indexOf(tag) !== -1; })) {
 			return { message: match[3] };
 		}
 
