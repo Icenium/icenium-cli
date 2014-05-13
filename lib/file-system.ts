@@ -163,7 +163,10 @@ export class FileSystem implements IFileSystem {
 	}
 
 	public writeFile(filename: string, data: any, encoding?: string): IFuture<void> {
-		return this._writeFile(filename, data, {encoding: encoding});
+		return (() => {
+			this.createDirectory(path.dirname(filename)).wait();
+			this._writeFile(filename, data, { encoding: encoding }).wait();
+		}).future<void>()();
 	}
 
 	public writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void> {
@@ -200,7 +203,7 @@ export class FileSystem implements IFileSystem {
 
 	public chmod(path: string, mode: number): IFuture<any> {
 		return this._chmod(path, mode);
-    }
+	}
 
 	public getFsStats(path: string): IFuture<fs.Stats> {
 		return this._stat(path);

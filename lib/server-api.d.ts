@@ -25,6 +25,7 @@ declare module Server {
 		getJs(version: string, platform: string, $resultStream: any): IFuture<void>;
 		getLiveSyncToken(solutionName: string, projectName: string): IFuture<any>;
 		getLiveSyncUrl(longUrl: string): IFuture<any>;
+		getMigrationData(): IFuture<any>;
 		getPlugins(version: string): IFuture<any>;
 		getPluginsPackage($resultStream: any): IFuture<void>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any>;
@@ -108,8 +109,14 @@ declare module Server {
 		updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: any): IFuture<void>;
 	}
 
+	interface ITamServiceContract {
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void>;
+		verifyStoreCreated(): IFuture<void>;
+	}
+
 	interface ITapServiceContract {
 		getExistingClientSolutions(): IFuture<any>;
+		getFeatures(accountId: string, serviceType: string): IFuture<any>;
 		getRemote(solutionName: string): IFuture<any>;
 		getUsersForProject(solutionName: string): IFuture<any>;
 		getWorkspaces(accountId: string): IFuture<any>;
@@ -161,6 +168,7 @@ declare module Server {
 		projects: IProjectServiceContract;
 		rawSettings: IRawSettingsServiceContract;
 		settings: ISettingsServiceContract;
+		tam: ITamServiceContract;
 		tap: ITapServiceContract;
 		versioncontrol: IVersionControlServiceContract;
 	}
