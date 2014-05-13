@@ -24,37 +24,12 @@
 	},
 	"FrameworkVersion": {
 		"description": "Cordova framework version.",
-		"range": ["3.2.0"]
+		"dynamicRange": "#{cordovaMigrationService.getSupportedVersions}",
+		"onChanging": "#{project.onFrameworkVersionChanging}"
 	},
 	"CorePlugins": {
 		"description": "List of core Cordova plugins required by the app.",
-		"range": [
-			"com.phonegap.plugins.barcodescanner",
-			"com.phonegap.plugins.PushPlugin",
-			"com.phonegap.plugins.sqlite",
-			"com.telerik.Cordova-MobileTestingExtension",
-			"com.telerik.plugin.eqatecanalytics",
-			"org.apache.cordova.AudioHandler",
-			"org.apache.cordova.battery-status",
-			"org.apache.cordova.camera",
-			"org.apache.cordova.console",
-			"org.apache.cordova.contacts",
-			"org.apache.cordova.device",
-			"org.apache.cordova.device-motion",
-			"org.apache.cordova.device-orientation",
-			"org.apache.cordova.dialogs",
-			"org.apache.cordova.file",
-			"org.apache.cordova.file-transfer",
-			"org.apache.cordova.geolocation",
-			"org.apache.cordova.globalization",
-			"org.apache.cordova.inappbrowser",
-			"org.apache.cordova.keyboard",
-			"org.apache.cordova.media",
-			"org.apache.cordova.media-capture",
-			"org.apache.cordova.network-information",
-			"org.apache.cordova.splashscreen",
-			"org.apache.cordova.statusbar",
-			"org.apache.cordova.vibration"],
+		"dynamicRange": "#{project.getSupportedPlugins}",
 		"flags": true
 	},
 	"AndroidPermissions": {

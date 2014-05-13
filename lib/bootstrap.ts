@@ -16,6 +16,7 @@ $injector.require("commandsService", "./commands-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
+$injector.require("cordovaMigrationService", "./services/cordova-migration-service");
 $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");

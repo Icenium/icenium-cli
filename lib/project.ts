@@ -26,7 +26,8 @@ export class Project implements Project.IProject {
 		private $loginManager: ILoginManager,
 		private $resources: IResourceLoader,
 		private $templatesService: ITemplatesService,
-		private $pathFilteringService : IPathFilteringService) {
+		private $pathFilteringService: IPathFilteringService,
+		private $cordovaMigrationService: ICordovaMigrationService) {
 			this.readProjectData().wait();
 		}
 
@@ -139,6 +140,58 @@ export class Project implements Project.IProject {
 				throw ex;
 			}
 
+		}).future<void>()();
+	}
+
+	public getSupportedPlugins(): IFuture<string[]> {
+		return (() => {
+			var version;
+			if (this.projectData) {
+				version = this.projectData.FrameworkVersion;
+			} else {
+				version = _.last(this.$cordovaMigrationService.getSupportedVersions().wait());
+			}
+			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
+		}).future<string[]>()();
+	}
+
+	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
+		return ((): void => {
+			if (newVersion === this.projectData.FrameworkVersion) {
+				return;
+			}
+
+			this.$logger.info("Migrating to cordova version %s", newVersion);
+			var oldVersion = this.projectData.FrameworkVersion;
+			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
+			this.$logger.trace("Migrated core plugins to", newPluginsList);
+			this.projectData.CorePlugins = newPluginsList;
+
+			var successfullyChanged = [],
+				backupSuffix = ".backup";
+			try {
+				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
+					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
+					var cordovaJsFileName = path.join(this.getProjectDir(), util.format("cordova.%s.js", platform).toLowerCase());
+					var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
+					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
+					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
+					successfullyChanged.push(cordovaJsFileName);
+				});
+			} catch (error) {
+				_.each(successfullyChanged, file => {
+					this.$logger.trace("Reverting %s", file);
+					this.$fs.copyFile(file + backupSuffix, file).wait();
+				});
+				throw error;
+			}
+			finally {
+				_.each(successfullyChanged, file => {
+					this.$fs.deleteFile(file + backupSuffix).wait();
+				});
+			}
+
+			this.$logger.info("Successfully migrated to version %s", newVersion);
 		}).future<void>()();
 	}
 
@@ -286,7 +339,7 @@ export class Project implements Project.IProject {
 					}
 
 					//triggers validation logic
-					this.updateProjectProperty({}, "set", prop, updateData, false);
+					this.updateProjectProperty({}, "set", prop, updateData, false).wait();
 				}
 			});
 
@@ -361,110 +414,116 @@ export class Project implements Project.IProject {
 		return propLookup[property.toLowerCase()] || property;
 	}
 
-	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) {
-		property = this.normalizePropertyName(property);
-		var propSchema = helpers.getProjectFileSchema();
-		var propData = propSchema[property];
+	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) : IFuture<void> {
+		return ((): any => {
+			property = this.normalizePropertyName(property);
+			var propSchema = helpers.getProjectFileSchema();
+			var propData = propSchema[property];
 
-		var validate = (condition: boolean, ...args) => {
-			if(condition) {
-				if(propData.validationMessage) {
-					this.$errors.fail(propData.validationMessage);
+			var validate = (condition: boolean, ...args) => {
+				if(condition) {
+					if(propData.validationMessage) {
+						this.$errors.fail(propData.validationMessage);
+					} else {
+						this.$errors.fail.apply(null, _.rest(args, 0));
+					}
+				}
+			};
+
+			if (!propData) {
+				this.$errors.fail("Unrecognized project property '%s'", property);
+			}
+
+			if (!propData.flags) {
+				if (newValue.length !== 1) {
+					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
+				}
+				if (mode === "add" || mode === "del") {
+					this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
+				}
+			} else {
+				newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
+			}
+
+			var range = this.getPropRange(propData).wait();
+			if (range) {
+				newValue = _.map(newValue, function(value:string) { return value.toLowerCase(); });
+
+				var validValues;
+				if (_.isArray(range)) {
+					validValues = helpers.toHash(range,
+						function(value) { return value.toLowerCase(); },
+						_.identity);
 				} else {
-					this.$errors.fail.apply(null, _.rest(args, 0));
+					validValues = helpers.toHash(range,
+						function (value, key) {
+							var result;
+							if (useMapping && value.input) {
+								result = value.input;
+							} else {
+								result = key;
+							}
+
+							return result.toLowerCase();
+						},
+						function(value, key) { return key; });
+				}
+
+				var badValues = _.reject(newValue, function(value) {
+					return validValues[value];
+				});
+
+				validate(badValues.length > 0, "Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+
+				newValue = _.map(newValue, function(value) { return validValues[value]; });
+			}
+
+			if (!propData.flags) {
+				newValue = newValue[0];
+
+				if (propData.regex) {
+					var matchRegex = new RegExp(propData.regex);
+					validate(!matchRegex.test(newValue), "Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
+				}
+
+				if (propData.validator) {
+					var validator = this.$injector.resolve(propData.validator);
+					validator.validate(newValue);
 				}
 			}
-		};
 
-		if (!propData) {
-			this.$errors.fail("Unrecognized project property '%s'", property);
-		}
-
-		if (!propData.flags) {
-			if (newValue.length !== 1) {
-				this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
+			var propertyValue = projectData[property];
+			if (propData.flags && _.isString(propertyValue)) {
+				propertyValue = propertyValue.split(";");
 			}
-			if (mode === "add" || mode === "del") {
-				this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
-			}
-		} else {
-			newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
-		}
 
-		var range = propData.range;
-		if (range) {
-			newValue = _.map(newValue, function(value:string) { return value.toLowerCase(); });
-
-			var validValues;
-			if (_.isArray(range)) {
-				validValues = helpers.toHash(range,
-					function(value) { return value.toLowerCase(); },
-					_.identity);
+			if (mode === "set") {
+				propertyValue = newValue;
+			} else if (mode === "del") {
+				propertyValue = _.difference(propertyValue, newValue);
+			} else if (mode === "add") {
+				propertyValue = _.union(propertyValue, newValue);
 			} else {
-				validValues = helpers.toHash(range,
-					function (value, key) {
-						var result;
-						if (useMapping && value.input) {
-							result = value.input;
-						} else {
-							result = key;
-						}
-
-						return result.toLowerCase();
-					},
-					function(value, key) { return key; });
+				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			var badValues = _.reject(newValue, function(value) {
-				return validValues[value];
-			});
-
-			validate(badValues.length > 0, "Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
-
-			newValue = _.map(newValue, function(value) { return validValues[value]; });
-		}
-
-		if (!propData.flags) {
-			newValue = newValue[0];
-
-			if (propData.regex) {
-				var matchRegex = new RegExp(propData.regex);
-				validate(!matchRegex.test(newValue), "Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
+			if (propertyValue.sort) {
+				propertyValue.sort();
 			}
 
-			if (propData.validator) {
-				var validator = this.$injector.resolve(propData.validator);
-				validator.validate(newValue);
+			if (propData.onChanging) {
+				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
-		}
 
-		var propertyValue = projectData[property];
-		if (propData.flags && _.isString(propertyValue)) {
-			propertyValue = propertyValue.split(";");
-		}
-
-		if (mode === "set") {
-			propertyValue = newValue;
-		} else if (mode === "del") {
-			propertyValue = _.difference(propertyValue, newValue);
-		} else if (mode === "add") {
-			propertyValue = _.union(propertyValue, newValue);
-		} else {
-			this.$errors.fail("Unknown property update mode '%s'", mode);
-		}
-
-		if (propertyValue.sort) {
-			propertyValue.sort();
-		}
-
-		projectData[property] = propertyValue;
+				projectData[property] = propertyValue;
+		}).future<void>()();
 	}
 
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
 
-			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, true);
+			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
 		}).future<void>()();
@@ -487,34 +546,43 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public getProjectSchemaHelp(): string {
-		var schema = helpers.getProjectFileSchema();
-		var help = ["Project properties:"];
-		_.each(schema, (value:any, key) => {
-			help.push(util.format("  %s - %s", key, value.description));
-			if (value.range) {
-				help.push("    Valid values:");
-				_.each(value.range, (rangeDesc:any, rangeKey) => {
-					var desc = "      " + (_.isArray(value.range) ? rangeDesc : rangeDesc.input || rangeKey);
-					if (rangeDesc.description) {
-						desc += " - " + rangeDesc.description;
-					}
-					help.push(desc);
-				});
-			}
-			if (value.validationMessage) {
-				help.push("    " + value.validationMessage.replace("\n", "\n    "));
-			}
-			else if (value.regex) {
-				help.push("    Valid values match /" + value.regex.toString() + "/");
-			}
-		});
+	public getProjectSchemaHelp(): IFuture<string> {
+		return (() => {
+			var schema = helpers.getProjectFileSchema();
+			var help = ["Project properties:"];
+			_.each(schema, (value:any, key) => {
+				help.push(util.format("  %s - %s", key, value.description));
+				var range = this.getPropRange(value).wait();
+				if (range) {
+					help.push("    Valid values:");
+					_.each(range, (rangeDesc:any, rangeKey) => {
+						var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
+						if (rangeDesc.description) {
+							desc += " - " + rangeDesc.description;
+						}
+						help.push(desc);
+					});
+				}
+				if (value.validationMessage) {
+					help.push("    " + value.validationMessage.replace("\n", "\n    "));
+				}
+				else if (value.regex) {
+					help.push("    Valid values match /" + value.regex.toString() + "/");
+				}
+			});
 
-		return help.join("\n");
+			return help.join("\n");
+		}).future<string>()();
 	}
 
-	private printProjectSchemaHelp() {
-		this.$logger.out(this.getProjectSchemaHelp());
+	private getPropRange(propData): IFuture<string[]>{
+		return (() => {
+			if (propData.dynamicRange) {
+				return this.$injector.dynamicCall(propData.dynamicRange).wait();
+			}
+
+				return propData.range;
+		}).future<string[]>()();
 	}
 
 	public ensureProject() {

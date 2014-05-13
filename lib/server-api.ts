@@ -86,6 +86,10 @@ export class CordovaService implements Server.ICordovaServiceContract {
 		return this.$serviceProxy.call<any>('GetLiveSyncUrl', 'GET', '/cordova/liveSyncUrl' + '?' + querystring.stringify({ 'longUrl': longUrl }), 'application/json', null, null);
 	}
 
+	getMigrationData(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetMigrationData', 'GET', '/cordova/migration-data', 'application/json', null, null);
+	}
+
 	getPlugins(version: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetPlugins', 'GET', ['/cordova', encodeURI(version.replace(/\\/g, '/')), 'plugins'].join('/'), 'application/json', null, null);
 	}
@@ -358,12 +362,30 @@ export class SettingsService implements Server.ISettingsServiceContract {
 
 }
 
+export class TamService implements Server.ITamServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['/tam/applications', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+
+	verifyStoreCreated(): IFuture<void> {
+		return this.$serviceProxy.call<void>('VerifyStoreCreated', 'GET', '/tam/store', null, null, null);
+	}
+
+}
+
 export class TapService implements Server.ITapServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
 
 	getExistingClientSolutions(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetExistingClientSolutions', 'GET', '/tap/projects', 'application/json', null, null);
+	}
+
+	getFeatures(accountId: string, serviceType: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetFeatures', 'GET', ['/tap/features', encodeURI(accountId.replace(/\\/g, '/')), encodeURI(serviceType.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
 	getRemote(solutionName: string): IFuture<any> {
@@ -519,6 +541,7 @@ export class Server {
 	public projects = $injector.resolve(ProjectService);
 	public rawSettings = $injector.resolve(RawSettingsService);
 	public settings = $injector.resolve(SettingsService);
+	public tam = $injector.resolve(TamService);
 	public tap = $injector.resolve(TapService);
 	public versioncontrol = $injector.resolve(VersionControlService);
 }

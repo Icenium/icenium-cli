@@ -139,7 +139,7 @@ declare module Project {
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
-		printProjectProperty(property: string): void;
+		printProjectProperty(property: string): IFuture<void>;
 		createNewProject(projectName: string): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
 	}
@@ -359,4 +359,11 @@ interface IServerExtensionsService {
 }interface IPathFilteringService {
 	getRulesFromFile(file: string) : string[];
 	filterIgnoredFiles(files: string[], rules: string[]) :string[];
+}
+
+interface ICordovaMigrationService {
+	downloadCordovaMigrationData(): IFuture<void>;
+	getSupportedVersions(): IFuture<string[]>;
+	pluginsForVersion(version: string): IFuture<string[]>;
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 }
