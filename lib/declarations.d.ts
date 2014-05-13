@@ -361,6 +361,7 @@ interface IUserSettingsService {
 	loadUserSettingsFile(): IFuture<void>;
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
+	userSettingsFilePath: string;
 }
 
 interface IServerExtensionsService {
@@ -387,6 +388,15 @@ interface ICancellationService extends IDisposable {
 interface ICordovaMigrationService {
 	downloadCordovaMigrationData(): IFuture<void>;
 	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion(version: string): IFuture<string[]>;
-	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+	pluginsForVersion(version:string): IFuture<string[]>;
+	migratePlugins(plugins:string[], fromVersion:string, toVersion:string): IFuture<string[]>;
+}
+
+interface ICommandOptions {
+	disableAnalytics?: boolean;
+}
+
+interface ICancellationService extends IDisposable {
+	begin(name: string): IFuture<void>;
+	end(name: string): void;
 }

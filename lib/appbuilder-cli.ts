@@ -18,7 +18,8 @@ var options = require("./options");
 errors.installUncaughtExceptionListener();
 
 class CommandDispatcher {
-	constructor(private $logger: ILogger,
+	constructor(
+		private $logger: ILogger,
 		private $cancellation: ICancellationService,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
