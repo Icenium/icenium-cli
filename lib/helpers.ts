@@ -81,13 +81,14 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
+export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
 	var factory = function (): ICommand {
 		return {
 			execute: (args: string[]): IFuture<void> => {
 				var mod = $injector.resolve(module);
 				return executor(mod, args);
-			}
+			},
+			disableAnalytics: opts && opts.disableAnalytics
 		};
 	};
 
@@ -272,4 +273,14 @@ export function mergeRecursive(obj1: Object, obj2: Object): Object {
 	}
 
 	return obj1;
+}
+
+export function block(operation: () => void): void {
+	if (isInteractive()) {
+		process.stdin.setRawMode(false);
+	}
+	operation();
+	if (isInteractive()) {
+		process.stdin.setRawMode(true);
+	}
 }
