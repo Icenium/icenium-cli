@@ -7,6 +7,7 @@ import Future = require("fibers/future");
 export class PostInstallCommand implements ICommand {
 	constructor(private $templatesService: ITemplatesService,
 		private $resourceDownloader: IResourceDownloader,
+		private $cordovaMigrationService: ICordovaMigrationService,
 		private $logger: ILogger,
 		private $serviceProxy: Server.IServiceProxy) { }
 
@@ -22,6 +23,9 @@ export class PostInstallCommand implements ICommand {
 			this.$templatesService.downloadItemTemplates().wait();
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();
+			this.$logger.info("Downloading cordova migration data.");
+			this.$cordovaMigrationService.downloadCordovaMigrationData().wait();
+			//Cordova files have to be downloaded after cordova migration data so we know which cordova versions we support
 			this.$logger.info("Downloading cordova.js files.");
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
 

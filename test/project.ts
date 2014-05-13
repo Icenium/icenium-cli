@@ -41,6 +41,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
+	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
 
@@ -136,93 +137,93 @@ describe("project unit tests", function() {
 	describe("updateProjectProperty", function() {
 		it("sets unconstrained string property", function() {
 			var projectData = {DisplayName: "wrong"};
-			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]);
+			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", function() {
 			var projectData = {name: "wrong"};
-			project.updateProjectProperty(projectData, "set", "name", ["fine"]);
+			project.updateProjectProperty(projectData, "set", "name", ["fine"]).wait();
 			assert.equal("fine", projectData.name);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", function() {
 			var projectData = {name: "wrong"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "add", "name", ["fine"]);});
+			assert.throws(function() {project.updateProjectProperty(projectData, "add", "name", ["fine"]).wait();});
 		});
 
 		it("disallows 'del' on non-flag property", function() {
 			var projectData = {name: "wrong"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "del", "name", ["fine"]);});
+			assert.throws(function() {project.updateProjectProperty(projectData, "del", "name", ["fine"]).wait();});
 		});
 
 		it("sets bundle version when given proper input", function() {
 			var projectData = {"BundleVersion": "0"};
-			project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]);
+			project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", function() {
 			var projectData = {"BundleVersion": "0"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]);});
+			assert.throws(function() {project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait();});
 		});
 
 		it("sets enumerated property", function() {
 			var projectData = {iOSStatusBarStyle: "Default"};
-			project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]);
+			project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", function() {
 			var projectData = {iOSStatusBarStyle: "Default"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]);});
+			assert.throws(function() {project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait();});
 		});
 
 		it("appends to verbatim enumerated collection property", function() {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]);
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]);
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape", "Portrait"], projectData.DeviceOrientations);
 		});
 
 		it("appends to enumerated collection property with shorthand", function() {
 			var projectData = {iOSDeviceFamily: []};
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"]);
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"]).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"]);
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("appends multiple values to enumerated collection property", function() {
 			var projectData = {iOSDeviceFamily: []};
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"]);
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", function() {
 			var projectData = {DeviceOrientations: ["Landscape", "Portrait"]};
-			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]);
+			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
-			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]);
+			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("disallows unrecognized values for enumerated collection property", function() {
 			var projectData = {DeviceOrientations: []};
-			assert.throws(function() {project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]);});
+			assert.throws(function() {project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait();});
 		});
 
 		it("makes case-insensitive comparisons of property name", function() {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]);
+			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", function() {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]);
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 	});

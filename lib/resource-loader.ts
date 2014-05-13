@@ -34,12 +34,13 @@ $injector.register("resources", ResourceLoader);
 class ResourceDownloader implements IResourceDownloader {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
-		private $resources: IResourceLoader) {}
+		private $resources: IResourceLoader,
+		private $cordovaMigrationService: ICordovaMigrationService) { }
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
 			var projectSchema = helpers.getProjectFileSchema();
-			var cordovaVersions = projectSchema.FrameworkVersion.range;
+			var cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
 			var platforms = Object.keys(MobileHelper.platformCapabilities);
 			cordovaVersions.forEach((version) => {
 				platforms.forEach((platform) => {

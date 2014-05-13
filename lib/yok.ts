@@ -58,6 +58,7 @@ function annotate(fn) {
 
 var util = require("util");
 var assert = require("assert");
+var Future = require("fibers/future");
 
 var indent = "";
 function trace(formatStr: string, ...args: any[]) {
@@ -221,6 +222,22 @@ export class Yok implements IInjector {
 			assert.ok(!ctorArguments);
 			return this.resolveByName(<string> param);
 		}
+	}
+
+	public get dynamicCallRegex(): RegExp {
+		return /#{([^.]+)\.([^}]+)}/;
+	}
+
+	public dynamicCall(call: string, args?: any[]): IFuture<any> {
+		return (() => {
+			var parsed = call.match(this.dynamicCallRegex);
+			var module = this.resolve(parsed[1]);
+			var data = module[parsed[2]].apply(module, args);
+			if (data && data.wait) {
+				return data.wait();
+			}
+			return data;
+		}).future<any>()();
 	}
 
 	private resolveConstructor(ctor: Function, ctorArguments?:  {[key: string]: any}): any {

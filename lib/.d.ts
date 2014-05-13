@@ -85,6 +85,7 @@
 /// <reference path="services/analytics-service.ts" />
 /// <reference path="services/build.ts" />
 /// <reference path="services/cancellation.ts" />
+/// <reference path="services/cordova-migration-service.ts" />
 /// <reference path="services/cordova-plugins.ts" />
 /// <reference path="services/path-filtering.ts" />
 /// <reference path="services/server-extensions.ts" />

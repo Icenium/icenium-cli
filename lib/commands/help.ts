@@ -31,11 +31,9 @@ export class HelpCommand implements ICommand {
 				var helpText = match[1].trim();
 
 				var substitutionPoint;
-				while (substitutionPoint = helpText.match(/#{([^.]+)\.([^}]+)}/)) {
+				while (substitutionPoint = helpText.match(this.$injector.dynamicCallRegex)) {
 					this.$logger.trace(substitutionPoint);
-
-					var module = this.$injector.resolve(substitutionPoint[1]);
-					var data = module[substitutionPoint[2]].apply(module) || "";
+					var data = this.$injector.dynamicCall(substitutionPoint[0]).wait();
 
 					var pointStart = substitutionPoint.index;
 					var pointEnd = pointStart + substitutionPoint[0].length;

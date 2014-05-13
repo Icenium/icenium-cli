@@ -200,7 +200,7 @@ export class FileSystem implements IFileSystem {
 
 	public chmod(path: string, mode: number): IFuture<any> {
 		return this._chmod(path, mode);
-    }
+	}
 
 	public getFsStats(path: string): IFuture<fs.Stats> {
 		return this._stat(path);
