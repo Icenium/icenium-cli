@@ -20,9 +20,9 @@ export class SimulateCommand implements ICommand {
 		private $server: Server.IServer,
 		private $project: Project.IProject,
 		private $loginManager: ILoginManager,
+		private $platformMigrator: Project.IPlatformMigrator,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
-		private $serverExtensionsService: IServerExtensionsService,
-		private $platformMigrator: Project.IPlatformMigrator) {
+		private $serverExtensionsService: IServerExtensionsService) {
 		this.projectData = $project.projectData;
 	}
 

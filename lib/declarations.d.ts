@@ -361,25 +361,6 @@ interface IUserSettingsService {
 	loadUserSettingsFile(): IFuture<void>;
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
-	userSettingsFilePath: string;
-}
-
-interface IServerExtensionsService {
-	prepareExtension(packageName: string): IFuture<void>;
-	getExtensionVersion(packageName: string): string;
-	getExtensionPath(packageName: string): string;
-	cacheDir: string;
-}
-interface IPathFilteringService {
-	getRulesFromFile(file: string) : string[];
-	filterIgnoredFiles(files: string[], rules: string[]) :string[];
-}
-
-interface ICordovaMigrationService {
-	downloadCordovaMigrationData(): IFuture<void>;
-	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion(version:string): IFuture<string[]>;
-	migratePlugins(plugins:string[], fromVersion:string, toVersion:string): IFuture<string[]>;
 }
 
 interface ICommandOptions {
@@ -390,3 +371,22 @@ interface ICancellationService extends IDisposable {
 	begin(name: string): IFuture<void>;
 	end(name: string): void;
 }
+interface IServerExtensionsService {
+	prepareExtension(packageName: string): IFuture<void>;
+	getExtensionVersion(packageName: string): string;
+	getExtensionPath(packageName: string): string;
+	cacheDir: string;
+}
+
+interface IPathFilteringService {
+	getRulesFromFile(file: string) : string[];
+	filterIgnoredFiles(files: string[], rules: string[]) :string[];
+}
+
+interface ICordovaMigrationService {
+	downloadCordovaMigrationData(): IFuture<void>;
+	getSupportedVersions(): IFuture<string[]>;
+	pluginsForVersion(version: string): IFuture<string[]>;
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+}
+

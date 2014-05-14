@@ -473,7 +473,7 @@ export class Project implements Project.IProject {
 					return validValues[value];
 				});
 
-				validate(badValues.length > 0, "Invalid property value%s: %s", badValues.length > 1 ? "s" : "", badValues.join("; "));
+			validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
 
 				newValue = _.map(newValue, function(value) { return validValues[value]; });
 			}

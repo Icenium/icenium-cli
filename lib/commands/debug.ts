@@ -14,7 +14,8 @@ export class DebugCommand implements ICommand {
 		private $loginManager: ILoginManager,
 		private $debuggerPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
-		private $sharedUserSettingsService: IUserSettingsService) {
+		private $sharedUserSettingsService: IUserSettingsService,
+		private $sharedUserSettingsFileService: IUserSettingsFileService) {
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -35,7 +36,7 @@ export class DebugCommand implements ICommand {
 			this.$sharedUserSettingsService.loadUserSettingsFile().wait();
 
 			var debuggerParams = [
-				"--user-settings", this.$sharedUserSettingsService.userSettingsFilePath,
+				"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
 				];
 
 			this.$debuggerPlatformServices.runApplication(this.debuggerPath, debuggerParams);
@@ -51,6 +52,7 @@ class WinDebuggerPlatformServices implements IExtensionPlatformServices {
 	constructor(private $childProcess: IChildProcess,
 		private $errors: IErrors,
 		private $logger: ILogger,
+		private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $sharedUserSettingsService: IUserSettingsService,
 		private $dispatcher: IFutureDispatcher) {
 	}
@@ -72,7 +74,7 @@ class WinDebuggerPlatformServices implements IExtensionPlatformServices {
 
 	private startWatchingUserSettingsFile(): void {
 		watchr.watch({
-			paths: [this.$sharedUserSettingsService.userSettingsFilePath],
+			paths: [this.$sharedUserSettingsFileService.userSettingsFilePath],
 			listeners: {
 				error: (error) => {
 					this.$errors.fail(error);

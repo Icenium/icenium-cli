@@ -27,7 +27,6 @@ $injector.register("clientUserSettingsFileService", ClientUserSettingsFileServic
 
 export class ClientSpecificUserSettingsService implements IUserSettingsService {
 	private userSettingsData: any = null;
-	public userSettingsFilePath = path.join(options["profile-dir"], "local-user-settings.json");
 
 	constructor(private $fs: IFileSystem,
 		private $clientUserSettingsFileService: IUserSettingsFileService) { }
@@ -83,11 +82,10 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 }
 $injector.register("sharedUserSettingsFileService", SharedUserSettingsFileService);
 
-export class SharedUserSettingsService implements IUserSettingsService {
+export  class SharedUserSettingsService implements IUserSettingsService {
 	private userSettingsData: any = null;
 
 	private static SETTINGS_ROOT_TAG = "JustDevelopSettings";
-	public userSettingsFilePath = path.join(options["profile-dir"], "user-settings.xml");
 
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
@@ -175,14 +173,9 @@ export class SharedUserSettingsService implements IUserSettingsService {
 			this.$server.rawSettings.saveUserSettings(xml).wait();
 
 			if (Object.keys(data).length !== 0) {
-				this.$fs.writeFile(this.userSettingsFilePath, xml).wait();
+				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml).wait();
 			}
-
 		}).future<void>()();
-	}
-
-	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFilePath);
 	}
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);
