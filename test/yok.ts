@@ -14,8 +14,8 @@ class MyClass {
 	}
 }
 
-describe("yok", function() {
-	it("resolves pre-constructed singleton", function() {
+describe("yok", () => {
+	it("resolves pre-constructed singleton", () => {
 		var injector = new yok.Yok();
 		var obj = {};
 		injector.register("foo", obj);
@@ -25,10 +25,10 @@ describe("yok", function() {
 		assert.strictEqual(obj, resolved);
 	});
 
-	it("resolves given constructor", function() {
+	it("resolves given constructor", () => {
 		var injector = new yok.Yok();
 		var obj;
-		injector.register("foo", function() {
+		injector.register("foo", () => {
 			obj = {foo:"foo"};
 			return obj;
 		});
@@ -38,7 +38,7 @@ describe("yok", function() {
 		assert.strictEqual(resolved, obj);
 	});
 
-	it("resolves constructed singleton", function() {
+	it("resolves constructed singleton", () => {
 		var injector = new yok.Yok();
 		injector.register("foo", {foo:"foo"});
 
@@ -48,7 +48,7 @@ describe("yok", function() {
 		assert.strictEqual(r1, r2);
 	})
 
-	it("injects directly into passed constructor", function() {
+	it("injects directly into passed constructor", () => {
 		var injector = new yok.Yok();
 		var obj = {}
 		injector.register("foo", obj);
@@ -62,7 +62,7 @@ describe("yok", function() {
 		assert.strictEqual(obj, result.foo);
 	});
 
-	it("inject dependency into registered constructor", function() {
+	it("inject dependency into registered constructor", () => {
 		var injector = new yok.Yok();
 		var obj = {};
 		injector.register("foo", obj);
@@ -78,7 +78,7 @@ describe("yok", function() {
 		assert.strictEqual(obj, result.foo);
 	});
 
-	it("inject dependency with $ prefix", function() {
+	it("inject dependency with $ prefix", () => {
 		var injector = new yok.Yok();
 		var obj = {}
 		injector.register("foo", obj);
@@ -92,7 +92,7 @@ describe("yok", function() {
 		assert.strictEqual(obj, result.foo);
 	});
 
-	it("inject into TS constructor", function() {
+	it("inject into TS constructor", () => {
 		var injector = new yok.Yok();
 
 		injector.register("x", "foo");
@@ -104,7 +104,7 @@ describe("yok", function() {
 		result.checkX();
 	});
 
-	it("resolves a parameterless constructor", function() {
+	it("resolves a parameterless constructor", () => {
 		var injector = new yok.Yok();
 
 		function Test() {
@@ -116,13 +116,13 @@ describe("yok", function() {
 		assert.equal(result.foo, "foo");
 	});
 
-	it("returns null when it can't resolve a command", function() {
+	it("returns null when it can't resolve a command", () => {
 		var injector = new yok.Yok();
 		var command = injector.resolveCommand("command");
 		assert.isNull(command);
 	})
 
-	it("throws when it can't resolve a registered command", function() {
+	it("throws when it can't resolve a registered command", () => {
 		var injector = new yok.Yok();
 
 		function Command(whatever) {}
@@ -131,4 +131,20 @@ describe("yok", function() {
 
 		assert.throws(() => injector.resolveCommand("command"));
 	})
+
+	it("disposes", () => {
+		var injector = new yok.Yok();
+
+		function Thing() {}
+
+		Thing.prototype.dispose = function() {
+			this.disposed = true;
+		}
+
+		injector.register("thing", Thing);
+		var thing = injector.resolve("thing");
+		injector.dispose();
+
+		assert.isTrue(thing.disposed);
+	});
 })

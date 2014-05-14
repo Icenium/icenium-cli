@@ -282,7 +282,7 @@ export class Project implements Project.IProject {
 			var parser = new xml2js.Parser();
 			var contents = this.$fs.readText(projectFile).wait();
 
-			var parseString = Future.wrap(function (str, callback) {
+			var parseString = Future.wrap((str, callback) => {
 				return parser.parseString(str, callback);
 			});
 
@@ -408,9 +408,7 @@ export class Project implements Project.IProject {
 		}
 
 		var propSchema = helpers.getProjectFileSchema();
-		var propLookup = helpers.toHash(propSchema,
-			function(value, key) { return key.toLowerCase(); },
-			function(value, key) { return key; });
+		var propLookup = helpers.toHash(propSchema, (value, key) => key.toLowerCase(), (value, key) => key);
 		return propLookup[property.toLowerCase()] || property;
 	}
 
@@ -442,40 +440,36 @@ export class Project implements Project.IProject {
 					this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
 				}
 			} else {
-				newValue = _.flatten(_.map(newValue, function(value:string) { return value.split(";"); }));
+				newValue = _.flatten(_.map(newValue, (value: string)  => value.split(";")));
 			}
 
 			var range = this.getPropRange(propData).wait();
 			if (range) {
-				newValue = _.map(newValue, function(value:string) { return value.toLowerCase(); });
+				newValue = _.map(newValue, (value: string) => value.toLowerCase());
 
 				var validValues;
 				if (_.isArray(range)) {
-					validValues = helpers.toHash(range,
-						function(value) { return value.toLowerCase(); },
-						_.identity);
+					validValues = helpers.toHash(range, (value) => value.toLowerCase(), _.identity);
 				} else {
-					validValues = helpers.toHash(range,
-						function (value, key) {
-							var result;
-							if (useMapping && value.input) {
-								result = value.input;
-							} else {
-								result = key;
-							}
+					var keySelector = (value, key) => {
+						var result;
+						if (useMapping && value.input) {
+							result = value.input;
+						} else {
+							result = key;
+						}
 
-							return result.toLowerCase();
-						},
-						function(value, key) { return key; });
+						return result.toLowerCase();
+					};
+
+					validValues = helpers.toHash(range, keySelector, (value, key) => key);
 				}
 
-				var badValues = _.reject(newValue, function(value) {
-					return validValues[value];
-				});
+				var badValues = _.reject(newValue, (value) => validValues[value]);
 
 			validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
 
-				newValue = _.map(newValue, function(value) { return validValues[value]; });
+				newValue = _.map(newValue, (value) => validValues[value]);
 			}
 
 			if (!propData.flags) {

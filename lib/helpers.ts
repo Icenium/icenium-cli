@@ -59,7 +59,7 @@ export function toHash(collection, keySelector, valueSelector): any {
 				valueSelector(collection[i], i, collection);
 		}
 	} else {
-		Object.keys(collection).forEach(function(key) {
+		Object.keys(collection).forEach((key) => {
 			result[keySelector(collection[key], key, collection)] =
 				valueSelector(collection[key], key, collection);
 		});
@@ -81,8 +81,8 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>) {
-	var factory = function (): ICommand {
+export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
+	var factory = (): ICommand => {
 		return {
 			execute: (args: string[]): IFuture<void> => {
 				var mod = $injector.resolve(module);

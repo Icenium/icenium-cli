@@ -70,7 +70,7 @@ export class BuildService implements Project.IBuildService {
 				this.$logger.error("Build errors: %s", body.Errors);
 			}
 
-			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map(function(buildResult) {
+			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult) => {
 				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
 				var solutionPath = util.format("%s/%s", projectName, fullPath);
 

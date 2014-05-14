@@ -34,7 +34,7 @@ function setTempDir(): string {
 	return tempDir;
 }
 
-describe("edit-configuration", function () {
+describe("edit-configuration", () => {
 
 	it("throws error when no parameter is given", () => {
 		setTempDir();

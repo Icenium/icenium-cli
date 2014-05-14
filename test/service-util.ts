@@ -63,14 +63,14 @@ function makeProxy(): Server.IServiceProxy {
 	return testInjector.resolve(ServiceUtil.ServiceProxy);
 }
 
-describe("ServiceProxy", function () {
+describe("ServiceProxy", () => {
 
-	before(function () {
+	before(() => {
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});
-	it("calls api without arguments and expected return", function() {
+	it("calls api without arguments and expected return", () => {
 		var proxy = makeProxy();
 
 		httpClient.setResponse({});
@@ -85,7 +85,7 @@ describe("ServiceProxy", function () {
 		assert.equal(httpClient.options.headers.Cookie, ".ASPXAUTH=dummy");
 	});
 
-	it("calls api and returns JSON", function() {
+	it("calls api and returns JSON", () => {
 		var expected = {a: "b", c: 4};
 
 		var proxy = makeProxy();
@@ -97,7 +97,7 @@ describe("ServiceProxy", function () {
 		assert.deepEqual(result, expected);
 	});
 
-	it("calls api and pipes result to stream", function() {
+	it("calls api and pipes result to stream", () => {
 		var proxy = makeProxy();
 		httpClient.setResponse({}, null);
 
@@ -108,11 +108,11 @@ describe("ServiceProxy", function () {
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});
 
-	it("throws error returned by HTTP client", function() {
+	it("throws error returned by HTTP client", () => {
 		var proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
-		assert.throws(function() {
+		assert.throws(() => {
 			proxy.call("test4", "GET", "/package/zip", "application/json", null, null).wait();
 		}, "404");
 	});

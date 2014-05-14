@@ -48,7 +48,7 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-describe("project integration tests", function() {
+describe("project integration tests", () => {
 	var project, testInjector;
 	before(() => {
 		testInjector = createTestInjector();
@@ -56,8 +56,8 @@ describe("project integration tests", function() {
 		project = testInjector.resolve("project");
 	});
 
-	describe("createNewProject", function () {
-		it("creates a valid project folder", function () {
+	describe("createNewProject", () => {
+		it("creates a valid project folder", () => {
 			var options: any = require("./../lib/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
@@ -88,8 +88,8 @@ describe("project integration tests", function() {
 		});
 	});
 
-	describe("createTemplateFolder", function () {
-		it("creates project folder when folder with that name doesn't exists", function () {
+	describe("createTemplateFolder", () => {
+		it("creates project folder when folder with that name doesn't exists", () => {
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
 			var projectFolder = path.join(tempFolder, projectName);
@@ -98,7 +98,7 @@ describe("project integration tests", function() {
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
-		it("doesn't fail when folder with that name exists and it's empty", function () {
+		it("doesn't fail when folder with that name exists and it's empty", () => {
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
 			var projectFolder = path.join(tempFolder, projectName);
@@ -108,19 +108,19 @@ describe("project integration tests", function() {
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
-		it("fails when project folder is not empty", function () {
+		it("fails when project folder is not empty", () => {
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
 			var projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
 			fs.openSync(path.join(projectFolder, "temp"), "a", "0666");
-			assert.throws(function () { project.createTemplateFolder(projectFolder).wait(); });
+			assert.throws(() => project.createTemplateFolder(projectFolder).wait());
 		});
 	});
 });
 
-describe("project unit tests", function() {
+describe("project unit tests", () => {
 	var project, testInjector;
 	before(() => {
 		testInjector = createTestInjector();
@@ -134,53 +134,53 @@ describe("project unit tests", function() {
 		project = testInjector.resolve("project");
 	});
 
-	describe("updateProjectProperty", function() {
-		it("sets unconstrained string property", function() {
+	describe("updateProjectProperty", () => {
+		it("sets unconstrained string property", () => {
 			var projectData = {DisplayName: "wrong"};
 			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
-		it("sets string property with custom validator", function() {
+		it("sets string property with custom validator", () => {
 			var projectData = {name: "wrong"};
 			project.updateProjectProperty(projectData, "set", "name", ["fine"]).wait();
 			assert.equal("fine", projectData.name);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
-		it("disallows 'add' on non-flag property", function() {
+		it("disallows 'add' on non-flag property", () => {
 			var projectData = {name: "wrong"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "add", "name", ["fine"]).wait();});
+			assert.throws(() => project.updateProjectProperty(projectData, "add", "name", ["fine"]).wait());
 		});
 
-		it("disallows 'del' on non-flag property", function() {
+		it("disallows 'del' on non-flag property", () => {
 			var projectData = {name: "wrong"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "del", "name", ["fine"]).wait();});
+			assert.throws(() => project.updateProjectProperty(projectData, "del", "name", ["fine"]).wait());
 		});
 
-		it("sets bundle version when given proper input", function() {
+		it("sets bundle version when given proper input", () => {
 			var projectData = {"BundleVersion": "0"};
 			project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
-		it("throws on invalid bundle version string", function() {
+		it("throws on invalid bundle version string", () => {
 			var projectData = {"BundleVersion": "0"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait();});
+			assert.throws(() => project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait());
 		});
 
-		it("sets enumerated property", function() {
+		it("sets enumerated property", () => {
 			var projectData = {iOSStatusBarStyle: "Default"};
 			project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
-		it("disallows unrecognized values for enumerated property", function() {
+		it("disallows unrecognized values for enumerated property", () => {
 			var projectData = {iOSStatusBarStyle: "Default"};
-			assert.throws(function() {project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait();});
+			assert.throws(() => project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
 		});
 
-		it("appends to verbatim enumerated collection property", function() {
+		it("appends to verbatim enumerated collection property", () => {
 			var projectData = {DeviceOrientations: []};
 			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
@@ -188,7 +188,7 @@ describe("project unit tests", function() {
 			assert.deepEqual(["Landscape", "Portrait"], projectData.DeviceOrientations);
 		});
 
-		it("appends to enumerated collection property with shorthand", function() {
+		it("appends to enumerated collection property with shorthand", () => {
 			var projectData = {iOSDeviceFamily: []};
 			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"]).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
@@ -196,13 +196,13 @@ describe("project unit tests", function() {
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
-		it("appends multiple values to enumerated collection property", function() {
+		it("appends multiple values to enumerated collection property", () => {
 			var projectData = {iOSDeviceFamily: []};
 			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
-		it("removes from enumerated collection property", function() {
+		it("removes from enumerated collection property", () => {
 			var projectData = {DeviceOrientations: ["Landscape", "Portrait"]};
 			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
@@ -210,18 +210,18 @@ describe("project unit tests", function() {
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("disallows unrecognized values for enumerated collection property", function() {
+		it("disallows unrecognized values for enumerated collection property", () => {
 			var projectData = {DeviceOrientations: []};
-			assert.throws(function() {project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait();});
+			assert.throws(() => project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
 		});
 
-		it("makes case-insensitive comparisons of property name", function() {
+		it("makes case-insensitive comparisons of property name", () => {
 			var projectData = {DeviceOrientations: []};
 			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("makes case-insensitive comparisons of property values", function() {
+		it("makes case-insensitive comparisons of property values", () => {
 			var projectData = {DeviceOrientations: []};
 			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
@@ -229,7 +229,7 @@ describe("project unit tests", function() {
 	});
 });
 
-describe("project unit tests (canonical paths)", function() {
+describe("project unit tests (canonical paths)", () => {
 	var project, testInjector;
 	before(() => {
 		testInjector = createTestInjector();
@@ -238,25 +238,25 @@ describe("project unit tests (canonical paths)", function() {
 		testInjector.resolve("config").PROJECT_FILE_NAME = "";
 	});
 
-	it("no ending path separator", function() {
+	it("no ending path separator", () => {
 		options.path = "test";
 		var project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
-	it("one ending path separator", function() {
+	it("one ending path separator", () => {
 		options.path = "test" + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
-	it("multiple ending path separator", function() {
+	it("multiple ending path separator", () => {
 		options.path = "test" + path.sep + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
-	it("do not remove separators which are not at the end", function() {
+	it("do not remove separators which are not at the end", () => {
 		options.path = "test" + path.sep + "test" + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test" + path.sep + "test"));
