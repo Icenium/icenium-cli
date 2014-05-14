@@ -1,7 +1,3 @@
-interface IDisposable {
-	dispose(): void;
-}
-
 declare module Server {
 	interface IResponse {
 		response: any;
@@ -71,7 +67,6 @@ interface IUserDataStore {
 	getUser(): IFuture<any>;
 	setCookie(cookie: string): IFuture<void>;
 	setUser(user: any): IFuture<void>;
-	clearLoginData(): IFuture<void>;
 }
 
 interface ILoginManager {
@@ -147,10 +142,6 @@ declare module Project {
 		printProjectProperty(property: string): IFuture<void>;
 		createNewProject(projectName: string): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
-	}
-
-	interface IPlatformMigrator {
-		ensureAllPlatformAssets(): IFuture<void>;
 	}
 }
 
@@ -297,7 +288,7 @@ declare enum ErrorCodes {
 	UNKNOWN = 127
 }
 
-interface IPrompter extends IDisposable {
+interface IPrompter {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
@@ -352,16 +343,12 @@ interface IAnalyticsService {
 	trackException(exception: any, message: string): IFuture<void>;
 }
 
-interface IUserSettingsFileService {
-	deleteUserSettingsFile(): IFuture<void>;
-	userSettingsFilePath: string;
-}
-
 interface IUserSettingsService {
 	loadUserSettingsFile(): IFuture<void>;
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
-	userSettingsFilePath: string;
+	deleteUserSettingsFile(): IFuture<void>;
+	userSettingsFilePath?: string;
 }
 
 interface IServerExtensionsService {
@@ -388,15 +375,6 @@ interface ICancellationService extends IDisposable {
 interface ICordovaMigrationService {
 	downloadCordovaMigrationData(): IFuture<void>;
 	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion(version:string): IFuture<string[]>;
-	migratePlugins(plugins:string[], fromVersion:string, toVersion:string): IFuture<string[]>;
-}
-
-interface ICommandOptions {
-	disableAnalytics?: boolean;
-}
-
-interface ICancellationService extends IDisposable {
-	begin(name: string): IFuture<void>;
-	end(name: string): void;
+	pluginsForVersion(version: string): IFuture<string[]>;
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 }

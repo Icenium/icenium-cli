@@ -131,20 +131,4 @@ describe("yok", function() {
 
 		assert.throws(() => injector.resolveCommand("command"));
 	})
-
-	it("disposes", function() {
-		var injector = new yok.Yok();
-
-		function Thing() {}
-
-		Thing.prototype.dispose = function() {
-			this.disposed = true;
-		}
-
-		injector.register("thing", Thing);
-		var thing = injector.resolve("thing");
-		injector.dispose();
-
-		assert.isTrue(thing.disposed);
-	});
 })

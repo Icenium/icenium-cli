@@ -18,9 +18,9 @@ var options = require("./options");
 errors.installUncaughtExceptionListener();
 
 class CommandDispatcher {
-	constructor(
+	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
-		private $cancellation: ICancellationService,
+		private $injector: IInjector,
 		private $config: IConfiguration,
 		private $commandsService: ICommandsService) {}
 
@@ -95,8 +95,6 @@ var fiber = Fiber(() => {
 	} else {
 		commandDispatcher.dispatchCommand();
 	}
-
-	$injector.dispose();
 	Future.assertNoFutureLeftBehind();
 });
 global.__main_fiber__ = fiber; // leak fiber to prevent it from being GC'd and thus corrupting V8

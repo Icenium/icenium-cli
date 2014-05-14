@@ -4,16 +4,6 @@ var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
-	private analyticsService : IAnalyticsService;
-
-	get $analyticsService(): IAnalyticsService {
-		if (!this.analyticsService) {
-			//We need to resolve analyticsService here due to cyclic dependency
-			this.analyticsService = this.$injector.resolve("analyticsService");
-		}
-		return this.analyticsService;
-	}
-
 	constructor(private $errors: IErrors,
 		private $analyticsService: IAnalyticsService,
 		private $injector: IInjector) { }
@@ -25,10 +15,8 @@ export class CommandsService implements ICommandsService {
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
 		var command = this.$injector.resolveCommand(commandName);
 		if (command) {
-			if (!command.disableAnalytics) {
-				this.$analyticsService.checkConsent(commandName).wait();
-				this.$analyticsService.trackFeature(commandName).wait();
-			}
+			this.$analyticsService.checkConsent(commandName).wait();
+			this.$analyticsService.trackFeature(commandName).wait();
 			command.execute(commandArguments).wait();
 			return true;
 		} else {

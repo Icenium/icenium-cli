@@ -577,10 +577,7 @@ class WinSocket implements Mobile.IiOSDeviceSocket {
 
 	private read(bytes: number): NodeBuffer {
 		var data = new Buffer(bytes);
-		var result: Number;
-		helpers.block(() => {
-			result = this.winSocketLibrary.recv(this.service, data, bytes, 0);
-		});
+		var result = this.winSocketLibrary.recv(this.service, data, bytes, 0);
 		if (result < 0) {
 			this.$errors.fail("Error receiving data: %s", result);
 		}

@@ -23,8 +23,7 @@ export class SimulateCommand implements ICommand {
 		private $platformServices: ISimulatorPlatformServices,
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
-		private $serverExtensionsService: IServerExtensionsService,
-		private $platformMigrator: Project.IPlatformMigrator) {
+		private $serverExtensionsService: IServerExtensionsService) {
 		this.projectData = $project.projectData;
 	}
 
@@ -38,7 +37,6 @@ export class SimulateCommand implements ICommand {
 			this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 			this.$serverExtensionsService.prepareExtension(simulatorPackageName).wait();
 			this.prepareCordovaPlugins(simulatorPackageName).wait();
-			this.$platformMigrator.ensureAllPlatformAssets().wait();
 
 			this.runSimulator();
 		}).future<void>()();

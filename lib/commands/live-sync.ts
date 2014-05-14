@@ -9,15 +9,11 @@ import MobileHelper = require("./../mobile/mobile-helper");
 import AppIdentifier = require("../mobile/app-identifier");
 import constants = require("../mobile/constants");
 
-interface IPlatformSpecificFileName {
-	platform: string;
-	onDeviceName: string;
-}
-
 export class LiveSyncCommand implements ICommand {
 	private excludedProjectDirsAndFiles = [
 		"app_resources"
 		, "plugins"
+		, "cordova.*.js"
 		, ".*.tmp"
 	];
 
@@ -50,18 +46,16 @@ export class LiveSyncCommand implements ICommand {
 
 			if (options.file) {
 				var isExistFile = this.$fs.exists(options.file).wait();
-				if (isExistFile) {
-					if (LiveSyncCommand.shouldIncludeFile(platform, options.file)) {
-						var projectFiles = [path.resolve(options.file)];
-						this.sync(appIdentifier, projectDir, projectFiles).wait();
-					}
+				if(isExistFile) {
+					var projectFiles = [path.resolve(options.file)];
+					this.sync(appIdentifier, projectDir, projectFiles).wait();
 				} else {
 					this.$errors.fail("The file %s does not exist.", options.file);
 				}
 			} else {
-				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
-				projectFiles = _.filter(projectFiles, (fileName) => LiveSyncCommand.shouldIncludeFile(platform, fileName));
+				this.uploadCordovaJs(appIdentifier, projectDir, platform).wait();
 
+				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
 
 				if (options.watch) {
@@ -73,23 +67,16 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private static shouldIncludeFile(platform: string, fileName: string): boolean {
-		var platformInfo = LiveSyncCommand.parsePlatformSpecificFileName(fileName);
-		return !platformInfo || platformInfo.platform === platform;
-	}
-
-	private static parsePlatformSpecificFileName(fileName: string): IPlatformSpecificFileName {
-		var platforms = MobileHelper.PlatformNames.join("|");
-		var regex = util.format("^(.+?)\.(%s)(\..+?)$", platforms);
-		var parsed = fileName.match(new RegExp(regex, "i"));
-		if (parsed) {
-			var result = {
-				platform: MobileHelper.normalizePlatformName(parsed[2]),
-				onDeviceName: parsed[1] + parsed[3]
-			};
-			return result;
-		}
-		return undefined;
+	private uploadCordovaJs(appIdentifier: Mobile.IAppIdentifier, projectDir: string, platform: string): IFuture<void> {
+		return this.$devicesServices.execute((device) => {
+			return (() => {
+				var cordovaJs = this.getLocalToDevicePaths(projectDir,
+					[path.join(projectDir, util.format("cordova.%s.js", platform))],
+					appIdentifier.deviceProjectPath,
+					(from) => path.join(path.dirname(from), "cordova.js"));
+				device.sync(cordovaJs, appIdentifier, {skipRefresh: true}).wait();
+			}).future<void>()();
+		});
 	}
 
 	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
@@ -106,10 +93,9 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
+	public getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string, rename?: (from: string) => string): MobileHelper.LocalToDevicePathData[] {
 		var localToDevicePaths = _.map(projectFiles, (projectFile: string) => {
-			var platformInfo = LiveSyncCommand.parsePlatformSpecificFileName(projectFile);
-			var renamedFile = platformInfo ? platformInfo.onDeviceName : projectFile;
+			var renamedFile = rename ? rename(projectFile) : projectFile;
 
 			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, renamedFile);
 			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
@@ -132,9 +118,7 @@ export class LiveSyncCommand implements ICommand {
 				change: (changeType, filePath) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
-						if (LiveSyncCommand.shouldIncludeFile(this.$devicesServices.platform, filePath)) {
-							this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
-						}
+						this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
 					}
 				},
 				next: (error, watchers) => {

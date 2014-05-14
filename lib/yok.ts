@@ -329,15 +329,6 @@ export class Yok implements IInjector {
 	private createCommandName(name: string) {
 		return util.format("%s.%s", this.COMMANDS_NAMESPACE, name);
 	}
-
-	public dispose(): void {
-		Object.keys(this.modules).forEach((moduleName) => {
-			var instance = this.modules[moduleName].instance;
-			if (instance && instance.dispose && instance !== this) {
-				instance.dispose();
-			}
-		})
-	}
 }
 
 export var injector = new Yok();
