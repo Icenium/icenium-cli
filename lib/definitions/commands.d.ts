@@ -1,3 +1,3 @@
-interface ICommand extends ICommandOptions {
+interface ICommand {
 	execute(args: string[]): IFuture<void>;
 }

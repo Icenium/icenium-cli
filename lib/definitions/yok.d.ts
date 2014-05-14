@@ -1,4 +1,4 @@
-interface IInjector extends IDisposable {
+interface IInjector {
 	require(name: string, file: string): void;
 	require(names: string[], file: string): void;
 	requireCommand(name: string, file: string): void;

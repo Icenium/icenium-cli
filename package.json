@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "preferGlobal": true,
-  "version": "2.1.1",
+  "version": "2.1.0",
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
@@ -10,8 +10,7 @@
   "scripts": {
     "test": "node_modules\\.bin\\mocha --ui mocha-fibers --recursive --no-colors --reporter spec --require test/test-bootstrap.js --timeout 15000 test/",
     "preinstall": "node preinstall.js",
-    "postinstall": "node postinstall.js",
-    "preuninstall": "node preuninstall.js"
+    "postinstall": "node postinstall.js"
   },
   "main": "./lib/appbuilder-cli.js",
   "repository": {
@@ -57,7 +56,7 @@
     "colors": "0.6.2",
     "xmlhttprequest": "1.6.0",
     "xml-mapping": "1.5.2",
-    "string-to-json": "0.1.0"
+    "string-to-json": "~0.1.0"
   },
   "analyze": true,
   "devDependencies": {

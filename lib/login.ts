@@ -52,13 +52,6 @@ export class UserDataStore implements IUserDataStore {
 		}
 	}
 
-	public clearLoginData(): IFuture<void> {
-		return (() => {
-			this.setCookie(null).wait();
-			this.setUser(null).wait();
-		}).future<void>()();
-	}
-
 	private checkCookieExists<T>(sourceFile: string, getter: () => T) : IFuture<boolean> {
 		return (() => {
 			return (getter() || this.$fs.exists(sourceFile).wait());
@@ -90,8 +83,6 @@ export class UserDataStore implements IUserDataStore {
 $injector.register("userDataStore", UserDataStore);
 
 export class LoginManager implements ILoginManager {
-	public static DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS = 15 * 60 * 1000;
-
 	constructor(private $logger: ILogger,
 		private $config: IConfiguration,
 		private $serverConfiguration: IServerConfiguration,
@@ -102,7 +93,7 @@ export class LoginManager implements ILoginManager {
 		private $userDataStore: IUserDataStore,
 		private $opener: IOpener,
 		private $commandsService: ICommandsService,
-		private $sharedUserSettingsFileService: IUserSettingsFileService) { }
+		private $sharedUserSettingsService: IUserSettingsService) { }
 
 	public basicLogin(userName: string, password: string): IFuture<void> {
 		var loginData = {
@@ -117,9 +108,10 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			this.$logger.info("Logging out...");
 
-			this.$userDataStore.clearLoginData().wait();
+			this.$userDataStore.setCookie(null).wait();
+			this.$userDataStore.setUser(null).wait();
 
-			this.$sharedUserSettingsFileService.deleteUserSettingsFile().wait();
+			this.$sharedUserSettingsService.deleteUserSettingsFile().wait();
 
 			this.$logger.info("Logout completed.");
 		}).future<void>()();
@@ -238,32 +230,12 @@ export class LoginManager implements ILoginManager {
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
 
-			var timeoutID: number = undefined;
-
-			if (!helpers.isInteractive()) {
-				var timeout = options.hasOwnProperty("timeout")
-					? +options.timeout
-					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
-
-				if (timeout > 0) {
-					timeoutID = setTimeout(() => {
-						if (!authComplete.isResolved()) {
-							this.$logger.debug("Aborting login procedure due to inactivity.");
-							process.exit();
-						}
-					}, timeout);
-				}
-			}
-
 			var code = authComplete.wait();
-			if(timeoutID !== undefined) {
-				clearTimeout(timeoutID);
-			}
 			return this.authenticate({ wrap_verification_code: code }).wait();
 		}).future()();
 	}
 }
 $injector.register("loginManager", LoginManager);
-helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login(), {disableAnalytics: true});
-helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout(), {disableAnalytics: true});
-helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]), {disableAnalytics: true});
+helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login());
+helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout());
+helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]));

@@ -1,12 +1,8 @@
 declare module "watchr" {
-	export interface IWatchData {
-		path?: string;
-		paths?: string[];
-		listeners: {
-			error: (error: string) => void;
-			change: (changeType, filePath) => void;
-		};
-	}
+    export interface IWatchData {
+        paths: string[];
+        listeners: { error:(error: string) => void; change: (changeType, filePath) => void; next: (error, watchers) => void };
+    }
 
-	export function watch(arg: IWatchData);
+    export function watch(arg: IWatchData);
 }

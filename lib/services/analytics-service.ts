@@ -7,8 +7,6 @@ import helpers = require("./../helpers");
 import options = require("./../options");
 import os = require("os");
 
-var TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
-
 export class AnalyticsService implements IAnalyticsService {
 	private _eqatecMonitor;
 	private trackFeatureUsage: boolean = false;
@@ -21,35 +19,24 @@ export class AnalyticsService implements IAnalyticsService {
 		private $prompter: IPrompter,
 		private $clientSpecificUserSettingsService: IUserSettingsService,
 		private $sharedUserSettingsService: IUserSettingsService,
-		private $userDataStore: IUserDataStore,
-		private $loginManager: ILoginManager) { }
+		private $userDataStore: IUserDataStore) { }
 
 	public checkConsent(featureName: string): IFuture<void> {
 		return ((): void => {
-			var trackFeatureUsage = null;
+			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
 
-			if (this.$loginManager.isLoggedIn().wait()) {
-				trackFeatureUsage = this.$sharedUserSettingsService.getValue(TRACK_FEATURE_USAGE_SETTING_NAME).wait();
+			if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null && $injector.resolve("loginManager").isLoggedIn().wait()) {
+				var message = "Do you want to help us improve " +
+					"Telerik".white.bold + " " + "AppBuilder".cyan.bold
+					+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you.";
 
-				if(helpers.isInteractive() && !_.contains(this.excluded, featureName) && trackFeatureUsage === null) {
-					var message = "Do you want to help us improve " +
-						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
-						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you."
-						+ " You can also read our official Privacy Policy at http://www.telerik.com/company/privacy-policy.";
-
-					trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
-					this.$sharedUserSettingsService.saveSettings(this.createSettingsObject(trackFeatureUsage)).wait();
-				}
+				trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
+				this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": trackFeatureUsage}).wait();
 			}
 
 			this.trackFeatureUsage = helpers.toBoolean(trackFeatureUsage);
-		}).future<void>()();
-	}
 
-	private createSettingsObject(trackFeatureUsage: boolean): {[key: string]: {}} {
-		var settingsObject: any = {};
-		settingsObject[TRACK_FEATURE_USAGE_SETTING_NAME] = trackFeatureUsage;
-		return settingsObject;
+		}).future<void>()();
 	}
 
 	private start(): IFuture<void> {
@@ -134,12 +121,41 @@ export class AnalyticsService implements IAnalyticsService {
 		return userAgentString;
 	}
 
+	private enableAnalytics(): IFuture<void> {
+		return this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": true});
+	}
+
+	private disableAnalytics(): IFuture<void> {
+		return(() => {
+			this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": false}).wait();
+
+			if(this._eqatecMonitor) {
+				this._eqatecMonitor.stop();
+			}
+		}).future<void>()();
+	}
+
+	private getStatusMessage(): IFuture<string> {
+		return (() => {
+			var trackFeatureUsage = this.$sharedUserSettingsService.getValue("AnalyticsSettings.TrackFeatureUsage").wait();
+			if(trackFeatureUsage == null) {
+				return "disabled until confirmed";
+			}
+
+			if(helpers.toBoolean(trackFeatureUsage)) {
+				return "enabled";
+			}
+
+			return"disabled";
+
+		}).future<string>()();
+	}
+
 	public analyticsCommand(arg: string): IFuture<any> {
 		return(() => {
 			switch(arg) {
 				case "status":
-					var status = this.getStatus().wait();
-					this.$logger.out(this.getStatusMessage(status));
+					this.$logger.out("Feature usage tracking is %s.", this.getStatusMessage().wait());
 					break;
 				case "enable":
 					this.enableAnalytics().wait();
@@ -154,58 +170,6 @@ export class AnalyticsService implements IAnalyticsService {
 					break;
 			}
 		}).future<any>()();
-	}
-
-	private enableAnalytics(): IFuture<void> {
-		return this.setAnalytics(true);
-	}
-
-	private disableAnalytics(): IFuture<void> {
-		return(() => {
-			this.setAnalytics(false).wait();
-
-			if(this._eqatecMonitor) {
-				this._eqatecMonitor.stop();
-			}
-		}).future<void>()();
-	}
-
-	private setAnalytics(enabled: boolean): IFuture<void> {
-		return this.$sharedUserSettingsService.saveSettings({"AnalyticsSettings.TrackFeatureUsage": enabled});
-	}
-
-	private getStatus(): IFuture<boolean> {
-		return (() => {
-			var trackFeatureUsage = this.$sharedUserSettingsService.getValue(TRACK_FEATURE_USAGE_SETTING_NAME).wait();
-			if (trackFeatureUsage) {
-				return helpers.toBoolean(trackFeatureUsage);
-			}
-			return undefined;
-		}).future<boolean>()();
-	}
-
-	private getStatusMessage(trackFeatureUsage?: boolean): string {
-		if (options.json) {
-			return this.getJsonStatusMessage(trackFeatureUsage);
-		} else {
-			return this.getHumanReadableStatusMessage(trackFeatureUsage);
-		}
-	}
-
-	private getHumanReadableStatusMessage(trackFeatureUsage?: boolean): string {
-		var status: string;
-		if (trackFeatureUsage) {
-			status = "enabled";
-		} else if (trackFeatureUsage === undefined) {
-			status = "disabled until confirmed";
-		} else {
-			status = "disabled";
-		}
-		return util.format("Feature usage tracking is %s.", status);
-	}
-
-	private getJsonStatusMessage(trackFeatureUsage?: boolean): string {
-		return JSON.stringify({ enabled: trackFeatureUsage !== undefined ? trackFeatureUsage : null });
 	}
 }
 $injector.register("analyticsService", AnalyticsService);
