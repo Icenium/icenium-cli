@@ -321,7 +321,7 @@ export class BuildService implements Project.IBuildService {
 				});
 
 				if (settings.platform === "WP8") {
-					var aetUrl = util.format("%s://%s/api/identityStore/aet", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+					var aetUrl = util.format("%s://%s/api/identityStore/winPhoneAppEnrollmentToken", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 					var aetDef = {
 						instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)"),
 						packageUrl: aetUrl,
