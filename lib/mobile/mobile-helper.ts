@@ -27,6 +27,8 @@ export var platformCapabilities: {[key: string]: Mobile.IPlatformCapabilities } 
 	}
 };
 
+export var PlatformNames = Object.keys(platformCapabilities);
+
 export class LocalToDevicePathData implements Mobile.ILocalToDevicePathData {
 	constructor(private localPath: string, private devicePath: string, private relativeToProjectBasePath: string) {}
 

@@ -3,20 +3,37 @@
 import Future = require("fibers/future");
 import prompt = require("prompt");
 import helpers = require("./helpers");
+import readline = require("readline");
 
 export class Prompter implements IPrompter {
+	private ctrlcReader;
+
 	constructor() {
 		prompt.message = "";
 		prompt.delimiter = ":";
 		prompt.colors = false;
 		prompt.isDefaultValueEditable = true;
-		if(helpers.isInteractive()) {
+
+		if (helpers.isInteractive()) {
 			process.stdin.setRawMode(true);
+
+			this.ctrlcReader = readline.createInterface(<any>{
+				input: process.stdin,
+				output: process.stdout
+			});
+
+			this.ctrlcReader.on("SIGINT", () => process.exit());
 		}
 	}
 
 	public start() {
 		prompt.start();
+	}
+
+	public dispose() {
+		if (this.ctrlcReader) {
+			this.ctrlcReader.close();
+		}
 	}
 
 	public get(schema: IPromptSchema): IFuture<any> {
