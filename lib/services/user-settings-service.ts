@@ -8,22 +8,37 @@ import util = require("util");
 import options = require("./../options");
 import helpers = require("./../helpers");
 
+export class ClientUserSettingsFileService implements IUserSettingsFileService {
+	private userSettingsFile: string;
+
+	constructor(private $fs: IFileSystem) {
+		this.userSettingsFile = path.join(options["profile-dir"], "local-user-settings.json");
+	}
+
+	public get userSettingsFilePath(): string {
+		return this.userSettingsFile;
+	}
+
+	public deleteUserSettingsFile(): IFuture<void> {
+		return this.$fs.deleteFile(this.userSettingsFilePath);
+	}
+}
+$injector.register("clientUserSettingsFileService", ClientUserSettingsFileService);
+
 export class ClientSpecificUserSettingsService implements IUserSettingsService {
-	private userSettingsFile = null;
 	private userSettingsData: any = null;
 
-	constructor(private $fs: IFileSystem) { }
+	constructor(private $fs: IFileSystem,
+		private $clientUserSettingsFileService: IUserSettingsFileService) { }
 
 	public loadUserSettingsFile(): IFuture<void> {
 		return (() => {
 			if(!this.userSettingsData) {
-				this.userSettingsFile = path.join(options["profile-dir"], "user-settings.json");
-
-				if(!this.$fs.exists(this.userSettingsFile).wait()) {
-					this.$fs.writeFile(this.userSettingsFile, null).wait();
+				if(!this.$fs.exists(this.$clientUserSettingsFileService.userSettingsFilePath).wait()) {
+					this.$fs.writeFile(this.$clientUserSettingsFileService.userSettingsFilePath, null).wait();
 				}
 
-				this.userSettingsData = this.$fs.readJson(this.userSettingsFile).wait();
+				this.userSettingsData = this.$fs.readJson(this.$clientUserSettingsFileService.userSettingsFilePath).wait();
 			}
 		}).future<void>()();
 	}
@@ -44,15 +59,28 @@ export class ClientSpecificUserSettingsService implements IUserSettingsService {
 				this.userSettingsData[propertyName] = data[propertyName];
 			});
 
-			this.$fs.writeJson(this.userSettingsFile, this.userSettingsData, "\t").wait();
+			this.$fs.writeJson(this.$clientUserSettingsFileService.userSettingsFilePath, this.userSettingsData, "\t").wait();
 		}).future<void>()();
-	}
-
-	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFile);
 	}
 }
 $injector.register("clientSpecificUserSettingsService", ClientSpecificUserSettingsService);
+
+export class SharedUserSettingsFileService implements IUserSettingsFileService {
+	private userSettingsFile: string;
+
+	constructor(private $fs: IFileSystem) {
+		this.userSettingsFile = path.join(options["profile-dir"], "user-settings.xml");
+	}
+
+	public get userSettingsFilePath(): string {
+		return this.userSettingsFile;
+	}
+
+	public deleteUserSettingsFile(): IFuture<void> {
+		return this.$fs.deleteFile(this.userSettingsFilePath);
+	}
+}
+$injector.register("sharedUserSettingsFileService", SharedUserSettingsFileService);
 
 export  class SharedUserSettingsService implements IUserSettingsService {
 	private userSettingsData: any = null;
@@ -60,47 +88,49 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	private static SETTINGS_ROOT_TAG = "JustDevelopSettings";
 
 	constructor(private $fs: IFileSystem,
-		private $server: Server.IServer) { }
-
-	public get userSettingsFilePath(): string {
-		return path.join(options["profile-dir"], "user-settings.xml");
-	}
+		private $server: Server.IServer,
+		private $sharedUserSettingsFileService: IUserSettingsFileService,
+		private $loginManager: ILoginManager) { }
 
 	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
-			var loginManager = $injector.resolve("loginManager"); //We need to resolve loginManager here due to cyclic dependency
-			if (loginManager.isLoggedIn().wait()) {
+			if(!this.userSettingsData) {
 				this.$fs.createDirectory(options["profile-dir"]).wait();
 
-				if (this.$fs.exists(this.userSettingsFilePath).wait()) {
-					var fileInfo = this.$fs.getFsStats(this.userSettingsFilePath).wait();
+				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath).wait()) {
+					var fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();
 					var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
 					var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 					if(diffDays > 1) {
-						this.makeServerRequest().wait();
+						this.downloadUserSettings().wait();
 					} else {
-						this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFilePath).wait());
+						this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
 					}
 				} else {
-					this.makeServerRequest().wait();
+					this.downloadUserSettings().wait();
 				}
 			}
 		}).future<void>()();
 	}
 
-	private makeServerRequest(): IFuture<void> {
+	private downloadUserSettings(): IFuture<void> {
 		return(() => {
 			try {
-				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.userSettingsFilePath)).wait();
-				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.userSettingsFilePath).wait());
-			} catch (e) {
-				this.userSettingsData = null;
+				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
+				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
+			} catch(error) {
+				if(error.response && error.response.statusCode === 404) {
+					this.userSettingsData = null;
+				} else {
+					throw error;
+				}
 			}
 		}).future<void>()();
 	}
 
 	public getValue(propertyName: string): IFuture<any> {
 		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
 			this.loadUserSettingsFile().wait();
 
 			if(!this.userSettingsData) {
@@ -121,7 +151,8 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 	public saveSettings(data: {[key: string]: {}}): IFuture<void> {
 		return (() => {
-			this.loadUserSettingsFile().wait();
+			this.$loginManager.ensureLoggedIn().wait();
+			this.downloadUserSettings().wait();
 
 			this.userSettingsData = this.userSettingsData || {};
 
@@ -142,14 +173,9 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 			this.$server.rawSettings.saveUserSettings(xml).wait();
 
 			if (Object.keys(data).length !== 0) {
-				this.$fs.writeFile(this.userSettingsFilePath, xml).wait();
+				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml).wait();
 			}
-
 		}).future<void>()();
-	}
-
-	public deleteUserSettingsFile(): IFuture<void> {
-		return this.$fs.deleteDirectory(this.userSettingsFilePath);
 	}
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);

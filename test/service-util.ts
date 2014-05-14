@@ -31,6 +31,10 @@ class MockUserDataStore implements IUserDataStore {
 	setUser(user):IFuture<void> {
 		return undefined;
 	}
+
+	clearLoginData(): IFuture<void> {
+		return undefined;
+	}
 }
 testInjector.register("userDataStore", MockUserDataStore);
 
@@ -103,7 +107,7 @@ describe("ServiceProxy", function () {
 
 		var result = new (require("stream").PassThrough)();
 
-		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result);
+		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result).wait();
 
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});

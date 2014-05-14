@@ -1,3 +1,4 @@
+
 //grunt-start
 /// <reference path="appbuilder-cli.ts" />
 /// <reference path="bootstrap.ts" />
@@ -84,9 +85,11 @@
 /// <reference path="service-util.ts" />
 /// <reference path="services/analytics-service.ts" />
 /// <reference path="services/build.ts" />
+/// <reference path="services/cancellation.ts" />
 /// <reference path="services/cordova-migration-service.ts" />
 /// <reference path="services/cordova-plugins.ts" />
 /// <reference path="services/path-filtering.ts" />
+/// <reference path="services/platform-migration.ts" />
 /// <reference path="services/server-extensions.ts" />
 /// <reference path="services/user-settings-service.ts" />
 /// <reference path="templates-service.ts" />
