@@ -199,11 +199,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 	private static adb;
 	private static get Adb() {
 		if (!AndroidDeviceDiscovery.adb) {
-			if (helpers.isWindows()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/windows/adb");
-			} else if (helpers.isDarwin()) {
-				AndroidDeviceDiscovery.adb = path.join(__dirname, "../../../resources/platform-tools/android/osx/adb");
-			}
+			AndroidDeviceDiscovery.adb = path.join(__dirname, util.format("../../../resources/platform-tools/android/%s/adb", process.platform));
 		}
 		return AndroidDeviceDiscovery.adb;
 	}
