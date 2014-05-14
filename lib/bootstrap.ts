@@ -60,7 +60,7 @@ $injector.requireCommand("list-projects", "./remote-projects");
 $injector.requireCommand("export-project", "./remote-projects");
 
 $injector.requireCommand("device|*list", "./commands/list-devices");
-$injector.requireCommand("device|log-stream", "./commands/open-device-log-stream");
+$injector.requireCommand("device|log", "./commands/open-device-log-stream");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 

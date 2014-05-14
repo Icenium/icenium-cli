@@ -24,6 +24,6 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("device|log-stream", OpenDeviceLogStreamCommand);
+$injector.registerCommand("device|log", OpenDeviceLogStreamCommand);
 
 

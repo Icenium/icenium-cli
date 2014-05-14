@@ -32,7 +32,7 @@ Project development commands:
 
 Device commands:
     device                          Lists all recognized connected devices.
-    device log-stream               Opens the log stream for the selected device.
+    device log                      Opens the log stream for the selected device.
 
 Certificate management and publishing commands:
     certificate                     Lists all configured certificates for code signing iOS and Android applications.
@@ -138,7 +138,7 @@ If a connected Android device is not shown in the list, make sure that you have 
 and that USB debugging is enabled on the device.
 
 Commands:
-    log-stream - Opens the log stream for the selected device.
+    log - Opens the log stream for the selected device.
 
 --[/]--
 
@@ -256,9 +256,9 @@ Options:
 
 --[/]--
 
---[device|log-stream]--
+--[device|log]--
 Usage:
-    $ appbuilder device log-stream [--device <id>]
+    $ appbuilder device log [--device <id>]
 
 Opens the device log stream for a selected connected device. You can select a device by index or identifier. In this version
 of the Telerik AppBuilder CLI, you cannot synchronize changes to Windows Phone 8 connected devices.
