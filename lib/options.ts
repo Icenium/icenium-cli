@@ -37,9 +37,7 @@ var knownOpts:any = {
 
 parsed["profile-dir"] = parsed["profile-dir"] || defaultProfileDir;
 
-Object.keys(parsed).forEach(function(opt) {
-	exports[opt] = parsed[opt];
-});
+Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
 
 exports.knownOpts = knownOpts;
 

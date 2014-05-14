@@ -42,10 +42,8 @@ function annotate(fn) {
 			argDecl = fnText.match(FN_NAME_AND_ARGS);
 			$inject.name = argDecl[1];
 			if (fn.length) {
-				argDecl[2].split(FN_ARG_SPLIT).forEach(function(arg){
-					arg.replace(FN_ARG, function(all, underscore, name){
-						$inject.args.push(name);
-					});
+				argDecl[2].split(FN_ARG_SPLIT).forEach((arg) => {
+					arg.replace(FN_ARG, (all, underscore, name) => $inject.args.push(name));
 				});
 			}
 			fn.$inject = $inject;

@@ -56,6 +56,6 @@ String.prototype.endsWith = endsWith;
 String.prototype.isEmpty = isEmpty;
 String.prototype.equals = equals;
 
-(<any>RegExp).escape = function(s) {
+(<any>RegExp).escape = (s) => {
 	return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };

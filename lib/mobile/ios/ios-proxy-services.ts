@@ -165,9 +165,7 @@ export class AfcClient implements Mobile.IAfcClient {
 			.on("error", (error) => {
 				this.$errors.fail(error);
 			})
-			.on("end", function () {
-				target.close();
-			});
+			.on("end", () => target.close());
 
 			this.$fs.futureFromEvent(reader, "close").wait();
 

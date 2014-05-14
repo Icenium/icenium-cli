@@ -22,7 +22,7 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-describe("Create self signed identity unit tests", function() {
+describe("Create self signed identity unit tests", () => {
 	var selfSignedIdentityValidator, testInjector;
 	before(() => {
 		testInjector = createTestInjector();

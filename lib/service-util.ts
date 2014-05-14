@@ -366,9 +366,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		intf.writeLine("//");
 		intf.writeLine("declare module Server {");
 
-		api.sort(function(a, b) {
-			return a.name.localeCompare(b.name);
-		});
+		api.sort((a, b) => a.name.localeCompare(b.name));
 
 		for (var i = 0; i < api.length; ++i) {
 			var intfName = api[i].name;
@@ -379,9 +377,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			impl.writeLine("}");
 
 			var operations = api[i].operations;
-			operations.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
+			operations.sort((a, b) => a.name.localeCompare(b.name));
 
 			for (var oi = 0; oi < operations.length; ++oi) {
 				var op = operations[oi];
