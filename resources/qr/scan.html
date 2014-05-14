@@ -11,11 +11,27 @@
 		var packages = $Packages$;
 
 		$(document).ready(function() {
-			var pkgDef = packages[0];
-			$(".solution-name").text(pkgDef.solution);
-			$(".platform-name").text(pkgDef.platform);
-			$(".qr-code").attr("src", pkgDef.qrUrl);
-			$(".download").attr("href", pkgDef.packageUrl);
+			var container = $('.container');
+			for (var i = 0; i < packages.length; ++i) {
+				if (i != 0) {
+					container.append($('<hr/>'));
+				}
+
+				var pkgDef = packages[i];
+				var instruction = $('<h3/>').addClass('instruction').text(pkgDef.instruction);
+				var qrCode = $('<img/>').addClass('qr-code').attr('src', pkgDef.qrUrl);
+				var qrLink = $('<a/>').addClass('download').attr('href', pkgDef.packageUrl);
+				qrLink.append(qrCode);
+				var anchorPara = $('<p/>');
+				var downloadLink = $('<a/>').addClass('download').attr('href', pkgDef.packageUrl).text('Download');
+				anchorPara.append(downloadLink);
+
+				container.append(instruction);
+				container.append(qrLink);
+				container.append(anchorPara);
+			}
+
+			container.append($("<p/>").text('You may close this tab after scanning the code.'));
 		});
 	</script>
 
@@ -25,10 +41,6 @@
 	<div class="header">
 		<div class="logo"></div>
 	</div>
-	<h3>Scan the QR code below to install <span class="solution-name"></span> to <span class="platform-name"></span></h3>
-	<a class="download"><img class="qr-code" /></a>
-	<p><a class="download">Download</a></p>
-	<p>You may close this tab after scanning the code.</p>
 </div>
 </body>
 </html>
