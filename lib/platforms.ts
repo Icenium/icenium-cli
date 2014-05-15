@@ -27,9 +27,7 @@ export function get(platform?: string) {
 
 export function getPlatformsNames() {
 	var names = [];
-	_.forEach(platforms, function(platform:any){
-		names.push(platform.getPlatformName());
-	});
+	_.forEach(platforms, (platform:any) => names.push(platform.getPlatformName()));
 	return names;
 }
 

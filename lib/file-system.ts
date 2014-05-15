@@ -31,7 +31,7 @@ export class FileSystem implements IFileSystem {
 		outFile.on("error", (err) => result.throw(err));
 
 		var fileIdx = -1;
-		var zipCallback = function () {
+		var zipCallback = () => {
 			fileIdx++;
 			if (fileIdx < files.length) {
 				var file = files[fileIdx];
@@ -45,11 +45,9 @@ export class FileSystem implements IFileSystem {
 					{ name: relativePath },
 					zipCallback);
 			} else {
-				outFile.on("finish", function () {
-					result.return();
-				});
+				outFile.on("finish", () => result.return());
 
-				zip.finalize(function (bytesWritten) {
+				zip.finalize((bytesWritten) => {
 					$logger.debug("zipstream: %d bytes written", bytesWritten);
 					outFile.end();
 				});
@@ -82,7 +80,7 @@ export class FileSystem implements IFileSystem {
 
 	public deleteFile(path: string): IFuture<void> {
 		var future = new Future<void>();
-		fs.unlink(path, function(err) {
+		fs.unlink(path, (err) => {
 			if (err && err.code !== "ENOENT") {  // ignore "file doesn't exist" error
 				future.throw(err);
 			} else {
@@ -122,15 +120,13 @@ export class FileSystem implements IFileSystem {
 					break;
 			}
 		});
-		eventEmitter.once("error", function(err) {
-			future.throw(err);
-		})
+		eventEmitter.once("error", (err) => future.throw(err))
 		return future;
 	}
 
 	public createDirectory(path:string): IFuture<void> {
 		var future = new Future<void>();
-		(<any> require("mkdirp"))(path, function(err: Error) {
+		(<any> require("mkdirp"))(path, (err: Error) => {
 			if (err) {
 				future.throw(err);
 			} else {

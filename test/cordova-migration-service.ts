@@ -18,8 +18,8 @@ function registerMockedFS(mockResult: any): void {
     });
 }
 
-describe("cordova-migration-service", function () {
-    describe("migratePlugins", function () {
+describe("cordova-migration-service", () => {
+    describe("migratePlugins", () => {
         it("Return unchanged plugins if no rename matches", () => {
             registerMockedFS({
                 renamedPlugins:

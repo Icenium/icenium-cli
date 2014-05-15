@@ -10,13 +10,13 @@ import helpers = require("./helpers");
 
 export function createServer(configuration): http.Server {
 	if (!configuration.catchAll) {
-		configuration.catchAll = function(request, response) {
+		configuration.catchAll = (request, response) => {
 			response.statusCode = 404;
 			response.end();
 		};
 	}
 
-	return http.createServer(function(request, response) {
+	return http.createServer((request, response) => {
 		var uriPath = url.parse(request.url).pathname;
 
 		log.debug("Serving '%s'", uriPath);
@@ -32,7 +32,7 @@ export function createServer(configuration): http.Server {
 }
 
 export function serveFile(fileName): (request, response) => void {
-	return function(request, response) {
+	return (request, response) => {
 		var mimeTypes = {
 			".html": "text/html",
 			".jpeg": "image/jpeg",
@@ -54,7 +54,7 @@ export function serveFile(fileName): (request, response) => void {
 }
 
 export function serveText(callback: () => string, mimeType: string) {
-	return function(request, response) {
+	return (request, response) => {
 		var text = callback();
 		log.debug("Content-Type: '%s', Body: '%s'", mimeType, text);
 		response.statusCode = 200;

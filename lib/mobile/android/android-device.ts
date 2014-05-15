@@ -170,7 +170,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
 		var lineStream = byline(adbLogcat.stdout);
 
-		adbLogcat.stderr.on("data", function (data) {
+		adbLogcat.stderr.on("data", (data) => {
 			this.$logger.trace("ADB logcat stderr: " + data);
 		});
 
