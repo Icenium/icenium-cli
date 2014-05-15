@@ -6,7 +6,7 @@ import stubs = require("./stubs");
 var assert:chai.Assert = chai.assert;
 var pfs = require("../lib/services/path-filtering");
 
-var projectDir = "c:/projectDir";
+var projectDir = "c:/projectDir/";
 var testInjector = new yok.Yok();
 testInjector.register("fs", stubs.FileSystemStub);
 testInjector.register("pathFilteringService", pfs.PathFilteringService);
