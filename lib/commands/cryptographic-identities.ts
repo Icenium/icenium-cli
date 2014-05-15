@@ -327,7 +327,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 			var identityGenerationData = new IdentityGenerationData(this.model);
 			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
-			this.$logger.info("Created certificated '%s'.", result.Alias);
+			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
 		}).future<void>()();
 	}
 
