@@ -26,8 +26,9 @@ export class PathFilteringService implements IPathFilteringService {
 		return rules;
 	}
 
-	public filterIgnoredFiles(files: string[], rules: string[]) :string[] {
+	public filterIgnoredFiles(files: string[], rules: string[], rootDir: string): string[]{
 		var selectedFiles = _.select(files, (file: string) => {
+			file = file.replace(rootDir, "");
 			var fileMatched = true;
 			_.forEach(rules, rule => {
 				// minimatch treats starting '!' as pattern negation

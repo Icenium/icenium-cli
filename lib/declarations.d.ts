@@ -380,7 +380,7 @@ interface IServerExtensionsService {
 
 interface IPathFilteringService {
 	getRulesFromFile(file: string) : string[];
-	filterIgnoredFiles(files: string[], rules: string[]) :string[];
+	filterIgnoredFiles(files: string[], rules: string[], rootDir: string) :string[];
 }
 
 interface ICordovaMigrationService {
