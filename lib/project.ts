@@ -72,7 +72,7 @@ export class Project implements Project.IProject {
 
 		var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), Project.IGNORE_FILE));
 
-		projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules);
+		projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, this.getProjectDir());
 
 		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
 		return projectFiles;

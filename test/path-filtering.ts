@@ -6,37 +6,54 @@ import stubs = require("./stubs");
 var assert:chai.Assert = chai.assert;
 var pfs = require("../lib/services/path-filtering");
 
+var projectDir = "c:/projectDir/";
 var testInjector = new yok.Yok();
 testInjector.register("fs", stubs.FileSystemStub);
 testInjector.register("pathFilteringService", pfs.PathFilteringService);
 
+function prefixWithProjectDir(files: string[]): string[] {
+	return _.map(files, (file: string) => projectDir + file);
+}
+
 describe("PathFilteringService", () => {
+	it("test ignore single file", () => {
+		var projectFiles = prefixWithProjectDir([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z.css"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["x/.DS_Store/z.css"], projectDir);
+		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "x/.DS_Store/z.css");
+		assert.deepEqual(actual, expected);
+	});
+
 	it("test ** rule", () => {
-		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"], ["**/.DS_Store"]);
-		var expected = ["allow", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"];
+		var projectFiles = prefixWithProjectDir([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["**/.DS_Store"], projectDir);
+		var expected = _.reject(projectFiles, file => _.contains([".DS_Store", "x/.DS_Store"], file.replace(projectDir, "")))
 		assert.deepEqual(actual, expected);
 	});
 
 	it("test ! rule", () => {
-		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["scripts/app.js", "scripts/login.js", "allow"], ["**/scripts/**", "!**/scripts/login.js"]);
-		var expected = ["scripts/login.js", "allow"];
+		var projectFiles = prefixWithProjectDir(["scripts/app.js", "scripts/login.js", "allow"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["**/scripts/**", "!**/scripts/login.js"], projectDir);
+		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "scripts/app.js")
 		assert.deepEqual(actual, expected);
 	});
 
 	it("test \\! rule", () => {
-		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["!z", "allow"], ["\\!z"]);
-		var expected = ["allow"];
+		var projectFiles = prefixWithProjectDir(["!z", "allow"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["\\!z"], projectDir);
+		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "!z")
 		assert.deepEqual(actual, expected);
 	});
 
-	it("test inclusion rule only", () =>{
-		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["z", "allow"], ["!z"]);
-		var expected = ["z", "allow"];
+	it("test inclusion rule only", () => {
+		var projectFiles = prefixWithProjectDir(["z", "allow"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["!z"], projectDir);
+		var expected = projectFiles;
 		assert.deepEqual(actual, expected);
 	});
 
 	it("test exclusion by two rules and in subdir", () => {
-		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(["./A/B/file.txt"], ["./A/B/*", "!./A/B/file.txt", "./A/**/*"]);
+		var projectFiles = prefixWithProjectDir(["A/B/file.txt"]);
+		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["A/B/*", "!A/B/file.txt", "A/**/*"], projectDir);
 		var expected = [];
 		assert.deepEqual(actual, expected);
 	});
