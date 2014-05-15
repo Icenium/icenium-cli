@@ -4,7 +4,7 @@
 
 import path = require("path");
 
-var nopt = <Function> require("nopt");
+var yargs: any = require("yargs");
 
 var knownOpts:any = {
 		"log" : String,
@@ -28,12 +28,32 @@ var knownOpts:any = {
 		"client": String
 	},
 	shorthands = {
-		"v" : ["--verbose"],
-		"p" : ["--path"],
-		"t" : ["--template"]
-	},
-	parsed = nopt(knownOpts, shorthands, process.argv, 2),
+		"v" : "verbose",
+		"p" : "path",
+		"t" : "template"
+	};
+
+Object.keys(knownOpts).forEach((opt) => {
+	var type = knownOpts[opt];
+	if (type === String) {
+		yargs.string(opt);
+	} else if (type === Boolean) {
+		yargs.boolean(opt);
+	}
+});
+
+Object.keys(shorthands).forEach((key) => {
+	yargs.alias(key, shorthands[key]);
+});
+
+var parsed = yargs.argv,
 	defaultProfileDir = path.join(process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH, ".appbuilder-cli");
+
+Object.keys(parsed).forEach((opt) => {
+	if (knownOpts[opt] !== Boolean && typeof(parsed[opt]) === 'boolean') {
+		delete parsed[opt];
+	}
+});
 
 parsed["profile-dir"] = parsed["profile-dir"] || defaultProfileDir;
 
