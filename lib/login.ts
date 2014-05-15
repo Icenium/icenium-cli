@@ -174,16 +174,14 @@ export class LoginManager implements ILoginManager {
 			var wrapData = querystring.parse(wrapResponse.body),
 				wrap_access_token = wrapData.wrap_access_token;
 
-			this.$serviceProxy.setShouldAuthenticate(false);
-			var userData = this.$server.authentication.login(wrap_access_token).wait();
-			this.$serviceProxy.setShouldAuthenticate(true);
+			try {
+				this.$serviceProxy.setShouldAuthenticate(false);
+				var userData = this.$server.authentication.login(wrap_access_token).wait();
+			} finally {
+				this.$serviceProxy.setShouldAuthenticate(true);
+			}
 
-			var cookies = this.$serviceProxy.getLastRequestCookies();
-			var abAuthCookie = cookies && cookies[".ASPXAUTH"];
-			this.$logger.debug("Cookie is '%s'", abAuthCookie);
-
-			if (abAuthCookie && userData) {
-				this.$userDataStore.setCookie(abAuthCookie).wait();
+			if (userData) {
 				this.$userDataStore.setUser(userData).wait();
 			} else {
 				throw new Error("Login failed.");
