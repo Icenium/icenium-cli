@@ -15,7 +15,7 @@ lib-cov
 *.tgz
 *.tmp
 *.sublime-workspace
-tscommand.tmp.txt
+tscommand*.tmp.txt
 .tscache/
 
 pids
