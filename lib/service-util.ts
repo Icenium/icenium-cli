@@ -173,8 +173,7 @@ export class HttpClient implements Server.IHttpClient {
 }
 $injector.register("httpClient", HttpClient);
 
-//TODO: append " implements Server.IServiceProxy" when the bug in the TypeScript compiler that prevents it is fixed.
-export class ServiceProxy {
+export class ServiceProxy implements Server.IServiceProxy {
 	private lastCallCookies: any;
 	private shouldAuthenticate: boolean = true;
 	private solutionSpaceName: string;
@@ -244,7 +243,17 @@ export class ServiceProxy {
 			});
 
 			try {
-				return result.wait();
+				var resultValue = result.wait();
+
+				if (this.lastCallCookies) {
+					var abAuthCookie = this.lastCallCookies['.ASPXAUTH'];
+					if (abAuthCookie) {
+						this.$logger.debug("Cookie is '%s'", abAuthCookie);
+						this.$userDataStore.setCookie(abAuthCookie).wait();
+					}
+				}
+
+				return resultValue;
 			} catch (err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
