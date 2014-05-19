@@ -133,7 +133,7 @@ export class Project implements Project.IProject {
 
 			try {
 				this.createProjectFile(projectDir, appname, properties).wait();
-				this.$logger.info("Successfuly initialised project in the folder!");
+				this.$logger.info("Successfully initialized project in the folder!");
 			}
 			catch (ex) {
 				this.$logger.error("There was an error while initialising the project:");
