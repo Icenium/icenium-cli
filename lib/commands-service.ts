@@ -15,6 +15,7 @@ export class CommandsService implements ICommandsService {
 	}
 
 	constructor(private $errors: IErrors,
+		private $logger: ILogger,
 		private $injector: IInjector) { }
 
 	public allCommands(includeDev: boolean): string[] {
