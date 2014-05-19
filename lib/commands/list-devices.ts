@@ -36,4 +36,4 @@ export class ListDevicesCommand implements ICommand {
 		}).future<void>()();
 	}
 }
-$injector.registerCommand("list-devices", ListDevicesCommand);
+$injector.registerCommand("device|*list", ListDevicesCommand);

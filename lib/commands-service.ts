@@ -1,5 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
+var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
+import helpers = require("./helpers");
 
 export class CommandsService implements ICommandsService {
 	private analyticsService : IAnalyticsService;
@@ -13,6 +15,7 @@ export class CommandsService implements ICommandsService {
 	}
 
 	constructor(private $errors: IErrors,
+		private $logger: ILogger,
 		private $injector: IInjector) { }
 
 	public allCommands(includeDev: boolean): string[] {
@@ -39,6 +42,41 @@ export class CommandsService implements ICommandsService {
 			() => this.executeCommandUnchecked("help", [commandName]));
 	}
 
+	public tryExecuteCommand(commandName: string, commandArguments: string[]): void {
+		if(!this.executeCommand(commandName, commandArguments)) {
+			this.$logger.fatal("Unknown command '%s'. Use 'appbuilder help' for help.", helpers.stringReplaceAll(commandName, "|", " "));
+			this.tryMatchCommand(commandName);
+		}
+	}
+
+	private tryMatchCommand(commandName: string): void {
+		var allCommands = this.allCommands(false);
+		var similarCommands = [];
+		_.each(allCommands, (command) => {
+			if(!this.$injector.isDefaultCommand(command)) {
+				command = helpers.stringReplaceAll(command, "|", " ");
+				var distance = jaroWinklerDistance(commandName, command);
+				if (commandName.length > 3 && command.indexOf(commandName) != -1) {
+					similarCommands.push({ rating: 1, name: command });
+				} else if (distance >= 0.65) {
+					similarCommands.push({ rating: distance, name: command });
+				}
+			}
+		});
+
+		similarCommands = _.sortBy(similarCommands, (command) => {
+			return -command.rating;
+		}).slice(0, 5);
+
+		if (similarCommands.length > 0) {
+			var message = ["Did you mean?"];
+			_.each(similarCommands, (command) => {
+				message.push("\t" + command.name);
+			});
+			this.$logger.fatal(message.join("\n"));
+		}
+	}
+
 	public completeCommand() {
 		var tabtab = require("tabtab");
 		tabtab.complete("appbuilder", (err, data) => {
@@ -48,11 +86,14 @@ export class CommandsService implements ICommandsService {
 
 			var deviceSpecific = ["build", "deploy"];
 			var propertyCommands = ["prop-cat", "prop-set", "prop-add", "prop-del"];
+			var childrenCommands = this.$injector.getChildrenCommandsNames(data.prev);
 
 			if (data.last.startsWith("--")) {
 				return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
 			} else if (_.contains(deviceSpecific, data.prev)) {
 				return tabtab.log(["ios", "android"], data);
+			} else if(childrenCommands) {
+				return tabtab.log(childrenCommands, data);
 			} else {
 				var propSchema = require("./helpers").getProjectFileSchema();
 				if (_.contains(propertyCommands, data.prev)) {
@@ -82,6 +123,14 @@ export class CommandsService implements ICommandsService {
 		});
 
 		return true;
+	}
+
+	private beautifyCommandName(commandName: string): string {
+		var str = helpers.stringReplaceAll(commandName, "|", " ");
+		if(str.indexOf("*") > 0) {
+			return str.substr(0, str.indexOf(" "));
+		}
+		return str;
 	}
 }
 $injector.register("commandsService", CommandsService);

@@ -17,9 +17,13 @@ export class HelpCommand implements ICommand {
 				topic = "";
 			}
 
+			if(args[1]) {
+				topic = util.format("%s|%s", args[0], args[1]);
+			}
+
 			var helpContent = this.$fs.readText(path.join(__dirname, "../../resources/help.txt")).wait();
 
-			var pattern = util.format("--\\[%s\\]--((.|[\\r\\n])+?)--\\[/\\]--", topic);
+			var pattern = util.format("--\\[%s\\]--((.|[\\r\\n])+?)--\\[/\\]--", (<any>RegExp).escape(topic));
 			var regex = new RegExp(pattern);
 
 			var match = regex.exec(helpContent);

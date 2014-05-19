@@ -97,10 +97,27 @@ export class Yok implements IInjector {
 	} = {};
 
 	private resolutionProgress: any = {};
+	private hierarchicalCommands: {[key: string]: string[]} = {};
 
 	public requireCommand(names: any, file: string) {
-		forEachName(names, (name) =>{
-			this.require(this.createCommandName(name), file);
+		forEachName(names, (commandName) => {
+			var commands = commandName.split("|");
+
+			if(commands.length > 1) {
+				var parentCommandName = commands[0];
+
+				if(!this.hierarchicalCommands[parentCommandName]) {
+					this.hierarchicalCommands[parentCommandName] = [];
+				}
+
+				this.hierarchicalCommands[parentCommandName].push(commands[1]);
+			}
+
+			if(commands.length > 1 && !this.modules[this.createCommandName(commands[0])]) {
+				this.require(this.createCommandName(commands[0]), file);
+			} else {
+				this.require(this.createCommandName(commandName), file);
+			}
 		});
 	}
 
@@ -122,8 +139,51 @@ export class Yok implements IInjector {
 
 	public registerCommand(names: any, resolver: any): void {
 		forEachName(names, (name) => {
+			var commands = name.split("|");
 			this.register(this.createCommandName(name), resolver);
+
+			if(commands.length > 1) {
+				this.createHierarchicalCommand(commands[0]);
+			}
 		});
+	}
+
+	private getDefaultCommand(name: string) {
+		var subCommands = this.hierarchicalCommands[name];
+		var defaultCommand = _.find(subCommands, (command) => command.startsWith("*"));
+		return defaultCommand;
+	}
+
+	private createHierarchicalCommand(name: string) {
+		var factory = () => {
+			return {
+				execute: (args: string[]): IFuture<void> => {
+					return (() => {
+						var commandsService = $injector.resolve("commandsService");
+						var commandName: string = null;
+
+						if(args.length > 0) {
+							commandName = args[0];
+						} else {
+							var defaultCommand = this.getDefaultCommand(name);
+							commandName = defaultCommand || "help";
+						}
+
+						if(commandName !== "help") {
+							commandName = util.format("%s|%s", name, commandName);
+						}
+
+						commandsService.tryExecuteCommand(commandName, commandName === "help" ? [name] : _.rest(args));
+					}).future<void>()();
+				}
+			};
+		};
+
+		$injector.registerCommand(name, factory);
+	}
+
+	public isDefaultCommand(commandName: string): boolean {
+		return commandName.indexOf("*") > 0 && commandName.indexOf("|") > 0;
 	}
 
 	public register(name: string, resolver: any, shared: boolean = true): void {
@@ -148,7 +208,7 @@ export class Yok implements IInjector {
 		if (!this.modules[commandModuleName]) {
 			return null;
 		}
-		command = this.resolve(commandModuleName);
+ 		command = this.resolve(commandModuleName);
 
 		return command;
 	}
@@ -258,6 +318,10 @@ export class Yok implements IInjector {
 			commands = _.reject(commands, (command) => command.startsWith("dev-"));
 		}
 		return commands;
+	}
+
+	public getChildrenCommandsNames(commandName: string): string[] {
+		return this.hierarchicalCommands[commandName];
 	}
 
 	private createCommandName(name: string) {
