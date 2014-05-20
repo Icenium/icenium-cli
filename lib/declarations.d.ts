@@ -146,14 +146,22 @@ declare module Project {
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
-		createNewProject(projectName: string): IFuture<void>;
-		createProjectFileFromExistingProject(): IFuture<void>;
+		createNewProject(projectType: number, projectName: string): IFuture<void>;
+		createNewCordovaProject(projectName: string): IFuture<void>;
+		createNewNativeScriptProject(projectName: string): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
 	}
 
 	interface IPlatformMigrator {
 		ensureAllPlatformAssets(): IFuture<void>;
 	}
+}
+
+interface IProjectTypes {
+	Cordova: number;
+	NativeScript: number;
+	CordovaName: string;
+	NativeScriptName: string;
 }
 
 // duplicated from fs.Stats, because I cannot import it here
@@ -227,6 +235,7 @@ interface IChildProcess {
 interface IProjectData {
 	ProjectName: string;
 	projectVersion : number;
+	projectType: string;
 	AppIdentifier: string;
 	DisplayName: string;
 	Author: string;
@@ -273,7 +282,8 @@ interface IConfiguration {
 	PROJECT_FILE_NAME: string;
 	SOLUTION_SPACE_NAME: string;
 	QR_SIZE: number;
-	DEFAULT_PROJECT_TEMPLATE: string;
+	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
+	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
 	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;

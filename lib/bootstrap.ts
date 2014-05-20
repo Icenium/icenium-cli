@@ -52,8 +52,10 @@ $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
 $injector.requireCommand("cloud-sync", "./services/build");
 
+$injector.require("projectTypes", "./project-types");
 $injector.require("project", "./project");
-$injector.requireCommand("create", "./project");
+$injector.requireCommand("create|cordova", "./project");
+$injector.requireCommand("create|nativescript", "./project");
 $injector.requireCommand("init", "./project");
 $injector.requireCommand("prop|add", "./project");
 $injector.requireCommand("prop|set", "./project");

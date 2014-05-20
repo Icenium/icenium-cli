@@ -22,7 +22,8 @@ export class TemplatesService implements ITemplatesService {
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $resources: IResourceLoader,
-		private $httpClient: Server.IHttpClient) {
+		private $httpClient: Server.IHttpClient,
+		private $projectTypes: IProjectTypes) {
 			this.configFiles = [
 				new ConfigurationFile(
 					"android-manifest",
@@ -75,11 +76,21 @@ export class TemplatesService implements ITemplatesService {
 		return this.configFiles;
 	}
 
-	public projectTemplatesString(): string {
+	public projectCordovaTemplatesString(): string {
 		var templates = _.map(this.$fs.readDirectory(this.projectTemplatesDir).wait(), (file) => {
 			var match = file.match(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
 			return match && match[1];
-		});
+		})
+		.filter((file: string) => file !== null);
+		return helpers.formatListOfNames(templates);
+	}
+
+	public projectNativeScriptTemplatesString(): string {
+		var templates = _.map(this.$fs.readDirectory(this.projectTemplatesDir).wait(), (file) => {
+			var match = file.match(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
+			return match && match[1];
+		})
+		.filter((file: string) => file !== null);
 		return helpers.formatListOfNames(templates);
 	}
 
@@ -89,8 +100,8 @@ export class TemplatesService implements ITemplatesService {
 		}).join("\n");
 	}
 
-	public getTemplateFilename(name: string): string {
-		return util.format("Telerik.Mobile.Cordova.%s.zip", name);
+	public getTemplateFilename(projectType: number, name: string): string {
+		return util.format("Telerik.Mobile.%s.%s.zip", this.$projectTypes[projectType], name);
 	}
 
 	public downloadProjectTemplates(): IFuture<void> {
