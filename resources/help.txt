@@ -18,7 +18,6 @@ Project development commands:
     deploy                          Builds and deploys the project to a connected device.
     cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
     livesync                        Synchronizes the latest changes in your project to connected devices.
-    simulate                        Runs the current project in the device simulator on Windows systems.
     debug                           Runs an application allowing you to remotely debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
@@ -301,8 +300,6 @@ Usage:
     $ appbuilder simulate
 
 Runs the current project in the device simulator.
-
-In this version of the Telerik AppBuilder CLI, you cannot run your apps in the device simulator on OS X systems. The device simulator will become available for OS X in a future release of Telerik AppBuilder.
 
 Options:
     --path <path> - Specifies the path to the project. If not specified, the project is searched
