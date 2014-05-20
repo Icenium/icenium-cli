@@ -146,10 +146,10 @@ declare module Project {
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
-		createNewProject(projectType: number, projectName: string): IFuture<void>;
 		createNewCordovaProject(projectName: string): IFuture<void>;
 		createNewNativeScriptProject(projectName: string): IFuture<void>;
-		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
+		createCordovaProjectFileFromExistingProject(): IFuture<void>;
+		createNativeScriptProjectFileFromExistingProject(): IFuture<void>;
 	}
 
 	interface IPlatformMigrator {

@@ -123,7 +123,7 @@ export class Project implements Project.IProject {
 		return this.createNewProject(this.$projectTypes.NativeScript, projectName);
 	}
 
-	public createNewProject(projectType: number, projectName: string): IFuture<void> {
+	private createNewProject(projectType: number, projectName: string): IFuture<void> {
 		return ((): void => {
 			if (!projectName) {
 				this.$errors.fail("No project name specified.")
@@ -135,7 +135,15 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createProjectFileFromExistingProject(): IFuture<void> {
+	public createCordovaProjectFileFromExistingProject(): IFuture<void> {
+		return this.createProjectFileFromExistingProject(this.$projectTypes.Cordova);
+	}
+
+	public createNativeScriptProjectFileFromExistingProject(): IFuture<void> {
+		return this.createProjectFileFromExistingProject(this.$projectTypes.NativeScript);
+	}
+
+	private createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
 			var projectFile = path.join(projectDir, this.$config.PROJECT_FILE_NAME);
@@ -149,7 +157,7 @@ export class Project implements Project.IProject {
 			}
 
 			try {
-				this.createProjectFile(projectDir, appname, properties).wait();
+				this.createProjectFile(projectDir, appname, projectType, properties).wait();
 				this.$logger.info("Successfully initialized project in the folder!");
 			}
 			catch (ex) {
@@ -230,20 +238,15 @@ export class Project implements Project.IProject {
 		}).future<IProjectData>()();
 	}
 
-	private getDefaultProjectForType(projectType: number) {
-		if (projectType === this.$projectTypes.Cordova) {
-			return this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
-		} else if (projectType === this.$projectTypes.NativeScript) {
-			return this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
-		} else {
-			throw new Error("Unsupported project type");
-		}
-	}
+	private defaultProjectForType = [
+		this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE,
+		this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE
+	];
 
 	private createFromTemplate(appname: string, projectType: number, projectDir: string): IFuture<void> {
 		return (() => {
 			var templatesDir = this.$templatesService.projectTemplatesDir,
-				template = options.template || this.getDefaultProjectForType(projectType),
+				template = options.template || this.defaultProjectForType[projectType],
 				templateFileName;
 
 			if (projectType === this.$projectTypes.Cordova && template.toLowerCase() === "kendouidataviz") {
@@ -283,7 +286,10 @@ export class Project implements Project.IProject {
 					throw ex;
 				}
 			} else {
-				var message = util.format("The requested template %s does not exist.%sAvailable templates are: %s", options.template, os.EOL, this.$templatesService.projectTemplatesString());
+				var message = util.format("The requested template %s does not exist.%sAvailable templates are: %s",
+					options.template,
+					os.EOL,
+					(projectType === this.$projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
 				this.$errors.fail({formatStr: message, suppressCommandHelp: true});
 			}
 		}).future<void>()();
@@ -313,14 +319,16 @@ export class Project implements Project.IProject {
 		return options.path || process.cwd();
 	}
 
-	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<void> {
+	private createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
 			var updateData;
 
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
-			this.projectData = this.$fs.readJson(path.join(__dirname, "../resources/default-project.json")).wait();
+			this.projectData = this.$fs.readJson(
+				path.join(__dirname,
+					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType]))).wait();
 
 			var projectSchema = helpers.getProjectFileSchema();
 			Object.keys(properties).forEach(propertyName => {
@@ -608,7 +616,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 		if (properties.hasOwnProperty("name")) {
 			properties.ProjectName = properties.name;
-			delete properties.name;
 			updated = true;
 		}
 
@@ -630,7 +637,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		});
 		
 		if(!properties.hasOwnProperty("projectType")) {
-			properties["projectType"] = this.$projectTypes.CordovaName;
+			properties["projectType"] = this.$projectTypes[this.$projectTypes.Cordova];
 			updated = true;
 		}
 
@@ -646,11 +653,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 }
 $injector.register("projectPropertiesService", ProjectPropertiesService);
-
+// register create * commands
 helpers.registerCommand("project", "create|cordova", (project, args) => project.createNewCordovaProject(args[0]));
 helpers.registerCommand("project", "create|nativescript", (project, args) => project.createNewNativeScriptProject(args[0]));
-
-helpers.registerCommand("project", "init", (project, args) => project.createProjectFileFromExistingProject());
+// register init * commands
+helpers.registerCommand("project", "init|cordova", (project, args) => project.createCordovaProjectFileFromExistingProject());
+helpers.registerCommand("project", "init|nativescript", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
+// register prop * commands
 _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	var propOperation = operation;
 	if (_.isArray(operation)) {

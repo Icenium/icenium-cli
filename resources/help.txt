@@ -145,13 +145,31 @@ Options:
 #{samplesService.getSamplesInformation}
 --[/]--
 
---[init]--
+--[init|cordova]--
 
 Usage:
-    $ appbuilder init [--appid <App ID>]
+    $ appbuilder init cordova [--appid <App ID>]
 
 Initializes an existing project for development in the current directory. If the folder contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
+The project must use Apache Cordova framework.
+
+Options:
+    --appid - Sets the application identifier for your app. The application identifier must consist of at least three
+        alphanumeric strings, separated by a dot (.). Each string must start with a letter.
+        The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
+        If not specified, the application identifier is set to com.telerik.<current directory name>.
+
+--[/]--
+
+--[init|nativescript]--
+
+Usage:
+    $ appbuilder init nativescript [--appid <App ID>]
+
+Initializes an existing project for development in the current directory. If the folder contains an existing AppBuilder project (created with
+the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
+The project must use Telerik NativeScript framework.
 
 Options:
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
