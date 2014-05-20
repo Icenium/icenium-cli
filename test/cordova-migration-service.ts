@@ -27,7 +27,10 @@ describe("cordova-migration-service", () => {
                     version: "3.2.0",
                     oldName: "org.apache.cordova.AudioHandler",
                     newName: "org.apache.cordova.media"
-                }]
+				}],
+				integratedPlugins: {
+					"3.2.0": ["org.apache.cordova.media", "plugin"]
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
@@ -41,12 +44,29 @@ describe("cordova-migration-service", () => {
                     version: "3.4.0",
                     oldName: "org.apache.cordova.AudioHandler",
                     newName: "org.apache.cordova.media"
-                }]
+				}],
+				integratedPlugins: {
+					"3.2.0": ["org.apache.cordova.AudioHandler"],
+					"3.4.0": ["org.apache.cordova.media"]
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0").wait(), ["org.apache.cordova.AudioHandler"]);
-        });
+		});
+
+		it("Remove plugins if they are no longer available in the version we are migrating to", () => {
+			registerMockedFS({
+				renamedPlugins: [],
+				integratedPlugins: {
+					"3.0.0": ["org.apache.cordova.camera"],
+					"3.2.0": ["org.apache.cordova.camera", "org.apache.cordova.statusbar"]
+				}
+			});
+
+			var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+			assert.deepEqual(service.migratePlugins(["org.apache.cordova.camera", "org.apache.cordova.statusbar"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.camera"]);
+		});
 
         it("Return renamed plugin if a rename matches", () => {
             registerMockedFS({
@@ -54,7 +74,10 @@ describe("cordova-migration-service", () => {
                     version: "3.2.0",
                     oldName: "org.apache.cordova.AudioHandler",
                     newName: "org.apache.cordova.media"
-                }]
+				}],
+				integratedPlugins: {
+					"3.2.0": ["org.apache.cordova.media"]
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
@@ -67,7 +90,10 @@ describe("cordova-migration-service", () => {
                     version: "3.2.0",
                     oldName: "org.apache.cordova.AudioHandler",
                     newName: "org.apache.cordova.media"
-                }]
+				}],
+				integratedPlugins: {
+					"3.0.0": ["org.apache.cordova.AudioHandler"],
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
@@ -85,7 +111,10 @@ describe("cordova-migration-service", () => {
                     version: "3.4.0",
                     oldName: "org.apache.cordova.media",
                     newName: "org.apache.cordova.NewMedia"
-                }]
+					}],
+				integratedPlugins: {
+					"3.4.0": ["org.apache.cordova.NewMedia"]
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
@@ -99,11 +128,14 @@ describe("cordova-migration-service", () => {
                     oldName: "org.apache.cordova.AudioHandler",
                     newName: "org.apache.cordova.media"
                 },
-                    {
-                        version: "3.4.0",
-                        oldName: "org.apache.cordova.media",
-                        newName: "org.apache.cordova.NewMedia"
-                    }]
+                {
+                    version: "3.4.0",
+                    oldName: "org.apache.cordova.media",
+                    newName: "org.apache.cordova.NewMedia"
+					}],
+				integratedPlugins: {
+					"3.0.0": ["org.apache.cordova.AudioHandler"]
+				}
             });
 
             var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
