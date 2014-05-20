@@ -72,6 +72,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				return plugin;
 			});
 
+			var supportedPlugins = this.pluginsForVersion(toVersion).wait();
+			plugins = _.filter(plugins, plugin => _.contains(supportedPlugins, plugin));
+
 			return plugins;
 		}).future<string[]>()();
 	}
