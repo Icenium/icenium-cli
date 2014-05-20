@@ -47,6 +47,7 @@ $injector.register("cryptographicIdentityStoreService", CryptographicIdentitySto
 
 export class IdentityManager implements Server.IIdentityManager {
 	constructor(private $cryptographicIdentityStoreService: ICryptographicIdentityStoreService,
+		private $selfSignedIdentityValidator: validators.SelfSignedIdentityValidator,
 		private $logger: ILogger,
 		private $errors: IErrors,
 		private $x509: IX509CertificateLoader,
@@ -170,6 +171,13 @@ export class IdentityManager implements Server.IIdentityManager {
 		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
 
 		return _.some(provision.Certificates, (c: string) => formattedCertificate.indexOf(c) >= 0);
+	}
+
+	public findReleaseCertificate(): IFuture<ICryptographicIdentity> {
+		return (() => {
+			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			return _.find(identities, (identity: ICryptographicIdentity) => this.$selfSignedIdentityValidator.validateCertificate(true, identity.Certificate));
+		}).future<ICryptographicIdentity>()();
 	}
 }
 $injector.register("identityManager", IdentityManager);

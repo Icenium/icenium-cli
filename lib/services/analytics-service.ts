@@ -35,7 +35,7 @@ export class AnalyticsService implements IAnalyticsService {
 					var message = "Do you want to help us improve " +
 						"Telerik".white.bold + " " + "AppBuilder".cyan.bold
 						+ " by automatically sending anonymous usage statistics? We will not use this information to identify or contact you."
-						+ " You can also read our official Privacy Policy at http://www.telerik.com/company/privacy-policy.";
+						+ " You can read our official Privacy Policy at\nhttp://www.telerik.com/company/privacy-policy";
 
 					trackFeatureUsage = this.$prompter.confirm(message, () => "y").wait();
 					this.$sharedUserSettingsService.saveSettings(this.createSettingsObject(trackFeatureUsage)).wait();

@@ -18,14 +18,23 @@ class X509Certificate implements IX509Certificate {
 		return X509Certificate.parseKeyValues(this.x509.getIssuerString());
 	}
 
+	public get issuedOn(): Date {
+		var notBefore = this.x509.getNotBefore();
+		return this.toDate(notBefore);
+	}
+
 	public get expiresOn(): Date {
 		var notAfter = this.x509.getNotAfter();
-		var timezone = notAfter.slice(-1);
+		return this.toDate(notAfter);
+	}
+
+	private toDate(certificateDate: string): Date {
+		var timezone = certificateDate.slice(-1);
 		if (timezone !== "Z") {
 			this.$logger.warn("Certificate time zone is not GMT.");
 		}
 
-		return moment(notAfter, "YYDDMMHHmmss").toDate();
+		return moment(certificateDate, "YYDDMMHHmmss").toDate();
 	}
 
 	private static parseKeyValues(keyValueStr: string): any {

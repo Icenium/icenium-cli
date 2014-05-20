@@ -18,6 +18,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("injector", testInjector);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("errors", stubs.ErrorsStub);
+	testInjector.register("x509", {});
 
 	return testInjector;
 }

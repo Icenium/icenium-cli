@@ -4,6 +4,7 @@
 /// <reference path="bootstrap.ts" />
 /// <reference path="child-process.ts" />
 /// <reference path="commands-service.ts" />
+/// <reference path="commands/appmanager.ts" />
 /// <reference path="commands/cryptographic-identities.ts" />
 /// <reference path="commands/debug.ts" />
 /// <reference path="commands/deploy.ts" />

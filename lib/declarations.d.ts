@@ -49,6 +49,7 @@ declare module Server {
 		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision>;
 		autoselectCertificate(provision: IProvision): IFuture<ICryptographicIdentity>;
 		isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean;
+		findReleaseCertificate(): IFuture<ICryptographicIdentity>;
 	}
 
 	interface IPackageDef {
@@ -319,6 +320,7 @@ interface IExtensionPlatformServices {
 
 interface IX509Certificate {
 	issuerData: any;
+	issuedOn: Date;
 	expiresOn: Date;
 }
 

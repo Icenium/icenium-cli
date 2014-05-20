@@ -147,8 +147,21 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
 				buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
 
+				var certificateData: ICryptographicIdentity;
 				if (options.certificate) {
-					var certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+				} else if (settings.configuration === "Release") {
+					certificateData = this.$identityManager.findReleaseCertificate().wait();
+
+					if (!certificateData) {
+						this.$logger.warn("Cannot find an applicable Google Play certificate to " +
+							"code sign this app. You will not be able to publish this app to " +
+							"Google Play. To create a Google Play certificate, run\n" +
+							"    $ appbuilder certificate create-self-signed");
+					}
+				}
+
+				if (certificateData) {
 					buildProperties.AndroidCodesigningIdentity = certificateData.Alias;
 					this.$logger.info("Using certificate '%s'", certificateData.Alias);
 				} else {

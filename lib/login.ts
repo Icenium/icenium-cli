@@ -172,7 +172,8 @@ export class LoginManager implements ILoginManager {
 			}).wait();
 
 			var wrapData = querystring.parse(wrapResponse.body),
-				wrap_access_token = wrapData.wrap_access_token;
+				wrap_access_token = wrapData.wrap_access_token,
+				wrap_refresh_token = wrapData.wrap_refresh_token;
 
 			try {
 				this.$serviceProxy.setShouldAuthenticate(false);
@@ -180,6 +181,8 @@ export class LoginManager implements ILoginManager {
 			} finally {
 				this.$serviceProxy.setShouldAuthenticate(true);
 			}
+
+			this.$server.authentication.setUserProperty("RefreshToken", wrap_refresh_token).wait();
 
 			if (userData) {
 				this.$userDataStore.setUser(userData).wait();

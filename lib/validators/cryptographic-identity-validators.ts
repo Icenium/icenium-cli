@@ -18,6 +18,10 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	public static INVALID_GOOGLE_PLAY_IDENTITY_EXPIRATION_DATE_ERROR_MESSAGE =
 		util.format("The expiration date of google play identity must be after %s", SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE);
 
+	constructor(private $x509: IX509CertificateLoader) {
+		super();
+	}
+
 	public validate(identityModel: ISelfSignedIdentityModel): IValidationResult {
 		var validationResult = BaseValidators.Helpers.validate([
 				() => this.validateName(identityModel.Name),
@@ -29,6 +33,12 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 			]);
 
 		return validationResult;
+	}
+
+	public validateCertificate(forGooglePlayPublishing: boolean, certificatePem: string): boolean {
+		var cert = this.$x509.load(certificatePem);
+		return this.validateStartDate(cert.issuedOn.toString()).IsSuccessful
+			&& this.validateEndDate(forGooglePlayPublishing.toString(), cert.issuedOn.toString(), cert.expiresOn.toString()).IsSuccessful;
 	}
 
 	public validateProperty(identityModel: ISelfSignedIdentityModel, propertyName: string): IValidationResult {
