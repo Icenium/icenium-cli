@@ -53,6 +53,7 @@ describe("project integration tests", () => {
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
+		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
 		project = testInjector.resolve("project");
 	});
 
@@ -125,6 +126,7 @@ describe("project unit tests", () => {
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", stubs.FileSystemStub);
+		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		var config = testInjector.resolve("config");
@@ -142,20 +144,20 @@ describe("project unit tests", () => {
 		});
 
 		it("sets string property with custom validator", () => {
-			var projectData = {name: "wrong"};
-			project.updateProjectProperty(projectData, "set", "name", ["fine"]).wait();
-			assert.equal("fine", projectData.name);
+			var projectData = {ProjectName: "wrong"};
+			project.updateProjectProperty(projectData, "set", "ProjectName", ["fine"]).wait();
+			assert.equal("fine", projectData.ProjectName);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
-			var projectData = {name: "wrong"};
-			assert.throws(() => project.updateProjectProperty(projectData, "add", "name", ["fine"]).wait());
+			var projectData = {ProjectName: "wrong"};
+			assert.throws(() => project.updateProjectProperty(projectData, "add", "ProjectName", ["fine"]).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
-			var projectData = {name: "wrong"};
-			assert.throws(() => project.updateProjectProperty(projectData, "del", "name", ["fine"]).wait());
+			var projectData = {ProjectName: "wrong"};
+			assert.throws(() => project.updateProjectProperty(projectData, "del", "ProjectName", ["fine"]).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
@@ -235,6 +237,7 @@ describe("project unit tests (canonical paths)", () => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
+		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
 		testInjector.resolve("config").PROJECT_FILE_NAME = "";
 	});
 

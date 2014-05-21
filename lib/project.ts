@@ -27,7 +27,8 @@ export class Project implements Project.IProject {
 		private $resources: IResourceLoader,
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
-		private $cordovaMigrationService: ICordovaMigrationService) {
+		private $cordovaMigrationService: ICordovaMigrationService,
+		private $projectPropertiesService: IProjectPropertiesService) {
 			this.readProjectData().wait();
 		}
 
@@ -98,9 +99,10 @@ export class Project implements Project.IProject {
 		return (() => {
 			var projectDir = this.getProjectDir();
 			if (projectDir) {
-				this.projectData = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
+				var data = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
+				this.projectData = data;
 
-				if (this.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
@@ -195,22 +197,22 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<any> {
+	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<IProjectData> {
 		return ((): any => {
 			var vseProjectFilepath = path.join(projectDir, appname + ".iceproj");
 			var githubProjectFilepath = path.join(projectDir, appname + ".proj");
 
 			if (this.$fs.exists(vseProjectFilepath).wait()) {
-				return this.getProjectProperties(vseProjectFilepath, appname).wait();
+				return this.$projectPropertiesService.getProjectProperties(vseProjectFilepath, false).wait();
 			}
 
 			if (this.$fs.exists(githubProjectFilepath).wait()) {
-				return this.getProjectProperties(githubProjectFilepath, appname).wait();
+				return this.$projectPropertiesService.getProjectProperties(githubProjectFilepath, false).wait();
 			}
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");
 			return null;
-		}).future<any>()();
+		}).future<IProjectData>()();
 	}
 
 	private createFromTemplate(appname, projectDir): IFuture<void> {
@@ -247,7 +249,7 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
-					var properties = this.getProjectProperties(path.join(projectDir, "mobile.proj"), appname).wait();
+					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, ".abproject"), true).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Creating project file.");
@@ -275,35 +277,9 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private getProjectProperties(projectFile: string, appName: string): IFuture<any> {
-		return ((): any => {
-			var properties: any = {};
-
-			var parser = new xml2js.Parser();
-			var contents = this.$fs.readText(projectFile).wait();
-
-			var parseString = Future.wrap((str, callback) => {
-				return parser.parseString(str, callback);
-			});
-
-			var result: any = parseString(contents).wait();
-			var propertyGroup: any = result.Project.PropertyGroup[0];
-
-			var projectSchema = helpers.getProjectFileSchema();
-			Object.keys(projectSchema).forEach((propertyName) => {
-				if (propertyGroup.hasOwnProperty(propertyName)) {
-					properties[propertyName] = propertyGroup[propertyName][0];
-				}
-			});
-
-			properties.name = propertyGroup.ProjectName[0];
-
-			return properties;
-		}).future<any>()();
-	}
-
-	private alterPropertiesForNewProject(properties, projectName: string): any {
-		properties.name = projectName;
+	private alterPropertiesForNewProject(properties: any, projectName: string): IProjectData {
+		properties.ProjectName = projectName;
+		properties.DisplayName = projectName;
 		var appid = options.appid;
 		if (!options.appid) {
 			appid = this.generateDefaultAppId(projectName);
@@ -328,56 +304,24 @@ export class Project implements Project.IProject {
 			this.projectData = this.$fs.readJson(path.join(__dirname, "../resources/default-project.json")).wait();
 
 			var projectSchema = helpers.getProjectFileSchema();
-			Object.keys(properties).forEach(prop => {
-				if (projectSchema.hasOwnProperty(prop)) {
-					if (projectSchema[prop].flags) {
-						this.projectData[prop] = properties[prop] !== "" ? properties[prop].split(";") : [];
-						updateData = this.projectData[prop];
+			Object.keys(properties).forEach(propertyName => {
+				if (projectSchema.hasOwnProperty(propertyName)) {
+					this.projectData[propertyName] = properties[propertyName];
+					if (projectSchema[propertyName].flags) {
+						updateData = this.projectData[propertyName];
 					} else {
-						this.projectData[prop] = properties[prop];
-						updateData = [this.projectData[prop]];
+						updateData = [this.projectData[propertyName]];
 					}
 
 					//triggers validation logic
-					this.updateProjectProperty({}, "set", prop, updateData, false).wait();
+					this.updateProjectProperty({}, "set", propertyName, updateData, false).wait();
 				}
 			});
 
-			this.completeProjectProperties(this.projectData);
+			this.$projectPropertiesService.completeProjectProperties(this.projectData);
 
 			this.saveProject(projectDir).wait();
 		}).future<void>()();
-	}
-
-	private completeProjectProperties(properties: any): boolean {
-		var updated = false;
-
-		if (properties.hasOwnProperty("iOSDisplayName")) {
-			properties.DisplayName = properties.iOSDisplayName;
-			delete properties.iOSDisplayName;
-			updated = true;
-		}
-		if (!properties.DisplayName) {
-			properties.DisplayName = properties.name;
-			updated = true;
-		}
-
-		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!properties.hasOwnProperty(wp8guid)) {
-				properties[wp8guid] = MobileHelper.generateWP8GUID();
-				updated = true;
-			}
-		});
-
-		var defaultProject = this.$resources.readJson("default-project.json").wait();
-		Object.keys(defaultProject).forEach((propName) => {
-			if (!properties.hasOwnProperty(propName)) {
-				properties[propName] = defaultProject[propName];
-				updated = true;
-			}
-		});
-
-		return updated;
 	}
 
 	public createTemplateFolder(projectDir: string): IFuture<any> {
@@ -586,6 +530,92 @@ export class Project implements Project.IProject {
 	}
 }
 $injector.register("project", Project);
+
+export class ProjectPropertiesService implements IProjectPropertiesService {
+	constructor(private $fs: IFileSystem,
+		private $resources: IResourceLoader) {
+	}
+
+	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
+		return ((): any => {
+			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
+				this.getProjectPropertiesFromXmlProjectFile(projectFile).wait();
+
+			this.completeProjectProperties(properties);
+
+			return properties;
+		}).future<IProjectData>()();
+	}
+
+	private getProjectPropertiesFromXmlProjectFile(projectFile: string): IFuture<any> {
+		return ((): any => {
+			var properties: any = {};
+
+			var parser = new xml2js.Parser();
+			var contents = this.$fs.readText(projectFile).wait();
+
+			var parseString = Future.wrap((str, callback) => {
+				return parser.parseString(str, callback);
+			});
+
+			var result: any = parseString(contents).wait();
+			var propertyGroup: any = result.Project.PropertyGroup[0];
+
+			var projectSchema = helpers.getProjectFileSchema();
+			Object.keys(projectSchema).forEach((propertyName) => {
+				if (propertyGroup.hasOwnProperty(propertyName)) {
+					properties[propertyName] = propertyGroup[propertyName][0];
+
+					if (projectSchema[propertyName].flags) {
+						properties[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
+					}
+				}
+			});
+
+			properties.ProjectName = propertyGroup.ProjectName[0];
+
+			return properties;
+		}).future<any>()();
+	}
+
+	public completeProjectProperties(properties: any): boolean {
+		var updated = false;
+
+		if (properties.hasOwnProperty("name")) {
+			properties.ProjectName = properties.name;
+			delete properties.name;
+			updated = true;
+		}
+
+		if (properties.hasOwnProperty("iOSDisplayName")) {
+			properties.DisplayName = properties.iOSDisplayName;
+			delete properties.iOSDisplayName;
+			updated = true;
+		}
+		if (!properties.DisplayName) {
+			properties.DisplayName = properties.ProjectName;
+			updated = true;
+		}
+
+		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
+			if (!properties.hasOwnProperty(wp8guid)) {
+				properties[wp8guid] = MobileHelper.generateWP8GUID();
+				updated = true;
+			}
+		});
+
+		var defaultProject = this.$resources.readJson("default-project.json").wait();
+		Object.keys(defaultProject).forEach((propName) => {
+			if (!properties.hasOwnProperty(propName)) {
+				properties[propName] = defaultProject[propName];
+				updated = true;
+			}
+		});
+
+		return updated;
+	}
+}
+$injector.register("projectPropertiesService", ProjectPropertiesService);
 
 helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
 helpers.registerCommand("project", "init", (project, args) => project.createProjectFileFromExistingProject());

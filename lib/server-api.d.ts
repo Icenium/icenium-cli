@@ -83,6 +83,7 @@ declare module Server {
 		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
 		getItemTemplates(): IFuture<any>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<any>;
+		getProjectFileSchema($resultStream: any): IFuture<void>;
 		getProjectTemplates(): IFuture<any>;
 		getSolution(solutionName: string, checkUpgradability: string): IFuture<any>;
 		importPackage(solutionName: string, projectName: string, archivePackage: any, parentIdentifier: string): IFuture<void>;
