@@ -16,134 +16,150 @@ export class HttpClient implements Server.IHttpClient {
 		private $config: IConfiguration) {}
 
 	httpRequest(options): IFuture<Server.IResponse> {
-		if (_.isString(options)) {
-			options = {
-				url: options,
-				method: "GET"
-			}
-		}
-
-		if (options.url) {
-			var urlParts = Url.parse(options.url);
-			if (urlParts.protocol) {
-				options.proto = urlParts.protocol.slice(0, -1);
-			}
-			options.host = urlParts.hostname;
-			options.port = urlParts.port;
-			options.path = urlParts.path;
-			delete options.url;
-		}
-
-		var requestProto =  options.proto || "http";
-		delete options.proto;
-		var body = options.body;
-		delete options.body;
-		var pipeTo = options.pipeTo;
-		delete options.pipeTo;
-
-		var proto = this.$config.PROXY_TO_FIDDLER ? "http" : requestProto;
-		var http = require(proto);
-
-		options.headers = options.headers || {};
-		var headers = options.headers;
-
-		if (this.$config.PROXY_TO_FIDDLER) {
-			options.path = requestProto + "://" + options.host + options.path;
-			headers.Host = options.host;
-			options.host = "127.0.0.1";
-			options.port = 8888;
-		}
-
-		if (!headers.Accept || headers.Accept.indexOf("application/json") < 0) {
-			if (headers.Accept) {
-				headers.Accept += ", ";
-			} else {
-				headers.Accept = "";
-			}
-			headers.Accept += "application/json; charset=UTF-8, */*;q=0.8";
-		}
-
-		if (!headers["User-Agent"]) {
-			if (!this.defaultUserAgent) {
-				this.defaultUserAgent = util.format("AppBuilderCLI/%s (Node.js %s; %s; %s)",
-					this.$config.version,
-					process.versions.node, process.platform, process.arch);
-				this.$logger.debug("User-Agent: %s", this.defaultUserAgent);
+		return (() => {
+			if (_.isString(options)) {
+				options = {
+					url: options,
+					method: "GET"
+				}
 			}
 
-			headers["User-Agent"] = this.defaultUserAgent;
-		}
+			var unmodifiedOptions = _.clone(options);
 
-		if (!headers["Accept-Encoding"]) {
-			headers["Accept-Encoding"] = "gzip,deflate";
-		}
-
-		var result = new Future<Server.IResponse>();
-
-		this.$logger.trace("httpRequest: %s", util.inspect(options));
-
-		var request = http.request(options, (response) => {
-			var data = [];
-			var successful = helpers.isRequestSuccessful(response);
-			if (!successful) {
-				pipeTo = undefined;
+			if (options.url) {
+				var urlParts = Url.parse(options.url);
+				if (urlParts.protocol) {
+					options.proto = urlParts.protocol.slice(0, -1);
+				}
+				options.host = urlParts.hostname;
+				options.port = urlParts.port;
+				options.path = urlParts.path;
+				delete options.url;
 			}
 
-			var responseStream = response;
-			switch (response.headers['content-encoding']) {
-				case 'gzip':
-					responseStream = responseStream.pipe(zlib.createGunzip());
-					break;
-				case 'deflate':
-					responseStream = responseStream.pipe(zlib.createInflate());
-					break;
+			var requestProto = options.proto || "http";
+			delete options.proto;
+			var body = options.body;
+			delete options.body;
+			var pipeTo = options.pipeTo;
+			delete options.pipeTo;
+
+			var proto = this.$config.PROXY_TO_FIDDLER ? "http" : requestProto;
+			var http = require(proto);
+
+			options.headers = options.headers || {};
+			var headers = options.headers;
+
+			if (this.$config.PROXY_TO_FIDDLER) {
+				options.path = requestProto + "://" + options.host + options.path;
+				headers.Host = options.host;
+				options.host = "127.0.0.1";
+				options.port = 8888;
 			}
 
-			if (pipeTo) {
-				pipeTo.on("finish", () => {
-					this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
-					result.return({
-						response: response,
-						headers: response.headers
-					});
-				});
-				responseStream.pipe(pipeTo);
-			} else {
-				responseStream.on("data", (chunk) => {
-					this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
-					data.push(chunk);
-				});
+			if (!headers.Accept || headers.Accept.indexOf("application/json") < 0) {
+				if (headers.Accept) {
+					headers.Accept += ", ";
+				} else {
+					headers.Accept = "";
+				}
+				headers.Accept += "application/json; charset=UTF-8, */*;q=0.8";
+			}
 
-				responseStream.on("end", () => {
-					this.$logger.trace("httpRequest: Done. code = %d", response.statusCode);
-					var body = data.join("");
+			if (!headers["User-Agent"]) {
+				if (!this.defaultUserAgent) {
+					this.defaultUserAgent = util.format("AppBuilderCLI/%s (Node.js %s; %s; %s)",
+						this.$config.version,
+						process.versions.node, process.platform, process.arch);
+					this.$logger.debug("User-Agent: %s", this.defaultUserAgent);
+				}
 
-					if (successful) {
+				headers["User-Agent"] = this.defaultUserAgent;
+			}
+
+			if (!headers["Accept-Encoding"]) {
+				headers["Accept-Encoding"] = "gzip,deflate";
+			}
+
+			var result = new Future<Server.IResponse>();
+
+			this.$logger.trace("httpRequest: %s", util.inspect(options));
+
+			var request = http.request(options, (response) => {
+				var data = [];
+				var isRedirect = helpers.isResponseRedirect(response);
+				var successful = helpers.isRequestSuccessful(response);
+				if (!successful) {
+					pipeTo = undefined;
+				}
+
+				var responseStream = response;
+				switch (response.headers['content-encoding']) {
+					case 'gzip':
+						responseStream = responseStream.pipe(zlib.createGunzip());
+						break;
+					case 'deflate':
+						responseStream = responseStream.pipe(zlib.createInflate());
+						break;
+				}
+
+				if (pipeTo) {
+					pipeTo.on("finish", () => {
+						this.$logger.trace("httpRequest: Piping done. code = %d", response.statusCode);
 						result.return({
-							body: body,
 							response: response,
-							headers: response.headers,
-						})
+							headers: response.headers
+						});
+					});
+					responseStream.pipe(pipeTo);
+				} else {
+					responseStream.on("data", (chunk) => {
+						this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
+						data.push(chunk);
+					});
+
+					responseStream.on("end", () => {
+						this.$logger.trace("httpRequest: Done. code = %d", response.statusCode);
+						var body = data.join("");
+
+						if (successful || isRedirect) {
+							result.return({
+								body: body,
+								response: response,
+								headers: response.headers,
+							})
 					} else {
-						var errorMessage = this.getErrorMessage(response, body);
-						var theError: any = new Error(errorMessage);
-						theError.response = response;
-						theError.body = body;
-						result.throw(theError);
-					}
-				});
+							var errorMessage = this.getErrorMessage(response, body);
+							var theError: any = new Error(errorMessage);
+							theError.response = response;
+							theError.body = body;
+							result.throw(theError);
+						}
+					});
+				}
+			});
+
+			this.$logger.trace("httpRequest: Sending:\n%s", body);
+
+			if (!body || !body.pipe) {
+				request.end(body);
+			} else {
+				body.pipe(request);
 			}
-		});
 
-		this.$logger.trace("httpRequest: Sending:\n%s", body);
+			var response = result.wait();
+			if(helpers.isResponseRedirect(response.response)) {
+				if (response.response.statusCode == 303) {
+					unmodifiedOptions.method = "GET";
+				}
 
-		if (!body || !body.pipe) {
-			request.end(body);
-		} else {
-			body.pipe(request);
-		}
+				this.$logger.trace("Begin redirected to %s", response.headers.location);
+				unmodifiedOptions.url = response.headers.location;
+				return this.httpRequest(unmodifiedOptions).wait();
+			}
 
-		return result;
+			return response;
+		}).future<Server.IResponse>()();
 	}
 
 	private getErrorMessage(response, body: string): string {

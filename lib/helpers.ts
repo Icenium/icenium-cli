@@ -42,6 +42,10 @@ export function isRequestSuccessful(request) {
 	return request.statusCode >= 200 && request.statusCode < 300;
 }
 
+export function isResponseRedirect(response) {
+	return _.contains([301, 302, 303, 307, 308], response.statusCode);
+}
+
 export function getRelativeToRootPath(rootPath, filePath) {
 	var relativeToRootPath = filePath.substr(rootPath.length);
 	return relativeToRootPath;
@@ -121,6 +125,10 @@ export function isNullOrWhitespace(input: string): boolean {
 	}
 
 	return input.replace(/\s/gi, '').length < 1;
+}
+
+export function capitalizeFirstLetter(str: string) {
+	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function formatListOfNames(names: string[], conjunction = "or"): string {

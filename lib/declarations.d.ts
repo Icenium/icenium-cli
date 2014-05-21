@@ -146,6 +146,7 @@ declare module Project {
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
 		createNewProject(projectName: string): IFuture<void>;
+		createProjectFileFromExistingProject(): IFuture<void>;
 		createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<any>;
 	}
 
@@ -393,5 +394,10 @@ interface ICordovaMigrationService {
 	getSupportedVersions(): IFuture<string[]>;
 	pluginsForVersion(version: string): IFuture<string[]>;
 	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+}
+
+interface ISamplesService {
+	cloneSample(sampleName: string): IFuture<void>;
+	printSamplesInformation(): IFuture<string>;
 }
 

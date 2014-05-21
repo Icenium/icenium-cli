@@ -1,0 +1,150 @@
+///<reference path="../.d.ts"/>
+"use strict";
+
+import Future = require("fibers/future");
+import path = require("path");
+import util = require("util");
+import os = require("os");
+import temp = require("temp");
+import helpers = require("../helpers");
+var options: any = require("../options");
+
+class Sample {
+	constructor(public name,
+		public displayName,
+		public description,
+		public zipUrl,
+		public githubUrl) {
+	}
+}
+
+export class SamplesService implements ISamplesService {
+	private static GITHUB_SAMPLES_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
+	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/sample-[\w\W]+[.]git$/i;
+	private static NAME_FORMAT_REGEX = /(sample-|-)/gi;
+	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i
+	private static REMOTE_LOCK_STATE_PRIVATE = "private";
+	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
+
+	private _samples: Sample[];
+	constructor(private $logger: ILogger,
+		private $errors: IErrors,
+		private $fs: IFileSystem,
+		private $project: Project.IProject,
+		private $httpClient: Server.IHttpClient) {
+	}
+
+	private get samples(): IFuture<Sample[]> {
+		return (() => {
+			if (!this._samples) {
+				this._samples = this.getAllSamples().wait();
+			}
+
+			return this._samples;
+		}).future<Sample[]>()();
+	}
+
+	public printSamplesInformation(): IFuture<string> {
+		return (() => {
+			this.$logger.info(this.getSamplesInformation().wait());
+		}).future<string>()();
+	}
+
+	public cloneSample(sampleName: string): IFuture<void> {
+		return (() => {
+			var cloneTo = options.path || sampleName;
+			if(this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
+				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
+			}
+
+			var sample = _.find(this.samples.wait(), (sample: Sample) => sample.name.toLowerCase() === sampleName.toLowerCase());
+			if (!sample) {
+				this.$errors.fail("There is no sample named '%s'.", sampleName);
+			}
+
+			this.$logger.info("Cloning sample from GitHub...");
+			try {
+				var tempDir = temp.mkdirSync("appbuilderSamples");
+				var filepath = path.join(tempDir, sampleName);
+				var file = this.$fs.createWriteStream(filepath);
+				var fileEnd = this.$fs.futureFromEvent(file, "finish");
+
+				var response = this.$httpClient.httpRequest({ url: sample.zipUrl, pipeTo: file }).wait();
+				fileEnd.wait();
+
+				this.$fs.unzip(filepath, tempDir).wait();
+				var projectFile = _.first(helpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.extname(filepath) === ".proj"));
+				var projectDir = path.dirname(projectFile);
+				var files = helpers.enumerateFilesInDirectorySync(projectDir);
+				_.each(files, file => {
+					var targetDir = path.join(cloneTo, file.replace(projectDir, ""));
+					this.$fs.copyFile(file, targetDir).wait();
+				})
+
+				//remove creating project file when project files are unified across clients and the samples contain an .abproject file
+				try {
+					options.path = cloneTo;
+					this.$project.createProjectFileFromExistingProject().wait();
+				}
+				catch (error) {
+					this.$fs.deleteDirectory(cloneTo).wait();
+					throw error;
+				}
+			} finally {
+				temp.cleanup();
+			}
+		}).future<void>()();
+	}
+
+	private getSamplesInformation(): IFuture<string> {
+		return (() => {
+			try {
+				var availableSamples = this.samples.wait();
+			} catch (error) {
+				return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
+			}
+
+			var samples = _.map(availableSamples, (sample: Sample) => {
+				var nameRow = util.format("Sample: %s", sample.displayName);
+				var descriptionRow = util.format("Description: %s", sample.description);
+				var gitClone = util.format("Github repository page: %s", sample.githubUrl)
+				var cloneCommand = util.format("Clone command: $ appbuilder sample clone %s", sample.name);
+				return [nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL);
+			});
+			samples.unshift("You can choose a sample from the following:");
+			return samples.join(os.EOL + os.EOL);
+		}).future<string>()();
+	}
+
+	private getAllSamples(): IFuture<Sample[]> {
+		return (() => {
+			try {
+				var repos = JSON.parse(this.$httpClient.httpRequest(SamplesService.GITHUB_SAMPLES_LOCATION_ENDPOINT).wait().body);
+			} catch (error) {
+				this.$logger.debug(error);
+				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
+			}
+
+			repos = _.select(repos, (repo: any) => {
+				return SamplesService.GITHUB_REGEX.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE];
+			});
+
+			var samples = _.map(repos, (repo: any) => {
+				return new Sample(
+					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
+					helpers.capitalizeFirstLetter(repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim()),
+					repo.description,
+					repo.url + "/zipball/" + repo.default_branch,
+					repo.html_url);
+			});
+
+			var sortedSamples = _.sortBy(samples, sample => sample.displayName);
+
+			return sortedSamples;
+		}).future<Sample[]>()();
+	}
+}
+$injector.register("samplesService", SamplesService);
+helpers.registerCommand("samplesService", "sample|*list", (samplesService, args) => samplesService.printSamplesInformation());
+helpers.registerCommand("samplesService", "sample|clone", (samplesService, args) => samplesService.cloneSample(args[0]));
+

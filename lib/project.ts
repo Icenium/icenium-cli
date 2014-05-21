@@ -199,15 +199,14 @@ export class Project implements Project.IProject {
 
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<IProjectData> {
 		return ((): any => {
-			var vseProjectFilepath = path.join(projectDir, appname + ".iceproj");
-			var githubProjectFilepath = path.join(projectDir, appname + ".proj");
+			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
+ 				var extension = path.extname(file);
+ 				return extension == ".proj" || extension == ".iceproj";
+ 
+			});
 
-			if (this.$fs.exists(vseProjectFilepath).wait()) {
-				return this.$projectPropertiesService.getProjectProperties(vseProjectFilepath, false).wait();
-			}
-
-			if (this.$fs.exists(githubProjectFilepath).wait()) {
-				return this.$projectPropertiesService.getProjectProperties(githubProjectFilepath, false).wait();
+			if (projectFile) {
+				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), false).wait();
 			}
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");
