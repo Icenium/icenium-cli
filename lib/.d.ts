@@ -94,6 +94,7 @@
 /// <reference path="services/path-filtering.ts" />
 /// <reference path="services/platform-migration.ts" />
 /// <reference path="services/samples-service.ts" />
+/// <reference path="services/project-properties-service.ts" />
 /// <reference path="services/server-extensions.ts" />
 /// <reference path="services/user-settings-service.ts" />
 /// <reference path="templates-service.ts" />
