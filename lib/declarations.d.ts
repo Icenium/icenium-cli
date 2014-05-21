@@ -366,6 +366,7 @@ interface IResourceLoader {
 
 interface IResourceDownloader {
 	downloadCordovaJsFiles(): IFuture<void>;
+	downloadProjectFileSchema(): IFuture<void>;
 }
 
 interface IQueue<T> {

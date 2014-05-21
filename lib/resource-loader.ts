@@ -35,12 +35,10 @@ class ResourceDownloader implements IResourceDownloader {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
 		private $resources: IResourceLoader,
-		private $cordovaMigrationService: ICordovaMigrationService,
-		private $projectTypes: IProjectTypes) { }
+		private $cordovaMigrationService: ICordovaMigrationService) { }
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
-			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
 			var cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
 			var platforms = Object.keys(MobileHelper.platformCapabilities);
 			cordovaVersions.forEach((version) => {
@@ -51,6 +49,15 @@ class ResourceDownloader implements IResourceDownloader {
 					this.$server.cordova.getJs(version, platform, targetFile).wait();
 				});
 			});
+		}).future<void>()();
+	}
+
+	public downloadProjectFileSchema(): IFuture<void> {
+		return (() => {
+			var targetFilePath = path.join(this.$resources.resolvePath(""), helpers.getProjectFileSchemaFileName());
+			this.$fs.createDirectory(path.dirname(targetFilePath)).wait();
+			var targetFile = this.$fs.createWriteStream(targetFilePath);
+			this.$server.projects.getProjectFileSchema(targetFile).wait();
 		}).future<void>()();
 	}
 }
