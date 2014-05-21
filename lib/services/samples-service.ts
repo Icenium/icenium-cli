@@ -87,16 +87,6 @@ export class SamplesService implements ISamplesService {
 					var targetDir = path.join(cloneTo, file.replace(projectDir, ""));
 					this.$fs.copyFile(file, targetDir).wait();
 				})
-
-				//remove creating project file when project files are unified across clients and the samples contain an .abproject file
-				try {
-					options.path = cloneTo;
-					this.$project.createProjectFileFromExistingProject().wait();
-				}
-				catch (error) {
-					this.$fs.deleteDirectory(cloneTo).wait();
-					throw error;
-				}
 			} finally {
 				try {
 					this.$fs.deleteDirectory(tempDir).wait();

@@ -4,6 +4,7 @@
 
 import projectlib = require("./../lib/project");
 import fslib = require("./../lib/file-system");
+import projectProperties = require("../lib/services/project-properties-service");
 import yok = require("./../lib/yok");
 import stubs = require("./stubs");
 import fs = require("fs");
@@ -53,7 +54,7 @@ describe("project integration tests", () => {
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
-		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
+		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
 		project = testInjector.resolve("project");
 	});
 
@@ -126,7 +127,7 @@ describe("project unit tests", () => {
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", stubs.FileSystemStub);
-		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
+		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		var config = testInjector.resolve("config");
@@ -237,7 +238,7 @@ describe("project unit tests (canonical paths)", () => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
-		testInjector.register("projectPropertiesService", projectlib.ProjectPropertiesService);
+		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
 		testInjector.resolve("config").PROJECT_FILE_NAME = "";
 	});
 
