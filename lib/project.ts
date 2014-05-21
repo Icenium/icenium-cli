@@ -279,6 +279,7 @@ export class Project implements Project.IProject {
 
 	private alterPropertiesForNewProject(properties: any, projectName: string): IProjectData {
 		properties.ProjectName = projectName;
+		properties.DisplayName = projectName;
 		var appid = options.appid;
 		if (!options.appid) {
 			appid = this.generateDefaultAppId(projectName);
@@ -530,14 +531,14 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-class ProjectPropertiesService implements IProjectPropertiesService {
+export class ProjectPropertiesService implements IProjectPropertiesService {
 	constructor(private $fs: IFileSystem,
 		private $resources: IResourceLoader) {
 	}
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
 		return ((): any => {
-			var properties = isJsonProjectFile ? this.getProjectPropertiesFromJsonProjectFile(projectFile).wait() :
+			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
 				this.getProjectPropertiesFromXmlProjectFile(projectFile).wait();
 
 			this.completeProjectProperties(properties);
@@ -575,10 +576,6 @@ class ProjectPropertiesService implements IProjectPropertiesService {
 
 			return properties;
 		}).future<any>()();
-	}
-
-	private getProjectPropertiesFromJsonProjectFile(projectFile: string): IFuture<any> {
-		return this.$fs.readJson(projectFile);
 	}
 
 	public completeProjectProperties(properties: any): boolean {
