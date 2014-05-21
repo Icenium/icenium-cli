@@ -108,7 +108,7 @@ export class UploadApplicationCommand implements ICommand {
 			var projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
 
 			var projectData = this.$project.projectData;
-			this.$server.itmstransporter.uploadApplication(projectData.name, projectData.name,
+			this.$server.itmstransporter.uploadApplication(projectData.ProjectName, projectData.ProjectName,
 				projectPath, userName, password, theApp.AppleID.toString()).wait();
 
 			this.$logger.info("Upload complete.")

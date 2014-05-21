@@ -1,5 +1,5 @@
 {
-	"name": {
+	"ProjectName": {
 		"description": "The project name identifies this project to the cloud build.",
 		"validator": "projectNameValidator"
 	},

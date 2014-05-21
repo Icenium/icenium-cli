@@ -223,7 +223,7 @@ interface IChildProcess {
 }
 
 interface IProjectData {
-	name: string;
+	ProjectName: string;
 	projectVersion : number;
 	AppIdentifier: string;
 	DisplayName: string;
@@ -246,6 +246,11 @@ interface IProjectData {
 	WP8Capabilities: string[];
 	WP8Requirements: string[];
 	WP8SupportedResolutions: string[];
+}
+
+interface IProjectPropertiesService {
+	getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData>;
+	completeProjectProperties(properties: any): boolean;
 }
 
 interface IServerConfigurationData {

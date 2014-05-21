@@ -276,6 +276,10 @@ export class ProjectService implements Server.IProjectServiceContract {
 		return this.$serviceProxy.call<any>('GetProjectContents', 'GET', ['/projects/contents', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
+	getProjectFileSchema($resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('GetProjectFileSchema', 'GET', '/projects/projectFileSchema', 'application/octet-stream', null, $resultStream);
+	}
+
 	getProjectTemplates(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetProjectTemplates', 'GET', '/projects/projectTemplates', 'application/json', null, null);
 	}

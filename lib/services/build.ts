@@ -132,7 +132,7 @@ export class BuildService implements Project.IBuildService {
 
 				CorePlugins: projectData.CorePlugins,
 				AppIdentifier: projectData.AppIdentifier,
-				ProjectName: projectData.name,
+				ProjectName: projectData.ProjectName,
 				Author: projectData.Author,
 				Description: projectData.Description,
 				FrameworkVersion: projectData.FrameworkVersion,
@@ -226,7 +226,7 @@ export class BuildService implements Project.IBuildService {
 				}
 			});
 
-			var result = this.buildProject(this.$project.projectData.name, this.$project.projectData.name,
+			var result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
 				this.$config.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
@@ -262,7 +262,7 @@ export class BuildService implements Project.IBuildService {
 
 			var scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
 			var htmlTemplateContents = this.$fs.readText(scanFile).wait();
-			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.name)
+			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
 				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
 			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
 
@@ -396,7 +396,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.importProject().wait();
 
-			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.name, this.$project.projectData.name).wait();
+			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
@@ -406,7 +406,7 @@ export class BuildService implements Project.IBuildService {
 			this.showPackageQRCodes([{
 				platform: "AppBuilder companion app for " + platform,
 				qrUrl: this.$qr.generateDataUri(fullDownloadPath),
-				solution: this.$project.projectData.name
+				solution: this.$project.projectData.ProjectName
 			}]).wait();
 		}).future<void>()();
 	}
@@ -420,7 +420,7 @@ export class BuildService implements Project.IBuildService {
 			var projectZipFile = this.zipProject().wait();
 			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait());
 
-			this.$server.projects.importProject(this.$project.projectData.name, this.$project.projectData.name,
+			this.$server.projects.importProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
 				this.$fs.createReadStream(projectZipFile)).wait();
 			this.$logger.trace("Project imported");
 		}).future<void>()();
