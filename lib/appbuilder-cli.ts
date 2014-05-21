@@ -12,7 +12,6 @@ require("./extensions");
 require("./bootstrap");
 import errors = require("./errors");
 
-var jaroWinklerDistance = require("../vendor/jaro-winkler_distance");
 var options = require("./options");
 
 errors.installUncaughtExceptionListener();

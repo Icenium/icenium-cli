@@ -12,6 +12,8 @@ General commands:
 
 Project development commands:
     create                          Creates a new project from template.
+    sample                          Lists sample apps.
+    sample clone                    Clones a selected sample app.
     init                            Initializes an existing project for development.
     build                           Builds the project and downloads the application package or produces a QR code
                                     for deploying the application package.
@@ -95,6 +97,29 @@ Options:
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
         If not specified, the application identifier is set to com.telerik.<App name>.
 
+--[/]--
+
+--[sample]--
+
+Usage:
+    $ appbuilder sample
+Lists all available sample apps with name, description, and GitHub repository. Run $ appbuilder sample clone to clone a selected sample app.
+
+--[/]--
+
+--[sample|clone]--
+
+Usage:
+    $ appbuilder sample clone <Sample name> [--path <path>]
+	
+Clones the selected app from GitHub to your local file system. You can examine and modify the sample code, run it in the simulator, and build and deploy it on your devices.
+<Sample name> is the name of the sample app as listed when you run $ appbuilder clone.
+
+Options: 
+     --path - Specifies the path where you want to clone the sample app, if different from the current directory. The directory must be empty.
+    If not specified, Telerik AppBuilder CLI attempts to clone the sample in the current directory.
+
+#{samplesService.getSamplesInformation}
 --[/]--
 
 --[init]--
