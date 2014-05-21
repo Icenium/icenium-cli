@@ -566,7 +566,8 @@ $injector.register("project", Project);
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	constructor(private $fs: IFileSystem,
-		private $resources: IResourceLoader) {
+		private $resources: IResourceLoader,
+		private $projectTypes: IProjectTypes) {
 	}
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
@@ -616,6 +617,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 		if (properties.hasOwnProperty("name")) {
 			properties.ProjectName = properties.name;
+			delete properties.name;
 			updated = true;
 		}
 
@@ -641,7 +643,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			updated = true;
 		}
 
-		var defaultProject = this.$resources.readJson("default-project.json").wait();
+		var defaultProject = this.$resources.readJson(
+			util.format("default-project-%s.json", properties.projectType)
+		).wait();
 		Object.keys(defaultProject).forEach((propName) => {
 			if (!properties.hasOwnProperty(propName)) {
 				properties[propName] = defaultProject[propName];
