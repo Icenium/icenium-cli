@@ -1,12 +1,15 @@
 var fs = require("fs");
 var path = require("path");
 var child_process = require("child_process");
+var util = require("util");
 
-fs.chmod("resources/platform-tools/android/osx/adb", "755", function (err) {
-	if (err) {
-		throw err;
-	}
-});
+if (process.platform !== "win32") {
+	fs.chmod(util.format("resources/platform-tools/android/%s/adb", process.platform), "755", function (err) {
+		if (err) {
+			throw err;
+		}
+	});
+}
 
 var homeDir = process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH;
 
