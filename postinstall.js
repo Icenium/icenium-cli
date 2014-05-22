@@ -1,7 +1,13 @@
+var skipPostinstallTasks = process.env["APPBUILDER_SKIP_POSTINSTALL_TASKS"];
+if (skipPostinstallTasks) {
+	return;
+}
+
 var fs = require("fs");
 var path = require("path");
 var child_process = require("child_process");
 var util = require("util");
+var homeDir = process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH;
 
 if (process.platform !== "win32") {
 	fs.chmod(util.format("resources/platform-tools/android/%s/adb", process.platform), "755", function (err) {
@@ -10,8 +16,6 @@ if (process.platform !== "win32") {
 		}
 	});
 }
-
-var homeDir = process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH;
 
 var scriptsOk = true;
 var outstandingUpdates = 0;
@@ -73,24 +77,3 @@ if (fs.existsSync(bashProfileFileName)) {
 
 // zsh - http://www.acm.uiuc.edu/workshops/zsh/startup_files.html
 updateShellScript(".zshrc");
-
-function invokeGrunt(callback) {
-	if (fs.existsSync("Gruntfile.js")) {
-		var grunt = require("grunt");
-		grunt.cli.tasks = ["ts:devall"];
-		grunt.cli(null, callback);
-	} else {
-		process.nextTick(callback);
-	}
-}
-
-invokeGrunt(function() {
-	var child = child_process.exec("node bin/appbuilder.js dev-post-install", function (error) {
-		if (error) {
-			console.error("Failed to complete all post-install steps.");
-			throw error;
-		}
-	});
-
-	child.stdout.pipe(process.stdout);
-});

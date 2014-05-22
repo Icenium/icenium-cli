@@ -2,11 +2,20 @@ var util = require("util");
 
 var now = new Date().toISOString();
 
+function shallowCopy(obj) {
+	var result = {};
+	Object.keys(obj).forEach(function(key) {
+		result[key] = obj[key];
+	});
+	return result;
+}
+
 module.exports = function(grunt) {
 	grunt.initConfig({
 		copyPackageTo: "\\\\telerik.com\\Resources\\BlackDragon\\Builds\\appbuilder-cli",
 
 		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
+		resourceDownloadEnvironment: process.env["ResourceDownloadEnvironment"] || "local",
 		jobName: process.env["JOB_NAME"] || "local",
 		buildNumber: process.env["BUILD_NUMBER"] || "non-ci",
 		dateString: now.substr(0, now.indexOf("T")),
@@ -52,27 +61,39 @@ module.exports = function(grunt) {
 		},
 
 		shell: {
-			npm_test: {
-				command: "npm test",
-				options: {
-					stdout: true,
-					stderr: true
-				}
+			options: {
+				stdout: true,
+				stderr: true
+			},
+
+			prepare_resources: {
+				command: [
+					"node bin\\appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>",
+					"node bin\\appbuilder.js dev-prepackage"
+				].join("&&")
 			},
 
 			ci_unit_tests: {
 				command: [
-					"node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>",
-					"npm install",
 					"call node_modules\\.bin\\mocha.cmd --ui mocha-fibers --recursive --reporter xunit --require test/test-bootstrap.js --timeout 15000 test/ > test-reports.xml"
 				].join("&&")
 			},
 
+			apply_deployment_environment: {
+				command: "node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
+			},
+
 			build_package: {
-				command: [
-					"node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>",
-					"npm pack"
-				].join("&&")
+				command: "npm pack",
+				options: {
+					execOptions: {
+						env: (function() {
+							var env = shallowCopy(process.env);
+							env["APPBUILDER_SKIP_POSTINSTALL_TASKS"] = "1";
+							return env;
+						})()
+					}
+				}
 			}
 		},
 
@@ -97,6 +118,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
 	grunt.loadNpmTasks("grunt-ts");
+	grunt.loadNpmTasks("grunt-curl");
 
 	grunt.registerTask("set_package_version", function(version) {
 		var fs = require("fs");
@@ -112,13 +134,38 @@ module.exports = function(grunt) {
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
 
+	grunt.registerTask("save_server_version", function() {
+		var done = this.async();
+		var configFileName = "config/config.json";
+		var config = grunt.file.readJSON(configFileName);
+
+		grunt.helper('curl', util.format("%s://%s/configuration.json", config.AB_SERVER_PROTO, config.AB_SERVER),
+			function(err, content) {
+				if (err) {
+					grunt.fail.fatal(err);
+				} else {
+					var serverConfig = JSON.parse(content);
+					config.SERVER_VERSION = serverConfig.assemblyVersion;
+					grunt.log.writeln("Server version is %s", config.SERVER_VERSION);
+					grunt.file.write(configFileName, JSON.stringify(config, null, "\t"));
+				}
+				done();
+			});
+	});
+
 	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
 		"clean",
 		"ts:release_build",
+		"shell:prepare_resources",
+
+		"shell:apply_deployment_environment",
 		"shell:ci_unit_tests",
+
 		"set_package_version",
+		"save_server_version",
 		"shell:build_package",
+
 		"copy:package_to_drop_folder",
 		"copy:package_to_qa_drop_folder"
 	]);
