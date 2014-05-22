@@ -12,6 +12,8 @@ import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validat
 import constants = require("../mobile/constants");
 
 export class BuildService implements Project.IBuildService {
+	private static WinPhoneAetPath = "install/WinPhoneAet";
+
 	constructor(private $config: IConfiguration,
 		private $logger: ILogger,
 		private $errors: IErrors,
@@ -206,6 +208,15 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.WP8Capabilities = projectData.WP8Capabilities;
 				buildProperties.WP8Requirements = projectData.WP8Requirements;
 				buildProperties.WP8SupportedResolutions = projectData.WP8SupportedResolutions;
+
+				var buildCompanyHubApp = !settings.downloadFiles;
+				if (buildCompanyHubApp) {
+					buildProperties.WP8CompanyHubApp = true;
+					this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
+						" deployed using a QR code. Use the --download switch if you want to cable deploy" +
+						"or publish the built app package.");
+				}
+
 				return this.beginBuild(buildProperties).wait();
 			} else {
 				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
@@ -244,7 +255,7 @@ export class BuildService implements Project.IBuildService {
 		}).future<Project.IBuildResult>()();
 	}
 
-	private showPackageQRCodes(packageDefs): IFuture<void> {
+	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): IFuture<void> {
 		return (() => {
 			if (!packageDefs.length) {
 				return;
@@ -294,18 +305,38 @@ export class BuildService implements Project.IBuildService {
 			if (settings.showQrCodes && packageDefs.length) {
 				var urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
 				var liveSyncToken = buildResult.buildProperties.LiveSyncToken;
-				packageDefs.forEach((def:any) => {
-					var liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
-					def.qrUrl = this.$qr.generateDataUri(liveSyncUrl);
-					this.$logger.debug("QR code image is '%s'", def.qrUrl);
 
-					def.packageUrl = (urlKind !== "package")
+				var packageDownloadViewModels = _.map(packageDefs, (def: Server.IPackageDef): IPackageDownloadViewModel => {
+					var liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
+
+					var packageUrl = (urlKind !== "package")
 						? this.getLiveSyncUrl("package", def.relativePath, liveSyncToken).wait()
 						: liveSyncUrl;
-					this.$logger.debug("Download URL is '%s'", def.packageUrl);
+					this.$logger.debug("Download URL is '%s'", packageUrl);
+
+					return {
+						qrUrl: liveSyncUrl,
+						qrImageData: this.$qr.generateDataUri(liveSyncUrl),
+						packageUrls: [{
+							packageUrl: packageUrl,
+							downloadText: "Download"
+						}],
+						instruction: util.format("Scan the QR code below to install %s to %s", def.solution, def.platform),
+					};
 				});
 
-				this.showPackageQRCodes(packageDefs).wait();
+				if (settings.platform === "WP8") {
+					var aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
+					var aetDef: IPackageDownloadViewModel = {
+						qrUrl: aetUrl,
+						qrImageData: this.$qr.generateDataUri(aetUrl),
+						packageUrls: [{packageUrl: aetUrl, downloadText: "Download application enrollment token"}],
+						instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)")
+					};
+					packageDownloadViewModels.push(aetDef);
+				}
+
+				this.showQRCodes(packageDownloadViewModels).wait();
 			}
 
 			if (settings.downloadFiles) {
@@ -403,10 +434,9 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
-			this.showPackageQRCodes([{
-				platform: "AppBuilder companion app for " + platform,
-				qrUrl: this.$qr.generateDataUri(fullDownloadPath),
-				solution: this.$project.projectData.ProjectName
+			this.showQRCodes([{
+				instruction: util.format("Scan the QR code below to install %s to AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
+				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
 			}]).wait();
 		}).future<void>()();
 	}
