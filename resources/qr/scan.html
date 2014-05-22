@@ -11,11 +11,34 @@
 		var packages = $Packages$;
 
 		$(document).ready(function() {
-			var pkgDef = packages[0];
-			$(".solution-name").text(pkgDef.solution);
-			$(".platform-name").text(pkgDef.platform);
-			$(".qr-code").attr("src", pkgDef.qrUrl);
-			$(".download").attr("href", pkgDef.packageUrl);
+			var container = $('.container');
+			for (var i = 0; i < packages.length; ++i) {
+				var pkgDef = packages[i];
+				var instruction = $('<h3/>').addClass('instruction').text(pkgDef.instruction);
+				var qrCode = $('<img/>').addClass('qr-code').attr('src', pkgDef.qrImageData);
+				var qrLink = $('<a/>').addClass('download').attr('href', pkgDef.qrUrl);
+				qrLink.append(qrCode);
+
+				container.append(instruction);
+				container.append(qrLink);
+
+				if (pkgDef.packageUrls) {
+					for (var j = 0; j < pkgDef.packageUrls.length; ++j) {
+						var url = pkgDef.packageUrls[j];
+						var anchorPara = $('<p/>');
+						var downloadLink = $('<a/>')
+							.addClass('download')
+							.attr('href', url.packageUrl)
+							.html(url.downloadText);
+						anchorPara.append(downloadLink);
+						container.append(anchorPara);
+					}
+				}
+
+				container.append($('<hr/>'));
+			}
+
+			container.append($("<p/>").text('You may close this tab after scanning.'));
 		});
 	</script>
 
@@ -25,10 +48,6 @@
 	<div class="header">
 		<div class="logo"></div>
 	</div>
-	<h3>Scan the QR code below to install <span class="solution-name"></span> to <span class="platform-name"></span></h3>
-	<a class="download"><img class="qr-code" /></a>
-	<p><a class="download">Download</a></p>
-	<p>You may close this tab after scanning the code.</p>
 </div>
 </body>
 </html>

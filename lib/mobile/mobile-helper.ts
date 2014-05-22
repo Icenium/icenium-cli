@@ -21,7 +21,7 @@ export var platformCapabilities: {[key: string]: Mobile.IPlatformCapabilities } 
 		companion: true
 	},
 	WP8: {
-		wirelessDeploy: false,
+		wirelessDeploy: true,
 		cableDeploy: false,
 		companion: false
 	}

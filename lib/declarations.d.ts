@@ -330,6 +330,18 @@ interface IQrCodeGenerator {
 	generateDataUri(data: string): string;
 }
 
+interface IPackageDownloadLink {
+	packageUrl: string;
+	downloadText: string;
+}
+
+interface IPackageDownloadViewModel {
+	qrUrl?: string;
+	qrImageData: string;
+	instruction: string;
+	packageUrls?: IPackageDownloadLink[];
+}
+
 interface IResourceLoader {
 	appResourcesDir: string;
 	resolvePath(path: string): string;

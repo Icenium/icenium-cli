@@ -185,8 +185,15 @@ provisioning profile by index or name.
 
 You cannot specify both the --companion and --download options.
 
-When you build for Windows Phone 8, Telerik AppBuilder always downloads the application package. In this version of the
-Telerik AppBuilder CLI, you cannot deploy Windows Phone 8 applications via QR code.
+When you build for Windows Phone 8 without the --download switch, AppBuilder lets you download and install
+the Telerik Application Enrollment Token (AET) on your device via QR code. Always make sure that you have
+installed the Telerik AET on the device before attempting to scan the QR code for your Windows Phone 8 app package.
+If the Telerik AET is not installed on the device, the following error message will appear when you attempt
+to install your app: "Before you install this app, you need to add Telerik AD company account".
+
+When you build for Windows Phone 8 without the --download switch, you can deploy the app
+package on device only via QR code or by opening the link in the device browser.
+You cannot install the app package manually via cable connection.
 
 Options:
     --download - If set, downloads the application package to the .ab directory in the current directory, instead
