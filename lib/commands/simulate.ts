@@ -22,13 +22,19 @@ export class SimulateCommand implements ICommand {
 		private $loginManager: ILoginManager,
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
-		private $serverExtensionsService: IServerExtensionsService) {
-		this.projectData = $project.projectData;
-	}
+		private $serverExtensionsService: IServerExtensionsService,
+		private $projectTypes: IProjectTypes) {
+			this.projectData = $project.projectData;
+		}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
+
+			if (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.NativeScript]) {
+				this.$logger.fatal("You cannot run Telerik NativeScript projects in the device simulator.");
+				return;
+			}
 
 			this.$loginManager.ensureLoggedIn().wait();
 

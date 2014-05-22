@@ -12,9 +12,21 @@ export class DeployCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
-		private $commandsService: ICommandsService) { }
+		private $commandsService: ICommandsService,
+		private $projectTypes: IProjectTypes) { }
 
 	public execute(args: string[]): IFuture<void> {
+		return ((): void => {
+			this.$project.ensureProject();
+			if (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.Cordova]) {
+				this.deployCordova(args);
+			} else {
+				this.deployNativeScript(args);
+			}
+		}).future<void>()();
+	}
+
+	private deployCordova(args: string[]): IFuture<void> {
 		return ((): void => {
 			if (options.companion) {
 				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
@@ -24,7 +36,6 @@ export class DeployCommand implements ICommand {
 			}
 
 			this.$devicesServices.initialize(args[0], options.device).wait();
-			this.$project.ensureProject();
 			var packageName = this.$project.projectData.AppIdentifier;
 			var packageFile: string = null;
 
@@ -40,10 +51,13 @@ export class DeployCommand implements ICommand {
 			};
 
 			this.$devicesServices.execute(action).wait();
+		}).future<void>()();
+	}
 
+	private deployNativeScript(args: string[]): IFuture<void> {
+		return ((): void => {
+			this.$logger.fatal("You will be able to deploy Telerik NativeScript projects to devices in a future release of the Telerik AppBuilder CLI.");
 		}).future<void>()();
 	}
 }
 $injector.registerCommand("deploy", DeployCommand);
-
-

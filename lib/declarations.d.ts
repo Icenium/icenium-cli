@@ -160,8 +160,6 @@ declare module Project {
 interface IProjectTypes {
 	Cordova: number;
 	NativeScript: number;
-	CordovaName: string;
-	NativeScriptName: string;
 }
 
 // duplicated from fs.Stats, because I cannot import it here

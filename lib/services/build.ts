@@ -26,7 +26,8 @@ export class BuildService implements Project.IBuildService {
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $projectNameValidator) { }
+		private $projectNameValidator,
+		private $projectTypes: IProjectTypes) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -390,9 +391,14 @@ export class BuildService implements Project.IBuildService {
 
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
-			platform = MobileHelper.validatePlatformName(platform, this.$errors);
-
 			this.$project.ensureProject();
+			return (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.Cordova]) ? this.executeBuildCordova(platform) : this.executeBuildNativeScript(platform);
+		}).future<void>()();
+	}
+
+	private executeBuildCordova(platform: string): IFuture<void> {
+		return (() => {
+			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 
 			if (options["save-to"]) {
 				options.download = true;
@@ -426,6 +432,12 @@ export class BuildService implements Project.IBuildService {
 					provisionTypes: provisionTypes
 				}).wait();
 			}
+			}).future<void>()();
+		}
+
+	private executeBuildNativeScript(platform: string): IFuture<void> {
+		return (() => {
+			this.$logger.fatal("You will be able to build for Telerik NativeScript in a future release of the Telerik AppBuilder CLI.");
 		}).future<void>()();
 	}
 
