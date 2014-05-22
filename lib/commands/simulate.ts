@@ -97,7 +97,7 @@ export class SimulateCommand implements ICommand {
 $injector.registerCommand("simulate", SimulateCommand);
 
 class WinSimulatorPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Package";
+	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
 	private static EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
 
 	constructor(private $childProcess: IChildProcess) {
