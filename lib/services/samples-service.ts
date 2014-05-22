@@ -10,11 +10,12 @@ import helpers = require("../helpers");
 var options: any = require("../options");
 
 class Sample {
-	constructor(public name,
-		public displayName,
-		public description,
-		public zipUrl,
-		public githubUrl) {
+	constructor(public name: string,
+		public displayName: string,
+		public description: string,
+		public zipUrl: string,
+		public githubUrl: string,
+		public type: string) {
 	}
 }
 
@@ -25,6 +26,12 @@ export class SamplesService implements ISamplesService {
 	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
+	private sampleCategories = [
+		{ id: "chrome-app", regEx: /(^|\s)chrome($|\s)/i, name: "Chrome Applications", order: 4, matchOrder: 1 },
+		{ id: "demo-app", regEx: /(^|\s)demo($|\s)/i, name: "Demo Applications", order: 1, matchOrder: 2 },
+		{ id: "core-api", regEx: /(^|\s)core($|\s)/i, name: "Core APIs", order: 2, matchOrder: 3 },
+		{ id: "advanced", regEx: /\w?/, name: "Advanced APIs", order: 3, matchOrder: 4 }
+	];
 
 	private _samples: Sample[];
 	constructor(private $logger: ILogger,
@@ -91,7 +98,7 @@ export class SamplesService implements ISamplesService {
 					throw error;
 				}
 			} finally {
-				temp.cleanup();
+				this.$fs.deleteDirectory(tempDir).wait();
 			}
 		}).future<void>()();
 	}
@@ -104,15 +111,33 @@ export class SamplesService implements ISamplesService {
 				return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
 			}
 
-			var samples = _.map(availableSamples, (sample: Sample) => {
-				var nameRow = util.format("Sample: %s", sample.displayName);
-				var descriptionRow = util.format("Description: %s", sample.description);
-				var gitClone = util.format("Github repository page: %s", sample.githubUrl)
-				var cloneCommand = util.format("Clone command: $ appbuilder sample clone %s", sample.name);
-				return [nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL);
+			var sortedCategories = _.sortBy(this.sampleCategories, category => category.order);
+			var categories = _.map(sortedCategories, category => {
+				return {
+					name: category.name,
+					samples: _.filter(availableSamples, sample => sample.type === category.id)
+				}
 			});
-			samples.unshift("You can choose a sample from the following:");
-			return samples.join(os.EOL + os.EOL);
+
+			var outputLines = [];
+			_.each(categories, category => {
+				if (category.samples.length == 0) {
+					return;
+				}
+
+				outputLines.push(util.format("%s:%s======================", category.name, os.EOL));
+
+				_.each(category.samples, (sample: Sample) => {
+					var nameRow = util.format("    Sample: %s", sample.displayName);
+					var descriptionRow = util.format("    Description: %s", sample.description);
+					var gitClone = util.format("    Github repository page: %s", sample.githubUrl)
+					var cloneCommand = util.format("    Clone command: $ appbuilder sample clone %s", sample.name);
+					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL));
+				});
+			});
+
+			outputLines.unshift("You can choose a sample from the following:");
+			return outputLines.join(os.EOL + os.EOL);
 		}).future<string>()();
 	}
 
@@ -135,13 +160,21 @@ export class SamplesService implements ISamplesService {
 					helpers.capitalizeFirstLetter(repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim()),
 					repo.description,
 					repo.url + "/zipball/" + repo.default_branch,
-					repo.html_url);
+					repo.html_url,
+					this.getTypeFromDescription(repo.description));
 			});
 
 			var sortedSamples = _.sortBy(samples, sample => sample.displayName);
 
 			return sortedSamples;
 		}).future<Sample[]>()();
+	}
+
+	private getTypeFromDescription(description: string): string {
+		var sortedCategories = _.sortBy(this.sampleCategories, category => category.matchOrder);
+
+		var matchedCategory = _.find(sortedCategories, category => category.regEx.test(description));
+		return matchedCategory ? matchedCategory.id : null;
 	}
 }
 $injector.register("samplesService", SamplesService);
