@@ -60,23 +60,28 @@ export class Project implements Project.IProject {
 	}
 
 	private static IGNORE_FILE = ".abignore";
-	private static INTERNAL_NONPROJECT_FILES = [".ab", ".abproject", Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private static PROJECT_FILE = ".abproject";
+	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.PROJECT_FILE, Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
 
-	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
-		var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
-			concat(additionalExcludedProjectDirsAndFiles || []);
+	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
+		return (() => {
+			var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
+				concat(additionalExcludedProjectDirsAndFiles || []);
 
-		var projectDir = this.getProjectDir();
-		var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath) => {
-			return !this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
-		});
+			var projectDir = this.getProjectDir();
+			var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
+				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
+				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, Project.PROJECT_FILE)).wait();
+				return !isExcluded && !isSubprojectDir;
+			});
 
-		var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), Project.IGNORE_FILE));
+			var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), Project.IGNORE_FILE));
 
-		projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, this.getProjectDir());
+			projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, this.getProjectDir());
 
-		this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
-		return projectFiles;
+			this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
+			return projectFiles;
+		}).future<string[]>()();
 	}
 
 	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
@@ -248,7 +253,7 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
-					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, ".abproject"), true).wait();
+					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, Project.PROJECT_FILE), true).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Creating project file.");

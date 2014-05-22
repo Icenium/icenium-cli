@@ -59,7 +59,7 @@ export class LiveSyncCommand implements ICommand {
 					this.$errors.fail("The file %s does not exist.", options.file);
 				}
 			} else {
-				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles);
+				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
 				projectFiles = _.filter(projectFiles, (fileName) => LiveSyncCommand.shouldIncludeFile(platform, fileName));
 
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
