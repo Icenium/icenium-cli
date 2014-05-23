@@ -113,7 +113,7 @@ export class BuildService implements Project.IBuildService {
 			var projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
 
-			var files = this.$project.enumerateProjectFiles();
+			var files = this.$project.enumerateProjectFiles().wait();
 			var zipOp = this.$fs.zipFiles(projectZipFile, files,
 				(path) => this.getProjectRelativePath(path));
 

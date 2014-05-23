@@ -141,7 +141,7 @@ declare module Project {
 		projectData: IProjectData;
 		getProjectDir(): string;
 		ensureProject(): void;
-		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[];
+		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
