@@ -310,10 +310,16 @@ export class Project implements Project.IProject {
 			var projectSchema = helpers.getProjectFileSchema();
 			Object.keys(properties).forEach(propertyName => {
 				if (projectSchema.hasOwnProperty(propertyName)) {
-					this.projectData[propertyName] = properties[propertyName];
 					if (projectSchema[propertyName].flags) {
+						if (_.isArray(properties[propertyName])) {
+							this.projectData[propertyName] = properties[propertyName];
+						} else {
+							this.projectData[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
+						}
+
 						updateData = this.projectData[propertyName];
 					} else {
+						this.projectData[propertyName] = properties[propertyName];
 						updateData = [this.projectData[propertyName]];
 					}
 
