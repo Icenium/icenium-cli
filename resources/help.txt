@@ -29,8 +29,8 @@ Project development commands:
     prop add                        Enables more options for the selected project property, if the property accepts multiple values.
     prop set                        Sets a project property.
     prop remove                     Disables options for the selected project property, if the property accepts multiple values.
-    list-projects                   Lists all projects associated with your Telerik Platform account.
-    export-project                  Exports a selected project from the cloud and initializes it for development.
+    project                         Lists all projects associated with your Telerik Platform account.
+    project export                  Exports a selected project from the cloud and initializes it for development.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -292,8 +292,7 @@ Options:
 Usage:
     $ appbuilder device log [--device <id>]
 
-Opens the device log stream for a selected connected device. You can select a device by index or identifier. In this version
-of the Telerik AppBuilder CLI, you cannot synchronize changes to Windows Phone 8 connected devices.
+Opens the device log stream for a selected connected device. You can select a device by index or identifier. 
 
 Run list-devices to list all connected devices, grouped by platform.
 
@@ -349,17 +348,20 @@ In this version of the Telerik AppBuilder CLI, you cannot debug your apps on OS 
 
 --[/]--
 
---[list-projects]--
+--[project]--
 Usage:
-    $ appbuilder list-projects
+    $ appbuilder project [command]
 
 Lists all projects associated with your Telerik Platform account.
 
+Commands:
+    export - Exports a selected project from the cloud and initializes it for development.
+
 --[/]--
 
---[export-project]--
+--[project|export]--
 Usage:
-    $ appbuilder export-project <ProjectIndex> | <ProjectName>
+    $ appbuilder project export <ProjectIndex> | <ProjectName>
 
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.

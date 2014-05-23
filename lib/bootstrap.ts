@@ -62,8 +62,8 @@ $injector.requireCommand("prop|remove", "./project");
 $injector.requireCommand("prop|print", "./project");
 $injector.require("projectNameValidator", "./validators/project-name-validator");
 
-$injector.requireCommand("list-projects", "./remote-projects");
-$injector.requireCommand("export-project", "./remote-projects");
+$injector.requireCommand("project|*list", "./remote-projects");
+$injector.requireCommand("project|export", "./remote-projects");
 
 $injector.requireCommand("device|*list", "./commands/list-devices");
 $injector.requireCommand("device|log", "./commands/open-device-log-stream");
