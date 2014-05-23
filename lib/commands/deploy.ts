@@ -18,7 +18,7 @@ export class DeployCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
 			this.$project.ensureProject();
-			if (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.Cordova]) {
+			if (this.$project.projectType === this.$projectTypes.Cordova) {
 				this.deployCordova(args);
 			} else {
 				this.deployNativeScript(args);

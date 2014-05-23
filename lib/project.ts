@@ -113,6 +113,10 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
+	public get projectType(): number {
+		return this.$projectTypes[this.projectData.projectType];
+	}
+
 	public createNewCordovaProject(projectName: string): IFuture<void> {
 		return this.createNewProject(this.$projectTypes.Cordova, projectName);
 	}
@@ -284,7 +288,7 @@ export class Project implements Project.IProject {
 					throw ex;
 				}
 			} else {
-				var message = util.format("The requested template %s does not exist.%sAvailable templates are: %s",
+				var message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
 					options.template,
 					os.EOL,
 					(projectType === this.$projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
@@ -317,7 +321,7 @@ export class Project implements Project.IProject {
 		return options.path || process.cwd();
 	}
 
-	private createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void> {
+	public createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
 			var updateData;
@@ -337,7 +341,6 @@ export class Project implements Project.IProject {
 						} else {
 							this.projectData[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
 						}
-
 						updateData = this.projectData[propertyName];
 					} else {
 						this.projectData[propertyName] = properties[propertyName];

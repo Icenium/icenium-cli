@@ -392,7 +392,7 @@ export class BuildService implements Project.IBuildService {
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			return (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.Cordova]) ? this.executeBuildCordova(platform) : this.executeBuildNativeScript(platform);
+			return (this.$project.projectType === this.$projectTypes.Cordova) ? this.executeBuildCordova(platform) : this.executeBuildNativeScript(platform);
 		}).future<void>()();
 	}
 

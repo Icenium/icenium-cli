@@ -12,6 +12,7 @@ import path = require("path");
 import temp = require("temp");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
+import projectTypes = require("../lib/project-types");
 var assert = require("chai").assert;
 temp.track();
 
@@ -45,6 +46,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
+	testInjector.register("projectTypes", projectTypes);
 
 	return testInjector;
 }

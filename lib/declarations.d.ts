@@ -140,6 +140,7 @@ declare module Project {
 
 	interface IProject {
 		projectData: IProjectData;
+		projectType: number;
 		getProjectDir(): string;
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
@@ -150,6 +151,7 @@ declare module Project {
 		createNewNativeScriptProject(projectName: string): IFuture<void>;
 		createCordovaProjectFileFromExistingProject(): IFuture<void>;
 		createNativeScriptProjectFileFromExistingProject(): IFuture<void>;
+		createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void>;
 	}
 
 	interface IPlatformMigrator {
