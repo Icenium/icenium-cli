@@ -98,7 +98,12 @@ export class SamplesService implements ISamplesService {
 					throw error;
 				}
 			} finally {
-				this.$fs.deleteDirectory(tempDir).wait();
+				try {
+					this.$fs.deleteDirectory(tempDir).wait();
+				}
+				catch (error) {
+					this.$logger.debug(error);
+				}
 			}
 		}).future<void>()();
 	}
