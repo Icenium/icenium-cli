@@ -46,7 +46,7 @@ export class DebugCommand implements ICommand {
 $injector.registerCommand("debug", DebugCommand);
 
 class WinDebuggerPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Debugger.Package";
+	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
 	private static EXECUTABLE_NAME_WIN = "Debugger.Windows.exe";
 
 	constructor(private $childProcess: IChildProcess,
