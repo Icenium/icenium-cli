@@ -63,8 +63,8 @@ export class IdentityManager implements Server.IIdentityManager {
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
 			if (!identities.length) {
-				this.$logger.info("No certificates registered. Use the `import-certificate` command " +
-					"or the `create-self-signed-certificate` to register certificates.");
+				this.$logger.info("No certificates found. To add a certificate, run `certificate import` " + 
+					"to import an existing certificate or `certificate create-self-signed` to create a new one.");
 			}
 		}).future<any>()();
 	}
@@ -92,8 +92,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			});
 
 			if (!provisions.length) {
-				this.$logger.info("No mobile provisioning profiles registered." +
-					" Import provisioning profiles using the `import-provision` command.");
+				this.$logger.info("No provisioning profiles found. To add a provisioning profile, run `provision import`.");
 			}
 		}).future<any>()();
 	}
