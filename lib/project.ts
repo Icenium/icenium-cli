@@ -253,7 +253,7 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
-					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, Project.PROJECT_FILE), true).wait();
+					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, "mobile.proj"), false).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Creating project file.");
