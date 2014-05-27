@@ -63,8 +63,8 @@ export class IdentityManager implements Server.IIdentityManager {
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
 			if (!identities.length) {
-				this.$logger.info("No certificates registered. Use the `import-certificate` command " +
-					"or the `create-self-signed-certificate` to register certificates.");
+				this.$logger.info("No certificates registered. Use the `certificate import` command " +
+					"or the `certificate create-self-signed` to register certificates.");
 			}
 		}).future<any>()();
 	}
@@ -93,7 +93,7 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			if (!provisions.length) {
 				this.$logger.info("No mobile provisioning profiles registered." +
-					" Import provisioning profiles using the `import-provision` command.");
+					" Import provisioning profiles using the `provision import` command.");
 			}
 		}).future<any>()();
 	}
@@ -106,7 +106,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			var result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if (!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
-					"a valid index. List registered certificates with 'list-certificates' command.", identityStr);
+					"a valid index. List registered certificates with 'certificate' command.", identityStr);
 			} else {
 				return result;
 			}
@@ -120,7 +120,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			var result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
 			if (!result) {
-				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr);
+				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'provision' command.", provisionStr);
 			} else {
 				return result;
 			}
@@ -693,7 +693,7 @@ class ImportProvisionCommand implements ICommand {
 			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("list-provisions", []);
+			this.$commandsService.executeCommand("provision", []);
 		}).future<void>()();
 	}
 }
@@ -711,7 +711,7 @@ class RemoveProvisionCommand implements ICommand {
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("list-provisions", []);
+			this.$commandsService.executeCommand("provision", []);
 		}).future<void>()();
 	}
 }
