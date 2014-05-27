@@ -233,49 +233,38 @@ export class ServiceProxy implements Server.IServiceProxy {
 				requestOpts.headers["Content-Type"] = theBody.contentType;
 			}
 
-			var response = this.$httpClient.httpRequest(requestOpts);
-			var result = new Future<any>();
-			response.resolve((err, response?) => {
-				if (err) {
-					result.throw(err);
-				} else {
-					this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
-					var newCookies = response.headers["set-cookie"];
-
-					if (newCookies) {
-						this.lastCallCookies = {};
-						newCookies.forEach((cookieStr: string) => {
-							var parsed = cookielib.parse(cookieStr);
-							Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
-						});
-					}
-
-					if (accept === "application/json") {
-						result.return(JSON.parse(response.body));
-					} else {
-						result.return(response.body);
-					}
-				}
-			});
-
 			try {
-				var resultValue = result.wait();
-
-				if (this.lastCallCookies) {
-					var abAuthCookie = this.lastCallCookies['.ASPXAUTH'];
-					if (abAuthCookie) {
-						this.$logger.debug("Cookie is '%s'", abAuthCookie);
-						this.$userDataStore.setCookie(abAuthCookie).wait();
-					}
-				}
-
-				return resultValue;
+				var response = this.$httpClient.httpRequest(requestOpts).wait();
 			} catch (err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
 				}
 				throw err;
 			}
+
+			this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
+			var newCookies = response.headers["set-cookie"];
+
+			if (newCookies) {
+				this.lastCallCookies = {};
+				newCookies.forEach((cookieStr: string) => {
+					var parsed = cookielib.parse(cookieStr);
+					Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
+				});
+			}
+
+			var resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
+
+			if (this.lastCallCookies) {
+				var abAuthCookie = this.lastCallCookies['.ASPXAUTH'];
+				if (abAuthCookie) {
+					this.$logger.debug("Cookie is '%s'", abAuthCookie);
+					this.$userDataStore.setCookie(abAuthCookie).wait();
+				}
+			}
+
+			return resultValue;
+
 		}).future()();
 	}
 

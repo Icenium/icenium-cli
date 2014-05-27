@@ -80,7 +80,6 @@ export class ServerExtensionsService implements IServerExtensionsService{
 				headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
 			});
 
-			this.$fs.futureFromEvent(zipFile, "finish").wait();
 			request.wait();
 		}).future<void >()();
 	}
