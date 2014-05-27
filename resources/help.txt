@@ -230,9 +230,9 @@ Run list-provisions to list available provisioning profiles for code signing iOS
 provisioning profile by index or name.
 --[/]--
 
---[cloud-sync]--
+--[livesync|cloud]--
 Usage:
-    $ appbuilder cloud-sync
+    $ appbuilder livesync cloud
 
 Synchronizes the project with the cloud to enable LiveSync via wireless connection. 
 
@@ -267,13 +267,23 @@ Options:
 
 --[/]--
 
+--[livesync]--
+Usage:
+	$appbuilder livesync [<command>]
+
+Commands:
+    devices - Synchronizes the latest changes in your project to connected devices.
+    cloud - Synchronizes the project with the cloud to enable LiveSync for remote devices.
+
+--[/]--
+
 --[livesync|devices]--
 Usage:
     $ appbuilder livesync devices [<Platform>] [--device <id>] [--companion] [--watch]
 
 Platform-specific example:
-    $ appbuilder livesync android
-    $ appbuilder livesync ios
+    $ appbuilder livesync devices android
+    $ appbuilder livesync devices ios
 
 Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
 you cannot synchronize changes to Windows Phone 8 connected devices.
@@ -351,7 +361,7 @@ In this version of the Telerik AppBuilder CLI, you cannot debug your apps on OS 
 
 --[cloud]--
 Usage:
-    $ appbuilder cloud <command>
+    $ appbuilder cloud  [<command>]
 
 Lists all projects associated with your Telerik Platform account.
 
