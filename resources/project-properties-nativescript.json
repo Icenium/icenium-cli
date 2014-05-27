@@ -1,0 +1,7 @@
+{
+	"FrameworkVersion": {
+		"description": "NativeScript framework version.",
+		"regex": "0\\.1\\.0",
+		"onChanging": "#{project.onFrameworkVersionChanging}"
+	}
+}

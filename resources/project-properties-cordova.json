@@ -1,0 +1,12 @@
+{
+	"FrameworkVersion": {
+		"description": "Cordova framework version.",
+		"dynamicRange": "#{cordovaMigrationService.getSupportedVersions}",
+		"onChanging": "#{project.onFrameworkVersionChanging}"
+	},
+	"CorePlugins": {
+		"description": "List of core Cordova plugins required by the app.",
+		"dynamicRange": "#{project.getSupportedPlugins}",
+		"flags": true
+	}
+}

@@ -4,11 +4,14 @@
 import util = require("util");
 
 var ProjectTypes = {
-	0: "Cordova",
-	"Cordova": 0,
+	1: "Cordova",
+	"Cordova": 1,
 
-	1: "NativeScript",
-	"NativeScript": 1
+	2: "NativeScript",
+	"NativeScript": 2,
+
+	4: "Common",
+	"Common" : 4
 }
 
 $injector.register("projectTypes", ProjectTypes);

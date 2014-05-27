@@ -39,7 +39,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = helpers.getProjectFileSchema();
+			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
 			Object.keys(projectSchema).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];

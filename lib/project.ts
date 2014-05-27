@@ -332,7 +332,7 @@ export class Project implements Project.IProject {
 				path.join(__dirname,
 					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType]))).wait();
 
-			var projectSchema = helpers.getProjectFileSchema();
+			var projectSchema = helpers.getProjectFileSchema(projectType);
 			Object.keys(properties).forEach(propertyName => {
 				if (projectSchema.hasOwnProperty(propertyName)) {
 					if (projectSchema[propertyName].flags) {
@@ -380,20 +380,19 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	private normalizePropertyName(property: string): string {
+	private normalizePropertyName(property: string, schema: any): string {
 		if (!property) {
 			return property;
 		}
 
-		var propSchema = helpers.getProjectFileSchema();
-		var propLookup = helpers.toHash(propSchema, (value, key) => key.toLowerCase(), (value, key) => key);
+		var propLookup = helpers.toHash(schema, (value, key) => key.toLowerCase(), (value, key) => key);
 		return propLookup[property.toLowerCase()] || property;
 	}
 
 	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) : IFuture<void> {
 		return ((): any => {
-			property = this.normalizePropertyName(property);
-			var propSchema = helpers.getProjectFileSchema();
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[projectData.projectType]);
+			property = this.normalizePropertyName(property, propSchema);
 			var propData = propSchema[property];
 
 			var validate = (condition: boolean, ...args) => {
@@ -504,7 +503,8 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			property = this.normalizePropertyName(property);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			property = this.normalizePropertyName(property, propSchema);
 
 			if (this.projectData.hasOwnProperty(property)) {
 				this.$logger.out(this.projectData[property]);
@@ -520,31 +520,47 @@ export class Project implements Project.IProject {
 
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
-			var schema = helpers.getProjectFileSchema();
-			var help = ["Project properties:"];
-			_.each(schema, (value:any, key) => {
-				help.push(util.format("  %s - %s", key, value.description));
-				var range = this.getPropRange(value).wait();
-				if (range) {
-					help.push("    Valid values:");
-					_.each(range, (rangeDesc:any, rangeKey) => {
-						var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
-						if (rangeDesc.description) {
-							desc += " - " + rangeDesc.description;
-						}
-						help.push(desc);
-					});
-				}
-				if (value.validationMessage) {
-					help.push("    " + value.validationMessage.replace("\n", "\n    "));
-				}
-				else if (value.regex) {
-					help.push("    Valid values match /" + value.regex.toString() + "/");
-				}
-			});
+			var result = [];
+			var schema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
+			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
+			result.concat(this.getProjectSchemaPartHelp(schema, title));
 
-			return help.join("\n");
+			schema = helpers.getProjectFileSchema(this.$projectTypes.NativeScript);
+			title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.NativeScript]);
+			result.concat(this.getProjectSchemaPartHelp(schema, title));
+
+			schema = helpers.getProjectFileSchema(this.$projectTypes.Common);
+			title = "Common properties for all projects:";
+			result.concat(this.getProjectSchemaPartHelp(schema, title));
+
+			return result.join("\n\n");
 		}).future<string>()();
+	}
+
+	private getProjectSchemaPartHelp(schema: string, title: string): string {
+		var help = [title];
+		_.each(schema, (value:any, key) => {
+			help.push(util.format("  %s - %s", key, value.description));
+			var range = this.getPropRange(value).wait();
+			if (range) {
+				help.push("    Valid values:");
+				_.each(range, (rangeDesc:any, rangeKey) => {
+					var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
+					if (rangeDesc.description) {
+						desc += " - " + rangeDesc.description;
+					}
+					help.push(desc);
+				});
+			}
+			if (value.validationMessage) {
+				help.push("    " + value.validationMessage.replace("\n", "\n    "));
+			}
+			else if (value.regex) {
+				help.push("    Valid values match /" + value.regex.toString() + "/");
+			}
+		});
+
+		return help.join("\n");
 	}
 
 	private getPropRange(propData): IFuture<string[]>{

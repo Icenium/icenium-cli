@@ -162,6 +162,7 @@ declare module Project {
 interface IProjectTypes {
 	Cordova: number;
 	NativeScript: number;
+	Common: number;
 }
 
 // duplicated from fs.Stats, because I cannot import it here

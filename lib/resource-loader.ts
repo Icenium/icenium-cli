@@ -35,11 +35,12 @@ class ResourceDownloader implements IResourceDownloader {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
 		private $resources: IResourceLoader,
-		private $cordovaMigrationService: ICordovaMigrationService) { }
+		private $cordovaMigrationService: ICordovaMigrationService,
+		private $projectTypes: IProjectTypes) { }
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
-			var projectSchema = helpers.getProjectFileSchema();
+			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
 			var cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
 			var platforms = Object.keys(MobileHelper.platformCapabilities);
 			cordovaVersions.forEach((version) => {

@@ -52,16 +52,17 @@ function createTestInjector(): IInjector {
 }
 
 describe("project integration tests", () => {
-	var project, testInjector;
+	var project, testInjector, projectTypes;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
 		project = testInjector.resolve("project");
+		projectTypes = testInjector.resolve("projectTypes");
 	});
 
 	describe("createNewProject", () => {
-		it("creates a valid project folder", () => {
+		it("creates a valid project folder (Cordova project)", () => {
 			var options: any = require("./../lib/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
@@ -77,7 +78,7 @@ describe("project integration tests", () => {
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = helpers.getProjectFileSchema();
+			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova);
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.WP8ProductID));

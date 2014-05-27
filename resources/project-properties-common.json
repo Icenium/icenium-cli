@@ -22,16 +22,6 @@
 		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$",
 		"validationMessage": "The version must consist of two or three numbers separated with dots."
 	},
-	"FrameworkVersion": {
-		"description": "Cordova framework version.",
-		"dynamicRange": "#{cordovaMigrationService.getSupportedVersions}",
-		"onChanging": "#{project.onFrameworkVersionChanging}"
-	},
-	"CorePlugins": {
-		"description": "List of core Cordova plugins required by the app.",
-		"dynamicRange": "#{project.getSupportedPlugins}",
-		"flags": true
-	},
 	"AndroidPermissions": {
 		"description": "Android permissions required by the app.",
 		"flags": true,
