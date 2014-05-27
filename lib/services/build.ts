@@ -459,4 +459,4 @@ export class BuildService implements Project.IBuildService {
 $injector.register("buildService", BuildService);
 
 helpers.registerCommand("buildService", "build", (buildService, args) => buildService.executeBuild(args[0]));
-helpers.registerCommand("buildService", "cloud-sync", (buildService, args) => buildService.importProject());
+helpers.registerCommand("buildService", ["livesync|cloud", "live-sync|cloud"], (buildService, args) => buildService.importProject());

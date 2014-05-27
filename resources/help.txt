@@ -18,8 +18,8 @@ Project development commands:
     build                           Builds the project and downloads the application package or produces a QR code
                                     for deploying the application package.
     deploy                          Builds and deploys the project to a connected device.
-    cloud-sync                      Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    livesync                        Synchronizes the latest changes in your project to connected devices.
+    livesync cloud                  Synchronizes the project with the cloud to enable LiveSync for remote devices.
+    livesync devices                Synchronizes the latest changes in your project to connected devices.
     debug                           Runs an application allowing you to remotely debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
@@ -29,8 +29,8 @@ Project development commands:
     prop add                        Enables more options for the selected project property, if the property accepts multiple values.
     prop set                        Sets a project property.
     prop remove                     Disables options for the selected project property, if the property accepts multiple values.
-    list-projects                   Lists all projects associated with your Telerik Platform account.
-    export-project                  Exports a selected project from the cloud and initializes it for development.
+    cloud                           Lists all projects associated with your Telerik Platform account.
+    cloud export                    Exports a selected project from the cloud and initializes it for development.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -267,9 +267,9 @@ Options:
 
 --[/]--
 
---[livesync]--
+--[livesync|devices]--
 Usage:
-    $ appbuilder livesync [<Platform>] [--device <id>] [--companion] [--watch]
+    $ appbuilder livesync devices [<Platform>] [--device <id>] [--companion] [--watch]
 
 Platform-specific example:
     $ appbuilder livesync android
@@ -349,17 +349,20 @@ In this version of the Telerik AppBuilder CLI, you cannot debug your apps on OS 
 
 --[/]--
 
---[list-projects]--
+--[cloud]--
 Usage:
-    $ appbuilder list-projects
+    $ appbuilder cloud <command>
 
 Lists all projects associated with your Telerik Platform account.
 
+Commands:
+	export - Exports a selected project from the cloud and initializes it for development.
+
 --[/]--
 
---[export-project]--
+--[cloud|export]--
 Usage:
-    $ appbuilder export-project <ProjectIndex> | <ProjectName>
+    $ appbuilder cloud export <ProjectIndex> | <ProjectName>
 
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.

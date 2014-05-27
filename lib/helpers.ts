@@ -85,7 +85,7 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
+export function registerCommand(module: string, commandName: any, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
 	var factory = (): ICommand => {
 		return {
 			execute: (args: string[]): IFuture<void> => {
