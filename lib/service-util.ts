@@ -197,11 +197,15 @@ export class ServiceProxy implements Server.IServiceProxy {
 	constructor(private $httpClient: Server.IHttpClient,
 		private $userDataStore: IUserDataStore,
 		private $logger: ILogger,
-		private $config: IConfiguration) {
+		private $config: IConfiguration,
+		private $serverConfiguration: IServerConfiguration,
+		private $errors: IErrors) {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
 		return <any> (() => {
+			this.ensureUpToDate().wait();
+
 			var headers: any = {
 				"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$config.SOLUTION_SPACE_NAME
 			};
@@ -278,6 +282,14 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 	public setSolutionSpaceName(solutionSpaceName: string): void {
 		this.solutionSpaceName = solutionSpaceName;
+	}
+
+	private ensureUpToDate(): IFuture<void> {
+		return (() => {
+			if (this.$config.SERVER_VERSION && helpers.versionCompare(this.$serverConfiguration.assemblyVersion.wait(), this.$config.SERVER_VERSION) > 0) {
+				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm update -g appbuilder'.", suppressCommandHelp: true });
+			}
+		}).future<void>()();
 	}
 }
 $injector.register("serviceProxy", ServiceProxy);
