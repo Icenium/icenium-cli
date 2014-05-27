@@ -47,7 +47,7 @@ class CommandDispatcher {
 	}
 
 	private getCommandName(): string {
-		var remaining = options.argv.remain;
+		var remaining: string[] = options._;
 		if (remaining.length > 0) {
 			return remaining[0].toLowerCase();
 		}
@@ -55,7 +55,7 @@ class CommandDispatcher {
 	}
 
 	private getCommandArguments(): string[] {
-		var remaining = options.argv.remain;
+		var remaining: string[] = options._;
 		if (remaining.length > 1) {
 			return remaining.slice(1);
 		}

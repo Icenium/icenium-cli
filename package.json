@@ -27,7 +27,6 @@
   ],
   "dependencies": {
     "cookie": "0.1.0",
-    "nopt": "2.1.2",
     "log4js": "0.6.9",
     "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master",
     "open": "0.0.4",
@@ -59,7 +58,8 @@
     "xmlhttprequest": "1.6.0",
     "xml-mapping": "1.5.2",
 	"temp": "0.6.0",
-    "string-to-json": "0.1.0"
+    "string-to-json": "0.1.0",
+    "yargs": "1.2.2"
   },
   "analyze": true,
   "devDependencies": {
