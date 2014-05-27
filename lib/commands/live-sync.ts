@@ -151,4 +151,4 @@ export class LiveSyncCommand implements ICommand {
 		});
 	}
 }
-$injector.registerCommand(["livesync|devices", "live-sync|devices"], LiveSyncCommand);
+$injector.registerCommand(["livesync|*devices", "live-sync|*devices"], LiveSyncCommand);

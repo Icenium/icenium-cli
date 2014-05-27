@@ -154,6 +154,15 @@ export class Yok implements IInjector {
 		return defaultCommand;
 	}
 
+	private isValidCommand(name: string): boolean {
+		var allCommands = this.getRegisteredCommandsNames(true);
+		return _.contains(allCommands, name);
+	}
+
+	private buildHierarchicalCommand(parentCommandName: string, childCommandName: string) {
+		return util.format("%s|%s", parentCommandName, childCommandName);
+	}
+
 	private createHierarchicalCommand(name: string) {
 		var factory = () => {
 			return {
@@ -161,19 +170,28 @@ export class Yok implements IInjector {
 					return (() => {
 						var commandsService = $injector.resolve("commandsService");
 						var commandName: string = null;
+						var defaultCommand = this.getDefaultCommand(name);
+						var commandArguments = [];
 
 						if(args.length > 0) {
-							commandName = args[0];
+							var isValidCommand = this.isValidCommand(this.buildHierarchicalCommand(name, args[0]));
+							if(isValidCommand) {
+								commandName = args[0];
+								commandArguments = _.rest(args);
+							} else {
+								commandName = defaultCommand || "help";
+								commandArguments = args;
+							}
 						} else {
-							var defaultCommand = this.getDefaultCommand(name);
+							//Execute only default command without arguments
 							commandName = defaultCommand || "help";
 						}
 
 						if(commandName !== "help") {
-							commandName = util.format("%s|%s", name, commandName);
+							commandName = this.buildHierarchicalCommand(name, commandName);
 						}
 
-						commandsService.tryExecuteCommand(commandName, commandName === "help" ? [name] : _.rest(args));
+						commandsService.tryExecuteCommand(commandName, commandName === "help" ? [name] : commandArguments);
 					}).future<void>()();
 				}
 			};

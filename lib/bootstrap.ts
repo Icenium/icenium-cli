@@ -70,7 +70,7 @@ $injector.requireCommand("device|log", "./commands/open-device-log-stream");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
-$injector.requireCommand(["livesync|devices", "live-sync|devices"], "./commands/live-sync");
+$injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 
 $injector.require("iOSCore", "./mobile/ios/ios-core");
 $injector.require("coreFoundation", "./mobile/ios/ios-core");

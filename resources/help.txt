@@ -18,8 +18,8 @@ Project development commands:
     build                           Builds the project and downloads the application package or produces a QR code
                                     for deploying the application package.
     deploy                          Builds and deploys the project to a connected device.
+    livesync                        Synchronizes the latest changes in your project to connected devices.
     livesync cloud                  Synchronizes the project with the cloud to enable LiveSync for remote devices.
-    livesync devices                Synchronizes the latest changes in your project to connected devices.
     debug                           Runs an application allowing you to remotely debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
@@ -258,7 +258,7 @@ provisioning profile by index or name.
 
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
-        Run list-devices to list all connected devices, grouped by platform.
+        Run device to list all connected devices, grouped by platform.
     --certificate - (Required when building for iOS) Sets the certificate that you want to use for code signing your iOS
         app. Must match the selected provisioning profile. You can set a certificate by index or name.
     --provision - (Required when building for iOS) Sets the provisioning profile that you want to use for code signing
@@ -269,21 +269,11 @@ Options:
 
 --[livesync]--
 Usage:
-	$appbuilder livesync [<command>]
-
-Commands:
-    devices - Synchronizes the latest changes in your project to connected devices.
-    cloud - Synchronizes the project with the cloud to enable LiveSync for remote devices.
-
---[/]--
-
---[livesync|devices]--
-Usage:
-    $ appbuilder livesync devices [<Platform>] [--device <id>] [--companion] [--watch]
+    $ appbuilder livesync [<Platform>] [--device <id>] [--companion] [--watch] [<command>]
 
 Platform-specific example:
-    $ appbuilder livesync devices android
-    $ appbuilder livesync devices ios
+    $ appbuilder livesync android
+    $ appbuilder livesync ios
 
 Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
 you cannot synchronize changes to Windows Phone 8 connected devices.
@@ -292,9 +282,12 @@ Options:
     --watch - When you save changes to the project, changes are automatically synchronized
         to the connected device.
     --device - Specifies the serial number or the index of the connected device to which you want to synchronize changes. 
-        Run list-devices to list all connected devices, grouped by platform.
+        Run device to list all connected devices, grouped by platform.
     --companion - When you save changes to the project, changes are automatically synchronized
         to the Telerik AppBuilder companion app.
+
+Commands:
+	cloud - Synchronizes the project with the cloud to enable LiveSync for remote devices.
 
 --[/]--
 
@@ -305,7 +298,7 @@ Usage:
 Opens the device log stream for a selected connected device. You can select a device by index or identifier. In this version
 of the Telerik AppBuilder CLI, you cannot synchronize changes to Windows Phone 8 connected devices.
 
-Run list-devices to list all connected devices, grouped by platform.
+Run device to list all connected devices, grouped by platform.
 
 --[/]--
 
