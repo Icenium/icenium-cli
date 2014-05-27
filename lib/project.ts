@@ -158,6 +158,7 @@ export class Project implements Project.IProject {
 			} else {
 				version = _.last(this.$cordovaMigrationService.getSupportedVersions().wait());
 			}
+			
 			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
 		}).future<string[]>()();
 	}
@@ -463,7 +464,7 @@ export class Project implements Project.IProject {
 				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
 
-				projectData[property] = propertyValue;
+			projectData[property] = propertyValue;
 		}).future<void>()();
 	}
 
@@ -572,7 +573,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
 			var projectSchema = helpers.getProjectFileSchema();
-			Object.keys(projectSchema).forEach((propertyName) => {
+			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];
 
