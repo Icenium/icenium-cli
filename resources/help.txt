@@ -37,6 +37,10 @@ Device commands:
     device log                      Opens the log stream for the selected device.
 
 Certificate management and publishing commands:
+    certificate-request             Lists all pending certificate signing requests.
+    certificate-request create      Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
+    certificate-request remove      Removes a pending certificate signing request.
+    certificate-request download    Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center.
     certificate                     Lists all configured certificates for code signing iOS and Android applications.
     certificate create-self-signed  Creates self-signed certificate for code signing Android applications.
     certificate remove              Removes the selected certificate from the server.
@@ -516,6 +520,19 @@ Options:
         You can specify a provisioning profile by index or name.
 --[/]--
 
+--[certificate-request]--
+Usage:
+    $ appbuilder certificate-request [<command>]
+
+Lists all pending certificate signing requests.
+
+Commands:
+    create - creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
+    remove - removes a pending certificate signing request.
+    download - downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center.
+
+--[/]--
+
 --[certificate-request|create]--
 Usage:
     $ appbuilder certificate-request create [<Name> [<Email> [<Country>]]] [--save-to <File>]
@@ -528,20 +545,13 @@ Options:
             certificate_request.csr.
 --[/]--
 
---[certificate-request|list]--
-Usage:
-    $ appbuilder certificate-request
-
-Lists all pending certificate signing requests.
---[/]--
-
 --[certificate-request|remove]--
 Usage:
     $ appbuilder certificate-request remove <Index>
 
 Removes a pending certificate signing request. 
 
-Run list-certificate-requests to list all pending certificate signing requests.
+Run certificate-request to list all pending certificate signing requests.
 --[/]--
 
 --[certificate-request|download]--
@@ -550,7 +560,7 @@ Usage:
 
 Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center. 
 
-Run list-certificate-requests to list all pending certificate signing requests. 
+Run certificate-request to list all pending certificate signing requests.
 
 Options:
     --save-to <File> - Saves the certificate request to the selected file. If not specified, the certificate signing request is saved as
