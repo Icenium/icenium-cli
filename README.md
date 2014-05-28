@@ -9,8 +9,6 @@ Command-Line Interface for Telerik AppBuilder
 
 The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store or Google Play.
 
-> For Windows Phone 8, you can only build and download an application package. To deploy the application package on device, you need to use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.<br/>To publish your app, you need to manually submit the app in the Windows Phone Store. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windows/apps/br230835.aspx" target="_blank">Submitting your app</a>.
-
 * [Installation](#installation "How to install the Telerik AppBuilder CLI")
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
@@ -21,12 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.1.1  
+Latest version: Telerik AppBuilder 2.2  
 Release date: 2014, May 12  
 
-> This is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.1.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1-1" target="_blank">Telerik AppBuilder 2.1.1 Release Notes</a>.
-
-> For a complete list of the features available in the last major release, Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
 
 ### System Requirements
 
@@ -51,7 +47,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
-> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line.
 
 #### OS X Systems
 
@@ -72,7 +68,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
-> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line. To deploy the application package manually, you can use the Application Deployment tool from the Windows Phone 8 SDK. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>.
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line.
 
 ### Install the Telerik AppBuilder CLI
 
@@ -127,8 +123,6 @@ The Telerik AppBuilder CLI creates the `.abproject` file required for working fr
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 
-> In this version of the Telerik AppBuilder CLI, you cannot run your apps in the device simulator on OS X systems. The device simulator will become available for OS X in a future release of Telerik AppBuilder.
-
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
 ```bash
@@ -161,13 +155,13 @@ After the operation completes, the Telerik AppBuilder CLI opens a new tab in you
 
 With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
 
-To run your app on a Windows Phone 8 device, install the Windows Phone 8 SDK on your system, navigate to the folder containing your project files and run the following command in the command line. 
+To run your app on a Windows Phone 8 device, install a QR code reader on the device, navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
 $ appbuilder build wp8
 ```
 
-After the operation completes, the Telerik AppBuilder CLI places the application package in the root of your project. You can manually deploy the application package on a Windows Phone 8 device. For more information, see <a href="http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff402565(v=vs.105).aspx#BKMK_tool" target="_blank">How to deploy and run a Windows Phone app</a>. 
+the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment. On your device, scan the QR code for the Telerik Application Enrollment Token (Telerik AET) and install it on your device. Next, scan the QR code for your app and install the app on your device.
 
 <a name="code"><b>5. Modify your code</b></a>
 
@@ -182,7 +176,7 @@ In the running device simulator, your app refreshes automatically on save.
 To get changes inside your running app, navigate to the folder containing your project files and run the following command. 
 
 ```bash
-$ appbuilder cloud-sync
+$ appbuilder livesync cloud
 ```
 
 On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
@@ -206,12 +200,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.1.1  
-Release date: 2014, May 12 
+Latest version: Telerik AppBuilder 2.2  
+Release date: 2014, June 3
 
-> This is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.1.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1-1" target="_blank">Telerik AppBuilder 2.1.1 Release Notes</a>.
-
-> For a complete list of the features available in the last major release, Telerik AppBuilder 2.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-1" target="_blank">Telerik AppBuilder 2.1 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -223,11 +215,13 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can log in and log out of the Telerik Platform. 
 * You can view your current login and subscription information.
 * You can create new projects from the *Blank*, *jQuery Mobile*, *Friends*, *Kendo UI Mobile*, and *Kendo UI DataViz* templates.
-* You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools. 
+* You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools.
+* You can export your existing projects from the cloud and initialize them for development.
+* You can clone the Telerik AppBuilder sample apps. 
 * You can create new projects by initializing the AppBuilder sample apps.
 * You can list connected iOS and Android devices.
 * You can view the device log for connected devices.
-* You can build applications for iOS and Android and deploy them via QR code on remote devices.
+* You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code on remote devices.
 * You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
 * You can build applications for iOS, Android, and Windows Phone 8 and download the application package. You can manually deploy the application package on devices. 
 * You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
@@ -236,9 +230,12 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
 * You can push changes via cable connection to connected devices.
 * You can run your apps in the device simulator on Windows systems.
+* You can run your apps in the device simulator on OS X systems.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
+* You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
 * You can enable and disable the Apache Cordova core and integrated plugins.
+* You can fetch and import custom plugins.
 * You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
 * You can configure the project properties for your project.
 * You can manage certificates and provisioning profiles for code signing iOS apps.
@@ -249,13 +246,12 @@ To see a complete list of the available commands, click <a href="https://github.
 The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
 
 * You cannot deploy your apps on connected Windows Phone 8 devices.
+* You cannot load your Windows Phone 8 apps in the companion app.
 * You cannot switch your Telerik Platform account.
-* You cannot run and debug your apps in the device simulator on OS X systems.<br/>The device simulator will become available for OS X in a future release of Telerik AppBuilder.
-* You cannot debug your Android apps while running on a connected device.
-* You cannot debug your iOS apps while running on a connected device.
+* You cannot debug your apps in the device simulator on OS X systems.
+* You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
 * You cannot migrate between Apache Cordova versions.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
-* You cannot automatically load and work with projects created with any of the other Telerik AppBuilder clients. You need to store such projects locally and initialize them with the `$ appbuilder init` command.
 * In the other Telerik AppBuilder clients, you cannot automatically load and work with projects created from the Telerik AppBuilder CLI.
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
