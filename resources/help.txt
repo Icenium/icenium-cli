@@ -37,6 +37,10 @@ Device commands:
     device log                      Opens the log stream for the selected device.
 
 Certificate management and publishing commands:
+    certificate-request             Lists all pending certificate signing requests.
+    certificate-request create      Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
+    certificate-request remove      Removes a pending certificate signing request.
+    certificate-request download    Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center.
     certificate                     Lists all configured certificates for code signing iOS and Android applications.
     certificate create-self-signed  Creates self-signed certificate for code signing Android applications.
     certificate remove              Removes the selected certificate from the server.
