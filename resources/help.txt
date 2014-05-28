@@ -60,6 +60,15 @@ Global Options:
 
 --[/]--
 
+--[help]--
+
+Usage:
+    $ appbuilder help [<Command>]
+
+Lists the available commands or shows information about the selected command.
+<Command> is any of the available commands as listed by $ appbuilder help.
+--[/]--
+
 --[login]--
 
 Usage:
@@ -266,15 +275,16 @@ Removes the selected provisioning profile.
 
 --[livesync]--
 Usage:
-    $ appbuilder livesync [<Platform>] [--device <id>] [--companion] [--watch]
+    $ appbuilder livesync [<Platform>] [--device <Device ID>] [--companion] [--watch]
     $ appbuilder livesync [<Command>]
 
 Platform-specific usages:
-    $ appbuilder livesync android [--companion] [--watch]
-    $ appbuilder livesync ios [--companion] [--watch]
+    $ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]
+    $ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]
 
 Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
 you cannot synchronize changes to Windows Phone 8 connected devices.
+<Device ID> is the device index or identifier as listed by run $ appbuilder device.
 
 Options:
     --watch - If set, when you save changes to the project, changes are automatically synchronized
@@ -302,14 +312,17 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform> [--device <ID>] [--no-livesync]
+    $ appbuilder deploy <Platform> [--device <Device ID>] [--no-livesync]
 
 Platform-specific usages:
-    $ appbuilder deploy android [--device <ID>] [--certificate]
-    $ appbuilder deploy ios [--device <ID>] --certificate <Name or ID> --provision <Name or ID>
+    $ appbuilder deploy android [--device <Device ID>] [--certificate]
+    $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
 
 Builds the project for the selected platform and deploys it to connected devices. In this version of the Telerik AppBuilder CLI,
 you cannot build and deploy to Windows Phone 8 connected devices.
+<Device ID> is the device index or identifier as listed by run $ appbuilder device.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
@@ -329,6 +342,7 @@ Usage:
     $ appbuilder plugin [Command]
 
 You must run the plugin command with a related command.
+
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
@@ -489,6 +503,7 @@ Usage:
     $ appbuilder appstore <Command>
 
 You must run the appstore command with a related command.
+
 <Command> is a related command that extends the appstore command. You can run the following related commands:
     list - Lists all applications in iTunes Connect that are in the Waiting for Upload state.
     upload - Builds the project and uploads the binary to iTunes Connect.
