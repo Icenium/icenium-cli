@@ -242,6 +242,8 @@ export function exitOnStdinEnd(): void {
 }
 
 export function versionCompare(version1: string, version2: string): number {
+	version1 = version1.split("-")[0];
+	version2 = version2.split("-")[0];
 	var v1array = _.map(version1.split("."), (x) => parseInt(x, 10)),
 		v2array = _.map(version2.split("."), (x) => parseInt(x, 10));
 

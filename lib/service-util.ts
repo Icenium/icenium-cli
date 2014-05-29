@@ -114,7 +114,6 @@ export class HttpClient implements Server.IHttpClient {
 					responseStream.pipe(pipeTo);
 				} else {
 					responseStream.on("data", (chunk) => {
-						this.$logger.trace("httpRequest: Receiving data:\n" + chunk);
 						data.push(chunk);
 					});
 
@@ -190,6 +189,7 @@ export class HttpClient implements Server.IHttpClient {
 $injector.register("httpClient", HttpClient);
 
 export class ServiceProxy implements Server.IServiceProxy {
+	private latestVersion: string = null;
 	private lastCallCookies: any;
 	private shouldAuthenticate: boolean = true;
 	private solutionSpaceName: string;
@@ -198,7 +198,6 @@ export class ServiceProxy implements Server.IServiceProxy {
 		private $userDataStore: IUserDataStore,
 		private $logger: ILogger,
 		private $config: IConfiguration,
-		private $serverConfiguration: IServerConfiguration,
 		private $errors: IErrors) {
 	}
 
@@ -286,7 +285,17 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 	private ensureUpToDate(): IFuture<void> {
 		return (() => {
-			if (this.$config.SERVER_VERSION && helpers.versionCompare(this.$serverConfiguration.assemblyVersion.wait(), this.$config.SERVER_VERSION) > 0) {
+			try {
+				if (!this.latestVersion) {
+					this.latestVersion = JSON.parse(this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder").wait().body)["dist-tags"].latest;
+				}
+			}
+			catch (error) {
+				this.$logger.debug("Failed to retrieve version from npm");
+				this.latestVersion = "0.0.0";
+			}
+
+			if (helpers.versionCompare(this.latestVersion, this.$config.version) > 0) {
 				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm update -g appbuilder'.", suppressCommandHelp: true });
 			}
 		}).future<void>()();
