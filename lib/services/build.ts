@@ -66,11 +66,7 @@ export class BuildService implements Project.IBuildService {
 
 			buildProperties.LiveSyncToken = liveSyncToken;
 
-			var body = this.$server.build.buildProject(solutionName, projectName, {Properties: buildProperties}).wait();
-
-			if (body.Errors.length) {
-				this.$logger.error("Build errors: %s", body.Errors);
-			}
+			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties }).wait();
 
 			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult) => {
 				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
@@ -86,7 +82,8 @@ export class BuildService implements Project.IBuildService {
 
 			return {
 				buildResults: buildResults,
-				output: body.Output
+				output: body.Output,
+				errors: body.Errors
 			};
 		}).future<Server.IBuildResult>()();
 	}
@@ -248,6 +245,10 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.debug(result.buildResults);
 
+			if (result.errors.length) {
+				this.$logger.error("Build errors: %s", util.inspect(result.errors));
+			}
+
 			return {
 				buildProperties: buildProperties,
 				packageDefs: result.buildResults
@@ -302,7 +303,11 @@ export class BuildService implements Project.IBuildService {
 				settings.downloadFiles = true;
 			}
 
-			if (settings.showQrCodes && packageDefs.length) {
+			if (!packageDefs.length) {
+				this.$errors.fail("Build failed. For more information read the build log.");
+			}
+
+			if (settings.showQrCodes) {
 				var urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
 				var liveSyncToken = buildResult.buildProperties.LiveSyncToken;
 

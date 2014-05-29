@@ -62,6 +62,7 @@ declare module Server {
 	interface IBuildResult {
 		buildResults: IPackageDef[];
 		output: string;
+		errors: string[];
 	}
 }
 
