@@ -54,7 +54,7 @@ Certificate management and publishing commands:
 
 Global Options:
     --help                Prints help about the selected command.
-    --path <File Path>         Specifies the file path to the project. If not set, the project is searched for
+    --path <Directory>    Specifies the directory that contains the project. If not set, the project is searched for
                           in the current directory and all directories above it.
     --version             Prints the client version.
 
@@ -93,7 +93,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[create]--
 
 Usage:
-    $ appbuilder create <App name> [--template <Template>] [--path <File Path>] [--appid <App ID>]
+    $ appbuilder create <App name> [--template <Template>] [--path <Directory>] [--appid <App ID>]
 
 Creates a new project from template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -103,7 +103,7 @@ Creates a new project from template.
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
         #{templatesService.projectTemplatesString}. The default value is KendoUI.
-    --path - Specifies the path where you want to create the project, if different from the current directory. 
+    --path - Specifies the directory where you want to create the project, if different from the current directory. 
         The directory must be empty.
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
@@ -118,8 +118,10 @@ Usage:
     $ appbuilder sample
     $ appbuilder sample [<Command>]
 
-Lists all available sample apps with name, description, GitHub repository, and clone command. To clone a selected sample app, run its clone command.
-<Command> is any related command that expands the sample command. You can run the following related commands:
+Lists all available sample apps with name, description, GitHub repository, and clone command. To clone a selected sample app,
+run its clone command as listed by $ appbuilder sample.
+
+<Command> is any related command that extends the sample command. You can run the following related commands:
     clone - Clones a selected sample app. 
 
 --[/]--
@@ -127,7 +129,7 @@ Lists all available sample apps with name, description, GitHub repository, and c
 --[sample|clone]--
 
 Usage:
-    $ appbuilder sample clone <Clone ID> [--path <File Path>]
+    $ appbuilder sample clone <Clone ID> [--path <Directory>]
 	
 Clones the selected sample app from GitHub to your local file system. You can examine and modify the sample code, run it in the simulator, and build and deploy it on your devices. To list all available sample apps with their clone commands, run $ appbuilder sample.
 <Clone ID> is the title of the sample app as listed by $ appbuilder sample. If the title consists of two or more strings, separated by a space, you must 
@@ -135,7 +137,7 @@ Clones the selected sample app from GitHub to your local file system. You can ex
 
 
 Options: 
-     --path - Specifies the path where you want to clone the sample app, if different from the current directory. The directory must be empty.
+     --path - Specifies the directory where you want to clone the sample app, if different from the current directory. The directory must be empty.
     If not specified, the Telerik AppBuilder CLI attempts to clone the sample in the current directory.
 
 #{samplesService.getSamplesInformation}
@@ -315,7 +317,7 @@ Usage:
     $ appbuilder deploy <Platform> [--device <Device ID>] [--no-livesync]
 
 Platform-specific usages:
-    $ appbuilder deploy android [--device <Device ID>] [--certificate]
+    $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
     $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
 
 Builds the project for the selected platform and deploys it to connected devices. In this version of the Telerik AppBuilder CLI,
@@ -327,11 +329,11 @@ you cannot build and deploy to Windows Phone 8 connected devices.
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         To list all connected devices, grouped by platform, run $ appbuilder device.
-    --certificate - (Required when building for iOS) Sets the certificate that you want to use for code signing your
+    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your
         iOS or Android app. You can set a certificate by index or name.
         If you build for iOS, the certificate must match the provisioning profile.
         To list available certificates, run $ appbuilder certificate.
-    --provision - (Required when building for iOS) Sets the provisioning profile that you want to use for code signing
+    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
         your iOS app. You can set a provisioning profile by index or name.
         To list available provisioning profiles, run $ appbuilder provision.
     --no-livesync - If set, disables LiveSync with the three-finger tap and hold gesture.
@@ -369,12 +371,11 @@ The plugin must be Plugman-compatible.
 
 --[simulate]--
 Usage:
-    $ appbuilder simulate [--path <File Path>]
-
+    $ appbuilder simulate [--path <Directory>]
 Runs the current project in the device simulator.
 
 Options:
-    --path - Specifies the file path to the project. If not specified, the project is searched
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
 
 --[/]--
@@ -403,14 +404,14 @@ Lists all projects associated with your Telerik Platform account.
 
 --[cloud|export]--
 Usage:
-    $ appbuilder cloud export <Project ID> [--path <File Path>]
+    $ appbuilder cloud export <Project ID> [--path <Directory>]
 
 Exports one of your projects from the cloud and initializes it for development
 in the current directory.
 <Project ID> is the index or name of the project as listed by $ appbuilder cloud.
 
 Options:
-    --path - Specifies where to export the selected project on your file system. If not set,
+    --path - Specifies the directory where to export the selected project on your file system. If not set,
              exports the project in the current directory.
 
 --[/]--
@@ -479,14 +480,14 @@ CAUTION: Deleting a certificate cannot be undone. If you have not backed up the 
 
 --[certificate|export]--
 Usage:
-    $ appbuilder certificate export <Certificate ID> [<Password>] [--path <File Path>]
+    $ appbuilder certificate export <Certificate ID> [<Password>] [--path <Directory>]
 
 Exports a selected certificate from the server as a P12 file. You must set a password for the exported file. If you do not set a password,
 Telerik AppBuilder will prompt you to provide a password.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 
 Options:
-    --path - Specifies where to store the exported certificate. If not specified, stores the exported certificate in the current 
+    --path - Specifies the directory where to store the exported certificate. If not specified, stores the exported certificate in the current 
             directory.
 --[/]--
 
@@ -536,11 +537,11 @@ Builds the project and uploads the application to iTunes Connect.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
 Options:
-    --certificate - (Required when building for iOS) Sets the certificate that you want to use for code signing your
+    --certificate - Required when building for iOS. Sets the certificate that you want to use for code signing your
         iOS or Android app. Must be a production certificate. You can set a certificate by index or name.
         If you build for iOS, the certificate must match the provisioning profile.
         To list available certificates, run $ appbuilder certificate.
-    --provision - (Required when building for iOS) Sets the provisioning profile that you want to use for code signing
+    --provision - Required when building for iOS. Sets the provisioning profile that you want to use for code signing
         your iOS app. Must be a provisioning profile for App Store distribution. You can set a provisioning profile by 
         index or name.
         To list available provisioning profiles, run $ appbuilder provision.
