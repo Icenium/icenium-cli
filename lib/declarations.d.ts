@@ -281,7 +281,6 @@ interface IConfiguration {
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	ANALYTICS_API_KEY: string;
-	SERVER_VERSION: string;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
