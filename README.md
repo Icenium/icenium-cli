@@ -232,6 +232,7 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can run your apps in the device simulator on Windows systems.
 * You can run your apps in the device simulator on OS X systems.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
+* You can debug your code with the built-in debug tools in the device simulator on OS X systems.
 * You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
 * You can enable and disable the Apache Cordova core and integrated plugins.
@@ -248,7 +249,6 @@ The following Telerik AppBuilder features are not available in the current relea
 * You cannot deploy your apps on connected Windows Phone 8 devices.
 * You cannot load your Windows Phone 8 apps in the companion app.
 * You cannot switch your Telerik Platform account.
-* You cannot debug your apps in the device simulator on OS X systems.
 * You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
 * You cannot migrate between Apache Cordova versions.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
