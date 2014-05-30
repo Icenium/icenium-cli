@@ -80,6 +80,8 @@ export class TemplatesService implements ITemplatesService {
 			var match = file.match(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
 			return match && match[1];
 		});
+
+		templates = _.select(templates, (template: string) => template != null);
 		return helpers.formatListOfNames(templates);
 	}
 
