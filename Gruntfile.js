@@ -118,7 +118,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
 	grunt.loadNpmTasks("grunt-ts");
-	grunt.loadNpmTasks("grunt-curl");
 
 	grunt.registerTask("set_package_version", function(version) {
 		var fs = require("fs");
@@ -134,25 +133,6 @@ module.exports = function(grunt) {
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
 
-	grunt.registerTask("save_server_version", function() {
-		var done = this.async();
-		var configFileName = "config/config.json";
-		var config = grunt.file.readJSON(configFileName);
-
-		grunt.helper('curl', util.format("%s://%s/configuration.json", config.AB_SERVER_PROTO, config.AB_SERVER),
-			function(err, content) {
-				if (err) {
-					grunt.fail.fatal(err);
-				} else {
-					var serverConfig = JSON.parse(content);
-					config.SERVER_VERSION = serverConfig.assemblyVersion;
-					grunt.log.writeln("Server version is %s", config.SERVER_VERSION);
-					grunt.file.write(configFileName, JSON.stringify(config, null, "\t"));
-				}
-				done();
-			});
-	});
-
 	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
 		"clean",
@@ -163,7 +143,6 @@ module.exports = function(grunt) {
 		"shell:ci_unit_tests",
 
 		"set_package_version",
-		"save_server_version",
 		"shell:build_package",
 
 		"copy:package_to_drop_folder",

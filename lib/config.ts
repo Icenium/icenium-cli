@@ -21,7 +21,6 @@ export class Configuration implements IConfiguration {
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	ANALYTICS_API_KEY: string;
-	SERVER_VERSION: string;
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
