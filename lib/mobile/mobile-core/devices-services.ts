@@ -11,8 +11,8 @@ import constants = require("../constants");
 export class DevicesServices implements Mobile.IDevicesServices {
 	private devices: { [key: string]: Mobile.IDevice } = {};
 	private platforms: string[] = [];
-	private static NOT_FOUND_DEVICE_BY_IDENTIFIER_ERROR_MESSAGE = "Could not find device by specified identifier '%s'. To list currently connected devices and verify that the specified identifier exists, run list-devices.";
-	private static NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE = "Could not find device by specified index %d. To list currently connected devices and verify that the specified index exists, run list-devices.";
+	private static NOT_FOUND_DEVICE_BY_IDENTIFIER_ERROR_MESSAGE = "Could not find device by specified identifier '%s'. To list currently connected devices and verify that the specified identifier exists, run 'appbuilder device'.";
+	private static NOT_FOUND_DEVICE_BY_INDEX_ERROR_MESSAGE = "Could not find device by specified index %d. To list currently connected devices and verify that the specified index exists, run 'appbuilder device'.";
 	private _platform: string;
 	private _device: Mobile.IDevice;
 	private _isInitialized = false;
@@ -131,7 +131,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 			}
 
 			if(!device) {
-				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run list-devices.");
+				this.$errors.fail("Cannot resolve the specified connected device by the provided index or identifier. To list currently connected devices and verify that the specified index or identifier exists, run 'appbuilder device'.");
 			}
 
 			return device;
