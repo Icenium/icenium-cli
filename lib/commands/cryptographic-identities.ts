@@ -664,7 +664,6 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 			var targetFile = this.$fs.createWriteStream(targetFileName);
 			this.$logger.info("Writing certificate signing request to %s", path.resolve(targetFileName));
 			this.$server.identityStore.getCertificateRequest(uniqueName, targetFile).wait();
-			this.$fs.futureFromEvent(targetFile, "finish").wait();
 		}).future<void>()();
 	}
 }
