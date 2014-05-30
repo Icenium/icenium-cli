@@ -47,6 +47,7 @@ Certificate management and publishing commands:
     provision remove                Removes a registered provisioning profile.
     appstore list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
     appstore upload                 Builds the project and uploads the binary to iTunes Connect.
+    appmanager upload               Builds the project and uploads the binary to Telerik AppManager.
 
 Global Options:
     --help                Prints help about the selected command.
@@ -510,6 +511,35 @@ Run list-provisions to list all available provisioning profiles for code signing
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS
         app. Must be a production certificate and must match the specified provisioning profile.
+        You can specify a certificate by index or name.
+    --provision - Sets the provisioning profile that you want to use for code signing
+        your iOS app. Must be an AppStore distribution provisioning profile and must match the specified certificate.
+        You can specify a provisioning profile by index or name.
+--[/]--
+
+--[appmanager]--
+Usage:
+    $ appbuilder appmanager <command>
+
+Commands:
+    upload - Builds the project and uploads the binary to Telerik AppManager.
+--[/]--
+
+--[appmanager|upload]--
+Usage:
+    $ appbuilder appmanager upload <Platform> [--certificate <index or name>] [--provision <index or name>]
+
+Builds the project and uploads the application to Telerik AppManager.
+
+The platform to build for is specified by the <Platform> parameter and should be one of Android, iOS or WP8.
+
+Run `appbuilder certificate` to list all available certificates for code signing your apps.
+Run `appbuilder provision` to list all available provisioning profiles for code signing your apps.
+
+Options:
+    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app.
+        For iOS, it must match the specified provisioning profile.
+        For Android, it must be suitable for publishing to Google Play.
         You can specify a certificate by index or name.
     --provision - Sets the provisioning profile that you want to use for code signing
         your iOS app. Must be an AppStore distribution provisioning profile and must match the specified certificate.
