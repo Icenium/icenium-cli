@@ -71,15 +71,15 @@ export function toHash(collection, keySelector, valueSelector): any {
 	return result;
 }
 
-var _projectFileSchema;
+var _projectFileSchemas = [];
 export function getProjectFileSchema(projectType: number): any {
-	if (!_projectFileSchema) {
-		var $projectType = $injector.resolve("projectTypes");
-		_projectFileSchema = getProjectFilePartSchema($projectType[projectType]).wait();
+	if (!_projectFileSchemas[projectType]) {
+		var projectTypes = require("./project-types");
+		_projectFileSchemas[projectType] = getProjectFilePartSchema(projectTypes[projectType]).wait();
 		var commonSchema = getProjectFilePartSchema("common").wait();
-		_.extend(_projectFileSchema, commonSchema);
+		_.extend(_projectFileSchemas[projectType], commonSchema);
 	}
-	return _projectFileSchema;
+	return _projectFileSchemas[projectType];
 }
 
 export function getProjectFilePartSchema(partName: string): IFuture<string> {

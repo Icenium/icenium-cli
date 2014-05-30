@@ -169,9 +169,8 @@ export class TemplateServiceStub implements ITemplatesService {
 	}
 
 	getTemplateFilename(projectType: number, name: string): string {
-		return util.format("Telerik.Mobile.%s.%s.zip",
-			projectType === 0 ? "Cordova" : "NativeScript",
-			name);
+		var projectTypes = require("../lib/project-types");
+		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
 	}
 
 	projectCordovaTemplatesString(): string {

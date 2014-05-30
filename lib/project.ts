@@ -348,7 +348,7 @@ export class Project implements Project.IProject {
 					}
 
 					//triggers validation logic
-					this.updateProjectProperty({}, "set", propertyName, updateData, false).wait();
+					this.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
 				}
 			});
 
@@ -389,9 +389,8 @@ export class Project implements Project.IProject {
 		return propLookup[property.toLowerCase()] || property;
 	}
 
-	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) : IFuture<void> {
+	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping: boolean = true) : IFuture<void> {
 		return ((): any => {
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[projectData.projectType]);
 			property = this.normalizePropertyName(property, propSchema);
 			var propData = propSchema[property];
 
@@ -494,7 +493,8 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, true).wait();
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
 		}).future<void>()();
@@ -521,17 +521,17 @@ export class Project implements Project.IProject {
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
 			var result = [];
-			var schema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
+			var schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Cordova]).wait();
 			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
-			result.concat(this.getProjectSchemaPartHelp(schema, title));
+			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			schema = helpers.getProjectFileSchema(this.$projectTypes.NativeScript);
+			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.NativeScript]).wait();
 			title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.NativeScript]);
-			result.concat(this.getProjectSchemaPartHelp(schema, title));
+			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			schema = helpers.getProjectFileSchema(this.$projectTypes.Common);
+			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Common]).wait();
 			title = "Common properties for all projects:";
-			result.concat(this.getProjectSchemaPartHelp(schema, title));
+			result.push(this.getProjectSchemaPartHelp(schema, title));
 
 			return result.join("\n\n");
 		}).future<string>()();

@@ -12,7 +12,7 @@ import path = require("path");
 import temp = require("temp");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
-import projectTypes = require("../lib/project-types");
+import projectTypeslib = require("../lib/project-types");
 var assert = require("chai").assert;
 temp.track();
 
@@ -46,7 +46,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
-	testInjector.register("projectTypes", projectTypes);
+	testInjector.register("projectTypes", projectTypeslib);
 
 	return testInjector;
 }
@@ -71,7 +71,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName).wait();
+			project.createNewProject(projectTypes.Cordova, projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank.abproject"));
@@ -86,7 +86,7 @@ describe("project integration tests", () => {
 			assert.ok(guidRegex.test(testProperties.WP8PublisherID));
 			delete testProperties.WP8PublisherID;
 
-			assert.deepEqual(Object.keys(testProperties), Object.keys(correctProperties));
+			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
 			for (var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
@@ -126,11 +126,12 @@ describe("project integration tests", () => {
 });
 
 describe("project unit tests", () => {
-	var project, testInjector;
+	var project, projectTypes, testInjector, propSchemaCordova;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
+		projectTypes = testInjector.resolve("projectTypes");
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		var config = testInjector.resolve("config");
@@ -138,98 +139,100 @@ describe("project unit tests", () => {
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 
 		project = testInjector.resolve("project");
+
+		propSchemaCordova = helpers.getProjectFileSchema(projectTypes.Cordova);
 	});
 
 	describe("updateProjectProperty", () => {
 		it("sets unconstrained string property", () => {
 			var projectData = {DisplayName: "wrong"};
-			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]).wait();
+			project.updateProjectProperty(projectData, "set", "DisplayName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", () => {
 			var projectData = {ProjectName: "wrong"};
-			project.updateProjectProperty(projectData, "set", "ProjectName", ["fine"]).wait();
+			project.updateProjectProperty(projectData, "set", "ProjectName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.ProjectName);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
 			var projectData = {ProjectName: "wrong"};
-			assert.throws(() => project.updateProjectProperty(projectData, "add", "ProjectName", ["fine"]).wait());
+			assert.throws(() => project.updateProjectProperty(projectData, "add", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
 			var projectData = {ProjectName: "wrong"};
-			assert.throws(() => project.updateProjectProperty(projectData, "del", "ProjectName", ["fine"]).wait());
+			assert.throws(() => project.updateProjectProperty(projectData, "del", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
 			var projectData = {"BundleVersion": "0"};
-			project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]).wait();
+			project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"], propSchemaCordova).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", () => {
 			var projectData = {"BundleVersion": "0"};
-			assert.throws(() => project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait());
+			assert.throws(() => project.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"], propSchemaCordova).wait());
 		});
 
 		it("sets enumerated property", () => {
 			var projectData = {iOSStatusBarStyle: "Default"};
-			project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
+			project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"], propSchemaCordova).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", () => {
 			var projectData = {iOSStatusBarStyle: "Default"};
-			assert.throws(() => project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
+			assert.throws(() => project.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"], propSchemaCordova).wait());
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]).wait();
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]).wait();
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape", "Portrait"], projectData.DeviceOrientations);
 		});
 
 		it("appends to enumerated collection property with shorthand", () => {
 			var projectData = {iOSDeviceFamily: []};
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"]).wait();
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"], propSchemaCordova).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"]).wait();
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"], propSchemaCordova).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("appends multiple values to enumerated collection property", () => {
 			var projectData = {iOSDeviceFamily: []};
-			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"]).wait();
+			project.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"], propSchemaCordova).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", () => {
 			var projectData = {DeviceOrientations: ["Landscape", "Portrait"]};
-			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
-			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			project.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("disallows unrecognized values for enumerated collection property", () => {
 			var projectData = {DeviceOrientations: []};
-			assert.throws(() => project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
+			assert.throws(() => project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"], propSchemaCordova).wait());
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]).wait();
+			project.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", () => {
 			var projectData = {DeviceOrientations: []};
-			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"]).wait();
+			project.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 	});

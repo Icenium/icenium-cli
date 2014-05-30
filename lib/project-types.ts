@@ -12,6 +12,8 @@ var ProjectTypes = {
 
 	4: "Common",
 	"Common" : 4
-}
+};
+
+export = ProjectTypes;
 
 $injector.register("projectTypes", ProjectTypes);
