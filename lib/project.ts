@@ -2,12 +2,10 @@
 
 "use strict";
 
-import xml2js = require("xml2js");
 import minimatch = require("minimatch");
 import path = require("path");
 var options:any = require("./options");
 import util = require("util");
-import Future = require("fibers/future");
 import helpers = require("./helpers");
 import os = require("os");
 import MobileHelper = require("./mobile/mobile-helper");
@@ -15,6 +13,8 @@ import MobileHelper = require("./mobile/mobile-helper");
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
 	public projectData: IProjectData;
+	private static PROJECT_FILE_ = ".abproject";
+	public PROJECT_FILE = Project.PROJECT_FILE_;
 
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
@@ -28,8 +28,13 @@ export class Project implements Project.IProject {
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
 		private $cordovaMigrationService: ICordovaMigrationService,
-		private $projectPropertiesService: IProjectPropertiesService) {
+		private $projectPropertiesService: IProjectPropertiesService,
+		private $projectTypes: IProjectTypes) {
 			this.readProjectData().wait();
+
+			this.defaultProjectForType = Object.create(null);
+			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
+			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
 		}
 
 	public getProjectDir(): string {
@@ -60,8 +65,8 @@ export class Project implements Project.IProject {
 	}
 
 	private static IGNORE_FILE = ".abignore";
-	private static PROJECT_FILE = ".abproject";
-	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.PROJECT_FILE, Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.PROJECT_FILE_, Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private defaultProjectForType: any;
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
@@ -71,7 +76,7 @@ export class Project implements Project.IProject {
 			var projectDir = this.getProjectDir();
 			var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
 				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
-				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, Project.PROJECT_FILE)).wait();
+				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
 			});
 
@@ -114,18 +119,39 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createNewProject(projectName: string): IFuture<void> {
+	public get projectType(): number {
+		return this.$projectTypes[this.projectData.projectType];
+	}
+
+	public createNewCordovaProject(projectName: string): IFuture<void> {
+		return this.createNewProject(this.$projectTypes.Cordova, projectName);
+	}
+
+	public createNewNativeScriptProject(projectName: string): IFuture<void> {
+		return this.createNewProject(this.$projectTypes.NativeScript, projectName);
+	}
+
+	private createNewProject(projectType: number, projectName: string): IFuture<void> {
 		return ((): void => {
 			if (!projectName) {
 				this.$errors.fail("No project name specified.")
 			}
+			this.$projectNameValidator.validate(projectName);
 
 			var projectDir = this.getNewProjectDir();
-			this.createFromTemplate(projectName, projectDir).wait();
+			this.createFromTemplate(projectName, projectType, projectDir).wait();
 		}).future<void>()();
 	}
 
-	public createProjectFileFromExistingProject(): IFuture<void> {
+	public createCordovaProjectFileFromExistingProject(): IFuture<void> {
+		return this.createProjectFileFromExistingProject(this.$projectTypes.Cordova);
+	}
+
+	public createNativeScriptProjectFileFromExistingProject(): IFuture<void> {
+		return this.createProjectFileFromExistingProject(this.$projectTypes.NativeScript);
+	}
+
+	private createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
 			var projectFile = path.join(projectDir, this.$config.PROJECT_FILE_NAME);
@@ -139,7 +165,7 @@ export class Project implements Project.IProject {
 			}
 
 			try {
-				this.createProjectFile(projectDir, appname, properties).wait();
+				this.createProjectFile(projectDir, appname, projectType, properties).wait();
 				this.$logger.info("Successfully initialized project in the folder!");
 			}
 			catch (ex) {
@@ -208,7 +234,6 @@ export class Project implements Project.IProject {
 			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
  				var extension = path.extname(file);
  				return extension == ".proj" || extension == ".iceproj";
- 
 			});
 
 			if (projectFile) {
@@ -220,13 +245,15 @@ export class Project implements Project.IProject {
 		}).future<IProjectData>()();
 	}
 
-	private createFromTemplate(appname, projectDir): IFuture<void> {
+
+
+	private createFromTemplate(appname: string, projectType: number, projectDir: string): IFuture<void> {
 		return (() => {
 			var templatesDir = this.$templatesService.projectTemplatesDir,
-				template = options.template || this.$config.DEFAULT_PROJECT_TEMPLATE,
+				template = options.template || this.defaultProjectForType[projectType],
 				templateFileName;
 
-			if (template.toLowerCase() === "kendouidataviz") {
+			if (projectType === this.$projectTypes.Cordova && template.toLowerCase() === "kendouidataviz") {
 				this.$loginManager.ensureLoggedIn().wait();
 				var user = this.$userDataStore.getUser().wait();
 				if (!user.tenant.features["Kendo UI DataViz"]) {
@@ -238,30 +265,24 @@ export class Project implements Project.IProject {
 				}
 			}
 
-			if (!appname) {
-				this.$logger.fatal("At least appname must be specified!");
-				return;
-			}
-			projectDir = path.join(projectDir, appname);
-
-			this.$projectNameValidator.validate(appname);
-			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(template));
+			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(projectType, template));
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if (this.$fs.exists(templateFileName).wait()) {
+				projectDir = path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
-					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, "mobile.proj"), false).wait();
-					properties = this.alterPropertiesForNewProject(properties, appname);
+					this.cachedProjectDir = projectDir; // so that readProjectData/saveProject can work
+					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.PROJECT_FILE), true).wait();
+					this.projectData = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
-					this.$logger.trace("Creating project file.");
-					this.createProjectFile(projectDir, appname, properties).wait();
+					this.$logger.trace("Saving project file.");
+					this.saveProject(projectDir).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir).wait();
-
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				}
 				catch (ex) {
@@ -269,7 +290,10 @@ export class Project implements Project.IProject {
 					throw ex;
 				}
 			} else {
-				var message = util.format("The requested template %s does not exist.%sAvailable templates are: %s", options.template, os.EOL, this.$templatesService.projectTemplatesString());
+				var message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
+					options.template,
+					os.EOL,
+					(projectType === this.$projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
 				this.$errors.fail({formatStr: message, suppressCommandHelp: true});
 			}
 		}).future<void>()();
@@ -277,7 +301,7 @@ export class Project implements Project.IProject {
 
 	private removeExtraFiles(projectDir: string): IFuture<void> {
 		return ((): void => {
-			_.each(["mobile.proj", "mobile.vstemplate"],
+			_.each(["mobile.vstemplate"],
 				(file) => this.$fs.deleteFile(path.join(projectDir, file)).wait());
 		}).future<void>()();
 	}
@@ -299,16 +323,18 @@ export class Project implements Project.IProject {
 		return options.path || process.cwd();
 	}
 
-	public createProjectFile(projectDir: string, projectName: string, properties: any): IFuture<void> {
+	public createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
 			var updateData;
 
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
-			this.projectData = this.$fs.readJson(path.join(__dirname, "../resources/default-project.json")).wait();
+			this.projectData = this.$fs.readJson(
+				path.join(__dirname,
+					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType]))).wait();
 
-			var projectSchema = helpers.getProjectFileSchema();
+			var projectSchema = helpers.getProjectFileSchema(projectType);
 			Object.keys(properties).forEach(propertyName => {
 				if (projectSchema.hasOwnProperty(propertyName)) {
 					if (projectSchema[propertyName].flags) {
@@ -317,7 +343,6 @@ export class Project implements Project.IProject {
 						} else {
 							this.projectData[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
 						}
-
 						updateData = this.projectData[propertyName];
 					} else {
 						this.projectData[propertyName] = properties[propertyName];
@@ -325,7 +350,7 @@ export class Project implements Project.IProject {
 					}
 
 					//triggers validation logic
-					this.updateProjectProperty({}, "set", propertyName, updateData, false).wait();
+					this.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
 				}
 			});
 
@@ -357,20 +382,18 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	private normalizePropertyName(property: string): string {
+	private normalizePropertyName(property: string, schema: any): string {
 		if (!property) {
 			return property;
 		}
 
-		var propSchema = helpers.getProjectFileSchema();
-		var propLookup = helpers.toHash(propSchema, (value, key) => key.toLowerCase(), (value, key) => key);
+		var propLookup = helpers.toHash(schema, (value, key) => key.toLowerCase(), (value, key) => key);
 		return propLookup[property.toLowerCase()] || property;
 	}
 
-	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, useMapping: boolean = true) : IFuture<void> {
+	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping: boolean = true) : IFuture<void> {
 		return ((): any => {
-			property = this.normalizePropertyName(property);
-			var propSchema = helpers.getProjectFileSchema();
+			property = this.normalizePropertyName(property, propSchema);
 			var propData = propSchema[property];
 
 			var validate = (condition: boolean, ...args) => {
@@ -472,7 +495,8 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, true).wait();
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
 		}).future<void>()();
@@ -481,7 +505,8 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			property = this.normalizePropertyName(property);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			property = this.normalizePropertyName(property, propSchema);
 
 			if (this.projectData.hasOwnProperty(property)) {
 				this.$logger.out(this.projectData[property]);
@@ -497,31 +522,47 @@ export class Project implements Project.IProject {
 
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
-			var schema = helpers.getProjectFileSchema();
-			var help = ["Project properties:"];
-			_.each(schema, (value:any, key) => {
-				help.push(util.format("  %s - %s", key, value.description));
-				var range = this.getPropRange(value).wait();
-				if (range) {
-					help.push("    Valid values:");
-					_.each(range, (rangeDesc:any, rangeKey) => {
-						var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
-						if (rangeDesc.description) {
-							desc += " - " + rangeDesc.description;
-						}
-						help.push(desc);
-					});
-				}
-				if (value.validationMessage) {
-					help.push("    " + value.validationMessage.replace("\n", "\n    "));
-				}
-				else if (value.regex) {
-					help.push("    Valid values match /" + value.regex.toString() + "/");
-				}
-			});
+			var result = [];
+			var schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Cordova]).wait();
+			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
+			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			return help.join("\n");
+			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.NativeScript]).wait();
+			title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.NativeScript]);
+			result.push(this.getProjectSchemaPartHelp(schema, title));
+
+			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Common]).wait();
+			title = "Common properties for all projects:";
+			result.push(this.getProjectSchemaPartHelp(schema, title));
+
+			return result.join(os.EOL + os.EOL);
 		}).future<string>()();
+	}
+
+	private getProjectSchemaPartHelp(schema: string, title: string): string {
+		var help = [title];
+		_.each(schema, (value:any, key) => {
+			help.push(util.format("  %s - %s", key, value.description));
+			var range = this.getPropRange(value).wait();
+			if (range) {
+				help.push("    Valid values:");
+				_.each(range, (rangeDesc:any, rangeKey) => {
+					var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
+					if (rangeDesc.description) {
+						desc += " - " + rangeDesc.description;
+					}
+					help.push(desc);
+				});
+			}
+			if (value.validationMessage) {
+				help.push("    " + value.validationMessage.replace(os.EOL, os.EOL + "    "));
+			}
+			else if (value.regex) {
+				help.push("    Valid values match /" + value.regex.toString() + "/");
+			}
+		});
+
+		return help.join(os.EOL);
 	}
 
 	private getPropRange(propData): IFuture<string[]>{
@@ -542,94 +583,13 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-export class ProjectPropertiesService implements IProjectPropertiesService {
-	constructor(private $fs: IFileSystem,
-		private $resources: IResourceLoader) {
-	}
-
-	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
-		return ((): any => {
-			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
-				this.getProjectPropertiesFromXmlProjectFile(projectFile).wait();
-
-			this.completeProjectProperties(properties);
-
-			return properties;
-		}).future<IProjectData>()();
-	}
-
-	private getProjectPropertiesFromXmlProjectFile(projectFile: string): IFuture<any> {
-		return ((): any => {
-			var properties: any = {};
-
-			var parser = new xml2js.Parser();
-			var contents = this.$fs.readText(projectFile).wait();
-
-			var parseString = Future.wrap((str, callback) => {
-				return parser.parseString(str, callback);
-			});
-
-			var result: any = parseString(contents).wait();
-			var propertyGroup: any = result.Project.PropertyGroup[0];
-
-			var projectSchema = helpers.getProjectFileSchema();
-			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
-				if (propertyGroup.hasOwnProperty(propertyName)) {
-					properties[propertyName] = propertyGroup[propertyName][0];
-
-					if (projectSchema[propertyName].flags) {
-						properties[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
-					}
-				}
-			});
-
-			properties.ProjectName = propertyGroup.ProjectName[0];
-
-			return properties;
-		}).future<any>()();
-	}
-
-	public completeProjectProperties(properties: any): boolean {
-		var updated = false;
-
-		if (properties.hasOwnProperty("name")) {
-			properties.ProjectName = properties.name;
-			delete properties.name;
-			updated = true;
-		}
-
-		if (properties.hasOwnProperty("iOSDisplayName")) {
-			properties.DisplayName = properties.iOSDisplayName;
-			delete properties.iOSDisplayName;
-			updated = true;
-		}
-		if (!properties.DisplayName) {
-			properties.DisplayName = properties.ProjectName;
-			updated = true;
-		}
-
-		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!properties.hasOwnProperty(wp8guid)) {
-				properties[wp8guid] = MobileHelper.generateWP8GUID();
-				updated = true;
-			}
-		});
-
-		var defaultProject = this.$resources.readJson("default-project.json").wait();
-		Object.keys(defaultProject).forEach((propName) => {
-			if (!properties.hasOwnProperty(propName)) {
-				properties[propName] = defaultProject[propName];
-				updated = true;
-			}
-		});
-
-		return updated;
-	}
-}
-$injector.register("projectPropertiesService", ProjectPropertiesService);
-
-helpers.registerCommand("project", "create", (project, args) => project.createNewProject(args[0]));
-helpers.registerCommand("project", "init", (project, args) => project.createProjectFileFromExistingProject());
+// register create * commands
+helpers.registerCommand("project", "create|hybrid", (project, args) => project.createNewCordovaProject(args[0]));
+helpers.registerCommand("project", "create|native", (project, args) => project.createNewNativeScriptProject(args[0]));
+// register init * commands
+helpers.registerCommand("project", "init|hybrid", (project, args) => project.createCordovaProjectFileFromExistingProject());
+helpers.registerCommand("project", "init|native", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
+// register prop * commands
 _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	var propOperation = operation;
 	if (_.isArray(operation)) {

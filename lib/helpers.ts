@@ -71,14 +71,25 @@ export function toHash(collection, keySelector, valueSelector): any {
 	return result;
 }
 
-var _projectFileSchema;
-export function getProjectFileSchema(): any {
-	if (!_projectFileSchema) {
-		var $fs: IFileSystem = $injector.resolve("fs");
-		var propPath = path.join(__dirname, "../resources/project-properties.json");
-		_projectFileSchema = $fs.readJson(propPath, "utf8").wait();
+var _projectFileSchemas = [];
+export function getProjectFileSchema(projectType: number): any {
+	if (!_projectFileSchemas[projectType]) {
+		var projectTypes = require("./project-types");
+		_projectFileSchemas[projectType] = getProjectFilePartSchema(projectTypes[projectType]).wait();
+		var commonSchema = getProjectFilePartSchema("common").wait();
+		_.extend(_projectFileSchemas[projectType], commonSchema);
 	}
-	return _projectFileSchema;
+	return _projectFileSchemas[projectType];
+}
+
+export function getProjectFilePartSchema(partName: string): IFuture<string> {
+	return (() => {
+		var $fs:IFileSystem = $injector.resolve("fs");
+		var propPath = path.join(__dirname,
+				"../resources/project-properties-" + partName + ".json");
+		var schema = $fs.readJson(propPath, "utf8").wait();
+		return schema;
+	}).future<string>()();
 }
 
 export function isStringOptionEmpty(optionValue) {

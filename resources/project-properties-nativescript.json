@@ -1,0 +1,6 @@
+{
+	"FrameworkVersion": {
+		"description": "NativeScript framework version.",
+		"range": ["0.1.0"]
+	}
+}

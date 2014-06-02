@@ -14,7 +14,8 @@ class RemoteProjectExporter {
 		private $userDataStore: IUserDataStore,
 		private $serviceProxy: Server.IServiceProxy,
 		private $project: Project.IProject,
-		private $errors: IErrors) {}
+		private $errors: IErrors,
+		private $projectTypes: IProjectTypes) {}
 
 	public listProjects(): IFuture<void> {
 		return (() => {
@@ -49,8 +50,12 @@ class RemoteProjectExporter {
 			this.$fs.futureFromEvent(projectExtractor, "close").wait();
 
 			try {
-				var properties = this.getProjectProperties(remoteProjectName).wait();
-				this.$project.createProjectFile(projectDir, remoteProjectName, properties).wait();
+				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
+				var projectFile = path.join(projectDir, this.$project.PROJECT_FILE);
+				if (!this.$fs.exists(projectFile).wait()) {
+					var properties = this.getProjectProperties(remoteProjectName).wait();
+					this.$project.createProjectFile(projectDir, remoteProjectName, this.$projectTypes.Cordova, properties).wait();
+				}
 			}
 			catch (ex) {
 				this.$logger.warn("Couldn't create project file: %s", ex.message);
@@ -103,7 +108,7 @@ class RemoteProjectExporter {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
 			var properties = solutionData.Items[0].Properties;
-			properties.name = projectName;
+			properties.ProjectName = projectName;
 			return properties;
 		}).future()();
 	}

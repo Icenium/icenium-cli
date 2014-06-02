@@ -163,15 +163,20 @@ export class TemplateServiceStub implements ITemplatesService {
 	downloadCordovaJsFiles():IFuture<void> {
 		return undefined;
 	}
+
 	get configurationFiles(): IConfigurationFile[] {
 		return [{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFilepath: "Mobile.Android.ManifestXml.zip", helpText: "" }];
 	}
 
-	getTemplateFilename(name: string): string {
-		return util.format("Telerik.Mobile.Cordova.%s.zip", name);
+	getTemplateFilename(projectType: number, name: string): string {
+		var projectTypes = require("../lib/project-types");
+		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
 	}
 
-	projectTemplatesString(): string {
+	projectCordovaTemplatesString(): string {
+		return "";
+	}
+	projectNativeScriptTemplatesString(): string {
 		return "";
 	}
 
