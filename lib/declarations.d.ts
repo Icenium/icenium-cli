@@ -139,6 +139,7 @@ declare module Project {
 	}
 
 	interface IProject {
+		PROJECT_FILE: string;
 		projectData: IProjectData;
 		projectType: number;
 		getProjectDir(): string;

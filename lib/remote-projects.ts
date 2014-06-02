@@ -51,7 +51,7 @@ class RemoteProjectExporter {
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
-				var projectFile = path.join(projectDir, ".abproject");
+				var projectFile = path.join(projectDir, this.$project.PROJECT_FILE);
 				if (!this.$fs.exists(projectFile).wait()) {
 					var properties = this.getProjectProperties(remoteProjectName).wait();
 					this.$project.createProjectFile(projectDir, remoteProjectName, this.$projectTypes.Cordova, properties).wait();

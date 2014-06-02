@@ -13,6 +13,8 @@ import MobileHelper = require("./mobile/mobile-helper");
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
 	public projectData: IProjectData;
+	private static PROJECT_FILE_ = ".abproject";
+	public PROJECT_FILE = Project.PROJECT_FILE_;
 
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
@@ -29,6 +31,10 @@ export class Project implements Project.IProject {
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $projectTypes: IProjectTypes) {
 			this.readProjectData().wait();
+
+			this.defaultProjectForType = Object.create(null);
+			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
+			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
 		}
 
 	public getProjectDir(): string {
@@ -59,8 +65,8 @@ export class Project implements Project.IProject {
 	}
 
 	private static IGNORE_FILE = ".abignore";
-	private static PROJECT_FILE = ".abproject";
-	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.PROJECT_FILE, Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.PROJECT_FILE_, Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private defaultProjectForType: any;
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
@@ -70,7 +76,7 @@ export class Project implements Project.IProject {
 			var projectDir = this.getProjectDir();
 			var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
 				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
-				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, Project.PROJECT_FILE)).wait();
+				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
 			});
 
@@ -228,7 +234,6 @@ export class Project implements Project.IProject {
 			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
  				var extension = path.extname(file);
  				return extension == ".proj" || extension == ".iceproj";
- 
 			});
 
 			if (projectFile) {
@@ -240,10 +245,7 @@ export class Project implements Project.IProject {
 		}).future<IProjectData>()();
 	}
 
-	private defaultProjectForType = [
-		this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE,
-		this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE
-	];
+
 
 	private createFromTemplate(appname: string, projectType: number, projectDir: string): IFuture<void> {
 		return (() => {
@@ -274,7 +276,7 @@ export class Project implements Project.IProject {
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
 					this.cachedProjectDir = projectDir; // so that readProjectData/saveProject can work
-					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, Project.PROJECT_FILE), true).wait();
+					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.PROJECT_FILE), true).wait();
 					this.projectData = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
@@ -533,7 +535,7 @@ export class Project implements Project.IProject {
 			title = "Common properties for all projects:";
 			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			return result.join("\n\n");
+			return result.join(os.EOL + os.EOL);
 		}).future<string>()();
 	}
 
@@ -553,14 +555,14 @@ export class Project implements Project.IProject {
 				});
 			}
 			if (value.validationMessage) {
-				help.push("    " + value.validationMessage.replace("\n", "\n    "));
+				help.push("    " + value.validationMessage.replace(os.EOL, os.EOL + "    "));
 			}
 			else if (value.regex) {
 				help.push("    Valid values match /" + value.regex.toString() + "/");
 			}
 		});
 
-		return help.join("\n");
+		return help.join(os.EOL);
 	}
 
 	private getPropRange(propData): IFuture<string[]>{
@@ -582,11 +584,11 @@ export class Project implements Project.IProject {
 $injector.register("project", Project);
 
 // register create * commands
-helpers.registerCommand("project", "create|cordova", (project, args) => project.createNewCordovaProject(args[0]));
-helpers.registerCommand("project", "create|nativescript", (project, args) => project.createNewNativeScriptProject(args[0]));
+helpers.registerCommand("project", "create|hybrid", (project, args) => project.createNewCordovaProject(args[0]));
+helpers.registerCommand("project", "create|native", (project, args) => project.createNewNativeScriptProject(args[0]));
 // register init * commands
-helpers.registerCommand("project", "init|cordova", (project, args) => project.createCordovaProjectFileFromExistingProject());
-helpers.registerCommand("project", "init|nativescript", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
+helpers.registerCommand("project", "init|hybrid", (project, args) => project.createCordovaProjectFileFromExistingProject());
+helpers.registerCommand("project", "init|native", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
 // register prop * commands
 _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	var propOperation = operation;

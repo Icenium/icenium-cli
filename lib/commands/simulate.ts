@@ -23,6 +23,7 @@ export class SimulateCommand implements ICommand {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
+		private $errors: IErrors,
 		private $projectTypes: IProjectTypes) {
 			this.projectData = $project.projectData;
 		}
@@ -32,7 +33,7 @@ export class SimulateCommand implements ICommand {
 			this.$project.ensureProject();
 
 			if (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.NativeScript]) {
-				this.$logger.fatal("You cannot run Telerik NativeScript projects in the device simulator.");
+				this.$errors.fail("You cannot run Telerik NativeScript projects in the device simulator.");
 				return;
 			}
 

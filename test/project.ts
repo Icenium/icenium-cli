@@ -74,11 +74,41 @@ describe("project integration tests", () => {
 			project.createNewProject(projectTypes.Cordova, projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
-			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank.abproject"));
+			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
 			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova);
+			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
+
+			assert.ok(guidRegex.test(testProperties.WP8ProductID));
+			delete testProperties.WP8ProductID;
+			assert.ok(guidRegex.test(testProperties.WP8PublisherID));
+			delete testProperties.WP8PublisherID;
+
+			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
+			for (var key in testProperties) {
+				assert.deepEqual(testProperties[key], correctProperties[key]);
+			}
+		});
+
+		it("creates a valid project folder (NativeScript project)", () => {
+			var options: any = require("./../lib/options");
+			var tempFolder = temp.mkdirSync("template");
+			var projectName = "Test";
+
+			options.path = tempFolder;
+			options.template = "Blank";
+			options.appid = "com.telerik.Test";
+
+			project.createNewProject(projectTypes.NativeScript, projectName).wait();
+
+			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
+			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
+			var testProperties = JSON.parse(abProject.toString());
+			var correctProperties = JSON.parse(correctABProject.toString());
+
+			var projectSchema = helpers.getProjectFileSchema(projectTypes.NativeScript);
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.WP8ProductID));

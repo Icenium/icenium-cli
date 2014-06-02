@@ -13,7 +13,8 @@ export class DeployCommand implements ICommand {
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
 		private $commandsService: ICommandsService,
-		private $projectTypes: IProjectTypes) { }
+		private $projectTypes: IProjectTypes,
+		private $errors: IErrors) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
@@ -56,7 +57,7 @@ export class DeployCommand implements ICommand {
 
 	private deployNativeScript(args: string[]): IFuture<void> {
 		return ((): void => {
-			this.$logger.fatal("You will be able to deploy Telerik NativeScript projects to devices in a future release of the Telerik AppBuilder CLI.");
+			this.$errors.fail("You will be able to deploy Telerik NativeScript projects to devices in a future release of the Telerik AppBuilder CLI.");
 		}).future<void>()();
 	}
 }

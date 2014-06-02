@@ -437,7 +437,7 @@ export class BuildService implements Project.IBuildService {
 
 	private executeBuildNativeScript(platform: string): IFuture<void> {
 		return (() => {
-			this.$logger.fatal("You will be able to build for Telerik NativeScript in a future release of the Telerik AppBuilder CLI.");
+			this.$errors.fail("You will be able to build for Telerik NativeScript in a future release of the Telerik AppBuilder CLI.");
 		}).future<void>()();
 	}
 

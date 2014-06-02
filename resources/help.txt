@@ -78,10 +78,18 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 
 --[/]--
 
---[create|cordova]--
+--[create]--
+
+Cannot create project. You need to specify project type and name.
+To create a project for hybrid development with Apache Cordova, run $ appbuilder create hybrid <App Name>.
+To create a project for native development with Telerik NativeScript, run $ appbuilder create native <App Name>.
+
+--[/]--
+
+--[create|hybrid]--
 
 Usage:
-    $ appbuilder create cordova <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ appbuilder create hybrid <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from an Apache Cordova-based template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -100,10 +108,10 @@ Options:
 
 --[/]--
 
---[create|nativescript]--
+--[create|native]--
 
 Usage:
-    $ appbuilder create nativescript <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
+    $ appbuilder create native <App name> [--template <Template>] [--path <path>] [--appid <App ID>]
 
 Creates a new project from a Telerik NativeScript-based template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
@@ -141,10 +149,18 @@ Options:
 #{samplesService.getSamplesInformation}
 --[/]--
 
---[init|cordova]--
+--[init]--
+
+Cannot initialize project. You need to specify project type and name.
+To create a project for hybrid development with Apache Cordova, run $ appbuilder init hybrid.
+To create a project for native development with Telerik NativeScript, run $ appbuilder init native.
+
+--[/]--
+
+--[init|hybrid]--
 
 Usage:
-    $ appbuilder init cordova [--appid <App ID>]
+    $ appbuilder init hybrid [--appid <App ID>]
 
 Initializes an existing Apache Cordova project for development in the current directory. If the folder contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
@@ -157,10 +173,10 @@ Options:
 
 --[/]--
 
---[init|nativescript]--
+--[init|native]--
 
 Usage:
-    $ appbuilder init nativescript [--appid <App ID>]
+    $ appbuilder init native [--appid <App ID>]
 
 Initializes an existing Telerik NativeScript project for development in the current directory. If the folder contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
