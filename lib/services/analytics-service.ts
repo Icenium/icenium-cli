@@ -137,10 +137,6 @@ export class AnalyticsService implements IAnalyticsService {
 	public analyticsCommand(arg: string): IFuture<any> {
 		return(() => {
 			switch(arg) {
-				case "status":
-					var status = this.getStatus().wait();
-					this.$logger.out(this.getStatusMessage(status));
-					break;
 				case "enable":
 					this.enableAnalytics().wait();
 					this.$logger.info("Feature usage tracking is now enabled.");
@@ -149,8 +145,13 @@ export class AnalyticsService implements IAnalyticsService {
 					this.disableAnalytics().wait();
 					this.$logger.info("Feature usage tracking is now disabled.");
 					break;
+				case "status":
+				case undefined:
+					var status = this.getStatus().wait();
+					this.$logger.out(this.getStatusMessage(status));
+					break;
 				default:
-					this.$errors.fail("Invalid parameter.");
+					this.$errors.fail("Invalid parameter");
 					break;
 			}
 		}).future<any>()();
