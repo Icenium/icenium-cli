@@ -5,6 +5,7 @@ import Future = require("fibers/future");
 import path = require("path");
 import byline = require("byline");
 import helpers = require("./../../helpers");
+import os = require("os");
 
 interface IAndroidDeviceDetails {
 	model: string;
@@ -21,6 +22,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	private name: string;
 	private version: string;
 	private vendor: string;
+	private _installedApplications: string[];
 
 	constructor(private identifier: string, private adb: string,
 		private $logger: ILogger,
@@ -75,6 +77,21 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	public getVendor(): string {
 		return this.vendor;
+	}
+
+	public get installedApplications(): IFuture<string[]> {
+		return (() => {
+			if (!this._installedApplications) {
+				var listPackagesCommand = this.composeCommand("shell pm list packages")
+				var result = this.$childProcess.exec(listPackagesCommand).wait();
+				this._installedApplications = _.map(result.split(os.EOL), (packageString: string) => {
+					var match = packageString.match(/package:(.+)/);
+					return match ? match[1] : null;
+				}).filter(parsedPackage => parsedPackage != null);
+			}
+
+			return this._installedApplications
+		}).future<string[]>()();
 	}
 
 	private composeCommand(...args) {
@@ -161,7 +178,7 @@ export class AndroidDevice implements Mobile.IDevice {
 				}
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());
 			} else {
-				this.$errors.fail({formatStr: "You can't live sync on %s! Deploy the app with live sync enabled and wait for the initial start up before live syncing.", suppressCommandHelp: true }, this.identifier);
+				this.$errors.fail({formatStr: appIdentifier.getliveSyncNotSupportedError(this), suppressCommandHelp: true });
 			}
 		}).future<void>()();
 	}
