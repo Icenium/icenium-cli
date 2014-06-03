@@ -48,34 +48,15 @@ export class DebugCommand implements ICommand {
 }
 $injector.registerCommand("debug", DebugCommand);
 
-class WinDebuggerPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
-	private static EXECUTABLE_NAME_WIN = "Debugger.Windows.exe";
+class BaseDebuggerPlatformServices {
 
-	constructor(private $childProcess: IChildProcess,
+	constructor(private $sharedUserSettingsFileService: IUserSettingsFileService,
+		private $sharedUserSettingsService: IUserSettingsService,
 		private $errors: IErrors,
 		private $logger: ILogger,
-		private $sharedUserSettingsFileService: IUserSettingsFileService,
-		private $sharedUserSettingsService: IUserSettingsService,
-		private $dispatcher: IFutureDispatcher) {
-	}
+		private $dispatcher: IFutureDispatcher) { }
 
-	public getPackageName(): string {
-		return WinDebuggerPlatformServices.PACKAGE_NAME_WIN;
-	}
-
-	public runApplication(applicationPath: string, applicationParams: string[]) {
-		this.startWatchingUserSettingsFile();
-
-		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
-		var childProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
-		childProcess.stderr.pipe(process.stderr);
-		childProcess.stdin.on("end", () => process.exit());
-		helpers.exitOnStdinEnd();
-		this.$dispatcher.run();
-	}
-
-	private startWatchingUserSettingsFile(): void {
+	public startWatchingUserSettingsFile(): void {
 		watchr.watch({
 			paths: [this.$sharedUserSettingsFileService.userSettingsFilePath],
 			listeners: {
@@ -99,6 +80,73 @@ class WinDebuggerPlatformServices implements IExtensionPlatformServices {
 			}
 		});
 	}
+
+	public handleChildProcessStdios(childProcess: any) {
+		//TODO: Darwin only - Prevent printing of all devtools log on the console.
+
+		childProcess.stderr.pipe(process.stderr);
+		childProcess.stdin.on("end", () => process.exit());
+		helpers.exitOnStdinEnd();
+		this.$dispatcher.run();
+	}
 }
 
-$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
+class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implements IExtensionPlatformServices {
+	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
+	private static EXECUTABLE_NAME_WIN = "Debugger.Windows.exe";
+
+	constructor(private $childProcess: IChildProcess,
+		$errors: IErrors,
+		$logger: ILogger,
+		$sharedUserSettingsFileService: IUserSettingsFileService,
+		$sharedUserSettingsService: IUserSettingsService,
+		$dispatcher: IFutureDispatcher) {
+		super($sharedUserSettingsFileService, $sharedUserSettingsService, $errors, $logger, $dispatcher);
+	}
+
+	public getPackageName(): string {
+		return WinDebuggerPlatformServices.PACKAGE_NAME_WIN;
+	}
+
+	public runApplication(applicationPath: string, applicationParams: string[]) {
+		this.startWatchingUserSettingsFile();
+
+		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
+		var childProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
+		this.handleChildProcessStdios(childProcess);
+	}
+}
+
+class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
+	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
+	private static EXECUTABLE_NAME_OSX = "AppBuilder Debugger.app";
+
+	constructor(private $childProcess: IChildProcess,
+		$errors: IErrors,
+		$logger: ILogger,
+		$sharedUserSettingsFileService: IUserSettingsFileService,
+		$sharedUserSettingsService: IUserSettingsService,
+		$dispatcher: IFutureDispatcher) {
+		super($sharedUserSettingsFileService, $sharedUserSettingsService, $errors, $logger, $dispatcher);
+	}
+
+	public getPackageName(): string {
+		return DarwinDebuggerPlatformServices.PACKAGE_NAME_OSX;
+	}
+
+	public runApplication(applicationPath: string, applicationParams: string[]) {
+		this.startWatchingUserSettingsFile();
+		var unixExecutableFilePath = "Contents/MacOS/Appbuilder Debugger";
+
+		var debuggerPath = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX, unixExecutableFilePath);
+		var childProcess = this.$childProcess.spawn(debuggerPath, applicationParams);
+
+		this.handleChildProcessStdios(childProcess);
+	}
+}
+
+if (helpers.isWindows()) {
+	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
+} else if (helpers.isDarwin()) {
+	$injector.register("debuggerPlatformServices", DarwinDebuggerPlatformServices);
+}
