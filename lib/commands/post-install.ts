@@ -28,6 +28,8 @@ export class PostInstallCommand implements ICommand {
 			//Cordova files have to be downloaded after cordova migration data so we know which cordova versions we support
 			this.$logger.info("Downloading cordova.js files.");
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
+			this.$logger.info("Downloading project file schema.");
+			//this.$resourceDownloader.downloadProjectFileSchema().wait();
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();
