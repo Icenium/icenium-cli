@@ -106,7 +106,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			var result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if (!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
-					"a valid index. List registered certificates with 'list-certificates' command.", identityStr);
+					"a valid index. List registered certificates with 'certificate' command.", identityStr);
 			} else {
 				return result;
 			}
@@ -120,7 +120,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			var result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
 			if (!result) {
-				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'list-provisions' command.", provisionStr);
+				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'provision' command.", provisionStr);
 			} else {
 				return result;
 			}
@@ -672,7 +672,6 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 			var targetFile = this.$fs.createWriteStream(targetFileName);
 			this.$logger.info("Writing certificate signing request to %s", path.resolve(targetFileName));
 			this.$server.identityStore.getCertificateRequest(uniqueName, targetFile).wait();
-			this.$fs.futureFromEvent(targetFile, "finish").wait();
 		}).future<void>()();
 	}
 }
@@ -700,7 +699,7 @@ class ImportProvisionCommand implements ICommand {
 			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("list-provisions", []);
+			this.$commandsService.executeCommand("provision", []);
 		}).future<void>()();
 	}
 }
@@ -718,7 +717,7 @@ class RemoveProvisionCommand implements ICommand {
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("list-provisions", []);
+			this.$commandsService.executeCommand("provision", []);
 		}).future<void>()();
 	}
 }

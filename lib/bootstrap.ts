@@ -50,7 +50,7 @@ $injector.requireCommand("dev-telerik-login", "./login");
 
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
-$injector.requireCommand("cloud-sync", "./services/build");
+$injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./services/build");
 
 $injector.require("projectTypes", "./project-types");
 $injector.require("project", "./project");
@@ -65,16 +65,15 @@ $injector.requireCommand("prop|remove", "./project");
 $injector.requireCommand("prop|print", "./project");
 $injector.require("projectNameValidator", "./validators/project-name-validator");
 
-$injector.requireCommand("list-projects", "./remote-projects");
-$injector.requireCommand("export-project", "./remote-projects");
+$injector.requireCommand("cloud|*list", "./remote-projects");
+$injector.requireCommand("cloud|export", "./remote-projects");
 
 $injector.requireCommand("device|*list", "./commands/list-devices");
 $injector.requireCommand("device|log", "./commands/open-device-log-stream");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
-$injector.requireCommand(["livesync", "live-sync"], "./commands/live-sync");
-
+$injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 
 $injector.require("iOSCore", "./mobile/ios/ios-core");
 $injector.require("coreFoundation", "./mobile/ios/ios-core");

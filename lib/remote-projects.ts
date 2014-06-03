@@ -119,5 +119,5 @@ class RemoteProjectExporter {
 }
 $injector.register("remoteProjectsExporter", RemoteProjectExporter);
 
-helpers.registerCommand("remoteProjectsExporter", "list-projects", (exporter) => exporter.listProjects());
-helpers.registerCommand("remoteProjectsExporter", "export-project", (exporter, args) => exporter.exportProject(args[0]));
+helpers.registerCommand("remoteProjectsExporter", "cloud|*list", (exporter) => exporter.listProjects());
+helpers.registerCommand("remoteProjectsExporter", "cloud|export", (exporter, args) => exporter.exportProject(args[0]));

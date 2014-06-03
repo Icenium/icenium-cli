@@ -16,7 +16,6 @@ export class Configuration implements IConfiguration {
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
-	DEFAULT_PROJECT_NAME: string;
 	CI_LOGGER: boolean;
 	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;

@@ -39,7 +39,7 @@ export class CommandsService implements ICommandsService {
 	public executeCommand(commandName: string, commandArguments: string[]): boolean {
 		return this.$errors.beginCommand(
 			() => this.executeCommandUnchecked(commandName, commandArguments),
-			() => this.executeCommandUnchecked("help", [commandName]));
+			() => this.executeCommandUnchecked("help", [this.beautifyCommandName(commandName)]));
 	}
 
 	public tryExecuteCommand(commandName: string, commandArguments: string[]): void {
@@ -126,11 +126,11 @@ export class CommandsService implements ICommandsService {
 	}
 
 	private beautifyCommandName(commandName: string): string {
-		var str = helpers.stringReplaceAll(commandName, "|", " ");
-		if(str.indexOf("*") > 0) {
-			return str.substr(0, str.indexOf(" "));
+		if(commandName.indexOf("*") > 0) {
+			return commandName.substr(0, commandName.indexOf("|"));
 		}
-		return str;
+
+		return commandName;
 	}
 }
 $injector.register("commandsService", CommandsService);

@@ -96,7 +96,7 @@ export function isStringOptionEmpty(optionValue) {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
+export function registerCommand(module: string, commandName: any, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
 	var factory = (): ICommand => {
 		return {
 			execute: (args: string[]): IFuture<void> => {
@@ -253,6 +253,8 @@ export function exitOnStdinEnd(): void {
 }
 
 export function versionCompare(version1: string, version2: string): number {
+	version1 = version1.split("-")[0];
+	version2 = version2.split("-")[0];
 	var v1array = _.map(version1.split("."), (x) => parseInt(x, 10)),
 		v2array = _.map(version2.split("."), (x) => parseInt(x, 10));
 

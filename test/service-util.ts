@@ -9,6 +9,8 @@ var assert:chai.Assert = chai.assert;
 
 var testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
+testInjector.register("serverConfiguration", {});
+testInjector.register("errors", stubs.ErrorsStub);
 
 class MockUserDataStore implements IUserDataStore {
 

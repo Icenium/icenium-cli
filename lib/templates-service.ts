@@ -82,6 +82,8 @@ export class TemplatesService implements ITemplatesService {
 			return match && match[1];
 		})
 		.filter((file: string) => file !== null);
+
+		templates = _.select(templates, (template: string) => template != null);
 		return helpers.formatListOfNames(templates);
 	}
 

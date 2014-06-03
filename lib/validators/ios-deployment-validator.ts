@@ -10,11 +10,11 @@ import util = require("util");
 
 export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<IiOSDeploymentValidatorModel> {
 	private static NOT_SPECIFIED_PROVISION_ERROR_MESSAGE = "Please specify the provisioning profile (with option --provision) that should be used when building the project.";
-	private static NOT_FOUND_PROVISION_ERROR_MESSAGE = "Could not find provision by specified index or name. List registered provisions with 'list-provisions' command";
+	private static NOT_FOUND_PROVISION_ERROR_MESSAGE = "Could not find provision by specified index or name. List registered provisions with 'provision' command";
 	private static EXPIRED_PROVISON_ERROR_MESSAGE = "Provisioning profile is expired.";
 	private static APPLICATION_IDENTIFIER_MISMATCH = "The application identifier must match the bundle identifier in the provisioning profile.";
 	private static NOT_SPECIFIED_CERTIFICATE_ERROR_MESSAGE = "Please specify the certificate (with option --certificate) that should be used when building the project.";
-	private static NOT_FOUND_CERTIFICATE_ERROR_MESSAGE = "Could not find certificate by specified index or name. List registered certificates  with 'list-certificates' command";
+	private static NOT_FOUND_CERTIFICATE_ERROR_MESSAGE = "Could not find certificate by specified index or name. List registered certificates  with 'certificate' command";
 	private static EXPIRED_CERTIFICATE_ERROR_MESSAGE = "Certificate is expired.";
 
 	constructor(private appIdentifier: string,
