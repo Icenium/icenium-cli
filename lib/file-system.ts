@@ -61,7 +61,7 @@ export class FileSystem implements IFileSystem {
 	public unzip(zipFile: string, destinationDir: string): IFuture<void> {
 		if (helpers.isDarwin()) {
 			var $childProcess = $injector.resolve("$childProcess");
-			var unzipProc = $childProcess.spawn('unzip', [zipFile, '-d', destinationDir],
+			var unzipProc = $childProcess.spawn('unzip', ['-uqo', zipFile, '-d', destinationDir],
 				{ stdio: "ignore", detached: true });
 			return this.futureFromEvent(unzipProc, "close");
 		}
