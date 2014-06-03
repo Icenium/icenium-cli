@@ -151,9 +151,9 @@ Options:
 
 --[init]--
 
-Cannot initialize project. You need to specify project type and name.
-To create a project for hybrid development with Apache Cordova, run $ appbuilder init hybrid.
-To create a project for native development with Telerik NativeScript, run $ appbuilder init native.
+Cannot initialize project. You need to specify project type.
+To initialize a project for hybrid development with Apache Cordova, run $ appbuilder init hybrid.
+To initialize a project for native development with Telerik NativeScript, run $ appbuilder init native.
 
 --[/]--
 
