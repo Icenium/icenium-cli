@@ -29,7 +29,7 @@ export class PostInstallCommand implements ICommand {
 			this.$logger.info("Downloading cordova.js files.");
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
 			this.$logger.info("Downloading project file schema.");
-			this.$resourceDownloader.downloadProjectFileSchema().wait();
+			//this.$resourceDownloader.downloadProjectFileSchema().wait();
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();
