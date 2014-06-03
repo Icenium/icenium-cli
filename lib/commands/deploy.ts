@@ -20,9 +20,9 @@ export class DeployCommand implements ICommand {
 		return ((): void => {
 			this.$project.ensureProject();
 			if (this.$project.projectType === this.$projectTypes.Cordova) {
-				this.deployCordova(args);
+				this.deployCordova(args).wait();
 			} else {
-				this.deployNativeScript(args);
+				this.deployNativeScript(args).wait();
 			}
 		}).future<void>()();
 	}
