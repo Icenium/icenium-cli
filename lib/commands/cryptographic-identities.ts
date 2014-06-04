@@ -130,19 +130,40 @@ export class IdentityManager implements Server.IIdentityManager {
 		return ((): IProvision => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 
+			provisions = _.filter(provisions, (prov) => _.contains(provisionTypes, prov.ProvisionType));
+			if(provisions.length === 0) {
+				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
+			}
+
 			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{deviceIdentifier: deviceIdentifier, appIdentifier: appIdentifier});
 
-			provisions = _.filter(provisions, (prov) => validator.validateProvision(prov).IsSuccessful);
+			var passedProvisions = [];
+			var failedProvisions = [];
+
+			_.each(provisions, (prov) => {
+				var validationResult = validator.validateProvision(prov);
+
+				if(validationResult.IsSuccessful) {
+					passedProvisions.push(prov);
+				} else {
+					failedProvisions.push({provision: prov, error: validationResult.Error});
+				}
+			});
+
 			var provision = _.chain(provisionTypes)
-				.map((type) => _.find(provisions, (prov) => prov.ProvisionType === type))
+				.map((type) => _.find(passedProvisions, (prov) => prov.ProvisionType === type))
 				.find((prov) => Boolean(prov))
 				.value();
 
 			if (provision) {
 				return provision;
 			} else {
-				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
+				var composedError = "Cannot find applicable provisioning profiles. \n";
+				failedProvisions.forEach(data => {
+					composedError += util.format('Cannot use provision "%s" because the following error occurred: %s \n', data.provision.Name, data.error);
+				});
+				this.$errors.fail(composedError);
 			}
 			return null;
 		}).future<IProvision>()();
