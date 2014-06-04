@@ -81,7 +81,7 @@ class BaseDebuggerPlatformServices {
 		});
 	}
 
-	public handleChildProcessStdios(childProcess: any) {
+	public waitDebuggerExit(childProcess: any) {
 		//TODO: Darwin only - Prevent printing of all devtools log on the console.
 
 		childProcess.stderr.pipe(process.stderr);
@@ -113,13 +113,14 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 
 		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
 		var childProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
-		this.handleChildProcessStdios(childProcess);
+		this.waitDebuggerExit(childProcess);
 	}
 }
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
 	private static EXECUTABLE_NAME_OSX = "AppBuilder Debugger.app";
+	private static UNIX_EXECUTABLE_FILE_PATH = "Contents/MacOS/Appbuilder Debugger";
 
 	constructor(private $childProcess: IChildProcess,
 		$errors: IErrors,
@@ -136,12 +137,11 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		this.startWatchingUserSettingsFile();
-		var unixExecutableFilePath = "Contents/MacOS/Appbuilder Debugger";
 
-		var debuggerPath = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX, unixExecutableFilePath);
+		var debuggerPath = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX, DarwinDebuggerPlatformServices.UNIX_EXECUTABLE_FILE_PATH);
 		var childProcess = this.$childProcess.spawn(debuggerPath, applicationParams);
 
-		this.handleChildProcessStdios(childProcess);
+		this.waitDebuggerExit(childProcess);
 	}
 }
 
