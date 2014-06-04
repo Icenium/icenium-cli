@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.2  
-Release date: 2014, June 3 
+Release date: 2014, June 5 
 
 > For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
 
@@ -201,7 +201,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.2  
-Release date: 2014, June 3
+Release date: 2014, June 5
 
 > For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
 
@@ -214,43 +214,43 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 or Sublime Text 3 to build and deploy apps straight from Sublime Text.
 * You can log in and log out of the Telerik Platform. 
 * You can view your current login and subscription information.
-* You can create new projects from the *Blank*, *jQuery Mobile*, *Friends*, *Kendo UI Mobile*, and *Kendo UI DataViz* templates.
-* You can create new projects by initializing any existing projects stored locally on your system. For example, local copies of projects created with the AppBuilder clients or third-party tools.
-* You can export your existing projects from the cloud and initialize them for development.
+* You can create new projects from the *Blank (JavaScript)*, *Blank (TypeScript)* *jQuery Mobile*, *Telerik Friends*, *Kendo UI mobile app*, and *Kendo UI mobile app with data visualization* templates.
+* You can create new projects by initializing any existing projects stored locally on your system. For example, you can initialize local copies of projects created with the AppBuilder clients or third-party tools.
+* You can export your existing projects from your {{tp}} account and automatically initialize them for development.
 * You can clone the Telerik AppBuilder sample apps. 
-* You can create new projects by initializing the AppBuilder sample apps.
+* You can target Apache Cordova 3.0.0 or Apache Cordova 3.2.0.
+* You can migrate between the supported Apache Cordova versions.
+* You can enable and disable the Apache Cordova core and integrated plugins.
+* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
 * You can list connected iOS and Android devices.
 * You can view the device log for connected devices.
-* You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code on remote devices.
-* You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
+* You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code.
 * You can build applications for iOS, Android, and Windows Phone 8 and download the application package. You can manually deploy the application package on devices. 
-* You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
-* You can upload your iOS application packages to iTunes Connect.
+* You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
 * You can load iOS and Android applications in the AppBuilder companion app.
 * You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
 * You can push changes via cable connection to connected devices.
+* You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
+* You can upload your iOS application packages to iTunes Connect.
 * You can run your apps in the device simulator on Windows systems.
 * You can run your apps in the device simulator on OS X systems.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
 * You can debug your code with the built-in debug tools in the device simulator on OS X systems.
 * You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
-* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
-* You can enable and disable the Apache Cordova core and integrated plugins.
-* You can fetch and import custom plugins.
-* You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
-* You can configure the project properties for your project.
 * You can manage certificates and provisioning profiles for code signing iOS apps.
 * You can manage certificates for code signing Android apps.
+* You can configure the project properties for your project.
+* You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
+* You can edit the `.abignore` file to exclude files and folders from the build process. You need to manually add `.abignore` to your project.
 
 #### What you cannot do with this version of the Telerik AppBuilder CLI
 
 The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
 
+* You cannot switch your Telerik Platform account.
 * You cannot deploy your apps on connected Windows Phone 8 devices.
 * You cannot load your Windows Phone 8 apps in the companion app.
-* You cannot switch your Telerik Platform account.
 * You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
-* You cannot migrate between Apache Cordova versions.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
 * In the other Telerik AppBuilder clients, you cannot automatically load and work with projects created from the Telerik AppBuilder CLI.
 
