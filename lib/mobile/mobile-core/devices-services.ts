@@ -194,7 +194,7 @@ export class DevicesServices implements Mobile.IDevicesServices {
 				this._platform = this._device.getPlatform();
 				if(this._platform !== this.getPlatform(platform)) {
 					this.$errors.fail("Cannot resolve the specified connected device. The provided platform does not match the provided index or identifier." +
-						"To list currently connected devices and verify that the specified pair of platform and index or identifier exists, run list-devices.");
+						"To list currently connected devices and verify that the specified pair of platform and index or identifier exists, run 'device'.");
 				}
 				this.$logger.warn("Your application will be deployed only on the device specified by the provided index or identifier.");
 			} else if(!platform && deviceOption) {
