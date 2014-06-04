@@ -241,7 +241,7 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can manage certificates for code signing Android apps.
 * You can configure the project properties for your project.
 * You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
-* You can edit the `.abignore` file to exclude files and folders from the build process. The `.abingore` is automatically added to newly created Telerik AppBuilder CLI projects.
+* You can edit the `.abignore` file to exclude files and folders from the build process. You need to manually add `.abingore` to your project.
 
 #### What you cannot do with this version of the Telerik AppBuilder CLI
 
