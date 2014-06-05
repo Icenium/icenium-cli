@@ -9,6 +9,7 @@ import path = require("path");
 import moment = require("moment");
 import validators = require("../validators/cryptographic-identity-validators");
 import iosValidators = require("../validators/ios-deployment-validator");
+import os = require("os");
 
 class CryptographicIdentityConstants {
 	public static PKCS12_TYPE = "Pkcs12";
@@ -159,10 +160,15 @@ export class IdentityManager implements Server.IIdentityManager {
 			if (provision) {
 				return provision;
 			} else {
-				var composedError = "Cannot find applicable provisioning profiles. \n";
-				failedProvisions.forEach(data => {
-					composedError += util.format('Cannot use provision "%s" because the following error occurred: %s \n', data.provision.Name, data.error);
-				});
+				var composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
+
+				var iterator = (result, data) => {
+					var currentError = util.format('Cannot use provision "%s" because the following error occurred: %s %s',
+						data.provision.Name, data.error, os.EOL);
+					return result + currentError;
+				};
+				composedError = _.reduce(failedProvisions, iterator, composedError);
+
 				this.$errors.fail(composedError);
 			}
 			return null;
