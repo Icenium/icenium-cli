@@ -51,6 +51,7 @@ export class ServerExtensionsService implements IServerExtensionsService{
 				this.$logger.info("Updating %s package...", packageName);
 				var zipFileName = path.join(this.cacheDir, packageName + ".zip");
 				this.downloadPackage(packageName, zipFileName).wait();
+				this.$fs.deleteDirectory(extensionPath).wait();
 				this.$fs.unzip(zipFileName, extensionPath).wait();
 				this.$fs.deleteFile(zipFileName).wait();
 				this.extensionVersions[packageName] = serverVersion;
