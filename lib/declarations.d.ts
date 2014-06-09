@@ -143,6 +143,7 @@ declare module Project {
 		PROJECT_FILE: string;
 		projectData: IProjectData;
 		projectType: number;
+		capabilities: IProjectCapabilities;
 		getProjectDir(): string;
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
@@ -165,6 +166,14 @@ interface IProjectTypes {
 	Cordova: number;
 	NativeScript: number;
 	Common: number;
+}
+
+interface IProjectCapabilities {
+	build: boolean;
+	deploy: boolean
+	simulate: boolean;
+	livesync: boolean;
+	livesyncCompanion: boolean;
 }
 
 // duplicated from fs.Stats, because I cannot import it here

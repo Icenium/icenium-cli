@@ -28,7 +28,8 @@ export class AndroidDevice implements Mobile.IDevice {
 		private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $childProcess: IChildProcess,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $projectTypes: IProjectTypes) {
 		var details: IAndroidDeviceDetails = this.getDeviceDetails().wait();
 		this.model = details.model;
 		this.name = details.name;
@@ -79,7 +80,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		return this.vendor;
 	}
 
-	public get installedApplications(): IFuture<string[]> {
+	public getInstalledApplications(): IFuture<string[]> {
 		return (() => {
 			if (!this._installedApplications) {
 				var listPackagesCommand = this.composeCommand("shell pm list packages")
@@ -105,7 +106,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	private startPackageOnDevice(packageName): IFuture<void> {
-		return(() => {
+		return (() => {
 			var startPackageCommand = this.composeCommand("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName);
 			var result = this.$childProcess.exec(startPackageCommand).wait();
 			return result[0];
@@ -113,7 +114,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	public deploy(packageFile: string, packageName: string): IFuture<void> {
-		return(() => {
+		return (() => {
 			var uninstallCommand = this.composeCommand("shell pm uninstall \"%s\"", packageName)
 			this.$childProcess.exec(uninstallCommand).wait();
 
@@ -126,7 +127,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	private pushFilesOnDevice(localToDevicePaths): IFuture<void> {
-		return(() => {
+		return (() => {
 			localToDevicePaths.forEach((localToDevicePathData) => {
 				this.pushFileOnDevice(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath()).wait();
 			});
@@ -134,7 +135,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	}
 
 	private pushFileOnDevice(localPath: string, devicePath: string): IFuture<void> {
-		return(() => {
+		return (() => {
 			var rmCommand = this.composeCommand('shell rm -r "%s"', devicePath);
 			this.$childProcess.exec(rmCommand).wait();
 
@@ -168,12 +169,21 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<number>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, options: Mobile.ISyncOptions = {}): IFuture<void> {
+	private getLiveSyncUrl(projectType: number): string {
+		switch (projectType) {
+			case this.$projectTypes.Cordova: return "icenium://";
+			case this.$projectTypes.NativeScript: return "nativescript://";
+			default: throw new Error("Unsupported project type");
+		}
+	}
+
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, projectType: number, options: Mobile.ISyncOptions = {}): IFuture<void> {
 		return (() => {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
 				this.pushFilesOnDevice(localToDevicePaths).wait();
 				if (!options.skipRefresh) {
-					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, {liveSyncUrl: "icenium://"}).wait();
+					var liveSyncUrl = { liveSyncUrl: this.getLiveSyncUrl(projectType) };
+					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, liveSyncUrl).wait();
 					this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME).wait();
 				}
 				this.$logger.info("Successfully synced device with identifier '%s'", this.getIdentifier());

@@ -5,6 +5,7 @@ import path = require("path");
 import options = require("../options");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
+import MobileHelper = require("../mobile/mobile-helper");
 
 export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
@@ -32,8 +33,8 @@ export class SimulateCommand implements ICommand {
 		return (() => {
 			this.$project.ensureProject();
 
-			if (this.$project.projectData.projectType === this.$projectTypes[this.$projectTypes.NativeScript]) {
-				this.$errors.fail("You cannot run Telerik NativeScript projects in the device simulator.");
+			if (!this.$project.capabilities.simulate) {
+				this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.projectType);
 				return;
 			}
 

@@ -26,11 +26,14 @@ export class LiveSyncCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $project: Project.IProject,
-		private $dispatcher: IFutureDispatcher) {
+		private $dispatcher: IFutureDispatcher,
+		private $projectTypes: IProjectTypes) {
 	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureProject();
+
 			this.$devicesServices.initialize(args[0], options.device).wait();
 			var platform = this.$devicesServices.platform;
 
@@ -42,11 +45,18 @@ export class LiveSyncCommand implements ICommand {
 				this.$errors.fail({formatStr: constants.ERROR_NO_DEVICES, suppressCommandHelp: true});
 			}
 
-			this.$project.ensureProject();
+			if (!this.$project.capabilities.livesync && !options.companion) {
+				this.$errors.fail("You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+			}
+
+			if (!this.$project.capabilities.livesyncCompanion && options.companion) {
+				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+			}
+
 			var projectDir = this.$project.getProjectDir();
 
 			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
-				this.$project.projectData.AppIdentifier, options.companion);
+				this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
 
 			if (options.file) {
 				var isExistFile = this.$fs.exists(options.file).wait();
@@ -98,7 +108,7 @@ export class LiveSyncCommand implements ICommand {
 				return (() => {
 					var platformSpecificProjectPath = appIdentifier.deviceProjectPath;
 					var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
-					device.sync(localDevicePaths, appIdentifier).wait();
+					device.sync(localDevicePaths, appIdentifier, this.$project.projectType).wait();
 				}).future<void>()();
 			};
 

@@ -397,11 +397,12 @@ export class BuildService implements Project.IBuildService {
 	public executeBuild(platform: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			if (this.$project.projectType === this.$projectTypes.Cordova) {
-				this.executeBuildCordova(platform).wait();
-			} else {
-				this.executeBuildNativeScript(platform).wait();
+
+			if (!this.$project.capabilities.build) {
+				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
 			}
+
+			this.executeBuildCordova(platform).wait();
 		}).future<void>()();
 	}
 
@@ -443,12 +444,6 @@ export class BuildService implements Project.IBuildService {
 			}
 			}).future<void>()();
 		}
-
-	private executeBuildNativeScript(platform: string): IFuture<void> {
-		return (() => {
-			this.$errors.fail("You will be able to build for Telerik NativeScript in a future release of the Telerik AppBuilder CLI.");
-		}).future<void>()();
-	}
 
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {

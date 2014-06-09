@@ -19,11 +19,12 @@ export class DeployCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
 			this.$project.ensureProject();
-			if (this.$project.projectType === this.$projectTypes.Cordova) {
-				this.deployCordova(args).wait();
-			} else {
-				this.deployNativeScript(args).wait();
+
+			if (!this.$project.capabilities.deploy) {
+				this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
 			}
+
+			this.deployCordova(args).wait();
 		}).future<void>()();
 	}
 
@@ -52,12 +53,6 @@ export class DeployCommand implements ICommand {
 			};
 
 			this.$devicesServices.execute(action).wait();
-		}).future<void>()();
-	}
-
-	private deployNativeScript(args: string[]): IFuture<void> {
-		return ((): void => {
-			this.$errors.fail("You will be able to deploy Telerik NativeScript projects to devices in a future release of the Telerik AppBuilder CLI.");
 		}).future<void>()();
 	}
 }

@@ -9,6 +9,7 @@ var yargs: any = require("yargs");
 var knownOpts:any = {
 		"log" : String,
 		"verbose" : Boolean,
+		"companion" : Boolean,
 		"download" : Boolean,
 		"certificate" : String,
 		"provision" : String,
