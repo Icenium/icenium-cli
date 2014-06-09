@@ -2,15 +2,20 @@
 // automatically generated code; do not edit manually!
 //
 declare module Server {
+	interface IAnalyticsServiceContract {
+		createAnalyticsApp(workspaceId: string, applicationName: string, description: any): IFuture<any>;
+		getApplications(accountId: string): IFuture<any>;
+		getProjectKey(id: string): IFuture<any>;
+	}
+
 	interface IAuthenticationServiceContract {
 		agreeToEula(): IFuture<void>;
 		getLoggedInUser(): IFuture<any>;
 		getTenants(): IFuture<any>;
 		login(simpleWebToken: any): IFuture<any>;
+		loginWithCode(code: any): IFuture<any>;
 		logout(): IFuture<void>;
-		removeUserProperty(propertyName: string): IFuture<any>;
 		setActiveTenant(tenantId: string): IFuture<any>;
-		setUserProperty(propertyName: string, value: any): IFuture<any>;
 	}
 
 	interface IBuildServiceContract {
@@ -67,6 +72,12 @@ declare module Server {
 		resizeImage(solutionName: string, path: string, size: any): IFuture<void>;
 	}
 
+	interface IKendoServiceContract {
+		changeKendoPackage(solutionName: string, projectName: string, packageId: string): IFuture<void>;
+		getCurrentPackage(solutionName: string, projectName: string): IFuture<any>;
+		getPackages(): IFuture<any>;
+	}
+
 	interface IMobileProvisionServiceContract {
 		getProvisions(): IFuture<any>;
 		importProvision(provision: any): IFuture<any>;
@@ -83,7 +94,6 @@ declare module Server {
 		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
 		getItemTemplates(): IFuture<any>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<any>;
-		getProjectFileSchema($resultStream: any): IFuture<void>;
 		getProjectTemplates(): IFuture<any>;
 		getSolution(solutionName: string, checkUpgradability: string): IFuture<any>;
 		importPackage(solutionName: string, projectName: string, archivePackage: any, parentIdentifier: string): IFuture<void>;
@@ -157,6 +167,7 @@ declare module Server {
 	}
 
 	interface IServer {
+		analytics: IAnalyticsServiceContract;
 		authentication: IAuthenticationServiceContract;
 		build: IBuildServiceContract;
 		cordova: ICordovaServiceContract;
@@ -165,6 +176,7 @@ declare module Server {
 		filesystem: IFileSystemServiceContract;
 		itmstransporter: IITMSTransporterServiceContract;
 		images: IImageServiceContract;
+		kendo: IKendoServiceContract;
 		mobileprovisions: IMobileProvisionServiceContract;
 		projects: IProjectServiceContract;
 		rawSettings: IRawSettingsServiceContract;

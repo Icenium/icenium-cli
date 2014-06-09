@@ -6,6 +6,24 @@
 
 import querystring = require('querystring');
 
+export class AnalyticsService implements Server.IAnalyticsServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	createAnalyticsApp(workspaceId: string, applicationName: string, description: any): IFuture<any> {
+		return this.$serviceProxy.call<any>('CreateAnalyticsApp', 'POST', ['/analytics/applications', encodeURI(workspaceId.replace(/\\/g, '/')), encodeURI(applicationName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'description', value: JSON.stringify(description), contentType: 'application/json'}], null);
+	}
+
+	getApplications(accountId: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetApplications', 'GET', ['/analytics/applications', encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
+	getProjectKey(id: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetProjectKey', 'GET', ['/analytics/applications', encodeURI(id.replace(/\\/g, '/')), 'projectKey'].join('/'), 'application/json', null, null);
+	}
+
+}
+
 export class AuthenticationService implements Server.IAuthenticationServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
@@ -26,20 +44,16 @@ export class AuthenticationService implements Server.IAuthenticationServiceContr
 		return this.$serviceProxy.call<any>('Login', 'POST', '/authentication', 'application/json', [{name: 'simpleWebToken', value: JSON.stringify(simpleWebToken), contentType: 'application/json'}], null);
 	}
 
+	loginWithCode(code: any): IFuture<any> {
+		return this.$serviceProxy.call<any>('LoginWithCode', 'POST', '/authentication/login', 'application/json', [{name: 'code', value: JSON.stringify(code), contentType: 'application/json'}], null);
+	}
+
 	logout(): IFuture<void> {
 		return this.$serviceProxy.call<void>('Logout', 'LOGOUT', '/authentication', null, null, null);
 	}
 
-	removeUserProperty(propertyName: string): IFuture<any> {
-		return this.$serviceProxy.call<any>('RemoveUserProperty', 'DELETE', ['/authentication/currentUser', encodeURI(propertyName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-
 	setActiveTenant(tenantId: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('SetActiveTenant', 'PATCH', ['/authentication/tenants', encodeURI(tenantId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-
-	setUserProperty(propertyName: string, value: any): IFuture<any> {
-		return this.$serviceProxy.call<any>('SetUserProperty', 'PATCH', ['/authentication/currentUser', encodeURI(propertyName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
 	}
 
 }
@@ -218,6 +232,24 @@ export class ImageService implements Server.IImageServiceContract {
 
 }
 
+export class KendoService implements Server.IKendoServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	changeKendoPackage(solutionName: string, projectName: string, packageId: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('ChangeKendoPackage', 'PATCH', ['/kendo', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'migrate'].join('/') + '?' + querystring.stringify({ 'packageId': packageId }), null, null, null);
+	}
+
+	getCurrentPackage(solutionName: string, projectName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetCurrentPackage', 'GET', ['/kendo', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'version'].join('/'), 'application/json', null, null);
+	}
+
+	getPackages(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetPackages', 'GET', '/kendo/packages', 'application/json', null, null);
+	}
+
+}
+
 export class MobileProvisionService implements Server.IMobileProvisionServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
@@ -274,10 +306,6 @@ export class ProjectService implements Server.IProjectServiceContract {
 
 	getProjectContents(solutionName: string, projectName: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetProjectContents', 'GET', ['/projects/contents', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-
-	getProjectFileSchema($resultStream: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('GetProjectFileSchema', 'GET', '/projects/projectFileSchema', 'application/octet-stream', null, $resultStream);
 	}
 
 	getProjectTemplates(): IFuture<any> {
@@ -533,6 +561,7 @@ export class VersionControlService implements Server.IVersionControlServiceContr
 }
 
 export class Server {
+	public analytics = $injector.resolve(AnalyticsService);
 	public authentication = $injector.resolve(AuthenticationService);
 	public build = $injector.resolve(BuildService);
 	public cordova = $injector.resolve(CordovaService);
@@ -541,6 +570,7 @@ export class Server {
 	public filesystem = $injector.resolve(FileSystemService);
 	public itmstransporter = $injector.resolve(ITMSTransporterService);
 	public images = $injector.resolve(ImageService);
+	public kendo = $injector.resolve(KendoService);
 	public mobileprovisions = $injector.resolve(MobileProvisionService);
 	public projects = $injector.resolve(ProjectService);
 	public rawSettings = $injector.resolve(RawSettingsService);

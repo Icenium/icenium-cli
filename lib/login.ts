@@ -110,7 +110,7 @@ export class LoginManager implements ILoginManager {
 			wrap_password: password
 		};
 
-		return this.authenticate(loginData);
+		return this.authenticateWithUsername(loginData);
 	}
 
 	public logout(): IFuture<void> {
@@ -156,7 +156,7 @@ export class LoginManager implements ILoginManager {
 		}).future<void>()();
 	}
 
-	private authenticate(loginData: any): IFuture<any> {
+	private authenticateWithUsername(loginData: any): IFuture<any> {
 		return ((): any => {
 			loginData.wrap_client_id = this.$config.WRAP_CLIENT_ID;
 
@@ -168,7 +168,8 @@ export class LoginManager implements ILoginManager {
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
-				body: querystring.stringify(loginData)
+				body: querystring.stringify(loginData),
+				rejectUnauthorized: false
 			}).wait();
 
 			var wrapData = querystring.parse(wrapResponse.body),
@@ -182,7 +183,24 @@ export class LoginManager implements ILoginManager {
 				this.$serviceProxy.setShouldAuthenticate(true);
 			}
 
-			this.$server.authentication.setUserProperty("RefreshToken", wrap_refresh_token).wait();
+			if (userData) {
+				this.$userDataStore.setUser(userData).wait();
+			} else {
+				throw new Error("Login failed.");
+			}
+
+			return userData;
+		}).future()();
+	}
+
+	private authenticate(code: string): IFuture<any> {
+		return ((): any => {
+			try {
+				this.$serviceProxy.setShouldAuthenticate(false);
+				var userData = this.$server.authentication.loginWithCode(code).wait();
+			} finally {
+				this.$serviceProxy.setShouldAuthenticate(true);
+			}
 
 			if (userData) {
 				this.$userDataStore.setUser(userData).wait();
@@ -200,7 +218,7 @@ export class LoginManager implements ILoginManager {
 
 	private loginInBrowser(): IFuture<any> {
 		return (() => {
-			var authComplete = new Future();
+			var authComplete = new Future<string>();
 
 			this.$logger.info("Launching login page in browser.");
 
@@ -260,7 +278,7 @@ export class LoginManager implements ILoginManager {
 			if(timeoutID !== undefined) {
 				clearTimeout(timeoutID);
 			}
-			return this.authenticate({ wrap_verification_code: code }).wait();
+			return this.authenticate(code).wait();
 		}).future()();
 	}
 }
