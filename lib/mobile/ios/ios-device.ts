@@ -47,6 +47,10 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		return "Apple";
 	}
 
+	public getInstalledApplications(): IFuture<string[]> {
+		throw new Error("Not implemented");
+	}
+
 	private getValue(value: string): string {
 		this.connect();
 		this.startSession();
@@ -132,7 +136,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 		}).future<void>()();
 	}
 
-	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, options: Mobile.ISyncOptions = {}): IFuture<void> {
+	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, projectType: number, options: Mobile.ISyncOptions = {}): IFuture<void> {
 		return(() => {
 			//TODO: CloseSocket must be part of afcClient. Refactor it.
 			var houseArrestClient: Mobile.IHouseArrestClient = this.$injector.resolve(iOSProxyServices.HouseArrestClient, {device: this});
@@ -149,8 +153,9 @@ export class IOSDevice implements Mobile.IIOSDevice {
 				notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 				notificationProxyClient.closeSocket();
 
-				this.$logger.out("Successfully synced device with identifier '%s'", this.getIdentifier());
 			}
+
+			this.$logger.out("Successfully synced device with identifier '%s'", this.getIdentifier());
 
 		}).future<void>()();
 	}

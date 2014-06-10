@@ -8,14 +8,15 @@ declare module Mobile {
 
 	interface IDevice {
 		getIdentifier(): string;
+		getInstalledApplications(): IFuture<string[]>;
 		getDisplayName(): string;
 		getModel(): string;
 		getVersion(): string;
 		getVendor(): string;
 		getPlatform(): string;
 		deploy(packageFile: string, packageName: string): IFuture<void>;
-		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier): IFuture<void>;
-		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier, options: ISyncOptions): IFuture<void>;
+		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier, projectType: number): IFuture<void>;
+		sync(localToDevicePaths: ILocalToDevicePathData[], appIdentifier: IAppIdentifier, projectType: number, options: ISyncOptions): IFuture<void>;
 		openDeviceLogStream(): void;
 	}
 

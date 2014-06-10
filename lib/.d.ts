@@ -75,7 +75,6 @@
 /// <reference path="opener.ts" />
 /// <reference path="options.ts" />
 /// <reference path="platforms.ts" />
-/// <reference path="project-types.ts" />
 /// <reference path="project.ts" />
 /// <reference path="prompter.ts" />
 /// <reference path="qr.ts" />

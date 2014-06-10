@@ -35,7 +35,28 @@ export class Project implements Project.IProject {
 			this.defaultProjectForType = Object.create(null);
 			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
 			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
+	}
+
+	private projectCapabilities: { [key: string]: IProjectCapabilities } = {
+		Cordova: {
+			build: true,
+			deploy: true,
+			simulate: true,
+			livesync: true,
+			livesyncCompanion: true
+		},
+		NativeScript: {
+			build: false,
+			deploy: false,
+			simulate: false,
+			livesync: false,
+			livesyncCompanion: true
 		}
+	};
+
+	public get capabilities(): IProjectCapabilities {
+		return this.projectCapabilities[this.projectData.projectType];
+	}
 
 	public getProjectDir(): string {
 		if (this.cachedProjectDir !== "") {
