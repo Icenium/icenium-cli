@@ -104,7 +104,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 					if(diffDays > 1) {
 						this.downloadUserSettings().wait();
 					} else {
-						this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
+						this.readUserSettingsFile().wait();
 					}
 				} else {
 					this.downloadUserSettings().wait();
@@ -149,10 +149,21 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 		}).future<any>()();
 	}
 
+	private readUserSettingsFile(): IFuture<void> {
+		return(() => {
+			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
+		}).future<void>()();
+	}
+
 	public saveSettings(data: {[key: string]: {}}): IFuture<void> {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
-			this.downloadUserSettings().wait();
+
+			if (Object.keys(data).length !== 0) {
+				this.downloadUserSettings().wait();
+			} else {
+				this.readUserSettingsFile().wait();
+			}
 
 			this.userSettingsData = this.userSettingsData || {};
 

@@ -726,12 +726,12 @@ Disables options for the selected project property, if the property accepts mult
 
 --[feature-usage-tracking]--
 Usage:
-    $appbuilder feature-usage-tracking --status | --enable | --disable
+    $appbuilder feature-usage-tracking [<Command>]
 
 Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.
 All data gathered is used strictly for improving the product and will never be used to identify or contact you.
 
-Options:
+<Command> is a related command that extends the feature-usage-tracking command. You can run the following related commands:
     status - Shows the current configuration for anonymous usage tracking for the
              Telerik AppBuilder command-line interface.
     enable - Enables anonymous usage statistics tracking. All data gathered is used strictly

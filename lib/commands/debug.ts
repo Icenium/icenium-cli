@@ -20,6 +20,10 @@ export class DebugCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			if(helpers.isDarwin()) {
+				throw new Error("In this version of the Telerik AppBuilder CLI, you can debug your apps only on Windows systems. The application debugger will become available for OS X in a future release of Telerik AppBuilder.");
+			}
+
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
@@ -98,8 +102,4 @@ class WinDebuggerPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-if (helpers.isWindows()) {
-	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
-} else if (helpers.isDarwin()) {
-	//darwin version comming soon
-}
+$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);

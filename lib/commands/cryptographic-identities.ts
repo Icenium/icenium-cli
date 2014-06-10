@@ -9,6 +9,7 @@ import path = require("path");
 import moment = require("moment");
 import validators = require("../validators/cryptographic-identity-validators");
 import iosValidators = require("../validators/ios-deployment-validator");
+import os = require("os");
 
 class CryptographicIdentityConstants {
 	public static PKCS12_TYPE = "Pkcs12";
@@ -131,19 +132,45 @@ export class IdentityManager implements Server.IIdentityManager {
 		return ((): IProvision => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 
+			provisions = _.filter(provisions, (prov) => _.contains(provisionTypes, prov.ProvisionType));
+			if(provisions.length === 0) {
+				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
+			}
+
 			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{deviceIdentifier: deviceIdentifier, appIdentifier: appIdentifier});
 
-			provisions = _.filter(provisions, (prov) => validator.validateProvision(prov).IsSuccessful);
+			var passedProvisions = [];
+			var failedProvisions = [];
+
+			_.each(provisions, (prov) => {
+				var validationResult = validator.validateProvision(prov);
+
+				if(validationResult.IsSuccessful) {
+					passedProvisions.push(prov);
+				} else {
+					failedProvisions.push({provision: prov, error: validationResult.Error});
+				}
+			});
+
 			var provision = _.chain(provisionTypes)
-				.map((type) => _.find(provisions, (prov) => prov.ProvisionType === type))
+				.map((type) => _.find(passedProvisions, (prov) => prov.ProvisionType === type))
 				.find((prov) => Boolean(prov))
 				.value();
 
 			if (provision) {
 				return provision;
 			} else {
-				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
+				var composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
+
+				var iterator = (result, data) => {
+					var currentError = util.format('Cannot use provision "%s" because the following error occurred: %s %s',
+						data.provision.Name, data.error, os.EOL);
+					return result + currentError;
+				};
+				composedError = _.reduce(failedProvisions, iterator, composedError);
+
+				this.$errors.fail(composedError);
 			}
 			return null;
 		}).future<IProvision>()();
