@@ -1,0 +1,1 @@
+npm publish "%1" --ignore-scripts

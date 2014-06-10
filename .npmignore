@@ -11,6 +11,7 @@ prepublish.js
 Gruntfile.js
 BuildPackage.cmd
 tscommand.tmp.txt
+.tscache/
 
 bin/appbuilder
 bin/*.cmd
