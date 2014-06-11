@@ -59,6 +59,10 @@ export class Logger implements ILogger {
 	out(...args): void {
 		console.log(util.format.apply(null, args));
 	}
+
+	write(...args): void {
+		process.stdout.write(util.format.apply(null, args));
+	}
 }
 $injector.register("logger", Logger);
 

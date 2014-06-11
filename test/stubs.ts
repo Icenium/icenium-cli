@@ -19,6 +19,8 @@ export class LoggerStub implements ILogger {
 		args.unshift(formatStr);
 		this.output += util.format.apply(null, args) + "\n";
 	}
+
+	write(...args): void { }
 }
 
 export class FileSystemStub implements IFileSystem {

@@ -5,6 +5,8 @@
 import util = require("util");
 import Future = require("fibers/future");
 import cookielib = require("cookie");
+import progress = require('progress-stream');
+import filesize = require('filesize');
 import Url = require("url");
 import helpers = require("./helpers");
 import zlib = require("zlib");
@@ -111,6 +113,9 @@ export class HttpClient implements Server.IHttpClient {
 							headers: response.headers
 						});
 					});
+
+					pipeTo = this.trackDownloadProgress(pipeTo);
+
 					responseStream.pipe(pipeTo);
 				} else {
 					responseStream.on("data", (chunk) => {
@@ -159,6 +164,39 @@ export class HttpClient implements Server.IHttpClient {
 
 			return response;
 		}).future<Server.IResponse>()();
+	}
+
+	private trackDownloadProgress(pipeTo: WritableStream): ReadableStream {
+		// \r for carriage return doesn't work on windows in node for some reason so we have to use it's hex representation \x1B[0G
+		var lastMessageSize = 0,
+			carriageReturn = "\x1B[0G",
+			timeElapsed = 0;
+
+		var progressStream = progress({ time: 1000 }, (progress: any) => {
+			timeElapsed = progress.runtime;
+
+			if (timeElapsed >= 1) {
+				this.$logger.write("%s%s", carriageReturn, Array(lastMessageSize + 1).join(' '));
+
+				var message = util.format("%sDownload progress ... %s | %s | %s/s",
+					carriageReturn,
+					Math.floor(progress.percentage) + '%',
+					filesize(progress.transferred),
+					filesize(progress.speed));
+
+				this.$logger.write(message);
+				lastMessageSize = message.length;
+			}
+		});
+
+		progressStream.on("finish", () => {
+			if (timeElapsed >= 1) {
+				this.$logger.out("%s%s%s%s", carriageReturn, Array(lastMessageSize + 1).join(' '), carriageReturn, "Download Completed.");
+			}
+		});
+
+		progressStream.pipe(pipeTo);
+		return progressStream;
 	}
 
 	private getErrorMessage(response, body: string): string {
