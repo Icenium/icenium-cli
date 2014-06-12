@@ -46,11 +46,11 @@ export class LiveSyncCommand implements ICommand {
 			}
 
 			if (!this.$project.capabilities.livesync && !options.companion) {
-				this.$errors.fail("You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+				this.$errors.fail("You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			if (!this.$project.capabilities.livesyncCompanion && options.companion) {
-				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			var projectDir = this.$project.getProjectDir();

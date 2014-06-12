@@ -72,5 +72,5 @@
 		"ID_RESOLUTION_WXGA",
 		"ID_RESOLUTION_HD720P"
 	],
-	"projectType": "Cordova"
+	"Framework": "Cordova"
 }

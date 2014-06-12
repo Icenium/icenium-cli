@@ -82,13 +82,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			}
 		});
 
-		if(!properties.hasOwnProperty("projectType")) {
-			properties["projectType"] = this.$projectTypes[this.$projectTypes.Cordova];
+		if(!properties.hasOwnProperty("Framework")) {
+			properties["Framework"] = this.$projectTypes[this.$projectTypes.Cordova];
 			updated = true;
 		}
 
 		var defaultProject = this.$resources.readJson(
-			util.format("default-project-%s.json", properties.projectType)
+			util.format("default-project-%s.json", properties.Framework)
 		).wait();
 		Object.keys(defaultProject).forEach((propName) => {
 			if (!properties.hasOwnProperty(propName)) {

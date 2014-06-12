@@ -247,12 +247,12 @@ interface IChildProcess {
 interface IProjectData {
 	ProjectName: string;
 	projectVersion : number;
-	projectType: string;
 	AppIdentifier: string;
 	DisplayName: string;
 	Author: string;
 	Description: string;
 	BundleVersion: string;
+	Framework: string;
 	FrameworkVersion: string;
 	CorePlugins: string[];
 	AndroidPermissions: string[];

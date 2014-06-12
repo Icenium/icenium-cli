@@ -34,7 +34,7 @@ export class SimulateCommand implements ICommand {
 			this.$project.ensureProject();
 
 			if (!this.$project.capabilities.simulate) {
-				this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.projectType);
+				this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.Framework);
 				return;
 			}
 
