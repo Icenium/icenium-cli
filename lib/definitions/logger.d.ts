@@ -8,4 +8,5 @@ interface ILogger {
 	trace(formatStr: any, ...args): void;
 
 	out(formatStr: any, ...args): void;
+	write(...args): void;
 }
