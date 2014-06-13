@@ -335,6 +335,7 @@ export class Project implements Project.IProject {
 			appid = this.generateDefaultAppId(projectName);
 			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
 		}
+
 		properties.AppIdentifier = appid;
 
 		return properties;

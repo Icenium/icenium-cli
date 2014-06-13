@@ -50,7 +50,6 @@ $injector.requireCommand("dev-telerik-login", "./login");
 
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
-$injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./services/build");
 
 $injector.require("projectTypes", "./project-types");
 $injector.require("project", "./project");
@@ -74,6 +73,7 @@ $injector.requireCommand("device|log", "./commands/open-device-log-stream");
 $injector.requireCommand("deploy", "./commands/deploy");
 
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
+$injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./services/build");
 
 $injector.require("iOSCore", "./mobile/ios/ios-core");
 $injector.require("coreFoundation", "./mobile/ios/ios-core");
@@ -107,8 +107,8 @@ $injector.requireCommand("certificate|create-self-signed", "./commands/cryptogra
 $injector.requireCommand("certificate|remove", "./commands/cryptographic-identities");
 $injector.requireCommand("certificate|export", "./commands/cryptographic-identities");
 $injector.requireCommand("certificate|import", "./commands/cryptographic-identities");
-$injector.requireCommand("certificate-request|create", "./commands/cryptographic-identities");
 $injector.requireCommand("certificate-request|*list", "./commands/cryptographic-identities");
+$injector.requireCommand("certificate-request|create", "./commands/cryptographic-identities");
 $injector.requireCommand("certificate-request|remove", "./commands/cryptographic-identities");
 $injector.requireCommand("certificate-request|download", "./commands/cryptographic-identities");
 
