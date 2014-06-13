@@ -1,12 +1,12 @@
 {
 	"ProjectName": null,
 	"projectVersion": 1,
-	"projectType" : "NativeScript",
 	"AppIdentifier": null,
 	"DisplayName": null,
 	"Author": "",
 	"Description": "",
 	"BundleVersion": "1.0",
+	"Framework" : "NativeScript",
 	"FrameworkVersion": "0.1.0",
 	"AndroidPermissions": [
 		"android.permission.CAMERA",

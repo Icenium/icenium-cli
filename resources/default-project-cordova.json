@@ -1,12 +1,12 @@
 {
 	"ProjectName": null,
 	"projectVersion": 1,
-	"projectType" : "Cordova",
 	"AppIdentifier": null,
 	"DisplayName": null,
 	"Author": "",
 	"Description": "",
 	"BundleVersion": "1.0",
+	"Framework" : "Cordova",
 	"FrameworkVersion": "3.2.0",
 	"CorePlugins": [
 		"org.apache.cordova.battery-status",

@@ -21,7 +21,7 @@ export class DeployCommand implements ICommand {
 			this.$project.ensureProject();
 
 			if (!this.$project.capabilities.deploy) {
-				this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+				this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			this.deployCordova(args).wait();

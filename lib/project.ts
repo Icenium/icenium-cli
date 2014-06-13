@@ -55,7 +55,7 @@ export class Project implements Project.IProject {
 	};
 
 	public get capabilities(): IProjectCapabilities {
-		return this.projectCapabilities[this.projectData.projectType];
+		return this.projectCapabilities[this.projectData.Framework];
 	}
 
 	public getProjectDir(): string {
@@ -141,7 +141,7 @@ export class Project implements Project.IProject {
 	}
 
 	public get projectType(): number {
-		return this.$projectTypes[this.projectData.projectType];
+		return this.$projectTypes[this.projectData.Framework];
 	}
 
 	public createNewCordovaProject(projectName: string): IFuture<void> {
@@ -516,7 +516,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]);
 			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
@@ -526,7 +526,7 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.projectType]);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]);
 			property = this.normalizePropertyName(property, propSchema);
 
 			if (this.projectData.hasOwnProperty(property)) {

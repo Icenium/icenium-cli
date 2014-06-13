@@ -399,7 +399,7 @@ export class BuildService implements Project.IBuildService {
 			this.$project.ensureProject();
 
 			if (!this.$project.capabilities.build) {
-				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.projectType);
+				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			this.executeBuildCordova(platform).wait();
