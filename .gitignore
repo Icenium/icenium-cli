@@ -17,6 +17,7 @@ lib-cov
 *.sublime-workspace
 tscommand*.tmp.txt
 .tscache/
+/lib/.d.ts
 
 pids
 logs

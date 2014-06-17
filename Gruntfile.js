@@ -37,11 +37,13 @@ module.exports = function(grunt) {
 			},
 
 			devall: {
-				src: ["lib/**/*.ts", "test/**/*.ts"]
+				src: ["lib/**/*.ts", "test/**/*.ts"],
+				reference: "lib/.d.ts"
 			},
 
 			release_build: {
 				src: ["lib/**/*.ts", "test/**/*.ts"],
+				reference: "lib/.d.ts",
 				options: {
 					sourceMap: false,
 					removeComments: true
