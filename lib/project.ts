@@ -186,7 +186,7 @@ export class Project implements Project.IProject {
 			}
 
 			try {
-				this.createProjectFile(projectDir, appname, projectType, properties).wait();
+				this.createProjectFile(projectDir, projectType, properties).wait();
 				this.$logger.info("Successfully initialized project in the folder!");
 			}
 			catch (ex) {
@@ -296,12 +296,11 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
-					this.cachedProjectDir = projectDir; // so that readProjectData/saveProject can work
 					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.PROJECT_FILE), true).wait();
-					this.projectData = this.alterPropertiesForNewProject(properties, appname);
+					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
-					this.saveProject(projectDir).wait();
+					this.createProjectFile(projectDir, projectType, properties).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
@@ -345,7 +344,7 @@ export class Project implements Project.IProject {
 		return options.path || process.cwd();
 	}
 
-	public createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void> {
+	public createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
 			var updateData;

@@ -54,7 +54,7 @@ class RemoteProjectExporter {
 				var projectFile = path.join(projectDir, this.$project.PROJECT_FILE);
 				if (!this.$fs.exists(projectFile).wait()) {
 					var properties = this.getProjectProperties(remoteProjectName).wait();
-					this.$project.createProjectFile(projectDir, remoteProjectName, this.$projectTypes.Cordova, properties).wait();
+					this.$project.createProjectFile(projectDir, this.$projectTypes.Cordova, properties).wait();
 				}
 			}
 			catch (ex) {
