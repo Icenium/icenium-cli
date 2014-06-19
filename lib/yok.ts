@@ -103,7 +103,11 @@ export class Yok implements IInjector {
 		forEachName(names, (commandName) => {
 			var commands = commandName.split("|");
 
-			if(commands.length > 1) {
+			if (commands.length > 1) {
+				if (commands[1].startsWith('*') && this.modules[this.createCommandName(commands[0])]) {
+					throw new Error("Default commands should be required before child commands");
+				}
+
 				var parentCommandName = commands[0];
 
 				if(!this.hierarchicalCommands[parentCommandName]) {

@@ -18,8 +18,9 @@ export class CommandsService implements ICommandsService {
 		private $logger: ILogger,
 		private $injector: IInjector) { }
 
-	public allCommands(includeDev: boolean): string[] {
-		return this.$injector.getRegisteredCommandsNames(includeDev);
+	public allCommands(includeDev: boolean): string[]{
+		var commands = this.$injector.getRegisteredCommandsNames(includeDev);
+		return _.reject(commands, (command) => _.contains(command, '|'));
 	}
 
 	public executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean {
@@ -85,26 +86,33 @@ export class CommandsService implements ICommandsService {
 			}
 
 			var deviceSpecific = ["build", "deploy"];
-			var propertyCommands = ["prop-cat", "prop-set", "prop-add", "prop-del"];
+			var propertyCommands = ["print", "set", "add", "del"]; 
 			var childrenCommands = this.$injector.getChildrenCommandsNames(data.prev);
+
+			if (data.words == 1) {
+				return tabtab.log(this.allCommands(false), data);
+			}
 
 			if (data.last.startsWith("--")) {
 				return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
-			} else if (_.contains(deviceSpecific, data.prev)) {
-				return tabtab.log(["ios", "android"], data);
-			} else if(childrenCommands) {
-				return tabtab.log(childrenCommands, data);
-			} else {
-				var propSchema = require("./helpers").getProjectFileSchema();
-				if (_.contains(propertyCommands, data.prev)) {
-					return tabtab.log(Object.keys(propSchema), data);
-				} else if (_.some(propertyCommands, (cmd) => {
-					return data.line.indexOf(" " + cmd + " ") >= 0;
-				})) {
-					var parseResult = /prop-[^ ]+ ([^ ]+) /.exec(data.line);
-					if (parseResult) {
-						var propName = parseResult[1];
-						if (propName && propSchema[propName]) {
+			}
+
+			if (_.contains(deviceSpecific, data.prev)) {
+				return tabtab.log(["ios", "android", "wp8"], data);
+			}
+
+			if (data.words == 2 && childrenCommands) {
+				return tabtab.log(_.reject(childrenCommands, (children: string) => children[0] === '*'), data);
+			}
+
+			var $project: Project.IProject = this.$injector.resolve("project");
+			if ($project.projectData && $project.projectType) {
+				var parseResult = /prop ([^ ]+) ([^ ]*)/.exec(data.line);
+				if (parseResult) {
+					if (_.contains(propertyCommands, parseResult[1])) {
+						var propSchema = require("./helpers").getProjectFileSchema($project.projectType);
+						var propName = parseResult[2];
+						if (propSchema[propName]) {
 							var range = propSchema[propName].range;
 							if (range) {
 								if (!_.isArray(range)) {
@@ -115,11 +123,14 @@ export class CommandsService implements ICommandsService {
 								}
 								return tabtab.log(range, data);
 							}
+						} else {
+							return tabtab.log(Object.keys(propSchema), data);
 						}
 					}
 				}
-				return tabtab.log(this.allCommands(false), data);
 			}
+
+			return false;
 		});
 
 		return true;
