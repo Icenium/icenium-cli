@@ -27,6 +27,10 @@ export class AndroidAppIdentifier implements Mobile.IAppIdentifier {
 		return helpers.fromWindowsRelativePathToUnix(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
 	}
 
+	get liveSyncFormat(): string {
+		return "icenium://%s?LiveSyncToken=%s";
+	}
+
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
 		return util.format("You can't LiveSync on %s! Deploy the app with LiveSync enabled and wait for the initial start up before LiveSyncing.", device.getIdentifier());
 	}
@@ -46,6 +50,10 @@ export class AndroidCompanionAppIdentifier implements Mobile.IAppIdentifier {
 
 	get deviceProjectPath(): string {
 		return helpers.fromWindowsRelativePathToUnix(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
+	}
+
+	get liveSyncFormat(): string {
+		return "";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
@@ -71,6 +79,10 @@ export class AndroidNativeScriptCompanionAppIdentifier implements Mobile.IAppIde
 		return helpers.fromWindowsRelativePathToUnix(path.join(ANDROID_NATIVESCRIPT_PROJECT_PATH, this.appIdentifier, "files"));
 	}
 
+	get liveSyncFormat(): string {
+		return "nativescript://%s?LiveSyncToken=%s";
+	}
+
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
 		return util.format("Cannot LiveSync changes to the NativeScript companion app. The NativeScript companion app is not installed on %s.", device.getIdentifier());
 	}
@@ -94,6 +106,10 @@ export class IOSAppIdentifier implements Mobile.IAppIdentifier {
 		return IOS_PROJECT_PATH;
 	}
 
+	get liveSyncFormat(): string {
+		return "icenium://%s?LiveSyncToken=%s";
+	}
+
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
 		return "";
 	}
@@ -114,6 +130,10 @@ export class IOSCompanionAppIdentifier implements Mobile.IAppIdentifier {
 		return IOS_PROJECT_PATH;
 	}
 
+	get liveSyncFormat(): string {
+		return "";
+	}
+
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
 		return "";
 	}
@@ -132,6 +152,10 @@ export class IOSNativeScriptCompanionAppIdentifier implements Mobile.IAppIdentif
 
 	get deviceProjectPath(): string {
 		return IOS_PROJECT_PATH;
+	}
+
+	get liveSyncFormat(): string {
+		return "nativescript://%s?LiveSyncToken=%s";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {

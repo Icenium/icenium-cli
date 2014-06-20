@@ -170,6 +170,7 @@ interface IProjectTypes {
 
 interface IProjectCapabilities {
 	build: boolean;
+	buildCompanion: boolean;
 	deploy: boolean
 	simulate: boolean;
 	livesync: boolean;
