@@ -92,11 +92,16 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 --[/]--
 
 --[create]--
+Usage:
+    $ appbuilder create [<Command>]
 
 Cannot create project. You need to specify project type and name.
 To create a project for hybrid development with Apache Cordova, run $ appbuilder create hybrid <App Name>.
 To create a project for native development with Telerik NativeScript, run $ appbuilder create native <App Name>.
 
+<Command> is a related command that extends the create command. You can run the following related commands:
+    hybrid - Creates a new project from an Apache Cordova-based template.
+    native - Creates a new project from a Telerik NativeScript-based template.
 --[/]--
 
 --[create|hybrid]--
