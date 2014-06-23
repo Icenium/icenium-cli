@@ -154,7 +154,7 @@ declare module Project {
 		createNewNativeScriptProject(projectName: string): IFuture<void>;
 		createCordovaProjectFileFromExistingProject(): IFuture<void>;
 		createNativeScriptProjectFileFromExistingProject(): IFuture<void>;
-		createProjectFile(projectDir: string, projectName: string, projectType: number, properties: any): IFuture<void>;
+		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
 	}
 
 	interface IPlatformMigrator {
