@@ -35,6 +35,15 @@ export class Project implements Project.IProject {
 			this.defaultProjectForType = Object.create(null);
 			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
 			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
+
+			if (this.projectData && _.has(this.projectData, "TemplateAppName")) {
+				this.$errors.fail({
+					formatStr: "This hybrid project targets Apache Cordova 2.x. " +
+						"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
+						"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.",
+					suppressCommandHelp: true
+				});
+			}
 	}
 
 	private projectCapabilities: { [key: string]: IProjectCapabilities } = {
@@ -265,8 +274,6 @@ export class Project implements Project.IProject {
 			return null;
 		}).future<IProjectData>()();
 	}
-
-
 
 	private createFromTemplate(appname: string, projectType: number, projectDir: string): IFuture<void> {
 		return (() => {
