@@ -53,7 +53,7 @@ function createTestInjector(): IInjector {
 
 describe("project integration tests", () => {
 	var project, testInjector, projectTypes;
-	before(() => {
+	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
@@ -74,6 +74,7 @@ describe("project integration tests", () => {
 			project.createNewProject(projectTypes.Cordova, projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
+
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());

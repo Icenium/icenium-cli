@@ -422,7 +422,7 @@ export class Project implements Project.IProject {
 					if(propData.validationMessage) {
 						this.$errors.fail(propData.validationMessage);
 					} else {
-						this.$errors.fail.apply(null, _.rest(args, 0));
+						this.$errors.fail.apply(this.$errors, _.rest(args, 0));
 					}
 				}
 			};

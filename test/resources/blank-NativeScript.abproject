@@ -1,55 +1,52 @@
 {
-	"ProjectName": "Test",
-	"IsRunnable": "$isrunnable$",
-	"ProjectGuid": "$guid1$",
-	"projectVersion": 1,
-	"AppIdentifier": "com.telerik.Test",
-	"DisplayName": "Test",
-	"Author": "",
-	"Description": "",
-	"BundleVersion": "1.0",
-	"AndroidVersionCode": "1",
-	"iOSDeviceFamily": [
-		"1",
-		"2"
-	],
-	"iOSBackgroundMode": [],
-	"WP8TileTitle": "",
-	"WP8Publisher": "",
-	"WP8Capabilities": [],
-	"WP8Requirements": [],
-	"ProjectTypeGuids": "{F0A65104-D4F4-4012-B799-F612D75820F6}",
-	"FrameworkVersion": "0.1.0",
-	"AndroidPermissions": [
-		"android.permission.ACCESS_COARSE_LOCATION",
-		"android.permission.ACCESS_FINE_LOCATION",
-		"android.permission.ACCESS_LOCATION_EXTRA_COMMANDS",
-		"android.permission.ACCESS_NETWORK_STATE",
-		"android.permission.ACCOUNT_MANAGER",
-		"android.permission.BROADCAST_STICKY",
-		"android.permission.CAMERA",
-		"android.permission.GET_ACCOUNTS",
-		"android.permission.INTERNET",
-		"android.permission.MANAGE_ACCOUNTS",
-		"android.permission.MODIFY_AUDIO_SETTINGS",
-		"android.permission.READ_CONTACTS",
-		"android.permission.READ_PHONE_STATE",
-		"android.permission.RECEIVE_SMS",
-		"android.permission.RECORD_AUDIO",
-		"android.permission.VIBRATE",
-		"android.permission.WRITE_CONTACTS",
-		"android.permission.WRITE_EXTERNAL_STORAGE"
-	],
-	"DeviceOrientations": [
-		"Portrait",
-		"Landscape"
-	],
-	"AndroidHardwareAcceleration": "false",
-	"iOSStatusBarStyle": "Default",
-	"WP8SupportedResolutions": [
-		"ID_RESOLUTION_WVGA",
-		"ID_RESOLUTION_WXGA",
-		"ID_RESOLUTION_HD720P"
-	],
-	"Framework": "NativeScript"
+    "ProjectName": "Test"
+    ,"projectVersion": 1
+    ,"AppIdentifier": "com.telerik.Test"
+    ,"DisplayName": "Test"
+    ,"Author": ""
+    ,"Description": ""
+    ,"BundleVersion": "1.0"
+    ,"AndroidVersionCode": "1"
+    ,"iOSDeviceFamily": [
+        "1",
+        "2"
+    ]
+    ,"iOSBackgroundMode": []
+    ,"WP8TileTitle": ""
+    ,"WP8Publisher": ""
+    ,"WP8Capabilities": []
+    ,"WP8Requirements": []
+    ,"FrameworkVersion": "0.1.0"
+    ,"AndroidPermissions": [
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.ACCESS_LOCATION_EXTRA_COMMANDS",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.ACCOUNT_MANAGER",
+      "android.permission.BROADCAST_STICKY",
+      "android.permission.CAMERA",
+      "android.permission.GET_ACCOUNTS",
+      "android.permission.INTERNET",
+      "android.permission.MANAGE_ACCOUNTS",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.READ_CONTACTS",
+      "android.permission.READ_PHONE_STATE",
+      "android.permission.RECEIVE_SMS",
+      "android.permission.RECORD_AUDIO",
+      "android.permission.VIBRATE",
+      "android.permission.WRITE_CONTACTS",
+      "android.permission.WRITE_EXTERNAL_STORAGE"
+    ]
+    ,"DeviceOrientations": [
+      "Portrait",
+      "Landscape"
+    ]
+    ,"AndroidHardwareAcceleration": "false"
+    ,"iOSStatusBarStyle": "Default"
+    ,"WP8SupportedResolutions": [
+      "ID_RESOLUTION_WVGA",
+      "ID_RESOLUTION_WXGA",
+      "ID_RESOLUTION_HD720P"
+    ]
+    ,"Framework": "NativeScript"
 }
