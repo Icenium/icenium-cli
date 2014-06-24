@@ -345,6 +345,7 @@ export class Project implements Project.IProject {
 		}
 
 		properties.AppIdentifier = appid;
+		properties.ProjectGuid = '{' + require("node-uuid").v4() + '}';
 
 		return properties;
 	}
@@ -356,7 +357,6 @@ export class Project implements Project.IProject {
 	public createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
-			var updateData;
 
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
@@ -364,9 +364,19 @@ export class Project implements Project.IProject {
 				path.join(__dirname,
 					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType]))).wait();
 
-			var projectSchema = helpers.getProjectFileSchema(projectType);
+			this.validateProjectData(projectType, properties).wait();
+			this.$projectPropertiesService.completeProjectProperties(this.projectData);
+
+			this.saveProject(projectDir).wait();
+		}).future<void>()();
+	}
+
+	private validateProjectData(projectType: number, properties: any): IFuture<void> {
+		return (() => {
+			var updateData;
+			var projectSchema = helpers.getProjectFileSchema(projectType).wait();
 			Object.keys(properties).forEach(propertyName => {
-				if (projectSchema.hasOwnProperty(propertyName)) {
+				if (_.has(projectSchema, propertyName)) {
 					if (projectSchema[propertyName].flags) {
 						if (_.isArray(properties[propertyName])) {
 							this.projectData[propertyName] = properties[propertyName];
@@ -383,10 +393,6 @@ export class Project implements Project.IProject {
 					this.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
 				}
 			});
-
-			this.$projectPropertiesService.completeProjectProperties(this.projectData);
-
-			this.saveProject(projectDir).wait();
 		}).future<void>()();
 	}
 
@@ -525,7 +531,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
 			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir()).wait();
@@ -535,7 +541,7 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]);
+			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
 			property = this.normalizePropertyName(property, propSchema);
 
 			if (this.projectData.hasOwnProperty(property)) {

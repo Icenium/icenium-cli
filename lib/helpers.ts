@@ -72,14 +72,16 @@ export function toHash(collection, keySelector, valueSelector): any {
 }
 
 var _projectFileSchemas = [];
-export function getProjectFileSchema(projectType: number): any {
-	if (!_projectFileSchemas[projectType]) {
-		var projectTypes = require("./project-types");
-		_projectFileSchemas[projectType] = getProjectFilePartSchema(projectTypes[projectType]).wait();
-		var commonSchema = getProjectFilePartSchema("common").wait();
-		_.extend(_projectFileSchemas[projectType], commonSchema);
-	}
-	return _projectFileSchemas[projectType];
+export function getProjectFileSchema(projectType: number): IFuture<any> {
+	return(() => {
+		if (!_projectFileSchemas[projectType]) {
+			var projectTypes = require("./project-types");
+			_projectFileSchemas[projectType] = getProjectFilePartSchema(projectTypes[projectType]).wait();
+			var commonSchema = getProjectFilePartSchema("common").wait();
+			_.extend(_projectFileSchemas[projectType], commonSchema);
+		}
+		return _projectFileSchemas[projectType];
+	}).future<any>()();
 }
 
 export function getProjectFilePartSchema(partName: string): IFuture<string> {

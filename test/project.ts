@@ -74,14 +74,15 @@ describe("project integration tests", () => {
 			project.createNewProject(projectTypes.Cordova, projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
-
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova);
+			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
+			assert.ok(guidRegex.test(testProperties.ProjectGuid));
+			delete testProperties.ProjectGuid;
 			assert.ok(guidRegex.test(testProperties.WP8ProductID));
 			delete testProperties.WP8ProductID;
 			assert.ok(guidRegex.test(testProperties.WP8PublisherID));
@@ -103,15 +104,16 @@ describe("project integration tests", () => {
 			options.appid = "com.telerik.Test";
 
 			project.createNewProject(projectTypes.NativeScript, projectName).wait();
-
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = helpers.getProjectFileSchema(projectTypes.NativeScript);
+			var projectSchema = helpers.getProjectFileSchema(projectTypes.NativeScript).wait();
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
+			assert.ok(guidRegex.test(testProperties.ProjectGuid));
+			delete testProperties.ProjectGuid;
 			assert.ok(guidRegex.test(testProperties.WP8ProductID));
 			delete testProperties.WP8ProductID;
 			assert.ok(guidRegex.test(testProperties.WP8PublisherID));
@@ -171,7 +173,7 @@ describe("project unit tests", () => {
 
 		project = testInjector.resolve("project");
 
-		propSchemaCordova = helpers.getProjectFileSchema(projectTypes.Cordova);
+		propSchemaCordova = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
 	});
 
 	describe("updateProjectProperty", () => {

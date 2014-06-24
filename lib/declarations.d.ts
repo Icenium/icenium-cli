@@ -247,6 +247,7 @@ interface IChildProcess {
 
 interface IProjectData {
 	ProjectName: string;
+	ProjectGuid: string;
 	projectVersion : number;
 	AppIdentifier: string;
 	DisplayName: string;

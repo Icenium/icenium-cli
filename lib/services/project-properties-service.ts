@@ -39,7 +39,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova);
+			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova).wait();
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];
@@ -59,13 +59,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public completeProjectProperties(properties: any): boolean {
 		var updated = false;
 
-		if (properties.hasOwnProperty("name")) {
+		if (_.has(properties, "name")) {
 			properties.ProjectName = properties.name;
 			delete properties.name;
 			updated = true;
 		}
 
-		if (properties.hasOwnProperty("iOSDisplayName")) {
+		if (_.has(properties, "iOSDisplayName")) {
 			properties.DisplayName = properties.iOSDisplayName;
 			delete properties.iOSDisplayName;
 			updated = true;
@@ -76,13 +76,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}
 
 		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!properties.hasOwnProperty(wp8guid)) {
+			if (!_.has(properties, wp8guid)) {
 				properties[wp8guid] = MobileHelper.generateWP8GUID();
 				updated = true;
 			}
 		});
 
-		if(!properties.hasOwnProperty("Framework")) {
+		if(!_.has(properties, "Framework")) {
 			properties["Framework"] = this.$projectTypes[this.$projectTypes.Cordova];
 			updated = true;
 		}
@@ -91,7 +91,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			util.format("default-project-%s.json", properties.Framework)
 		).wait();
 		Object.keys(defaultProject).forEach((propName) => {
-			if (!properties.hasOwnProperty(propName)) {
+			if (!_.has(properties, propName)) {
 				properties[propName] = defaultProject[propName];
 				updated = true;
 			}
