@@ -10,6 +10,7 @@ import Future = require("fibers/future");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../mobile/constants");
+import AppIdentifier = require("../mobile/app-identifier");
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "install/WinPhoneAet";
@@ -398,7 +399,7 @@ export class BuildService implements Project.IBuildService {
 		return (() => {
 			this.$project.ensureProject();
 
-			if (!this.$project.capabilities.build) {
+			if (!this.$project.capabilities.build && !options.companion) {
 				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
@@ -456,10 +457,13 @@ export class BuildService implements Project.IBuildService {
 
 			this.importProject().wait();
 
+			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
+				this.$project.projectData.AppIdentifier, true, this.$project.projectType);
+
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			var fullDownloadPath = util.format("icenium://%s?LiveSyncToken=%s", querystring.escape(hostPart), querystring.escape(liveSyncToken));
+			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, querystring.escape(hostPart), querystring.escape(liveSyncToken));
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
@@ -478,7 +482,7 @@ export class BuildService implements Project.IBuildService {
 
 			var projectZipFile = this.zipProject().wait();
 			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait());
-
+			
 			this.$server.projects.importProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
 				this.$fs.createReadStream(projectZipFile)).wait();
 			this.$logger.trace("Project imported");

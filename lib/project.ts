@@ -49,6 +49,7 @@ export class Project implements Project.IProject {
 	private projectCapabilities: { [key: string]: IProjectCapabilities } = {
 		Cordova: {
 			build: true,
+			buildCompanion: true,
 			deploy: true,
 			simulate: true,
 			livesync: true,
@@ -56,6 +57,7 @@ export class Project implements Project.IProject {
 		},
 		NativeScript: {
 			build: false,
+			buildCompanion: true,
 			deploy: false,
 			simulate: false,
 			livesync: false,

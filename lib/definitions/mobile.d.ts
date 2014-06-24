@@ -23,6 +23,7 @@ declare module Mobile {
 	interface IAppIdentifier {
 		appIdentifier: string;
 		deviceProjectPath: string;
+		liveSyncFormat: string;
 		isLiveSyncSupported(device: any): IFuture<boolean>;
 		getliveSyncNotSupportedError(device: any): string;
 	}
