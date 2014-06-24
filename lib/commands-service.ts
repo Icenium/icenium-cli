@@ -78,62 +78,64 @@ export class CommandsService implements ICommandsService {
 		}
 	}
 
-	public completeCommand() {
-		var tabtab = require("tabtab");
-		tabtab.complete("appbuilder", (err, data) => {
-			if (err || !data) {
-				return;
-			}
+	public completeCommand(): IFuture<any> {
+		return (() => {
+			var tabtab = require("tabtab");
+			tabtab.complete("appbuilder", (err, data) => {
+				if (err || !data) {
+					return;
+				}
 
-			var deviceSpecific = ["build", "deploy"];
-			var propertyCommands = ["print", "set", "add", "del"]; 
-			var childrenCommands = this.$injector.getChildrenCommandsNames(data.prev);
+				var deviceSpecific = ["build", "deploy"];
+				var propertyCommands = ["print", "set", "add", "del"];
+				var childrenCommands = this.$injector.getChildrenCommandsNames(data.prev);
 
-			if (data.words == 1) {
-				return tabtab.log(this.allCommands(false), data);
-			}
+				if (data.words == 1) {
+					return tabtab.log(this.allCommands(false), data);
+				}
 
-			if (data.last.startsWith("--")) {
-				return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
-			}
+				if (data.last.startsWith("--")) {
+					return tabtab.log(Object.keys(require("./options").knownOpts), data, "--");
+				}
 
-			if (_.contains(deviceSpecific, data.prev)) {
-				return tabtab.log(["ios", "android", "wp8"], data);
-			}
+				if (_.contains(deviceSpecific, data.prev)) {
+					return tabtab.log(["ios", "android", "wp8"], data);
+				}
 
-			if (data.words == 2 && childrenCommands) {
-				return tabtab.log(_.reject(childrenCommands, (children: string) => children[0] === '*'), data);
-			}
+				if (data.words == 2 && childrenCommands) {
+					return tabtab.log(_.reject(childrenCommands, (children: string) => children[0] === '*'), data);
+				}
 
-			var $project: Project.IProject = this.$injector.resolve("project");
-			if ($project.projectData && $project.projectType) {
-				var parseResult = /prop ([^ ]+) ([^ ]*)/.exec(data.line);
-				if (parseResult) {
-					if (_.contains(propertyCommands, parseResult[1])) {
-						var propSchema = require("./helpers").getProjectFileSchema($project.projectType);
-						var propName = parseResult[2];
-						if (propSchema[propName]) {
-							var range = propSchema[propName].range;
-							if (range) {
-								if (!_.isArray(range)) {
-									var helpers = require("./helpers");
-									range = _.map(range, (value: { input }, key) => {
-										return value.input || key;
-									});
+				var $project: Project.IProject = this.$injector.resolve("project");
+				if ($project.projectData && $project.projectType) {
+					var parseResult = /prop ([^ ]+) ([^ ]*)/.exec(data.line);
+					if (parseResult) {
+						if (_.contains(propertyCommands, parseResult[1])) {
+							var propSchema = require("./helpers").getProjectFileSchema($project.projectType).wait();
+							var propName = parseResult[2];
+							if (propSchema[propName]) {
+								var range = propSchema[propName].range;
+								if (range) {
+									if (!_.isArray(range)) {
+										var helpers = require("./helpers");
+										range = _.map(range, (value: { input }, key) => {
+											return value.input || key;
+										});
+									}
+									return tabtab.log(range, data);
 								}
-								return tabtab.log(range, data);
+							} else {
+								return tabtab.log(Object.keys(propSchema), data);
 							}
-						} else {
-							return tabtab.log(Object.keys(propSchema), data);
 						}
 					}
 				}
-			}
 
-			return false;
-		});
+				return false;
+			});
 
-		return true;
+			return true;
+		}).future<any>()();
 	}
 
 	private beautifyCommandName(commandName: string): string {

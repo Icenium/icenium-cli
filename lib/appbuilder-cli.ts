@@ -43,7 +43,7 @@ class CommandDispatcher {
 	}
 
 	public completeCommand(): void {
-		this.$commandsService.completeCommand();
+		this.$commandsService.completeCommand().wait();
 	}
 
 	private getCommandName(): string {

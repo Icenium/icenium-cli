@@ -3,6 +3,11 @@
 		"description": "The project name identifies this project to the cloud build.",
 		"validator": "projectNameValidator"
 	},
+	"ProjectGuid": {
+		"description": "Unique identifier of the project.",
+		"regex": "\\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\}",
+		"validationMessage": "The project ID must be a GUID string enclosed in curly braces."
+	},
 	"AppIdentifier": {
 		"description": "The application identifier (or app id) must match the app id property of the iOS mobile provision used for building.",
 		"regex": "^[a-zA-Z]+([a-zA-Z0-9]*)(\\.[a-zA-Z]+([a-zA-Z0-9]*)){2,}$",

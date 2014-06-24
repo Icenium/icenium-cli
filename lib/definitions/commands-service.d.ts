@@ -3,5 +3,5 @@ interface ICommandsService {
 	executeCommand(commandName: string, commandArguments: string[]): boolean;
 	tryExecuteCommand(commandName: string, commandArguments: string[]): void;
 	executeCommandUnchecked(commandName: string, commandArguments: string[]): boolean;
-	completeCommand(): any;
+	completeCommand(): IFuture<any>;
 }
