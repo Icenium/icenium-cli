@@ -346,6 +346,7 @@ export class Project implements Project.IProject {
 
 		properties.AppIdentifier = appid;
 		properties.ProjectGuid = '{' + require("node-uuid").v4() + '}';
+		properties.IsRunnable = "true";
 
 		return properties;
 	}
