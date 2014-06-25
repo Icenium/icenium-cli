@@ -46,7 +46,7 @@ export class LiveSyncCommand implements ICommand {
 			}
 
 			if (!this.$project.capabilities.livesync && !options.companion) {
-				this.$errors.fail("You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+				this.$errors.fail("Use $ appbuilder livesync cloud to sync your application to Telerik Nativescript Companion App. You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			if (!this.$project.capabilities.livesyncCompanion && options.companion) {
