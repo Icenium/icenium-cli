@@ -50,4 +50,5 @@
     ]
     ,"Framework": "NativeScript"
     ,"ProjectTypeGuids": "{F0A65104-D4F4-4012-B799-F612D75820F6}"
+    ,"IsRunnable": "true"
 }
