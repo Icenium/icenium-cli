@@ -111,8 +111,7 @@ Usage:
 
 Creates a new project from an Apache Cordova-based template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
-    A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&), semi-colon (;),
-    opening and closing brackets (()), and comma (,).
+    A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
@@ -133,8 +132,7 @@ Usage:
 
 Creates a new project from a Telerik NativeScript-based template.
 <App name> is the name of the application. The maximum length is 30 characters. You can use only the following characters:
-    A-Z, a-z, 0-9, underscore (_), dot (.), plus (+), hyphen (-), at (@), dollar ($), ampersand (&), semi-colon (;),
-    opening and closing brackets (()), and comma (,).
+    A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
@@ -177,9 +175,16 @@ Options:
 
 --[init]--
 
+Usage:
+    $appbuilder init [<Command>]
+
 Cannot initialize project. You need to specify project type.
 To initialize a project for hybrid development with Apache Cordova, run $ appbuilder init hybrid.
 To initialize a project for native development with Telerik NativeScript, run $ appbuilder init native.
+
+<Command> is a related command that extends the init command. You can run the following related commands:
+    hybrid - Initializes an existing Apache Cordova project for development in the current directory.
+    native - Initializes an existing Telerik NativeScript project for development in the current directory.
 
 --[/]--
 
