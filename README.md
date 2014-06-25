@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.2  
-Release date: 2014, June 9 
+Latest version: Telerik AppBuilder 2.3  
+Release date: 2014, June 26 
 
-> For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
 
 ### System Requirements
 
@@ -105,10 +105,10 @@ A new tab opens in your default browser. Provide your login credentials, confirm
 
 <a name="create"><b>2. Create project</b></a>
 
-To create a new project from the default template, navigate to an empty directory and run the following command. 
+To create a new hybrid project from the default template, navigate to an empty directory and run the following command. 
 
 ```bash
-$ appbuilder create MyApp
+$ appbuilder create hybrid MyApp
 ```
 
 The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI Mobile template.
@@ -116,7 +116,7 @@ The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current direc
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
 ```bash
-$ appbuilder init
+$ appbuilder init hybrid
 ```
 
 The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
@@ -161,7 +161,7 @@ To run your app on a Windows Phone 8 device, install a QR code reader on the dev
 $ appbuilder build wp8
 ```
 
-the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment. On your device, scan the QR code for the Telerik Application Enrollment Token (Telerik AET) and install it on your device. Next, scan the QR code for your app and install the app on your device.
+The Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment. On your device, scan the QR code for the Telerik Application Enrollment Token (Telerik AET) and install it on your device. Next, scan the QR code for your app and install the app on your device.
 
 <a name="code"><b>5. Modify your code</b></a>
 
@@ -200,10 +200,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.2  
-Release date: 2014, June 9
+Latest version: Telerik AppBuilder 2.3  
+Release date: 2014, June 26
 
-> For a complete list of the features available in Telerik AppBuilder 2.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-2" target="_blank">Telerik AppBuilder 2.2 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -218,7 +218,7 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can create new projects by initializing any existing projects stored locally on your system. For example, you can initialize local copies of projects created with the AppBuilder clients or third-party tools.
 * You can export your existing projects from your {{tp}} account and automatically initialize them for development.
 * You can clone the Telerik AppBuilder sample apps. 
-* You can target Apache Cordova 3.0.0 or Apache Cordova 3.2.0.
+* You can target Apache Cordova 3.0.0, Apache Cordova 3.2.0, or Apache Cordova 3.5.0.
 * You can migrate between the supported Apache Cordova versions.
 * You can enable and disable the Apache Cordova core and integrated plugins.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
@@ -252,7 +252,6 @@ The following Telerik AppBuilder features are not available in the current relea
 * You cannot load your Windows Phone 8 apps in the companion app.
 * You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
-* In the other Telerik AppBuilder clients, you cannot automatically load and work with projects created from the Telerik AppBuilder CLI.
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
 
