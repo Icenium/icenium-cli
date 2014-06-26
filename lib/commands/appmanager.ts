@@ -21,6 +21,13 @@ class AppManagerUploadCommand implements ICommand {
 			var platform = MobileHelper.validatePlatformName(args[0], this.$errors);
 			this.$project.ensureProject();
 
+			if(!MobileHelper.platformCapabilities[platform].publishTelerikAppManager) {
+				this.$errors.fail({
+					formatStr: "In this version of the Telerik AppBuilder CLI and Telerik AppManager, you cannot upload and distribute %s apps via Telerik AppManager.",
+					suppressCommandHelp: true
+				}, platform);
+			}
+
 			this.$loginManager.ensureLoggedIn().wait();
 
 			this.$logger.info("Accessing Telerik AppManager store.");
