@@ -28,7 +28,7 @@ export class AndroidAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get liveSyncFormat(): string {
-		return "icenium://%s?LiveSyncToken=%s";
+		return "";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
@@ -53,7 +53,7 @@ export class AndroidCompanionAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get liveSyncFormat(): string {
-		return "";
+		return "icenium://%s?LiveSyncToken=%s";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
@@ -107,7 +107,7 @@ export class IOSAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get liveSyncFormat(): string {
-		return "icenium://%s?LiveSyncToken=%s";
+		return "";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
@@ -131,7 +131,7 @@ export class IOSCompanionAppIdentifier implements Mobile.IAppIdentifier {
 	}
 
 	get liveSyncFormat(): string {
-		return "";
+		return "icenium://%s?LiveSyncToken=%s";
 	}
 
 	getliveSyncNotSupportedError(device: Mobile.IDevice): string {
