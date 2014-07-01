@@ -95,9 +95,7 @@ To build, deploy, or synchronize your projects with the cloud, you need to be lo
 Usage:
     $ appbuilder create [<Command>]
 
-Cannot create project. You need to specify project type and name.
-To create a project for hybrid development with Apache Cordova, run $ appbuilder create hybrid <App Name>.
-To create a project for native development with Telerik NativeScript, run $ appbuilder create native <App Name>.
+Creates a project for hybrid or native development. You must run the create command with a related command.
 
 <Command> is a related command that extends the create command. You can run the following related commands:
     hybrid - Creates a new project from an Apache Cordova-based template.
@@ -178,9 +176,7 @@ Options:
 Usage:
     $appbuilder init [<Command>]
 
-Cannot initialize project. You need to specify project type.
-To initialize a project for hybrid development with Apache Cordova, run $ appbuilder init hybrid.
-To initialize a project for native development with Telerik NativeScript, run $ appbuilder init native.
+Initializes an existing hybrid or native project for development. You must run the init command with a related command.
 
 <Command> is a related command that extends the init command. You can run the following related commands:
     hybrid - Initializes an existing Apache Cordova project for development in the current directory.
@@ -610,31 +606,35 @@ Options:
 
 --[appmanager]--
 Usage:
-    $ appbuilder appmanager <command>
+    $ appbuilder appmanager <Command>
 
-Commands:
+You must run the appmanager command with a related command.
+
+<Command> is a related command that extends the appmanager command. You can run the following related commands:
     upload - Builds the project and uploads the binary to Telerik AppManager.
 --[/]--
 
 --[appmanager|upload]--
 Usage:
-    $ appbuilder appmanager upload <Platform> [--certificate <index or name>] [--provision <index or name>]
+    $ appbuilder appmanager upload <Platform> [--certificate <Certificate ID>] [--provision <Provision ID>]
 
-Builds the project and uploads the application to Telerik AppManager.
+Platform-specific usage:
+    $ appbuilder appmanager upload android --certificate <Certificate ID>
+    $ appbuilder appmanager upload ios --certificate <Certificate ID> --provision <Provision ID>
 
-The platform to build for is specified by the <Platform> parameter and should be one of Android, iOS or WP8.
+Builds the project and uploads the application to Telerik AppManager. In this version of Telerik AppManager, you can upload and distribute only iOS and Android apps.
 
-Run `appbuilder certificate` to list all available certificates for code signing your apps.
-Run `appbuilder provision` to list all available provisioning profiles for code signing your apps.
+<Platform> is the target distribution platform. You can set ios or android.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
 Options:
-    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app.
-        For iOS, it must match the specified provisioning profile.
-        For Android, it must be suitable for publishing to Google Play.
-        You can specify a certificate by index or name.
-    --provision - Sets the provisioning profile that you want to use for code signing
-        your iOS app. Must be an AppStore distribution provisioning profile and must match the specified certificate.
-        You can specify a provisioning profile by index or name.
+    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
+        a certificate by index or name.
+        To list available certificates, run $ appbuilder certificate.
+    --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
+        a provisioning profile by index or name.
+        To list available provisioning profiles, run $ appbuilder provision.
 --[/]--
 
 --[certificate-request]--
