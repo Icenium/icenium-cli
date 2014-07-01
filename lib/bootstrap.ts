@@ -37,6 +37,7 @@ $injector.requireCommand("debug", "./commands/debug");
 
 $injector.require("server", "./server-api");
 $injector.require("httpClient", "./service-util");
+$injector.require("httpServer", "./http-server");
 $injector.require("serviceProxy", "./service-util");
 $injector.require("serviceContractGenerator", "./service-util");
 $injector.require("serviceContractProvider", "./service-util");
