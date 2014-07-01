@@ -13,17 +13,20 @@ export var platformCapabilities: {[key: string]: Mobile.IPlatformCapabilities } 
 	iOS: {
 		wirelessDeploy: true,
 		cableDeploy: true,
-		companion: true
+		companion: true,
+		publishTelerikAppManager: true
 	},
 	Android: {
 		wirelessDeploy: true,
 		cableDeploy: true,
-		companion: true
+		companion: true,
+		publishTelerikAppManager: true
 	},
 	WP8: {
 		wirelessDeploy: true,
 		cableDeploy: false,
-		companion: false
+		companion: false,
+		publishTelerikAppManager: false
 	}
 };
 
