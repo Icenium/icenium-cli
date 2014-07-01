@@ -1,19 +1,19 @@
 global._ = require("underscore");
-global.$injector = require("./common/lib/yok").injector;
+global.$injector = require("./common/yok").injector;
 require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
-$injector.require("errors", "./common/lib/errors");
+$injector.require("errors", "./common/errors");
 $injector.require("fs", "./file-system");
 $injector.require("cancellation", "./services/cancellation");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("childProcess", "./child-process");
-$injector.require("logger", "./common/lib/logger");
+$injector.require("logger", "./common/logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");

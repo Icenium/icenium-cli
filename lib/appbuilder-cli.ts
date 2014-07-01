@@ -10,7 +10,7 @@ import queue = require("./queue");
 
 require("./extensions");
 require("./bootstrap");
-import errors = require("./common/lib/errors");
+import errors = require("./common/errors");
 
 var options = require("./options");
 
