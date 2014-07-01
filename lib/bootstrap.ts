@@ -6,7 +6,7 @@ $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
-$injector.require("errors", "./errors");
+$injector.require("errors", "./common/lib/errors");
 $injector.require("fs", "./file-system");
 $injector.require("cancellation", "./services/cancellation");
 $injector.require("resources", "./resource-loader");
