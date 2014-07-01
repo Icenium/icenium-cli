@@ -1,5 +1,5 @@
 global._ = require("underscore");
-global.$injector = require("./yok").injector;
+global.$injector = require("./common/lib/yok").injector;
 require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
@@ -13,7 +13,7 @@ $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("childProcess", "./child-process");
-$injector.require("logger", "./logger");
+$injector.require("logger", "./common/lib/logger");
 $injector.require("commandsService", "./commands-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");

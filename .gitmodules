@@ -1,0 +1,3 @@
+[submodule "lib/common"]
+	path = lib/common
+	url = git@github.com:Icenium/mobile-cli-lib.git

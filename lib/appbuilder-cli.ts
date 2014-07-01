@@ -24,6 +24,9 @@ class CommandDispatcher {
 		private $commandsService: ICommandsService) {}
 
 	public dispatchCommand() {
+
+		this.$logger.setLoggerConfiguration(this.$config, options.log);
+
 		if (options.version) {
 			this.$logger.out(this.$config.version);
 			return;
