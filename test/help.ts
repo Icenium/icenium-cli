@@ -2,7 +2,7 @@
 
 "use strict";
 
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 import helpCommand = require("../lib/commands/help");
 import stubs = require("./stubs");
 import Future = require("fibers/future");

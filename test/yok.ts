@@ -3,7 +3,7 @@
 import chai = require("chai");
 var assert:chai.Assert = chai.assert;
 
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 
 class MyClass {
 	constructor(private x, public y) {

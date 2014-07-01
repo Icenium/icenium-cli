@@ -4,7 +4,7 @@ import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 var assert:chai.Assert = chai.assert;
 
 var testInjector = new yok.Yok();

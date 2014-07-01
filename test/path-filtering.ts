@@ -1,7 +1,7 @@
 ///<reference path=".d.ts"/>
 
 import chai = require("chai");
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
 var assert:chai.Assert = chai.assert;
 var pfs = require("../lib/services/path-filtering");
