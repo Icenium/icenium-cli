@@ -118,6 +118,8 @@ $injector.requireCommand("appstore|list", "./commands/itunes-connect");
 $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 $injector.requireCommand("appmanager|upload", "./commands/appmanager");
 
+$injector.requireCommand("update-kendoui", "./commands/update-kendoui");
+
 $injector.requireCommand("dev-prepackage", "./commands/post-install");
 $injector.require("platformServices", "./commands/simulate");
 $injector.require("analyticsService", "./services/analytics-service");

@@ -2,12 +2,6 @@
 // automatically generated code; do not edit manually!
 //
 declare module Server {
-	interface IAnalyticsServiceContract {
-		createAnalyticsApp(workspaceId: string, applicationName: string, description: any): IFuture<any>;
-		getApplications(accountId: string): IFuture<any>;
-		getProjectKey(id: string): IFuture<any>;
-	}
-
 	interface IAuthenticationServiceContract {
 		agreeToEula(): IFuture<void>;
 		getLoggedInUser(): IFuture<any>;
@@ -94,6 +88,7 @@ declare module Server {
 		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
 		getItemTemplates(): IFuture<any>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<any>;
+		getProjectFileSchema($resultStream: any): IFuture<void>;
 		getProjectTemplates(): IFuture<any>;
 		getSolution(solutionName: string, checkUpgradability: string): IFuture<any>;
 		importPackage(solutionName: string, projectName: string, archivePackage: any, parentIdentifier: string): IFuture<void>;
@@ -126,9 +121,12 @@ declare module Server {
 	}
 
 	interface ITapServiceContract {
+		createServiceApplication(serviceType: string, workspaceId: string, applicationName: string, description: any): IFuture<any>;
 		getExistingClientSolutions(): IFuture<any>;
 		getFeatures(accountId: string, serviceType: string): IFuture<any>;
 		getRemote(solutionName: string): IFuture<any>;
+		getServiceApplicationProjectKey(serviceType: string, id: string): IFuture<any>;
+		getServiceApplications(serviceType: string, accountId: string): IFuture<any>;
 		getUsersForProject(solutionName: string): IFuture<any>;
 		getWorkspaces(accountId: string): IFuture<any>;
 		initCurrentUserSharedRepository(solutionName: string): IFuture<void>;
@@ -167,7 +165,6 @@ declare module Server {
 	}
 
 	interface IServer {
-		analytics: IAnalyticsServiceContract;
 		authentication: IAuthenticationServiceContract;
 		build: IBuildServiceContract;
 		cordova: ICordovaServiceContract;
