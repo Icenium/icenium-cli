@@ -53,7 +53,8 @@ export class Project implements Project.IProject {
 			deploy: true,
 			simulate: true,
 			livesync: true,
-			livesyncCompanion: true
+			livesyncCompanion: true,
+			updateKendo: true
 		},
 		NativeScript: {
 			build: false,
@@ -61,7 +62,8 @@ export class Project implements Project.IProject {
 			deploy: false,
 			simulate: false,
 			livesync: false,
-			livesyncCompanion: true
+			livesyncCompanion: true,
+			updateKendo: false
 		}
 	};
 

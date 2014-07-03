@@ -6,24 +6,6 @@
 
 import querystring = require('querystring');
 
-export class AnalyticsService implements Server.IAnalyticsServiceContract {
-	constructor(private $serviceProxy: Server.IServiceProxy) {
-	}
-
-	createAnalyticsApp(workspaceId: string, applicationName: string, description: any): IFuture<any> {
-		return this.$serviceProxy.call<any>('CreateAnalyticsApp', 'POST', ['/analytics/applications', encodeURI(workspaceId.replace(/\\/g, '/')), encodeURI(applicationName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'description', value: JSON.stringify(description), contentType: 'application/json'}], null);
-	}
-
-	getApplications(accountId: string): IFuture<any> {
-		return this.$serviceProxy.call<any>('GetApplications', 'GET', ['/analytics/applications', encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-
-	getProjectKey(id: string): IFuture<any> {
-		return this.$serviceProxy.call<any>('GetProjectKey', 'GET', ['/analytics/applications', encodeURI(id.replace(/\\/g, '/')), 'projectKey'].join('/'), 'application/json', null, null);
-	}
-
-}
-
 export class AuthenticationService implements Server.IAuthenticationServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
@@ -308,6 +290,10 @@ export class ProjectService implements Server.IProjectServiceContract {
 		return this.$serviceProxy.call<any>('GetProjectContents', 'GET', ['/projects/contents', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
+	getProjectFileSchema($resultStream: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('GetProjectFileSchema', 'GET', '/projects/projectFileSchema', 'application/octet-stream', null, $resultStream);
+	}
+
 	getProjectTemplates(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetProjectTemplates', 'GET', '/projects/projectTemplates', 'application/json', null, null);
 	}
@@ -412,6 +398,10 @@ export class TapService implements Server.ITapServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
 
+	createServiceApplication(serviceType: string, workspaceId: string, applicationName: string, description: any): IFuture<any> {
+		return this.$serviceProxy.call<any>('CreateServiceApplication', 'POST', ['/tap/services', encodeURI(serviceType.replace(/\\/g, '/')), encodeURI(workspaceId.replace(/\\/g, '/')), encodeURI(applicationName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'description', value: JSON.stringify(description), contentType: 'application/json'}], null);
+	}
+
 	getExistingClientSolutions(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetExistingClientSolutions', 'GET', '/tap/projects', 'application/json', null, null);
 	}
@@ -422,6 +412,14 @@ export class TapService implements Server.ITapServiceContract {
 
 	getRemote(solutionName: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetRemote', 'GET', ['/tap/versioncontrol', encodeURI(solutionName.replace(/\\/g, '/')), 'remote'].join('/'), 'application/json', null, null);
+	}
+
+	getServiceApplicationProjectKey(serviceType: string, id: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetServiceApplicationProjectKey', 'GET', ['/tap/services', encodeURI(serviceType.replace(/\\/g, '/')), encodeURI(id.replace(/\\/g, '/')), 'projectKey'].join('/'), 'application/json', null, null);
+	}
+
+	getServiceApplications(serviceType: string, accountId: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetServiceApplications', 'GET', ['/tap/services', encodeURI(serviceType.replace(/\\/g, '/')), encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
 	getUsersForProject(solutionName: string): IFuture<any> {
@@ -561,7 +559,6 @@ export class VersionControlService implements Server.IVersionControlServiceContr
 }
 
 export class Server {
-	public analytics = $injector.resolve(AnalyticsService);
 	public authentication = $injector.resolve(AuthenticationService);
 	public build = $injector.resolve(BuildService);
 	public cordova = $injector.resolve(CordovaService);

@@ -65,6 +65,14 @@ declare module Server {
 		output: string;
 		errors: string[];
 	}
+
+	interface IKendoDownloadablePackageData {
+		Id: string;
+		DownloadUrl: string;
+		Keywords: string[];
+		Name: string;
+		Version: string;
+	}
 }
 
 interface IUserDataStore {
@@ -175,6 +183,7 @@ interface IProjectCapabilities {
 	simulate: boolean;
 	livesync: boolean;
 	livesyncCompanion: boolean;
+	updateKendo: boolean;
 }
 
 // duplicated from fs.Stats, because I cannot import it here
