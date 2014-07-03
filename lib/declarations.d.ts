@@ -1,7 +1,3 @@
-interface IDisposable {
-	dispose(): void;
-}
-
 declare module Server {
 	interface IResponse {
 		response: any;
@@ -177,30 +173,6 @@ interface IProjectCapabilities {
 	livesyncCompanion: boolean;
 }
 
-// duplicated from fs.Stats, because I cannot import it here
-interface IFsStats {
-	isFile(): boolean;
-	isDirectory(): boolean;
-	isBlockDevice(): boolean;
-	isCharacterDevice(): boolean;
-	isSymbolicLink(): boolean;
-	isFIFO(): boolean;
-	isSocket(): boolean;
-	dev: number;
-	ino: number;
-	mode: number;
-	nlink: number;
-	uid: number;
-	gid: number;
-	rdev: number;
-	size: number;
-	blksize: number;
-	blocks: number;
-	atime: Date;
-	mtime: Date;
-	ctime: Date;
-}
-
 interface IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
 	unzip(zipFile: string, destinationDir: string): IFuture<void>;
@@ -315,18 +287,6 @@ interface IServerConfiguration {
 	assemblyVersion: IFuture<string>;
 }
 
-interface IErrors {
-	fail(formatStr: string, ...args: any[]): void;
-	fail(opts: {formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
-
-	beginCommand(action: () => any, printCommandHelp: () => void): any;
-	verifyHeap(message: string): void;
-}
-
-declare enum ErrorCodes {
-	UNKNOWN = 127
-}
-
 interface IPrompter extends IDisposable {
 	start(): void;
 	get(schema: IPromptSchema): IFuture<any>;
@@ -404,10 +364,6 @@ interface IUserSettingsService {
 	loadUserSettingsFile(): IFuture<void>;
 	saveSettings(data: {[key: string]: {}}): IFuture<void>;
 	getValue(propertyName: string): IFuture<any>;
-}
-
-interface ICommandOptions {
-	disableAnalytics?: boolean;
 }
 
 interface ICancellationService extends IDisposable {
