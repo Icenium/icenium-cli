@@ -152,6 +152,7 @@ declare module Project {
 		projectData: IProjectData;
 		projectType: number;
 		capabilities: IProjectCapabilities;
+		projectTargets: IFuture<string[]>;
 		getProjectDir(): string;
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;

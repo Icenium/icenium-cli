@@ -46,7 +46,7 @@ export class SimulateCommand implements ICommand {
 			this.prepareCordovaPlugins(simulatorPackageName).wait();
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
 
-			this.runSimulator();
+			this.runSimulator().wait();
 		}).future<void>()();
 	}
 
@@ -75,21 +75,26 @@ export class SimulateCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private runSimulator() {
-		this.$logger.info("Starting simulator...");
+	private runSimulator(): IFuture<void> {
+		return (() => {
+			this.$logger.info("Starting simulator...");
 
-		var simulatorParams = [
-			"--path", this.$project.getProjectDir(),
-			"--statusbarstyle", this.projectData.iOSStatusBarStyle,
-			"--frameworkversion", this.projectData.FrameworkVersion,
-			"--orientations", this.projectData.DeviceOrientations.join(";"),
-			"--assemblypaths", this.simulatorPath,
-			"--corepluginspath", this.pluginsPath,
-			"--plugins", this.projectData.CorePlugins.join(";")
+			var projectTargets = this.$project.projectTargets.wait().join(";");
+
+			var simulatorParams = [
+				"--path", this.$project.getProjectDir(),
+				"--statusbarstyle", this.projectData.iOSStatusBarStyle,
+				"--frameworkversion", this.projectData.FrameworkVersion,
+				"--orientations", this.projectData.DeviceOrientations.join(";"),
+				"--assemblypaths", this.simulatorPath,
+				"--corepluginspath", this.pluginsPath,
+				"--supportedplatforms", projectTargets,
+				"--plugins", this.projectData.CorePlugins.join(";")
 			];
 
-		this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
-	}	
+			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
+		}).future<void>()();
+	}
 
 	private getPluginsDirName(serverVersion) {
 		var result;
