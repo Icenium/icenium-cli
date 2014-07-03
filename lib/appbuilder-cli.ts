@@ -10,11 +10,21 @@ import Future = require("fibers/future");
 errors.installUncaughtExceptionListener();
 
 var fiber = Fiber(() => {
-	var commandDispatcher = $injector.resolve("commandDispatcher");
+	var commandDispatcher:ICommandDispatcher = $injector.resolve("commandDispatcher");
+	commandDispatcher.setConfiguration($injector.resolve("config"));
+
+	var beforeExecuteCommandHook = (command:ICommand, commandName:string) => {
+		if (!command.disableAnalytics) {
+			var analyticsService = $injector.resolve("analyticsService");
+			analyticsService.checkConsent(commandName).wait();
+			analyticsService.trackFeature(commandName).wait();
+		}
+	}
+
 	if (process.argv[2] === "completion") {
 		commandDispatcher.completeCommand();
 	} else {
-		commandDispatcher.dispatchCommand();
+		commandDispatcher.dispatchCommand(beforeExecuteCommandHook);
 	}
 
 	$injector.dispose();
