@@ -354,11 +354,6 @@ interface IQueue<T> {
 	dequeue(): IFuture<T>;
 }
 
-interface IFutureDispatcher {
-	run(): void;
-	dispatch(action: () => IFuture<void>): void;
-}
-
 interface IAnalyticsService {
 	checkConsent(featureName: string): IFuture<void>;
 	trackFeature(featureName: string): IFuture<void>;
@@ -376,10 +371,6 @@ interface IUserSettingsService {
 	getValue(propertyName: string): IFuture<any>;
 }
 
-interface ICancellationService extends IDisposable {
-	begin(name: string): IFuture<void>;
-	end(name: string): void;
-}
 interface IServerExtensionsService {
 	prepareExtension(packageName: string): IFuture<void>;
 	getExtensionVersion(packageName: string): string;
