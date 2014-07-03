@@ -21,6 +21,8 @@ export class LoggerStub implements ILogger {
 	}
 
 	write(...args): void { }
+
+	setLoggerConfiguration(config: any, logLevel: string): void { }
 }
 
 export class FileSystemStub implements IFileSystem {
@@ -107,7 +109,7 @@ export class FileSystemStub implements IFileSystem {
 }
 
 export class ErrorsStub implements IErrors {
-	private impl: IErrors = new (require("../lib/errors").Errors)();
+	private impl: IErrors = new (require("../lib/common/errors").Errors)();
 
 	fail(formatStr:string, ...args: any[]): void;
 	fail(opts:{formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;

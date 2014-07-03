@@ -6,7 +6,6 @@ import fs = require("fs");
 import path = require("path");
 import util = require("util");
 import querystring = require("querystring");
-import log = require("./logger");
 import Future = require("fibers/future");
 
 function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {

@@ -3,9 +3,9 @@
 "use strict";
 
 import projectlib = require("./../lib/project");
-import fslib = require("./../lib/file-system");
+import fslib = require("./../lib/common/file-system");
 import projectProperties = require("../lib/services/project-properties-service");
-import yok = require("./../lib/yok");
+import yok = require("./../lib/common/yok");
 import stubs = require("./stubs");
 import fs = require("fs");
 import path = require("path");
@@ -25,7 +25,7 @@ var mockProjectNameValidator = {
 };
 
 function createTestInjector(): IInjector {
-	require("../lib/logger");
+	require("../lib/common/logger");
 
 	var testInjector = new yok.Yok();
 	testInjector.register("project", projectlib.Project);

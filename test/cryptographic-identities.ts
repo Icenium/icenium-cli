@@ -1,8 +1,8 @@
 ///<reference path="./.d.ts"/>
 "use strict";
 
-require("./../lib/extensions");
-import yok = require("./../lib/yok");
+require("./../lib/common/extensions");
+import yok = require("./../lib/common/yok");
 import stubs = require("./stubs");
 import Future = require("fibers/future");
 import util = require("util");
@@ -12,7 +12,7 @@ import commandsModule = require("./../lib/commands/cryptographic-identities");
 var assert = require("chai").assert;
 
 function createTestInjector(): IInjector {
-	require("../lib/logger");
+	require("../lib/common/logger");
 
 	var testInjector = new yok.Yok();
 	testInjector.register("injector", testInjector);

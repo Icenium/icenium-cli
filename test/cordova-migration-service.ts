@@ -5,7 +5,7 @@ import chai = require("chai");
 import fs = require("fs");
 import path = require("path");
 import stubs = require("./stubs");
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
 var assert: chai.Assert = chai.assert;
 

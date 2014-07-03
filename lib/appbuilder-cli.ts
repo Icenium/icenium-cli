@@ -8,9 +8,9 @@ import path = require("path");
 import util = require("util");
 import queue = require("./queue");
 
-require("./extensions");
+require("./common/extensions");
 require("./bootstrap");
-import errors = require("./errors");
+import errors = require("./common/errors");
 
 var options = require("./options");
 
@@ -24,6 +24,9 @@ class CommandDispatcher {
 		private $commandsService: ICommandsService) {}
 
 	public dispatchCommand() {
+
+		this.$logger.setLoggerConfiguration(this.$config, options.log);
+
 		if (options.version) {
 			this.$logger.out(this.$config.version);
 			return;

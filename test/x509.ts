@@ -2,7 +2,7 @@
 
 "use strict";
 
-import yok = require("../lib/yok");
+import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
 var assert = require("chai").assert;
 

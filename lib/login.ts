@@ -5,7 +5,6 @@
 import util = require("util");
 import path = require("path");
 import url = require("url");
-import fileSrv = require("./http-server");
 import options = require("./options");
 import querystring = require("querystring");
 import Future = require("fibers/future");
@@ -102,7 +101,8 @@ export class LoginManager implements ILoginManager {
 		private $userDataStore: IUserDataStore,
 		private $opener: IOpener,
 		private $commandsService: ICommandsService,
-		private $sharedUserSettingsFileService: IUserSettingsFileService) { }
+		private $sharedUserSettingsFileService: IUserSettingsFileService,
+		private $httpServer: IHttpServer) { }
 
 	public basicLogin(userName: string, password: string): IFuture<void> {
 		var loginData = {
@@ -212,8 +212,8 @@ export class LoginManager implements ILoginManager {
 		}).future()();
 	}
 
-	private static serveLoginFile(relPath): (request, response) => void {
-		return fileSrv.serveFile(path.join(__dirname, "../resources/login", relPath));
+	private serveLoginFile(relPath): (request, response) => void {
+		return this.$httpServer.serveFile(path.join(__dirname, "../resources/login", relPath));
 	}
 
 	private loginInBrowser(): IFuture<any> {
@@ -222,20 +222,20 @@ export class LoginManager implements ILoginManager {
 
 			this.$logger.info("Launching login page in browser.");
 
-			var localhostServer = fileSrv.createServer({
+			var localhostServer = this.$httpServer.createServer({
 				routes: {
 					"/completeLogin": (request, response) => {
 						var code = url.parse(request.url, true).query.wrap_verification_code;
 						this.$logger.debug("Verification code: '%s'", code);
 						if (code) {
-							LoginManager.serveLoginFile("end.html")(request, response);
+							this.serveLoginFile("end.html")(request, response);
 
 							this.$logger.debug("Login complete: " + request.url);
 							localhostServer.close();
 
 							authComplete.return(code);
 						} else {
-							fileSrv.redirect(response, loginUrl);
+							this.$httpServer.redirect(response, loginUrl);
 						}
 					}
 				}
