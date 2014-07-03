@@ -8,7 +8,7 @@ import path = require("path");
 import util = require("util");
 import queue = require("./queue");
 
-require("./extensions");
+require("./common/extensions");
 require("./bootstrap");
 import errors = require("./common/errors");
 

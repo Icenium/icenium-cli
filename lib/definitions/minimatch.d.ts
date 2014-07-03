@@ -1,4 +1,4 @@
-///<reference path="node.d.ts"/>
+///<reference path="../common/definitions/node.d.ts"/>
 
 declare module minimatch {
 	export interface Options {
