@@ -1,3 +1,4 @@
+require("./options");
 require("./common/bootstrap");
 require("colors");
 
@@ -5,7 +6,6 @@ $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
-$injector.require("cancellation", "./services/cancellation");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
