@@ -22,7 +22,13 @@ var fiber = Fiber(() => {
 	}
 
 	if (process.argv[2] === "completion") {
-		commandDispatcher.completeCommand();
+		var project: any = $injector.resolve("project");
+		var propSchema = undefined;
+		if(project.projectData && project.projectType) {
+			propSchema = require("./helpers").getProjectFileSchema(project.projectType).wait();
+		}
+
+		commandDispatcher.completeCommand(propSchema);
 	} else {
 		commandDispatcher.dispatchCommand(beforeExecuteCommandHook);
 	}

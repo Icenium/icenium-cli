@@ -349,11 +349,6 @@ interface IResourceDownloader {
 	downloadCordovaJsFiles(): IFuture<void>;
 }
 
-interface IQueue<T> {
-	enqueue(item: T): void;
-	dequeue(): IFuture<T>;
-}
-
 interface IAnalyticsService {
 	checkConsent(featureName: string): IFuture<void>;
 	trackFeature(featureName: string): IFuture<void>;
