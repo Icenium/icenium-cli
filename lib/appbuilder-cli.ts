@@ -30,7 +30,7 @@ var fiber = Fiber(() => {
 
 		commandDispatcher.completeCommand(propSchema);
 	} else {
-		commandDispatcher.dispatchCommand(beforeExecuteCommandHook);
+		commandDispatcher.dispatchCommand(beforeExecuteCommandHook).wait();
 	}
 
 	$injector.dispose();
