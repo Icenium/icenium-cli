@@ -7,7 +7,17 @@ import errors = require("./common/errors");
 import Fiber = require("fibers");
 import Future = require("fibers/future");
 
-errors.installUncaughtExceptionListener();
+var analyticsService = $injector.resolve("analyticsService");
+
+var action = (err: Error, callstack: string) => {
+	try {
+		analyticsService.trackException(err, callstack);
+	} catch (e) {
+		console.log("Error while reporting exception: " + e);
+	}
+};
+
+errors.installUncaughtExceptionListener(action);
 
 var fiber = Fiber(() => {
 	var commandDispatcher:ICommandDispatcher = $injector.resolve("commandDispatcher");
@@ -15,7 +25,6 @@ var fiber = Fiber(() => {
 
 	var beforeExecuteCommandHook = (command:ICommand, commandName:string) => {
 		if (!command.disableAnalytics) {
-			var analyticsService = $injector.resolve("analyticsService");
 			analyticsService.checkConsent(commandName).wait();
 			analyticsService.trackFeature(commandName).wait();
 		}
