@@ -13,8 +13,7 @@ import MobileHelper = require("./mobile/mobile-helper");
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
 	public projectData: IProjectData;
-	private static PROJECT_FILE_ = ".abproject";
-	public PROJECT_FILE = Project.PROJECT_FILE_;
+	public PROJECT_FILE = ".abproject";
 
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
@@ -69,6 +68,30 @@ export class Project implements Project.IProject {
 
 	public get capabilities(): IProjectCapabilities {
 		return this.projectCapabilities[this.projectData.Framework];
+	}
+
+	public get projectTargets(): IFuture<string[]> {
+		return (() => {
+			var result: string[] = [], dir: string, fileMask: RegExp;
+
+			if (this.projectType === this.$projectTypes.Cordova) {
+				dir = this.getProjectDir();
+				fileMask = /^cordova\.(\w*)\.js$/i;
+			} else { // NativeScript
+				dir = path.join(this.getProjectDir(), "app");
+				fileMask = /^bootstrap\.(\w*)\.js$/i;
+			}
+
+			var files = this.$fs.readDirectory(dir).wait();
+			var platformFiles = _.each(files, (file) => {
+				var matches = file.match(fileMask);
+				if (matches) {
+					result.push(matches[1]);
+				}
+			});
+
+			return result;
+		}).future<string[]>()();
 	}
 
 	public getProjectDir(): string {
