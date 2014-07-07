@@ -1,20 +1,15 @@
-global._ = require("underscore");
-global.$injector = require("./common/yok").injector;
+require("./options");
+require("./common/bootstrap");
 require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
-$injector.require("errors", "./common/errors");
-$injector.require("fs", "./common/file-system");
-$injector.require("cancellation", "./services/cancellation");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("childProcess", "./child-process");
-$injector.require("logger", "./common/logger");
-$injector.require("commandsService", "./commands-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
@@ -129,6 +124,5 @@ $injector.require("clientUserSettingsFileService", "./services/user-settings-ser
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsFileService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
-$injector.require("futureDispatcher", "./appbuilder-cli");
 
 $injector.require("pathFilteringService", "./services/path-filtering");
