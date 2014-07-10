@@ -19,10 +19,6 @@ export class DebugCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			if(helpers.isDarwin()) {
-				throw new Error("In this version of the Telerik AppBuilder CLI, you can debug your apps only on Windows systems. The application debugger will become available for OS X in a future release of Telerik AppBuilder.");
-			}
-
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
@@ -118,9 +114,8 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 }
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
+	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Debugger.Mac.Package";
 	private static EXECUTABLE_NAME_OSX = "AppBuilder Debugger.app";
-	private static UNIX_EXECUTABLE_FILE_PATH = "Contents/MacOS/Appbuilder Debugger";
 
 	constructor(private $childProcess: IChildProcess,
 		$errors: IErrors,
@@ -138,10 +133,11 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		this.startWatchingUserSettingsFile();
 
-		var debuggerPath = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX, DarwinDebuggerPlatformServices.UNIX_EXECUTABLE_FILE_PATH);
-		var childProcess = this.$childProcess.spawn(debuggerPath, applicationParams);
-
-		this.waitDebuggerExit(childProcess);
+		var debuggerBinary = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX);
+		var commandLine = [debuggerBinary, '--args'].concat(applicationParams);
+		var childProcess = this.$childProcess.spawn('open', commandLine,
+			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
+		childProcess.unref();
 	}
 }
 
