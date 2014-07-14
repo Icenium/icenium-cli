@@ -308,18 +308,6 @@ export class Project implements Project.IProject {
 				template = options.template || this.defaultProjectForType[projectType],
 				templateFileName;
 
-			if (projectType === this.$projectTypes.Cordova && template.toLowerCase() === "kendouidataviz") {
-				this.$loginManager.ensureLoggedIn().wait();
-				var user = this.$userDataStore.getUser().wait();
-				if (!user.tenant.features["Kendo UI DataViz"]) {
-					this.$errors.fail("You cannot create Kendo UI DataViz projects " +
-						"with your current subscription plan. To use this feature, " +
-						"upgrade your subscription plan to Business or greater, " +
-						"or contact the account owner.\n" +
-						"http://www.telerik.com/purchase/platform");
-				}
-			}
-
 			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(projectType, template));
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if (this.$fs.exists(templateFileName).wait()) {
