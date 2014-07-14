@@ -106,6 +106,10 @@ export class FileSystemStub implements IFileSystem {
 	getFsStats(path: string): IFuture<IFsStats> {
 		return undefined;
 	}
+
+	isEmptyDir(directoryPath: string): IFuture<boolean> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {

@@ -211,11 +211,6 @@ interface IOpener {
 	open(filename: string): void;
 }
 
-interface IChildProcess {
-	exec(command: string): IFuture<any>;
-	spawn(command: string, args?: string[], options?: any): any;
-}
-
 interface IProjectData {
 	ProjectName: string;
 	ProjectGuid: string;
