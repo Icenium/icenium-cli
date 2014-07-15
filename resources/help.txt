@@ -445,8 +445,6 @@ Usage:
 
 Shows the debug tools to let you debug applications on connected devices.
 
-In this version of the Telerik AppBuilder CLI, you can debug your apps only on Windows systems. The application debugger will become available for OS X in a future release of Telerik AppBuilder.
-
 --[/]--
 
 --[cloud]--

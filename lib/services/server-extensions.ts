@@ -6,7 +6,7 @@ import options = require("../options");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 
-export class ServerExtensionsService implements IServerExtensionsService{
+export class ServerExtensionsService implements IServerExtensionsService {
 	private extensionVersions = {};
 
 	constructor(private $logger: ILogger,
@@ -16,7 +16,7 @@ export class ServerExtensionsService implements IServerExtensionsService{
 		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer) {
 			if (this.$fs.exists(this.versionsFile).wait()) {
-				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait();
+				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 			}
 	}
 
@@ -65,7 +65,7 @@ export class ServerExtensionsService implements IServerExtensionsService{
 		return path.join(this.cacheDir, "extension-versions.json");
 	}
 
-	private saveVersionsFile() : IFuture<void>{
+	private saveVersionsFile() : IFuture<void> {
 		return this.$fs.writeJson(this.versionsFile, this.extensionVersions);
 	}
 
