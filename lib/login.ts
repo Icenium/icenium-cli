@@ -12,20 +12,27 @@ import Future = require("fibers/future");
 import helpers = require("./helpers");
 
 export class UserDataStore implements IUserDataStore {
-	private cookie: string;
+	private cookies: IStringDictionary;
 	private user: any;
 
-	constructor(private $fs: IFileSystem) {
-	}
+	constructor(private $fs: IFileSystem,
+		private $logger: ILogger) {}
 
 	public hasCookie(): IFuture<boolean> {
-		return this.checkCookieExists(UserDataStore.getCookieFilePath(), () => this.cookie);
+		return (() => {
+			try {
+				this.getCookies().wait();
+				return true;
+			} catch (err) {
+				return false;
+			}
+		}).future<boolean>()();
 	}
 
-	public getCookie(): IFuture<string> {
+	public getCookies(): IFuture<IStringDictionary> {
 		return this.readAndCache(UserDataStore.getCookieFilePath(),
-			() => this.cookie,
-			(value: string) => this.cookie = value);
+			() => this.cookies,
+			(value: string) => this.cookies = JSON.parse(value));
 	}
 
 	public getUser(): IFuture<any> {
@@ -34,10 +41,10 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.user = JSON.parse(value));
 	}
 
-	public setCookie(cookie?: string): IFuture<void> {
-		this.cookie = cookie;
-		if (cookie) {
-			return this.$fs.writeFile(UserDataStore.getCookieFilePath(), cookie);
+	public setCookies(cookies?: IStringDictionary): IFuture<void> {
+		this.cookies = cookies;
+		if (this.cookies) {
+			return this.$fs.writeFile(UserDataStore.getCookieFilePath(), JSON.stringify(this.cookies));
 		} else {
 			return this.$fs.deleteFile(UserDataStore.getCookieFilePath());
 		}
@@ -54,7 +61,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public clearLoginData(): IFuture<void> {
 		return (() => {
-			this.setCookie(null).wait();
+			this.setCookies(null).wait();
 			this.setUser(null).wait();
 		}).future<void>()();
 	}
@@ -72,7 +79,15 @@ export class UserDataStore implements IUserDataStore {
 					throw new Error("Not logged in.");
 				}
 
-				setter(this.$fs.readText(sourceFile).wait());
+				var contents = this.$fs.readText(sourceFile).wait();
+				try {
+					setter(contents);
+				} catch (err) {
+					this.$logger.debug("Error while reading user data file '%s':\n%s\n\nContents:\n%s",
+						sourceFile, err.toString(), contents);
+					this.clearLoginData().wait();
+					throw new Error("Not logged in.");
+				}
 			}
 
 			return getter();
@@ -94,24 +109,12 @@ export class LoginManager implements ILoginManager {
 
 	constructor(private $logger: ILogger,
 		private $config: IConfiguration,
-		private $serverConfiguration: IServerConfiguration,
-		private $httpClient: Server.IHttpClient,
-		private $server: Server.IServer,
-		private $serviceProxy: Server.IServiceProxy,
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
 		private $opener: IOpener,
+		private $server: Server.IServer,
 		private $commandsService: ICommandsService,
 		private $sharedUserSettingsFileService: IUserSettingsFileService) { }
-
-	public basicLogin(userName: string, password: string): IFuture<void> {
-		var loginData = {
-			wrap_username: userName,
-			wrap_password: password
-		};
-
-		return this.authenticateWithUsername(loginData);
-	}
 
 	public logout(): IFuture<void> {
 		return (() => {
@@ -156,63 +159,7 @@ export class LoginManager implements ILoginManager {
 		}).future<void>()();
 	}
 
-	private authenticateWithUsername(loginData: any): IFuture<any> {
-		return ((): any => {
-			loginData.wrap_client_id = this.$config.WRAP_CLIENT_ID;
-
-			var wrapResponse = this.$httpClient.httpRequest({
-				proto: "https",
-				host: this.$serverConfiguration.tfisServer.wait(),
-				path: "/Authenticate/WRAPv0.9",
-				method: "POST",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
-				},
-				body: querystring.stringify(loginData),
-				rejectUnauthorized: false
-			}).wait();
-
-			var wrapData = querystring.parse(wrapResponse.body),
-				wrap_access_token = wrapData.wrap_access_token,
-				wrap_refresh_token = wrapData.wrap_refresh_token;
-
-			try {
-				this.$serviceProxy.setShouldAuthenticate(false);
-				var userData = this.$server.authentication.login(wrap_access_token).wait();
-			} finally {
-				this.$serviceProxy.setShouldAuthenticate(true);
-			}
-
-			if (userData) {
-				this.$userDataStore.setUser(userData).wait();
-			} else {
-				throw new Error("Login failed.");
-			}
-
-			return userData;
-		}).future()();
-	}
-
-	private authenticate(code: string): IFuture<any> {
-		return ((): any => {
-			try {
-				this.$serviceProxy.setShouldAuthenticate(false);
-				var userData = this.$server.authentication.loginWithCode(code).wait();
-			} finally {
-				this.$serviceProxy.setShouldAuthenticate(true);
-			}
-
-			if (userData) {
-				this.$userDataStore.setUser(userData).wait();
-			} else {
-				throw new Error("Login failed.");
-			}
-
-			return userData;
-		}).future()();
-	}
-
-	private static serveLoginFile(relPath): (request, response) => void {
+	private serveLoginFile(relPath): (request, response) => void {
 		return fileSrv.serveFile(path.join(__dirname, "../resources/login", relPath));
 	}
 
@@ -224,16 +171,16 @@ export class LoginManager implements ILoginManager {
 
 			var localhostServer = fileSrv.createServer({
 				routes: {
-					"/completeLogin": (request, response) => {
-						var code = url.parse(request.url, true).query.wrap_verification_code;
-						this.$logger.debug("Verification code: '%s'", code);
-						if (code) {
-							LoginManager.serveLoginFile("end.html")(request, response);
+					"/": (request, response) => {
+						this.$logger.debug("Login complete: " + request.url);
+						var parsedUrl = url.parse(request.url, true);
+						var cookieData = parsedUrl.query.cookies;
+						if (cookieData) {
+							this.serveLoginFile("end.html")(request, response);
 
-							this.$logger.debug("Login complete: " + request.url);
 							localhostServer.close();
 
-							authComplete.return(code);
+							authComplete.return(cookieData);
 						} else {
 							fileSrv.redirect(response, loginUrl);
 						}
@@ -245,14 +192,7 @@ export class LoginManager implements ILoginManager {
 			this.$fs.futureFromEvent(localhostServer, "listening").wait();
 
 			var port = localhostServer.address().port;
-
-			var queryParams = {
-				wrap_client_id: this.$config.WRAP_CLIENT_ID,
-				wrap_callback: util.format("http://localhost:%s/completeLogin", port)
-			};
-			var loginUrl = util.format("https://%s/Authenticate/WRAPv0.9?%s",
-				this.$serverConfiguration.tfisServer.wait(),
-				querystring.stringify(queryParams));
+			var loginUrl = util.format("%s://%s/Mist/ClientLogin?port=%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
 
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
@@ -274,15 +214,23 @@ export class LoginManager implements ILoginManager {
 				}
 			}
 
-			var code = authComplete.wait();
+			var cookieData = authComplete.wait();
 			if(timeoutID !== undefined) {
 				clearTimeout(timeoutID);
 			}
-			return this.authenticate(code).wait();
+
+			var cookies = JSON.parse(cookieData);
+			this.$userDataStore.setCookies(cookies).wait();
+
+			var userData = this.$server.authentication.getLoggedInUser().wait();
+			this.$userDataStore.setUser(userData).wait();
+
+			return userData;
 		}).future()();
 	}
+
 }
 $injector.register("loginManager", LoginManager);
+
 helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login(), {disableAnalytics: true});
 helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout(), {disableAnalytics: true});
-helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.basicLogin(args[0], args[1]), {disableAnalytics: true});

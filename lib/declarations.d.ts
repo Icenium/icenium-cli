@@ -2,6 +2,10 @@ interface IDisposable {
 	dispose(): void;
 }
 
+interface IStringDictionary {
+	[key: string]: string;
+}
+
 declare module Server {
 	interface IResponse {
 		response: any;
@@ -18,7 +22,6 @@ declare module Server {
 
 	interface IServiceProxy {
 		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream): IFuture<T>;
-		getLastRequestCookies(): any;
 		setShouldAuthenticate(shouldAuthenticate: boolean): void;
 		setSolutionSpaceName(solutionSpaceName: string): void;
 	}
@@ -69,15 +72,14 @@ declare module Server {
 
 interface IUserDataStore {
 	hasCookie(): IFuture<boolean>;
-	getCookie(): IFuture<string>;
+	getCookies(): IFuture<IStringDictionary>;
 	getUser(): IFuture<any>;
-	setCookie(cookie: string): IFuture<void>;
-	setUser(user: any): IFuture<void>;
+	setCookies(cookies?: IStringDictionary): IFuture<void>;
+	setUser(user?: any): IFuture<void>;
 	clearLoginData(): IFuture<void>;
 }
 
 interface ILoginManager {
-	basicLogin(userName: string, password: string): IFuture<void>;
 	login(): IFuture<void>;
 	logout(): IFuture<void>;
 	isLoggedIn(): IFuture<boolean>;

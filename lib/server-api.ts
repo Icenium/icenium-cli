@@ -44,10 +44,6 @@ export class AuthenticationService implements Server.IAuthenticationServiceContr
 		return this.$serviceProxy.call<any>('Login', 'POST', '/authentication', 'application/json', [{name: 'simpleWebToken', value: JSON.stringify(simpleWebToken), contentType: 'application/json'}], null);
 	}
 
-	loginWithCode(code: any): IFuture<any> {
-		return this.$serviceProxy.call<any>('LoginWithCode', 'POST', '/authentication/login', 'application/json', [{name: 'code', value: JSON.stringify(code), contentType: 'application/json'}], null);
-	}
-
 	logout(): IFuture<void> {
 		return this.$serviceProxy.call<void>('Logout', 'LOGOUT', '/authentication', null, null, null);
 	}
@@ -164,8 +160,8 @@ export class EverliveService implements Server.IEverliveServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
 
-	getAccessToken(): IFuture<any> {
-		return this.$serviceProxy.call<any>('GetAccessToken', 'GET', '/everlive/accessToken', 'application/json', null, null);
+	getAuthorizationHeader(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetAuthorizationHeader', 'GET', '/everlive/authorizationHeader', 'application/json', null, null);
 	}
 
 	getEverliveApplications(accountId: string): IFuture<any> {

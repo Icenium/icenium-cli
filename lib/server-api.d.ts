@@ -13,7 +13,6 @@ declare module Server {
 		getLoggedInUser(): IFuture<any>;
 		getTenants(): IFuture<any>;
 		login(simpleWebToken: any): IFuture<any>;
-		loginWithCode(code: any): IFuture<any>;
 		logout(): IFuture<void>;
 		setActiveTenant(tenantId: string): IFuture<any>;
 	}
@@ -49,7 +48,7 @@ declare module Server {
 	}
 
 	interface IEverliveServiceContract {
-		getAccessToken(): IFuture<any>;
+		getAuthorizationHeader(): IFuture<any>;
 		getEverliveApplications(accountId: string): IFuture<any>;
 	}
 

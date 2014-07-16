@@ -228,7 +228,6 @@ $injector.register("httpClient", HttpClient);
 
 export class ServiceProxy implements Server.IServiceProxy {
 	private latestVersion: string = null;
-	private lastCallCookies: any;
 	private shouldAuthenticate: boolean = true;
 	private solutionSpaceName: string;
 
@@ -248,7 +247,11 @@ export class ServiceProxy implements Server.IServiceProxy {
 			};
 
 			if (this.shouldAuthenticate) {
-				headers.Cookie = ".ASPXAUTH=" + this.$userDataStore.getCookie().wait();
+				var cookies = this.$userDataStore.getCookies().wait();
+				if (cookies) {
+					var cookieValues = _.map(_.pairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
+					headers.Cookie = cookieValues.join("; ");
+				}
 			}
 
 			if (accept) {
@@ -287,30 +290,20 @@ export class ServiceProxy implements Server.IServiceProxy {
 			var newCookies = response.headers["set-cookie"];
 
 			if (newCookies) {
-				this.lastCallCookies = {};
+				cookies = cookies || {};
 				newCookies.forEach((cookieStr: string) => {
 					var parsed = cookielib.parse(cookieStr);
-					Object.keys(parsed).forEach((key) => this.lastCallCookies[key] = parsed[key]);
+					Object.keys(parsed).forEach((key) => {
+						this.$logger.debug("Stored cookie %s=%s", key, parsed[key]);
+						cookies[key] = parsed[key];
+					});
 				});
+				this.$userDataStore.setCookies(cookies).wait();
 			}
 
 			var resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
-
-			if (this.lastCallCookies) {
-				var abAuthCookie = this.lastCallCookies['.ASPXAUTH'];
-				if (abAuthCookie) {
-					this.$logger.debug("Cookie is '%s'", abAuthCookie);
-					this.$userDataStore.setCookie(abAuthCookie).wait();
-				}
-			}
-
 			return resultValue;
-
 		}).future()();
-	}
-
-	public getLastRequestCookies(): any {
-		return this.lastCallCookies;
 	}
 
 	public setShouldAuthenticate(shouldAuthenticate: boolean): void {
