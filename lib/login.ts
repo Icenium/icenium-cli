@@ -120,18 +120,26 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			this.$logger.info("Logging out...");
 
-			this.$userDataStore.clearLoginData().wait();
+			this.localLogout().wait();
 
-			this.$sharedUserSettingsFileService.deleteUserSettingsFile().wait();
+			var logoutUrl = util.format("%s://%s/Mist/Logout", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			this.$logger.debug("Logout URL is '%s'", logoutUrl);
+			this.$opener.open(logoutUrl);
 
 			this.$logger.info("Logout completed.");
 		}).future<void>()();
 	}
 
+	private localLogout(): IFuture<void> {
+		return (() => {
+			this.$userDataStore.clearLoginData().wait();
+			this.$sharedUserSettingsFileService.deleteUserSettingsFile().wait();
+		}).future<void>()();
+	}
+
 	public login(): IFuture<void> {
 		return (() => {
-			this.logout().wait();
-
+			this.localLogout().wait();
 			this.doLogin().wait();
 		}).future<void>()();
 	}
