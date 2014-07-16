@@ -13,24 +13,25 @@ testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
 
 class MockUserDataStore implements IUserDataStore {
-
 	hasCookie(): IFuture<boolean> {
 		return Future.fromResult(false);
 	}
 
-	getCookie():IFuture<string> {
-		return (() => "dummy").future<string>()();
+	getCookies(): IFuture<IStringDictionary> {
+		return (() => {
+			return {"tlrkappshell": "dummy"};
+		}).future<IStringDictionary>()();
 	}
 
 	getUser():IFuture<any> {
 		return undefined;
 	}
 
-	setCookie(cookie:string):IFuture<void> {
+	setCookies(cookies?: IStringDictionary): IFuture<void> {
 		return undefined;
 	}
 
-	setUser(user):IFuture<void> {
+	setUser(user?: any): IFuture<void> {
 		return undefined;
 	}
 
@@ -88,7 +89,7 @@ describe("ServiceProxy", () => {
 		assert.notOk(result);
 
 		assert.ok(httpClient.options.headers["X-Icenium-SolutionSpace"]);
-		assert.equal(httpClient.options.headers.Cookie, ".ASPXAUTH=dummy");
+		assert.equal(httpClient.options.headers.Cookie, "tlrkappshell=dummy");
 	});
 
 	it("calls api and returns JSON", () => {
