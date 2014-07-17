@@ -321,9 +321,5 @@
 				"input": "720p"
 			}
 		}
-	},
-	"IsRunnable" : {
-		"description": "Indicates that the project is runnable in Visual Studio",
-		"range": [ "true" ]
 	}
 }
