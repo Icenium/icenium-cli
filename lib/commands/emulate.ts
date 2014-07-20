@@ -7,9 +7,9 @@ import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
 import osenv = require("osenv");
 import helpers = require("../helpers");
-import hostInfo = require("../host-info");
-import MobileHelper = require("../mobile/mobile-helper");
-import constants = require("../mobile/constants");
+import hostInfo = require("../common/host-info");
+import MobileHelper = require("../common/mobile/mobile-helper");
+import constants = require("../common/mobile/constants");
 
 class AndroidPlatformServices implements IEmulatorPlatformServices {
 	constructor(private $logger: ILogger

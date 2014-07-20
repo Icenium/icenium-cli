@@ -4,7 +4,7 @@
 import util = require("util");
 import path = require("path");
 import helpers = require("../common/helpers");
-import MobileHelper = require("../mobile/mobile-helper");
+import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class PlatformMigrationService implements Project.IPlatformMigrator {
 	constructor(private $fs: IFileSystem,

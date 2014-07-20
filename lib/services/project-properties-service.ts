@@ -6,7 +6,7 @@ import xml2js = require("xml2js");
 import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import MobileHelper = require("../mobile/mobile-helper");
+import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	constructor(private $fs: IFileSystem,

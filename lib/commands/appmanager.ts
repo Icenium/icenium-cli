@@ -1,8 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import MobileHelper = require("../mobile/mobile-helper");
-import constants = require("../mobile/constants");
+import MobileHelper = require("../common/mobile/mobile-helper");
+import constants = require("../common/mobile/constants");
 import util = require("util");
 
 class AppManagerUploadCommand implements ICommand {

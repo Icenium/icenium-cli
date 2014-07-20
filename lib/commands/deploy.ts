@@ -2,7 +2,7 @@
 
 import options = require("./../options");
 import util = require("util");
-import MobileHelper = require("./../mobile/mobile-helper");
+import MobileHelper = require("./../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import iOSDeploymentValidatorLib = require("./../validators/ios-deployment-validator");
 
