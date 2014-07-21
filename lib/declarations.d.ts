@@ -2,6 +2,10 @@ interface IStringDictionary {
 	[key: string]: string;
 }
 
+interface IStringDictionary {
+	[key: string]: string;
+}
+
 declare module Server {
 
 	interface IRequestBodyElement {
