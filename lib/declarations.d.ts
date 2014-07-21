@@ -3,7 +3,6 @@ interface IStringDictionary {
 }
 
 declare module Server {
-
 	interface IRequestBodyElement {
 		name: string;
 		value: any;
