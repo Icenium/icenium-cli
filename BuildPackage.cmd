@@ -5,6 +5,8 @@ set APPBUILDER_SKIP_POSTINSTALL_TASKS=1
 call npm.cmd install
 set APPBUILDER_SKIP_POSTINSTALL_TASKS=
 
+call npm.cmd dedupe
+
 call grunt.cmd pack --no-color
 
 call npm.cmd cache rm appbuilder
