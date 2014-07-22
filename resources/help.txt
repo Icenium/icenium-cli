@@ -378,8 +378,12 @@ Platform-specific usages:
     $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
     $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
 
-Builds the project for the selected platform and deploys it to connected devices. In this version of the Telerik AppBuilder CLI,
-you cannot build and deploy to Windows Phone 8 connected devices.
+Builds the project for the selected platform and deploys it to connected devices. 
+
+In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone 8 connected devices. 
+
+In this version of the Telerik AppBuilder CLI, you cannot build and deploy to iOS connected devices on Linux systems.
+
 <Device ID> is the device index or identifier as listed by run $ appbuilder device.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
@@ -433,6 +437,8 @@ Usage:
     $ appbuilder simulate [--path <Directory>]
 Runs the current project in the device simulator.
 
+In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux systems.
+
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
                     for in the current directory and all directories above it.
@@ -444,6 +450,8 @@ Usage:
     $ appbuilder debug
 
 Shows the debug tools to let you debug applications on connected devices.
+
+In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux systems.
 
 --[/]--
 

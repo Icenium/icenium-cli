@@ -70,6 +70,29 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 > In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line.
 
+#### Linux Systems
+
+**Minimum Software Requirements** 
+
+* Ubuntu 14.04 LTS
+* Node.js 0.10.22 or later
+
+> The {{site.ab-cli}} is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the {{site.ab-cli}} on other Linux distributions.
+
+> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
+
+**Additional Software Requirements for iOS On-Device Deployment**
+
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync on connected iOS devices from the command line. You need to manually deploy the application package using iTunes.
+
+**Additional Software Requirements for Android On-Device Deployment**
+
+* Device drivers required by your system to recognize the connected Android device
+
+**Additional Software Requirements for Windows Phone 8 On-Device Deployment**
+
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line.
+
 ### Install the Telerik AppBuilder CLI
 
 The Telerik AppBuilder CLI is available for installing as an npm package.
@@ -111,7 +134,7 @@ To create a new hybrid project from the default template, navigate to an empty d
 $ appbuilder create hybrid MyApp
 ```
 
-The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI Mobile template.
+The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI TabStrip template.
 
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
@@ -128,6 +151,8 @@ To load your newly created project in the simulator, navigate to the folder cont
 ```bash
 $ appbuilder simulate
 ```
+
+> In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux systems.
 
 The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can adjust the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
 
@@ -210,26 +235,30 @@ Release date: 2014, July 29
 To see a complete list of the available commands, click <a href="https://github.com/Icenium/icenium-cli/blob/release/resources/help.txt" target="_blank">here</a> or run `$ appbuilder help` in the command prompt.
 
 * You can develop your hybrid mobile locally and with limited Internet connectivity. 
-* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite development tools on Windows or OS X.
+* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite development tools on Windows, OS X, or Linux.
 * You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 or Sublime Text 3 to build and deploy apps straight from Sublime Text.
 * You can log in and log out of the Telerik Platform. 
 * You can view your current login and subscription information.
-* You can create new projects from the *Blank (JavaScript)*, *Blank (TypeScript)* *jQuery Mobile*, *Telerik Friends*, *Kendo UI mobile app*, and *Kendo UI mobile app with data visualization* templates.
+* You can create new projects from the *Blank (JavaScript)*, *Blank (TypeScript)*, *Telerik Friends*, *Kendo UI Blank*, *Kendo UI Drawer*, and *Kendo UI TabStrip* templates.
 * You can create new projects by initializing any existing projects stored locally on your system. For example, you can initialize local copies of projects created with the AppBuilder clients or third-party tools.
-* You can export your existing projects from your {{tp}} account and automatically initialize them for development.
+* You can export your existing projects from your Telerik Platform account and automatically initialize them for development.
 * You can clone the Telerik AppBuilder sample apps. 
 * You can target Apache Cordova 3.0.0, Apache Cordova 3.2.0, or Apache Cordova 3.5.0.
 * You can migrate between the supported Apache Cordova versions.
 * You can enable and disable the Apache Cordova core and integrated plugins.
 * You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
-* You can list connected iOS and Android devices.
-* You can view the device log for connected devices.
+* You can list connected iOS and Android devices on Windows and OS X systems.
+* You can list connected Android devices on Linux systems.
+* You can view the device log for connected iOS and Android devices on Windows and OS X systems.
+* You can view the device log for connected Android devices on Linux systems.
 * You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code.
 * You can build applications for iOS, Android, and Windows Phone 8 and download the application package. You can manually deploy the application package on devices. 
-* You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
+* You can build applications for iOS and Android and deploy them via cable connection on connected devices on Windows and OS X systems.
+* You can build applications for Android and deploy them via cable connection on connected devices on Linux systems.
 * You can load iOS and Android applications in the AppBuilder companion app.
 * You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
-* You can push changes via cable connection to connected devices.
+* You can push changes via cable connection to connected iOS and Android devices on Windows and OS X systems.
+* You can push changes via cable connection to connected Android devices on Linux systems.
 * You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
 * You can upload your iOS application packages to iTunes Connect.
 * You can run your apps in the device simulator on Windows systems.
@@ -249,9 +278,16 @@ To see a complete list of the available commands, click <a href="https://github.
 The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
 
 * You cannot switch your Telerik Platform account.
+* You cannot list connected iOS devices on Linux systems.
+* You cannot view the device log for connected iOS devices on Linux systems.
+* You cannot build applications for iOS and deploy them via cable connection on connected devices on Linux systems.
+* You cannot push changes via cable connection to connected iOS devices on Linux systems.
 * You cannot deploy your apps on connected Windows Phone 8 devices.
 * You cannot load your Windows Phone 8 apps in the companion app.
-* You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
+* You cannot run your apps in the device simulator on Linux systems.
+* You cannot debug your code with the built-in debug tools in the device simulator on Linux systems.
+* You cannot debug your iOS and Android apps while running on connected iOS and Android devices on Linux systems.
+* You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Core or Kendo UI Professional apps.
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
 
