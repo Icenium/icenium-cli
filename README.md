@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.3.1  
-Release date: 2014, July 17 
+Latest version: Telerik AppBuilder 2.4  
+Release date: 2014, July 29 
 
-> AppBuilder 2.3.1 is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.4, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-4" target="_blank">Telerik AppBuilder 2.4 Release Notes</a>.
 
 ### System Requirements
 
@@ -200,10 +200,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.3.1  
-Release date: 2014, July 17 
+Latest version: Telerik AppBuilder 2.4  
+Release date: 2014, July 29 
 
-> AppBuilder 2.3.1 is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.4, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-4" target="_blank">Telerik AppBuilder 2.4 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -237,6 +237,7 @@ To see a complete list of the available commands, click <a href="https://github.
 * You can debug your code with the built-in debug tools in the device simulator on Windows systems.
 * You can debug your code with the built-in debug tools in the device simulator on OS X systems.
 * You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
+* You can debug your iOS and Android apps while running on connected iOS and Android devices on OS X systems.
 * You can manage certificates and provisioning profiles for code signing iOS apps.
 * You can manage certificates for code signing Android apps.
 * You can configure the project properties for your project.
@@ -250,7 +251,6 @@ The following Telerik AppBuilder features are not available in the current relea
 * You cannot switch your Telerik Platform account.
 * You cannot deploy your apps on connected Windows Phone 8 devices.
 * You cannot load your Windows Phone 8 apps in the companion app.
-* You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
 * You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
