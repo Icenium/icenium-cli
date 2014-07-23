@@ -19,7 +19,7 @@ export class UserStatusCommand implements ICommand {
 			};
 
 			if (user.tenant) {
-				fields["License"] = util.format("Telerik AppBuilder %s Edition (%s)", user.tenant.edition, user.tenant.license);
+				fields["License"] = util.format("Telerik %s Edition (%s)", user.tenant.name, user.tenant.license);
 				var expires = new Date(Date.parse(user.tenant.expSoft));
 				fields["License expires"] = expires.toLocaleDateString();
 				fields["Licensed by"] = user.tenant.name;
