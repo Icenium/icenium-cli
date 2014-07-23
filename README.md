@@ -3,7 +3,7 @@ Command-Line Interface for Telerik AppBuilder
 
 *Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
-[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/ab-24/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
@@ -234,65 +234,69 @@ Release date: 2014, July 29
 
 To see a complete list of the available commands, click <a href="https://github.com/Icenium/icenium-cli/blob/release/resources/help.txt" target="_blank">here</a> or run `$ appbuilder help` in the command prompt.
 
-* You can develop your hybrid mobile locally and with limited Internet connectivity. 
-* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite development tools on Windows, OS X, or Linux.
-* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 or Sublime Text 3 to build and deploy apps straight from Sublime Text.
-* You can log in and log out of the Telerik Platform. 
-* You can view your current login and subscription information.
-* You can create new projects from the *Blank (JavaScript)*, *Blank (TypeScript)*, *Telerik Friends*, *Kendo UI Blank*, *Kendo UI Drawer*, and *Kendo UI TabStrip* templates.
-* You can create new projects by initializing any existing projects stored locally on your system. For example, you can initialize local copies of projects created with the AppBuilder clients or third-party tools.
-* You can export your existing projects from your Telerik Platform account and automatically initialize them for development.
-* You can clone the Telerik AppBuilder sample apps. 
-* You can target Apache Cordova 3.0.0, Apache Cordova 3.2.0, or Apache Cordova 3.5.0.
-* You can migrate between the supported Apache Cordova versions.
-* You can enable and disable the Apache Cordova core and integrated plugins.
-* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
-* You can list connected iOS and Android devices on Windows and OS X systems.
-* You can list connected Android devices on Linux systems.
-* You can view the device log for connected iOS and Android devices on Windows and OS X systems.
-* You can view the device log for connected Android devices on Linux systems.
-* You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code.
-* You can build applications for iOS, Android, and Windows Phone 8 and download the application package. You can manually deploy the application package on devices. 
-* You can build applications for iOS and Android and deploy them via cable connection on connected devices on Windows and OS X systems.
-* You can build applications for Android and deploy them via cable connection on connected devices on Linux systems.
-* You can load iOS and Android applications in the AppBuilder companion app.
-* You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
-* You can push changes via cable connection to connected iOS and Android devices on Windows and OS X systems.
-* You can push changes via cable connection to connected Android devices on Linux systems.
-* You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
-* You can upload your iOS application packages to iTunes Connect.
-* You can run your apps in the device simulator on Windows systems.
-* You can run your apps in the device simulator on OS X systems.
-* You can debug your code with the built-in debug tools in the device simulator on Windows systems.
-* You can debug your code with the built-in debug tools in the device simulator on OS X systems.
-* You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
-* You can debug your iOS and Android apps while running on connected iOS and Android devices on OS X systems.
-* You can manage certificates and provisioning profiles for code signing iOS apps.
-* You can manage certificates for code signing Android apps.
-* You can configure the project properties for your project.
-* You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
-* You can edit the `.abignore` file to exclude files and folders from the build process. You need to manually add `.abignore` to your project.
+Platform | Operation | Windows | OS&nbsp;X | Linux
+---------|-----------|---------|------|------
+**Cross-platform** | Develop hybrid mobile apps locally | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop hybrid mobile apps with third-party tools | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop hybrid mobile apps with Sublime Text | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Log in and out of the Telerik Platform | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Switch {{site.ab}} accounts | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Create projects from the project templates | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Clone the sample apps | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Export existing projects from your {{site.tp}} account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop with {{site.ac}} 3.0.0 or later | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Migrate between supported {{site.ac}} versions | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Enable and disable the core {{site.ac}} plugins | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Enable and disable the integrate {{site.ac}} plugins | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Fetch custom {{site.ac}} plugins from the {{site.ac}} Plugin Registry | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Manage code signing identities | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Configure project properties | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Edit configuration files | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Edit `.abignore` to exclude files and folders from the build process<br/>(You need to add `.abingore` to your projects manually.) | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Design user interfaces with the {{site.ui-tool}} | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+**iOS**  | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> 
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in the App Store | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Upload application packages to iTunes Connect | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+**Android** | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in Google Play | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+**Windows Phone 8** | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in the Windows Phone Store | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
 
-#### What you cannot do with this version of the Telerik AppBuilder CLI
+The following Telerik AppBuilder features are not applicable to the {{site.ab-cli}} and will not become available in a future release.
 
-The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
-
-* You cannot switch your Telerik Platform account.
-* You cannot list connected iOS devices on Linux systems.
-* You cannot view the device log for connected iOS devices on Linux systems.
-* You cannot build applications for iOS and deploy them via cable connection on connected devices on Linux systems.
-* You cannot push changes via cable connection to connected iOS devices on Linux systems.
-* You cannot deploy your apps on connected Windows Phone 8 devices.
-* You cannot load your Windows Phone 8 apps in the companion app.
-* You cannot run your apps in the device simulator on Linux systems.
-* You cannot debug your code with the built-in debug tools in the device simulator on Linux systems.
-* You cannot debug your iOS and Android apps while running on connected iOS and Android devices on Linux systems.
-* You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Core or Kendo UI Professional apps.
-
-The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
-
-* You cannot use the Data Navigator to review your Telerik Backend Services projects and their resources.
-* You cannot use the AppBuilder version control and storage cloud services.
+* You cannot use the **Data Navigator** to review your {{site.bes}} projects and their resources.
+* You cannot use the {{site.ab}} version control and storage cloud services.
 
 [Back to Top][1]
 
