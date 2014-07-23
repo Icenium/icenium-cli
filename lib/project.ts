@@ -375,7 +375,7 @@ export class Project implements Project.IProject {
 			this.cachedProjectDir = projectDir;
 			this.projectData = this.$fs.readJson(
 				path.join(__dirname,
-					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType]))).wait();
+					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType].toLowerCase()))).wait();
 
 			this.validateProjectData(projectType, properties).wait();
 			this.$projectPropertiesService.completeProjectProperties(this.projectData);

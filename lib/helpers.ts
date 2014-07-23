@@ -87,7 +87,7 @@ export function getProjectFilePartSchema(partName: string): IFuture<string> {
 	return (() => {
 		var $fs:IFileSystem = $injector.resolve("fs");
 		var propPath = path.join(__dirname,
-				"../resources/project-properties-" + partName + ".json");
+				"../resources/project-properties-" + partName.toLowerCase() + ".json");
 		var schema = $fs.readJson(propPath, "utf8").wait();
 		return schema;
 	}).future<string>()();
