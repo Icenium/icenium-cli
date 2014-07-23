@@ -23,7 +23,7 @@ class UpdateKendoUICommand implements ICommand {
 				this.$errors.fail("Only Hybrid projects can use Kendo UI");
 			}
 
-			var packages: Server.IKendoDownloadablePackageData[] = this.$server.kendo.getPackages().wait();
+			var packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 
 			this.$logger.out("The following Kendo UI update packages are available:");
 			_.each(packages, (update: Server.IKendoDownloadablePackageData, idx: number) => {
