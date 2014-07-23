@@ -84,7 +84,7 @@ export class Project implements Project.IProject {
 			var platformFiles = _.each(files, (file) => {
 				var matches = file.match(fileMask);
 				if (matches) {
-					result.push(matches[1]);
+					result.push(matches[1].toLowerCase());
 				}
 			});
 

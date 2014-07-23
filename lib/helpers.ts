@@ -77,6 +77,7 @@ export function registerCommand(module: string, commandName: any, executor: (mod
 	};
 
 	$injector.registerCommand(commandName, factory);
+	return process.platform.toUpperCase() === "DARWIN";
 }
 
 export function stringReplaceAll(string: string, find: any, replace: string): string {

@@ -26,6 +26,8 @@ $injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");
 $injector.requireCommand("simulate", "./commands/simulate");
+$injector.requireCommand("emulate|list", "./commands/emulate");
+$injector.requireCommand("emulate|start", "./commands/emulate");
 $injector.requireCommand("debug", "./commands/debug");
 
 $injector.require("server", "./server-api");

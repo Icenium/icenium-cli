@@ -22,6 +22,7 @@ Project development commands:
     livesync cloud                  Synchronizes the project with the cloud to enable LiveSync for remote devices.
     debug                           Shows the debug tools to let you debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
+    emulate                         Runs the current project in the platform emulator.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -442,6 +443,46 @@ In this version of the Telerik AppBuilder CLI, you cannot run the device simulat
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
                     for in the current directory and all directories above it.
+
+--[/]--
+
+--[emulate]--
+Usage:
+    $ appbuilder emulate start <Platform> [--path <Directory>] [--certificate <Certificate ID>] [--provision <Provision ID>]
+Runs the current project in the native platform emulator.
+
+Platform-specific usages:
+    $ appbuilder emulate start android [--path <Directory>] [--certificate <Certificate ID>]
+    $ appbuilder emulate start ios [--path <Directory>] –certificate <Certificate ID> --provision <Provision ID>
+    $ appbuilder emulate start wp8 [--path <Directory>]
+
+Builds the specified project in the cloud and runs it in the native emulator for the specified platform.
+
+Prerequisites:
+Before running the Android emulator, verify that you have added the following Android SDK directories to the PATH environment variable.
+    platform-tools
+    tools
+Before running the iOS simulator, verify that you have met the following requirements.
+    You are running the Telerik AppBuilder CLI on OS X.
+    You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
+    You have imported a valid provisioning profile and a matching certificate. For more information, run $ appbuilder certificate --help and $ appbuilder provision --help.
+Before running the Windows Phone 8 simulator, verify that you are running the Telerik AppBuilder CLI on Windows.
+
+<Platform> is the target mobile platform. You can set ios, android, or wp8.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
+
+Options:
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
+            for in the current directory and all directories above it.
+    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
+            a certificate by index or name.
+            If you build for iOS, you must specify a certificate. The certificate must match the provisioning profile.
+            To list available certificates, run $ appbuilder certificate.
+        --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
+            a provisioning profile by index or name.
+            If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate.
+            To list available provisioning profiles, run $ appbuilder provision.
 
 --[/]--
 

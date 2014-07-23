@@ -129,6 +129,8 @@ declare module Project {
 
 		provisionTypes?: string[];
 		device?: Mobile.IDevice;
+
+		buildForiOSSimulator?: boolean;
 	}
 
 	interface IProject {
@@ -253,6 +255,11 @@ interface IPrompter extends IDisposable {
 interface IExtensionPlatformServices {
 	getPackageName() : string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
+}
+
+interface IEmulatorPlatformServices {
+	checkAvailability(): IFuture<void>;
+	run(image: string) : IFuture<void>;
 }
 
 interface IX509Certificate {

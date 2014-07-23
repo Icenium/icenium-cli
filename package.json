@@ -35,6 +35,7 @@
     "fibers": "https://github.com/icenium/node-fibers/tarball/master",
     "filesize": "2.0.3",
     "hex": "0.0.1",
+    "iconv-lite": "^0.4.3",
     "log4js": "0.6.9",
     "minimatch": "0.2.14",
     "mkdirp": "0.3.5",
