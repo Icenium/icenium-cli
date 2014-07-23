@@ -20,12 +20,12 @@ class UpdateKendoUICommand implements ICommand {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.$project.ensureProject();
 			if(!this.$project.capabilities.updateKendo) {
-				this.$errors.fail("Only Hybrid projects can use Kendo UI");
+				this.$errors.fail("This operation is applicable only to hybrid projects.");
 			}
 
 			var packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 
-			this.$logger.out("The following Kendo UI update packages are available:");
+			this.$logger.out("You can download and install the following Kendo UI Core or Kendo UI Professional packages.");
 			_.each(packages, (update: Server.IKendoDownloadablePackageData, idx: number) => {
 				this.$logger.out("\t[%s] %s %s", (idx+1).toString().cyan, update.Name, update.Version);
 			});
@@ -36,7 +36,7 @@ class UpdateKendoUICommand implements ICommand {
 						required: true,
 						type: "string",
 						message: "Valid values are between 1 and " + packages.length,
-						description: "Select Kendo UI update package to download",
+						description: "Enter the index of the package that you want to install",
 						conform: (value: string) => {
 							var num = parseInt(value, 10);
 							return !isNaN(num) && num >= 1 && num <= packages.length;
@@ -48,8 +48,10 @@ class UpdateKendoUICommand implements ICommand {
 			this.$prompter.start();
 			var choice = this.$prompter.get(schema).wait();
 
-			var confirm = this.$prompter.confirm("Downloading the new Kendo UI package will overwrite existing files. " +
-				"If you have made changes, they will be lost.".red.bold,
+			var confirm = this.$prompter.confirm(
+				"This operation will overwrite existing Kendo UI framework files and " +
+				"any changes will be lost. ".red.bold +
+				"Are you sure you want to continue?",
 				() => "y").wait();
 			if (!confirm) {
 				return;
