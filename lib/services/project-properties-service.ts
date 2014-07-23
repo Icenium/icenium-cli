@@ -88,7 +88,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}
 
 		var defaultProject = this.$resources.readJson(
-			util.format("default-project-%s.json", properties.Framework)
+			util.format("default-project-%s.json", properties.Framework.toLowerCase())
 		).wait();
 		Object.keys(defaultProject).forEach((propName) => {
 			if (!_.has(properties, propName)) {
