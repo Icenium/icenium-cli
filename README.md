@@ -44,6 +44,9 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for Android On-Device Deployment**
 
 * Device drivers required by your system to recognize the connected Android device
+* On 64-bit systems, you need to install the runtime libraries for the ia32/i386 architecture.
+   * In the terminal, run `sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0`.
+   * In the terminal, run `sudo apt-get install libgl1-mesa-dri:i386`.
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
