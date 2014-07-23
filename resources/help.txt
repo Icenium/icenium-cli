@@ -31,7 +31,7 @@ Project development commands:
     prop remove                     Disables options for the selected project property, if the property accepts multiple values.
     cloud                           Lists all projects associated with your Telerik Platform account.
     cloud export                    Exports a selected project from the cloud and initializes it for development.
-    update-kendoui                  Updates Kendo UI libraries
+    update-kendoui                  Updates or adds Kendo UI Core or Kendo UI Professional to your project.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -485,8 +485,9 @@ Options:
 Usage:
     $ appbuilder update-kendoui
 
-Shows list of officially supported Kendo UI versions, download and extract the chosen one in the project directory.
-This command works only for hybrid projects. Note that all custom changes to the Kendo UI libraries will be lost!
+Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory. 
+
+This operation is applicable only to hybrid projects.
 
 --[/]--
 
