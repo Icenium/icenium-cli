@@ -246,6 +246,20 @@ export class MobileProvisionService implements Server.IMobileProvisionServiceCon
 
 }
 
+export class PackageManagerService implements Server.IPackageManagerServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	getInstalledPackages(solutionName: string, projectName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetInstalledPackages', 'GET', ['/packages', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
+	installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('InstallPackage', 'PUT', ['/packages', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(packageName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'version': version }), null, null, null);
+	}
+
+}
+
 export class ProjectService implements Server.IProjectServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
@@ -378,6 +392,10 @@ export class SettingsService implements Server.ISettingsServiceContract {
 
 export class TamService implements Server.ITamServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	getAccountStatus(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetAccountStatus', 'GET', ['/tam/account', 'status'].join('/'), 'application/json', null, null);
 	}
 
 	uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void> {
@@ -565,6 +583,7 @@ export class Server {
 	public images = $injector.resolve(ImageService);
 	public kendo = $injector.resolve(KendoService);
 	public mobileprovisions = $injector.resolve(MobileProvisionService);
+	public packages = $injector.resolve(PackageManagerService);
 	public projects = $injector.resolve(ProjectService);
 	public rawSettings = $injector.resolve(RawSettingsService);
 	public settings = $injector.resolve(SettingsService);

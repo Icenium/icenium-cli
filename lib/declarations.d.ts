@@ -59,6 +59,7 @@ declare module Server {
 		Keywords: string[];
 		Name: string;
 		Version: string;
+		NeedPurchase: boolean;
 	}
 }
 

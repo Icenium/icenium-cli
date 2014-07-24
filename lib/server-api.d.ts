@@ -77,6 +77,11 @@ declare module Server {
 		removeProvision(identifier: string): IFuture<void>;
 	}
 
+	interface IPackageManagerServiceContract {
+		getInstalledPackages(solutionName: string, projectName: string): IFuture<any>;
+		installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void>;
+	}
+
 	interface IProjectServiceContract {
 		canLoadSolution(solutionName: string): IFuture<any>;
 		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<void>;
@@ -115,6 +120,7 @@ declare module Server {
 	}
 
 	interface ITamServiceContract {
+		getAccountStatus(): IFuture<any>;
 		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void>;
 		verifyStoreCreated(): IFuture<void>;
 	}
@@ -174,6 +180,7 @@ declare module Server {
 		images: IImageServiceContract;
 		kendo: IKendoServiceContract;
 		mobileprovisions: IMobileProvisionServiceContract;
+		packages: IPackageManagerServiceContract;
 		projects: IProjectServiceContract;
 		rawSettings: IRawSettingsServiceContract;
 		settings: ISettingsServiceContract;
