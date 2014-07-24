@@ -108,6 +108,14 @@ export class FileSystemStub implements IFileSystem {
 	isEmptyDir(directoryPath: string): IFuture<boolean> {
 		return undefined;
 	}
+
+	ensureDirectoryExists(directoryPath: string): IFuture<void> {
+		return undefined;
+	}
+
+	rename(oldPath: string, newPath: string): IFuture<void> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
