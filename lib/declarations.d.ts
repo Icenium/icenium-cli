@@ -173,41 +173,6 @@ interface IProjectCapabilities {
 	updateKendo: boolean;
 }
 
-interface IFileSystem {
-	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void>;
-	unzip(zipFile: string, destinationDir: string): IFuture<void>;
-	exists(path: string): IFuture<boolean>;
-	deleteFile(path: string): IFuture<void>;
-	deleteDirectory(directory: string): IFuture<void>;
-	getFileSize(path: string): IFuture<number>;
-	futureFromEvent(eventEmitter: any, event: string): IFuture<any>;
-	createDirectory(path: string): IFuture<void>;
-	readDirectory(path: string): IFuture<string[]>;
-	readFile(filename: string): IFuture<NodeBuffer>;
-	readText(filename: string, encoding?: string): IFuture<string>;
-	readJson(filename: string, encoding?: string): IFuture<any>;
-	writeFile(filename: string, data: any, encoding?: string): IFuture<void>;
-	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void>;
-	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void>;
-	getUniqueFileName(baseName: string): IFuture<string>;
-	getFsStats(path: string): IFuture<IFsStats>;
-
-	createReadStream(path: string, options?: {
-		flags?: string;
-		encoding?: string;
-		fd?: string;
-		mode?: number;
-		bufferSize?: number;
-	}): any;
-	createWriteStream(path: string, options?: {
-		flags?: string;
-		encoding?: string;
-		string?: string;
-	}): any;
-
-	chmod(path: string, mode: number): IFuture<any>;
-}
-
 interface IOpener {
 	open(filename: string): void;
 }
