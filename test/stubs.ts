@@ -21,9 +21,7 @@ export class LoggerStub implements ILogger {
 	}
 
 	write(...args): void { }
-
-	setLoggerConfiguration(config: any, logLevel: string): void { }
-}
+	}
 
 export class FileSystemStub implements IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
