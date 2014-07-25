@@ -111,22 +111,6 @@ export function registerCommand(module: string, commandName: any, executor: (mod
 	$injector.registerCommand(commandName, factory);
 }
 
-export function isWindows() {
-	return process.platform === "win32";
-}
-
-export function isWindows64() {
-	return isWindows() && (process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"));
-}
-
-export function isWindows32() {
-	return isWindows() && !isWindows64();
-}
-
-export function isDarwin() {
-	return process.platform.toUpperCase() === "DARWIN";
-}
-
 export function stringReplaceAll(string: string, find: any, replace: string): string {
 	return string.split(find).join(replace);
 }

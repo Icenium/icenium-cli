@@ -341,3 +341,6 @@ interface ISamplesService {
 	printSamplesInformation(): IFuture<string>;
 }
 
+interface IHostCapabilities {
+	debugToolsSupported: boolean;
+}

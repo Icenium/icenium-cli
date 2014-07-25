@@ -5,11 +5,14 @@ import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 import watchr = require("watchr");
+import MobileHelper = require("./../mobile/mobile-helper");
+import hostInfo = require("../host-info");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
 
 	constructor(private $logger: ILogger,
+		private $errors: IErrors,
 		private $loginManager: ILoginManager,
 		private $debuggerPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
@@ -19,6 +22,10 @@ export class DebugCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+				this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux. The debug tools for Linux will become available in a future release of the Telerik AppBuilder CLI.");
+			}
+
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
@@ -141,8 +148,10 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	}
 }
 
-if (helpers.isWindows()) {
+if (hostInfo.isWindows()) {
 	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
-} else if (helpers.isDarwin()) {
+} else if (hostInfo.isDarwin()) {
 	$injector.register("debuggerPlatformServices", DarwinDebuggerPlatformServices);
+} else {
+	$injector.register("debuggerPlatformServices", {}); // for unsupported OSes
 }
