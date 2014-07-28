@@ -7,7 +7,7 @@ import helpers = require("../helpers");
 import util = require("util");
 
 var ANDROID_PROJECT_PATH = "mnt/sdcard/Icenium/";
-var ANDROID_NATIVESCRIPT_PROJECT_PATH = "data/data/";
+var ANDROID_NATIVESCRIPT_PROJECT_PATH = "/data/data/";
 var ANDROID_CHECK_LIVE_SYNC_INTENT = "com.telerik.IsLiveSyncSupported";
 var ANDROID_ION_APP_IDENTIFIER = "com.telerik.AppBuilder";
 
