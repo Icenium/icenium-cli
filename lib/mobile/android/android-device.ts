@@ -17,6 +17,7 @@ interface IAndroidDeviceDetails {
 export class AndroidDevice implements Mobile.IDevice {
 	private static REFRESH_WEB_VIEW_INTENT_NAME = "com.telerik.RefreshWebView";
 	private static CHANGE_LIVESYNC_URL_INTENT_NAME = "com.telerik.ChangeLiveSyncUrl";
+	private static DEVICE_TMP_DIR = "/data/local/tmp";
 
 	private model: string;
 	private name: string;
@@ -126,11 +127,44 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	private pushFilesOnDevice(localToDevicePaths): IFuture<void> {
+	private prepareTmpDir(appIdentifier: Mobile.IAppIdentifier): IFuture<string> {
 		return (() => {
+			var tmpRoot = path.join(AndroidDevice.DEVICE_TMP_DIR, "12590FAA-5EDD-4B12-856D-F52A0A1599F2", appIdentifier.appIdentifier);
+			var filesInTmp = path.join(tmpRoot, "*");
+
+			var command = this.composeCommand('shell mkdir -p "%s"', tmpRoot);
+			this.$childProcess.exec(command).wait();
+			command = this.composeCommand('shell rm -rf "%s"', filesInTmp);
+			this.$childProcess.exec(command).wait();
+
+			return tmpRoot;
+		}).future<string>()();
+	}
+
+	private pushFilesOnDevice(localToDevicePaths, appIdentifier: Mobile.IAppIdentifier): IFuture<void> {
+		return (() => {
+			// On Samsung Android 4.3 and Nexus KitKat & L devices, one cannot adb push to /data/data/appId/ directly
+			// Instead, we push to /data/local/tmp, where we have the required permissions and them mv to the final destination
+			var tmpRoot = this.prepareTmpDir(appIdentifier).wait();
+
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				this.pushFileOnDevice(localToDevicePathData.getLocalPath(), localToDevicePathData.getDevicePath()).wait();
+				var tmpPath = path.join(tmpRoot, localToDevicePathData.getRelativeToProjectBasePath());
+				this.pushFileOnDevice(localToDevicePathData.getLocalPath(), tmpPath).wait();
 			});
+
+			// move the files from the tmp dir into their proper path.
+			// Due to limitation of android toolset, we use a more involved shell script
+			// the following line finds all files and subfolders in the tmp dir,
+			// removes the corresponding entries in the data dir and then moves the /tmp files in their proper place on /data
+			// we set IFS so that for will properly iterate over files with spaces in their names
+			// we use for `ls`, because android toolbox lacks find
+			var command = this.composeCommand('shell "IFS=\\$\'\\n\'; for i in \\$(ls -a %s); do rm -rf %s/\\$i && mv %s/\\$i %s; done; unset IFS"',
+				tmpRoot,
+				appIdentifier.deviceProjectPath,
+				tmpRoot,
+				appIdentifier.deviceProjectPath
+				);
+			this.$childProcess.exec(command).wait();
 		}).future<void>()();
 	}
 
@@ -180,7 +214,7 @@ export class AndroidDevice implements Mobile.IDevice {
 	public sync(localToDevicePaths: Mobile.ILocalToDevicePathData[], appIdentifier: Mobile.IAppIdentifier, projectType: number, options: Mobile.ISyncOptions = {}): IFuture<void> {
 		return (() => {
 			if (appIdentifier.isLiveSyncSupported(this).wait()) {
-				this.pushFilesOnDevice(localToDevicePaths).wait();
+				this.pushFilesOnDevice(localToDevicePaths, appIdentifier).wait();
 				if (!options.skipRefresh) {
 					var changeLiveSyncUrlExtras = { liveSyncUrl: this.getLiveSyncUrl(projectType), "app-id": appIdentifier.appIdentifier };
 					this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, changeLiveSyncUrlExtras).wait();
