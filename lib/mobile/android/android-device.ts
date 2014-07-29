@@ -4,8 +4,9 @@ import util = require("util");
 import Future = require("fibers/future");
 import path = require("path");
 import byline = require("byline");
-import helpers = require("./../../helpers");
+import helpers = require("../../helpers");
 import os = require("os");
+import hostInfo = require("../../host-info");
 
 interface IAndroidDeviceDetails {
 	model: string;
@@ -129,8 +130,8 @@ export class AndroidDevice implements Mobile.IDevice {
 
 	private prepareTmpDir(appIdentifier: Mobile.IAppIdentifier): IFuture<string> {
 		return (() => {
-			var tmpRoot = path.join(AndroidDevice.DEVICE_TMP_DIR, "12590FAA-5EDD-4B12-856D-F52A0A1599F2", appIdentifier.appIdentifier);
-			var filesInTmp = path.join(tmpRoot, "*");
+			var tmpRoot = AndroidDevice.DEVICE_TMP_DIR + "/12590FAA-5EDD-4B12-856D-F52A0A1599F2/" + appIdentifier.appIdentifier;
+			var filesInTmp = tmpRoot + "/*";
 
 			var command = this.composeCommand('shell mkdir -p "%s"', tmpRoot);
 			this.$childProcess.exec(command).wait();
@@ -148,7 +149,7 @@ export class AndroidDevice implements Mobile.IDevice {
 			var tmpRoot = this.prepareTmpDir(appIdentifier).wait();
 
 			localToDevicePaths.forEach((localToDevicePathData) => {
-				var tmpPath = path.join(tmpRoot, localToDevicePathData.getRelativeToProjectBasePath());
+				var tmpPath = tmpRoot + "/" + helpers.fromWindowsRelativePathToUnix(localToDevicePathData.getRelativeToProjectBasePath());
 				this.pushFileOnDevice(localToDevicePathData.getLocalPath(), tmpPath).wait();
 			});
 
@@ -158,12 +159,12 @@ export class AndroidDevice implements Mobile.IDevice {
 			// removes the corresponding entries in the data dir and then moves the /tmp files in their proper place on /data
 			// we set IFS so that for will properly iterate over files with spaces in their names
 			// we use for `ls`, because android toolbox lacks find
-			var command = this.composeCommand('shell "IFS=\\$\'\\n\'; for i in \\$(ls -a %s); do rm -rf %s/\\$i && mv %s/\\$i %s; done; unset IFS"',
-				tmpRoot,
-				appIdentifier.deviceProjectPath,
-				tmpRoot,
-				appIdentifier.deviceProjectPath
-				);
+			var commandStr = 'shell "IFS=\\$\'\\n\'; for i in \\$(ls -a %s); do rm -rf %s/\\$i && mv %s/\\$i %s; done; unset IFS"';
+			if (hostInfo.isWindows()) {
+				commandStr = commandStr.replace(/\\\$/g, "$");
+			}
+			var command = this.composeCommand(commandStr, tmpRoot, appIdentifier.deviceProjectPath, tmpRoot, appIdentifier.deviceProjectPath);
+
 			this.$childProcess.exec(command).wait();
 		}).future<void>()();
 	}
