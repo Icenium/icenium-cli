@@ -107,6 +107,16 @@ export class AndroidDevice implements Mobile.IDevice {
 		return result;
 	}
 
+	private composeCommandParams(...args) {
+		var command = util.format.apply(null, args);
+		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
+		if (command && !command.isEmpty()) {
+			result += util.format(" %s", command);
+		}
+
+		return result;
+	}
+
 	private startPackageOnDevice(packageName): IFuture<void> {
 		return (() => {
 			var startPackageCommand = this.composeCommand("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName);
@@ -159,13 +169,14 @@ export class AndroidDevice implements Mobile.IDevice {
 			// removes the corresponding entries in the data dir and then moves the /tmp files in their proper place on /data
 			// we set IFS so that for will properly iterate over files with spaces in their names
 			// we use for `ls`, because android toolbox lacks find
-			var commandStr = 'shell "IFS=\\$\'\\n\'; for i in \\$(ls -a %s); do rm -rf %s/\\$i && mv %s/\\$i %s; done; unset IFS"';
-			if (hostInfo.isWindows()) {
-				commandStr = commandStr.replace(/\\\$/g, "$");
-			}
-			var command = this.composeCommand(commandStr, tmpRoot, appIdentifier.deviceProjectPath, tmpRoot, appIdentifier.deviceProjectPath);
-
-			this.$childProcess.exec(command).wait();
+			var adbCommand = util.format('IFS=$\'\\n\'; for i in $(ls -a %s); do rm -rf %s/$i && mv %s/$i %s; done; unset IFS',
+				tmpRoot, appIdentifier.deviceProjectPath, tmpRoot, appIdentifier.deviceProjectPath);
+			this.$childProcess.execFile(this.adb, [
+				"-s",
+				this.identifier,
+				"shell",
+				adbCommand
+			]).wait();
 		}).future<void>()();
 	}
 
