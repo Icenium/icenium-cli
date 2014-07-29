@@ -3,7 +3,7 @@ Command-Line Interface for Telerik AppBuilder
 
 *Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
-[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
+[![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/ab-24/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.3.1  
-Release date: 2014, July 17 
+Latest version: Telerik AppBuilder 2.4  
+Release date: 2014, July 29 
 
-> AppBuilder 2.3.1 is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.4, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-4" target="_blank">Telerik AppBuilder 2.4 Release Notes</a>.
 
 ### System Requirements
 
@@ -44,6 +44,9 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for Android On-Device Deployment**
 
 * Device drivers required by your system to recognize the connected Android device
+* On 64-bit systems, you need to install the runtime libraries for the ia32/i386 architecture.
+   * In the terminal, run `sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0`.
+   * In the terminal, run `sudo apt-get install libgl1-mesa-dri:i386`.
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
@@ -61,6 +64,29 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for iOS On-Device Deployment**
 
 * iTunes
+
+**Additional Software Requirements for Android On-Device Deployment**
+
+* Device drivers required by your system to recognize the connected Android device
+
+**Additional Software Requirements for Windows Phone 8 On-Device Deployment**
+
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone 8 devices from the command line.
+
+#### Linux Systems
+
+**Minimum Software Requirements** 
+
+* Ubuntu 14.04 LTS
+* Node.js 0.10.22 or later
+
+> The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
+
+> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
+
+**Additional Software Requirements for iOS On-Device Deployment**
+
+> In this version of the Telerik AppBuilder CLI, you cannot deploy and LiveSync on connected iOS devices from the command line. You need to manually deploy the application package using iTunes.
 
 **Additional Software Requirements for Android On-Device Deployment**
 
@@ -111,7 +137,7 @@ To create a new hybrid project from the default template, navigate to an empty d
 $ appbuilder create hybrid MyApp
 ```
 
-The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI Mobile template.
+The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI TabStrip template.
 
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
@@ -128,6 +154,8 @@ To load your newly created project in the simulator, navigate to the folder cont
 ```bash
 $ appbuilder simulate
 ```
+
+> In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux systems.
 
 The Telerik AppBuilder CLI launches the device simulator. In the device simulator, you can change the target device form factor, mobile platform and version, and orientation. You can adjust the geolocation details, network connection configuration, file storage configuration, and the default contacts. You can debug your code using the built-in debug tools.
 
@@ -200,63 +228,78 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.3.1  
-Release date: 2014, July 17 
+Latest version: Telerik AppBuilder 2.4  
+Release date: 2014, July 29 
 
-> AppBuilder 2.3.1 is a maintenance release. For a complete list of the features available in Telerik AppBuilder 2.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-3" target="_blank">Telerik AppBuilder 2.3 Release Notes</a>.
+> For a complete list of the features available in Telerik AppBuilder 2.4, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-4" target="_blank">Telerik AppBuilder 2.4 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
 To see a complete list of the available commands, click <a href="https://github.com/Icenium/icenium-cli/blob/release/resources/help.txt" target="_blank">here</a> or run `$ appbuilder help` in the command prompt.
 
-* You can develop your hybrid mobile locally and with limited Internet connectivity. 
-* You can benefit from the code editing, code analysis, and version control capabilities provided by your favorite development tools on Windows or OS X.
-* You can use the Telerik AppBuilder CLI with the Telerik AppBuilder package for Sublime Text 2 or Sublime Text 3 to build and deploy apps straight from Sublime Text.
-* You can log in and log out of the Telerik Platform. 
-* You can view your current login and subscription information.
-* You can create new projects from the *Blank (JavaScript)*, *Blank (TypeScript)* *jQuery Mobile*, *Telerik Friends*, *Kendo UI mobile app*, and *Kendo UI mobile app with data visualization* templates.
-* You can create new projects by initializing any existing projects stored locally on your system. For example, you can initialize local copies of projects created with the AppBuilder clients or third-party tools.
-* You can export your existing projects from your {{tp}} account and automatically initialize them for development.
-* You can clone the Telerik AppBuilder sample apps. 
-* You can target Apache Cordova 3.0.0, Apache Cordova 3.2.0, or Apache Cordova 3.5.0.
-* You can migrate between the supported Apache Cordova versions.
-* You can enable and disable the Apache Cordova core and integrated plugins.
-* You can fetch Apache Cordova custom plugins from the Apache Cordova Plugin Registry and import them into your projects.
-* You can list connected iOS and Android devices.
-* You can view the device log for connected devices.
-* You can build applications for iOS, Android, and Windows Phone 8 and deploy them via QR code.
-* You can build applications for iOS, Android, and Windows Phone 8 and download the application package. You can manually deploy the application package on devices. 
-* You can build applications for iOS and Android and deploy them via cable connection on connected devices. 
-* You can load iOS and Android applications in the AppBuilder companion app.
-* You can LiveSync changes wirelessly to remote devices with the three-finger refresh gesture.
-* You can push changes via cable connection to connected devices.
-* You can build applications for distribution in the Apple App Store, Google Play, and Windows Phone Store. 
-* You can upload your iOS application packages to iTunes Connect.
-* You can run your apps in the device simulator on Windows systems.
-* You can run your apps in the device simulator on OS X systems.
-* You can debug your code with the built-in debug tools in the device simulator on Windows systems.
-* You can debug your code with the built-in debug tools in the device simulator on OS X systems.
-* You can debug your iOS and Android apps while running on connected iOS and Android devices on Windows systems.
-* You can manage certificates and provisioning profiles for code signing iOS apps.
-* You can manage certificates for code signing Android apps.
-* You can configure the project properties for your project.
-* You can open the `AndroidManifest.xml`, `Info.plist`, `WMAppManifest.xml` and `config.xml` files for editing.
-* You can edit the `.abignore` file to exclude files and folders from the build process. You need to manually add `.abignore` to your project.
-
-#### What you cannot do with this version of the Telerik AppBuilder CLI
-
-The following Telerik AppBuilder features are not available in the current release of the Telerik AppBuilder CLI but might become available in a future release.
-
-* You cannot switch your Telerik Platform account.
-* You cannot deploy your apps on connected Windows Phone 8 devices.
-* You cannot load your Windows Phone 8 apps in the companion app.
-* You cannot debug your Android and iOS apps while running on a connected device on OS X systems.
-* You cannot use the AppBuilder UI Designer tool to design the user interface of your Kendo UI Mobile or Kendo UI DataViz apps.
+Platform | Operation | Windows | OS&nbsp;X | Linux
+---------|-----------|---------|------|------
+**Cross-platform** | Develop hybrid mobile apps locally | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop hybrid mobile apps with third-party tools | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop hybrid mobile apps with Sublime Text | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Log in and out of the Telerik Platform | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Switch Telerik AppBuilder accounts | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Create projects from the project templates | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Clone the sample apps | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Develop with Apache Cordova 3.0.0 or later | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Migrate between supported Apache Cordova versions | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Enable and disable the core Apache Cordova plugins | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Enable and disable the integrate Apache Cordova plugins | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Fetch custom Apache Cordova plugins from the Apache Cordova Plugin Registry | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Manage code signing identities | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Configure project properties | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Edit configuration files | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Edit `.abignore` to exclude files and folders from the build process<br/>(You need to add `.abignore` to your projects manually.) | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Design user interfaces with the UI Designer tool | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+**iOS**  | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> 
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in the App Store | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Upload application packages to iTunes Connect | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+**Android** | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in Google Play | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+**Windows Phone 8** | Connect devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | List connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | View the device log for connected devices | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
+         | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/no-support.png" style="width: 16px;">
+         | Build for distribution in the Windows Phone Store | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/ab-24/support.png" style="width: 16px;">
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
 
-* You cannot use the Data Navigator to review your Telerik Backend Services projects and their resources.
-* You cannot use the AppBuilder version control and storage cloud services.
+* You cannot use the **Data Navigator** to review your Telerik Backend Services projects and their resources.
+* You cannot use the Telerik AppBuilder version control and storage cloud services.
 
 [Back to Top][1]
 
