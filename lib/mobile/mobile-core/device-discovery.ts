@@ -11,6 +11,7 @@ import Signal = require("./../../events/signal");
 import Future = require("fibers/future");
 import child_process = require("child_process");
 import helpers = require("./../../helpers");
+import hostInfo = require("../../host-info");
 var options = require("./../../options");
 
 export class DeviceDiscovery implements Mobile.IDeviceDiscovery {
@@ -150,7 +151,7 @@ class ITunesValidator {
 
 	public getError(): IFuture<string> {
 		return (() => {
-			if(helpers.isWindows64()) {
+			if(hostInfo.isWindows64()) {
 				if(process.arch === "x64") {
 					return "To be able to run operations on connected iOS devices, install the 32-bit version of Node.js.";
 				}
@@ -159,11 +160,11 @@ class ITunesValidator {
 			var coreFoundationDir = "";
 			var mobileDeviceDir = "";
 
-			if(helpers.isWindows()) {
-				var commonProgramFiles = helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
+			if(hostInfo.isWindows()) {
+				var commonProgramFiles = hostInfo.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
 				coreFoundationDir = path.join(commonProgramFiles, "Apple", "Apple Application Support");
 				mobileDeviceDir = path.join(commonProgramFiles, "Apple", "Mobile Device Support");
-			} else if(helpers.isDarwin()) {
+			} else if(hostInfo.isDarwin()) {
 				coreFoundationDir = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
 				mobileDeviceDir = "/System/Library/PrivateFrameworks/MobileDevice.framework/MobileDevice";
 			}

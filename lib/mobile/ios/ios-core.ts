@@ -7,7 +7,8 @@ import ffi = require("ffi");
 import struct = require("ref-struct");
 import bufferpack = require("bufferpack");
 import plistlib = require("plistlib");
-import helpers = require("./../../helpers");
+import helpers = require("../../helpers");
+import hostInfo = require("../../host-info");
 import net = require("net");
 import util = require("util");
 import Future = require("fibers/future");
@@ -85,9 +86,9 @@ class IOSCore implements Mobile.IiOSCore {
 	public static kCFStringEncodingUTF8 = 0x08000100;
 
 	private get CoreFoundationDir(): string {
-		if(helpers.isWindows()) {
+		if(hostInfo.isWindows()) {
 			return path.join(this.CommonProgramFilesPath, "Apple", "Apple Application Support");
-		} else if(helpers.isDarwin()) {
+		} else if(hostInfo.isDarwin()) {
 			return "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
 		}
 
@@ -95,9 +96,9 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	private get MobileDeviceDir(): string {
-		if(helpers.isWindows()) {
+		if(hostInfo.isWindows()) {
 			return path.join(this.CommonProgramFilesPath, "Apple", "Mobile Device Support");
-		} else if(helpers.isDarwin()) {
+		} else if(hostInfo.isDarwin()) {
 			return "/System/Library/PrivateFrameworks/MobileDevice.framework/MobileDevice";
 		}
 
@@ -105,7 +106,7 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	private get CommonProgramFilesPath(): string {
-		return helpers.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
+		return hostInfo.isWindows64() ?  process.env["CommonProgramFiles(x86)"] : process.env.CommonProgramFiles;
 	}
 
 	private is32BitProcess(): boolean {
@@ -119,12 +120,12 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	public getCoreFoundationLibrary(): {[key: string]: any} {
-		if(helpers.isWindows()) {
+		if(hostInfo.isWindows()) {
 			process.env.PATH = this.CoreFoundationDir + ";" + process.env.PATH;
 			process.env.PATH += ";" + this.MobileDeviceDir;
 		}
 
-		var coreFoundationDll = helpers.isWindows() ?  path.join(this.CoreFoundationDir, "CoreFoundation.dll") : this.CoreFoundationDir;
+		var coreFoundationDll = hostInfo.isWindows() ?  path.join(this.CoreFoundationDir, "CoreFoundation.dll") : this.CoreFoundationDir;
 		var lib = ffi.DynamicLibrary(coreFoundationDll);
 
 		return {
@@ -167,7 +168,7 @@ class IOSCore implements Mobile.IiOSCore {
 	}
 
 	public getMobileDeviceLibrary(): {[key: string]: any} {
-		var mobileDeviceDll = helpers.isWindows() ? path.join(this.MobileDeviceDir, "MobileDevice.dll") : this.MobileDeviceDir;
+		var mobileDeviceDll = hostInfo.isWindows() ? path.join(this.MobileDeviceDir, "MobileDevice.dll") : this.MobileDeviceDir;
 		var lib = ffi.DynamicLibrary(mobileDeviceDll);
 
 		return  {
@@ -187,7 +188,7 @@ class IOSCore implements Mobile.IiOSCore {
 			"AFCConnectionOpen": ffi.ForeignFunction(lib.get("AFCConnectionOpen"), "uint", ["int", "uint", ref.refType(CoreTypes.afcConnectionRef)]),
 			"AFCConnectionClose": ffi.ForeignFunction(lib.get("AFCConnectionClose"), "uint", [CoreTypes.afcConnectionRef]),
 			"AFCDirectoryCreate": ffi.ForeignFunction(lib.get("AFCDirectoryCreate"), "uint", [CoreTypes.afcConnectionRef, "string"]),
-			"AFCFileRefOpen": helpers.isDarwin() ? ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", ref.refType(CoreTypes.afcFileRef)]) : ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]),
+			"AFCFileRefOpen": hostInfo.isDarwin() ? ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", ref.refType(CoreTypes.afcFileRef)]) : ffi.ForeignFunction(lib.get("AFCFileRefOpen"), "uint", [CoreTypes.afcConnectionRef, "string", "uint", "uint", ref.refType(CoreTypes.afcFileRef)]),
 			"AFCFileRefClose": ffi.ForeignFunction(lib.get("AFCFileRefClose"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef]),
 			"AFCFileRefWrite": ffi.ForeignFunction(lib.get("AFCFileRefWrite"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, "uint"]),
 			"AFCFileRefRead": ffi.ForeignFunction(lib.get("AFCFileRefRead"), "uint", [CoreTypes.afcConnectionRef, CoreTypes.afcFileRef, CoreTypes.voidPtr, CoreTypes.uintPtr]),
@@ -514,9 +515,9 @@ export class MobileDevice implements Mobile.IMobileDevice {
 	}
 
 	public afcFileRefOpen(afcConnection: NodeBuffer, path: string,  mode: number, afcFileRef: NodeBuffer): number {
-		if(helpers.isWindows()) {
+		if(hostInfo.isWindows()) {
 			return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, 0, afcFileRef);
-		} else if(helpers.isDarwin()) {
+		} else if(hostInfo.isDarwin()) {
 			return this.mobileDeviceLibrary.AFCFileRefOpen(afcConnection, path, mode, afcFileRef);
 		}
 	}
@@ -735,9 +736,9 @@ export class PlistService implements Mobile.IiOSDeviceSocket {
 	constructor(private service: number,
 		private format: number,
 		private $injector: IInjector) {
-		if(helpers.isWindows()) {
+		if(hostInfo.isWindows()) {
 			this.socket = this.$injector.resolve(WinSocket, {service: this.service});
-		} else if(helpers.isDarwin()) {
+		} else if(hostInfo.isDarwin()) {
 			this.socket = this.$injector.resolve(PosixSocket, {service: this.service });
 		}
 	}

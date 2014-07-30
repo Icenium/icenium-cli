@@ -87,7 +87,7 @@ export function getProjectFilePartSchema(partName: string): IFuture<string> {
 	return (() => {
 		var $fs:IFileSystem = $injector.resolve("fs");
 		var propPath = path.join(__dirname,
-				"../resources/project-properties-" + partName + ".json");
+				"../resources/project-properties-" + partName.toLowerCase() + ".json");
 		var schema = $fs.readJson(propPath, "utf8").wait();
 		return schema;
 	}).future<string>()();
@@ -109,22 +109,6 @@ export function registerCommand(module: string, commandName: any, executor: (mod
 	};
 
 	$injector.registerCommand(commandName, factory);
-}
-
-export function isWindows() {
-	return process.platform === "win32";
-}
-
-export function isWindows64() {
-	return isWindows() && (process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"));
-}
-
-export function isWindows32() {
-	return isWindows() && !isWindows64();
-}
-
-export function isDarwin() {
-	return process.platform.toUpperCase() === "DARWIN";
 }
 
 export function stringReplaceAll(string: string, find: any, replace: string): string {

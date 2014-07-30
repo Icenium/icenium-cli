@@ -5,6 +5,7 @@ import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 import MobileHelper = require("../mobile/mobile-helper");
+import hostInfo = require("../host-info");
 
 export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
@@ -34,7 +35,10 @@ export class SimulateCommand implements ICommand {
 
 			if (!this.$project.capabilities.simulate) {
 				this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.Framework);
-				return;
+			}
+
+			if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+				this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux. The device simulator for Linux will become available in a future release of the Telerik AppBuilder CLI.");
 			}
 
 			this.$loginManager.ensureLoggedIn().wait();
@@ -149,8 +153,10 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-if (helpers.isWindows()) {
+if (hostInfo.isWindows()) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
-} else if (helpers.isDarwin()) {
+} else if (hostInfo.isDarwin()) {
 	$injector.register("simulatorPlatformServices", MacSimulatorPlatformServices);
+} else {
+	$injector.register("simulatorPlatformServices", {});
 }
