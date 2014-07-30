@@ -131,6 +131,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	public autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision> {
 		return ((): IProvision => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 
 			provisions = _.filter(provisions, (prov) => _.contains(provisionTypes, prov.ProvisionType));
 			if(provisions.length === 0) {
@@ -145,8 +146,9 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			_.each(provisions, (prov) => {
 				var validationResult = validator.validateProvision(prov);
+				var hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().IsSuccessful);
 
-				if(validationResult.IsSuccessful) {
+				if(validationResult.IsSuccessful && hasCompatibleCertificate) {
 					passedProvisions.push(prov);
 				} else {
 					failedProvisions.push({provision: prov, error: validationResult.Error});

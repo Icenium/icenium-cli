@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "preferGlobal": true,
-  "version": "2.3.1",
+  "version": "2.4.0",
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
@@ -61,7 +61,8 @@
     "xml2js": "0.4.1",
     "xmlhttprequest": "1.6.0",
     "yargs": "1.2.2",
-    "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master"
+    "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master",
+    "mute-stream": "0.0.4"
   },
   "analyze": true,
   "devDependencies": {

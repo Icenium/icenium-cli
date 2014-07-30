@@ -8,5 +8,4 @@ set APPBUILDER_SKIP_POSTINSTALL_TASKS=
 call grunt.cmd pack --no-color
 
 call npm.cmd cache rm appbuilder
-rem dedupe command flattens node_modules folder and fixes problems coming from paths being too long
-call npm.cmd dedupe
+cmd /C "rmdir /S /Q node_modules"

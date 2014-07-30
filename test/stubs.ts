@@ -21,9 +21,7 @@ export class LoggerStub implements ILogger {
 	}
 
 	write(...args): void { }
-
-	setLoggerConfiguration(config: any, logLevel: string): void { }
-}
+	}
 
 export class FileSystemStub implements IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
@@ -108,6 +106,14 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	isEmptyDir(directoryPath: string): IFuture<boolean> {
+		return undefined;
+	}
+
+	ensureDirectoryExists(directoryPath: string): IFuture<void> {
+		return undefined;
+	}
+
+	rename(oldPath: string, newPath: string): IFuture<void> {
 		return undefined;
 	}
 }

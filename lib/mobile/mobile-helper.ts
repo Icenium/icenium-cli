@@ -14,19 +14,22 @@ export var platformCapabilities: {[key: string]: Mobile.IPlatformCapabilities } 
 		wirelessDeploy: true,
 		cableDeploy: true,
 		companion: true,
-		publishTelerikAppManager: true
+		publishTelerikAppManager: true,
+		hostPlatformsForDeploy: ["win32", "darwin"]
 	},
 	Android: {
 		wirelessDeploy: true,
 		cableDeploy: true,
 		companion: true,
-		publishTelerikAppManager: true
+		publishTelerikAppManager: true,
+		hostPlatformsForDeploy: ["win32", "darwin", "linux"]
 	},
 	WP8: {
 		wirelessDeploy: true,
 		cableDeploy: false,
 		companion: false,
-		publishTelerikAppManager: false
+		publishTelerikAppManager: false,
+		hostPlatformsForDeploy: ["win32"]
 	}
 };
 
@@ -62,6 +65,11 @@ export function normalizePlatformName(platform: string): string {
 	}
 
 	return undefined;
+}
+
+export function isPlatformSupported(platform: string) {
+	var platformName = normalizePlatformName(platform);
+	return _.contains(platformCapabilities[platformName].hostPlatformsForDeploy, process.platform);
 }
 
 export function generateWP8GUID() {

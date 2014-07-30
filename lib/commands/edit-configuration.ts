@@ -5,6 +5,7 @@
 import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
+import hostInfo = require("../host-info");
 
 export class EditConfigurationCommand implements ICommand {
 	constructor(private $logger: ILogger,
@@ -37,7 +38,7 @@ export class EditConfigurationCommand implements ICommand {
 
 					//delete extra file in template zip
 					this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();
-					if (helpers.isWindows()) {
+					if (hostInfo.isWindows()) {
 						var contents = this.$fs.readText(filepath).wait();
 						contents = helpers.stringReplaceAll(contents, "\n", "\r\n");
 						this.$fs.writeFile(filepath, contents).wait();

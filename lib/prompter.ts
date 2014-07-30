@@ -4,6 +4,7 @@ import Future = require("fibers/future");
 import prompt = require("prompt");
 import helpers = require("./helpers");
 import readline = require("readline");
+var MuteStream = require("mute-stream");
 
 export class Prompter implements IPrompter {
 	private ctrlcReader;
@@ -15,12 +16,19 @@ export class Prompter implements IPrompter {
 		prompt.isDefaultValueEditable = true;
 
 		if (helpers.isInteractive()) {
-			process.stdin.setRawMode(true);
+			process.stdin.setRawMode(true); // After setting rawMode to true, Ctrl+C doesn't work for non node.js events loop i.e device log command
+
+			// We need to create mute-stream and to pass it as output to ctrlcReader
+			// This will prevent the prompter to show the user's text twice on the console
+			var mutestream = new MuteStream();
+			mutestream.pipe(process.stdout);
+			mutestream.mute();
 
 			this.ctrlcReader = readline.createInterface(<any>{
 				input: process.stdin,
-				output: process.stdout
+				output: mutestream
 			});
+
 
 			this.ctrlcReader.on("SIGINT", () => process.exit());
 		}
