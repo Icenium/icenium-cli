@@ -23,7 +23,7 @@ export class DeployCommand implements ICommand {
 			if (!this.$project.capabilities.deploy) {
 				this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
-			if (!MobileHelper.isPlatformSupported(args[0])) {
+			if (args[0] && !MobileHelper.isPlatformSupported(args[0])) {
 				this.$errors.fail("On your current OS, you cannot deploy apps on connected %s devices.", MobileHelper.normalizePlatformName(args[0]));
 			}
 
