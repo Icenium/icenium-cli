@@ -35,7 +35,7 @@ declare module Mobile {
 	interface IDeviceDiscovery {
 		deviceFound: ISignal;
 		deviceLost: ISignal;
-		startLookingForDevices?(): IFuture<void>;
+		startLookingForDevices(): IFuture<void>;
 	}
 
 	interface IDevicesServicesInitializationOptions {

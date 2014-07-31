@@ -39,6 +39,10 @@ export class DeviceDiscovery implements Mobile.IDeviceDiscovery {
 		this.raiseOnDeviceLost(device);
 	}
 
+	public startLookingForDevices(): IFuture<void> {
+		return undefined;
+	}
+
 	private raiseOnDeviceFound(device: Mobile.IDevice) {
 		this.deviceFound.dispatch(device);
 	}
@@ -67,10 +71,12 @@ class IOSDeviceDiscovery extends DeviceDiscovery {
 		this.notificationCallbackPtr = CoreTypes.CoreTypes.am_device_notification_callback.toPointer(IOSDeviceDiscovery.deviceNotificationCallback);
 	}
 
-	public startLookingForDevices(): void {
-		this.subscribeForNotifications();
-		var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 1;
-		this.startRunLoopWithTimer(defaultTimeoutInSeconds);
+	public startLookingForDevices(): IFuture<void> {
+		return (() => {
+			this.subscribeForNotifications();
+			var defaultTimeoutInSeconds = options.timeout ? parseInt(options.timeout, 10)/1000 : 1;
+			this.startRunLoopWithTimer(defaultTimeoutInSeconds);
+		}).future<void>()();
 	}
 
 	private static deviceNotificationCallback(devicePointer?: NodeBuffer, user?: number) : any {
