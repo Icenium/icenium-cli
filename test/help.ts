@@ -1,9 +1,9 @@
 ///<reference path=".d.ts"/>
 
 "use strict";
-
+import path = require("path");
 import yok = require("../lib/common/yok");
-import helpCommand = require("../lib/commands/help");
+import helpCommand = require("../lib/common/commands/help");
 import stubs = require("./stubs");
 import Future = require("fibers/future");
 
@@ -21,6 +21,9 @@ describe("help", () => {
 		});
 		injector.register("module", {
 			command: () => "woot"
+		});
+		injector.register("config", {
+			helpTextPath: path.join(__dirname, "../resources/help.txt")
 		});
 
 		var help = injector.resolve(helpCommand.HelpCommand);

@@ -22,6 +22,10 @@ export class Configuration implements IConfiguration {
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	ANALYTICS_API_KEY: string;
 
+	get helpTextPath() {
+		return path.join(__dirname, "../resources/help.txt");
+	}
+
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
 		this.mergeConfig(this, this.loadConfig("config").wait());
