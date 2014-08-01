@@ -87,10 +87,10 @@ export class DevicesServices implements Mobile.IDevicesServices {
 		return (() => {
 			this.$logger.trace("startLookingForDevices; platform is %s", this._platform);
 			if(!this._platform) {
-				this.$iOSDeviceDiscovery.startLookingForDevices();
+				this.$iOSDeviceDiscovery.startLookingForDevices().wait();
 				this.$androidDeviceDiscovery.startLookingForDevices().wait();
 			} else if(MobileHelper.isiOSPlatform(this._platform)) {
-				this.$iOSDeviceDiscovery.startLookingForDevices();
+				this.$iOSDeviceDiscovery.startLookingForDevices().wait();
 			} else if(MobileHelper.isAndroidPlatform(this._platform)) {
 				this.$androidDeviceDiscovery.startLookingForDevices().wait();
 			}
