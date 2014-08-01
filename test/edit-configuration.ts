@@ -4,6 +4,7 @@ import chai = require("chai");
 import fs = require("fs");
 import path = require("path");
 import stubs = require("./stubs");
+import childProcess = require("../lib/common/child-process");
 import fileSystem = require("../lib/common/file-system");
 import project = require("../lib/project");
 import options = require("../lib/options");
@@ -15,6 +16,7 @@ var assert: chai.Assert = chai.assert;
 
 var testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
+testInjector.register("childProcess", childProcess);
 testInjector.register("fs", fileSystem.FileSystem);
 testInjector.register("project", {
 	getProjectDir: () => { return options.path; },

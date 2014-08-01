@@ -20,8 +20,6 @@ $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
 
-$injector.requireCommand(["help", "/?"], "./commands/help");
-
 $injector.requireCommand("plugin|find", "./commands/find-plugins");
 $injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 

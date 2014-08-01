@@ -1,10 +1,10 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
+import path=require("path");
 require("./common/extensions");
 require("./bootstrap");
 import errors = require("./common/errors");
-
 import Fiber = require("fibers");
 import Future = require("fibers/future");
 
