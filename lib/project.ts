@@ -35,7 +35,7 @@ export class Project implements Project.IProject {
 			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
 			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
 
-			if (this.projectData && _.has(this.projectData, "TemplateAppName")) {
+			if (this.projectData && this.projectData["TemplateAppName"]) {
 				this.$errors.fail({
 					formatStr: "This hybrid project targets Apache Cordova 2.x. " +
 						"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
