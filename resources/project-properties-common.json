@@ -24,8 +24,8 @@
 	},
 	"BundleVersion": {
 		"description": "The application (or bundle) version.",
-		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?$",
-		"validationMessage": "The version must consist of two or three numbers separated with dots."
+		"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?$",
+		"validationMessage": "The version must consist of two, three or four numbers separated with dots."
 	},
 	"AndroidPermissions": {
 		"description": "Android permissions required by the app.",
