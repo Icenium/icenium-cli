@@ -21,8 +21,6 @@ export class Project implements Project.IProject {
 		private $logger: ILogger,
 		private $projectNameValidator,
 		private $errors: IErrors,
-		private $userDataStore: IUserDataStore,
-		private $loginManager: ILoginManager,
 		private $resources: IResourceLoader,
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
@@ -75,10 +73,10 @@ export class Project implements Project.IProject {
 			var result: string[] = [], dir: string, fileMask: RegExp;
 
 			if (this.projectType === this.$projectTypes.Cordova) {
-				dir = this.getProjectDir();
+				dir = this.getProjectDir().wait();
 				fileMask = /^cordova\.(\w*)\.js$/i;
 			} else { // NativeScript
-				dir = path.join(this.getProjectDir(), "app");
+				dir = path.join(this.getProjectDir().wait(), "app");
 				fileMask = /^bootstrap\.(\w*)\.js$/i;
 			}
 
@@ -94,31 +92,33 @@ export class Project implements Project.IProject {
 		}).future<string[]>()();
 	}
 
-	public getProjectDir(): string {
-		if (this.cachedProjectDir !== "") {
+	public getProjectDir(): IFuture<string> {
+		return (() => {
+			if (this.cachedProjectDir !== "") {
+				return this.cachedProjectDir;
+			}
+			this.cachedProjectDir = null;
+
+			var projectDir = path.resolve(options.path || ".");
+			while (true) {
+				this.$logger.trace("Looking for project in '%s'", projectDir);
+
+				if (this.$fs.exists(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait()) {
+					this.$logger.debug("Project directory is '%s'.", projectDir);
+					this.cachedProjectDir = projectDir;
+					break;
+				}
+
+				var dir = path.dirname(projectDir);
+				if (dir === projectDir) {
+					this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
+					break;
+				}
+				projectDir = dir;
+			}
+
 			return this.cachedProjectDir;
-		}
-		this.cachedProjectDir = null;
-
-		var projectDir = path.resolve(options.path || ".");
-		while (true) {
-			this.$logger.trace("Looking for project in '%s'", projectDir);
-
-			if (this.$fs.exists(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait()) {
-				this.$logger.debug("Project directory is '%s'.", projectDir);
-				this.cachedProjectDir = projectDir;
-				break;
-			}
-
-			var dir = path.dirname(projectDir);
-			if (dir === projectDir) {
-				this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
-				break;
-			}
-			projectDir = dir;
-		}
-
-		return this.cachedProjectDir;
+		}).future<string>()();
 	}
 
 	private static IGNORE_FILE = ".abignore";
@@ -130,16 +130,16 @@ export class Project implements Project.IProject {
 			var excludedProjectDirsAndFiles = Project.INTERNAL_NONPROJECT_FILES.
 				concat(additionalExcludedProjectDirsAndFiles || []);
 
-			var projectDir = this.getProjectDir();
+			var projectDir = this.getProjectDir().wait();
 			var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
 				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
 				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
 			});
 
-			var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(this.getProjectDir(), Project.IGNORE_FILE));
+			var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(projectDir, Project.IGNORE_FILE));
 
-			projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, this.getProjectDir());
+			projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, projectDir);
 
 			this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
 			return projectFiles;
@@ -164,7 +164,7 @@ export class Project implements Project.IProject {
 
 	private readProjectData(): IFuture<void> {
 		return (() => {
-			var projectDir = this.getProjectDir();
+			var projectDir = this.getProjectDir().wait();
 			if (projectDir) {
 				var data = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
 				this.projectData = data;
@@ -263,7 +263,7 @@ export class Project implements Project.IProject {
 			try {
 				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
 					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
-					var cordovaJsFileName = path.join(this.getProjectDir(), util.format("cordova.%s.js", platform).toLowerCase());
+					var cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
 					var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
 					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
@@ -547,7 +547,7 @@ export class Project implements Project.IProject {
 			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
 			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
-			this.saveProject(this.getProjectDir()).wait();
+			this.saveProject(this.getProjectDir().wait()).wait();
 		}).future<void>()();
 	}
 

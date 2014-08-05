@@ -28,7 +28,7 @@ export class EditConfigurationCommand implements ICommand {
 		return (() => {
 			if (template) {
 				this.$project.ensureProject();
-				var projectPath = this.$project.getProjectDir();
+				var projectPath = this.$project.getProjectDir().wait();
 				var filepath = path.join(projectPath, template.filepath);
 				var directory = path.dirname(filepath);
 				if (!this.$fs.exists(filepath).wait()) {

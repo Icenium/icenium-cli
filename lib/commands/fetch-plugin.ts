@@ -15,7 +15,7 @@ export class FetchPluginCommand implements ICommand {
 			if (args.length === 0) {
 				this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
 			} else if (args.length === 1 && (this.isLocalPath(args[0]).wait() || this.isUrlToRepository(args[0]))) {
-				var result = this.$cordovaPluginsService.fetch(args[0]);
+				var result = this.$cordovaPluginsService.fetch(args[0]).wait();
 				this.$logger.out(result);
 			} else {
 				var plugins = this.$cordovaPluginsService.getPlugins(args);
@@ -25,7 +25,7 @@ export class FetchPluginCommand implements ICommand {
 				} else if (pluginsCount > 1) {
 					this.$logger.out("There are more then 1 matching plugins.");
 				} else {
-					this.$logger.out(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]));
+					this.$logger.out(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]).wait());
 				}
 			}
 		}).future<void>()();

@@ -85,7 +85,7 @@ export class SimulateCommand implements ICommand {
 			var projectTargets = this.$project.projectTargets.wait().join(";");
 
 			var simulatorParams = [
-				"--path", this.$project.getProjectDir(),
+				"--path", this.$project.getProjectDir().wait(),
 				"--statusbarstyle", this.projectData.iOSStatusBarStyle,
 				"--frameworkversion", this.projectData.FrameworkVersion,
 				"--orientations", this.projectData.DeviceOrientations.join(";"),

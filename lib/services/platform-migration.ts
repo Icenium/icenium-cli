@@ -20,7 +20,7 @@ export class PlatformMigrationService implements Project.IPlatformMigrator {
 
 			var appResourcesDir = this.$resources.appResourcesDir;
 			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
-			var projectDir = this.$project.getProjectDir();
+			var projectDir = this.$project.getProjectDir().wait();
 			appResourceFiles.forEach((appResourceFile) => {
 				var relativePath = path.relative(appResourcesDir, appResourceFile);
 				var targetFilePath = path.join(projectDir, relativePath);
@@ -44,7 +44,7 @@ export class PlatformMigrationService implements Project.IPlatformMigrator {
 
 	private ensureCordovaJs(platform: string): IFuture<void> {
 		return (() => {
-			var cordovaJsFileName = path.join(this.$project.getProjectDir(), util.format("cordova.%s.js", platform).toLowerCase());
+			var cordovaJsFileName = path.join(this.$project.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
 			if (!this.$fs.exists(cordovaJsFileName).wait()) {
 				this.printAssetUpdateMessage();
 				var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(

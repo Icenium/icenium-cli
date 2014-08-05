@@ -33,18 +33,19 @@ export class CordovaPluginsService {
 		return future.wait();
 	}
 
-	public fetch(pluginId: string): string {
-		this.$project.ensureProject();
-		var future = new Future<string>();
-		plugman.fetch(pluginId, this.getPluginsDir(), false, ".", "HEAD", (result) => {
-			if (this.isError(result)) {
-				future.throw(result);
-			} else {
-				var message = util.format("The plugin has been successfully fetched to %s", result);
-				future.return(message);
-			}
-		});
-		return future.wait();
+	public fetch(pluginId: string): IFuture<string> {
+		return(() => {
+			this.$project.ensureProject();
+			var future = new Future<string>();
+			plugman.fetch(pluginId, this.getPluginsDir().wait(), false, ".", "HEAD", (result) => {
+				if (this.isError(result)) {
+					future.throw(result);
+				} else {
+					future.return(util.format("The plugin has been successfully fetched to %s", result));
+				}
+			});
+			return future.wait();
+		}).future<string>()();
 	}
 
 	public configure(): void {
@@ -64,8 +65,10 @@ export class CordovaPluginsService {
 		return object instanceof Error;
 	}
 
-	private getPluginsDir() {
-		return path.join(this.$project.getProjectDir(), "plugins");
+	private getPluginsDir(): IFuture<string> {
+		return(() => {
+			return path.join(this.$project.getProjectDir().wait(), "plugins");
+		}).future<string>()();
 	}
 }
 $injector.register("cordovaPluginsService", CordovaPluginsService);

@@ -272,36 +272,40 @@ describe("project unit tests", () => {
 });
 
 describe("project unit tests (canonical paths)", () => {
-	var project, testInjector;
+	var project, testInjector, oldPath;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
 		testInjector.resolve("config").PROJECT_FILE_NAME = "";
+		oldPath = options.path;
+	});
+	after(() => {
+		options.path = oldPath;
 	});
 
 	it("no ending path separator", () => {
 		options.path = "test";
 		var project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("one ending path separator", () => {
 		options.path = "test" + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("multiple ending path separator", () => {
 		options.path = "test" + path.sep + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("do not remove separators which are not at the end", () => {
 		options.path = "test" + path.sep + "test" + path.sep;
 		var project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test" + path.sep + "test"));
+		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test" + path.sep + "test"));
 	});
 });

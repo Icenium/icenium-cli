@@ -90,31 +90,35 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IBuildResult>()();
 	}
 
-	private getTempDir(): string {
-		var dir = path.join(this.$project.getProjectDir(), ".ab");
-		this.$fs.createDirectory(dir).wait();
-		return dir;
+	private getTempDir(): IFuture<string> {
+		return(() => {
+			var dir = path.join(this.$project.getProjectDir().wait(), ".ab");
+			this.$fs.createDirectory(dir).wait();
+			return dir;
+		}).future<string>()();
 	}
 
-	private getProjectRelativePath(fullPath): string {
-		var projectDir = this.$project.getProjectDir() + path.sep;
-		if (!fullPath.startsWith(projectDir)) {
-			throw new Error("File is not part of the project.");
-		}
+	private getProjectRelativePath(fullPath): IFuture<string> {
+		return(() => {
+			var projectDir = this.$project.getProjectDir().wait() + path.sep;
+			if (!fullPath.startsWith(projectDir)) {
+				throw new Error("File is not part of the project.");
+			}
 
-		return fullPath.substring(projectDir.length);
+			return fullPath.substring(projectDir.length);
+		}).future<string>()();
 	}
 
 	private zipProject(): IFuture<string> {
 		return (() => {
-			var tempDir = this.getTempDir();
+			var tempDir = this.getTempDir().wait();
 
 			var projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
 
 			var files = this.$project.enumerateProjectFiles().wait();
 			var zipOp = this.$fs.zipFiles(projectZipFile, files,
-				(path) => this.getProjectRelativePath(path));
+				(path) => this.getProjectRelativePath(path).wait());
 
 			var result = new Future<string>();
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
@@ -253,7 +257,7 @@ export class BuildService implements Project.IBuildService {
 				this.$config.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
-				var buildLogFilePath = path.join(this.getTempDir(), "build.log");
+				var buildLogFilePath = path.join(this.getTempDir().wait(), "build.log");
 				this.$fs.writeFile(buildLogFilePath, result.output).wait();
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
@@ -278,7 +282,7 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			var templateFiles = helpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir(), path.basename(file)));
+			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir().wait(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each((zipped) => {
 				var srcFile = zipped[0];
@@ -362,7 +366,7 @@ export class BuildService implements Project.IBuildService {
 			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
 					var targetFileName = settings.downloadedFilePath
-						|| path.join(this.$project.getProjectDir(), path.basename(pkg.solutionPath));
+						|| path.join(this.$project.getProjectDir().wait(), path.basename(pkg.solutionPath));
 
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
 					var targetFile = this.$fs.createWriteStream(targetFileName);
