@@ -22,7 +22,7 @@ describe("help", () => {
 		injector.register("module", {
 			command: () => "woot"
 		});
-		injector.register("config", {
+		injector.register("staticConfig", {
 			helpTextPath: path.join(__dirname, "../resources/help.txt")
 		});
 

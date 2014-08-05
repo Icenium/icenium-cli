@@ -5,30 +5,34 @@
 import path = require("path");
 import helpers = require("./helpers");
 
-export class Configuration implements IConfiguration {
+export class Configuration implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG :boolean;
 	PROXY_TO_FIDDLER: boolean;
-	PROJECT_FILE_NAME: string;
-	SOLUTION_SPACE_NAME: string;
-	QR_SIZE: number;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
 	CI_LOGGER: boolean;
-	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
-	ANALYTICS_API_KEY: string;
-
-	get helpTextPath() {
-		return path.join(__dirname, "../resources/help.txt");
-	}
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
 		this.mergeConfig(this, this.loadConfig("config").wait());
+	}
+
+	public reset(): IFuture<void> {
+		return this.copyFile(this.getConfigName("config-base"), this.getConfigName("config"));
+	}
+
+	public apply(configName: string): IFuture<void> {
+		return ((): any => {
+			var baseConfig = this.loadConfig("config-base").wait();
+			var newConfig = this.loadConfig("config-" + configName).wait();
+			this.mergeConfig(baseConfig, newConfig);
+			this.saveConfig(baseConfig, "config").wait();
+		}).future<void>()();
 	}
 
 	private getConfigName(filename: string) : string {
@@ -64,22 +68,24 @@ export class Configuration implements IConfiguration {
 			config[key] = mergeFrom[key];
 		});
 	}
-
-	reset(): IFuture<void> {
-		return this.copyFile(this.getConfigName("config-base"), this.getConfigName("config"));
-	}
-
-	apply(configName: string): IFuture<void> {
-		return ((): any => {
-			var baseConfig = this.loadConfig("config-base").wait();
-			var newConfig = this.loadConfig("config-" + configName).wait();
-			this.mergeConfig(baseConfig, newConfig);
-			this.saveConfig(baseConfig, "config").wait();
-		}).future<void>()();
-	}
-
-	public version: string = require("../package.json").version;
 }
 $injector.register("config", Configuration);
+
 helpers.registerCommand("config", "dev-config-reset", (config, args) => config.reset());
 helpers.registerCommand("config", "dev-config-apply", (config, args) => config.apply(args[0]));
+
+export class StaticConfig implements IStaticConfig {
+	public PROJECT_FILE_NAME = ".abproject";
+	public CLIENT_NAME = "appbuilder";
+	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
+
+	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
+	public QR_SIZE = 300;
+
+	public version = require("../package.json").version;
+
+	public get helpTextPath() {
+		return path.join(__dirname, "../resources/help.txt");
+	}
+}
+$injector.register("staticConfig", StaticConfig);

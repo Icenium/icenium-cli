@@ -18,6 +18,7 @@ export class Project implements Project.IProject {
 	constructor(private $fs: IFileSystem,
 		private $injector: IInjector,
 		private $config: IConfiguration,
+		private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
 		private $projectNameValidator,
 		private $errors: IErrors,
@@ -103,7 +104,7 @@ export class Project implements Project.IProject {
 			while (true) {
 				this.$logger.trace("Looking for project in '%s'", projectDir);
 
-				if (this.$fs.exists(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait()) {
+				if (this.$fs.exists(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait()) {
 					this.$logger.debug("Project directory is '%s'.", projectDir);
 					this.cachedProjectDir = projectDir;
 					break;
@@ -159,14 +160,14 @@ export class Project implements Project.IProject {
 	}
 
 	public saveProject(projectDir: string): IFuture<void> {
-		return this.$fs.writeJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME), this.projectData, "\t");
+		return this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t");
 	}
 
 	private readProjectData(): IFuture<void> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
 			if (projectDir) {
-				var data = this.$fs.readJson(path.join(projectDir, this.$config.PROJECT_FILE_NAME)).wait();
+				var data = this.$fs.readJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait();
 				this.projectData = data;
 
 				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
@@ -211,7 +212,7 @@ export class Project implements Project.IProject {
 	private createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
-			var projectFile = path.join(projectDir, this.$config.PROJECT_FILE_NAME);
+			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 			if (this.$fs.exists(projectFile).wait()) {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
