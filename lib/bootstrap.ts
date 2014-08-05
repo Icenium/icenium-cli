@@ -4,6 +4,7 @@ require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
+$injector.require("staticConfig", "./config");
 $injector.requireCommand("dev-config-apply", "./config");
 $injector.requireCommand("dev-config-reset", "./config");
 $injector.require("resources", "./resource-loader");

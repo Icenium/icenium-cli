@@ -5,7 +5,8 @@ var qrlib: any = require("../vendor/qrcode");
 "use strict";
 
 export class QrCodeGenerator implements IQrCodeGenerator {
-	constructor(private $config: IConfiguration) {}
+	constructor(private $config: IConfiguration,
+		private $staticConfig: IStaticConfig) {}
 
 	public generateQrCode(data) {
 		for (var i = 1; i <= 10; ++i) {
@@ -30,7 +31,7 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 	generateDataUri(data: string): string {
 		var qr = this.generateQrCode(data);
 		var cells = qr.getModuleCount();
-		var size = this.$config.QR_SIZE;
+		var size = this.$staticConfig.QR_SIZE;
 		var cellSize = Math.ceil(size / (cells + 2*4 /* margin */));
 
 		return qr.createDataUri(cellSize);

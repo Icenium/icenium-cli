@@ -15,7 +15,7 @@ export class AnalyticsService implements IAnalyticsService {
 
 	private excluded = ["help", "feature-usage-tracking"];
 
-	constructor(private $config: IConfiguration,
+	constructor(private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
 		private $errors: IErrors,
 		private $prompter: IPrompter,
@@ -63,8 +63,8 @@ export class AnalyticsService implements IAnalyticsService {
 
 			require("../../vendor/EqatecMonitor");
 
-			var settings = global._eqatec.createSettings(this.$config.ANALYTICS_API_KEY);
-			settings.version = this.$config.version;
+			var settings = global._eqatec.createSettings(this.$staticConfig.ANALYTICS_API_KEY);
+			settings.version = this.$staticConfig.version;
 			settings.loggingInterface = {
 				logMessage: this.$logger.trace.bind(this.$logger),
 				logError: this.$logger.debug.bind(this.$logger)

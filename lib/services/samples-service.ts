@@ -39,7 +39,7 @@ export class SamplesService implements ISamplesService {
 		private $fs: IFileSystem,
 		private $project: Project.IProject,
 		private $httpClient: Server.IHttpClient,
-		private $config: IConfiguration) {
+		private $staticConfig: IStaticConfig) {
 	}
 
 	private get samples(): IFuture<Sample[]> {
@@ -81,7 +81,7 @@ export class SamplesService implements ISamplesService {
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
-				var projectFile = _.first(helpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$config.PROJECT_FILE_NAME ));
+				var projectFile = _.first(helpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME ));
 				var projectDir = path.dirname(projectFile);
 				var files = helpers.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {

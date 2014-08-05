@@ -74,6 +74,7 @@ describe("ServiceProxy", () => {
 
 	before(() => {
 		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});

@@ -221,26 +221,20 @@ interface IServerConfigurationData {
 	eqatecProductId: string;
 }
 
-interface IConfiguration {
-	AB_SERVER_PROTO: string;
-	AB_SERVER: string;
-	DEBUG: boolean;
-	PROXY_TO_FIDDLER: boolean;
-	PROJECT_FILE_NAME: string;
-	SOLUTION_SPACE_NAME: string;
-	QR_SIZE: number;
+interface IConfiguration extends Config.IConfig {
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
-	CI_LOGGER: boolean;
-	WRAP_CLIENT_ID: string;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
-	ANALYTICS_API_KEY: string;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
-	version: string;
+}
+
+interface IStaticConfig extends Config.IStaticConfig {
+	QR_SIZE: number;
+	SOLUTION_SPACE_NAME: string;
 }
 
 interface IServerConfiguration {

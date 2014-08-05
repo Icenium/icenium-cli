@@ -16,6 +16,7 @@ export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "install/WinPhoneAet";
 
 	constructor(private $config: IConfiguration,
+		private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
 		private $errors: IErrors,
 		private $server: Server.IServer,
@@ -254,7 +255,7 @@ export class BuildService implements Project.IBuildService {
 			});
 
 			var result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
-				this.$config.SOLUTION_SPACE_NAME, buildProperties).wait();
+				this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
 				var buildLogFilePath = path.join(this.getTempDir().wait(), "build.log");

@@ -20,6 +20,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 		private $userDataStore: IUserDataStore,
 		private $logger: ILogger,
 		private $config: IConfiguration,
+		private $staticConfig: IStaticConfig,
 		private $errors: IErrors) {
 	}
 
@@ -28,7 +29,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 			this.ensureUpToDate().wait();
 
 			var headers: any = {
-				"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$config.SOLUTION_SPACE_NAME
+				"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME
 			};
 
 			if (this.shouldAuthenticate) {
@@ -111,7 +112,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 				this.latestVersion = "0.0.0";
 			}
 
-			if (helpers.versionCompare(this.latestVersion, this.$config.version) > 0) {
+			if (helpers.versionCompare(this.latestVersion, this.$staticConfig.version) > 0) {
 				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm update -g appbuilder'.", suppressCommandHelp: true });
 			}
 		}).future<void>()();

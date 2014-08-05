@@ -35,6 +35,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("opener", stubs.OpenerStub);
 	testInjector.register("config", require("../lib/config").Configuration);
+	testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 	testInjector.register("server", {});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
@@ -167,8 +168,10 @@ describe("project unit tests", () => {
 		projectTypes = testInjector.resolve("projectTypes");
 
 		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 		var config = testInjector.resolve("config");
-		config.PROJECT_FILE_NAME = "";
+		var staticConfig = testInjector.resolve("staticConfig");
+		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 
 		project = testInjector.resolve("project");
@@ -276,9 +279,10 @@ describe("project unit tests (canonical paths)", () => {
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.register("projectPropertiesService", projectProperties.ProjectPropertiesService);
-		testInjector.resolve("config").PROJECT_FILE_NAME = "";
+		testInjector.resolve("staticConfig").PROJECT_FILE_NAME = "";
 		oldPath = options.path;
 	});
 	after(() => {
