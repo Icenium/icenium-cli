@@ -140,7 +140,7 @@ declare module Project {
 		projectType: number;
 		capabilities: IProjectCapabilities;
 		projectTargets: IFuture<string[]>;
-		getProjectDir(): string;
+		getProjectDir(): IFuture<string>;
 		ensureProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;

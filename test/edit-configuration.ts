@@ -3,6 +3,7 @@
 import chai = require("chai");
 import fs = require("fs");
 import path = require("path");
+import Future = require("fibers/future");
 import stubs = require("./stubs");
 import childProcess = require("../lib/common/child-process");
 import fileSystem = require("../lib/common/file-system");
@@ -19,7 +20,9 @@ testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("childProcess", childProcess);
 testInjector.register("fs", fileSystem.FileSystem);
 testInjector.register("project", {
-	getProjectDir: () => { return options.path; },
+	getProjectDir: (): IFuture<string> => {
+		return (() => options.path).future<string>()();
+	},
 	ensureProject: () => {}
 });
 testInjector.register("errors", stubs.ErrorsStub);

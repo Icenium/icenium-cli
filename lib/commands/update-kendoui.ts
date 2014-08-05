@@ -74,7 +74,7 @@ class UpdateKendoUICommand implements ICommand {
 			var response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 
-			var outDir = path.join(this.$project.getProjectDir(), "kendo");
+			var outDir = path.join(this.$project.getProjectDir().wait(), "kendo");
 			this.$fs.unzip(filepath, outDir).wait();
 
 		}).future<void>()();

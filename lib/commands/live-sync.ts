@@ -53,7 +53,7 @@ export class LiveSyncCommand implements ICommand {
 				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
-			var projectDir = this.$project.getProjectDir();
+			var projectDir = this.$project.getProjectDir().wait();
 
 			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
 				this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
