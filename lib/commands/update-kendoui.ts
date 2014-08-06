@@ -27,7 +27,7 @@ class UpdateKendoUICommand implements ICommand {
 
 			this.$logger.out("You can download and install the following Kendo UI Core or Kendo UI Professional packages.");
 			_.each(packages, (update: Server.IKendoDownloadablePackageData, idx: number) => {
-				this.$logger.out("\t[%s] %s %s", (idx+1).toString().cyan, update.Name, update.Version);
+				this.$logger.out("\t[%s] %s %s", (idx+1).toString().cyan.toString(), update.Name, update.Version);
 			});
 
 			var schema: IPromptSchema = {

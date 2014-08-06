@@ -47,6 +47,7 @@ export class DeployCommand implements ICommand {
 				if(!packageFile) {
 					var packageDefs = this.$buildService.deploy(this.$devicesServices.platform, device).wait();
 					packageFile = packageDefs[0].localFile;
+
 					this.$logger.debug("Ready to deploy %s", packageFile);
 					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
 				}

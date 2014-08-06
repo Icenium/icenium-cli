@@ -243,15 +243,6 @@ interface IServerConfiguration {
 	assemblyVersion: IFuture<string>;
 }
 
-interface IPrompter extends IDisposable {
-	start(): void;
-	get(schema: IPromptSchema): IFuture<any>;
-	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string>;
-	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean>;
-	history(name: string): IPromptHistoryValue;
-	override(object: any): void;
-}
-
 interface IExtensionPlatformServices {
 	getPackageName() : string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
@@ -300,21 +291,14 @@ interface IResourceDownloader {
 	downloadCordovaJsFiles(): IFuture<void>;
 }
 
-interface IAnalyticsService {
-	checkConsent(featureName: string): IFuture<void>;
-	trackFeature(featureName: string): IFuture<void>;
-	trackException(exception: any, message: string): IFuture<void>;
-}
-
 interface IUserSettingsFileService {
 	deleteUserSettingsFile(): IFuture<void>;
 	userSettingsFilePath: string;
 }
 
-interface IUserSettingsService {
+interface IUserSettingsService extends UserSettings.IUserSettingsService {
 	loadUserSettingsFile(): IFuture<void>;
-	saveSettings(data: {[key: string]: {}}): IFuture<void>;
-	getValue(propertyName: string): IFuture<any>;
+	saveSettings(data: IDictionary<{}>): IFuture<void>;
 }
 
 interface IServerExtensionsService {

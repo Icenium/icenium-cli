@@ -255,7 +255,7 @@ export class Project implements Project.IProject {
 			this.$logger.info("Migrating to cordova version %s", newVersion);
 			var oldVersion = this.projectData.FrameworkVersion;
 			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
-			this.$logger.trace("Migrated core plugins to ", newPluginsList.toString());
+			this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 			this.projectData.CorePlugins = newPluginsList;
 
 			var successfullyChanged: string[] = [],
