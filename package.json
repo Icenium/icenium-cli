@@ -39,12 +39,14 @@
     "minimatch": "0.2.14",
     "mkdirp": "0.3.5",
     "moment": "2.5.1",
+    "mute-stream": "0.0.4",
     "node-uuid": "1.4.1",
     "open": "0.0.4",
     "plistlib": "0.2.1",
     "plugman": "0.16.0",
     "progress-stream": "0.5.0",
     "prompt": "https://github.com/Icenium/prompt/tarball/master",
+    "properties-parser": "0.2.3",
     "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ref-struct": "0.0.5",
@@ -61,8 +63,7 @@
     "xml2js": "0.4.1",
     "xmlhttprequest": "1.6.0",
     "yargs": "1.2.2",
-    "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master",
-    "mute-stream": "0.0.4"
+    "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master"
   },
   "analyze": true,
   "devDependencies": {
