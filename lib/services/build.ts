@@ -99,15 +99,13 @@ export class BuildService implements Project.IBuildService {
 		}).future<string>()();
 	}
 
-	private getProjectRelativePath(fullPath): IFuture<string> {
-		return(() => {
-			var projectDir = this.$project.getProjectDir().wait() + path.sep;
-			if (!fullPath.startsWith(projectDir)) {
-				throw new Error("File is not part of the project.");
-			}
+	private getProjectRelativePath(fullPath, projectDir): string {
+		projectDir = path.join(projectDir, path.sep);
+		if (!fullPath.startsWith(projectDir)) {
+			throw new Error("File is not part of the project.");
+		}
 
-			return fullPath.substring(projectDir.length);
-		}).future<string>()();
+		return fullPath.substring(projectDir.length);
 	}
 
 	private zipProject(): IFuture<string> {
@@ -116,10 +114,11 @@ export class BuildService implements Project.IBuildService {
 
 			var projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
+			var projectDir = this.$project.getProjectDir().wait();
 
 			var files = this.$project.enumerateProjectFiles().wait();
 			var zipOp = this.$fs.zipFiles(projectZipFile, files,
-				(path) => this.getProjectRelativePath(path).wait());
+				p => this.getProjectRelativePath(p, projectDir));
 
 			var result = new Future<string>();
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
