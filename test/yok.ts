@@ -1,12 +1,11 @@
 ///<reference path=".d.ts"/>
-
+"use strict";
 import chai = require("chai");
 var assert:chai.Assert = chai.assert;
-
 import yok = require("../lib/common/yok");
 
 class MyClass {
-	constructor(private x, public y) {
+	constructor(private x:string, public y:any) {
 	}
 
 	public checkX():void {
@@ -27,7 +26,7 @@ describe("yok", () => {
 
 	it("resolves given constructor", () => {
 		var injector = new yok.Yok();
-		var obj;
+		var obj:any;
 		injector.register("foo", () => {
 			obj = {foo:"foo"};
 			return obj;
@@ -46,14 +45,14 @@ describe("yok", () => {
 		var r2 = injector.resolve("foo");
 
 		assert.strictEqual(r1, r2);
-	})
+	});
 
 	it("injects directly into passed constructor", () => {
 		var injector = new yok.Yok();
-		var obj = {}
+		var obj = {};
 		injector.register("foo", obj);
 
-		function Test(foo) {
+		function Test(foo:any) {
 			this.foo = foo;
 		}
 
@@ -67,7 +66,7 @@ describe("yok", () => {
 		var obj = {};
 		injector.register("foo", obj);
 
-		function Test(foo) {
+		function Test(foo:any) {
 			this.foo = foo;
 		}
 
@@ -80,10 +79,10 @@ describe("yok", () => {
 
 	it("inject dependency with $ prefix", () => {
 		var injector = new yok.Yok();
-		var obj = {}
+		var obj = {};
 		injector.register("foo", obj);
 
-		function Test($foo) {
+		function Test($foo:any) {
 			this.foo = $foo;
 		}
 
@@ -120,17 +119,17 @@ describe("yok", () => {
 		var injector = new yok.Yok();
 		var command = injector.resolveCommand("command");
 		assert.isNull(command);
-	})
+	});
 
 	it("throws when it can't resolve a registered command", () => {
 		var injector = new yok.Yok();
 
-		function Command(whatever) {}
+		function Command(whatever:any) {}
 
 		injector.registerCommand("command", Command);
 
 		assert.throws(() => injector.resolveCommand("command"));
-	})
+	});
 
 	it("disposes", () => {
 		var injector = new yok.Yok();
@@ -139,7 +138,7 @@ describe("yok", () => {
 
 		Thing.prototype.dispose = function() {
 			this.disposed = true;
-		}
+		};
 
 		injector.register("thing", Thing);
 		var thing = injector.resolve("thing");
@@ -147,4 +146,4 @@ describe("yok", () => {
 
 		assert.isTrue(thing.disposed);
 	});
-})
+});

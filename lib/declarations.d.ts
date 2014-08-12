@@ -1,6 +1,3 @@
-interface IStringDictionary {
-	[key: string]: string;
-}
 
 declare module Server {
 	interface IRequestBodyElement {
@@ -29,10 +26,10 @@ declare module Server {
 	}
 
 	interface IIdentityManager {
-		listCertificates(): IFuture<any>;
-		listProvisions(): IFuture<any>;
-		findCertificate(identityStr): IFuture<ICryptographicIdentity>;
-		findProvision(provisionStr): IFuture<IProvision>;
+		listCertificates(): IFuture<void>;
+		listProvisions(): IFuture<void>;
+		findCertificate(identityStr: string): IFuture<ICryptographicIdentity>;
+		findProvision(provisionStr: string): IFuture<IProvision>;
 		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision>;
 		autoselectCertificate(provision: IProvision): IFuture<ICryptographicIdentity>;
 		isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean;
@@ -116,7 +113,7 @@ declare module Project {
 
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
-		buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult>;
+		buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult>;
 		importProject(): IFuture<void>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
@@ -151,6 +148,8 @@ declare module Project {
 		createCordovaProjectFileFromExistingProject(): IFuture<void>;
 		createNativeScriptProjectFileFromExistingProject(): IFuture<void>;
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
+		createTemplateFolder(projectDir: string): IFuture<any>;
+		updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping?: boolean) : IFuture<void>;
 	}
 
 	interface IPlatformMigrator {
@@ -253,7 +252,7 @@ interface IPrompter extends IDisposable {
 
 interface IExtensionPlatformServices {
 	getPackageName() : string;
-	runApplication(applicationPath: string, applicationParams: string[]);
+	runApplication(applicationPath: string, applicationParams: string[]): void;
 }
 
 interface IX509Certificate {
@@ -337,4 +336,8 @@ interface ISamplesService {
 
 interface IHostCapabilities {
 	debugToolsSupported: boolean;
+}
+
+interface IProjectNameValidator {
+	validate(name: string): boolean;
 }

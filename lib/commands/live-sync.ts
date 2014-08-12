@@ -133,13 +133,8 @@ export class LiveSyncCommand implements ICommand {
 		watchr.watch({
 			paths: [projectDir],
 			listeners: {
-//				log: (logLevel, ...args) => {
-//					this.$logger.debug.apply(this.$logger, args);
-//				},
-				error: (error) => {
-					this.$errors.fail(error);
-				},
-				change: (changeType, filePath) => {
+				error: (error: Error) => this.$errors.fail(error.toString()),
+				change: (changeType: string, filePath: string) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
 						if (LiveSyncCommand.shouldIncludeFile(this.$devicesServices.platform, filePath)) {
@@ -147,14 +142,13 @@ export class LiveSyncCommand implements ICommand {
 						}
 					}
 				},
-				next: (error, watchers) => {
+				next: (error: Error, _watchers: any) => {
+					var watchers: watchr.IWatcherInstance[] = _watchers;
 					if(error) {
-						this.$errors.fail(error);
+						this.$errors.fail(error.toString());
 					}
 					this.$logger.trace("File system watchers are stopping.");
-					for (var i = 0; i < watchers.length; i++) {
-						watchers[i].close();
-					}
+					_.each(watchers, (watcher) => watcher.close());
 					this.$logger.trace("File system watchers are stopped.");
 				}
 			}

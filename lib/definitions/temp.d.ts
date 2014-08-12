@@ -5,8 +5,8 @@ interface ITempPathOptions {
 }
 
 declare module "temp" {
-	function track();
-	function cleanup();
-	function mkdirSync(affixes: string);
+	function track(): void;
+	function cleanup(): void;
+	function mkdirSync(affixes: string): string;
 	function path(options: ITempPathOptions) : string;
 }

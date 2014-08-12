@@ -1,11 +1,10 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
-
 import minimatch = require("minimatch");
 import path = require("path");
 var options:any = require("./options");
 import util = require("util");
+import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
 import os = require("os");
 import MobileHelper = require("./mobile/mobile-helper");
@@ -20,7 +19,7 @@ export class Project implements Project.IProject {
 		private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
-		private $projectNameValidator,
+		private $projectNameValidator: IProjectNameValidator,
 		private $errors: IErrors,
 		private $resources: IResourceLoader,
 		private $templatesService: ITemplatesService,
@@ -132,7 +131,7 @@ export class Project implements Project.IProject {
 				concat(additionalExcludedProjectDirsAndFiles || []);
 
 			var projectDir = this.getProjectDir().wait();
-			var projectFiles = helpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
+			var projectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
 				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
 				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
@@ -236,7 +235,7 @@ export class Project implements Project.IProject {
 
 	public getSupportedPlugins(): IFuture<string[]> {
 		return (() => {
-			var version;
+			var version: string;
 			if (this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
@@ -256,10 +255,10 @@ export class Project implements Project.IProject {
 			this.$logger.info("Migrating to cordova version %s", newVersion);
 			var oldVersion = this.projectData.FrameworkVersion;
 			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
-			this.$logger.trace("Migrated core plugins to", newPluginsList);
+			this.$logger.trace("Migrated core plugins to ", newPluginsList.toString());
 			this.projectData.CorePlugins = newPluginsList;
 
-			var successfullyChanged = [],
+			var successfullyChanged: string[] = [],
 				backupSuffix = ".backup";
 			try {
 				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
@@ -307,7 +306,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			var templatesDir = this.$templatesService.projectTemplatesDir,
 				template = options.template || this.defaultProjectForType[projectType],
-				templateFileName;
+				templateFileName: string;
 
 			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(projectType, template));
 			this.$logger.trace("Using template '%s'", templateFileName);
@@ -387,7 +386,7 @@ export class Project implements Project.IProject {
 
 	private validateProjectData(projectType: number, properties: any): IFuture<void> {
 		return (() => {
-			var updateData;
+			var updateData: any;
 			var projectSchema = helpers.getProjectFileSchema(projectType).wait();
 			Object.keys(properties).forEach(propertyName => {
 				if (_.has(projectSchema, propertyName)) {
@@ -446,7 +445,7 @@ export class Project implements Project.IProject {
 			property = this.normalizePropertyName(property, propSchema);
 			var propData = propSchema[property];
 
-			var validate = (condition: boolean, ...args) => {
+			var validate = (condition: boolean, ...args: string[]) => {
 				if(condition) {
 					if(propData.validationMessage) {
 						this.$errors.fail(propData.validationMessage);
@@ -475,12 +474,12 @@ export class Project implements Project.IProject {
 			if (range) {
 				newValue = _.map(newValue, (value: string) => value.toLowerCase());
 
-				var validValues;
+				var validValues: any;
 				if (_.isArray(range)) {
 					validValues = helpers.toHash(range, (value) => value.toLowerCase(), _.identity);
 				} else {
-					var keySelector = (value, key) => {
-						var result;
+					var keySelector = (value: any, key: string) => {
+						var result: string;
 						if (useMapping && value.input) {
 							result = value.input;
 						} else {
@@ -572,7 +571,7 @@ export class Project implements Project.IProject {
 
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
-			var result = [];
+			var result: string[] = [];
 			var schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Cordova]).wait();
 			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
 			result.push(this.getProjectSchemaPartHelp(schema, title));
@@ -591,12 +590,12 @@ export class Project implements Project.IProject {
 
 	private getProjectSchemaPartHelp(schema: string, title: string): string {
 		var help = [title];
-		_.each(schema, (value:any, key) => {
+		_.each(schema, (value: any, key: any) => {
 			help.push(util.format("  %s - %s", key, value.description));
 			var range = this.getPropRange(value).wait();
 			if (range) {
 				help.push("    Valid values:");
-				_.each(range, (rangeDesc:any, rangeKey) => {
+				_.each(range, (rangeDesc:any, rangeKey:any) => {
 					var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
 					if (rangeDesc.description) {
 						desc += " - " + rangeDesc.description;
@@ -615,13 +614,12 @@ export class Project implements Project.IProject {
 		return help.join(os.EOL);
 	}
 
-	private getPropRange(propData): IFuture<string[]>{
+	private getPropRange(propData: any): IFuture<string[]>{
 		return (() => {
 			if (propData.dynamicRange) {
 				return this.$injector.dynamicCall(propData.dynamicRange).wait();
 			}
-
-				return propData.range;
+			return propData.range;
 		}).future<string[]>()();
 	}
 

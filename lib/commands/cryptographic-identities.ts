@@ -16,10 +16,15 @@ class CryptographicIdentityConstants {
 	public static PKCS12_EXTENSION = "p12";
 	public static X509_TYPE = "X509Certificate";
 	public static X509_EXTENSION = "cer";
-	public static ExtensionToTypeMap = {
+	public static ExtensionToTypeMap: IStringDictionary = {
 		".p12": CryptographicIdentityConstants.PKCS12_TYPE,
 		".cer": CryptographicIdentityConstants.X509_TYPE
 	};
+}
+
+interface IFailedProvision {
+	provision: IProvision;
+	error: string
 }
 
 export class CryptographicIdentityStoreService implements ICryptographicIdentityStoreService{
@@ -55,29 +60,29 @@ export class IdentityManager implements Server.IIdentityManager {
 		private $injector: IInjector) {
 	}
 
-	public listCertificates(): IFuture<any> {
+	public listCertificates(): IFuture<void> {
 		return ((): any => {
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
 				var cert = this.$x509.load(identity.Certificate);
-				this.$logger.out("#%d: '%s', expires on %s, issued by %s", index + 1, identity.Alias,
+				this.$logger.out("#%d: '%s', expires on %s, issued by %s", (index + 1).toString(), identity.Alias,
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
 			if (!identities.length) {
 				this.$logger.info("No certificates found. To add a certificate, run `certificate import` " + 
 					"to import an existing certificate or `certificate create-self-signed` to create a new one.");
 			}
-		}).future<any>()();
+		}).future<void>()();
 	}
 
-	public listProvisions(): IFuture<any> {
-		return ((): any => {
+	public listProvisions(): IFuture<void> {
+		return (() => {
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 			provisions = _.sortBy(provisions, (provision) => provision.Name);
 
 			_.forEach(provisions, (provision, provisionIndex) => {
-				this.$logger.out("#%d: '%s'; type: %s, App ID: '%s.%s'", provisionIndex + 1, provision.Name, provision.ProvisionType,
+				this.$logger.out("#%d: '%s'; type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
 					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 				if (options.verbose) {
 					var devices = provision.ProvisionedDevices;
@@ -96,10 +101,10 @@ export class IdentityManager implements Server.IIdentityManager {
 			if (!provisions.length) {
 				this.$logger.info("No provisioning profiles found. To add a provisioning profile, run `provision import`.");
 			}
-		}).future<any>()();
+		}).future<void>()();
 	}
 
-	public findCertificate(identityStr): IFuture<ICryptographicIdentity> {
+	public findCertificate(identityStr: string): IFuture<ICryptographicIdentity> {
 		return ((): any => {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
@@ -114,7 +119,7 @@ export class IdentityManager implements Server.IIdentityManager {
 		}).future<any>()();
 	}
 
-	public findProvision(provisionStr): IFuture<IProvision> {
+	public findProvision(provisionStr: string): IFuture<IProvision> {
 		return ((): any => {
 			this.$logger.debug("Looking for provision '%s'", provisionStr);
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
@@ -141,10 +146,10 @@ export class IdentityManager implements Server.IIdentityManager {
 			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{deviceIdentifier: deviceIdentifier, appIdentifier: appIdentifier});
 
-			var passedProvisions = [];
-			var failedProvisions = [];
+			var passedProvisions: IProvision[] = [];
+			var failedProvisions: IFailedProvision[] = [];
 
-			_.each(provisions, (prov) => {
+			_.each(provisions, (prov: IProvision) => {
 				var validationResult = validator.validateProvision(prov);
 				var hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().IsSuccessful);
 
@@ -165,7 +170,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			} else {
 				var composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
 
-				var iterator = (result, data) => {
+				var iterator = (result: string, data: IFailedProvision) => {
 					var currentError = util.format('Cannot use provision "%s" because the following error occurred: %s %s',
 						data.provision.Name, data.error, os.EOL);
 					return result + currentError;
@@ -220,7 +225,7 @@ class IdentityGenerationData {
 		EmailAddress: "1.2.840.113549.1.9.1"
 	};
 
-	public SubjectNameValues;
+	public SubjectNameValues: any[];
 	public StartDate: Date;
 	public EndDate: Date;
 
@@ -231,8 +236,8 @@ class IdentityGenerationData {
 			identityModel.Name, identityModel.Email, identityModel.Country);
 	}
 
-	public static getDistinguishedNameValues(name: string, email: string, countryCode: string) {
-		var distinguishedNameValues = {};
+	public static getDistinguishedNameValues(name: string, email: string, countryCode: string): any {
+		var distinguishedNameValues: any = {};
 		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.CN] = name;
 		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.EmailAddress] = email;
 		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.C] = countryCode;
@@ -567,7 +572,7 @@ export class ImportCryptographicIdentity implements ICommand {
 			var targetFile = this.$fs.createReadStream(certificateFile);
 			var result = this.$server.identityStore.importIdentity(importType, password, targetFile).wait();
 
-			result.forEach((identity) => {
+			result.forEach((identity: ICryptographicIdentity) => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
 			});
 		}).future<void>()();
@@ -610,7 +615,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 			var requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
-				this.$logger.out("#%s: %s", i + 1, req.Subject);
+				this.$logger.out("#%s: %s", (i + 1).toString(), req.Subject);
 			})
 			if (!requests.length) {
 				this.$logger.info("No certificate signing requests.");

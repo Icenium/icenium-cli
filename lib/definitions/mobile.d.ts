@@ -70,15 +70,15 @@ declare module Mobile {
 		runLoopAddTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void;
 		runLoopRemoveTimer(r1: NodeBuffer, timer: NodeBuffer, mode: NodeBuffer): void;
 		runLoopStop(r1: any): void;
-		convertCFStringToCString(cfstr);
+		convertCFStringToCString(cfstr: NodeBuffer): string;
 		dictionaryCreate(allocator: NodeBuffer, keys: NodeBuffer, values: NodeBuffer, count: number, dictionaryKeyCallbacks: NodeBuffer, dictionaryValueCallbacks: NodeBuffer): NodeBuffer;
 		getTypeID(type: NodeBuffer): number;
 		stringGetCString(theString: NodeBuffer, buffer: NodeBuffer, bufferSize: number, encoding: number): boolean;
 		stringGetLength(theString: NodeBuffer): number;
 		dictionaryGetCount(theDict: NodeBuffer): number;
 		createCFString(str: string): NodeBuffer;
-		dictToPlistEncoding(dict: {[key: string]: {}}, format: number);
-		dictFromPlistEncoding(s, format?: number);
+		dictToPlistEncoding(dict: {[key: string]: {}}, format: number): NodeBuffer;
+		dictFromPlistEncoding(str: NodeBuffer): NodeBuffer;
 		dictionaryGetTypeID(): number;
 		stringGetTypeID(): number;
 		dataGetTypeID():  number;
@@ -93,7 +93,7 @@ declare module Mobile {
 	interface IMobileDevice {
 		deviceNotificationSubscribe(notificationCallback: NodeBuffer, p1: number, p2: number, context: any, callbackSignature: NodeBuffer): number;
 		deviceCopyDeviceIdentifier(devicePointer: NodeBuffer): NodeBuffer;
-		deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer);
+		deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer): NodeBuffer;
 		deviceConnect(devicePointer: NodeBuffer): number;
 		deviceIsPaired(devicePointer: NodeBuffer): number;
 		devicePair(devicePointer: NodeBuffer): number;
@@ -101,7 +101,7 @@ declare module Mobile {
 		deviceStartSession(devicePointer: NodeBuffer): number;
 		deviceStopSession(devicePointer: NodeBuffer): number;
 		deviceDisconnect(devicePointer: NodeBuffer): number;
-		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer);
+		deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer): number;
 		deviceTransferApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
 		deviceInstallApplication(service: number, packageFile: NodeBuffer, options: NodeBuffer, installationCallback: NodeBuffer): number;
 		afcConnectionOpen(service: number, timeout: number, afcConnection: NodeBuffer): number;
@@ -116,14 +116,6 @@ declare module Mobile {
 		afcDirectoryRead(afcConnection: NodeBuffer, afcdirectory: NodeBuffer,  name: NodeBuffer): number;
 		afcDirectoryClose(afcConnection: NodeBuffer, afcdirectory: NodeBuffer): number;
 		isDataReceivingCompleted(reply: string): boolean;
-	}
-
-	interface IInstallationProxyClient {
-		deploy(packageFile: string, packageName: string);
-	}
-
-	interface INotificationProxyClient {
-		postNotification(notificationName: string);
 	}
 
 	interface IHouseArrestClient {
@@ -145,7 +137,7 @@ declare module Mobile {
 
 	interface IiOSDeviceSocket {
 		receiveMessage(): IFuture<void>;
-		readSystemLog(action: (data: string) => void): void;
+		readSystemLog(action: (data: NodeBuffer) => void): void;
 		sendMessage(message: {[key: string]: {}}, format?: number): void;
 		close(): void;
 	}

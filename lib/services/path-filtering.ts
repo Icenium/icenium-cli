@@ -1,4 +1,5 @@
 ///<reference path="../.d.ts"/>
+"use strict"
 import _ = require("underscore");
 import os = require("os");
 import minimatch = require("minimatch");
@@ -10,7 +11,7 @@ export class PathFilteringService implements IPathFilteringService {
 
 	public getRulesFromFile(fullFilePath: string) : string[] {
 		var COMMENT_START = '#';
-		var rules = [];
+		var rules: string[] = [];
 
 		try {
 			var fileContent = this.$fs.readText(fullFilePath).wait();

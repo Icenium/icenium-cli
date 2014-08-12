@@ -6,22 +6,22 @@ import path = require("path");
 
 export class LoggerStub implements ILogger {
 	setLevel(level: string): void {}
-	fatal(formatStr: string, ...args): void {}
-	error(formatStr: string, ...args): void {}
-	warn(formatStr: string, ...args): void {}
-	info(formatStr: string, ...args): void {}
-	debug(formatStr: string, ...args): void {}
-	trace(formatStr: string, ...args): void {}
+	fatal(formatStr: string, ...args:string[]): void {}
+	error(formatStr: string, ...args:string[]): void {}
+	warn(formatStr: string, ...args:string[]): void {}
+	info(formatStr: string, ...args:string[]): void {}
+	debug(formatStr: string, ...args:string[]): void {}
+	trace(formatStr: string, ...args:string[]): void {}
 
 	public output = "";
 
-	out(formatStr: string, ...args): void {
+	out(formatStr: string, ...args:string[]): void {
 		args.unshift(formatStr);
 		this.output += util.format.apply(null, args) + "\n";
 	}
 
-	write(...args): void { }
-	}
+	write(...args:string[]): void { }
+}
 
 export class FileSystemStub implements IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
@@ -47,7 +47,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	futureFromEvent(eventEmitter, event:string):IFuture<any> {
+	futureFromEvent(eventEmitter: EventEmitter, event:string):IFuture<any> {
 		return undefined;
 	}
 
@@ -71,11 +71,11 @@ export class FileSystemStub implements IFileSystem {
 		return Future.fromResult({});
 	}
 
-	writeFile(filename:string, data, encoding?:string):IFuture<void> {
+	writeFile(filename:string, data: any, encoding?:string):IFuture<void> {
 		return undefined;
 	}
 
-	writeJson(filename:string, data, space?:string, encoding?:string):IFuture<void> {
+	writeJson(filename:string, data:any, space?:string, encoding?:string):IFuture<void> {
 		return undefined;
 	}
 

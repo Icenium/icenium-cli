@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 
 "use strict";
-
 import util = require("util");
 
 export class UserStatusCommand implements ICommand {
@@ -9,7 +8,7 @@ export class UserStatusCommand implements ICommand {
 		private $logger: ILogger,
 		private $config: IConfiguration) {}
 
-	private licenseNames = {
+	private licenseNames: IStringDictionary = {
 		"Starter": "AppBuilder Starter Edition",
 		"Developer": "AppBuilder Developer Edition",
 		"DeveloperPlus": "Telerik Platform Developer Edition",
@@ -22,7 +21,7 @@ export class UserStatusCommand implements ICommand {
 		return (() => {
 			var user = this.$userDataStore.getUser().wait();
 
-			var fields = {
+			var fields: IStringDictionary = {
 				"Name": user.name,
 				"E-mail": user.email
 			};

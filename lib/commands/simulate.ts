@@ -1,6 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
+import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
@@ -11,7 +11,7 @@ export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
 	private static PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
 
-	private projectData;
+	private projectData: IProjectData;
 	private pluginsPath: string;
 	private simulatorPath: string;
 
@@ -24,8 +24,7 @@ export class SimulateCommand implements ICommand {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
-		private $errors: IErrors,
-		private $projectTypes: IProjectTypes) {
+		private $errors: IErrors) {
 			this.projectData = $project.projectData;
 		}
 
@@ -99,8 +98,8 @@ export class SimulateCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private getPluginsDirName(serverVersion) {
-		var result;
+	private getPluginsDirName(serverVersion: string) {
+		var result: string;
 		if (this.$config.DEBUG) {
 			result = SimulateCommand.PLUGINS_PACKAGE_IDENTIFIER;
 		} else {
@@ -125,7 +124,7 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
-		var childProcess = this.$childProcess.spawn(simulatorBinary, applicationParams,
+		var childProcess: child_process.ChildProcess = this.$childProcess.spawn(simulatorBinary, applicationParams,
 			{ stdio: ["ignore", "ignore", "ignore"], detached: true });
 		childProcess.unref();
 	}
@@ -147,7 +146,7 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC_APP);
 		var commandLine = [simulatorBinary, '--args'].concat(applicationParams);
-		var childProcess = this.$childProcess.spawn('open', commandLine,
+		var childProcess: child_process.ChildProcess = this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
 		childProcess.unref();
 	}

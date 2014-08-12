@@ -15,7 +15,7 @@ export class SignalBinding implements ISignalBinding {
 	 * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
 	 * @param {Number} [priority] The priority level of the event listener. (default = 0).
 	 */
-		constructor(signal: Signal, listener, isOnce: boolean, listenerContext, priority?: number) {
+		constructor(signal: Signal, listener: Function, isOnce: boolean, listenerContext: any, priority?: number) {
 
 		this._listener = listener;
 		this._isOnce = isOnce;
@@ -30,7 +30,7 @@ export class SignalBinding implements ISignalBinding {
 	 * @type Function
 	 * @private
 	 */
-	private _listener;
+	private _listener: Function;
 
 	/**
 	 * If binding should be executed just once.
@@ -45,7 +45,7 @@ export class SignalBinding implements ISignalBinding {
 	 * @name context
 	 * @type Object|undefined|null
 	 */
-	public context;
+	public context: any;
 
 	/**
 	 * Reference to Signal object that listener is currently bound to.
@@ -70,7 +70,7 @@ export class SignalBinding implements ISignalBinding {
 	 * Default parameters passed to listener during `Signal.dispatch` and `SignalBinding.execute`. (curried parameters)
 	 * @type Array|null
 	 */
-	public params = null;
+	public params: any[] = null;
 
 	/**
 	 * Call listener passing arbitrary parameters.
@@ -78,10 +78,10 @@ export class SignalBinding implements ISignalBinding {
 	 * @param {Array} [paramsArr] Array of parameters that should be passed to the listener
 	 * @return {*} Value returned by the listener.
 	 */
-	public execute(paramsArr?: any[]) {
+	public execute(paramsArr?: any[]): any {
 
-		var handlerReturn;
-		var params;
+		var handlerReturn: any;
+		var params: any[];
 
 		if (this.active && !!this._listener)
 		{
@@ -183,7 +183,7 @@ export class Signal implements ISignal {
 	 * @type Any
 	 * @private
 	 */
-	private _prevParams = null;
+	private _prevParams: any = null;
 
 	/**
 	 * Signals Version Number
@@ -219,7 +219,7 @@ export class Signal implements ISignal {
 	 * @param {Any} listener
 	 * @param {Any} fnName
 	 */
-	public validateListener(listener, fnName) {
+	public validateListener(listener: Function, fnName: string): void {
 
 		if (typeof listener !== 'function')
 		{
@@ -236,7 +236,7 @@ export class Signal implements ISignal {
 	 * @return {SignalBinding}
 	 * @private
 	 */
-	private _registerListener(listener, isOnce: boolean, listenerContext, priority: number): SignalBinding {
+	private _registerListener(listener: Function, isOnce: boolean, listenerContext: any, priority: number): SignalBinding {
 
 		var prevIndex: number = this._indexOfListener(listener, listenerContext);
 		var binding: SignalBinding;
@@ -289,7 +289,7 @@ export class Signal implements ISignal {
 	 * @return {number}
 	 * @private
 	 */
-	private _indexOfListener(listener, context): number {
+	private _indexOfListener(listener: Function, context: any): number {
 
 		var n: number = this._bindings.length;
 		var cur: SignalBinding;
@@ -314,7 +314,7 @@ export class Signal implements ISignal {
 	 * @param {Object} [context]
 	 * @return {booleanean} if Signal has the specified listener.
 	 */
-	public has(listener, context?: any): boolean {
+	public has(listener: Function, context?: any): boolean {
 
 		return this._indexOfListener(listener, context) !== -1;
 
@@ -327,7 +327,7 @@ export class Signal implements ISignal {
 	 * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
 	 * @return {SignalBinding} An Object representing the binding between the Signal and listener.
 	 */
-	public add(listener, listenerContext?: any, priority?: number): SignalBinding {
+	public add(listener: Function, listenerContext?: any, priority?: number): SignalBinding {
 
 		this.validateListener(listener, 'add');
 
@@ -342,7 +342,7 @@ export class Signal implements ISignal {
 	 * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
 	 * @return {SignalBinding} An Object representing the binding between the Signal and listener.
 	 */
-	public addOnce(listener, listenerContext?: any, priority?: number): SignalBinding {
+	public addOnce(listener: Function, listenerContext?: any, priority?: number): SignalBinding {
 
 		this.validateListener(listener, 'addOnce');
 
@@ -375,7 +375,7 @@ export class Signal implements ISignal {
 	/**
 	 * Remove all listeners from the Signal.
 	 */
-	public removeAll() {
+	public removeAll(): void {
 
 		var n: number = this._bindings.length;
 
@@ -402,7 +402,7 @@ export class Signal implements ISignal {
 	 * <p><strong>IMPORTANT:</strong> should be called only during signal dispatch, calling it before/after dispatch won't affect signal broadcast.</p>
 	 * @see Signal.prototype.disable
 	 */
-	public halt() {
+	public halt(): void {
 
 		this._shouldPropagate = false;
 
@@ -412,7 +412,7 @@ export class Signal implements ISignal {
 	 * Dispatch/Broadcast Signal to all listeners added to the queue.
 	 * @param {...*} [params] Parameters that should be passed to each handler.
 	 */
-	public dispatch(...paramsArr: any[]) {
+	public dispatch(...paramsArr: any[]): void {
 
 		if (!this.active)
 		{
@@ -447,7 +447,7 @@ export class Signal implements ISignal {
 	 * Forget memorized arguments.
 	 * @see Signal.memorize
 	 */
-	public forget() {
+	public forget(): void {
 
 		this._prevParams = null;
 
@@ -457,7 +457,7 @@ export class Signal implements ISignal {
 	 * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
 	 * <p><strong>IMPORTANT:</strong> calling any method on the signal instance after calling dispose will throw errors.</p>
 	 */
-	public dispose() {
+	public dispose(): void {
 
 		this.removeAll();
 

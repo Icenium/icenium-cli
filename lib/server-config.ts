@@ -1,7 +1,7 @@
 ///<reference path=".d.ts"/>
-
+"use strict";
 export class ServerConfiguration implements IServerConfiguration {
-	private cachedServerConfiguration = null;
+	private cachedServerConfiguration: any = null;
 
 	constructor(private $config: IConfiguration) { }
 

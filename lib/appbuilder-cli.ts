@@ -33,7 +33,7 @@ var fiber = Fiber(() => {
 	if (process.argv[2] === "completion") {
 		var getPropSchemaAction = () => {
 			var project:any = $injector.resolve("project");
-			var propSchema = undefined;
+			var propSchema:any = undefined;
 			if (project.projectData && project.projectType) {
 				propSchema = require("./helpers").getProjectFileSchema(project.projectType).wait();
 			}

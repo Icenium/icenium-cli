@@ -139,7 +139,7 @@ function toClassName(contractName: string): string {
 
 class CodePrinter {
 	private indent = "";
-	private lines = [];
+	private lines: string[] = [];
 
 	public pushIndent(): void {
 		this.indent += "\t";
@@ -249,12 +249,12 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 					["/" + api[i].endpoint].concat(op.routePrefixes, [op.actionName]),
 					(part) => !!part).join("/");
 				var pathComponents = [quote(actionPath)];
-				var queryParams = [];
+				var queryParams:string[] = [];
 
 				intf.writeLine(signature + ";");
 				impl.writeLine(signature + " {");
 
-				var bodyParams = [];
+				var bodyParams:string[] = [];
 
 				for (var pi = 0; pi < op.parameters.length; ++pi) {
 					var param = op.parameters[pi];

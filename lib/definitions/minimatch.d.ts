@@ -16,7 +16,7 @@ declare module minimatch {
 	}
 
 	export interface Minimatch {
-		constructor(pattern: string, options: Options);
+		constructor(pattern: string, options: Options): Minimatch;
 		pattern: string;
 		options: Options;
 		regexp: RegExp;

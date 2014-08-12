@@ -1,5 +1,5 @@
 ///<reference path=".d.ts"/>
-
+"use strict"
 import Future = require("fibers/future");
 import prompt = require("prompt");
 import helpers = require("./helpers");
@@ -7,7 +7,7 @@ import readline = require("readline");
 var MuteStream = require("mute-stream");
 
 export class Prompter implements IPrompter {
-	private ctrlcReader;
+	private ctrlcReader: readline.ReadLine;
 
 	constructor() {
 		prompt.message = "";

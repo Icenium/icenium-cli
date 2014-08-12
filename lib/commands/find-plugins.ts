@@ -16,21 +16,21 @@ export class FindPluginsCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private printPlugins(plugins) {
+	private printPlugins(plugins: service.IPlugin[]) {
 		_.each(plugins, (plugin) => {
 			var pluginDescription = this.composePluginDescription(plugin);
 			console.log(pluginDescription);
 		});
 	}
 
-	private composePluginDescription(plugin) {
+	private composePluginDescription(plugin: service.IPlugin) {
 		var description = util.format("Name: %s%s", plugin.name, os.EOL);
 		description += util.format("Description: %s%s", this.trim(plugin.description), os.EOL);
 		description += util.format("Version: %s%s", plugin.version, os.EOL);
 		return description;
 	}
 
-	private trim(content) {
+	private trim(content: string) {
 		if (content) {
 			return content.trim();
 		}

@@ -1,5 +1,10 @@
 
 declare module "saxjs" {
+	export interface INode {
+		name: string;
+		attributes: any[]; // Warning! Untested definition
+	}
+
 	export class parser {
 		comment: string;
 		sgmlDecl: string;
@@ -45,10 +50,10 @@ declare module "saxjs" {
 		line: number;
 		position: number;
 
-		onerror: (e) => any;
-		onopentag: (node) => any;
+		onerror: (e: Error) => any;
+		onopentag: (node: INode) => any;
 		onclosetag: Function;
-		ontext: (t) => any;
+		ontext: (t: string) => any;
 		oncdata: Function;
 
 		startTagPosition: number;

@@ -1,14 +1,12 @@
 ///<reference path=".d.ts"/>
-
-var qrlib: any = require("../vendor/qrcode");
-
 "use strict";
+var qrlib: any = require("../vendor/qrcode");
 
 export class QrCodeGenerator implements IQrCodeGenerator {
 	constructor(private $config: IConfiguration,
 		private $staticConfig: IStaticConfig) {}
 
-	public generateQrCode(data) {
+	public generateQrCode(data: string) {
 		for (var i = 1; i <= 10; ++i) {
 			var qr = qrlib(i, "L");
 			try {
