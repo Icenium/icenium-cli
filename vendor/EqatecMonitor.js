@@ -91,9 +91,10 @@
 				}
 			}
 
-			var targetProtocol = "https";
-			if (global && global.location && global.location.protocol != "https:")
-				targetProtocol = "http";
+			var targetProtocol = "http";
+			if (global && global.location && global.location.protocol != "http:") {
+				targetProtocol = "https";
+			}
 			return targetProtocol + "://" + productId + ".monitor-eqatec.com/json.ashx";
 		},
 		// Safely logs a message
