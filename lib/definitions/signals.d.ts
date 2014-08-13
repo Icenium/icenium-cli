@@ -7,8 +7,8 @@ interface ISignalBinding {
 	active: boolean;
 	context: any;
 	params: any;
-	detach();
-	execute(paramsArr);
+	detach(): Function;
+	execute(paramsArr: any[]): any;
 	getListener(): any;
 	getSignal(): ISignal;
 	isBound(): boolean;
@@ -48,24 +48,24 @@ interface ISignal {
 	 * @param listenercontext Context on which listener will be executed (object that should represent the `this` variable inside listener function).
 	 * @param priority The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
 	 */
-	addOnce(listener: Function, listenerContext, priority): ISignalBinding;
+	addOnce(listener: Function, listenerContext?: any, priority?: number): ISignalBinding;
 
 	/**
 	 * Dispatch/Broadcast Signal to all listeners added to the queue.
 	 *
 	 * @param params Parameters that should be passed to each handler.
 	 */
-	dispatch(...params: any[]);
+	dispatch(...params: any[]): void;
 
 	/**
 	 * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
 	 */
-	dispose();
+	dispose(): void;
 
 	/**
 	 * Forget memorized arguments.
 	 */
-	forget();
+	forget(): void;
 
 	/**
 	 * Returns a number of listeners attached to the Signal.
@@ -75,7 +75,7 @@ interface ISignal {
 	/**
 	 * Stop propagation of the event, blocking the dispatch to next listeners on the queue.
 	 */
-	halt();
+	halt(): void;
 
 	/**
 	 * Check if listener was attached to Signal.
@@ -87,5 +87,5 @@ interface ISignal {
 	 */
 	remove(listener: Function, context?: any): Function;
 
-	removeAll();
+	removeAll(): void;
 }

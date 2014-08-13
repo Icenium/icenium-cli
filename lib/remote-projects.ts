@@ -24,14 +24,14 @@ class RemoteProjectExporter {
 		}).future<void>()();
 	}
 
-	private printProjects(projects) {
+	private printProjects(projects: any) {
 		this.$logger.out("Projects:");
-		projects.forEach( (project, index) => {
-			this.$logger.out("#%d: '%s'", index + 1, project.name);
+		projects.forEach( (project:any, index:number) => {
+			this.$logger.out("#%d: '%s'", (index + 1).toString(), project.name);
 		});
 	}
 
-	public exportProject(projectId): IFuture<void> {
+	public exportProject(projectId:string): IFuture<void> {
 		return (() => {
 			var name = this.getProjectName(projectId).wait();
 			this.doExportRemoteProject(name).wait();

@@ -56,7 +56,7 @@ describe("edit-configuration", () => {
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
 		var tempDir = setTempDir();
 		var template = testInjector.resolve("templatesService").configurationFiles[0];
-		var openArgument;
+		var openArgument: string;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
 			openArgument = filepath;
@@ -72,7 +72,7 @@ describe("edit-configuration", () => {
 	it("opens and doesn't modify file if correct configuration file is given and it exists", () => {
 		var tempDir = setTempDir();
 		var template = testInjector.resolve("templatesService").configurationFiles[0];
-		var openArgument;
+		var openArgument: string;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
 			openArgument = filepath;

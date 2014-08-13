@@ -1,4 +1,5 @@
 ///<reference path="../../.d.ts"/>
+"use strict"
 import MobileHelper = require("./../mobile-helper");
 import util = require("util");
 import Future = require("fibers/future");
@@ -38,7 +39,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		private $childProcess: IChildProcess,
 		private $errors: IErrors,
 		private $projectTypes: IProjectTypes,
-		private $propertiesParser) {
+		private $propertiesParser: IPropertiesParser) {
 		var details: IAndroidDeviceDetails = this.getDeviceDetails().wait();
 		this.model = details.model;
 		this.name = details.name;
@@ -49,11 +50,10 @@ export class AndroidDevice implements Mobile.IDevice {
 	private getDeviceDetails(): IFuture<IAndroidDeviceDetails> {
 		return (() => {
 			var requestDeviceDetailsCommand = this.composeCommand("shell cat /system/build.prop");
-			var details = this.$childProcess.exec(requestDeviceDetailsCommand).wait();
-			details = details.split(/\r?\n|\r/);
+			var details: string = this.$childProcess.exec(requestDeviceDetailsCommand).wait();
 
 			var parsedDetails: any = {};
-			details.forEach((value) => {
+			details.split(/\r?\n|\r/).forEach((value) => {
 				//sample line is "ro.build.version.release=4.4"
 				var match = /(?:ro\.build\.version|ro\.product)\.(.+)=(.+)/.exec(value)
 				if (match) {
@@ -104,7 +104,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<string[]>()();
 	}
 
-	private composeCommand(...args) {
+	private composeCommand(...args: string[]) {
 		var command = util.format.apply(null, args);
 		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
 		if (command && !command.isEmpty()) {
@@ -114,17 +114,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		return result;
 	}
 
-	private composeCommandParams(...args) {
-		var command = util.format.apply(null, args);
-		var result = util.format("\"%s\" -s %s", this.adb, this.identifier);
-		if (command && !command.isEmpty()) {
-			result += util.format(" %s", command);
-		}
-
-		return result;
-	}
-
-	private startPackageOnDevice(packageName): IFuture<void> {
+	private startPackageOnDevice(packageName: string): IFuture<void> {
 		return (() => {
 			var startPackageCommand = this.composeCommand("shell am start -a android.intent.action.MAIN -n %s/.TelerikCallbackActivity", packageName);
 			var result = this.$childProcess.exec(startPackageCommand).wait();
@@ -145,7 +135,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	private _tmpRoot: string[] = [];
+	private _tmpRoot: IStringDictionary = Object.create(null);
 	private prepareTmpDir(appIdentifier: Mobile.IAppIdentifier): IFuture<string> {
 		return (() => {
 			if (!this._tmpRoot[appIdentifier.appIdentifier]) {
@@ -206,7 +196,7 @@ export class AndroidDevice implements Mobile.IDevice {
 		}).future<void>()();
 	}
 
-	public sendBroadcastToDevice(action, extras = {}): IFuture<number> {
+	public sendBroadcastToDevice(action: string, extras: IStringDictionary = {}): IFuture<number> {
 		return (() => {
 			var broadcastCommand = this.composeCommand("shell am broadcast -a \"%s\"", action);
 
@@ -252,7 +242,10 @@ export class AndroidDevice implements Mobile.IDevice {
 		return (() => {
 			this.pushFilesOnDevice(localToDevicePaths, appIdentifier).wait();
 			if (!options.skipRefresh) {
-				var changeLiveSyncUrlExtras = { liveSyncUrl: this.getLiveSyncUrl(projectType), "app-id": appIdentifier.appIdentifier };
+				var changeLiveSyncUrlExtras: IStringDictionary = {
+					"liveSyncUrl": this.getLiveSyncUrl(projectType),
+					"app-id": appIdentifier.appIdentifier
+				};
 				this.sendBroadcastToDevice(AndroidDevice.CHANGE_LIVESYNC_URL_INTENT_NAME, changeLiveSyncUrlExtras).wait();
 				this.sendBroadcastToDevice(AndroidDevice.REFRESH_WEB_VIEW_INTENT_NAME, { "app-id": appIdentifier.appIdentifier }).wait();
 			}
@@ -306,17 +299,17 @@ export class AndroidDevice implements Mobile.IDevice {
 		var adbLogcat = this.$childProcess.spawn(this.adb, ["-s", this.getIdentifier(), "logcat"]);
 		var lineStream = byline(adbLogcat.stdout);
 
-		adbLogcat.stderr.on("data", (data) => {
-			this.$logger.trace("ADB logcat stderr: " + data);
+		adbLogcat.stderr.on("data", (data: NodeBuffer) => {
+			this.$logger.trace("ADB logcat stderr: " + data.toString());
 		});
 
-		adbLogcat.on("close", (code) => {
+		adbLogcat.on("close", (code: number) => {
 			if (code !== 0) {
-				this.$logger.trace("ADB process exited with code " + code);
+				this.$logger.trace("ADB process exited with code " + code.toString());
 			}
 		});
 
-		lineStream.on('data', (line) => {
+		lineStream.on('data', (line: NodeBuffer) => {
 			var lineText = line.toString();
 			var log = this.getConsoleLogFromLine(lineText);
 			if (log) {

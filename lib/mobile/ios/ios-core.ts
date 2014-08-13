@@ -218,7 +218,8 @@ $injector.register("iOSCore", IOSCore);
 export class CoreFoundation implements  Mobile.ICoreFoundation {
 	private coreFoundationLibrary: any;
 
-	constructor($iOSCore: Mobile.IiOSCore){
+	constructor($iOSCore: Mobile.IiOSCore,
+		private $errors: IErrors){
 		this.coreFoundationLibrary = $iOSCore.getCoreFoundationLibrary();
 	}
 
@@ -362,11 +363,11 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return this.coreFoundationLibrary.CFDataCreate(allocator, data, length);
 	}
 
-	public convertCFStringToCString(cfstr) {
-		var result;
+	public convertCFStringToCString(cfstr: NodeBuffer): string {
+		var result: string;
 		if (cfstr != null) {
-			result = this.stringGetCStringPtr(cfstr, IOSCore.kCFStringEncodingUTF8 );
-			if (ref.address(result) === 0) {
+			var rawData = this.stringGetCStringPtr(cfstr, IOSCore.kCFStringEncodingUTF8);
+			if (ref.address(rawData) === 0) {
 				var cfstrLength = this.stringGetLength(cfstr);
 				var length = cfstrLength + 1;
 				var stringBuffer = new Buffer(length);
@@ -374,10 +375,10 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 				if (status) {
 					result = stringBuffer.toString("utf8", 0, cfstrLength);
 				} else {
-					throw "Unable to convert string: " + result;
+					this.$errors.fail("Unable to convert string: ", result);
 				}
 			} else {
-				result = ref.readCString(result, 0);
+				result = ref.readCString(rawData, 0);
 			}
 		}
 
@@ -418,7 +419,7 @@ export class CoreFoundation implements  Mobile.ICoreFoundation {
 		return retval;
 	}
 
-	public dictToPlistEncoding(dict: {[key: string]: {}}, format: number) {
+	public dictToPlistEncoding(dict: {[key: string]: {}}, format: number): NodeBuffer {
 
 		var cfDict = this.cfTypeFrom(dict);
 		var cfData = this.propertyListCreateData(null, cfDict, format, 0, null);
@@ -458,7 +459,7 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AMDeviceCopyDeviceIdentifier(devicePointer);
 	}
 
-	public deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer) {
+	public deviceCopyValue(devicePointer: NodeBuffer, domain: NodeBuffer, name: NodeBuffer): NodeBuffer {
 		return this.mobileDeviceLibrary.AMDeviceCopyValue(devicePointer, domain, name);
 	}
 
@@ -490,7 +491,7 @@ export class MobileDevice implements Mobile.IMobileDevice {
 		return this.mobileDeviceLibrary.AMDeviceDisconnect(devicePointer);
 	}
 
-	public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer) {
+	public deviceStartService(devicePointer: NodeBuffer, serviceName: NodeBuffer, socketNumber: NodeBuffer): number {
 		return this.mobileDeviceLibrary.AMDeviceStartService(devicePointer, serviceName, socketNumber, null);
 	}
 
@@ -676,8 +677,8 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 		var result = new Future<void>();
 
 		this.socket
-			.on("data", (data) => {
-				this.$logger.debug("PosixSocket receiving: '%s'", data);
+			.on("data", (data: NodeBuffer) => {
+				this.$logger.debug("PosixSocket receiving: '%s'", data.toString());
 				this.$errors.verifyHeap("receiveMessage");
 				var reply = data.toString();
 
@@ -685,28 +686,28 @@ class PosixSocket implements Mobile.IiOSDeviceSocket {
 					if(this.$mobileDevice.isDataReceivingCompleted(reply)) {
 						result.return();
 					}
-				} catch(ex) {
-					result.throw(ex);
+				} catch(e) {
+					result.throw(e);
 				}
 
 			})
-			.on("error", (error) => {
+			.on("error", (error: Error) => {
 				result.throw(error);
 			});
 
 		return result;
 	}
 
-	public readSystemLog(action: (data: string) => void) {
+	public readSystemLog(action: (data: NodeBuffer) => void) {
 		this.socket
-			.on("data", (data) => {
+			.on("data", (data: NodeBuffer) => {
 				action(data);
 			})
 			.on("end", () => {
 				this.close();
 				this.$errors.verifyHeap("readSystemLog");
 			})
-			.on("error", (error) => {
+			.on("error", (error: Error) => {
 				this.$errors.fail(error);
 			});
 	}
@@ -747,7 +748,7 @@ export class PlistService implements Mobile.IiOSDeviceSocket {
 		return this.socket.receiveMessage();
 	}
 
-	public readSystemLog(action: (data: string) => void): any {
+	public readSystemLog(action: (data: NodeBuffer) => void): any {
 		this.socket.readSystemLog(action);
 	}
 

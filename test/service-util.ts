@@ -1,5 +1,5 @@
 ///<reference path=".d.ts"/>
-
+"use strict";
 import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
@@ -46,7 +46,7 @@ class MockHttpClient implements Server.IHttpClient {
 	public mockResponse: Server.IResponse;
 	public mockError: any;
 
-	httpRequest(options): IFuture<Server.IResponse> {
+	httpRequest(options: any): IFuture<Server.IResponse> {
 		this.options = options;
 		return Future.wrap<Server.IResponse>((callback) => callback(this.mockError, this.mockResponse))();
 	}

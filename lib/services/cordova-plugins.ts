@@ -10,6 +10,8 @@ import Future = require("fibers/future");
 
 export interface IPlugin {
 	name: string;
+	description: string;
+	version: string;
 }
 
 export class CordovaPluginsService {

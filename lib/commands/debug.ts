@@ -1,6 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
+import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
@@ -63,28 +63,23 @@ class BaseDebuggerPlatformServices {
 		watchr.watch({
 			paths: [this.$sharedUserSettingsFileService.userSettingsFilePath],
 			listeners: {
-				error: (error) => {
-					this.$errors.fail(error);
-				},
-				change: (changeType, filePath) => {
-					this.$dispatcher.dispatch(() => this.$sharedUserSettingsService.saveSettings({}));
-				},
-				next: (error, watchers) => {
+				error: (error: Error) => this.$errors.fail(error.toString()),
+				change: (changeType: string, filePath: string) => this.$dispatcher.dispatch(() => this.$sharedUserSettingsService.saveSettings({})),
+				next: (error: Error, _watchers: any) => {
+					var watchers: watchr.IWatcherInstance[] = _watchers;
 					if (error) {
-						this.$errors.fail(error);
+						this.$errors.fail(error.toString());
 					}
 
 					this.$logger.trace("User settings watchers are stopping.");
-					for (var i = 0; i < watchers.length; i++) {
-						watchers[i].close();
-					}
+					_.each(watchers, (watcher) => watcher.close());
 					this.$logger.trace("User settings watchers are stopped.");
 				}
 			}
 		});
 	}
 
-	public waitDebuggerExit(childProcess: any) {
+	public waitDebuggerExit(childProcess: child_process.ChildProcess) {
 		//TODO: Darwin only - Prevent printing of all devtools log on the console.
 
 		childProcess.stderr.pipe(process.stderr);
@@ -111,11 +106,11 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 		return WinDebuggerPlatformServices.PACKAGE_NAME_WIN;
 	}
 
-	public runApplication(applicationPath: string, applicationParams: string[]) {
+	public runApplication(applicationPath: string, applicationParams: string[]): void {
 		this.startWatchingUserSettingsFile();
 
 		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
-		var childProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
+		var childProcess: child_process.ChildProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
 		this.waitDebuggerExit(childProcess);
 	}
 }
@@ -137,12 +132,12 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 		return DarwinDebuggerPlatformServices.PACKAGE_NAME_OSX;
 	}
 
-	public runApplication(applicationPath: string, applicationParams: string[]) {
+	public runApplication(applicationPath: string, applicationParams: string[]): void {
 		this.startWatchingUserSettingsFile();
 
 		var debuggerBinary = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX);
 		var commandLine = [debuggerBinary, '--args'].concat(applicationParams);
-		var childProcess = this.$childProcess.spawn('open', commandLine,
+		var childProcess: child_process.ChildProcess = this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
 		childProcess.unref();
 	}

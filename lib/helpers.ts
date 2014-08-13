@@ -1,60 +1,26 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
-
 import fs = require("fs");
 import path = require("path");
 import util = require("util");
 import querystring = require("querystring");
 import Future = require("fibers/future");
+import commonHelpers = require("./common/helpers");
 
-function enumerateFilesInDirectorySyncRecursive(foundFiles, directoryPath, filterCallback) {
-	var $fs: IFileSystem = $injector.resolve("fs");
-	var contents = $fs.readDirectory(directoryPath).wait();
-	for (var i = 0; i < contents.length; ++i) {
-		var file = path.join(directoryPath, contents[i]);
-		var stat = $fs.getFsStats(file).wait();
-		if (filterCallback && !filterCallback(file, stat)) {
-			continue;
-		}
-
-		if (stat.isDirectory()) {
-			enumerateFilesInDirectorySyncRecursive(foundFiles, file, filterCallback);
-		} else {
-			foundFiles.push(file);
-		}
-	}
-}
-
-// filterCallback: function(path: String, stat: fs.Stats): Boolean
-export function enumerateFilesInDirectorySync(directoryPath, filterCallback?: (file: string, stat: fs.Stats) => boolean) {
-	var result = [];
-	enumerateFilesInDirectorySyncRecursive(result, directoryPath, filterCallback);
-	return result;
-}
-
-export function fromWindowsRelativePathToUnix(windowsRelativePath) {
+export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");
 }
 
-export function isRequestSuccessful(request) {
-	return request.statusCode >= 200 && request.statusCode < 300;
-}
-
-export function isResponseRedirect(response) {
-	return _.contains([301, 302, 303, 307, 308], response.statusCode);
-}
-
-export function getRelativeToRootPath(rootPath, filePath) {
+export function getRelativeToRootPath(rootPath: string, filePath: string): string {
 	var relativeToRootPath = filePath.substr(rootPath.length);
 	return relativeToRootPath;
 }
 
-export function isNumber(n) {
+export function isNumber(n: any): boolean {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-export function toHash(collection, keySelector, valueSelector): any {
+export function toHash(collection: any, keySelector: (value: any, positionOrKey: any, collection: any) => string, valueSelector: (value: any, positionOrKey: any, collection: any) => any): any {
 	var result = {};
 	if (_.isArray(collection)) {
 		for (var i = 0; i < collection.length; ++i) {
@@ -70,7 +36,7 @@ export function toHash(collection, keySelector, valueSelector): any {
 	return result;
 }
 
-var _projectFileSchemas = [];
+var _projectFileSchemas: string[] = [];
 export function getProjectFileSchema(projectType: number): IFuture<any> {
 	return(() => {
 		if (!_projectFileSchemas[projectType]) {
@@ -93,11 +59,13 @@ export function getProjectFilePartSchema(partName: string): IFuture<string> {
 	}).future<string>()();
 }
 
-export function isStringOptionEmpty(optionValue) {
+export function isStringOptionEmpty(optionValue: string): boolean {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: any, executor: (module, args: string[]) => IFuture<void>, opts?: ICommandOptions) {
+export function registerCommand(module: string, commandName: string, executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void;
+export function registerCommand(module: string, commandNames: string[], executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void;
+export function registerCommand(module: string, commandName: any, executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void {
 	var factory = (): ICommand => {
 		return {
 			execute: (args: string[]): IFuture<void> => {
@@ -123,7 +91,7 @@ export function isNullOrWhitespace(input: string): boolean {
 	return input.replace(/\s/gi, '').length < 1;
 }
 
-export function capitalizeFirstLetter(str: string) {
+export function capitalizeFirstLetter(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -135,7 +103,7 @@ export function formatListOfNames(names: string[], conjunction = "or"): string {
 	}
 }
 
-export function getCountries() {
+export function getCountries(): string[] {
 	return ["Afghanistan", "Aland Islands", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina",
 		"Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
 		"Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "Brunei Darussalam",
@@ -177,10 +145,10 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 
 	var extents = _.map(columnList, (sublist) => _.max(sublist, (element: string) => element.length).length);
 
-	var formattedRows = [];
+	var formattedRows: string[] = [];
 	var width: number;
 	for (var r = 0; r < rows; ++r) {
-		var rowItems = [];
+		var rowItems:string[] = [];
 		for (var c = 0; c < columns; ++c) {
 			var item = columnList[c][r] || "";
 			var padding = _.map(_.range(extents[c] - item.length), (x) => " ").join("");
@@ -260,7 +228,7 @@ export function isInteractive(): boolean {
 	return process.stdout.isTTY && process.stdin.isTTY;
 }
 
-export function toBoolean(str: string) {
+export function toBoolean(str: string): boolean {
 	return str === "true" ? true : false;
 }
 
@@ -271,7 +239,7 @@ export function mergeRecursive(obj1: Object, obj2: Object): Object {
 			continue;
 		}
 
-		if ( obj2[p].constructor === Object ) {
+		if (obj2[p].constructor === Object ) {
 			obj1[p] = mergeRecursive(obj1[p], obj2[p]);
 		} else {
 			obj1[p] = obj2[p];
@@ -290,3 +258,4 @@ export function block(operation: () => void): void {
 		process.stdin.setRawMode(true);
 	}
 }
+

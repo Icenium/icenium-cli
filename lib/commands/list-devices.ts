@@ -13,10 +13,10 @@ export class ListDevicesCommand implements ICommand {
 			var index = 1;
 			this.$devicesServices.initialize(args[0], null, {skipInferPlatform: true}).wait();
 
-			var action;
+			var action: (device: Mobile.IDevice) => IFuture<void>;
 			if (options.json) {
 				this.$logger.setLevel("ERROR");
-				action = (device: Mobile.IDevice): IFuture<void> => {
+				action = (device) => {
 					return (() => { this.$logger.out(JSON.stringify({
 							identifier: device.getIdentifier(),
 							platform: device.getPlatform(),
@@ -27,8 +27,8 @@ export class ListDevicesCommand implements ICommand {
 						}))}).future<void>()();
 				};
 			} else {
-				action = (device: Mobile.IDevice): IFuture<void> => {
-					return (() => { this.$logger.out("#%d: '%s'", index++, device.getDisplayName(), device.getPlatform(), device.getIdentifier()); }).future<void>()();
+				action = (device) => {
+					return (() => { this.$logger.out("#%d: '%s'", (index++).toString(), device.getDisplayName(), device.getPlatform(), device.getIdentifier()); }).future<void>()();
 				};
 			}
 

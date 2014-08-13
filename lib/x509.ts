@@ -4,7 +4,7 @@
 import moment = require("moment");
 
 class X509Certificate implements IX509Certificate {
-	private x509;
+	private x509: any;
 
 	constructor(private $logger: ILogger) {}
 

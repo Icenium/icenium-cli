@@ -3,7 +3,7 @@
 
 import util = require("util");
 import path = require("path");
-import helpers = require("../helpers");
+import helpers = require("../common/helpers");
 import MobileHelper = require("../mobile/mobile-helper");
 
 export class PlatformMigrationService implements Project.IPlatformMigrator {

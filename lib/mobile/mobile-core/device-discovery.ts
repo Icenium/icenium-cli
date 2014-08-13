@@ -59,8 +59,8 @@ class IOSDeviceDiscovery extends DeviceDiscovery {
 	private static ADNCI_MSG_DISCONNECTED = 2;
 	private static APPLE_SERVICE_NOT_STARTED_ERROR_CODE = 0xE8000063;
 
-	private timerCallbackPtr = null;
-	private  notificationCallbackPtr = null;
+	private timerCallbackPtr: NodeBuffer = null;
+	private notificationCallbackPtr: NodeBuffer = null;
 
 	constructor(private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
@@ -132,7 +132,7 @@ class IOSDeviceDiscovery extends DeviceDiscovery {
 		this.$errors.verifyHeap("startRunLoopWithTimer");
 	}
 
-	private createAndAddDevice(devicePointer): void {
+	private createAndAddDevice(devicePointer: NodeBuffer): void {
 		var device = this.$injector.resolve(IOSDevice.IOSDevice, {devicePointer: devicePointer});
 		this.addDevice(device);
 	}
@@ -203,7 +203,7 @@ $injector.register("iOSDeviceDiscovery", ($errors: IErrors, $logger: ILogger, $f
 });
 
 export class AndroidDeviceDiscovery extends DeviceDiscovery {
-	private static adb;
+	private static adb: string;
 	private static get Adb() {
 		if (!AndroidDeviceDiscovery.adb) {
 			AndroidDeviceDiscovery.adb = path.join(__dirname, util.format("../../../resources/platform-tools/android/%s/adb", process.platform));
@@ -216,7 +216,7 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 		super();
 	}
 
-	private createAndAddDevice(deviceIdentifier): IFuture<void> {
+	private createAndAddDevice(deviceIdentifier: string): IFuture<void> {
 		return (() => {
 			var device = this.$injector.resolve(AndroidDevice.AndroidDevice, {
 					identifier: deviceIdentifier, adb: AndroidDeviceDiscovery.Adb
@@ -233,10 +233,10 @@ export class AndroidDeviceDiscovery extends DeviceDiscovery {
 			var result = this.$childProcess.exec(requestAllDevicesCommand).wait();
 
 			var devices = result.toString().split(os.EOL).slice(1)
-				.filter( (element) => {
+				.filter( (element: string) => {
 					return element && !element.isEmpty();
 				})
-				.map((element) => {
+				.map((element: string) => {
 					// http://developer.android.com/tools/help/adb.html#devicestatus
 					var parts = element.split("\t");
 					var identifier = parts[0];

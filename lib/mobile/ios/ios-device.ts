@@ -12,7 +12,7 @@ export class IOSDevice implements Mobile.IIOSDevice {
 	private identifier: string = null;
 	private voidPtr = ref.refType(ref.types.void);
 
-	constructor(private devicePointer,
+	constructor(private devicePointer: NodeBuffer,
 		private $coreFoundation: Mobile.ICoreFoundation,
 		private $mobileDevice: Mobile.IMobileDevice,
 		private $errors: IErrors,

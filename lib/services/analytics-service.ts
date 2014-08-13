@@ -10,7 +10,7 @@ import os = require("os");
 var TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 
 export class AnalyticsService implements IAnalyticsService {
-	private _eqatecMonitor;
+	private _eqatecMonitor: any;
 	private trackFeatureUsage: boolean = false;
 
 	private excluded = ["help", "feature-usage-tracking"];
@@ -26,7 +26,7 @@ export class AnalyticsService implements IAnalyticsService {
 
 	public checkConsent(featureName: string): IFuture<void> {
 		return ((): void => {
-			var trackFeatureUsage = null;
+			var trackFeatureUsage: any = null;
 
 			if (this.$loginManager.isLoggedIn().wait()) {
 				trackFeatureUsage = this.$sharedUserSettingsService.getValue(TRACK_FEATURE_USAGE_SETTING_NAME).wait();

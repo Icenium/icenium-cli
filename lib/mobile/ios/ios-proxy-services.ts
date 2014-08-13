@@ -21,7 +21,7 @@ class MobileServices {
 
 export class AfcFile {
 	private open: boolean = false;
-	private afcFile;
+	private afcFile: number;
 
 	constructor(path: string,
 		mode: string,
@@ -76,7 +76,7 @@ export class AfcFile {
 }
 
 export class AfcClient implements Mobile.IAfcClient {
-	private afcConnection = null;
+	private afcConnection: NodeBuffer = null;
 
 	constructor(private service: number,
 		private $mobileDevice: Mobile.IMobileDevice,
@@ -144,7 +144,7 @@ export class AfcClient implements Mobile.IAfcClient {
 
 	public deleteFile(devicePath: string): void {
 		var removeResult = this.$mobileDevice.afcRemovePath(this.afcConnection, devicePath);
-		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult);
+		this.$logger.trace("Removing device file '%s', result: %s", devicePath, removeResult.toString());
 	}
 
 	private transfer(localFilePath: string, devicePath: string): IFuture<void> {
@@ -158,11 +158,12 @@ export class AfcClient implements Mobile.IAfcClient {
 			var target = this.open(devicePath, "w");
 			var localFilePathSize = this.$fs.getFileSize(localFilePath).wait();
 
-			reader.on("data", (data) => {
+			reader.on("data", (data: NodeBuffer) => {
 				target.write(data, data.length);
-				this.$logger.trace("transfer-> localFilePath: '%s', devicePath: '%s', localFilePathSize: '%s', transferred bytes: '%s'", localFilePath, devicePath, localFilePathSize, data.length);
+				this.$logger.trace("transfer-> localFilePath: '%s', devicePath: '%s', localFilePathSize: '%s', transferred bytes: '%s'",
+					localFilePath, devicePath, localFilePathSize.toString(), data.length.toString());
 			})
-			.on("error", (error) => {
+			.on("error", (error: Error) => {
 				this.$errors.fail(error);
 			})
 			.on("end", () => target.close());
@@ -246,7 +247,7 @@ export class HouseArrestClient implements Mobile.IHouseArrestClient {
 		private $injector: IInjector) {
 	}
 
-	private getAfcClientCore(command, applicationIdentifier: string): Mobile.IAfcClient {
+	private getAfcClientCore(command: string, applicationIdentifier: string): Mobile.IAfcClient {
 		var service = this.device.startService(MobileServices.HOUSE_ARREST);
 		this.plistService = this.$injector.resolve(iOSCore.PlistService, {service: service, format: iOSCore.CoreTypes.kCFPropertyListXMLFormat_v1_0});
 
@@ -274,7 +275,7 @@ export class HouseArrestClient implements Mobile.IHouseArrestClient {
 }
 
 export class IOSSyslog {
-	private plistService;
+	private plistService: Mobile.IiOSDeviceSocket;
 	private matchRegex = new RegExp(".*?((Cordova.{3}|AppBuilder)\\[\\d+\\] <Warning>: )", 'i');
 
 	constructor(private device: Mobile.IIOSDevice,

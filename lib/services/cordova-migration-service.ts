@@ -57,8 +57,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			var biggerVersion = isUpgrade ? toVersion : fromVersion;
 
 			var renames = _.select(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
-			return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0
-		}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
+				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0
+			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
 			var transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
 

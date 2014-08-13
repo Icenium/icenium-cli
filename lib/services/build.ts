@@ -7,6 +7,7 @@ import path = require("path");
 var options:any = require("../options");
 import MobileHelper = require("../mobile/mobile-helper");
 import Future = require("fibers/future");
+import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../mobile/constants");
@@ -28,8 +29,7 @@ export class BuildService implements Project.IBuildService {
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $projectNameValidator,
-		private $projectTypes: IProjectTypes) { }
+		private $projectNameValidator: IProjectNameValidator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -57,7 +57,7 @@ export class BuildService implements Project.IBuildService {
 		}).future<string>()();
 	}
 
-	public buildProject(solutionName, projectName, solutionSpace, buildProperties): IFuture<Server.IBuildResult> {
+	public buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
 		return ((): Server.IBuildResult => {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 
@@ -71,7 +71,7 @@ export class BuildService implements Project.IBuildService {
 
 			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties }).wait();
 
-			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult) => {
+			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult: any) => {
 				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
 				var solutionPath = util.format("%s/%s", projectName, fullPath);
 
@@ -99,7 +99,7 @@ export class BuildService implements Project.IBuildService {
 		}).future<string>()();
 	}
 
-	private getProjectRelativePath(fullPath, projectDir): string {
+	private getProjectRelativePath(fullPath: string, projectDir: string): string {
 		projectDir = path.join(projectDir, path.sep);
 		if (!fullPath.startsWith(projectDir)) {
 			throw new Error("File is not part of the project.");
@@ -281,7 +281,7 @@ export class BuildService implements Project.IBuildService {
 				return;
 			}
 
-			var templateFiles = helpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
+			var templateFiles = commonHelpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
 			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir().wait(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each((zipped) => {
@@ -485,7 +485,7 @@ export class BuildService implements Project.IBuildService {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var projectZipFile = this.zipProject().wait();
-			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait());
+			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait().toString());
 			
 			this.$server.projects.importProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
 				this.$fs.createReadStream(projectZipFile)).wait();

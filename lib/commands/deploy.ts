@@ -13,7 +13,6 @@ export class DeployCommand implements ICommand {
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
 		private $commandsService: ICommandsService,
-		private $projectTypes: IProjectTypes,
 		private $errors: IErrors) { }
 
 	public execute(args: string[]): IFuture<void> {
@@ -48,9 +47,8 @@ export class DeployCommand implements ICommand {
 				if(!packageFile) {
 					var packageDefs = this.$buildService.deploy(this.$devicesServices.platform, device).wait();
 					packageFile = packageDefs[0].localFile;
-
-					this.$logger.debug("Ready to deploy %s", packageDefs);
-					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait());
+					this.$logger.debug("Ready to deploy %s", packageFile);
+					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
 				}
 				return device.deploy(packageFile, packageName);
 			};

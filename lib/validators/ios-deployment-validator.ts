@@ -101,7 +101,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		return cert.expiresOn <= new Date();
 	}
 
-	private getRegexPattern(appIdentifier): string {
+	private getRegexPattern(appIdentifier: string): string {
 		var starPlaceholder = "<!StarPlaceholder!>";
 		var escapedIdentifier = (<any>RegExp).escape(helpers.stringReplaceAll(appIdentifier, "*", starPlaceholder));
 		var replacedIdentifier = helpers.stringReplaceAll(escapedIdentifier, starPlaceholder, ".*");

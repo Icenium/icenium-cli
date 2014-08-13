@@ -1,12 +1,10 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
-
+import http = require("http");
 import util = require("util");
 import path = require("path");
 import url = require("url");
 import options = require("./options");
-import querystring = require("querystring");
 import Future = require("fibers/future");
 import helpers = require("./helpers");
 
@@ -167,7 +165,7 @@ export class LoginManager implements ILoginManager {
 		}).future<void>()();
 	}
 
-	private serveLoginFile(relPath): (request, response) => void {
+	private serveLoginFile(relPath: string): (request: http.ServerRequest, response: http.ServerResponse) => void {
 		return this.$httpServer.serveFile(path.join(__dirname, "../resources/login", relPath));
 	}
 
@@ -179,7 +177,7 @@ export class LoginManager implements ILoginManager {
 
 			var localhostServer = this.$httpServer.createServer({
 				routes: {
-					"/": (request, response) => {
+					"/": (request: http.ServerRequest, response: http.ServerResponse) => {
 						this.$logger.debug("Login complete: " + request.url);
 						var parsedUrl = url.parse(request.url, true);
 						var cookieData = parsedUrl.query.cookies;

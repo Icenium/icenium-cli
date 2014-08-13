@@ -8,15 +8,15 @@ import helpers = require("./helpers");
 export class HttpServer implements IHttpServer {
 	constructor(private $logger: ILogger) { }
 
-	public createServer(configuration): http.Server {
+	public createServer(configuration: IHttpServerConfig): http.Server {
 		if (!configuration.catchAll) {
-			configuration.catchAll = (request, response) => {
+			configuration.catchAll = (request: http.ServerRequest, response: http.ServerResponse) => {
 				response.statusCode = 404;
 				response.end();
 			};
 		}
 
-		return http.createServer((request, response) => {
+		return http.createServer((request: http.ServerRequest, response: http.ServerResponse) => {
 			var uriPath = url.parse(request.url).pathname;
 
 			this.$logger.debug("Serving '%s'", uriPath);
@@ -31,9 +31,9 @@ export class HttpServer implements IHttpServer {
 		});
 	}
 
-	public serveFile(fileName): (request, response) => void {
-		return (request, response) => {
-			var mimeTypes = {
+	public serveFile(fileName: string): (request: http.ServerRequest, response: http.ServerResponse) => void {
+		return (request: http.ServerRequest, response: http.ServerResponse) => {
+			var mimeTypes: IStringDictionary = {
 				".html": "text/html",
 				".jpeg": "image/jpeg",
 				".jpg": "image/jpeg",
@@ -53,7 +53,7 @@ export class HttpServer implements IHttpServer {
 		};
 	}
 
-	public redirect(response, targetUrl: string): void {
+	public redirect(response: http.ServerResponse, targetUrl: string): void {
 		response.statusCode = 302;
 		response.setHeader("Location", targetUrl);
 		response.end();

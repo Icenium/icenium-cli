@@ -1,16 +1,14 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
 import helpers = require("../lib/helpers");
-
 var assert = require("chai").assert;
 
 describe("helpers", () => {
 	describe("toHash", () => {
 		it("converts array to hash", () => {
 			var source = ["one", "two"];
-			var result = helpers.toHash(source, (value) => value, (value, key, source) => {
+			var result:any = helpers.toHash(source, (value) => value, (value, key, source) => {
 					return {key: key, value: value, source: source};
 				});
 
@@ -27,7 +25,7 @@ describe("helpers", () => {
 
 		it("converts hash to another hash", () => {
 			var source = {one:1, two:2};
-			var result = helpers.toHash(source, (value, key) => key,
+			var result:any = helpers.toHash(source, (value, key) => key,
 				(value, key, source) => {
 					return {key: key, value: value, source: source};
 				});

@@ -138,7 +138,7 @@ export class TemplatesService implements ITemplatesService {
 			this.$fs.deleteDirectory(appResourcesDir).wait();
 
 			var assetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
-			var unzipOps = [];
+			var unzipOps:IFuture<any>[] = [];
 			var unzipStream = this.$fs.createReadStream(assetsZipFileName)
 				.pipe(unzip.Parse())
 				.on("entry", (entry: ZipEntry) => {
@@ -166,7 +166,7 @@ export class TemplatesService implements ITemplatesService {
 		}).future<void>()();
 	}
 
-	private downloadTemplate(template, templatesDir: string): IFuture<void> {
+	private downloadTemplate(template: any, templatesDir: string): IFuture<void> {
 		return (() => {
 			var downloadUri = template.DownloadUri;
 			var name = path.basename(downloadUri);

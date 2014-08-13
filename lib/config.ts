@@ -1,7 +1,5 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
-
 import path = require("path");
 import helpers = require("./helpers");
 
@@ -50,8 +48,8 @@ export class Configuration implements IConfiguration { // User specific config
 		}).future<any>()();
 	}
 
-	private saveConfig(config, name: string): IFuture<any> {
-		var configNoFunctions = {};
+	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
+		var configNoFunctions = Object.create(null);
 		Object.keys(config).forEach((key) => {
 			var entry = config[key];
 			if (typeof entry !== "function") {
@@ -63,10 +61,8 @@ export class Configuration implements IConfiguration { // User specific config
 		return this.$fs.writeJson(configFileName, configNoFunctions, "\t");
 	}
 
-	private mergeConfig(config, mergeFrom) {
-		Object.keys(mergeFrom).forEach((key) => {
-			config[key] = mergeFrom[key];
-		});
+	private mergeConfig(config: IConfiguration, mergeFrom: IConfiguration) {
+		_.extend(config, mergeFrom);
 	}
 }
 $injector.register("config", Configuration);

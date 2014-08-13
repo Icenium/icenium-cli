@@ -54,7 +54,7 @@ describe("PathFilteringService", () => {
 	it("test exclusion by two rules and in subdir", () => {
 		var projectFiles = prefixWithProjectDir(["A/B/file.txt"]);
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["A/B/*", "!A/B/file.txt", "A/**/*"], projectDir);
-		var expected = [];
+		var expected:string[] = [];
 		assert.deepEqual(actual, expected);
 	});
 });

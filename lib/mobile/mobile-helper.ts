@@ -43,11 +43,11 @@ export class LocalToDevicePathData implements Mobile.ILocalToDevicePathData {
 	getRelativeToProjectBasePath(): string { return this.relativeToProjectBasePath; }
 }
 
-export function isAndroidPlatform(platform) {
+export function isAndroidPlatform(platform: string): boolean {
 	return DevicePlatforms[DevicePlatforms.Android].toLowerCase() === platform.toLowerCase();
 }
 
-export function isiOSPlatform(platform) {
+export function isiOSPlatform(platform:string): boolean {
 	return DevicePlatforms[DevicePlatforms.iOS].toLowerCase() === platform.toLowerCase();
 }
 
@@ -67,12 +67,12 @@ export function normalizePlatformName(platform: string): string {
 	return undefined;
 }
 
-export function isPlatformSupported(platform: string) {
+export function isPlatformSupported(platform: string): boolean {
 	var platformName = normalizePlatformName(platform);
 	return _.contains(platformCapabilities[platformName].hostPlatformsForDeploy, process.platform);
 }
 
-export function generateWP8GUID() {
+export function generateWP8GUID(): string {
 	return "{" + require("node-uuid").v4() + "}";
 }
 

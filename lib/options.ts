@@ -1,7 +1,5 @@
 ///<reference path=".d.ts"/>
-
 import path = require("path");
-
 var yargs: any = require("yargs");
 
 var knownOpts:any = {
@@ -26,7 +24,7 @@ var knownOpts:any = {
 		"json": Boolean,
 		"client": String
 	},
-	shorthands = {
+	shorthands: IStringDictionary = {
 		"v" : "verbose",
 		"p" : "path",
 		"t" : "template"

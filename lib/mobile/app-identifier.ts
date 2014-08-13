@@ -175,7 +175,7 @@ var factoryRules = {
 			vanilla: IOSAppIdentifier
 		},
 		NativeScript: {
-			companion: IOSNativeScriptCompanionAppIdentifier,
+			companion: IOSNativeScriptCompanionAppIdentifier
 		}
 	},
 	Android: {
@@ -184,7 +184,7 @@ var factoryRules = {
 			vanilla: AndroidAppIdentifier
 		},
 		NativeScript: {
-			companion: AndroidNativeScriptCompanionAppIdentifier,
+			companion: AndroidNativeScriptCompanionAppIdentifier
 		}
 	}
 };

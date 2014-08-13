@@ -24,7 +24,7 @@ function createTestInjector(): IInjector {
 }
 
 describe("Create self signed identity unit tests", () => {
-	var selfSignedIdentityValidator, testInjector;
+	var selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>, testInjector: IInjector;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("selfSignedIdentityValidator", validatorsModule.SelfSignedIdentityValidator);
