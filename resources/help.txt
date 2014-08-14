@@ -448,25 +448,25 @@ Options:
 
 --[emulate]--
 Usage:
-    $ appbuilder emulate start <Platform> [--path <Directory>] [--certificate <Certificate ID>] [--provision <Provision ID>]
+    $ appbuilder emulate <Platform> [--path <Directory>] [--certificate <Certificate ID>] [--provision <Provision ID>]
 Runs the current project in the native platform emulator.
 
 Platform-specific usages:
-    $ appbuilder emulate start android [--path <Directory>] [--certificate <Certificate ID>]
-    $ appbuilder emulate start ios [--path <Directory>] –certificate <Certificate ID> --provision <Provision ID>
-    $ appbuilder emulate start wp8 [--path <Directory>]
+    $ appbuilder emulate android [--path <Directory>]
+    $ appbuilder emulate ios [--path <Directory>] –-certificate <Certificate ID> --provision <Provision ID>
+    $ appbuilder emulate wp8 [--path <Directory>]
 
 Builds the specified project in the cloud and runs it in the native emulator for the specified platform.
 
 Prerequisites:
-Before running the Android emulator, verify that you have added the following Android SDK directories to the PATH environment variable.
+Before running the Android emulator, verify that you have added the following Android SDK directories to the PATH environment variable:
     platform-tools
     tools
 Before running the iOS simulator, verify that you have met the following requirements.
     You are running the Telerik AppBuilder CLI on OS X.
     You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
     You have imported a valid provisioning profile and a matching certificate. For more information, run $ appbuilder certificate --help and $ appbuilder provision --help.
-Before running the Windows Phone 8 simulator, verify that you are running the Telerik AppBuilder CLI on Windows.
+Before running the Windows Phone 8 simulator, verify that you are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
 
 <Platform> is the target mobile platform. You can set ios, android, or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.

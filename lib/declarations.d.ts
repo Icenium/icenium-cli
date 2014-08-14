@@ -259,7 +259,7 @@ interface IExtensionPlatformServices {
 
 interface IEmulatorPlatformServices {
 	checkAvailability(): IFuture<void>;
-	run(image: string) : IFuture<void>;
+	startEmulator(app: string, image?: string) : IFuture<void>;
 }
 
 interface IX509Certificate {

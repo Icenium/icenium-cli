@@ -32,3 +32,7 @@ export var hostCapabilities: { [key:string]: IHostCapabilities } = {
 		debugToolsSupported: false
 	}
 }
+
+export function getUserHomeDir(): string {
+	return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE; // works on mac/win. not tested on linux
+}

@@ -24,12 +24,14 @@ class AndroidPlatformServices implements IEmulatorPlatformServices {
 		}).future<void>()();
 	}
 
-	run(image: string) : IFuture<void> {
+	startEmulator(app: string, image?: string) : IFuture<void> {
 		return (() => {
 			this.$logger.info("Starting Android emulator with image %s", image);
-			var childProcess = this.$childProcess.spawn('emulator', ['-avd', image],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-			childProcess.unref();
+			this.$childProcess.spawn('emulator', ['-avd', image],
+				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+
+			this.$childProcess.spawn('adb', ['-e', 'install', app],
+				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
 	}
 }
@@ -52,9 +54,9 @@ class IosPlatformServices implements IEmulatorPlatformServices {
 		}).future<void>()();
 	}
 
-	run(image: string) : IFuture<void> {
+	startEmulator(image: string) : IFuture<void> {
 		return (() => {
-			this.$logger.info("Starting iOS Simulator with image %s", image);
+			this.$logger.info("Starting iOS Simulator");
 			this.$childProcess.spawn(IosPlatformServices.IOS_SIM, ["launch", image],
 				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
@@ -81,29 +83,20 @@ class Wp8PlatformServices implements IEmulatorPlatformServices {
 		}).future<void>()();
 	}
 
-	run(image: string) : IFuture<void> {
+	startEmulator(image: string) : IFuture<void> {
 		return (() => {
-			this.$logger.info("Starting Windows Phone Emulator with image %s", image);
-			var exe = path.join (process.env.ProgramFiles, "Microsoft SDKs\\Windows Phone\\v8.0\\Tools\\XAP Deployment", "XapDeployCmd.exe");
-			this.$childProcess.spawn(exe, ["/installlaunch", image, "/targetdevice:xd"], { stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+			this.$logger.info("Starting Windows Phone Emulator");
+			var emulatorStarter = path.join (process.env.ProgramFiles, Wp8PlatformServices.WP8_LAUNCHER_PATH, Wp8PlatformServices.WP8_LAUNCHER);
+			this.$childProcess.spawn(emulatorStarter, ["/installlaunch", image, "/targetdevice:xd"], { stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
 	}
+
+	private static WP8_LAUNCHER = "XapDeployCmd.exe";
+	private static WP8_LAUNCHER_PATH = "Microsoft SDKs\\Windows Phone\\v8.0\\Tools\\XAP Deployment";
 }
 $injector.register("wp8", Wp8PlatformServices);
 
-//	Name: Toshe
-//	Device: Nexus 4 (Google)
-//	Path: /Users/totev/.android/avd/Toshe.avd
-//	Target: Android 4.4.2 (API level 19)
-//	Tag/ABI: default/x86
-//	Skin: WXGA800-7in
-//	Sdcard: 128M
-
-interface IEmulatorInfo {
-	emulator: string;
-}
-
-interface IAvdInfo extends IEmulatorInfo {
+interface IAvdInfo {
 	target: string;
 	targetNum: number;
 	path: string;
@@ -115,10 +108,8 @@ interface IAvdInfo extends IEmulatorInfo {
 }
 
 export class EmulateCommand {
-	constructor(private $logger: ILogger
-				,private $errors: IErrors
+	constructor(private $errors: IErrors
 				,private $fs: IFileSystem
-				,private $childProcess: IChildProcess
 				,private $project: Project.IProject
 				,private $projectTypes: IProjectTypes
 				,private $buildService: Project.IBuildService
@@ -127,28 +118,11 @@ export class EmulateCommand {
 				,private $ios: IEmulatorPlatformServices
 				,private $wp8: IEmulatorPlatformServices) {
 		iconv.extendNodeEncodings();
+		this.$project.ensureProject();
+		this.$loginManager.ensureLoggedIn().wait();
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			if (args.length < 1 || args.length > 2) {
-				this.$errors.fail("Please specify which emulator to start.");
-			}
-
-			this.$project.ensureProject();
-			this.$loginManager.ensureLoggedIn().wait();
-
-			if (args[0].toLowerCase() === 'android') {
-				return this.runAndroid(args).wait();
-			} else if (args[0].toLowerCase() === 'ios') {
-				return this.runIos(args).wait();
-			} else if (args[0].toLowerCase() === 'wp8') {
-				return this.runWp8(args).wait();
-			}
-		}).future<void>()();
-	}
-
-	private runAndroid(args: string[]): IFuture<void> {
+	public runAndroid(args: string[]): IFuture<void> {
 		return (() => {
 			this.$android.checkAvailability().wait();
 
@@ -164,19 +138,14 @@ export class EmulateCommand {
 
 			var image: string = args[1] || this.getBestFit().wait();
 			if (image) {
-				this.$android.run(image).wait();
+				this.$android.startEmulator(packageFilePath, image).wait();
 			} else {
 				this.$errors.fail("Could not find an emulator image to run your project.");
 			}
-
-			var childProcess = this.$childProcess.spawn('adb', ['-e', 'install', packageFilePath],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-			childProcess.unref();
-
 		}).future<void>()();
 	}
 
-	private runIos(args: string[]): IFuture<void> {
+	public runIos(args: string[]): IFuture<void> {
 		return (() => {
 			this.$ios.checkAvailability().wait();
 
@@ -192,12 +161,12 @@ export class EmulateCommand {
 			}).wait();
 			this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
 
-			var image = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
-			this.$ios.run(image).wait();
+			var app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			this.$ios.startEmulator(app).wait();
 		}).future<void>()();
 	}
 
-	private runWp8(args: string[]): IFuture<void> {
+	public runWp8(args: string[]): IFuture<void> {
 		return (() => {
 			this.$wp8.checkAvailability().wait();
 
@@ -211,7 +180,7 @@ export class EmulateCommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 
-			this.$wp8.run(packageFilePath).wait();
+			this.$wp8.startEmulator(packageFilePath).wait();
 		}).future<void>()();
 	}
 
@@ -224,9 +193,6 @@ export class EmulateCommand {
 			return dir;
 		}).future<string>()();
 	}
-
-	private static CORDOVA_REQURED_ANDROID_APILEVEL = 10; // 2.3 Gingerbread
-	private static NATIVESCRIPT_REQURED_ANDROID_APILEVEL = 17; // 4.2 JellyBean
 
 	private getBestFit(): IFuture<string> {
 		return (() => {
@@ -280,8 +246,6 @@ export class EmulateCommand {
 			},
 			avdInfo  || <IAvdInfo>Object.create(null));
 			avdInfo.name = avdName;
-			avdInfo.emulator = "Android";
-
 			return avdInfo;
 		}).future<IAvdInfo>()();
 	}
@@ -305,17 +269,8 @@ export class EmulateCommand {
 		}).future<any>()();
 	}
 
-	private static ANDROID_DIR_NAME = ".android";
-	private static AVD_DIR_NAME = "avd";
-	private static INI_FILES_MASK = /^(.*)\.ini$/i;
-	private static ENCODING_MASK = /^avd\.ini\.encoding=(.*)$/;
-
-	private get userHome(): string {
-		return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE; // works on mac/win. not tested on linux
-	}
-
 	private get androidHomeDir(): string {
-		return path.join(this.userHome, EmulateCommand.ANDROID_DIR_NAME);
+		return path.join(hostInfo.getUserHomeDir(), EmulateCommand.ANDROID_DIR_NAME);
 	}
 
 	private get avdDir(): string {
@@ -330,10 +285,20 @@ export class EmulateCommand {
 				result = _.select(entries, (e: string) => e.match(EmulateCommand.INI_FILES_MASK) !== null)
 						.map((e) => e.match(EmulateCommand.INI_FILES_MASK)[1]);
 			}
-
 			return result;
 		}).future<string[]>()();
 	}
+
+	private static ANDROID_DIR_NAME = ".android";
+	private static AVD_DIR_NAME = "avd";
+	private static INI_FILES_MASK = /^(.*)\.ini$/i;
+	private static ENCODING_MASK = /^avd\.ini\.encoding=(.*)$/;
+	private static CORDOVA_REQURED_ANDROID_APILEVEL = 10; // 2.3 Gingerbread
+	private static NATIVESCRIPT_REQURED_ANDROID_APILEVEL = 17; // 4.2 JellyBean
 }
 
-$injector.registerCommand("emulate", EmulateCommand);
+$injector.register("emulate", EmulateCommand);
+
+helpers.registerCommand("emulate", "emulate|android", (emulateCommand, args) => emulateCommand.runAndroid(args));
+helpers.registerCommand("emulate", "emulate|ios", (emulateCommand, args) => emulateCommand.runIos(args));
+helpers.registerCommand("emulate", "emulate|wp8", (emulateCommand, args) => emulateCommand.runWp8(args));
