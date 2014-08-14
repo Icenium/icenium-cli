@@ -4,8 +4,9 @@
 import path = require("path");
 import Future = require("fibers/future");
 import minimatch = require("minimatch");
-var iconv = require("iconv-lite");
+import iconv = require("iconv-lite");
 import helpers = require("../helpers");
+import hostInfo = require("../host-info");
 import MobileHelper = require("../mobile/mobile-helper");
 import constants = require("../mobile/constants");
 
@@ -25,7 +26,7 @@ class AndroidPlatformServices implements IEmulatorPlatformServices {
 
 	run(image: string) : IFuture<void> {
 		return (() => {
-			this.$logger.info("Starting emulator (Android)...");
+			this.$logger.info("Starting Android emulator with image %s", image);
 			var childProcess = this.$childProcess.spawn('emulator', ['-avd', image],
 				{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
 			childProcess.unref();
@@ -45,7 +46,7 @@ class IosPlatformServices implements IEmulatorPlatformServices {
 			if (!_.contains(this.$project.projectTargets.wait(), "ios")) {
 				this.$errors.fail("The current project does not target iOS and cannot be run in the iOS Simulator.");
 			}
-			if (!helpers.isDarwin()) {
+			if (!hostInfo.isDarwin()) {
 				this.$errors.fail("iOS Simulator is available only on Mac OS X.");
 			}
 		}).future<void>()();
@@ -53,10 +54,9 @@ class IosPlatformServices implements IEmulatorPlatformServices {
 
 	run(image: string) : IFuture<void> {
 		return (() => {
-			this.$logger.info("Starting emulator (iOS)...");
-			var childProcess = this.$childProcess.spawn(IosPlatformServices.IOS_SIM, ["launch", image],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-			childProcess.unref();
+			this.$logger.info("Starting iOS Simulator with image %s", image);
+			this.$childProcess.spawn(IosPlatformServices.IOS_SIM, ["launch", image],
+				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
 	}
 
@@ -75,7 +75,7 @@ class Wp8PlatformServices implements IEmulatorPlatformServices {
 			if (!_.contains(this.$project.projectTargets.wait(), "wp8")) {
 				this.$errors.fail("The current project does not target Windows Phone 8 and cannot be run in the Windows Phone emulator.");
 			}
-			if (!helpers.isWindows()) {
+			if (!hostInfo.isWindows()) {
 				this.$errors.fail("Windows Phone Emulator is available only on Windows 8 or later.");
 			}
 		}).future<void>()();
@@ -83,7 +83,9 @@ class Wp8PlatformServices implements IEmulatorPlatformServices {
 
 	run(image: string) : IFuture<void> {
 		return (() => {
-
+			this.$logger.info("Starting Windows Phone Emulator with image %s", image);
+			var exe = path.join (process.env.ProgramFiles, "Microsoft SDKs\\Windows Phone\\v8.0\\Tools\\XAP Deployment", "XapDeployCmd.exe");
+			this.$childProcess.spawn(exe, ["/installlaunch", image, "/targetdevice:xd"], { stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
 	}
 }
@@ -116,67 +118,108 @@ export class EmulateCommand {
 	constructor(private $logger: ILogger
 				,private $errors: IErrors
 				,private $fs: IFileSystem
+				,private $childProcess: IChildProcess
 				,private $project: Project.IProject
 				,private $projectTypes: IProjectTypes
 				,private $buildService: Project.IBuildService
 				,private $loginManager: ILoginManager
 				,private $android: IEmulatorPlatformServices
 				,private $ios: IEmulatorPlatformServices
-				,private $wp8: IEmulatorPlatformServices
-		) {
-		this.$project.ensureProject();
-		this.$loginManager.ensureLoggedIn().wait();
+				,private $wp8: IEmulatorPlatformServices) {
 		iconv.extendNodeEncodings();
 	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-
 			if (args.length < 1 || args.length > 2) {
 				this.$errors.fail("Please specify which emulator to start.");
 			}
 
+			this.$project.ensureProject();
+			this.$loginManager.ensureLoggedIn().wait();
+
 			if (args[0].toLowerCase() === 'android') {
-				this.$android.checkAvailability().wait();
-
-				var image: string = args[1] || this.getBestFit().wait();
-				if (image) {
-					this.$android.run(image).wait();
-				} else {
-					this.$errors.fail("Could not find an emulator image to run your project.");
-				}
+				return this.runAndroid(args).wait();
 			} else if (args[0].toLowerCase() === 'ios') {
-				this.$ios.checkAvailability().wait();
-
-				var tempDir = this.createTempDir().wait();
-
-				var packageDefs = this.$buildService.build({
-					platform: "ios",
-					configuration: "Debug",
-					showQrCodes: false,
-					downloadFiles: true,
-					downloadedFilePath: path.join(tempDir, "package.zip"),
-					provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
-					buildForiOSSimulator: true
-				}).wait();
-
-				this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
-
-				var image = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
-				this.$ios.run(image).wait();
+				return this.runIos(args).wait();
 			} else if (args[0].toLowerCase() === 'wp8') {
-				this.$wp8.checkAvailability().wait();
-				this.$wp8.run(null).wait(); // TODO
+				return this.runWp8(args).wait();
+			}
+		}).future<void>()();
+	}
+
+	private runAndroid(args: string[]): IFuture<void> {
+		return (() => {
+			this.$android.checkAvailability().wait();
+
+			var tempDir = this.createTempDir().wait();
+			var packageFilePath = path.join(tempDir, "package.apk");
+			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+				platform: "android",
+				configuration: "Debug",
+				showQrCodes: false,
+				downloadFiles: true,
+				downloadedFilePath: packageFilePath
+			}).wait();
+
+			var image: string = args[1] || this.getBestFit().wait();
+			if (image) {
+				this.$android.run(image).wait();
+			} else {
+				this.$errors.fail("Could not find an emulator image to run your project.");
 			}
 
+			var childProcess = this.$childProcess.spawn('adb', ['-e', 'install', packageFilePath],
+				{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
+			childProcess.unref();
+
+		}).future<void>()();
+	}
+
+	private runIos(args: string[]): IFuture<void> {
+		return (() => {
+			this.$ios.checkAvailability().wait();
+
+			var tempDir = this.createTempDir().wait();
+			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+				platform: "ios",
+				configuration: "Debug",
+				showQrCodes: false,
+				downloadFiles: true,
+				downloadedFilePath: path.join(tempDir, "package.zip"),
+				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
+				buildForiOSSimulator: true
+			}).wait();
+			this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
+
+			var image = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			this.$ios.run(image).wait();
+		}).future<void>()();
+	}
+
+	private runWp8(args: string[]): IFuture<void> {
+		return (() => {
+			this.$wp8.checkAvailability().wait();
+
+			var tempDir = this.createTempDir().wait();
+			var packageFilePath = path.join(tempDir, "package.apk");
+			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+				platform: "android",
+				configuration: "Debug",
+				showQrCodes: false,
+				downloadFiles: true,
+				downloadedFilePath: packageFilePath
+			}).wait();
+
+			this.$wp8.run(packageFilePath).wait();
 		}).future<void>()();
 	}
 
 	private createTempDir(): IFuture<string> {
 		return (() => {
-			var dir = path.join(this.$project.getProjectDir(), ".ab");
+			var dir = path.join(this.$project.getProjectDir().wait(), ".ab");
 			this.$fs.createDirectory(dir).wait();
-			dir = path.join(dir, "simulatorfiles");
+			dir = path.join(dir, "emulatorfiles");
 			this.$fs.createDirectory(dir).wait();
 			return dir;
 		}).future<string>()();
@@ -219,7 +262,7 @@ export class EmulateCommand {
 			var encoding = this.getAvdEncoding(avdFileName).wait();
 			var contents = this.$fs.readText(avdFileName, encoding).wait().split("\n");
 
-			avdInfo = _.reduce(contents, (result: IAvdInfo, line) => {
+			avdInfo = _.reduce(contents, (result: IAvdInfo, line:string) => {
 				var parsedLine = line.split("=");
 				var key = parsedLine[0];
 				switch(key) {
@@ -245,7 +288,7 @@ export class EmulateCommand {
 
 	private getAvdEncoding(avdName: string): IFuture<any> {
 		return (() => {
-			// avd files can have different encoding, defined on te first line.
+			// avd files can have different encoding, defined on the first line.
 			// find which one it is (if any) and use it to correctly read the file contents
 			var encoding = "utf8";
 			var contents = this.$fs.readText(avdName, "ascii").wait();
@@ -281,7 +324,7 @@ export class EmulateCommand {
 
 	private getAvds(): IFuture<string[]> {
 		return (() => {
-			var result = [];
+			var result:string[] = [];
 			if (this.$fs.exists(this.avdDir).wait()) {
 				var entries = this.$fs.readDirectory(this.avdDir).wait();
 				result = _.select(entries, (e: string) => e.match(EmulateCommand.INI_FILES_MASK) !== null)
