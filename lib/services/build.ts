@@ -142,7 +142,8 @@ export class BuildService implements Project.IBuildService {
 				Description: projectData.Description,
 				FrameworkVersion: projectData.FrameworkVersion,
 				BundleVersion: projectData.BundleVersion,
-				DeviceOrientations: projectData.DeviceOrientations
+				DeviceOrientations: projectData.DeviceOrientations,
+				BuildForiOSSimulator: settings.buildForiOSSimulator || false
 			};
 
 			if (settings.platform === "Android") {
