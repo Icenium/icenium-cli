@@ -242,7 +242,7 @@ export class EmulateCommand {
 				switch(key) {
 					case "target":
 						result.target = parsedLine[1];
-						result.targetNum = +result.target.replace('android-', '');
+						result.targetNum = this.readTargetNum(result.target);
 						break;
 					case "path": result.path = parsedLine[1]; break;
 					case "hw.device.name": result.device = parsedLine[1]; break;
@@ -256,6 +256,18 @@ export class EmulateCommand {
 			avdInfo.name = avdName;
 			return avdInfo;
 		}).future<IAvdInfo>()();
+	}
+
+	// Android L is not written as a number in the .ini files, and we need to convert it
+	private readTargetNum(target: string): number {
+		var platform = target.replace('android-', '');
+		var platformNumber = +platform;
+		if (isNaN(platformNumber)) {
+			if (platform === "L") {
+				platformNumber = 20;
+			}
+		}
+		return platformNumber;
 	}
 
 	private getAvdEncoding(avdName: string): IFuture<any> {
@@ -278,7 +290,7 @@ export class EmulateCommand {
 	}
 
 	private get androidHomeDir(): string {
-		return path.join(osenv.home, EmulateCommand.ANDROID_DIR_NAME);
+		return path.join(osenv.home(), EmulateCommand.ANDROID_DIR_NAME);
 	}
 
 	private get avdDir(): string {
