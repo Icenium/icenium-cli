@@ -43,6 +43,7 @@
     "mute-stream": "0.0.4",
     "node-uuid": "1.4.1",
     "open": "0.0.4",
+    "osenv": "0.1.0",
     "plistlib": "0.2.1",
     "plugman": "0.16.0",
     "progress-stream": "0.5.0",

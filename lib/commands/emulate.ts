@@ -5,6 +5,7 @@ import path = require("path");
 import Future = require("fibers/future");
 import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
+import osenv = require("osenv");
 import helpers = require("../helpers");
 import hostInfo = require("../host-info");
 import MobileHelper = require("../mobile/mobile-helper");
@@ -45,11 +46,11 @@ class IosPlatformServices implements IEmulatorPlatformServices {
 
 	checkAvailability(): IFuture<void> {
 		return (() => {
-			if (!_.contains(this.$project.projectTargets.wait(), "ios")) {
-				this.$errors.fail("The current project does not target iOS and cannot be run in the iOS Simulator.");
-			}
 			if (!hostInfo.isDarwin()) {
 				this.$errors.fail("iOS Simulator is available only on Mac OS X.");
+			}
+			if (!_.contains(this.$project.projectTargets.wait(), "ios")) {
+				this.$errors.fail("The current project does not target iOS and cannot be run in the iOS Simulator.");
 			}
 		}).future<void>()();
 	}
@@ -57,12 +58,12 @@ class IosPlatformServices implements IEmulatorPlatformServices {
 	startEmulator(image: string) : IFuture<void> {
 		return (() => {
 			this.$logger.info("Starting iOS Simulator");
-			this.$childProcess.spawn(IosPlatformServices.IOS_SIM, ["launch", image],
+			this.$childProcess.spawn(IosPlatformServices.SimulatorLauncher, ["launch", image],
 				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
 	}
 
-	private static IOS_SIM = "ios-sim";
+	private static SimulatorLauncher = "ios-sim";
 }
 $injector.register("ios", IosPlatformServices);
 
@@ -74,11 +75,11 @@ class Wp8PlatformServices implements IEmulatorPlatformServices {
 
 	checkAvailability(): IFuture<void> {
 		return (() => {
-			if (!_.contains(this.$project.projectTargets.wait(), "wp8")) {
-				this.$errors.fail("The current project does not target Windows Phone 8 and cannot be run in the Windows Phone emulator.");
-			}
 			if (!hostInfo.isWindows()) {
 				this.$errors.fail("Windows Phone Emulator is available only on Windows 8 or later.");
+			}
+			if (!_.contains(this.$project.projectTargets.wait(), "wp8")) {
+				this.$errors.fail("The current project does not target Windows Phone 8 and cannot be run in the Windows Phone emulator.");
 			}
 		}).future<void>()();
 	}
@@ -108,6 +109,13 @@ interface IAvdInfo {
 }
 
 export class EmulateCommand {
+	private static ANDROID_DIR_NAME = ".android";
+	private static AVD_DIR_NAME = "avd";
+	private static INI_FILES_MASK = /^(.*)\.ini$/i;
+	private static ENCODING_MASK = /^avd\.ini\.encoding=(.*)$/;
+	private static CORDOVA_REQURED_ANDROID_APILEVEL = 10; // 2.3 Gingerbread
+	private static NATIVESCRIPT_REQURED_ANDROID_APILEVEL = 17; // 4.2 JellyBean
+
 	constructor(private $errors: IErrors
 				,private $fs: IFileSystem
 				,private $project: Project.IProject
@@ -129,7 +137,7 @@ export class EmulateCommand {
 			var tempDir = this.createTempDir().wait();
 			var packageFilePath = path.join(tempDir, "package.apk");
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: "android",
+				platform: MobileHelper.normalizePlatformName("Android"),
 				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,
@@ -151,7 +159,7 @@ export class EmulateCommand {
 
 			var tempDir = this.createTempDir().wait();
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: "ios",
+				platform: MobileHelper.normalizePlatformName("iOS"),
 				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,
@@ -171,9 +179,9 @@ export class EmulateCommand {
 			this.$wp8.checkAvailability().wait();
 
 			var tempDir = this.createTempDir().wait();
-			var packageFilePath = path.join(tempDir, "package.apk");
+			var packageFilePath = path.join(tempDir, "package.xap");
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: "android",
+				platform: MobileHelper.normalizePlatformName("WP8"),
 				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,
@@ -270,7 +278,7 @@ export class EmulateCommand {
 	}
 
 	private get androidHomeDir(): string {
-		return path.join(hostInfo.getUserHomeDir(), EmulateCommand.ANDROID_DIR_NAME);
+		return path.join(osenv.home, EmulateCommand.ANDROID_DIR_NAME);
 	}
 
 	private get avdDir(): string {
@@ -288,17 +296,10 @@ export class EmulateCommand {
 			return result;
 		}).future<string[]>()();
 	}
-
-	private static ANDROID_DIR_NAME = ".android";
-	private static AVD_DIR_NAME = "avd";
-	private static INI_FILES_MASK = /^(.*)\.ini$/i;
-	private static ENCODING_MASK = /^avd\.ini\.encoding=(.*)$/;
-	private static CORDOVA_REQURED_ANDROID_APILEVEL = 10; // 2.3 Gingerbread
-	private static NATIVESCRIPT_REQURED_ANDROID_APILEVEL = 17; // 4.2 JellyBean
 }
 
 $injector.register("emulate", EmulateCommand);
 
 helpers.registerCommand("emulate", "emulate|android", (emulateCommand, args) => emulateCommand.runAndroid(args));
-helpers.registerCommand("emulate", "emulate|ios", (emulateCommand, args) => emulateCommand.runIos(args));
-helpers.registerCommand("emulate", "emulate|wp8", (emulateCommand, args) => emulateCommand.runWp8(args));
+helpers.registerCommand("emulate", "emulate|ios",     (emulateCommand, args) => emulateCommand.runIos(args));
+helpers.registerCommand("emulate", "emulate|wp8",     (emulateCommand, args) => emulateCommand.runWp8(args));
