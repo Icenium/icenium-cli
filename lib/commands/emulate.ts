@@ -2,9 +2,11 @@
 "use strict";
 
 import path = require("path");
+import Fiber = require("fibers");
 import Future = require("fibers/future");
 import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
+import os = require("os");
 import osenv = require("osenv");
 import helpers = require("../helpers");
 import hostInfo = require("../host-info");
@@ -17,23 +19,59 @@ class AndroidPlatformServices implements IEmulatorPlatformServices {
 		,private $errors: IErrors
 		,private $childProcess: IChildProcess) {}
 
-	checkAvailability(): IFuture<void> {
+	public checkAvailability(): IFuture<void> {
 		return (() => {
 			if (!_.contains(this.$project.projectTargets.wait(), "android")) {
-				this.$errors.fail("The current project does not target android and cannot be run in the Android emulator.");
+				this.$errors.fail("The current project does not target Android and cannot be run in the Android emulator.");
 			}
 		}).future<void>()();
 	}
 
-	startEmulator(app: string, image?: string) : IFuture<void> {
+	public startEmulator(app: string, image?: string) : IFuture<void> {
 		return (() => {
-			this.$logger.info("Starting Android emulator with image %s", image);
-			this.$childProcess.spawn('emulator', ['-avd', image],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+			// start the emulator, if needed
+			var runningEmulators = this.getRunningEmulators().wait();
+			if (runningEmulators.length === 0) {
+				this.$logger.info("Starting Android emulator with image %s", image);
+				this.$childProcess.spawn('emulator', ['-avd', image],
+					{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+			}
 
-			this.$childProcess.spawn('adb', ['-e', 'install', app],
+			// adb does not always wait for the emulator to fully startup. wait for this
+			while (runningEmulators.length === 0) {
+				this.sleep(500);
+				runningEmulators = this.getRunningEmulators().wait();
+			}
+
+			// install the app
+			this.$logger.info("installing %s through adb", app);
+			this.$childProcess.execFile('adb', ['-e', 'install', '-r', app]).wait();
+
+			// run the installed app
+			this.$logger.info("running %s through adb", app);
+			this.$childProcess.spawn('adb', ['-e', 'shell', 'am', 'start', '-S', this.$project.projectData.AppIdentifier + "/.TelerikCallbackActivity"],
 				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 		}).future<void>()();
+	}
+
+	private sleep(ms: number): void {
+		var fiber = Fiber.current;
+		setTimeout(() => fiber.run(), ms);
+		Fiber.yield();
+	}
+
+	private getRunningEmulators(): IFuture<string[]> {
+		return (() => {
+			var emulatorDevices: string[] = [];
+			var outputRaw = this.$childProcess.execFile('adb', ['devices']).wait().split(os.EOL);
+			_.each(outputRaw, (device: string) => {
+				var rx = device.match(/^emulator-(\d+)\s+device$/);
+				if (rx && rx[1]) {
+					emulatorDevices.push(rx[1]);
+				}
+			});
+			return emulatorDevices;
+		}).future<string[]>()();
 	}
 }
 $injector.register("android", AndroidPlatformServices);

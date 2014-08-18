@@ -124,9 +124,8 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
-		var childProcess: child_process.ChildProcess = this.$childProcess.spawn(simulatorBinary, applicationParams,
-			{ stdio: ["ignore", "ignore", "ignore"], detached: true });
-		childProcess.unref();
+		this.$childProcess.spawn(simulatorBinary, applicationParams,
+			{ stdio: ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}
 }
 
@@ -146,9 +145,8 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC_APP);
 		var commandLine = [simulatorBinary, '--args'].concat(applicationParams);
-		var childProcess: child_process.ChildProcess = this.$childProcess.spawn('open', commandLine,
-			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-		childProcess.unref();
+		this.$childProcess.spawn('open', commandLine,
+			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}
 }
 

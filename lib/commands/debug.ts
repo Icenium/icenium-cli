@@ -137,9 +137,8 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 
 		var debuggerBinary = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX);
 		var commandLine = [debuggerBinary, '--args'].concat(applicationParams);
-		var childProcess: child_process.ChildProcess = this.$childProcess.spawn('open', commandLine,
-			{ stdio:  ["ignore", "ignore", "ignore"], detached: true });
-		childProcess.unref();
+		this.$childProcess.spawn('open', commandLine,
+			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}
 }
 
