@@ -1,12 +1,11 @@
 require("./options");
 require("./common/bootstrap");
-require("colors");
 
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.require("staticConfig", "./config");
-$injector.requireCommand("dev-config-apply", "./config");
-$injector.requireCommand("dev-config-reset", "./config");
+$injector.requireCommand("dev-config-apply", "./commands/dev/config-apply");
+$injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
 $injector.require("resources", "./resource-loader");
 $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
@@ -91,7 +90,6 @@ $injector.require("iOSDevice", "./mobile/ios/ios-device");
 $injector.require("androidDevice", "./mobile/android/android-device");
 
 $injector.require("devicesServices", "./mobile/mobile-core/devices-services");
-$injector.require("prompter", "./prompter");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|*list", "./commands/cryptographic-identities");
@@ -118,11 +116,11 @@ $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
 $injector.requireCommand("dev-prepackage", "./commands/post-install");
 $injector.require("platformServices", "./commands/simulate");
-$injector.require("analyticsService", "./services/analytics-service");
-$injector.requireCommand("feature-usage-tracking", "./services/analytics-service");
 $injector.require("clientUserSettingsFileService", "./services/user-settings-service");
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsFileService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
+$injector.require("userSettingsService", "./services/user-settings-service");
+$injector.require("analyticsSettingsService", "./services/analytics-settings-service");
 
 $injector.require("pathFilteringService", "./services/path-filtering");

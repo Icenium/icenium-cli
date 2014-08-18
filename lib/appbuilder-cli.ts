@@ -9,26 +9,9 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 
 var fiber = Fiber(() => {
-	var analyticsService = $injector.resolve("analyticsService");
-
-	var action = (err: Error, callstack: string) => {
-		try {
-			analyticsService.trackException(err, callstack);
-		} catch (e) {
-			console.log("Error while reporting exception: " + e);
-		}
-	};
-
-	errors.installUncaughtExceptionListener(action);
+	errors.installUncaughtExceptionListener();
 
 	var commandDispatcher:ICommandDispatcher = $injector.resolve("commandDispatcher");
-
-	var beforeExecuteCommandHook = (command:ICommand, commandName:string) => {
-		if (!command.disableAnalytics) {
-			analyticsService.checkConsent(commandName).wait();
-			analyticsService.trackFeature(commandName).wait();
-		}
-	}
 
 	if (process.argv[2] === "completion") {
 		var getPropSchemaAction = () => {
@@ -43,7 +26,7 @@ var fiber = Fiber(() => {
 
 		commandDispatcher.completeCommand(getPropSchemaAction);
 	} else {
-		commandDispatcher.dispatchCommand(beforeExecuteCommandHook).wait();
+		commandDispatcher.dispatchCommand().wait();
 	}
 
 	$injector.dispose();

@@ -7,6 +7,7 @@ import path = require("path");
 import util = require("util");
 import options = require("./../options");
 import helpers = require("./../helpers");
+import userSettingsServiceBaseLib = require("./../common/services/user-settings-service");
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
@@ -25,42 +26,10 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 }
 $injector.register("clientUserSettingsFileService", ClientUserSettingsFileService);
 
-export class ClientSpecificUserSettingsService implements IUserSettingsService {
-	private userSettingsData: any = null;
-
-	constructor(private $fs: IFileSystem,
-		private $clientUserSettingsFileService: IUserSettingsFileService) { }
-
-	public loadUserSettingsFile(): IFuture<void> {
-		return (() => {
-			if(!this.userSettingsData) {
-				if(!this.$fs.exists(this.$clientUserSettingsFileService.userSettingsFilePath).wait()) {
-					this.$fs.writeFile(this.$clientUserSettingsFileService.userSettingsFilePath, null).wait();
-				}
-
-				this.userSettingsData = this.$fs.readJson(this.$clientUserSettingsFileService.userSettingsFilePath).wait();
-			}
-		}).future<void>()();
-	}
-
-	public getValue(propertyName: string): IFuture<any> {
-		return(() => {
-			this.loadUserSettingsFile().wait();
-			return this.userSettingsData ? this.userSettingsData[propertyName] : null;
-		}).future<any>()();
-	}
-
-	public saveSettings(data: {[key: string]: {}}): IFuture<void> {
-		return(() => {
-			this.loadUserSettingsFile().wait();
-			this.userSettingsData = this.userSettingsData || {};
-
-			Object.keys(data).forEach(propertyName => {
-				this.userSettingsData[propertyName] = data[propertyName];
-			});
-
-			this.$fs.writeJson(this.$clientUserSettingsFileService.userSettingsFilePath, this.userSettingsData, "\t").wait();
-		}).future<void>()();
+export class ClientSpecificUserSettingsService extends userSettingsServiceBaseLib.UserSettingsServiceBase {
+	constructor($fs: IFileSystem,
+		$clientUserSettingsFileService: IUserSettingsFileService) {
+		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 }
 $injector.register("clientSpecificUserSettingsService", ClientSpecificUserSettingsService);
@@ -128,7 +97,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 		}).future<void>()();
 	}
 
-	public getValue(propertyName: string): IFuture<any> {
+	public getSettingValue<T>(settingName: string): IFuture<T> {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.loadUserSettingsFile().wait();
@@ -139,20 +108,27 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 
 			var data = this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG];
 			try {
-				propertyName.split(".").forEach(property => { data = data[property]; });
+				settingName.split(".").forEach(property => { data = data[property]; });
 			} catch(e) {
 				return null;
 			}
 
 			return data.$t || data;
 
-		}).future<any>()();
+		}).future<T>()();
 	}
 
 	private readUserSettingsFile(): IFuture<void> {
 		return(() => {
 			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
 		}).future<void>()();
+	}
+
+	public saveSetting<T>(key: string, value: T): IFuture<void> {
+		var settingObject: any = {};
+		settingObject[key] = value;
+
+		return this.saveSettings(settingObject);
 	}
 
 	public saveSettings(data: {[key: string]: {}}): IFuture<void> {
@@ -190,4 +166,28 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	}
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);
+
+export class UserSettingsService implements UserSettings.IUserSettingsService {
+	private static 	ANALYTICS_INSTALLATION_ID_PROPERTY_NAME = "AnalyticsInstallationID";
+
+	constructor(private $sharedUserSettingsService: IUserSettingsService,
+		private $clientSpecificUserSettingsService: IUserSettingsService) { }
+
+	public getSettingValue<T>(settingName: string): IFuture<any> {
+		if(settingName === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
+			return this.$clientSpecificUserSettingsService.getSettingValue(settingName);
+		}
+
+		return this.$sharedUserSettingsService.getSettingValue(settingName);
+	}
+
+	public saveSetting<T>(key: string, value: T): IFuture<void> {
+		if(key === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
+			return this.$clientSpecificUserSettingsService.saveSetting(key, value);
+		}
+
+		return this.$sharedUserSettingsService.saveSetting(key, value);
+	}
+}
+$injector.register("userSettingsService", UserSettingsService);
 
