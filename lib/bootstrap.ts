@@ -103,3 +103,4 @@ $injector.require("userSettingsService", "./services/user-settings-service");
 $injector.require("analyticsSettingsService", "./services/analytics-settings-service");
 
 $injector.require("pathFilteringService", "./services/path-filtering");
+$injector.require("emulatorSettingsService", "./services/emulator-settings-service");
