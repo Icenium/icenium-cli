@@ -4,7 +4,7 @@ import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import MobileHelper = require("../mobile/mobile-helper");
+import MobileHelper = require("../common/mobile/mobile-helper");
 import hostInfo = require("../host-info");
 
 export class SimulateCommand implements ICommand {

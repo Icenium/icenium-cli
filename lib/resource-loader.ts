@@ -3,7 +3,7 @@
 
 import path = require("path");
 import helpers = require("./helpers");
-import MobileHelper = require("./mobile/mobile-helper");
+import MobileHelper = require("./common/mobile/mobile-helper");
 import util = require("util");
 
 class ResourceLoader implements IResourceLoader {

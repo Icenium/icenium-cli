@@ -2,7 +2,7 @@
 
 "use strict";
 
-import constants = require("../mobile/constants");
+import constants = require("../common/mobile/constants");
 var options:any = require("../options");
 
 interface IAppStoreApplication {

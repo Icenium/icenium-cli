@@ -70,27 +70,6 @@ $injector.requireCommand("deploy", "./commands/deploy");
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 $injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./services/build");
 
-$injector.require("iOSCore", "./mobile/ios/ios-core");
-$injector.require("coreFoundation", "./mobile/ios/ios-core");
-$injector.require("mobileDevice", "./mobile/ios/ios-core");
-$injector.require("plistService", "./mobile/ios/ios-core");
-
-$injector.require("installationProxyClient", "./mobile/ios/ios-proxy-services");
-$injector.require("notificationProxyClient", "./mobile/ios/ios-proxy-services");
-$injector.require("houseArrestClient", "./mobile/ios/ios-proxy-services");
-
-$injector.require("signal", "./events/signal");
-$injector.require("deviceFound", "./mobile/mobile-core/device-discovery");
-$injector.require("deviceLost", "./mobile/mobile-core/device-discovery");
-
-$injector.require("deviceDiscovery", "./mobile/mobile-core/device-discovery");
-$injector.require("iOSDeviceDiscovery", "./mobile/mobile-core/device-discovery");
-$injector.require("androidDeviceDiscovery", "./mobile/mobile-core/device-discovery");
-$injector.require("iOSDevice", "./mobile/ios/ios-device");
-$injector.require("androidDevice", "./mobile/android/android-device");
-
-$injector.require("devicesServices", "./mobile/mobile-core/devices-services");
-
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|*list", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|import", "./commands/cryptographic-identities");

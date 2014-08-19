@@ -5,13 +5,13 @@ import util = require("util");
 import querystring = require("querystring");
 import path = require("path");
 var options:any = require("../options");
-import MobileHelper = require("../mobile/mobile-helper");
+import MobileHelper = require("../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
-import constants = require("../mobile/constants");
-import AppIdentifier = require("../mobile/app-identifier");
+import constants = require("../common/mobile/constants");
+import AppIdentifier = require("../common/mobile/app-identifier");
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "install/WinPhoneAet";

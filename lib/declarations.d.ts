@@ -325,10 +325,6 @@ interface ISamplesService {
 	printSamplesInformation(): IFuture<string>;
 }
 
-interface IHostCapabilities {
-	debugToolsSupported: boolean;
-}
-
 interface IProjectNameValidator {
 	validate(name: string): boolean;
 }

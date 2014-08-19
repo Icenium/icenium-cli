@@ -5,9 +5,9 @@ import path = require("path");
 import watchr = require("watchr");
 var options: any = require("./../options");
 import helpers = require("./../helpers");
-import MobileHelper = require("./../mobile/mobile-helper");
-import AppIdentifier = require("../mobile/app-identifier");
-import constants = require("../mobile/constants");
+import MobileHelper = require("./../common/mobile/mobile-helper");
+import AppIdentifier = require("../common/mobile/app-identifier");
+import constants = require("../common/mobile/constants");
 
 interface IPlatformSpecificFileName {
 	platform: string;

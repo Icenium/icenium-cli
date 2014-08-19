@@ -1,6 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
 import path = require("path");
+import util = require("util");
 import helpers = require("./helpers");
 
 export class Configuration implements IConfiguration { // User specific config
@@ -74,6 +75,8 @@ export class StaticConfig implements IStaticConfig {
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 
+	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
+
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;
 
@@ -81,6 +84,10 @@ export class StaticConfig implements IStaticConfig {
 
 	public get helpTextPath() {
 		return path.join(__dirname, "../resources/help.txt");
+	}
+
+	public get adbFilePath() {
+		return path.join(__dirname, util.format("../resources/platform-tools/android/%s/adb", process.platform));
 	}
 }
 $injector.register("staticConfig", StaticConfig);
