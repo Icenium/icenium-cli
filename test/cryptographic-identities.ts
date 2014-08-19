@@ -45,7 +45,7 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isTrue(validationResult.IsSuccessful);
+			assert.isTrue(validationResult.isSuccessful);
 		});
 
 		it("validates that Name is missing", () => {
@@ -59,8 +59,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Name"));
 		});
 
@@ -75,8 +75,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Email"));
 		});
 
@@ -91,8 +91,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		});
 
@@ -107,8 +107,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				INVALID_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		});
 
@@ -123,8 +123,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "StartDate"));
 		});
 
@@ -139,8 +139,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, util.format(validatorsModule.SelfSignedIdentityValidator.
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "EndDate"));
 		});
 
@@ -155,8 +155,8 @@ describe("Create self signed identity unit tests", () => {
 			};
 
 			var validationResult = selfSignedIdentityValidator.validate(model);
-			assert.isFalse(validationResult.IsSuccessful);
-			assert.equal(validationResult.Error, validatorsModule.SelfSignedIdentityValidator.NEGATIVE_EXPIRATION_ERROR_MESSAGE);
+			assert.isFalse(validationResult.isSuccessful);
+			assert.equal(validationResult.error, validatorsModule.SelfSignedIdentityValidator.NEGATIVE_EXPIRATION_ERROR_MESSAGE);
 		});
 	});
 })

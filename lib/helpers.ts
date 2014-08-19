@@ -83,14 +83,6 @@ export function stringReplaceAll(string: string, find: any, replace: string): st
 	return string.split(find).join(replace);
 }
 
-export function isNullOrWhitespace(input: string): boolean {
-	if (!input) {
-		return true;
-	}
-
-	return input.replace(/\s/gi, '').length < 1;
-}
-
 export function capitalizeFirstLetter(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }

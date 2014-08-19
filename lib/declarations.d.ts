@@ -325,6 +325,3 @@ interface ISamplesService {
 	printSamplesInformation(): IFuture<string>;
 }
 
-interface IProjectNameValidator {
-	validate(name: string): boolean;
-}

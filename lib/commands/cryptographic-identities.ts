@@ -151,12 +151,12 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			_.each(provisions, (prov: IProvision) => {
 				var validationResult = validator.validateProvision(prov);
-				var hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().IsSuccessful);
+				var hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().isSuccessful);
 
-				if(validationResult.IsSuccessful && hasCompatibleCertificate) {
+				if(validationResult.isSuccessful && hasCompatibleCertificate) {
 					passedProvisions.push(prov);
 				} else {
-					failedProvisions.push({provision: prov, error: validationResult.Error});
+					failedProvisions.push({provision: prov, error: validationResult.error});
 				}
 			});
 
@@ -190,7 +190,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{deviceIdentifier: null, appIdentifier: null});
 
-			var identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().IsSuccessful);
+			var identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().isSuccessful);
 
 			if (identity) {
 				return identity;
@@ -283,8 +283,8 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 							var validationResult = this.$selfSignedIdentityValidator.
 								validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
 
-							if (!validationResult.IsSuccessful) {
-								schema.properties["Email"].message = validationResult.Error;
+							if (!validationResult.isSuccessful) {
+								schema.properties["Email"].message = validationResult.error;
 								return false;
 							}
 							return true;
@@ -298,8 +298,8 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 							var validationResult = this.$selfSignedIdentityValidator.
 								validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
 
-							if (!validationResult.IsSuccessful) {
-								var message = [validationResult.Error, "Valid countries are:"];
+							if (!validationResult.isSuccessful) {
+								var message = [validationResult.error, "Valid countries are:"];
 
 								message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
 
@@ -397,8 +397,8 @@ export class CreateSelfSignedIdentity implements ICommand {
 						var validationResult = this.$selfSignedIdentityValidator.
 							validateProperty(<ISelfSignedIdentityModel>{ StartDate: value }, "StartDate");
 
-						if (!validationResult.IsSuccessful) {
-							promptSchema.properties["StartDate"].message = validationResult.Error;
+						if (!validationResult.isSuccessful) {
+							promptSchema.properties["StartDate"].message = validationResult.error;
 							return false;
 						}
 
@@ -418,8 +418,8 @@ export class CreateSelfSignedIdentity implements ICommand {
 								EndDate: value
 							}, "EndDate");
 
-						if (!validationResult.IsSuccessful) {
-							promptSchema.properties["EndDate"].message = validationResult.Error;
+						if (!validationResult.isSuccessful) {
+							promptSchema.properties["EndDate"].message = validationResult.error;
 							return false;
 						}
 						return true;
