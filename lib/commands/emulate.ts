@@ -6,145 +6,10 @@ import Fiber = require("fibers");
 import Future = require("fibers/future");
 import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
-import os = require("os");
 import osenv = require("osenv");
 import helpers = require("../helpers");
-import hostInfo = require("../common/host-info");
 import MobileHelper = require("../common/mobile/mobile-helper");
 import constants = require("../common/mobile/constants");
-
-class AndroidPlatformServices implements IEmulatorPlatformServices {
-	constructor(private $logger: ILogger
-		,private $project: Project.IProject
-		,private $errors: IErrors
-		,private $childProcess: IChildProcess) {}
-
-	public checkAvailability(): IFuture<void> {
-		return (() => {
-			if (!_.contains(this.$project.projectTargets.wait(), "android")) {
-				this.$errors.fail("The current project does not target Android and cannot be run in the Android emulator.");
-			}
-		}).future<void>()();
-	}
-
-	public startEmulator(app: string, image?: string) : IFuture<void> {
-		return (() => {
-			// start the emulator, if needed
-			var runningEmulators = this.getRunningEmulators().wait();
-			if (runningEmulators.length === 0) {
-				this.$logger.info("Starting Android emulator with image %s", image);
-				this.$childProcess.spawn('emulator', ['-avd', image],
-					{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
-			}
-
-			// adb does not always wait for the emulator to fully startup. wait for this
-			while (runningEmulators.length === 0) {
-				this.sleep(500);
-				runningEmulators = this.getRunningEmulators().wait();
-			}
-
-			// install the app
-			this.$logger.info("installing %s through adb", app);
-			this.$childProcess.execFile('adb', ['-e', 'install', '-r', app]).wait();
-
-			// run the installed app
-			this.$logger.info("running %s through adb", app);
-			this.$childProcess.spawn('adb', ['-e', 'shell', 'am', 'start', '-S', this.$project.projectData.AppIdentifier + "/.TelerikCallbackActivity"],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
-		}).future<void>()();
-	}
-
-	private sleep(ms: number): void {
-		var fiber = Fiber.current;
-		setTimeout(() => fiber.run(), ms);
-		Fiber.yield();
-	}
-
-	private getRunningEmulators(): IFuture<string[]> {
-		return (() => {
-			var emulatorDevices: string[] = [];
-			var outputRaw = this.$childProcess.execFile('adb', ['devices']).wait().split(os.EOL);
-			_.each(outputRaw, (device: string) => {
-				var rx = device.match(/^emulator-(\d+)\s+device$/);
-				if (rx && rx[1]) {
-					emulatorDevices.push(rx[1]);
-				}
-			});
-			return emulatorDevices;
-		}).future<string[]>()();
-	}
-}
-$injector.register("android", AndroidPlatformServices);
-
-class IosPlatformServices implements IEmulatorPlatformServices {
-	constructor(private $logger: ILogger
-		,private $project: Project.IProject
-		,private $errors: IErrors
-		,private $childProcess: IChildProcess) {}
-
-	checkAvailability(): IFuture<void> {
-		return (() => {
-			if (!hostInfo.isDarwin()) {
-				this.$errors.fail("iOS Simulator is available only on Mac OS X.");
-			}
-			if (!_.contains(this.$project.projectTargets.wait(), "ios")) {
-				this.$errors.fail("The current project does not target iOS and cannot be run in the iOS Simulator.");
-			}
-		}).future<void>()();
-	}
-
-	startEmulator(image: string) : IFuture<void> {
-		return (() => {
-			this.$logger.info("Starting iOS Simulator");
-			this.$childProcess.spawn(IosPlatformServices.SimulatorLauncher, ["launch", image],
-				{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
-		}).future<void>()();
-	}
-
-	private static SimulatorLauncher = "ios-sim";
-}
-$injector.register("ios", IosPlatformServices);
-
-class Wp8PlatformServices implements IEmulatorPlatformServices {
-	constructor(private $logger: ILogger
-		,private $project: Project.IProject
-		,private $errors: IErrors
-		,private $childProcess: IChildProcess) {}
-
-	checkAvailability(): IFuture<void> {
-		return (() => {
-			if (!hostInfo.isWindows()) {
-				this.$errors.fail("Windows Phone Emulator is available only on Windows 8 or later.");
-			}
-			if (!_.contains(this.$project.projectTargets.wait(), "wp8")) {
-				this.$errors.fail("The current project does not target Windows Phone 8 and cannot be run in the Windows Phone emulator.");
-			}
-		}).future<void>()();
-	}
-
-	startEmulator(image: string) : IFuture<void> {
-		return (() => {
-			this.$logger.info("Starting Windows Phone Emulator");
-			var emulatorStarter = path.join (process.env.ProgramFiles, Wp8PlatformServices.WP8_LAUNCHER_PATH, Wp8PlatformServices.WP8_LAUNCHER);
-			this.$childProcess.spawn(emulatorStarter, ["/installlaunch", image, "/targetdevice:xd"], { stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
-		}).future<void>()();
-	}
-
-	private static WP8_LAUNCHER = "XapDeployCmd.exe";
-	private static WP8_LAUNCHER_PATH = "Microsoft SDKs\\Windows Phone\\v8.0\\Tools\\XAP Deployment";
-}
-$injector.register("wp8", Wp8PlatformServices);
-
-interface IAvdInfo {
-	target: string;
-	targetNum: number;
-	path: string;
-	device?: string;
-	name?: string;
-	abi?: string;
-	skin?: string;
-	sdcard?: string;
-}
 
 export class EmulateCommand {
 	private static ANDROID_DIR_NAME = ".android";
@@ -160,9 +25,9 @@ export class EmulateCommand {
 				,private $projectTypes: IProjectTypes
 				,private $buildService: Project.IBuildService
 				,private $loginManager: ILoginManager
-				,private $android: IEmulatorPlatformServices
-				,private $ios: IEmulatorPlatformServices
-				,private $wp8: IEmulatorPlatformServices) {
+				,private $androidEmulatorServices: IEmulatorPlatformServices
+				,private $iOSEmulatorServices: IEmulatorPlatformServices
+				,private $wp8EmulatorServices: IEmulatorPlatformServices) {
 		iconv.extendNodeEncodings();
 		this.$project.ensureProject();
 		this.$loginManager.ensureLoggedIn().wait();
@@ -170,7 +35,7 @@ export class EmulateCommand {
 
 	public runAndroid(args: string[]): IFuture<void> {
 		return (() => {
-			this.$android.checkAvailability().wait();
+			this.$androidEmulatorServices.checkAvailability().wait();
 
 			var tempDir = this.createTempDir().wait();
 			var packageFilePath = path.join(tempDir, "package.apk");
@@ -184,7 +49,7 @@ export class EmulateCommand {
 
 			var image: string = args[1] || this.getBestFit().wait();
 			if (image) {
-				this.$android.startEmulator(packageFilePath, image).wait();
+				this.$androidEmulatorServices.startEmulator(packageFilePath, image).wait();
 			} else {
 				this.$errors.fail("Could not find an emulator image to run your project.");
 			}
@@ -193,7 +58,7 @@ export class EmulateCommand {
 
 	public runIos(args: string[]): IFuture<void> {
 		return (() => {
-			this.$ios.checkAvailability().wait();
+			this.$iOSEmulatorServices.checkAvailability().wait();
 
 			var tempDir = this.createTempDir().wait();
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
@@ -208,13 +73,13 @@ export class EmulateCommand {
 			this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
 
 			var app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
-			this.$ios.startEmulator(app).wait();
+			this.$iOSEmulatorServices.startEmulator(app).wait();
 		}).future<void>()();
 	}
 
 	public runWp8(args: string[]): IFuture<void> {
 		return (() => {
-			this.$wp8.checkAvailability().wait();
+			this.$wp8EmulatorServices.checkAvailability().wait();
 
 			var tempDir = this.createTempDir().wait();
 			var packageFilePath = path.join(tempDir, "package.xap");
@@ -226,7 +91,7 @@ export class EmulateCommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 
-			this.$wp8.startEmulator(packageFilePath).wait();
+			this.$wp8EmulatorServices.startEmulator(packageFilePath).wait();
 		}).future<void>()();
 	}
 
@@ -255,26 +120,26 @@ export class EmulateCommand {
 		}).future<string>()();
 	}
 
-	private getInfoFromAvd(avdName: string): IFuture<IAvdInfo> {
+	private getInfoFromAvd(avdName: string): IFuture<Mobile.IAvdInfo> {
 		return (() => {
 			var iniFile = path.join(this.avdDir, avdName + ".ini");
-			var avdInfo: IAvdInfo = this.parseAvdFile(avdName, iniFile).wait();
+			var avdInfo: Mobile.IAvdInfo = this.parseAvdFile(avdName, iniFile).wait();
 			if (avdInfo.path && this.$fs.exists(avdInfo.path).wait()) {
 				iniFile = path.join(avdInfo.path, "config.ini");
 				avdInfo = this.parseAvdFile(avdName, iniFile, avdInfo).wait();
 			}
 			return avdInfo;
-		}).future<IAvdInfo>()();
+		}).future<Mobile.IAvdInfo>()();
 	}
 
-	private parseAvdFile(avdName: string, avdFileName: string, avdInfo: IAvdInfo = null): IFuture<IAvdInfo> {
+	private parseAvdFile(avdName: string, avdFileName: string, avdInfo: Mobile.IAvdInfo = null): IFuture<Mobile.IAvdInfo> {
 		return (() => {
 			// avd files can have different encoding, defined on the first line.
 			// find which one it is (if any) and use it to correctly read the file contents
 			var encoding = this.getAvdEncoding(avdFileName).wait();
 			var contents = this.$fs.readText(avdFileName, encoding).wait().split("\n");
 
-			avdInfo = _.reduce(contents, (result: IAvdInfo, line:string) => {
+			avdInfo = _.reduce(contents, (result: Mobile.IAvdInfo, line:string) => {
 				var parsedLine = line.split("=");
 				var key = parsedLine[0];
 				switch(key) {
@@ -290,10 +155,10 @@ export class EmulateCommand {
 				}
 				return result;
 			},
-			avdInfo  || <IAvdInfo>Object.create(null));
+			avdInfo  || <Mobile.IAvdInfo>Object.create(null));
 			avdInfo.name = avdName;
 			return avdInfo;
-		}).future<IAvdInfo>()();
+		}).future<Mobile.IAvdInfo>()();
 	}
 
 	// Android L is not written as a number in the .ini files, and we need to convert it
@@ -347,7 +212,6 @@ export class EmulateCommand {
 		}).future<string[]>()();
 	}
 }
-
 $injector.register("emulate", EmulateCommand);
 
 helpers.registerCommand("emulate", "emulate|android", (emulateCommand, args) => emulateCommand.runAndroid(args));
