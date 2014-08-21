@@ -1,13 +1,13 @@
 ////<reference path="../.d.ts"/>
 "use strict";
 
-import ValidationResult = require("./validation-result");
+import ValidationResult = require("../common/validators/validation-result");
 
 export class BaseValidator<Input> implements IValidator<Input> {
 	public throwIfInvalid(data: Input): void {
 		var validationResult: IValidationResult = this.validate(data);
-		if (!validationResult.IsSuccessful) {
-			throw new Error(validationResult.Error);
+		if (!validationResult.isSuccessful) {
+			$injector.resolve("$errors").fail(validationResult.error);
 		}
 	}
 
@@ -24,8 +24,8 @@ export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 	public throwIfInvalid(data: Input): IFuture<void> {
 		return (() => {
 			var validationResult: IValidationResult = this.validate(data).wait();
-			if (!validationResult.IsSuccessful) {
-				throw new Error(validationResult.Error);
+			if (!validationResult.isSuccessful) {
+				$injector.resolve("$errors").fail(validationResult.error);
 			}
 		}).future<void>()();
 	}
@@ -61,6 +61,6 @@ export class Helpers {
 	}
 
 	private static getFirstFailedValidationResult(validationResults: IValidationResult[]): IValidationResult {
-		return _.find(validationResults, (validationResult) => !validationResult.IsSuccessful);
+		return _.find(validationResults, (validationResult) => !validationResult.isSuccessful);
 	}
 }

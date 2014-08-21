@@ -2,8 +2,9 @@
 "use strict";
 
 import validator = require("validator");
+import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
-import ValidationResult = require("./validation-result");
+import ValidationResult = require("../common/validators/validation-result");
 import BaseValidators = require("./base-validators");
 import util = require("util");
 import path = require("path");
@@ -37,8 +38,8 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 
 	public validateCertificate(forGooglePlayPublishing: boolean, certificatePem: string): boolean {
 		var cert = this.$x509.load(certificatePem);
-		return this.validateStartDate(cert.issuedOn.toString()).IsSuccessful
-			&& this.validateEndDate(forGooglePlayPublishing.toString(), cert.issuedOn.toString(), cert.expiresOn.toString()).IsSuccessful;
+		return this.validateStartDate(cert.issuedOn.toString()).isSuccessful
+			&& this.validateEndDate(forGooglePlayPublishing.toString(), cert.issuedOn.toString(), cert.expiresOn.toString()).isSuccessful;
 	}
 
 	public validateProperty(identityModel: ISelfSignedIdentityModel, propertyName: string): IValidationResult {
@@ -61,14 +62,14 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateName(name: string): IValidationResult {
-		if(helpers.isNullOrWhitespace(name)) {
+		if(commonHelpers.isNullOrWhitespace(name)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Name"));
 		}
 		return ValidationResult.ValidationResult.Successful;
 	}
 
 	private validateEmail(email: string): IValidationResult {
-		if(helpers.isNullOrWhitespace(email)) {
+		if(commonHelpers.isNullOrWhitespace(email)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Email"));
 		}
 		if (!validator.isEmail(email)) {
@@ -78,7 +79,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateCountry(country: string): IValidationResult {
-		if(helpers.isNullOrWhitespace(country)) {
+		if(commonHelpers.isNullOrWhitespace(country)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		}
 		if (_.contains(helpers.getCountries(), country)) {
@@ -89,7 +90,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateForGooglePlayPublishing(forGooglePlayPublishing: string): IValidationResult {
-		if (helpers.isNullOrWhitespace(forGooglePlayPublishing)) {
+		if (commonHelpers.isNullOrWhitespace(forGooglePlayPublishing)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "For Google Play Publishing"));
 		}
 		if ("true".equals(forGooglePlayPublishing, false) ||
@@ -109,7 +110,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 		var parsedEndDate: Date;
 
 		var validationResult: IValidationResult = this.validateDate(endDate, "EndDate");
-		if (!validationResult.IsSuccessful) {
+		if (!validationResult.isSuccessful) {
 			return validationResult;
 		}
 
@@ -119,7 +120,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateDate(date: string, fieldName: string): IValidationResult {
-		if(helpers.isNullOrWhitespace(date)) {
+		if(commonHelpers.isNullOrWhitespace(date)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, fieldName));
 		}
 		if (!validator.isDate(date)) {

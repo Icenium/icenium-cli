@@ -2,7 +2,7 @@
 
 "use strict";
 
-import ValidationResult = require("./validation-result");
+import ValidationResult = require("../common/validators/validation-result");
 import BaseValidators = require("./base-validators");
 import Future = require("fibers/future");
 import helpers = require("./../helpers");
@@ -38,14 +38,14 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 			var provision = this.$identityManager.findProvision(model.provisionOption).wait();
 			var provisionValidationResult = this.validateProvision(provision);
 
-			if(!provisionValidationResult.IsSuccessful) {
+			if(!provisionValidationResult.isSuccessful) {
 				return provisionValidationResult;
 			}
 
 			var certificate = this.$identityManager.findCertificate(model.certificateOption).wait();
 			var certificateValidationResult = this.validateCertificate(certificate, provision).wait();
 
-			if(!certificateValidationResult.IsSuccessful) {
+			if(!certificateValidationResult.isSuccessful) {
 				return certificateValidationResult;
 			}
 

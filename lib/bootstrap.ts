@@ -57,7 +57,7 @@ $injector.requireCommand("prop|set", "./project");
 $injector.requireCommand("prop|rm", "./project");
 $injector.requireCommand("prop|remove", "./project");
 $injector.requireCommand("prop|print", "./project");
-$injector.require("projectNameValidator", "./validators/project-name-validator");
+
 
 $injector.requireCommand("cloud|*list", "./remote-projects");
 $injector.requireCommand("cloud|export", "./remote-projects");

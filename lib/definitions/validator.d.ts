@@ -53,11 +53,6 @@ declare module "validator" {
 	export function blacklist(str: string, chars: string): boolean;
 }
 
-interface IValidationResult {
-	Error: string;
-	IsSuccessful: boolean;
-}
-
 interface IValidator<Input> {
 	throwIfInvalid(data: Input): void;
 	validate(data: Input): IValidationResult;
