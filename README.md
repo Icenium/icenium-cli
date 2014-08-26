@@ -57,9 +57,9 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* Node.js 0.10.22 or later
+* Node.js 0.10.22 or later installed via **Node Version Manager** or **Homebrew**
 
-> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>. 
+> For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.<br/>For more information about Homebrew, see <a href="http://brew.sh/" target="_blank">the Homebrew web page</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -105,6 +105,8 @@ In the command prompt, run the following command.
 ```bash
 $ npm install appbuilder -g
 ```
+
+On an OS X system, if prompted, confirm that you want to install the Xcode command-line developer tools.
 
 [Back to Top][1]
 
