@@ -33,7 +33,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * Windows 7 or later
-* Node.js 0.10.22 or later (32-bit)
+* Node.js 0.10.22 or a later official stable release (32-bit)
 
 > IMPORTANT: Download and install the 32-bit Node.js. Otherwise, you will not be able to install or run the Telerik AppBuilder CLI properly. The Telerik AppBuilder requires 32-bit Node.js, because the 64-bit Node.js cannot communicate with the 32-bit iTunes.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
 
@@ -57,7 +57,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* Node.js 0.10.22 or later installed via **Node Version Manager** or **Homebrew**
+* Node.js 0.10.22 or a later official stable release installed via **Node Version Manager** or **Homebrew**
 
 > For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.<br/>For more information about Homebrew, see <a href="http://brew.sh/" target="_blank">the Homebrew web page</a>.
 
@@ -78,7 +78,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements** 
 
 * Ubuntu 14.04 LTS
-* Node.js 0.10.22 or later
+* Node.js 0.10.22 or a later official stable release
 
 > The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 
