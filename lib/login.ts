@@ -161,7 +161,7 @@ export class LoginManager implements ILoginManager {
 			this.loginInBrowser().wait();
 
 			this.$logger.info("Login completed.");
-			this.$commandsService.executeCommand("user", []);
+			this.$commandsService.executeCommand("user", []).wait();
 		}).future<void>()();
 	}
 

@@ -733,7 +733,7 @@ class ImportProvisionCommand implements ICommand {
 			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("provision", []);
+			this.$commandsService.executeCommand("provision", []).wait();
 		}).future<void>()();
 	}
 }
@@ -751,7 +751,7 @@ class RemoveProvisionCommand implements ICommand {
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("provision", []);
+			this.$commandsService.executeCommand("provision", []).wait();
 		}).future<void>()();
 	}
 }
