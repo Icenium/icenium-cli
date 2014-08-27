@@ -35,7 +35,7 @@ export class DeployCommand implements ICommand {
 			if (options.companion) {
 				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
 					" Use the `livesync` command instead to avoid this warning.")
-				this.$commandsService.executeCommandUnchecked("livesync", args);
+				this.$commandsService.executeCommandUnchecked("livesync", args).wait();
 				return;
 			}
 

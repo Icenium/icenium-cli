@@ -128,7 +128,7 @@ export class ErrorsStub implements IErrors {
 		this.impl.fail.apply(this.impl, args);
 	}
 
-	beginCommand(action:() => void, printHelpCommand: () => void) {
+	beginCommand(action:() => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
 		throw new Error("not supported");
 	}
 
