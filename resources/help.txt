@@ -46,7 +46,7 @@ Certificate management and publishing commands:
     certificate create-self-signed  Creates self-signed certificate for code signing Android applications.
     certificate remove              Removes the selected certificate from the server.
     certificate export              Exports the selected certificate from the server on your file system.
-    certificate import              Imports a certificate from your file system to the server.
+    certificate import              Imports a P12 or a CER file from your file system to the server.
     provision                       Lists all configured provisioning profiles for code signing iOS applications.
     provision import                Imports a provisioning profile from file.
     provision remove                Removes a registered provisioning profile.
@@ -570,8 +570,8 @@ Options:
 Usage:
     $ appbuilder certificate import <File Path> [<Password>]
 
-Imports an existing certificate from a P12 file stored on your local file system. If you do not provide the certificate password when
-running the command, the Telerik AppBuilder CLI prompts you to provide it.
+Imports an existing certificate from a P12 or a CER file stored on your local file system. If you do not provide the certificate
+password when running the command, the Telerik AppBuilder CLI prompts you to provide it.
 --[/]--
 
 --[appstore]--
