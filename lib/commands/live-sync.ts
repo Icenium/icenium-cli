@@ -1,5 +1,5 @@
 ///<reference path="../.d.ts"/>
-
+"use strict";
 import util = require("util");
 import path = require("path");
 import watchr = require("watchr");
@@ -26,9 +26,7 @@ export class LiveSyncCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $project: Project.IProject,
-		private $dispatcher: IFutureDispatcher,
-		private $projectTypes: IProjectTypes) {
-	}
+		private $dispatcher: IFutureDispatcher) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
