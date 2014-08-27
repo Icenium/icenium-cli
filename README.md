@@ -91,6 +91,16 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for Android On-Device Deployment**
 
 * Device drivers required by your system to recognize the connected Android device
+* You might need to install the G++ compiler.
+   
+   ```Shell
+   sudo apt-get install g++
+   ```
+* On 64-bit systems, you need to install the runtime libraries for the ia32/i386 architecture.
+
+   ```Shell
+   sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 libstdc++6:i386
+   ```
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
@@ -107,6 +117,8 @@ $ npm install appbuilder -g
 ```
 
 On an OS X system, if prompted, confirm that you want to install the Xcode command-line developer tools.
+
+
 
 [Back to Top][1]
 
