@@ -24,7 +24,7 @@ var fiber = Fiber(() => {
 			return propSchema;
 		};
 
-		commandDispatcher.completeCommand(getPropSchemaAction);
+		commandDispatcher.completeCommand(["build", "deploy"], ["android, ios, wp8"], getPropSchemaAction).wait();
 	} else {
 		commandDispatcher.dispatchCommand().wait();
 	}
