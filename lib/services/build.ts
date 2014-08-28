@@ -466,11 +466,11 @@ export class BuildService implements Project.IBuildService {
 				this.$project.projectData.AppIdentifier, true, this.$project.projectType);
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
-
-			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, querystring.escape(hostPart), querystring.escape(liveSyncToken));
-
-			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
+			var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/redirect?token=%s",
+				this.$config.AB_SERVER_PROTO,
+				this.$config.AB_SERVER,
+				querystring.escape(liveSyncToken));
+			this.$logger.debug("Using LiveSync URL for AppBuilder Companion App: ", fullDownloadPath);
 
 			this.showQRCodes([{
 				instruction: util.format("Scan the QR code below to install %s to AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
