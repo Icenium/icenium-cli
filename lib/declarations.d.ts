@@ -249,8 +249,8 @@ interface IExtensionPlatformServices {
 }
 
 interface IEmulatorPlatformServices {
-	checkAvailability(): IFuture<void>;
-	startEmulator(app: string, image?: string) : IFuture<void>;
+	checkAvailability(dependsOnProject?: boolean): IFuture<void>;
+	startEmulator(app: string, image?: string, deviceType?: string) : IFuture<void>;
 }
 
 interface IX509Certificate {
@@ -323,5 +323,11 @@ interface ICordovaMigrationService {
 interface ISamplesService {
 	cloneSample(sampleName: string): IFuture<void>;
 	printSamplesInformation(): IFuture<string>;
+}
+
+interface IExpress {
+    run(): void;
+    listen(port: number, callback?: Function): any;
+    post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
 }
 

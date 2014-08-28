@@ -95,6 +95,7 @@ $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
 $injector.requireCommand("dev-prepackage", "./commands/post-install");
 $injector.require("platformServices", "./commands/simulate");
+$injector.requireCommand("remote", "./commands/remote");
 $injector.require("clientUserSettingsFileService", "./services/user-settings-service");
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsFileService", "./services/user-settings-service");
@@ -104,3 +105,4 @@ $injector.require("analyticsSettingsService", "./services/analytics-settings-ser
 
 $injector.require("pathFilteringService", "./services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
+$injector.require("express", "./express");
