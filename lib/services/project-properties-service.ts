@@ -19,7 +19,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
 				this.getProjectPropertiesFromXmlProjectFile(projectFile).wait();
 
-			this.completeProjectProperties(properties);
+			if (properties) {
+				this.completeProjectProperties(properties);
+			}
 
 			return properties;
 		}).future<IProjectData>()();
@@ -50,7 +52,12 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			});
 
-			properties.ProjectName = propertyGroup.ProjectName[0];
+			// only old style .proj files (before project unification) have ProjectName
+			if (propertyGroup.ProjectName) {
+				properties.ProjectName = propertyGroup.ProjectName[0];
+			} else {
+				properties = null;
+			}
 
 			return properties;
 		}).future<any>()();
