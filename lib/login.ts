@@ -7,6 +7,8 @@ import url = require("url");
 import options = require("./options");
 import Future = require("fibers/future");
 import helpers = require("./helpers");
+import querystring = require("querystring");
+import cookielib = require("cookie");
 
 export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
@@ -45,6 +47,19 @@ export class UserDataStore implements IUserDataStore {
 		} else {
 			return this.$fs.deleteFile(UserDataStore.getCookieFilePath());
 		}
+	}
+
+	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void> {
+		cookies = cookies || {};
+		_.each(setCookieHeader, (cookieStr: string) => {
+			var parsed = cookielib.parse(cookieStr);
+			_.each(Object.keys(parsed), (key: string) => {
+				this.$logger.debug("Stored cookie %s=%s", key, parsed[key]);
+				cookies[key] = parsed[key];
+			});
+		});
+
+		return this.setCookies(cookies);
 	}
 
 	public setUser(user?: any): IFuture<void> {
@@ -105,6 +120,7 @@ export class LoginManager implements ILoginManager {
 	public static DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS = 15 * 60 * 1000;
 
 	constructor(private $logger: ILogger,
+		private $errors: IErrors,
 		private $config: IConfiguration,
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
@@ -112,7 +128,8 @@ export class LoginManager implements ILoginManager {
 		private $server: Server.IServer,
 		private $commandsService: ICommandsService,
 		private $sharedUserSettingsFileService: IUserSettingsFileService,
-		private $httpServer: IHttpServer) { }
+		private $httpServer: IHttpServer,
+		private $httpClient: Server.IHttpClient) { }
 
 	public logout(): IFuture<void> {
 		return (() => {
@@ -235,8 +252,33 @@ export class LoginManager implements ILoginManager {
 		}).future()();
 	}
 
+	public telerikLogin(user: string, password: string): IFuture<void> {
+		return (() => {
+			if(!user || !password) {
+				this.$errors.fail("Missing user name or password.");
+			}
+
+			var response = this.$httpClient.httpRequest({
+				method: "POST",
+				url: util.format("%s://%s/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: querystring.stringify({userName: user, password: password})
+			}).wait();
+
+			var cookies = response.headers["set-cookie"];
+			if(cookies) {
+				this.$userDataStore.parseAndSetCookies(cookies).wait();
+
+				var userData = this.$server.authentication.getLoggedInUser().wait();
+				this.$userDataStore.setUser(userData).wait();
+			}
+		}).future<void>()();
+	}
 }
 $injector.register("loginManager", LoginManager);
 
 helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login(), {disableAnalytics: true});
 helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout(), {disableAnalytics: true});
+helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.telerikLogin(args[0], args[1]), {disableAnalytics: true});

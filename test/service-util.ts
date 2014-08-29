@@ -31,6 +31,10 @@ class MockUserDataStore implements IUserDataStore {
 		return undefined;
 	}
 
+	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void> {
+		return undefined;
+	}
+
 	setUser(user?: any): IFuture<void> {
 		return undefined;
 	}

@@ -65,6 +65,7 @@ interface IUserDataStore {
 	getCookies(): IFuture<IStringDictionary>;
 	getUser(): IFuture<any>;
 	setCookies(cookies?: IStringDictionary): IFuture<void>;
+	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void>;
 	setUser(user?: any): IFuture<void>;
 	clearLoginData(): IFuture<void>;
 }
