@@ -91,14 +91,6 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IBuildResult>()();
 	}
 
-	private getTempDir(): IFuture<string> {
-		return(() => {
-			var dir = path.join(this.$project.getProjectDir().wait(), ".ab");
-			this.$fs.createDirectory(dir).wait();
-			return dir;
-		}).future<string>()();
-	}
-
 	private getProjectRelativePath(fullPath: string, projectDir: string): string {
 		projectDir = path.join(projectDir, path.sep);
 		if (!fullPath.startsWith(projectDir)) {
@@ -110,7 +102,7 @@ export class BuildService implements Project.IBuildService {
 
 	private zipProject(): IFuture<string> {
 		return (() => {
-			var tempDir = this.getTempDir().wait();
+			var tempDir = this.$project.getTempDir().wait();
 
 			var projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
@@ -258,7 +250,7 @@ export class BuildService implements Project.IBuildService {
 				this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
-				var buildLogFilePath = path.join(this.getTempDir().wait(), "build.log");
+				var buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
 				this.$fs.writeFile(buildLogFilePath, result.output).wait();
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
@@ -283,7 +275,7 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			var templateFiles = commonHelpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			var targetFiles = _.map(templateFiles, (file) => path.join(this.getTempDir().wait(), path.basename(file)));
+			var targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each((zipped) => {
 				var srcFile = zipped[0];
