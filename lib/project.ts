@@ -627,6 +627,18 @@ export class Project implements Project.IProject {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}
 	}
+
+	public getTempDir(extraSubdir?:string): IFuture<string> {
+		return(() => {
+			var dir = path.join(this.getProjectDir().wait(), ".ab");
+			this.$fs.createDirectory(dir).wait();
+			if (extraSubdir) {
+				dir = path.join(dir, extraSubdir);
+				this.$fs.createDirectory(dir).wait();
+			}
+			return dir;
+		}).future<string>()();
+	}
 }
 $injector.register("project", Project);
 

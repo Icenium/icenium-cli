@@ -152,6 +152,7 @@ declare module Project {
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<any>;
 		updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping?: boolean) : IFuture<void>;
+		getTempDir(extraSubdir?:string): IFuture<string>;
 	}
 
 	interface IPlatformMigrator {
@@ -246,11 +247,6 @@ interface IServerConfiguration {
 interface IExtensionPlatformServices {
 	getPackageName() : string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
-}
-
-interface IEmulatorPlatformServices {
-	checkAvailability(dependsOnProject?: boolean): IFuture<void>;
-	startEmulator(app: string, image?: string, deviceType?: string) : IFuture<void>;
 }
 
 interface IX509Certificate {

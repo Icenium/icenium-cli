@@ -15,7 +15,7 @@ export class RemoteCommand implements ICommand {
     constructor (private $logger:ILogger,
                  private $fs:IFileSystem,
                  private $express: IExpress,
-                 private $iOSEmulatorServices: IEmulatorPlatformServices) {
+                 private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices) {
         this.appBuilderDir = path.join(os.tmpDir(), 'AppBuilder');
         this.packageLocation = path.join(this.appBuilderDir, 'package.zip');
 
@@ -49,7 +49,7 @@ export class RemoteCommand implements ICommand {
             var appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
 
             this.$iOSEmulatorServices.checkAvailability(false).wait();
-            this.$iOSEmulatorServices.startEmulator(appLocation, "", deviceFamily).wait();
+            this.$iOSEmulatorServices.startEmulator(appLocation, <Mobile.IEmulatorOptions>{ deviceFamily: deviceFamily }).wait();
 
             res.status(200).end();
         }).future<void>()();
