@@ -28,8 +28,8 @@ describe("x509", () => {
 		var cert = loader.load(certificatePem);
 		var expiresOn = cert.expiresOn;
 
-		assert.equal(expiresOn.getFullYear(), 2016);
-		assert.equal(expiresOn.getMonth(), 6);
-		assert.equal(expiresOn.getDate(), 2);
+		assert.equal(expiresOn.getFullYear(), 2015);
+		assert.equal(expiresOn.getMonth() + 1, 2); // The getMonth() method returns the month in the specified date according to local time, as a zero-based value
+		assert.equal(expiresOn.getDate(), 19);
 	});
 });
