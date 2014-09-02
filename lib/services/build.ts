@@ -177,22 +177,22 @@ export class BuildService implements Project.IBuildService {
 				var provisionData: IProvision;
 				if (options.provision) {
 					provisionData = this.$identityManager.findProvision(options.provision).wait();
-				} else {
+				} else if (!settings.buildForiOSSimulator) {
 					var deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
 					provisionData = this.$identityManager.autoselectProvision(
 						projectData.AppIdentifier, settings.provisionTypes, deviceIdentifier).wait();
 					options.provision = provisionData.Name;
 				}
-				this.$logger.info("Using mobile provision '%s'", provisionData.Name);
+				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
 
 				var certificateData: ICryptographicIdentity;
 				if (options.certificate) {
 					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
-				} else {
+				} else if (!settings.buildForiOSSimulator) {
 					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
 					options.certificate = certificateData.Alias;
 				}
-				this.$logger.info("Using certificate '%s'", certificateData.Alias);
+				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
 
 				if (!completeAutoselect) {
 					var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
@@ -203,11 +203,17 @@ export class BuildService implements Project.IBuildService {
 						{provisionOption: options.provision, certificateOption: options.certificate}).wait();
 				}
 
-				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
-				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
+				if (provisionData) {
+					buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
+				}
+				if (certificateData) {
+					buildProperties.iOSCodesigningIdentity = certificateData.Alias;
+				}
 
 				var buildResult = this.beginBuild(buildProperties).wait();
-				buildResult.provisionType = provisionData.ProvisionType;
+				if (provisionData) {
+					buildResult.provisionType = provisionData.ProvisionType;
+				}
 				return buildResult;
 			} else if (settings.platform === "WP8") {
 				buildProperties.WP8ProductID = projectData.WP8ProductID || MobileHelper.generateWP8GUID();
