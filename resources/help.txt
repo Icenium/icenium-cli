@@ -448,28 +448,54 @@ Options:
 
 --[emulate]--
 Usage:
-    $ appbuilder emulate <Platform> [--path <Directory>] [--certificate <Certificate ID>] [--provision <Provision ID>]
+    $ appbuilder emulate <Command>
 
-Platform-specific usages:
-    $ appbuilder emulate android [--path <Directory>]
-    $ appbuilder emulate ios [--path <Directory>] –-certificate <Certificate ID> --provision <Provision ID>
-    $ appbuilder emulate wp8 [--path <Directory>]
+You must run the emulate command with a related command.
 
-Builds the specified project in the cloud and runs it in the native emulator for the selected platform.
+<Command> is a related command that sets a target platform for the emulate command. You can run the following related commands:
+    android - Builds the specified project in the cloud and runs it in the native Android emulator.
+    ios - Builds the specified project in the cloud and runs it in the native iOS Simulator.
+    wp8 - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+--[/]--
 
-<Platform> is the target mobile platform. You can set ios, android, or wp8.
+--[emulate|android]--
+Usage:
+    $ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>]
+
+Builds the specified project in the cloud and runs it in the native Android emulator.
+
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
+
+Prerequisites:
+Before running your app in the Android emulator, verify that your system meets the following requirements.
+    * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X, or Linux system.
+    * Verify that you have installed the Android SDK.
+    * Verify that you have added the following Android SDK directories to the PATH environment variable:
+        platform-tools
+        tools
+
+Options:
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
+            for in the current directory and all directories above it.
+    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
+            a certificate by index or name.
+            To list available certificates, run $ appbuilder certificate.
+
+--[/]--
+
+--[emulate|ios]--
+Usage:
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>]
+
+Builds the specified project in the cloud and runs it in the native iOS Simulator.
+
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
 Prerequisites:
-Before running the Android emulator, verify that you have added the following Android SDK directories to the PATH environment variable:
-    platform-tools
-    tools
-Before running the iOS simulator, verify that you have met the following requirements.
+Before running the iOS Simulator, verify that you have met the following requirements.
     You are running the Telerik AppBuilder CLI on OS X.
     You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
-    You have imported a valid provisioning profile and a matching certificate. For more information, run $ appbuilder certificate --help and $ appbuilder provision --help.
-Before running the Windows Phone 8 simulator, verify that you are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
@@ -482,6 +508,23 @@ Options:
             a provisioning profile by index or name.
             If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate.
             To list available provisioning profiles, run $ appbuilder provision.
+
+--[/]--
+
+--[emulate|wp8]--
+Usage:
+    $ appbuilder emulate wp8 [--path <Directory>]
+
+Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+
+Prerequisites:
+Before running the Windows Phone 8.0 emulator, verify that your system meets the following requirements.
+	You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
+	You have installed the Windows Phone 8.0 SDK.
+
+Options:
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
+            for in the current directory and all directories above it.
 
 --[/]--
 
