@@ -34,7 +34,7 @@ class X509Certificate implements IX509Certificate {
 			this.$logger.warn("Certificate time zone is not GMT.");
 		}
 
-		return moment(certificateDate, "YYDDMMHHmmss").toDate();
+		return moment(certificateDate, "YYMMDDHHmmss").toDate();
 	}
 
 	private static parseKeyValues(keyValueStr: string): any {
