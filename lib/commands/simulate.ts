@@ -130,13 +130,11 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 }
 
 class MacSimulatorPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Simulator.Mac.Package";
+	private static PACKAGE_NAME_MAC: string = "Telerik.BlackDragon.Client.Mobile.Tools.Mac.Package";
 	private static EXECUTABLE_NAME_MAC = "AppBuilder Simulator";
 	private static EXECUTABLE_NAME_MAC_APP = MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC + ".app";
 
-	constructor(private $fs: IFileSystem,
-				private $childProcess: IChildProcess) {
-	}
+	constructor(private $childProcess: IChildProcess) { }
 
 	public getPackageName() : string {
 		return MacSimulatorPlatformServices.PACKAGE_NAME_MAC;
