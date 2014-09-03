@@ -71,7 +71,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewCordovaProject(projectName).wait();
+			project.createNewProject(projectTypes.Cordova, projectName).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
@@ -103,7 +103,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewNativeScriptProject(projectName).wait();
+			project.createNewProject(projectTypes.NativeScript, projectName).wait();
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
