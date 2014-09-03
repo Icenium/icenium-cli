@@ -198,7 +198,7 @@ export class LoginManager implements ILoginManager {
 			this.$fs.futureFromEvent(localhostServer, "listening").wait();
 
 			var port = localhostServer.address().port;
-			var loginUrl = util.format("%s://%s/Mist/ClientLogin?port=%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
+			var loginUrl = util.format("%s://%s/Mist/ClientLogin?port=%s&client_name=AppBuilderCLI", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
 
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
