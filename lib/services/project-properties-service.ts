@@ -83,7 +83,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}
 
 		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!_.has(properties, wp8guid)) {
+			if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
 				properties[wp8guid] = MobileHelper.generateWP8GUID();
 				updated = true;
 			}
