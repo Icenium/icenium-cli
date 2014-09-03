@@ -2,44 +2,48 @@
 "use strict";
 
 export class CreateHybridCommand implements ICommand {
-	constructor(private $project: Project.IProject) {}
+	constructor(private $project: Project.IProject,
+		private $projectTypes: IProjectTypes) {}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.createNewCordovaProject(args[0]).wait();
+			this.$project.createNewProject(this.$projectTypes.Cordova, args[0]).wait();
 		}).future<void>()();
 	}
 }
 $injector.registerCommand("create|hybrid", CreateHybridCommand);
 
 export class CreateNativeCommand implements ICommand {
-	constructor(private $project: Project.IProject) {}
+	constructor(private $project: Project.IProject,
+				private $projectTypes: IProjectTypes) {}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.createNewNativeScriptProject(args[0]).wait();
+			this.$project.createNewProject(this.$projectTypes.NativeScript, args[0]).wait();
 		}).future<void>()();
 	}
 }
 $injector.registerCommand("create|native", CreateNativeCommand);
 
 export class InitHybridCommand implements ICommand {
-	constructor(private $project: Project.IProject) {}
+	constructor(private $project: Project.IProject,
+				private $projectTypes: IProjectTypes) {}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.createCordovaProjectFileFromExistingProject().wait();
+			this.$project.createProjectFileFromExistingProject(this.$projectTypes.Cordova).wait();
 		}).future<void>()();
 	}
 }
 $injector.registerCommand("init|hybrid", InitHybridCommand);
 
 export class InitNativeCommand implements ICommand {
-	constructor(private $project: Project.IProject) {}
+	constructor(private $project: Project.IProject,
+				private $projectTypes: IProjectTypes) {}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.createNativeScriptProjectFileFromExistingProject().wait();
+			this.$project.createProjectFileFromExistingProject(this.$projectTypes.NativeScript).wait();
 		}).future<void>()();
 	}
 }

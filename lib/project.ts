@@ -180,15 +180,7 @@ export class Project implements Project.IProject {
 		return this.$projectTypes[this.projectData.Framework];
 	}
 
-	public createNewCordovaProject(projectName: string): IFuture<void> {
-		return this.createNewProject(this.$projectTypes.Cordova, projectName);
-	}
-
-	public createNewNativeScriptProject(projectName: string): IFuture<void> {
-		return this.createNewProject(this.$projectTypes.NativeScript, projectName);
-	}
-
-	private createNewProject(projectType: number, projectName: string): IFuture<void> {
+	public createNewProject(projectType: number, projectName: string): IFuture<void> {
 		return ((): void => {
 			if (!projectName) {
 				this.$errors.fail("No project name specified.")
@@ -200,15 +192,7 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createCordovaProjectFileFromExistingProject(): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectTypes.Cordova);
-	}
-
-	public createNativeScriptProjectFileFromExistingProject(): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectTypes.NativeScript);
-	}
-
-	private createProjectFileFromExistingProject(projectType: number): IFuture<void> {
+	public createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
 			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
