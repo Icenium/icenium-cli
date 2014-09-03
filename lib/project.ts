@@ -642,12 +642,6 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-// register create * commands
-helpers.registerCommand("project", "create|hybrid", (project, args) => project.createNewCordovaProject(args[0]));
-helpers.registerCommand("project", "create|native", (project, args) => project.createNewNativeScriptProject(args[0]));
-// register init * commands
-helpers.registerCommand("project", "init|hybrid", (project, args) => project.createCordovaProjectFileFromExistingProject());
-helpers.registerCommand("project", "init|native", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
 // register prop * commands
 _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	var propOperation = operation;
