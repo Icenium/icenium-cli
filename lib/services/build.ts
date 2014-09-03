@@ -466,7 +466,7 @@ export class BuildService implements Project.IBuildService {
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, querystring.escape(hostPart), querystring.escape(liveSyncToken));
+			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, appIdentifier.encodeLiveSyncHostUri(hostPart), querystring.escape(liveSyncToken));
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
