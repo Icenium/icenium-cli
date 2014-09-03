@@ -201,13 +201,13 @@ export class Project implements Project.IProject {
 			}
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
-			if (properties) {
+			if (!properties) {
 				properties = this.alterPropertiesForNewProject({}, appname);
 			}
 
 			try {
 				this.createProjectFile(projectDir, projectType, properties).wait();
-				this.$logger.info("Successfully initialized project in the folder!");
+				this.$logger.info("Successfully initialized project in the folder.");
 			}
 			catch (e) {
 				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
