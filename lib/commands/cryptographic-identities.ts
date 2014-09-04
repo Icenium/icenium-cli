@@ -76,26 +76,36 @@ export class IdentityManager implements Server.IIdentityManager {
 		}).future<void>()();
 	}
 
-	public listProvisions(): IFuture<void> {
+	private printProvisionData(provision: IProvision, provisionIndex: number): void {
+		this.$logger.out("#%d: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
+			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
+		if (options.verbose) {
+			var devices = provision.ProvisionedDevices;
+			if (devices && devices.length) {
+				this.$logger.out("  Provisioned device identifiers:");
+				devices.sort();
+				_.forEach(devices, (device, deviceIndex) => {
+					this.$logger.out("    " + devices[deviceIndex])
+				});
+			} else {
+				this.$logger.out("  No provisioned devices.");
+			}
+		}
+	}
+
+	public listProvisions(provisionStr?: string): IFuture<void> {
 		return (() => {
+			if(provisionStr) {
+				var provision = this.findProvision(provisionStr).wait();
+				this.printProvisionData(provision, 0);
+				return;
+			}
+
 			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 			provisions = _.sortBy(provisions, (provision) => provision.Name);
 
 			_.forEach(provisions, (provision, provisionIndex) => {
-				this.$logger.out("#%d: '%s'; type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
-					provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
-				if (options.verbose) {
-					var devices = provision.ProvisionedDevices;
-					if (devices && devices.length) {
-						this.$logger.out("  Provisioned device identifiers:");
-						devices.sort();
-						_.forEach(devices, (device, deviceIndex) => {
-							this.$logger.out("    " + devices[deviceIndex])
-						});
-					} else {
-						this.$logger.out("  No provisioned devices.");
-					}
-				}
+				this.printProvisionData(provision, provisionIndex);
 			});
 
 			if (!provisions.length) {
@@ -127,9 +137,10 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			if (!result) {
 				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'provision' command.", provisionStr);
-			} else {
-				return result;
 			}
+
+			return result;
+
 		}).future<any>()();
 	}
 
@@ -216,7 +227,7 @@ export class IdentityManager implements Server.IIdentityManager {
 }
 $injector.register("identityManager", IdentityManager);
 helpers.registerCommand("identityManager", "certificate|*list", (identityManager, args) => identityManager.listCertificates());
-helpers.registerCommand('identityManager', "provision|*list", (identityManager, args) => identityManager.listProvisions());
+helpers.registerCommand('identityManager', "provision|*list", (identityManager, args) => identityManager.listProvisions(args[0]));
 
 class IdentityGenerationData {
 	private static derObjectIdentifierNames = {
