@@ -180,15 +180,7 @@ export class Project implements Project.IProject {
 		return this.$projectTypes[this.projectData.Framework];
 	}
 
-	public createNewCordovaProject(projectName: string): IFuture<void> {
-		return this.createNewProject(this.$projectTypes.Cordova, projectName);
-	}
-
-	public createNewNativeScriptProject(projectName: string): IFuture<void> {
-		return this.createNewProject(this.$projectTypes.NativeScript, projectName);
-	}
-
-	private createNewProject(projectType: number, projectName: string): IFuture<void> {
+	public createNewProject(projectType: number, projectName: string): IFuture<void> {
 		return ((): void => {
 			if (!projectName) {
 				this.$errors.fail("No project name specified.")
@@ -200,15 +192,7 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createCordovaProjectFileFromExistingProject(): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectTypes.Cordova);
-	}
-
-	public createNativeScriptProjectFileFromExistingProject(): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectTypes.NativeScript);
-	}
-
-	private createProjectFileFromExistingProject(projectType: number): IFuture<void> {
+	public createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
 			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
@@ -217,13 +201,13 @@ export class Project implements Project.IProject {
 			}
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
-			if (properties) {
+			if (!properties) {
 				properties = this.alterPropertiesForNewProject({}, appname);
 			}
 
 			try {
 				this.createProjectFile(projectDir, projectType, properties).wait();
-				this.$logger.info("Successfully initialized project in the folder!");
+				this.$logger.info("Successfully initialized project in the folder.");
 			}
 			catch (e) {
 				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
@@ -642,12 +626,6 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-// register create * commands
-helpers.registerCommand("project", "create|hybrid", (project, args) => project.createNewCordovaProject(args[0]));
-helpers.registerCommand("project", "create|native", (project, args) => project.createNewNativeScriptProject(args[0]));
-// register init * commands
-helpers.registerCommand("project", "init|hybrid", (project, args) => project.createCordovaProjectFileFromExistingProject());
-helpers.registerCommand("project", "init|native", (project, args) => project.createNativeScriptProjectFileFromExistingProject());
 // register prop * commands
 _.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
 	var propOperation = operation;
