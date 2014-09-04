@@ -801,7 +801,7 @@ Usage:
 
 Shows the value for the selected project property.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|add]--
@@ -811,7 +811,7 @@ Usage:
 Enables more options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|set]--
@@ -821,7 +821,7 @@ Usage:
 Sets the selected project property and overwrites its current value.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|remove]--
@@ -831,7 +831,7 @@ Usage:
 Disables options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[feature-usage-tracking]--
