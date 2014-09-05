@@ -4,7 +4,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	constructor(private $loginManager: ILoginManager,
 		private $userDataStore: IUserDataStore) { }
 
-	public canRequestConsent(): IFuture<boolean> {
+	public canDoRequest(): IFuture<boolean> {
 		return this.$loginManager.isLoggedIn();
 	}
 
