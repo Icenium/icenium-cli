@@ -15,7 +15,6 @@ export class Project implements Project.IProject {
 	public PROJECT_FILE = ".abproject";
 
 	constructor(private $fs: IFileSystem,
-		private $injector: IInjector,
 		private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
@@ -386,7 +385,7 @@ export class Project implements Project.IProject {
 					}
 
 					//triggers validation logic
-					this.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
+					this.$projectPropertiesService.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
 				}
 			});
 		}).future<void>()();
@@ -414,121 +413,12 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	private normalizePropertyName(property: string, schema: any): string {
-		if (!property) {
-			return property;
-		}
-
-		var propLookup = helpers.toHash(schema, (value, key) => key.toLowerCase(), (value, key) => key);
-		return propLookup[property.toLowerCase()] || property;
-	}
-
-	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping: boolean = true) : IFuture<void> {
-		return ((): any => {
-			property = this.normalizePropertyName(property, propSchema);
-			var propData = propSchema[property];
-
-			var validate = (condition: boolean, ...args: string[]) => {
-				if(condition) {
-					if(propData.validationMessage) {
-						this.$errors.fail(propData.validationMessage);
-					} else {
-						this.$errors.fail.apply(this.$errors, _.rest(args, 0));
-					}
-				}
-			};
-
-			if (!propData) {
-				this.$errors.fail("Unrecognized project property '%s'", property);
-			}
-
-			if (!propData.flags) {
-				if (newValue.length !== 1) {
-					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
-				}
-				if (mode === "add" || mode === "del") {
-					this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
-				}
-			} else {
-				newValue = _.flatten(_.map(newValue, (value: string)  => value.split(";")));
-			}
-
-			var range = this.getPropRange(propData).wait();
-			if (range) {
-				newValue = _.map(newValue, (value: string) => value.toLowerCase());
-
-				var validValues: any;
-				if (_.isArray(range)) {
-					validValues = helpers.toHash(range, (value) => value.toLowerCase(), _.identity);
-				} else {
-					var keySelector = (value: any, key: string) => {
-						var result: string;
-						if (useMapping && value.input) {
-							result = value.input;
-						} else {
-							result = key;
-						}
-
-						return result.toLowerCase();
-					};
-
-					validValues = helpers.toHash(range, keySelector, (value, key) => key);
-				}
-
-				var badValues = _.reject(newValue, (value) => validValues[value]);
-
-			validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
-
-				newValue = _.map(newValue, (value) => validValues[value]);
-			}
-
-			if (!propData.flags) {
-				newValue = newValue[0];
-
-				if (propData.regex) {
-					var matchRegex = new RegExp(propData.regex);
-					validate(!matchRegex.test(newValue), "Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
-				}
-
-				if (propData.validator) {
-					var validator = this.$injector.resolve(propData.validator);
-					validator.validate(newValue);
-				}
-			}
-
-			var propertyValue = projectData[property];
-			if (propData.flags && _.isString(propertyValue)) {
-				propertyValue = propertyValue.split(";");
-			}
-
-			if (mode === "set") {
-				propertyValue = newValue;
-			} else if (mode === "del") {
-				propertyValue = _.difference(propertyValue, newValue);
-			} else if (mode === "add") {
-				propertyValue = _.union(propertyValue, newValue);
-			} else {
-				this.$errors.fail("Unknown property update mode '%s'", mode);
-			}
-
-			if (propertyValue.sort) {
-				propertyValue.sort();
-			}
-
-			if (propData.onChanging) {
-				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
-			}
-
-			projectData[property] = propertyValue;
-		}).future<void>()();
-	}
-
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
 
 			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
-			this.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
+			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
 		}).future<void>()();
@@ -538,7 +428,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
-			property = this.normalizePropertyName(property, propSchema);
+			property = this.$projectPropertiesService.normalizePropertyName(property, propSchema);
 
 			if (this.projectData.hasOwnProperty(property)) {
 				this.$logger.out(this.projectData[property]);
@@ -550,60 +440,6 @@ export class Project implements Project.IProject {
 				});
 			}
 		}).future<void>()();
-	}
-
-	public getProjectSchemaHelp(): IFuture<string> {
-		return (() => {
-			var result: string[] = [];
-			var schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Cordova]).wait();
-			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.NativeScript]).wait();
-			title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.NativeScript]);
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Common]).wait();
-			title = "Common properties for all projects:";
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			return result.join(os.EOL + os.EOL);
-		}).future<string>()();
-	}
-
-	private getProjectSchemaPartHelp(schema: string, title: string): string {
-		var help = [title];
-		_.each(schema, (value: any, key: any) => {
-			help.push(util.format("  %s - %s", key, value.description));
-			var range = this.getPropRange(value).wait();
-			if (range) {
-				help.push("    Valid values:");
-				_.each(range, (rangeDesc:any, rangeKey:any) => {
-					var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
-					if (rangeDesc.description) {
-						desc += " - " + rangeDesc.description;
-					}
-					help.push(desc);
-				});
-			}
-			if (value.validationMessage) {
-				help.push("    " + value.validationMessage.replace(os.EOL, os.EOL + "    "));
-			}
-			else if (value.regex) {
-				help.push("    Valid values match /" + value.regex.toString() + "/");
-			}
-		});
-
-		return help.join(os.EOL);
-	}
-
-	private getPropRange(propData: any): IFuture<string[]>{
-		return (() => {
-			if (propData.dynamicRange) {
-				return this.$injector.dynamicCall(propData.dynamicRange).wait();
-			}
-			return propData.range;
-		}).future<string[]>()();
 	}
 
 	public ensureProject() {
