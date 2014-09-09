@@ -121,7 +121,7 @@ export class Project implements Project.IProject {
 	}
 
 	private static IGNORE_FILE = ".abignore";
-	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.IGNORE_FILE, "*.ipa", "*.apk", "*.xap"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.IGNORE_FILE, "**/*.ipa", "**/*.apk", "**/*.xap"];
 	private defaultProjectForType: any;
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {

@@ -54,7 +54,7 @@ export class EmulateIosCommand implements ICommand {
 				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,
-				downloadedFilePath: path.join(tempDir, "package.zip"),
+				downloadedFilePath: path.join(tempDir, "package.ipa"),
 				buildForiOSSimulator: true
 			}).wait();
 			this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
