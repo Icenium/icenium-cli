@@ -39,6 +39,7 @@ export class RemoteCommand implements ICommand {
             var archive = this.$fs.createWriteStream(this.packageLocation);
             archive.on('error', (err: Error) => {
                 this.$logger.error('Could not save the uploaded file. ' + err);
+                res.status(500).send('Could not save the uploaded file. ' + err).end();
             });
 
             req.pipe(archive);
