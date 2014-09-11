@@ -116,7 +116,7 @@ Creates a new project from an Apache Cordova-based template.
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
-        #{templatesService.projectCordovaTemplatesString}. The default value is KendoUI.
+        #{templatesService.projectCordovaTemplatesString}. The default value is KendoUI.TabStrip.
     --path - Specifies the directory where you want to create the project, if different from the current directory. 
         The directory must be empty.
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
