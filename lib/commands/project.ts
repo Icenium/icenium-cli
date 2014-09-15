@@ -5,6 +5,8 @@ export class CreateHybridCommand implements ICommand {
 	constructor(private $project: Project.IProject,
 		private $projectTypes: IProjectTypes) {}
 
+	public enableHooks = false;
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.createNewProject(this.$projectTypes.Cordova, args[0]).wait();
@@ -15,7 +17,9 @@ $injector.registerCommand("create|hybrid", CreateHybridCommand);
 
 export class CreateNativeCommand implements ICommand {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {}
+
+	public enableHooks = false;
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -27,7 +31,9 @@ $injector.registerCommand("create|native", CreateNativeCommand);
 
 export class InitHybridCommand implements ICommand {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {}
+
+	public enableHooks = false;
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -39,7 +45,9 @@ $injector.registerCommand("init|hybrid", InitHybridCommand);
 
 export class InitNativeCommand implements ICommand {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {}
+
+	public enableHooks = false;
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
