@@ -15,6 +15,7 @@ export class Configuration implements IConfiguration { // User specific config
 	CI_LOGGER: boolean;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
+	TYPESCRIPT_COMPILER_OPTIONS: ITypeScriptCompilerOptions;
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {

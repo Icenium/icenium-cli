@@ -112,7 +112,7 @@ module.exports = function(grunt) {
 		},
 
 		clean: {
-			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "*.tgz"]
+			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/hooks/**/*.js", "*.tgz"]
 		}
 	});
 
