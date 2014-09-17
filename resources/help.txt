@@ -23,6 +23,7 @@ Project development commands:
     debug                           Shows the debug tools to let you debug applications on connected devices.
     simulate                        Runs the current project in the device simulator.
     emulate                         Runs the current project in the selected platform emulator.
+    remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -115,7 +116,7 @@ Creates a new project from an Apache Cordova-based template.
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
-        #{templatesService.projectCordovaTemplatesString}. The default value is KendoUI.
+        #{templatesService.projectCordovaTemplatesString}. The default value is KendoUI.TabStrip.
     --path - Specifies the directory where you want to create the project, if different from the current directory. 
         The directory must be empty.
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
@@ -801,7 +802,7 @@ Usage:
 
 Shows the value for the selected project property.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|add]--
@@ -811,7 +812,7 @@ Usage:
 Enables more options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|set]--
@@ -821,7 +822,7 @@ Usage:
 Sets the selected project property and overwrites its current value.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|remove]--
@@ -831,12 +832,12 @@ Usage:
 Disables options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-#{project.getProjectSchemaHelp}
+#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[feature-usage-tracking]--
 Usage:
-    $appbuilder feature-usage-tracking [<Command>]
+    $ appbuilder feature-usage-tracking [<Command>]
 
 Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.
 All data gathered is used strictly for improving the product and will never be used to identify or contact you.
@@ -847,4 +848,20 @@ All data gathered is used strictly for improving the product and will never be u
     enable - Enables anonymous usage statistics tracking. All data gathered is used strictly
              for improving the product and will never be used to identify or contact you.
     disable - Disables anonymous usage statistics tracking.
+--[/]--
+
+--[remote]--
+
+Usage:
+    $ appbuilder remote <Port>
+
+Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. 
+
+This operation is applicable only to OS X systems.
+
+IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run the command using sudo. For example: $ sudo appbuilder remote 443 
+
+<Port> is a non-negative integer that specifies a port on your OS X system. 
+       Make sure that the port is open and that your firewall allows traffic on it, if configured. 
+       Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
 --[/]--

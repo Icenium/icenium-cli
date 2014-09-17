@@ -13,6 +13,7 @@ export class RemoteCommand implements ICommand {
     private packageLocation: string;
 
     constructor (private $logger:ILogger,
+                 private $errors: IErrors,
                  private $fs:IFileSystem,
                  private $express: IExpress,
                  private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices) {
@@ -24,10 +25,19 @@ export class RemoteCommand implements ICommand {
 
     public execute(args:string[]): IFuture<void> {
         return (() => {
-            this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
+            if (args.length === 0) {
+                this.$errors.fail("You must specify a valid port number.");
+            }
 
-            this.$express.listen(parseInt(args[0]), () => this.$logger.info('Listening on port ' + args[0]));
-            this.$express.run();
+            var parsedPortNumber = parseInt(args[0]);
+            if(parsedPortNumber != NaN  && parsedPortNumber > 0 && parsedPortNumber < 65536){
+                this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
+
+                this.$express.listen(parsedPortNumber, () => this.$logger.info('Listening on port ' + parsedPortNumber));
+                this.$express.run();
+            } else {
+                this.$errors.fail("You must specify a valid port number.");
+            }
         }).future<void>()();
     }
 
@@ -39,6 +49,7 @@ export class RemoteCommand implements ICommand {
             var archive = this.$fs.createWriteStream(this.packageLocation);
             archive.on('error', (err: Error) => {
                 this.$logger.error('Could not save the uploaded file. ' + err);
+                res.status(500).send('Could not save the uploaded file. ' + err).end();
             });
 
             req.pipe(archive);

@@ -145,13 +145,10 @@ declare module Project {
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
-		createNewCordovaProject(projectName: string): IFuture<void>;
-		createNewNativeScriptProject(projectName: string): IFuture<void>;
-		createCordovaProjectFileFromExistingProject(): IFuture<void>;
-		createNativeScriptProjectFileFromExistingProject(): IFuture<void>;
+		createNewProject(projectType: number, projectName: string): IFuture<void>;
+		createProjectFileFromExistingProject(projectType: number): IFuture<void>;
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<any>;
-		updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping?: boolean) : IFuture<void>;
 		getTempDir(extraSubdir?:string): IFuture<string>;
 	}
 
@@ -211,6 +208,8 @@ interface IProjectData {
 interface IProjectPropertiesService {
 	getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData>;
 	completeProjectProperties(properties: any): boolean;
+	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping?: boolean) : IFuture<void>;
+	normalizePropertyName(property: string, schema: any): string;
 }
 
 interface IServerConfigurationData {

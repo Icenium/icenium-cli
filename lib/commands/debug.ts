@@ -116,7 +116,7 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 }
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
-	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Debugger.Mac.Package";
+	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Tools.Mac.Package";
 	private static EXECUTABLE_NAME_OSX = "AppBuilder Debugger.app";
 
 	constructor(private $childProcess: IChildProcess,
