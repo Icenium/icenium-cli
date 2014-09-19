@@ -8,6 +8,8 @@ export class GenerateServerApiCommand implements ICommand {
 				private $fs: IFileSystem) {
 	}
 
+	allowedParameters: ICommandParameter[] = [];
+
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			var result = this.$serviceContractGenerator.generate();

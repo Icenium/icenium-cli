@@ -2,11 +2,15 @@
 
 import util = require("util");
 import options = require("./../options");
+import commandParams = require("../common/command-params");
 
 export class ListDevicesCommand implements ICommand {
 	constructor(private $devicesServices: Mobile.IDevicesServices,
-		private $logger: ILogger) {
+		private $logger: ILogger,
+		private $stringParameter: ICommandParameter) {
 	}
+
+	allowedParameters = [this.$stringParameter];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

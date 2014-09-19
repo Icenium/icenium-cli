@@ -63,22 +63,6 @@ export function isStringOptionEmpty(optionValue: string): boolean {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function registerCommand(module: string, commandName: string, executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void;
-export function registerCommand(module: string, commandNames: string[], executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void;
-export function registerCommand(module: string, commandName: any, executor: (module: any, args: string[]) => IFuture<void>, opts?: ICommandOptions): void {
-	var factory = (): ICommand => {
-		return {
-			execute: (args: string[]): IFuture<void> => {
-				var mod = $injector.resolve(module);
-				return executor(mod, args);
-			},
-			disableAnalytics: opts && opts.disableAnalytics
-		};
-	};
-
-	$injector.registerCommand(commandName, factory);
-}
-
 export function stringReplaceAll(string: string, find: any, replace: string): string {
 	return string.split(find).join(replace);
 }

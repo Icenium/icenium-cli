@@ -13,6 +13,8 @@ export class PostInstallCommand implements ICommand {
 
 	public disableAnalytics = true;
 
+	public allowedParameters: ICommandParameter[] = [];
+
 	public execute(args:string[]): IFuture<void> {
 		return (() => {
 			this.$serviceProxy.setShouldAuthenticate(false);

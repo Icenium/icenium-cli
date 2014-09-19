@@ -20,6 +20,8 @@ export class DebugCommand implements ICommand {
 		private $sharedUserSettingsFileService: IUserSettingsFileService) {
 	}
 
+	allowedParameters: ICommandParameter[];
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {

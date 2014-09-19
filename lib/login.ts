@@ -9,20 +9,21 @@ import Future = require("fibers/future");
 import helpers = require("./helpers");
 import querystring = require("querystring");
 import cookielib = require("cookie");
+import commandParams = require("./common/command-params");
 
 export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
 	private user: any;
 
 	constructor(private $fs: IFileSystem,
-		private $logger: ILogger) {}
+		private $logger: ILogger) { }
 
 	public hasCookie(): IFuture<boolean> {
 		return (() => {
 			try {
 				this.getCookies().wait();
 				return true;
-			} catch (err) {
+			} catch(err) {
 				return false;
 			}
 		}).future<boolean>()();
@@ -42,7 +43,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public setCookies(cookies?: IStringDictionary): IFuture<void> {
 		this.cookies = cookies;
-		if (this.cookies) {
+		if(this.cookies) {
 			return this.$fs.writeFile(UserDataStore.getCookieFilePath(), JSON.stringify(this.cookies));
 		} else {
 			return this.$fs.deleteFile(UserDataStore.getCookieFilePath());
@@ -64,7 +65,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public setUser(user?: any): IFuture<void> {
 		this.user = user;
-		if (user) {
+		if(user) {
 			return this.$fs.writeJson(UserDataStore.getUserStateFilePath(), user);
 		} else {
 			return this.$fs.deleteFile(UserDataStore.getUserStateFilePath());
@@ -78,7 +79,7 @@ export class UserDataStore implements IUserDataStore {
 		}).future<void>()();
 	}
 
-	private checkCookieExists<T>(sourceFile: string, getter: () => T) : IFuture<boolean> {
+	private checkCookieExists<T>(sourceFile: string, getter: () => T): IFuture<boolean> {
 		return (() => {
 			return (getter() || this.$fs.exists(sourceFile).wait());
 		}).future<boolean>()();
@@ -86,15 +87,15 @@ export class UserDataStore implements IUserDataStore {
 
 	private readAndCache<T>(sourceFile: string, getter: () => T, setter: (value: string) => void): IFuture<T> {
 		return (() => {
-			if (!getter()) {
-				if (!this.checkCookieExists(sourceFile, getter).wait()) {
+			if(!getter()) {
+				if(!this.checkCookieExists(sourceFile, getter).wait()) {
 					throw new Error("Not logged in.");
 				}
 
 				var contents = this.$fs.readText(sourceFile).wait();
 				try {
 					setter(contents);
-				} catch (err) {
+				} catch(err) {
 					this.$logger.debug("Error while reading user data file '%s':\n%s\n\nContents:\n%s",
 						sourceFile, err.toString(), contents);
 					this.clearLoginData().wait();
@@ -159,13 +160,13 @@ export class LoginManager implements ILoginManager {
 		}).future<void>()();
 	}
 
-	public isLoggedIn() : IFuture<boolean> {
+	public isLoggedIn(): IFuture<boolean> {
 		return this.$userDataStore.hasCookie();
 	}
 
 	public ensureLoggedIn(): IFuture<void> {
 		return (() => {
-			if (!this.isLoggedIn().wait()) {
+			if(!this.isLoggedIn().wait()) {
 				this.doLogin().wait();
 			}
 		}).future<void>()();
@@ -178,7 +179,7 @@ export class LoginManager implements ILoginManager {
 			this.loginInBrowser().wait();
 
 			this.$logger.info("Login completed.");
-			this.$commandsService.executeCommand("user", []).wait();
+			this.$commandsService.tryExecuteCommand("user", []).wait();
 		}).future<void>()();
 	}
 
@@ -198,7 +199,7 @@ export class LoginManager implements ILoginManager {
 						this.$logger.debug("Login complete: " + request.url);
 						var parsedUrl = url.parse(request.url, true);
 						var cookieData = parsedUrl.query.cookies;
-						if (cookieData) {
+						if(cookieData) {
 							this.serveLoginFile("end.html")(request, response);
 
 							localhostServer.close();
@@ -222,14 +223,14 @@ export class LoginManager implements ILoginManager {
 
 			var timeoutID: number = undefined;
 
-			if (!helpers.isInteractive()) {
+			if(!helpers.isInteractive()) {
 				var timeout = options.hasOwnProperty("timeout")
 					? +options.timeout
 					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
 
-				if (timeout > 0) {
+				if(timeout > 0) {
 					timeoutID = setTimeout(() => {
-						if (!authComplete.isResolved()) {
+						if(!authComplete.isResolved()) {
 							this.$logger.debug("Aborting login procedure due to inactivity.");
 							process.exit();
 						}
@@ -254,17 +255,13 @@ export class LoginManager implements ILoginManager {
 
 	public telerikLogin(user: string, password: string): IFuture<void> {
 		return (() => {
-			if(!user || !password) {
-				this.$errors.fail("Missing user name or password.");
-			}
-
 			var response = this.$httpClient.httpRequest({
 				method: "POST",
 				url: util.format("%s://%s/appbuilder/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
-				body: querystring.stringify({userName: user, password: password})
+				body: querystring.stringify({ userName: user, password: password })
 			}).wait();
 
 			var cookies = response.headers["set-cookie"];
@@ -279,6 +276,16 @@ export class LoginManager implements ILoginManager {
 }
 $injector.register("loginManager", LoginManager);
 
-helpers.registerCommand("loginManager", "login", (loginManager, args) => loginManager.login(), {disableAnalytics: true});
-helpers.registerCommand("loginManager", "logout", (loginManager, args) => loginManager.logout(), {disableAnalytics: true});
-helpers.registerCommand("loginManager", "dev-telerik-login", (loginManager, args) => loginManager.telerikLogin(args[0], args[1]), {disableAnalytics: true});
+export class TelerikLoginCommand implements ICommand {
+	constructor(private $loginManager: ILoginManager) { }
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			this.$loginManager.telerikLogin(args[0], args[1]).wait();
+		}).future<void>()();
+	}
+
+	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Missing user name or password."), new commandParams.StringCommandParameter(true, "Missing user name or password.")];
+
+	disableAnalytics = true;
+}
+$injector.registerCommand("dev-telerik-login", TelerikLoginCommand);

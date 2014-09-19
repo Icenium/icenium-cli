@@ -3,7 +3,8 @@
 "use strict";
 
 import constants = require("../common/mobile/constants");
-var options: any = require("../options");
+import commandParams = require("../common/command-params");
+var options:any = require("../options");
 
 interface IAppStoreApplication {
 	AppleID: number;
@@ -24,6 +25,8 @@ export class AppstoreApplicationCommandBase implements ICommand {
 		return (() => {
 		}).future<void>()();
 	}
+
+	allowedParameters: ICommandParameter[] = [];
 
 	public getAppleId(): IFuture<string> {
 		return (() => {
@@ -53,10 +56,13 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 		super($server, $logger, $prompter, $errors);
 	}
 
-	execute(args: string[]): IFuture<void> {
+    allowedParameters = [new commandParams.StringCommandParameter(false), new commandParams.StringCommandParameter(false)];
+	
+    execute(args: string[]): IFuture<void> {
 		return (() => {
 			var userName = args[0];
 			var password = args[1];
+
 			if(!userName) {
 				userName = this.getAppleId().wait();
 			}
@@ -90,13 +96,15 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		private $identityManager: Server.IIdentityManager) {
 		super($server, $logger, $prompter, $errors);
 	}
-
-	execute(args: string[]): IFuture<void> {
+    
+    allowedParameters = [new commandParams.StringCommandParameter(true, "No application specified. Specify an application that is ready for upload in iTunes Connect."),
+		new commandParams.StringCommandParameter(false), new commandParams.StringCommandParameter(false)];
+        
+	execute(args:string[]): IFuture<void> {
 		return (() => {
 			var application = args[0];
 			var userName = args[1];
 			var password = args[2];
-
 			if(!application) {
 				this.$errors.fail("No application specified. Specify an application that is ready for upload in iTunes Connect.");
 			}
@@ -104,7 +112,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 			if(!userName) {
 				userName = this.getAppleId().wait();
 			}
-
+            
 			this.$project.ensureProject();
 
 			if(options.provision) {

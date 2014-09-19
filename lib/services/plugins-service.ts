@@ -107,6 +107,11 @@ export class PluginsService implements IPluginsService {
 		this.$logger.out(outputLines.join(os.EOL + os.EOL));
 	}
 
+	public isPluginInstalled(pluginName: string): boolean {
+		pluginName = pluginName.toLowerCase();
+		return _.any(this.getInstalledPlugins(), (plugin) => plugin.name.toLowerCase() === pluginName);
+	}
+
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
@@ -143,11 +148,6 @@ export class PluginsService implements IPluginsService {
 		}
 
 		return plugin;
-	}
-
-	private isPluginInstalled(pluginName: string): boolean {
-		pluginName = pluginName.toLowerCase();
-		return _.any(this.getInstalledPlugins(), (plugin) => plugin.name.toLowerCase() === pluginName);
 	}
 }
 $injector.register("pluginsService", PluginsService);

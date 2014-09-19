@@ -6,7 +6,9 @@ import util = require("util");
 export class UserStatusCommand implements ICommand {
 	constructor(private $userDataStore: IUserDataStore,
 		private $logger: ILogger,
-		private $config: IConfiguration) {}
+		private $config: IConfiguration) { }
+
+	allowedParameters: ICommandParameter[] = [];
 
 	private licenseNames: IStringDictionary = {
 		"Starter": "AppBuilder Starter Edition",

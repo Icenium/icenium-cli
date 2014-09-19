@@ -7,12 +7,15 @@ export class ProjectCommandBase implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return null;
 	}
+
+	allowedParameters: ICommandParameter[] = [];
 }
 
 export class CreateHybridCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
 		private $projectTypes: IProjectTypes,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+        private $projectNameValidator: IProjectNameValidator) {
 		super();
 	}
 
@@ -25,13 +28,31 @@ export class CreateHybridCommand extends ProjectCommandBase {
 			this.$project.createNewProject(this.$projectTypes.Cordova, args[0]).wait();
 		}).future<void>()();
 	}
+    
+	allowedParameters = [new NameParameter(this.$projectNameValidator)];
 }
 $injector.registerCommand("create|hybrid", CreateHybridCommand);
+
+export class NameParameter implements ICommandParameter {
+	constructor(private $projectNameValidator: IProjectNameValidator) { }
+	mandatory = true;
+	validate(validationValue: string): IFuture<boolean> {
+		return (() => {
+			if(validationValue) {
+				return this.$projectNameValidator.validate(validationValue);
+			}
+
+			return false;
+		}).future<boolean>()();
+	}
+}
+$injector.register("nameCommandParameter", NameParameter);
 
 export class CreateNativeCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
 		private $projectTypes: IProjectTypes,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $projectNameValidator: IProjectNameValidator) {
 		super();
 	}
 
@@ -44,6 +65,8 @@ export class CreateNativeCommand extends ProjectCommandBase {
 			this.$project.createNewProject(this.$projectTypes.NativeScript, args[0]).wait();
 		}).future<void>()();
 	}
+
+	allowedParameters = [new NameParameter(this.$projectNameValidator)];
 }
 $injector.registerCommand("create|native", CreateNativeCommand);
 
@@ -54,6 +77,8 @@ export class InitHybridCommand extends ProjectCommandBase {
 		super();
 	}
 
+	allowedParameters: ICommandParameter[] = [];
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if (this.$project.projectData) {
@@ -63,6 +88,7 @@ export class InitHybridCommand extends ProjectCommandBase {
 			this.$project.createProjectFileFromExistingProject(this.$projectTypes.Cordova).wait();
 		}).future<void>()();
 	}
+
 }
 $injector.registerCommand("init|hybrid", InitHybridCommand);
 
@@ -72,6 +98,8 @@ export class InitNativeCommand extends ProjectCommandBase {
 		private $errors: IErrors) {
 		super();
 	}
+
+	allowedParameters: ICommandParameter[] = [];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

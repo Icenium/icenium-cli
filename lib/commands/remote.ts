@@ -9,6 +9,26 @@ import minimatch = require("minimatch");
 import ip = require("ip");
 import hostInfo = require("../common/host-info");
 
+export class PortCommandParameter implements ICommandParameter {
+	constructor(private $errors: IErrors) { }
+
+	mandatory = true;
+
+	validate(validationValue: string): IFuture<boolean> {
+		return (() => {
+			if(!validationValue) {
+				this.$errors.fail("You must specify a port number.");
+			}
+
+			var parsedPortNumber = parseInt(validationValue);
+			if(parsedPortNumber === NaN || parsedPortNumber < 0 || parsedPortNumber > 65536) {
+				this.$errors.fail("You must specify a port number between 0 and 65536.");
+			}
+			return true;
+		}).future<boolean>()();
+	}
+}
+
 export class RemoteCommand implements ICommand {
 	private appBuilderDir: string;
 	private packageLocation: string;
@@ -58,14 +78,14 @@ export class RemoteCommand implements ICommand {
 				}
 			});
 			this.$express.run();
-
 		}).future<void>()();
 	}
+
+	allowedParameters = [new PortCommandParameter(this.$errors)];
 
 	private onLaunchRequest(req: express.Request, res: express.Response): IFuture<void> {
 		return (() => {
 			this.$logger.info("launch simulator request received ... ");
-			
 			// Clean the tempdir before new launch
 			this.$fs.deleteDirectory(this.appBuilderDir).wait();
 			this.$fs.createDirectory(this.appBuilderDir).wait();

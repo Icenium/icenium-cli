@@ -10,6 +10,8 @@ export class OpenDeviceLogStreamCommand implements ICommand {
 		private $commandsService: ICommandsService) {
 	}
 
+	allowedParameters: ICommandParameter[] = [];
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$devicesServices.initialize(undefined, options.device, {skipInferPlatform: true}).wait();

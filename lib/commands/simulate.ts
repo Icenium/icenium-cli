@@ -52,6 +52,8 @@ export class SimulateCommand implements ICommand {
 		}).future<void>()();
 	}
 
+	allowedParameters: ICommandParameter[] = [];
+
 	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<void> {
 		return (() => {
 			var packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
