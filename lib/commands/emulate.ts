@@ -9,9 +9,12 @@ import iconv = require("iconv-lite");
 import osenv = require("osenv");
 import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
+import AppIdentifier = require("../common/mobile/app-identifier");
+import options = require("../options");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
+				private $projectTypes: IProjectTypes,
 				private $buildService: Project.IBuildService,
 				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices) { }
 
@@ -30,7 +33,8 @@ export class EmulateAndroidCommand implements ICommand {
 			}).wait();
 
 			var image: string = args[1];
-			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{image: image}).wait();
+			var appId = AppIdentifier.createAppIdentifier(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android], this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
+			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{image: image, appId:appId.appIdentifier }).wait();
 		}).future<void>()();
 	}
 }
