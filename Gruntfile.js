@@ -71,8 +71,8 @@ module.exports = function(grunt) {
 
 			prepare_resources: {
 				command: [
-					"node bin\\appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>",
-					"node bin\\appbuilder.js dev-prepackage"
+					"node bin/appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>",
+					"node bin/appbuilder.js dev-prepackage"
 				].join("&&")
 			},
 
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
 			},
 
 			apply_deployment_environment: {
-				command: "node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
+				command: "node bin/appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
 			},
 
 			build_package: {
@@ -150,6 +150,17 @@ module.exports = function(grunt) {
 
 		"copy:package_to_drop_folder",
 		"copy:package_to_qa_drop_folder"
+	]);
+	
+	grunt.registerTask("pack-for-deploy", [
+		"clean",
+		"ts:release_build",
+		"shell:prepare_resources",
+
+		"shell:apply_deployment_environment",
+
+		"set_package_version",
+		"shell:build_package"
 	]);
 
 	grunt.registerTask("default", "ts:devlib");
