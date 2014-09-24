@@ -99,7 +99,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    !\#cordova.js
    ```
 
-## Example
+## Sample .abignore
 
 This is the markup of a sample `.abignore` file.
 
