@@ -268,6 +268,9 @@ Builds the project for the target platform and produces an application package o
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
+
 Options:
     --download - If set, downloads the application package to the root of the project, instead
         of producing a QR code. Set this option if you want to manually deploy the app package later.
@@ -390,6 +393,9 @@ In this version of the Telerik AppBuilder CLI, you cannot build and deploy to iO
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
+
 Options:
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         To list all connected devices, grouped by platform, run $ appbuilder device.
@@ -453,6 +459,9 @@ Usage:
 
 You must run the emulate command with a related command.
 
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
+
 <Command> is a related command that sets a target platform for the emulate command. You can run the following related commands:
     android - Builds the specified project in the cloud and runs it in the native Android emulator.
     ios - Builds the specified project in the cloud and runs it in the native iOS Simulator.
@@ -474,6 +483,9 @@ Before running your app in the Android emulator, verify that your system meets t
     * Verify that you have added the following Android SDK directories to the PATH environment variable:
         platform-tools
         tools
+
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
@@ -497,6 +509,9 @@ Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
     You are running the Telerik AppBuilder CLI on OS X.
     You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
+
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
@@ -522,6 +537,9 @@ Prerequisites:
 Before running the Windows Phone 8.0 emulator, verify that your system meets the following requirements.
 	You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
 	You have installed the Windows Phone 8.0 SDK.
+
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
