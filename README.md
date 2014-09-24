@@ -119,6 +119,7 @@ Quick Start
 1. [Run on Device](#device "Run on device")
 1. [Modify Your Code](#code "Modify your code")
 1. [Get Code Changes in the Simulator and on Device](#livesync "LiveSync changes from your code to your app in the simulator or on device")
+1. [Modify the Application Package with .abignore](#modify-the-application-package)
 1. [Get Help](#help "List the available commands and options")
 
 <a name="login"><b>1. Log in the Telerik Platform</b></a>
@@ -210,6 +211,12 @@ $ appbuilder livesync cloud
 ```
 
 On the device, in the running app, tap and hold with three fingers until the download pop-up appears. After the download completes, the app refreshes automatically.
+
+<a name="modify-the-application-package"><b>8. Modify the application package with .abignore</b></a>
+
+When you develop apps with the Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can create and manage an `.abignore` file in the root of your project.
+
+For more information about creating and maintaining your `.abignore` file, see [this manual](ABIGNORE.md).
 
 <a name="help"><b>7. List the available commands</b></a>
 
