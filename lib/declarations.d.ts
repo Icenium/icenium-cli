@@ -228,6 +228,7 @@ interface IConfiguration extends Config.IConfig {
 	CORDOVA_PLUGINS_REGISTRY: string;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
+	TYPESCRIPT_COMPILER_OPTIONS: ITypescriptCompilerOptions;
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
@@ -324,5 +325,19 @@ interface IExpress {
     run(): void;
     listen(port: number, callback?: Function): any;
     post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
+}
+
+interface ITypescriptCompilerOptions {
+	codePage: number; // Specify the codepage to use when opening source files.
+	declaration: boolean; //  Generates corresponding .d.ts file.
+	mapRoot: string; //  Specifies the location where debugger should locate map files instead of generated locations.
+	module: string; // Specify module code generation: 'commonjs' or 'amd'.
+	noImplicitAny: boolean; //  Warn on expressions and declarations with an implied 'any' type.
+	out: string; // Concatenate and emit output to single file.
+	outDir: string; // Redirect output structure to the directory.
+	removeComments: boolean; // Do not emit comments to output.
+	sourceMap: boolean; // Generates corresponding .map file
+	sourceRoot: string; // Specifies the location where debugger should locate TypeScript files instead of source locations.
+	targetVersion: string;  // Specify ECMAScript target version: 'ES3' (default), or 'ES5'.
 }
 

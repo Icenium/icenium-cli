@@ -1,4 +1,3 @@
-require("./common/extensions");
 require("./options");
 require("./common/bootstrap");
 

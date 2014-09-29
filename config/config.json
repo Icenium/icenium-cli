@@ -7,5 +7,18 @@
 	"DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE": "Blank",
 	"CORDOVA_PLUGINS_REGISTRY": "http://registry.cordova.io",
 	"USE_CDN_FOR_EXTENSION_DOWNLOAD": false,
-	"AUTO_UPGRADE_PROJECT_FILE": true
+	"AUTO_UPGRADE_PROJECT_FILE": true,
+	"TYPESCRIPT_COMPILER_OPTIONS": {
+		//"codePage": number,
+		"declaration": false,
+		//"mapRoot": string,
+		"module": "commonjs",
+		"noImplicitAny": true,
+		//"out": string,
+		//"outDir": string,
+		"removeComments": false,
+		"sourceMap": false,
+		//"sourceRoot": string,
+		"targetVersion": "ES5"
+	}
 }
