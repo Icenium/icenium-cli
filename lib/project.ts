@@ -331,8 +331,6 @@ export class Project implements Project.IProject {
 	}
 
 	private alterPropertiesForNewProject(properties: any, projectName: string): IProjectData {
-		var uuid = require("node-uuid");
-
 		properties.ProjectName = projectName;
 		properties.DisplayName = projectName;
 		var appid = options.appid;
@@ -342,13 +340,13 @@ export class Project implements Project.IProject {
 		}
 
 		properties.AppIdentifier = appid;
-		properties.ProjectGuid = '{' + uuid.v4() + '}';
+		properties.ProjectGuid = commonHelpers.createGUID();
 
 		if (!properties.WP8ProductID) {
-			properties.WP8ProductID = '{' + uuid.v4() + '}';
+			properties.WP8ProductID = commonHelpers.createGUID();
 		}
 		if (!properties.WP8PublisherID) {
-			properties.WP8PublisherID = '{' + uuid.v4() + '}';
+			properties.WP8PublisherID = commonHelpers.createGUID();
 		}
 
 		return properties;
