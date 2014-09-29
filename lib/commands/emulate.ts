@@ -14,7 +14,6 @@ import options = require("../options");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes,
 				private $buildService: Project.IBuildService,
 				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices) { }
 
@@ -32,7 +31,7 @@ export class EmulateAndroidCommand implements ICommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 
-			var image: string = args[1];
+			var image = options.avd;
 			var appId = AppIdentifier.createAppIdentifier(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android], this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{image: image, appId:appId.appIdentifier }).wait();
 		}).future<void>()();

@@ -470,11 +470,15 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>]
+    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
+If you do not select an Android virtual device (AVD) with the avd option,
+your app runs in the default emulator or the currently running emulator, if any.
+To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
+<Name> is the name of the AVD that you want to use as listed by $ android list avd
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -493,7 +497,6 @@ Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
             a certificate by index or name.
             To list available certificates, run $ appbuilder certificate.
-
 --[/]--
 
 --[emulate|ios]--
