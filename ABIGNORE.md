@@ -17,13 +17,14 @@ The AppBuilder CLI respects `.abignore` during the following operations.
 * Build an application package.
 * Build an application package for publishing.
 * Build and deploy an application package on device.
+* Build and deploy in the companion app from QR code.
 * Build and deploy in the native emulators.
+* LiveSync changes to remote devices.
 
 The AppBuilder CLI does not respect `.abignore` during the following operations.
 
-* Build and deploy in the companion app.
 * Build and deploy in the device simulator.
-* LiveSync changes to remote or connected devices.
+* LiveSync changes to connected devices.
 
 ## Create .abignore
 
@@ -53,7 +54,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
 * By default, all rules are exclude rules.
 * By default, the AppBuilder CLI excludes the following files and subdirectories from your project. You do not need to manually list these files in your `.abignore` file.
    * `.ab:` The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
-   * `.abignore:` This files contains exclude and include rules for your application package.
+   * `.abignore:` This file contains exclude and include rules for your application package.
    * `IPA, APK, and XAP:` The application packages for iOS, Android, and Windows Phone 8, respectively.
 * To introduce a comment, place a hash (`#`) before the text.<br/>For example: 
       
