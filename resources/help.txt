@@ -740,10 +740,12 @@ Usage:
 Platform-specific usage:
     $ appbuilder appmanager upload android --certificate <Certificate ID>
     $ appbuilder appmanager upload ios --certificate <Certificate ID> --provision <Provision ID>
+    $ appbuilder appmanager upload wp8
 
-Builds the project and uploads the application to Telerik AppManager. In this version of Telerik AppManager, you can upload and distribute only iOS and Android apps.
+Builds the project and uploads the application to Telerik AppManager.
+After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
 
-<Platform> is the target distribution platform. You can set ios or android.
+<Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
