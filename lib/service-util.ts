@@ -4,7 +4,6 @@
 
 import util = require("util");
 import Future = require("fibers/future");
-import cookielib = require("cookie");
 import progress = require('progress-stream');
 import filesize = require('filesize');
 import Url = require("url");
@@ -76,15 +75,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 			var newCookies = response.headers["set-cookie"];
 
 			if (newCookies) {
-				cookies = cookies || {};
-				newCookies.forEach((cookieStr: string) => {
-					var parsed = cookielib.parse(cookieStr);
-					Object.keys(parsed).forEach((key) => {
-						this.$logger.debug("Stored cookie %s=%s", key, parsed[key]);
-						cookies[key] = parsed[key];
-					});
-				});
-				this.$userDataStore.setCookies(cookies).wait();
+				this.$userDataStore.parseAndSetCookies(newCookies, cookies).wait();
 			}
 
 			var resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
