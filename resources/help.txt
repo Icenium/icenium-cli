@@ -631,7 +631,7 @@ set the certificate by index or name in the --certificate option.
 
 --[certificate|create-self-signed]--
 Usage:
-    $ appbuilder certificate create-self-signed [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]
+    $ appbuilder certificate create-self-signed [<Purpose> [<Name> [<Email> [<Country> [<StartDate> [<EndDate>]]]]]]
 
 Creates a self-signed certificate for code signing Android applications.
 
@@ -643,8 +643,8 @@ If you want to publish your app in Google Play, verify that the certificate expi
         following format: yyyy-mm-dd. 
         If you want to publish your app in Google Play, verify that the end date is greater than 2033-10-22.
 
-If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set the remaining
-certificate details.
+If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set
+the remaining certificate details.
 --[/]--
 
 --[certificate|remove]--
