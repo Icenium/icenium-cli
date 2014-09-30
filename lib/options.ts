@@ -1,18 +1,19 @@
 ///<reference path=".d.ts"/>
-"use strict";
 import path = require("path");
+import util = require("util");
+import helpers = require("./common/helpers");
 var yargs: any = require("yargs");
 
-var knownOpts:any = {
-		"log" : String,
-		"verbose" : Boolean,
-		"companion" : Boolean,
-		"download" : Boolean,
-		"certificate" : String,
-		"provision" : String,
-		"path" : String,
+var knownOpts: any = {
+		"log": String,
+		"verbose": Boolean,
+		"companion": Boolean,
+		"download": Boolean,
+		"certificate": String,
+		"provision": String,
+		"path": String,
 		"template": String,
-		"appid" : String,
+		"appid": String,
 		"deploy": String,
 		"watch": Boolean,
 		"device": String,
@@ -26,38 +27,17 @@ var knownOpts:any = {
 		"client": String
 	},
 	shorthands: IStringDictionary = {
-		"v" : "verbose",
-		"p" : "path",
-		"t" : "template"
+		"v": "verbose",
+		"p": "path",
+		"t": "template"
 	};
 
-Object.keys(knownOpts).forEach((opt) => {
-	var type = knownOpts[opt];
-	if (type === String) {
-		yargs.string(opt);
-	} else if (type === Boolean) {
-		yargs.boolean(opt);
-	}
-});
-
-Object.keys(shorthands).forEach((key) => {
-	yargs.alias(key, shorthands[key]);
-});
-
-var parsed = yargs.argv,
-	defaultProfileDir = path.join(process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH, ".appbuilder-cli");
-
-Object.keys(parsed).forEach((opt) => {
-	if (knownOpts[opt] !== Boolean && typeof(parsed[opt]) === 'boolean') {
-		delete parsed[opt];
-	}
-});
-
-parsed["profile-dir"] = parsed["profile-dir"] || defaultProfileDir;
+var defaultProfileDir = path.join(process.env.USERPROFILE || process.env.HOME || process.env.HOMEPATH, ".appbuilder-cli");
+var parsed = helpers.getParsedOptions(knownOpts, shorthands, defaultProfileDir);
 
 Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
 
 exports.knownOpts = knownOpts;
 
-declare var exports:any;
+declare var exports: any;
 export = exports;
