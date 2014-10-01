@@ -151,6 +151,7 @@ declare module Project {
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<any>;
 		getTempDir(extraSubdir?:string): IFuture<string>;
+		saveProject(projectDir?: string): IFuture<void>;
 	}
 
 	interface IPlatformMigrator {
@@ -329,4 +330,27 @@ interface IExpress {
 
 interface IDomainNameSystem {
 	getDomains(): IFuture<string[]>;
+}
+
+interface IPluginsService {
+	getInstalledPlugins(): IFuture<IPlugin[]>;
+	getAvailablePlugins(): IFuture<IPlugin[]>;
+	printPlugins(plugins: IPlugin[]): void;
+	addPlugin(pluginName: string): IFuture<void>;
+	removePlugin(pluginName: string): IFuture<void>;
+}
+
+interface IPlugin {
+	name: string;
+	type: any;
+	description?: string;
+	version?: string;
+	toProjectDataRecord(): string;
+}
+
+interface IMarketplacePlugin extends IPlugin {
+	identifier: string;
+	downloads: number;
+	gitRepoUrl: string;
+	demoAppRepositoryUrl: string;
 }

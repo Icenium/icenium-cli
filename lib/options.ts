@@ -21,7 +21,8 @@ var knownOpts: any = {
 		"livesync": Boolean,
 		"timeout": String,
 		"save-to": String,
-		"client": String
+		"client": String,
+		"available": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template"

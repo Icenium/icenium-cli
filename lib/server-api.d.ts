@@ -18,6 +18,7 @@ declare module Server {
 
 	interface ICordovaServiceContract {
 		addPlatform(solutionName: string, projectName: string, platform: string): IFuture<any>;
+		getCordovaPluginVariables(solutionName: string, projectName: string): IFuture<any>;
 		getCordovaVersions(): IFuture<any>;
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<any>;
 		getJs(version: string, platform: string, $resultStream: any): IFuture<void>;
@@ -26,7 +27,9 @@ declare module Server {
 		getMigrationData(): IFuture<any>;
 		getPlugins(version: string): IFuture<any>;
 		getPluginsPackage($resultStream: any): IFuture<void>;
+		getProjectCordovaPlugins(solutionName: string, projectName: string): IFuture<any>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any>;
+		setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any): IFuture<void>;
 	}
 
 	interface ICryptographicIdentityStoreServiceContract {
@@ -78,6 +81,7 @@ declare module Server {
 	}
 
 	interface IPackageManagerServiceContract {
+		getFilters(): IFuture<any>;
 		getInstalledPackages(solutionName: string, projectName: string): IFuture<any>;
 		installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void>;
 	}
