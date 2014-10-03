@@ -194,10 +194,16 @@ export class Project implements Project.IProject {
 	public createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
+
+			if (!this.$fs.exists(projectDir).wait()) {
+				this.$errors.fail({ formatStr: util.format("The specified folder '%s' does not exist!", projectDir), suppressCommandHelp: true });
+			}
+
 			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 			if (this.$fs.exists(projectFile).wait()) {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
+
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
 			if (!properties) {
