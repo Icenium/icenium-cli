@@ -2,13 +2,22 @@
 "use strict";
 
 import helpers = require("../lib/common/helpers");
-import options = require("../lib/options");
 var assert = require("chai").assert;
 
 var isExecutionStopped = false;
 var mockBreakExecution = (message: string): void => {
 	isExecutionStopped = true;
 };
+
+var knownOpts = {
+	"path": String,
+	"help": Boolean,
+	"verbose": Boolean
+};
+
+var shorthands = {
+	"v": "verbose"
+}
 
 describe("common helpers", () => {
 	describe("validateYargsArguments", () => {
@@ -19,7 +28,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, options.knownOpts, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -32,21 +41,33 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, options.knownOpts, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
 			assert.isTrue(isExecutionStopped);
 		});
 
-		it("does not break execution when valid option has value", () => {
+		it("does not break execution when valid option has correct value", () => {
 			isExecutionStopped = false;
 			var parsed = {
 				"path": "SomeDir"
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, options.knownOpts, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
 			assert.isFalse(isExecutionStopped);
+		});
+
+		it("breaks execution when valid option has incorrect value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"help": "Invalid string value" // help requires boolean value.
+			};
+
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isTrue(isExecutionStopped);
 		});
 
 		it("breaks execution when valid option has empty string value", () => {
@@ -56,7 +77,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, options.knownOpts, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -68,7 +89,43 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, options.knownOpts, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isTrue(isExecutionStopped);
+		});
+
+		it("breaks execution when shorthand option is not valid", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"r": "incorrect shorthand"
+			};
+
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isTrue(isExecutionStopped);
+		});
+
+		it("does not break execution when valid shorthand option has correct value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"v": true
+			};
+
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isFalse(isExecutionStopped);
+		});
+
+		it("breaks execution when valid shorthand option has incorrect value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"v": "invalid string value" // v requires boolean value
+			};
+
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
 			assert.isTrue(isExecutionStopped);
 		});
