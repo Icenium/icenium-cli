@@ -90,7 +90,6 @@ describe("common helpers", () => {
 
 			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
-
 			assert.isTrue(isExecutionStopped);
 		});
 
@@ -124,6 +123,45 @@ describe("common helpers", () => {
 				"v": "invalid string value" // v requires boolean value
 			};
 
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isTrue(isExecutionStopped);
+		});
+
+		// all numbers are changed to strings before calling validateYargsArguments
+		it("does not break execution when valid option has number value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"path": "1"
+			};
+
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isFalse(isExecutionStopped);
+		});
+
+		it("breaks execution when valid option has null value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"path": ""
+			};
+
+			parsed.path = null;
+			helpers.breakExecution = mockBreakExecution;
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+
+			assert.isTrue(isExecutionStopped);
+		});
+
+		it("breaks execution when valid option has undefined value", () => {
+			isExecutionStopped = false;
+			var parsed = {
+				"path": ""
+			};
+
+			parsed.path = undefined;
 			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
 
