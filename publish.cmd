@@ -1,1 +1,1 @@
-npm publish "%1" --ignore-scripts
+@call npm.cmd publish "%1"

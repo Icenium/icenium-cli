@@ -1,8 +1,4 @@
-var skipPostinstallTasks = process.env["APPBUILDER_SKIP_POSTINSTALL_TASKS"];
-if (skipPostinstallTasks) {
-	return;
-}
-
+"use strict";
 var fs = require("fs");
 var path = require("path");
 var child_process = require("child_process");
