@@ -35,7 +35,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Windows 7 or later
 * Node.js 0.10.22 or a later stable official release (32-bit)
 
-> **IMPORTANT:** Download and install the 32-bit Node.js. Otherwise, you will not be able to install and run the {{site.ab-cli}} properly.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
+> **IMPORTANT:** Download and install the 32-bit Node.js. Otherwise, you will not be able to install and run the AppBuilder CLI properly.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -216,7 +216,7 @@ On the device, in the running app, tap and hold with three fingers until the dow
 
 When you develop apps with the Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
 
-Starting with {{site.ab}} 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of {{site.ab}}, you need to manually add `.abignore` to your project.
+Starting with AppBuilder 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of AppBuilder, you need to manually add `.abignore` to your project.
 
 For more information about creating and maintaining your `.abignore` file, see [this manual](ABIGNORE.md).
 

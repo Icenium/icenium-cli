@@ -28,7 +28,7 @@ The AppBuilder CLI does not respect `.abignore` during the following operations.
 
 ## Create .abignore
 
-Starting with {{site.ab}} 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of {{site.ab}}, you need to manually add `.abignore` to your project.
+Starting with AppBuilder 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of AppBuilder, you need to manually add `.abignore` to your project.
 
 * If you are running the AppBuilder CLI on a Windows system, complete these steps to create `.abignore`.
    1. From the command prompt, navigate to the root of your project.
@@ -54,20 +54,20 @@ When you create and modify your `.abignore` file, keep in mind the following spe
 * Each rule must start on a new line. 
 * Empty lines are ignored.
 * By default, all rules are exclude rules.
-* Starting with {{site.ab}} 2.6, newly created projects contain a default `.abignore` file. This file excludes the following files and subdirectories from your application package.
+* Starting with AppBuilder 2.6, newly created projects contain a default `.abignore` file. This file excludes the following files and subdirectories from your application package.
    * All `Thumbs.db` files: Thumbnails cache files managed by Windows.
    * All `.DS_Store` files: Hidden OS X system files.
    * All `__MACOSX` directories and their contents: Hidden OS X system directories.
    * `bin`: A subdirectory in projects created with Visual Studio. It contains your latest built application packages.
-   * `obj`: A subdirectory in projects created with Visual Studio. It contains the archived project files that {{site.ab}} sends to the build server.
+   * `obj`: A subdirectory in projects created with Visual Studio. It contains the archived project files that AppBuilder sends to the build server.
    * `.gitignore`: A file that Git uses to deremine which files and directories to ignore when you are making a commit.
    * `.git`: A subdirectory in which Git stores your version control history and other relevant version control data. 
    * `.abignore`: This file contains exclude and include rules for your application package.
-   * `.ab`: The {{site.ab-cli}} creates and manages this subdirectory. It contains temporary working files which the {{site.ab-cli}} uses.
-* For projects created with {{site.ab}} 2.5.2 or earlier, you need to manually create `.abignore`. For such projects, by default, the {{site.ab-cli}} excludes the following files and subdirectories. You do not need to manually list these files in your `.abignore` file.
-   * `.ab:` The {{site.ab-cli}} creates and manages this subdirectory. It contains temporary working files which the {{site.ab-cli}} uses.
+   * `.ab`: The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
+* For projects created with AppBuilder 2.5.2 or earlier, you need to manually create `.abignore`. For such projects, by default, the AppBuilder CLI excludes the following files and subdirectories. You do not need to manually list these files in your `.abignore` file.
+   * `.ab:` The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
    * `.abignore:` This file contains exclude and include rules for your application package.
-   * `IPA, APK, and XAP:` The application packages for iOS, Android, and {{site.wp8}}, respectively.
+   * `IPA, APK, and XAP:` The application packages for iOS, Android, and Windows Phone 8, respectively.
 * To introduce a comment, place a hash (`#`) before the text.<br/>For example: 
       
    ```
@@ -114,7 +114,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
 
 ## Sample .abignore
 
-This is the markup of a sample `.abignore` file. This sample is based on the default `.abignore` file included in projects created with {{site.ab}} 2.6 or later.
+This is the markup of a sample `.abignore` file. This sample is based on the default `.abignore` file included in projects created with AppBuilder 2.6 or later.
 
 ```
 # This file contains sample exclude and include rules for my application package.
