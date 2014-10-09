@@ -2,9 +2,11 @@
 "use strict";
 
 import helpers = require("./common/helpers");
-import commonOptions = require("./common/options");
+
 import _ = require("underscore"); 
-var yargs: any = require("yargs");
+import path = require("path");
+import osenv = require("osenv");
+import commonOptions = require("./common/options");
 
 var knownOpts: any = {
 		"companion": Boolean,
@@ -25,15 +27,13 @@ var knownOpts: any = {
 		"t": "template"
 	};
 
-
-var parsed = yargs.argv;
 _.extend(knownOpts, commonOptions.knownOpts);
 _.extend(shorthands, commonOptions.shorthands);
 
-parsed = helpers.getParsedOptions(knownOpts, shorthands);
-parsed["profile-dir"] = commonOptions["profile-dir"];
-Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
+commonOptions.setProfileDir(".appbuilder-cli");
+var parsed = helpers.getParsedOptions(knownOpts, shorthands);
 
+Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
 exports.knownOpts = knownOpts;
 
 declare var exports: any;
