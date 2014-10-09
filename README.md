@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.5.2 
-Release date: 2014, October 6
+Release date: 2014, October 9
 
 > Telerik AppBuilder 2.5.2 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-2" target="_blank">Telerik AppBuilder 2.5.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
 
@@ -231,7 +231,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.5.2 
-Release date: 2014, October 6
+Release date: 2014, October 9
 
 > Telerik AppBuilder 2.5.2 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-2" target="_blank">Telerik AppBuilder 2.5.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
 
