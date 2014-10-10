@@ -229,7 +229,7 @@ export class BuildService implements Project.IBuildService {
 					buildProperties.WP8CompanyHubApp = true;
 					this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
 						" deployed using a QR code. Use the --download switch if you want to cable deploy" +
-						"or publish the built app package.");
+						" or publish the built app package.");
 				}
 
 				return this.beginBuild(buildProperties).wait();
