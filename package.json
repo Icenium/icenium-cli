@@ -55,7 +55,7 @@
     "ref-struct": "0.0.5",
     "rimraf": "2.2.6",
     "string-to-json": "0.1.0",
-    "tabtab": "https://github.com/tailsu/node-tabtab/tarball/master",
+    "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
     "temp": "0.6.0",
     "underscore": "1.6.0",
     "unzip": "0.1.9",
@@ -66,7 +66,7 @@
     "xml2js": "0.4.1",
     "xmlhttprequest": "1.6.0",
     "yargs": "1.2.2",
-    "zipstream": "https://github.com/tailsu/node-zipstream/tarball/master"
+    "zipstream": "https://github.com/Icenium/node-zipstream/tarball/master"
   },
   "analyze": true,
   "devDependencies": {
@@ -76,7 +76,7 @@
     "grunt": "0.4.2",
     "grunt-ts": "1.11.2",
     "grunt-contrib-clean": "0.5.0",
-    "mocha-fibers": "https://github.com/tailsu/mocha-fibers/tarball/master",
+    "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
     "grunt-contrib-watch": "0.5.3",
     "grunt-shell": "0.6.4",
     "grunt-contrib-copy": "0.5.0"
