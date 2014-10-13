@@ -327,3 +327,6 @@ interface IExpress {
     post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
 }
 
+interface IDomainNameSystem {
+	getDomains(): IFuture<string[]>;
+}
