@@ -317,6 +317,7 @@ export class Project implements Project.IProject {
 					this.createProjectFile(projectDir, projectType, properties).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir).wait();
+					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				}
 				catch (ex) {

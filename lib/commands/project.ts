@@ -1,9 +1,19 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-export class CreateHybridCommand implements ICommand {
+export class ProjectCommandBase implements ICommand {
+	public enableHooks = false;
+
+	public execute(args: string[]): IFuture<void> {
+		return null;
+	}
+}
+
+export class CreateHybridCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {
+		super();
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -13,9 +23,11 @@ export class CreateHybridCommand implements ICommand {
 }
 $injector.registerCommand("create|hybrid", CreateHybridCommand);
 
-export class CreateNativeCommand implements ICommand {
+export class CreateNativeCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {
+		super();
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -25,9 +37,11 @@ export class CreateNativeCommand implements ICommand {
 }
 $injector.registerCommand("create|native", CreateNativeCommand);
 
-export class InitHybridCommand implements ICommand {
+export class InitHybridCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {
+		super();
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -37,9 +51,11 @@ export class InitHybridCommand implements ICommand {
 }
 $injector.registerCommand("init|hybrid", InitHybridCommand);
 
-export class InitNativeCommand implements ICommand {
+export class InitNativeCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {}
+		private $projectTypes: IProjectTypes) {
+		super();
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
