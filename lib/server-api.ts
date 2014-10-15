@@ -58,6 +58,10 @@ export class CordovaService implements Server.ICordovaServiceContract {
 		return this.$serviceProxy.call<any>('AddPlatform', 'POST', ['/cordova/platforms', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(platform.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
+	getCordovaPluginVariables(solutionName: string, projectName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetCordovaPluginVariables', 'GET', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'variables'].join('/'), 'application/json', null, null);
+	}
+
 	getCordovaVersions(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetCordovaVersions', 'GET', '/cordova/versions', 'application/json', null, null);
 	}
@@ -90,8 +94,16 @@ export class CordovaService implements Server.ICordovaServiceContract {
 		return this.$serviceProxy.call<void>('GetPluginsPackage', 'GET', ['/cordova/plugins', 'package'].join('/'), 'application/octet-stream', null, $resultStream);
 	}
 
+	getProjectCordovaPlugins(solutionName: string, projectName: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetProjectCordovaPlugins', 'GET', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
 	migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any> {
 		return this.$serviceProxy.call<any>('Migrate', 'POST', ['/cordova/migrate', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+	}
+
+	setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('SetCordovaPluginVariable', 'POST', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'variables', encodeURI(pluginId.replace(/\\/g, '/')), encodeURI(variableName.replace(/\\/g, '/'))].join('/'), null, [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
 	}
 
 }
@@ -248,6 +260,10 @@ export class MobileProvisionService implements Server.IMobileProvisionServiceCon
 
 export class PackageManagerService implements Server.IPackageManagerServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	getFilters(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetFilters', 'GET', '/packages/filters', 'application/json', null, null);
 	}
 
 	getInstalledPackages(solutionName: string, projectName: string): IFuture<any> {

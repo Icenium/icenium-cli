@@ -7,16 +7,14 @@ import util = require("util");
 import os = require("os");
 import validUrl = require("valid-url");
 import Future = require("fibers/future");
+import PluginsServiceBaseLib = require("./plugins-service-base");
 
-export interface IPlugin {
-	name: string;
-	description: string;
-	version: string;
-}
-
-export class CordovaPluginsService {
-	constructor(private $project: Project.IProject,
-		private $config: IConfiguration) { }
+export class CordovaPluginsService extends PluginsServiceBaseLib.PluginsServiceBase {
+	constructor(private $cordovaMigrationService: ICordovaMigrationService,
+		private $project: Project.IProject,
+		private $config: IConfiguration) {
+		super();
+	}
 
 	public getPlugins(keywords: string[]): IPlugin[] {
 		this.configure();
@@ -61,6 +59,33 @@ export class CordovaPluginsService {
 			}
 		});
 		future.wait();
+	}
+
+	public getInstalledPlugins(): IFuture<IPlugin[]> {
+		return (() => {
+			var plugins = _.filter(this.$project.projectData.CorePlugins, (pluginName: string) => this.isCordovaPlugin(pluginName));
+			return this.getMappedPlugins(plugins);
+		}).future<IPlugin[]>()();
+	}
+
+	public getAvailablePlugins(): IFuture<IPlugin[]> {
+		return (() => {
+			var version = this.$project.projectData.FrameworkVersion;
+			var plugins = this.$cordovaMigrationService.pluginsForVersion(version).wait();
+			return this.getMappedPlugins(plugins);
+		}).future<IPlugin[]>()();
+	}
+
+	private getMappedPlugins(plugins: string[]): IPlugin[] {
+		return _.map(plugins, pluginName => {
+			var pluginType = this.getPluginTypeByName(pluginName);
+			return new PluginsServiceBaseLib.CordovaPluginData(pluginName, pluginType);
+		});
+	}
+
+	public isCordovaPlugin(pluginName: string): boolean {
+		var pluginType = this.getPluginTypeByName(pluginName);
+		return pluginType === PluginsServiceBaseLib.PluginType.CorePlugin || pluginType === PluginsServiceBaseLib.PluginType.AdvancedPlugin;
 	}
 
 	private isError(object:any): boolean {

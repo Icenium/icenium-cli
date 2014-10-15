@@ -11,7 +11,11 @@ $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
+
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
+$injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
+$injector.require("pluginsService", "./services/plugins-service");
+
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
 $injector.require("samplesService", "./services/samples-service");
 $injector.requireCommand("sample|*list", "./services/samples-service");
@@ -20,6 +24,9 @@ $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
 
+$injector.requireCommand("plugin|*list", "./commands/plugin");
+$injector.requireCommand("plugin|add", "./commands/plugin");
+$injector.requireCommand("plugin|remove", "./commands/plugin");
 $injector.requireCommand("plugin|find", "./commands/find-plugins");
 $injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 
@@ -110,3 +117,4 @@ $injector.require("pathFilteringService", "./services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
+

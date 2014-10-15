@@ -24,6 +24,9 @@ Project development commands:
     simulate                        Runs the current project in the device simulator.
     emulate                         Runs the current project in the selected platform emulator.
     remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
+    plugin                          Lists all installed or available plugins for your project
+    plugin add                      Enables plugin into your project
+    plugin remove                   Disables plugin into your project
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -414,13 +417,32 @@ Options:
 Usage:
     $ appbuilder plugin [Command]
 
+Lists all installed or available plugins for your project.
+If --available option is specified, lists all available plugins for current cordova version and all Telerik Verified Plugins Marketplace plugins.
+
 You must run the plugin command with a related command.
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
+    add - Enables plugin into your project
+    remove - Disables plugin into your project
     find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
             URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry.
             The plugin must be Plugman-compatible.
+--[/]--
+
+--[plugin|add]--
+Usage:
+    $ appbuilder plugin add [<Name>]
+
+Enables plugin into your project.
+--[/]--
+
+--[plugin|remove]--
+Usage:
+    $ appbuilder plugin remove [<Name>]
+
+Disables plugin into your project.
 --[/]--
 
 --[plugin|find]--

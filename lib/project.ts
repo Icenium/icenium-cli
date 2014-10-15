@@ -157,8 +157,12 @@ export class Project implements Project.IProject {
 		return Boolean(_.find(exclusionList, (pattern) => minimatch(path, pattern, {nocase: true})));
 	}
 
-	public saveProject(projectDir: string): IFuture<void> {
-		return this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t");
+	public saveProject(projectDir?: string): IFuture<void> {
+		return (() => {
+			projectDir = projectDir || this.getProjectDir().wait();
+
+			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t").wait();
+		}).future<void>()();
 	}
 
 	private readProjectData(): IFuture<void> {
