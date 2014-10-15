@@ -16,7 +16,7 @@
     ,"WP8Publisher": ""
     ,"WP8Capabilities": []
     ,"WP8Requirements": []
-    ,"FrameworkVersion": "0.1.0"
+    ,"FrameworkVersion": "0.3.1"
     ,"AndroidPermissions": [
       "android.permission.ACCESS_COARSE_LOCATION",
       "android.permission.ACCESS_FINE_LOCATION",
