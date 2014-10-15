@@ -109,3 +109,4 @@ $injector.require("analyticsSettingsService", "./services/analytics-settings-ser
 $injector.require("pathFilteringService", "./services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
+$injector.require("domainNameSystem", "./dns");
