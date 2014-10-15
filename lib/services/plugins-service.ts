@@ -1,11 +1,12 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import os = require("os");
 import util = require("util");
 import options = require("./../options");
 
 export class PluginsService implements IPluginsService {
-	private static MESSAGES = ["\nCore Plugins:", "\nAdvanced Plugins:", "\nMarketplace Plugins:"];
+	private static MESSAGES = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
 
 	constructor(private $cordovaPluginsService: IPluginsService,
 		private $marketplacePluginsService: IPluginsService,
@@ -55,13 +56,18 @@ export class PluginsService implements IPluginsService {
 
 	public printPlugins(plugins: IPlugin[]): void {
 		var groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
+		var outputLines:string[] = [];
+
 		_.each(Object.keys(groups), (group: string) => {
-			this.$logger.out(PluginsService.MESSAGES[group]);
-			var currentPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.name);
-			_.each(currentPlugins, (plugin: IPlugin) => {
-				this.$logger.out(plugin.description);
+			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[group], os.EOL));
+
+			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.name);
+			_.each(sortedPlugins, (plugin: IPlugin) => {
+				outputLines.push(plugin.pluginInformation.join(os.EOL));
 			});
 		});
+
+		this.$logger.out(outputLines.join(os.EOL + os.EOL));
 	}
 
 	private getPluginByName(pluginName: string): IFuture<IPlugin> {

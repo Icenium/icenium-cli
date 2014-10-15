@@ -346,6 +346,7 @@ interface IPlugin {
 	type: any;
 	description?: string;
 	version?: string;
+	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }
 
