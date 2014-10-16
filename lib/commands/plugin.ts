@@ -24,7 +24,15 @@ export class AddPluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return this.$pluginsService.addPlugin(args[0]);
+		return (() => {
+			if(options.available){
+				var installedPlugins = this.$pluginsService.getInstalledPlugins().wait();
+				var plugins = _.reject(this.$pluginsService.getAvailablePlugins().wait(), plugin => _.any(installedPlugins, installedPlugin => installedPlugin.name === plugin.name));
+				this.$pluginsService.printPlugins(plugins);
+			} else {
+				this.$pluginsService.addPlugin(args[0]).wait();
+			}
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("plugin|add", AddPluginCommand);

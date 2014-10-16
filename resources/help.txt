@@ -418,7 +418,7 @@ Usage:
     $ appbuilder plugin [Command]
 
 Lists all installed or available plugins for your project.
-If --available option is specified, lists all available plugins for current cordova version and all Telerik Verified Plugins Marketplace plugins.
+If --available option is specified, lists all available plugins for current cordova version and all Telerik Verified Marketplace Plugins.
 
 You must run the plugin command with a related command.
 
@@ -436,6 +436,7 @@ Usage:
     $ appbuilder plugin add [<Name>]
 
 Enables plugin into your project.
+If --available option is specified, lists all available plugins that are not installed.
 --[/]--
 
 --[plugin|remove]--

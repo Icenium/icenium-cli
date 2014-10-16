@@ -13,8 +13,9 @@ export class CordovaPluginData implements IPlugin {
 	constructor(public name: string,
 		public type: PluginType) { }
 
-	public get description(): string {
-		return this.name;
+	public get pluginInformation(): string[] {
+		var nameRow = util.format("    Plugin: %s", this.name);
+		return [nameRow];
 	}
 
 	public toProjectDataRecord(): string {
@@ -32,8 +33,14 @@ export class MarketplacePluginData extends CordovaPluginData {
 		super(name, PluginType.MarketplacePlugin);
 	}
 
-	public get description(): string {
-		return util.format("%s, version: %s, url: %s, demo app repository url: %s", this.name, this.version, this.gitRepoUrl, this.demoAppRepositoryUrl);
+	public get pluginInformation(): string[] {
+		var nameRow = util.format("    Plugin: %s", this.name);
+		var versionRow = util.format("    Version: %s", this.version);
+		var urlRow = util.format("    Url: %s", this.gitRepoUrl);
+		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
+		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
+
+		return [nameRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
 	}
 
 	public toProjectDataRecord(): string {
