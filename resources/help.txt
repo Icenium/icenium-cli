@@ -512,6 +512,7 @@ Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
     You are running the Telerik AppBuilder CLI on OS X.
     You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
+    You have installed Xcode. The version of Xcode must be compatible with the ios-sim npm package.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
