@@ -132,6 +132,7 @@ declare module Project {
 		device?: Mobile.IDevice;
 
 		buildForiOSSimulator?: boolean;
+		showWp8SigningMessage?: boolean;
 	}
 
 	interface IProject {
