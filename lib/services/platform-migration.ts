@@ -10,13 +10,16 @@ export class PlatformMigrationService implements Project.IPlatformMigrator {
 	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $project: Project.IProject,
+		private $projectType: IProjectTypes,
 		private $resources: IResourceLoader) {}
 
 	public ensureAllPlatformAssets(): IFuture<void> {
 		return ((): void => {
-			Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
-				this.ensureCordovaJs(platform).wait();
-			})
+			if (this.$project.projectType === this.$projectType.Cordova) {
+				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
+					this.ensureCordovaJs(platform).wait();
+				});
+			}
 
 			var appResourcesDir = this.$resources.appResourcesDir;
 			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);

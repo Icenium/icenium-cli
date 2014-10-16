@@ -1,8 +1,6 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import util = require("util");
-
 var ProjectTypes = {
 	1: "Cordova",
 	"Cordova": 1,
@@ -15,5 +13,4 @@ var ProjectTypes = {
 };
 
 export = ProjectTypes;
-
 $injector.register("projectTypes", ProjectTypes);

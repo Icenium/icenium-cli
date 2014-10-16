@@ -51,6 +51,7 @@ $injector.requireCommand("login", "./login");
 $injector.requireCommand("logout", "./login");
 $injector.requireCommand("dev-telerik-login", "./login");
 
+$injector.require("buildPropertiesAdjustment", "./services/build");
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
 
