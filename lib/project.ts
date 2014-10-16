@@ -53,7 +53,7 @@ export class Project implements Project.IProject {
 			updateKendo: true
 		},
 		NativeScript: {
-			build: false,
+			build: true,
 			buildCompanion: true,
 			deploy: false,
 			simulate: false,
