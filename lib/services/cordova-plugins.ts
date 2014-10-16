@@ -7,11 +7,13 @@ import util = require("util");
 import os = require("os");
 import validUrl = require("valid-url");
 import Future = require("fibers/future");
+import temp = require("temp");
 import PluginsServiceBaseLib = require("./plugins-service-base");
 
 export class CordovaPluginsService extends PluginsServiceBaseLib.PluginsServiceBase {
 	constructor(private $cordovaMigrationService: ICordovaMigrationService,
 		private $project: Project.IProject,
+		private $fs: IFileSystem,
 		private $config: IConfiguration) {
 		super();
 	}
@@ -37,14 +39,47 @@ export class CordovaPluginsService extends PluginsServiceBaseLib.PluginsServiceB
 		return(() => {
 			this.$project.ensureProject();
 			var future = new Future<string>();
-			plugman.fetch(pluginId, this.getPluginsDir().wait(), false, ".", "HEAD", (result) => {
-				if (this.isError(result)) {
-					future.throw(result);
-				} else {
-					future.return(util.format("The plugin has been successfully fetched to %s", result));
+			var pluginDir = this.getPluginsDir().wait();
+
+			try {
+				if (this.$fs.exists(pluginId).wait() && this.$fs.getFsStats(pluginId).wait().isFile()) {
+					pluginId = this.resolveLocalPluginDir(pluginId).wait();
 				}
-			});
+
+				plugman.fetch(pluginId, pluginDir, false, ".", "HEAD", (result) => {
+					if (this.isError(result)) {
+						future.throw(result);
+					} else {
+						future.return(util.format("The plugin has been successfully fetched to %s", result));
+					}
+				});
+			} catch(e) {
+				future.throw(e);
+			}
 			return future.wait();
+		}).future<string>()();
+	}
+
+	private resolveLocalPluginDir(pluginId: string): IFuture<string> {
+		return (() => {
+			temp.track();
+			var destDir = temp.mkdirSync("ab-");
+			this.$fs.unzip(pluginId, destDir).wait();
+
+			var pluginXml = path.join(destDir, "plugin.xml");
+			if (this.$fs.exists(pluginXml).wait()) {
+				return destDir;
+			}
+
+			var archiveName = path.basename(pluginId, path.extname(pluginId));
+			destDir = path.join(destDir, archiveName);
+			pluginXml = path.join(destDir, "plugin.xml");
+			if (this.$fs.exists(pluginXml).wait()) {
+				return destDir;
+			}
+
+			throw new Error(util.format("The specified archive file '%s' does not contain valid Cordova plugin." +
+				" It must contain plugin.xml in the root or in a directory with the name of the archive.", pluginId));
 		}).future<string>()();
 	}
 
