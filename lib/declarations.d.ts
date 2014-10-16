@@ -112,6 +112,10 @@ declare module Project {
 		provisionType?: string;
 	}
 
+	interface IBuildPropertiesAdjustment {
+		adjustBuildProperties(oldBuildProperties: any): any;
+	}
+
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult>;
