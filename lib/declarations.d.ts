@@ -338,9 +338,12 @@ interface IDomainNameSystem {
 	getDomains(): IFuture<string[]>;
 }
 
-interface IPluginsService {
+interface ICordovaPluginsService {
 	getInstalledPlugins(): IFuture<IPlugin[]>;
 	getAvailablePlugins(): IFuture<IPlugin[]>;
+}
+
+interface IPluginsService extends ICordovaPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;

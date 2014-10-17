@@ -2,26 +2,25 @@
 "use strict";
 
 import util = require("util");
-import PluginsServiceBaseLib = require("./plugins-service-base");
+import PluginsDataLib = require("./../plugins-data");
 
-export class MarketplacePluginsService extends PluginsServiceBaseLib.PluginsServiceBase {
+export class MarketplacePluginsService implements ICordovaPluginsService {
 	private static MARKET_PLACE_PLUGINS_URL = "http://plugins.telerik.com/api/plugins";
 	private identifierToPluginDictionary: IDictionary<IMarketplacePlugin>;
 
 	constructor(private $httpClient: Server.IHttpClient,
 		private $project: Project.IProject) {
-		super();
 		this.identifierToPluginDictionary = Object.create(null);
 	}
 
-	private getMarketplacePlugins(): IFuture<IMarketplacePlugin[]> {
+	public getAvailablePlugins(): IFuture<IMarketplacePlugin[]> {
 		return (() => {
 			if(_.keys(this.identifierToPluginDictionary).length === 0) {
 				var req = this.$httpClient.httpRequest(MarketplacePluginsService.MARKET_PLACE_PLUGINS_URL).wait();
 				var body = req.body;
 				var plugins = JSON.parse(body);
 				_.each(plugins, (plugin: any) => {
-					var marketplacePlugin = new PluginsServiceBaseLib.MarketplacePluginData(plugin.title, plugin.uniqueId, plugin.pluginVersion, plugin.downloadsCount, plugin.repositoryUrl, plugin.demoAppRepositoryLink);
+					var marketplacePlugin = new PluginsDataLib.MarketplacePluginData(plugin.title, plugin.uniqueId, plugin.pluginVersion, plugin.downloadsCount, plugin.repositoryUrl, plugin.demoAppRepositoryLink);
 					this.identifierToPluginDictionary[plugin.uniqueId] = marketplacePlugin;
 				});
 			}
@@ -32,9 +31,7 @@ export class MarketplacePluginsService extends PluginsServiceBaseLib.PluginsServ
 
 	public getInstalledPlugins(): IFuture<IMarketplacePlugin[]> {
 		return (() => {
-			this.getMarketplacePlugins().wait();
-
-			var plugins = _.filter(this.$project.projectData.CorePlugins, (pluginName: string) => this.isMarketplacePlugin(pluginName));
+			var plugins = _.filter(this.$project.projectData.CorePlugins, (pluginName: string) => this.isMarketplacePlugin(pluginName.split("@")[0]).wait());
 			return _.map(plugins, (plugin: string) => {
 				return this.identifierToPluginDictionary[plugin.split("@")[0]];
 			});
@@ -42,13 +39,11 @@ export class MarketplacePluginsService extends PluginsServiceBaseLib.PluginsServ
 		}).future<IMarketplacePlugin[]>()();
 	}
 
-	public getAvailablePlugins(): IFuture<IMarketplacePlugin[]> {
-		return this.getMarketplacePlugins();
-	}
-
-	public isMarketplacePlugin(pluginName: string): boolean {
-		var pluginType = this.getPluginTypeByName(pluginName);
-		return pluginType === PluginsServiceBaseLib.PluginType.MarketplacePlugin;
+	public isMarketplacePlugin(pluginName: string): IFuture<boolean> {
+		return (() => {
+			pluginName = pluginName.toLowerCase();
+			return _.any(this.getAvailablePlugins().wait(), p => p.identifier.toLowerCase() === pluginName);
+		}).future<boolean>()();
 	}
 }
 $injector.register("marketplacePluginsService", MarketplacePluginsService);
