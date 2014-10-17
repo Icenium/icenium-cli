@@ -8,8 +8,8 @@ import options = require("./../options");
 export class PluginsService implements IPluginsService {
 	private static MESSAGES = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
 
-	constructor(private $cordovaPluginsService: IPluginsService,
-		private $marketplacePluginsService: IPluginsService,
+	constructor(private $cordovaPluginsService: ICordovaPluginsService,
+		private $marketplacePluginsService: ICordovaPluginsService,
 		private $errors: IErrors,
 		private $logger: ILogger,
 		private $project: Project.IProject) {

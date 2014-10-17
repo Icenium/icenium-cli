@@ -8,14 +8,15 @@ import os = require("os");
 import validUrl = require("valid-url");
 import Future = require("fibers/future");
 import temp = require("temp");
-import PluginsServiceBaseLib = require("./plugins-service-base");
+import PluginsDataLib = require("./../plugins-data");
 
-export class CordovaPluginsService extends PluginsServiceBaseLib.PluginsServiceBase {
+export class CordovaPluginsService implements ICordovaPluginsService {
+	private availablePlugins: IPlugin[];
+
 	constructor(private $cordovaMigrationService: ICordovaMigrationService,
 		private $project: Project.IProject,
 		private $fs: IFileSystem,
 		private $config: IConfiguration) {
-		super();
 	}
 
 	public getPlugins(keywords: string[]): IPlugin[] {
@@ -98,29 +99,44 @@ export class CordovaPluginsService extends PluginsServiceBaseLib.PluginsServiceB
 
 	public getInstalledPlugins(): IFuture<IPlugin[]> {
 		return (() => {
-			var plugins = _.filter(this.$project.projectData.CorePlugins, (pluginName: string) => this.isCordovaPlugin(pluginName));
+			var plugins = _.filter(this.$project.projectData.CorePlugins, (pluginName: string) => this.isCordovaPlugin(pluginName).wait());
 			return this.getMappedPlugins(plugins);
 		}).future<IPlugin[]>()();
 	}
 
 	public getAvailablePlugins(): IFuture<IPlugin[]> {
 		return (() => {
-			var version = this.$project.projectData.FrameworkVersion;
-			var plugins = this.$cordovaMigrationService.pluginsForVersion(version).wait();
-			return this.getMappedPlugins(plugins);
+			if(!this.availablePlugins) {
+				var version = this.$project.projectData.FrameworkVersion;
+				var plugins = this.$cordovaMigrationService.pluginsForVersion(version).wait();
+				this.availablePlugins = this.getMappedPlugins(plugins);
+			}
+
+			return this.availablePlugins;
 		}).future<IPlugin[]>()();
 	}
 
 	private getMappedPlugins(plugins: string[]): IPlugin[] {
 		return _.map(plugins, pluginName => {
 			var pluginType = this.getPluginTypeByName(pluginName);
-			return new PluginsServiceBaseLib.CordovaPluginData(pluginName, pluginType);
+			return new PluginsDataLib.CordovaPluginData(pluginName, pluginType);
 		});
 	}
 
-	public isCordovaPlugin(pluginName: string): boolean {
-		var pluginType = this.getPluginTypeByName(pluginName);
-		return pluginType === PluginsServiceBaseLib.PluginType.CorePlugin || pluginType === PluginsServiceBaseLib.PluginType.AdvancedPlugin;
+	private isCordovaPlugin(pluginName: string): IFuture<boolean> {
+		return (() => {
+			pluginName = pluginName.toLowerCase();
+			return _.any(this.getAvailablePlugins().wait(), p => p.name.toLowerCase() === pluginName);
+		}).future<boolean>()();
+	}
+
+	private getPluginTypeByName(pluginName: string): PluginsDataLib.PluginType {
+		var pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
+		if (pluginName.startsWith("org.apache.cordova")) {
+			pluginType = PluginsDataLib.PluginType.CorePlugin;
+		}
+
+		return pluginType;
 	}
 
 	private isError(object:any): boolean {

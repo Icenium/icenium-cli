@@ -1,4 +1,4 @@
-///<reference path="../.d.ts"/>
+///<reference path=".d.ts"/>
 "use strict";
 
 import util = require("util");
@@ -45,19 +45,5 @@ export class MarketplacePluginData extends CordovaPluginData {
 
 	public toProjectDataRecord(): string {
 		return util.format("%s@%s", this.identifier, this.version);
-	}
-}
-
-export class PluginsServiceBase {
-
-	public getPluginTypeByName(pluginName: string): PluginType {
-		var pluginType = PluginType.AdvancedPlugin;
-		if (pluginName.startsWith("org.apache.cordova")) {
-			pluginType = PluginType.CorePlugin;
-		} else if(pluginName.indexOf("@") > 0) {
-			pluginType = PluginType.MarketplacePlugin;
-		}
-
-		return pluginType;
 	}
 }
