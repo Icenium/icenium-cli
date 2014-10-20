@@ -72,15 +72,20 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 				return destDir;
 			}
 
-			var archiveName = path.basename(pluginId, path.extname(pluginId));
-			destDir = path.join(destDir, archiveName);
-			pluginXml = path.join(destDir, "plugin.xml");
-			if (this.$fs.exists(pluginXml).wait()) {
-				return destDir;
+			var dirs = _.filter(
+				this.$fs.readDirectory(destDir).wait(),
+				(item) => this.$fs.getFsStats(path.join(destDir, item)).wait().isDirectory());
+
+			if (dirs.length === 1) {
+				destDir = path.join(destDir, dirs[0]);
+				pluginXml = path.join(destDir, "plugin.xml");
+				if (this.$fs.exists(pluginXml).wait()) {
+					return destDir;
+				}
 			}
 
 			throw new Error(util.format("The specified archive file '%s' does not contain valid Cordova plugin." +
-				" It must contain plugin.xml in the root or in a directory with the name of the archive.", pluginId));
+				" It must contain plugin.xml in the root or in a single directory inside.", pluginId));
 		}).future<string>()();
 	}
 
