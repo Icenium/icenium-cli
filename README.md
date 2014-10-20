@@ -172,7 +172,7 @@ To run your app on an Android device, install a QR code reader on the device, in
 $ appbuilder build android --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. Scan the produced QR code on your device and tap the URL to load your project in the AppBuilder companion app.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
 With the Telerik AppBuilder companion app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik AppBuilder companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>.
 
@@ -182,7 +182,7 @@ To run your app on an iOS device, install the Telerik AppBuilder companion app o
 $ appbuilder build ios --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. 
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
 With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
 
