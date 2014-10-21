@@ -210,6 +210,7 @@ interface IProjectData {
 	WP8Capabilities: string[];
 	WP8Requirements: string[];
 	WP8SupportedResolutions: string[];
+	CordovaPluginVariables?: any;
 }
 
 interface IProjectPropertiesService {
@@ -339,11 +340,13 @@ interface IDomainNameSystem {
 }
 
 interface ICordovaPluginsService {
-	getInstalledPlugins(): IFuture<IPlugin[]>;
-	getAvailablePlugins(): IFuture<IPlugin[]>;
+	getAvailablePlugins(): IFuture<any[]>;
+	createPluginData(plugin: any): IFuture<IPlugin>;
 }
 
-interface IPluginsService extends ICordovaPluginsService {
+interface IPluginsService {
+	getAvailablePlugins(): IPlugin[];
+	getInstalledPlugins(): IPlugin[];
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;
@@ -351,17 +354,19 @@ interface IPluginsService extends ICordovaPluginsService {
 
 interface IPlugin {
 	name: string;
+	identifier: string;
+	version: string;
+	description: string;
+	url: string;
 	type: any;
-	description?: string;
-	version?: string;
+	variables: string[];
+	platforms: string[];
 	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }
 
 interface IMarketplacePlugin extends IPlugin {
-	identifier: string;
 	downloads: number;
-	gitRepoUrl: string;
 	demoAppRepositoryUrl: string;
 }
 

@@ -24,12 +24,14 @@ declare module Server {
 		getJs(version: string, platform: string, $resultStream: any): IFuture<void>;
 		getLiveSyncToken(solutionName: string, projectName: string): IFuture<any>;
 		getLiveSyncUrl(longUrl: string): IFuture<any>;
+		getMarketplacePluginData(pluginId: string, version: string): IFuture<any>;
 		getMigrationData(): IFuture<any>;
 		getPlugins(version: string): IFuture<any>;
 		getPluginsPackage($resultStream: any): IFuture<void>;
 		getProjectCordovaPlugins(solutionName: string, projectName: string): IFuture<any>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any>;
-		setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any): IFuture<void>;
+		migrate(solutionName: string, projectName: string, targetVersion: string, sourceVersion?: string): IFuture<any>;
+		setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any, configuration: string): IFuture<void>;
 	}
 
 	interface ICryptographicIdentityStoreServiceContract {
@@ -88,8 +90,8 @@ declare module Server {
 
 	interface IProjectServiceContract {
 		canLoadSolution(solutionName: string): IFuture<any>;
-		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<void>;
-		createProject(solutionName: string, expansionData: any): IFuture<void>;
+		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<any>;
+		createProject(solutionName: string, projectName: string, expansionData: any): IFuture<void>;
 		deleteProject(solutionName: string, projectName: string): IFuture<void>;
 		deleteSolution(solutionName: string): IFuture<void>;
 		exportSolution(solutionSpaceName: string, solutionName: string, $resultStream: any): IFuture<void>;
@@ -104,7 +106,7 @@ declare module Server {
 		renameProject(solutionName: string, projectName: string, newProjectName: string): IFuture<void>;
 		renameSolution(solutionName: string, newSolutionName: string): IFuture<void>;
 		saveProjectContents(solutionName: string, projectName: string, projectContents: any): IFuture<void>;
-		setProjectProperty(solutionName: string, projectName: string, changeset: any): IFuture<void>;
+		setProjectProperty(solutionName: string, projectName: string, changeset: any, configuration?: string): IFuture<void>;
 		upgradeSolution(solutionName: string): IFuture<void>;
 	}
 
@@ -121,6 +123,11 @@ declare module Server {
 		setCodesignIdentity(solutionName: string, projectIdentity: string, platform: string, identityAlias: any): IFuture<void>;
 		setMobileProvision(solutionName: string, projectIdentity: string, provisionIdentifier: any): IFuture<void>;
 		updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: any): IFuture<void>;
+	}
+
+	interface IStatusServiceContract {
+		getLinuxBuildMachineStatus(): IFuture<any>;
+		getMacBuildMachineStatus(): IFuture<any>;
 	}
 
 	interface ITamServiceContract {
@@ -188,6 +195,7 @@ declare module Server {
 		projects: IProjectServiceContract;
 		rawSettings: IRawSettingsServiceContract;
 		settings: ISettingsServiceContract;
+		status: IStatusServiceContract;
 		tam: ITamServiceContract;
 		tap: ITapServiceContract;
 		versioncontrol: IVersionControlServiceContract;

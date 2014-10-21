@@ -10,15 +10,14 @@ import assert = require("assert");
 import Future = require("fibers/future");
 import util = require("util");
 
-function doMarketplacePluginsData(marketplacePlugins: string[]) {
+function createMarketplacePluginsData(marketplacePlugins: any[]) {
 	var json = '[';
 	var index = 0;
 	_.each(marketplacePlugins, plugin => {
-		var parts = plugin.split("@");
-		var uniqueId = parts[0];
-		var version = parts[1];
+		var uniqueId = plugin.Identifier;
+		var version = plugin.Version;
 		var title = _.last(uniqueId.split("."));
-		var obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","repositoryUrl": "","demoAppRepositoryLink": ""}',
+		var obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
 			title, uniqueId, version);
 		if(++index !== marketplacePlugins.length) {
 			json += obj + ",";
@@ -31,7 +30,7 @@ function doMarketplacePluginsData(marketplacePlugins: string[]) {
 	return json;
 }
 
-function createTestInjector(cordovaPlugins: string[], installedMarketplacePlugins: string[], availableMarketplacePlugins: string[]) {
+function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	var testInjector = new yok.Yok();
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
@@ -39,12 +38,13 @@ function createTestInjector(cordovaPlugins: string[], installedMarketplacePlugin
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
+	testInjector.register("prompter", {});
 
 	// Register mocked project
 	testInjector.register("project", {
 		projectData: {
 			FrameworkVersion: "",
-			CorePlugins: cordovaPlugins.concat(installedMarketplacePlugins)
+			CorePlugins: _.map(cordovaPlugins, p => p.Identifier).concat(_.map(installedMarketplacePlugins, m => util.format("%s@%s", m.Identifier, m.Version)))
 		},
 		ensureProject: () => { },
 		saveProject: () => {
@@ -52,10 +52,14 @@ function createTestInjector(cordovaPlugins: string[], installedMarketplacePlugin
 		}
 	});
 
-	// Register mocked cordovaMigrationService
-	testInjector.register("cordovaMigrationService", {
-		pluginsForVersion: (verion: string) => {
-			return Future.fromResult(cordovaPlugins);
+	testInjector.register("server", {
+		cordova: {
+			getPlugins: () => {
+				return Future.fromResult(cordovaPlugins);
+			},
+			getMarketplacePluginData: (pluginIdentifier: string, pluginVersion: string) => {
+				return Future.fromResult(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
+			}
 		}
 	});
 
@@ -63,7 +67,7 @@ function createTestInjector(cordovaPlugins: string[], installedMarketplacePlugin
 	testInjector.register("httpClient", {
 		httpRequest: (): IFuture<any> => {
 			return Future.fromResult({
-				body: doMarketplacePluginsData(installedMarketplacePlugins.concat(availableMarketplacePlugins))
+				body: createMarketplacePluginsData(installedMarketplacePlugins.concat(availableMarketplacePlugins))
 			});
 		}
 	});
@@ -73,37 +77,92 @@ function createTestInjector(cordovaPlugins: string[], installedMarketplacePlugin
 
 describe("plugins-service", () => {
 	it("return count of installed plugins", () => {
-		var cordovaPlugins = ["org.apache.cordova.battery-status", "com.phonegap.plugins.PushPlugin"];
-		var marketplacePlugins = ["com.telerik.stripe@1.0.4"];
+		var cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			},
+			{
+				Identifier: "com.phonegap.plugins.PushPlugin",
+				Name: "PushPlugin"
+			}
+		];
+		var marketplacePlugins = [{
+			Identifier: "com.telerik.stripe",
+			Name: "Stripe",
+			Version: "1.0.4"
+		}];
 
 	 	var testInjector = createTestInjector(cordovaPlugins, marketplacePlugins, marketplacePlugins);
 
 		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-		var installedPlugins = service.getInstalledPlugins().wait();
+		var installedPlugins = service.getInstalledPlugins();
 
 		assert.equal(3, installedPlugins.length);
 	});
 	it("increment installed plugins count after add plugin", () => {
-		var cordovaPlugins = ["org.apache.cordova.battery-status", "com.phonegap.plugins.PushPlugin"];
-		var installedMarketplacePlugins = ["com.telerik.stripe@1.0.4"];
-		var availableMarketplacePlugins = ["nl.x-services.plugins.toast@2.0.1"];
+		var cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			},
+			{
+				Identifier: "com.phonegap.plugins.PushPlugin",
+				Name: "PushPlugin"
+			}
+		];
+		var installedMarketplacePlugins = [{
+			Identifier: "com.telerik.stripe",
+			Name: "Stripe",
+			Version: "1.0.4" }];
+		var availableMarketplacePlugins = [
+			{
+				Identifier: "nl.x-services.plugins.toast",
+				Name: "Toast",
+				Version: "2.0.1"
+			},
+			{
+				Identifier: "com.telerik.stripe",
+				Name: "Stripe",
+				Version: "1.0.4"
+			}
+		];
 
 		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
-
 		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
 		service.addPlugin("toast").wait();
 
-		assert.equal(4, service.getInstalledPlugins().wait().length);
+		assert.equal(4, service.getInstalledPlugins().length);
 	});
 	it("decrement installed plugins count after remove plugin", () => {
-		var cordovaPlugins = ["org.apache.cordova.battery-status", "com.phonegap.plugins.PushPlugin"];
-		var installedMarketplacePlugins = ["com.telerik.stripe@1.0.4", "nl.x-services.plugins.toast@2.0.1"];
+		var cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			},
+			{
+				Identifier: "com.phonegap.plugins.PushPlugin",
+				Name: "PushPlugin"
+			}
+		];
+		var installedMarketplacePlugins = [
+			{
+				Identifier: "com.telerik.stripe",
+				Name: "Stripe",
+				Version: "1.0.4"
+			},
+			{
+				Identifier: "nl.x-services.plugins.toast",
+				Name: "Toast",
+				Version: "2.0.1"
+			}
+		];
 
 		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, installedMarketplacePlugins);
 
 		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-		service.removePlugin("stripe").wait();
+		service.removePlugin("Stripe").wait();
 
-		assert.equal(3, service.getInstalledPlugins().wait().length);
+		assert.equal(3, service.getInstalledPlugins().length);
 	});
 });

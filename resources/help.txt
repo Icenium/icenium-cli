@@ -439,7 +439,8 @@ Usage:
     $ appbuilder plugin add --available
     $ appbuilder plugin add <Name>
 
-Enables a core, integrated or verified plugin for your project. 
+Enables a core, integrated or verified plugin for your project.
+If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set value for each plugin variable.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
