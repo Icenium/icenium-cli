@@ -55,7 +55,7 @@ export class Project implements Project.IProject {
 		NativeScript: {
 			build: true,
 			buildCompanion: true,
-			deploy: false,
+			deploy: true,
 			simulate: false,
 			livesync: false,
 			livesyncCompanion: true,
