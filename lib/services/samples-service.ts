@@ -21,12 +21,14 @@ class Sample {
 }
 
 export class SamplesService implements ISamplesService {
-	private static GITHUB_SAMPLES_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
+	private static GITHUB_ICENIUM_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
+	private static GITHUB_TELERIK_LOCATION_ENDPOINT = "https://api.github.com/orgs/telerik/repos?per_page=100";
 	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/sample-[\w\W]+[.]git$/i;
 	private static NAME_FORMAT_REGEX = /(sample-|-)/gi;
 	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
+	private static NATIVESCRIPT_SAMPLE_CUTENESS_NAME = "nativescript-sample-cuteness";
 	private sampleCategories = [
 		{ id: "chrome-app", regEx: /(^|\s)chrome($|\s)/i, name: "Chrome Applications", order: 4, matchOrder: 1 },
 		{ id: "demo-app", regEx: /(^|\s)demo($|\s)/i, name: "Demo Applications", order: 1, matchOrder: 2 },
@@ -140,16 +142,9 @@ export class SamplesService implements ISamplesService {
 
 	private getAllSamples(): IFuture<Sample[]> {
 		return (() => {
-			try {
-				var repos = JSON.parse(this.$httpClient.httpRequest(SamplesService.GITHUB_SAMPLES_LOCATION_ENDPOINT).wait().body);
-			} catch (error) {
-				this.$logger.debug(error);
-				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
-			}
-
-			repos = _.select(repos, (repo: any) => {
-				return SamplesService.GITHUB_REGEX.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE];
-			});
+			var iceniumOrganizationSamples = this.getRepositories(SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT, (repo: any) => SamplesService.GITHUB_REGEX.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]).wait();
+			var telerikOrganizationSamples = this.getRepositories(SamplesService.GITHUB_TELERIK_LOCATION_ENDPOINT, (repo: any) => repo.name === SamplesService.NATIVESCRIPT_SAMPLE_CUTENESS_NAME).wait();
+			var repos = _.union(iceniumOrganizationSamples, telerikOrganizationSamples);
 
 			var samples = _.map(repos, (repo: any) => {
 				return new Sample(
@@ -165,6 +160,21 @@ export class SamplesService implements ISamplesService {
 
 			return sortedSamples;
 		}).future<Sample[]>()();
+	}
+
+	private getRepositories(gitHubEndpointUrl: string, filter: (repo: any) => boolean): IFuture<string[]> {
+		return (() => {
+			try {
+				var repos = JSON.parse(this.$httpClient.httpRequest(gitHubEndpointUrl).wait().body);
+			} catch (error) {
+				this.$logger.debug(error);
+				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
+			}
+
+			repos = _.select(repos, (repo:any) => filter(repo));
+
+			return repos;
+		}).future<string[]>()();
 	}
 
 	private getTypeFromDescription(description: string): string {
