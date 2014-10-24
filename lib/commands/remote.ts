@@ -65,6 +65,10 @@ export class RemoteCommand implements ICommand {
 	private onLaunchRequest(req: express.Request, res: express.Response): IFuture<void> {
 		return (() => {
 			this.$logger.info("launch simulator request received ... ");
+			
+			// Clean the tempdir before new launch
+			this.$fs.deleteDirectory(this.appBuilderDir).wait();
+			this.$fs.createDirectory(this.appBuilderDir).wait();
 
 			var deviceFamily = req.query.deviceFamily.toLowerCase();
 			var archive = this.$fs.createWriteStream(this.packageLocation);
