@@ -8,8 +8,8 @@ import options = require("./../options");
 export class PluginsService implements IPluginsService {
 	private static MESSAGES = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
 
-	constructor(private $cordovaPluginsService: IPluginsService,
-		private $marketplacePluginsService: IPluginsService,
+	constructor(private $cordovaPluginsService: ICordovaPluginsService,
+		private $marketplacePluginsService: ICordovaPluginsService,
 		private $errors: IErrors,
 		private $logger: ILogger,
 		private $project: Project.IProject) {
@@ -30,6 +30,10 @@ export class PluginsService implements IPluginsService {
 
 	public addPlugin(pluginName: string): IFuture<void> {
 		return (() => {
+			if(!pluginName) {
+				this.$errors.fail("No plugin name specified");
+			}
+
 			if(this.isPluginInstalled(pluginName).wait()) {
 				this.$errors.fail("Plugin %s already exists", pluginName);
 			}
@@ -43,6 +47,10 @@ export class PluginsService implements IPluginsService {
 
 	public removePlugin(pluginName: string): IFuture<void> {
 		return (() => {
+			if(!pluginName) {
+				this.$errors.fail("No plugin name specified.");
+			}
+
 			if(!this.isPluginInstalled(pluginName).wait()) {
 			 	this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}

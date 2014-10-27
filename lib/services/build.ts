@@ -13,6 +13,30 @@ import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validat
 import constants = require("../common/mobile/constants");
 import AppIdentifier = require("../common/mobile/app-identifier");
 
+class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
+	constructor(private $project: Project.IProject,
+				private $projectTypes: IProjectTypes) {
+	}
+
+	private adjustBuildPropertiesCordova(buildProperties: any): any {
+		buildProperties.CorePlugins = this.$project.projectData.CorePlugins;
+		return buildProperties;
+	}
+
+	private adjustBuildPropertiesNativeScript(buildProperties: any): any {
+		return buildProperties;
+	}
+
+	public adjustBuildProperties(oldBuildProperties: any): any {
+		if (this.$project.projectType === this.$projectTypes.Cordova) {
+			return this.adjustBuildPropertiesCordova(oldBuildProperties);
+		} else if (this.$project.projectType === this.$projectTypes.NativeScript) {
+			return this.adjustBuildPropertiesNativeScript(oldBuildProperties);
+		}
+	}
+}
+$injector.register("buildPropertiesAdjustment", BuildPropertiesAdjustment);
+
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "install/WinPhoneAet";
 
@@ -22,6 +46,7 @@ export class BuildService implements Project.IBuildService {
 		private $errors: IErrors,
 		private $server: Server.IServer,
 		private $project: Project.IProject,
+		private $buildPropertiesAdjustment: Project.IBuildPropertiesAdjustment,
 		private $fs: IFileSystem,
 		private $injector: IInjector,
 		private $identityManager: Server.IIdentityManager,
@@ -66,7 +91,6 @@ export class BuildService implements Project.IBuildService {
 			this.$server.projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
-
 			buildProperties.LiveSyncToken = liveSyncToken;
 
 			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties }).wait();
@@ -127,7 +151,6 @@ export class BuildService implements Project.IBuildService {
 				Configuration: settings.configuration,
 				Platform: settings.platform,
 
-				CorePlugins: projectData.CorePlugins,
 				AppIdentifier: projectData.AppIdentifier,
 				ProjectName: projectData.ProjectName,
 				Author: projectData.Author,
@@ -137,6 +160,7 @@ export class BuildService implements Project.IBuildService {
 				DeviceOrientations: projectData.DeviceOrientations,
 				BuildForiOSSimulator: settings.buildForiOSSimulator || false
 			};
+			this.$buildPropertiesAdjustment.adjustBuildProperties(buildProperties);
 
 			if (settings.platform === "Android") {
 				buildProperties.AndroidPermissions = projectData.AndroidPermissions;
@@ -227,9 +251,11 @@ export class BuildService implements Project.IBuildService {
 				var buildCompanyHubApp = !settings.downloadFiles;
 				if (buildCompanyHubApp) {
 					buildProperties.WP8CompanyHubApp = true;
-					this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
-						" deployed using a QR code. Use the --download switch if you want to cable deploy" +
-						" or publish the built app package.");
+					if(settings.showWp8SigningMessage === undefined) {
+						this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
+							" deployed using a QR code. Use the --download switch if you want to cable deploy" +
+							" or publish the built app package.");
+					}
 				}
 
 				return this.beginBuild(buildProperties).wait();

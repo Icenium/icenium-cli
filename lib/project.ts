@@ -53,9 +53,9 @@ export class Project implements Project.IProject {
 			updateKendo: true
 		},
 		NativeScript: {
-			build: false,
+			build: true,
 			buildCompanion: true,
-			deploy: false,
+			deploy: true,
 			simulate: false,
 			livesync: false,
 			livesyncCompanion: true,

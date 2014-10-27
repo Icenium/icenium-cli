@@ -79,7 +79,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	private printProvisionData(provision: IProvision, provisionIndex: number): void {
 		this.$logger.out("#%d: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
 			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
-		if (options.verbose) {
+		if (options.verbose || options.v) {
 			var devices = provision.ProvisionedDevices;
 			if (devices && devices.length) {
 				this.$logger.out("  Provisioned device identifiers:");

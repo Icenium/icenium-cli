@@ -493,7 +493,7 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>]
+    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--retryCount NumberOfRetries]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
@@ -502,6 +502,8 @@ To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the AVD that you want to use as listed by $ android list avd
+<NumberOfRetries> is the count of the retries that will be executed before the command fails in case its unable to start the simulator.
+Default value is 10. There's 10 seconds gap between the retries.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.

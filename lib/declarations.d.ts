@@ -112,6 +112,10 @@ declare module Project {
 		provisionType?: string;
 	}
 
+	interface IBuildPropertiesAdjustment {
+		adjustBuildProperties(oldBuildProperties: any): any;
+	}
+
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult>;
@@ -132,6 +136,7 @@ declare module Project {
 		device?: Mobile.IDevice;
 
 		buildForiOSSimulator?: boolean;
+		showWp8SigningMessage?: boolean;
 	}
 
 	interface IProject {
@@ -333,9 +338,12 @@ interface IDomainNameSystem {
 	getDomains(): IFuture<string[]>;
 }
 
-interface IPluginsService {
+interface ICordovaPluginsService {
 	getInstalledPlugins(): IFuture<IPlugin[]>;
 	getAvailablePlugins(): IFuture<IPlugin[]>;
+}
+
+interface IPluginsService extends ICordovaPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;

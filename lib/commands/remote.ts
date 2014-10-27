@@ -1,5 +1,4 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
 
 import express = require("express");
@@ -8,6 +7,7 @@ import path = require("path");
 import os = require("os");
 import minimatch = require("minimatch");
 import ip = require("ip");
+import hostInfo = require("../common/host-info");
 
 export class RemoteCommand implements ICommand {
 	private appBuilderDir: string;
@@ -29,34 +29,46 @@ export class RemoteCommand implements ICommand {
 				this.$errors.fail("You must specify a valid port number. Valid values are between 1 and 65535.");
 			}
 
-			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
-
 			var parsedPortNumber = parseInt(args[0]);
-			if(parsedPortNumber != NaN && parsedPortNumber > 0 && parsedPortNumber < 65536) {
-				this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
-				var domain = this.$domainNameSystem.getDomains().wait()[0];
-				this.$express.listen(parsedPortNumber, () => {
-					var ipAddress = ip.address();
-					this.$logger.info("Listening on port " + parsedPortNumber);
-					if(domain) {
-						this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in one of the following formats:\n" +
-							" - Address: http://" + ipAddress + " Port: " + parsedPortNumber + "\n" +
-							" - Address: http://" + domain + " Port: " + parsedPortNumber);
-					} else {
-						this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in the following format:\n" +
-							" - Address: http://" + ipAddress + " Port: " + parsedPortNumber);
-					}
-				});
-				this.$express.run();
-			} else {
+			if( isNaN(parsedPortNumber) || parsedPortNumber <= 0 || parsedPortNumber >= 65536) {
 				this.$errors.fail("You must specify a valid port number. Valid values are between 1 and 65535.");
 			}
+
+			if (!hostInfo.isWindows() && (parsedPortNumber < 1024) && process.getuid() != 0) {
+				this.$logger.warn("Port %s is a system port and requires superuser privileges." + os.EOL +
+				"To use this port, re-run the command using sudo." + os.EOL +
+				"To use a non-system port, re-run the command with a port above 1024.", parsedPortNumber.toString());
+			}
+
+			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
+
+			this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
+			var domain = this.$domainNameSystem.getDomains().wait()[0];
+
+			this.$express.listen(parsedPortNumber, () => {
+				var ipAddress = ip.address();
+				this.$logger.info("Listening on port " + parsedPortNumber);
+				if(domain) {
+					this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in one of the following formats:\n" +
+						" - Address: http://" + ipAddress + " Port: " + parsedPortNumber + "\n" +
+						" - Address: http://" + domain + " Port: " + parsedPortNumber);
+				} else {
+					this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in the following format:\n" +
+						" - Address: http://" + ipAddress + " Port: " + parsedPortNumber);
+				}
+			});
+			this.$express.run();
+
 		}).future<void>()();
 	}
 
 	private onLaunchRequest(req: express.Request, res: express.Response): IFuture<void> {
 		return (() => {
 			this.$logger.info("launch simulator request received ... ");
+			
+			// Clean the tempdir before new launch
+			this.$fs.deleteDirectory(this.appBuilderDir).wait();
+			this.$fs.createDirectory(this.appBuilderDir).wait();
 
 			var deviceFamily = req.query.deviceFamily.toLowerCase();
 			var archive = this.$fs.createWriteStream(this.packageLocation);
