@@ -497,7 +497,7 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--retryCount NumberOfRetries]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--retryCount <Number of Retries>]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
@@ -505,9 +505,9 @@ your app runs in the default emulator or the currently running emulator, if any.
 To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Name> is the name of the AVD that you want to use as listed by $ android list avd
-<NumberOfRetries> is the count of the retries that will be executed before the command fails in case its unable to start the simulator.
-Default value is 10. There's 10 seconds gap between the retries.
+<Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
+<Number of Retries> is the number of times that the AppBuilder CLI will retry to execute the command before quitting. The AppBuilder CLI
+     waits 10 seconds between retries. If not set, the default number of retries is 10.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -525,7 +525,11 @@ Options:
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
             a certificate by index or name.
-            To list available certificates, run $ appbuilder certificate.
+            To list available certificates, run $ appbuilder certificate
+    --avd - Sets the Android virtual device on which you want to run your app. 
+            To list the available Android virtual devices, run $ android list avd
+    --retryCount - Sets the number of times that AppBuilder CLI will retry to execute the command before quitting.
+            If not set, the default number of retries is 10.
 --[/]--
 
 --[emulate|ios]--
@@ -780,16 +784,16 @@ Builds the project and uploads the application to Telerik AppManager.
 After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
 
 <Platform> is the target distribution platform. You can set ios, android or wp8.
-<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
         a certificate by index or name.
-        To list available certificates, run $ appbuilder certificate.
+        To list available certificates, run $ appbuilder certificate
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
-        To list available provisioning profiles, run $ appbuilder provision.
+        To list available provisioning profiles, run $ appbuilder provision
 --[/]--
 
 --[certificate-request]--

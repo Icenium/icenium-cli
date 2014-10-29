@@ -19,10 +19,8 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.5.1  
-Release date: 2014, September 18 
-
-> Telerik AppBuilder 2.5.1 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-1" target="_blank">Telerik AppBuilder 2.5.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
+Latest version: Telerik AppBuilder 2.6  
+Release date: 2014, October 30
 
 ### System Requirements
 
@@ -56,7 +54,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * OS X Mavericks
 * Node.js 0.10.22 or a later stable official release
 
-> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>. 
+> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager or Homebrew. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.<br/>For more information about Homebrew, see <a href="http://brew.sh/" target="_blank">the Homebrew web page</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -79,7 +77,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 > The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 
-> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
+> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -239,10 +237,8 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.5.1 
-Release date: 2014, September 18
-
-> Telerik AppBuilder 2.5.1 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-1" target="_blank">Telerik AppBuilder 2.5.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
+Latest version: Telerik AppBuilder 2.6 
+Release date: 2014, October 30
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
