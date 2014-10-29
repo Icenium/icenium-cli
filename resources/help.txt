@@ -506,8 +506,8 @@ To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
-<Number of Retries> is the number of times that the AppBuilder CLI will retry to execute the command before quitting. The AppBuilder CLI
-     waits 10 seconds between retries. If not set, the default number of retries is 10.
+<Number of Retries> is the number of times that the AppBuilder CLI will check if the emulator is running before quitting. 
+    The AppBuilder CLI waits 10 seconds between retries. If not set, the default number of retries is 10.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -528,8 +528,8 @@ Options:
             To list available certificates, run $ appbuilder certificate
     --avd - Sets the Android virtual device on which you want to run your app. 
             To list the available Android virtual devices, run $ android list avd
-    --retryCount - Sets the number of times that AppBuilder CLI will retry to execute the command before quitting.
-            If not set, the default number of retries is 10.
+    --retryCount - Sets the number of times that AppBuilder CLI will check if the emulator is running before quitting.
+            The AppBuilder CLI waits 10 seconds between retries. If not set, the default number of retries is 10.
 --[/]--
 
 --[emulate|ios]--
