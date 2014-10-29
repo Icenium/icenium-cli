@@ -24,9 +24,9 @@ Project development commands:
     simulate                        Runs the current project in the device simulator.
     emulate                         Runs the current project in the selected platform emulator.
     remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
-    plugin                          Lists all installed or available plugins for your project
-    plugin add                      Enables plugin into your project
-    plugin remove                   Disables plugin into your project
+    plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
+    plugin add                      Enables a core, integrated or verified plugin for your project.
+    plugin remove                   Disables a core, integrated, or verified plugin for your project.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
@@ -415,16 +415,13 @@ Options:
 
 --[plugin]--
 Usage:
-    $ appbuilder plugin [Command]
+    $ appbuilder plugin [<Command>]
 
-Lists all installed or available plugins for your project.
-If --available option is specified, lists all available plugins for current cordova version and all Telerik Verified Marketplace Plugins.
-
-You must run the plugin command with a related command.
+Lists all core, integrated and verified plugins that are currently enabled for your project.
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
-    add - Enables plugin into your project
-    remove - Disables plugin into your project
+    add - Enables a core, integrated or verified plugin for your project.
+    remove - Disables a core, integrated or verified plugin for your project.
     find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
             URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry.
@@ -433,17 +430,24 @@ You must run the plugin command with a related command.
 
 --[plugin|add]--
 Usage:
-    $ appbuilder plugin add [<Name>]
+    $ appbuilder plugin add --available
+    $ appbuilder plugin add <Name>
 
-Enables plugin into your project.
-If --available option is specified, lists all available plugins that are not installed.
+Enables a core, integrated or verified plugin for your project. 
+
+<Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
+
+Options:
+    --available - Lists all plugins that are currently available for your project.
 --[/]--
 
 --[plugin|remove]--
 Usage:
-    $ appbuilder plugin remove [<Name>]
+    $ appbuilder plugin remove <Name>
 
-Disables plugin into your project.
+Disables a core, integrated or verified plugin from your project.
+
+<Name> is the name or ID of the plugin as listed by $ appbuilder plugin
 --[/]--
 
 --[plugin|find]--
@@ -493,7 +497,7 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--retryCount NumberOfRetries]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--retryCount <Number of Retries>]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
@@ -501,9 +505,9 @@ your app runs in the default emulator or the currently running emulator, if any.
 To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Name> is the name of the AVD that you want to use as listed by $ android list avd
-<NumberOfRetries> is the count of the retries that will be executed before the command fails in case its unable to start the simulator.
-Default value is 10. There's 10 seconds gap between the retries.
+<Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
+<Number of Retries> is the number of times that the AppBuilder CLI will check if the emulator is running before quitting. 
+    The AppBuilder CLI waits 10 seconds between retries. If not set, the default number of retries is 10.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -521,7 +525,11 @@ Options:
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
             a certificate by index or name.
-            To list available certificates, run $ appbuilder certificate.
+            To list available certificates, run $ appbuilder certificate
+    --avd - Sets the Android virtual device on which you want to run your app. 
+            To list the available Android virtual devices, run $ android list avd
+    --retryCount - Sets the number of times that AppBuilder CLI will check if the emulator is running before quitting.
+            The AppBuilder CLI waits 10 seconds between retries. If not set, the default number of retries is 10.
 --[/]--
 
 --[emulate|ios]--
@@ -537,6 +545,7 @@ Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
     You are running the Telerik AppBuilder CLI on OS X.
     You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
+    You have installed Xcode. The version of Xcode must be compatible with the ios-sim npm package.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
@@ -775,16 +784,16 @@ Builds the project and uploads the application to Telerik AppManager.
 After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
 
 <Platform> is the target distribution platform. You can set ios, android or wp8.
-<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
         a certificate by index or name.
-        To list available certificates, run $ appbuilder certificate.
+        To list available certificates, run $ appbuilder certificate
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
-        To list available provisioning profiles, run $ appbuilder provision.
+        To list available provisioning profiles, run $ appbuilder provision
 --[/]--
 
 --[certificate-request]--

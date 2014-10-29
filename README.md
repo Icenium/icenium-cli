@@ -19,10 +19,8 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.5.1  
-Release date: 2014, September 18 
-
-> Telerik AppBuilder 2.5.1 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-1" target="_blank">Telerik AppBuilder 2.5.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
+Latest version: Telerik AppBuilder 2.6  
+Release date: 2014, October 30
 
 ### System Requirements
 
@@ -56,7 +54,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * OS X Mavericks
 * Node.js 0.10.22 or a later stable official release
 
-> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>. 
+> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager or Homebrew. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.<br/>For more information about Homebrew, see <a href="http://brew.sh/" target="_blank">the Homebrew web page</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -79,7 +77,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 > The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 
-> You can install and maintain Node.js with Node Version Manager. For more information, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
+> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -172,7 +170,7 @@ To run your app on an Android device, install a QR code reader on the device, in
 $ appbuilder build android --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. Scan the produced QR code on your device and tap the URL to load your project in the AppBuilder companion app.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
 With the Telerik AppBuilder companion app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik AppBuilder companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>.
 
@@ -182,7 +180,7 @@ To run your app on an iOS device, install the Telerik AppBuilder companion app o
 $ appbuilder build ios --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. 
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
 With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
 
@@ -239,10 +237,8 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.5.1 
-Release date: 2014, September 18
-
-> Telerik AppBuilder 2.5.1 is a maintenance release. For a complete list of the bug fixes available in Telerik AppBuilder 2.5.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5-1" target="_blank">Telerik AppBuilder 2.5.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.5, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-5" target="_blank">Telerik AppBuilder 2.5 Release Notes</a>.
+Latest version: Telerik AppBuilder 2.6 
+Release date: 2014, October 30
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -263,8 +259,11 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
          | Develop with Apache Cordova 3.0.0 or later | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Migrate between supported Apache Cordova versions | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Enable and disable the core Apache Cordova plugins | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-         | Enable and disable the integrate Apache Cordova plugins | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+         | Enable and disable the integrated Apache Cordova plugins | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+         | Enable and disable the Telerik verified plugins | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Fetch custom Apache Cordova plugins from the Apache Cordova Plugin Registry | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+         | Enable and disable plugins in the debug and release build configurations | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+         | Configure plugin variables from the command-line | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Debug apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Manage code signing identities | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
@@ -311,7 +310,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
          | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Run apps in the native Windows Phone 8 emulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Build for distribution in the Windows Phone Store | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-         | Build and upload your app to Telerik AppManager | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+         | Build and upload your app to Telerik AppManager | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 
 The following Telerik AppBuilder features are not applicable to the Telerik AppBuilder CLI and will not become available in a future release.
 
