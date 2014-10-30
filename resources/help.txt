@@ -415,9 +415,11 @@ Options:
 
 --[plugin]--
 Usage:
+    $ appbuilder plugin --available
     $ appbuilder plugin [<Command>]
 
-Lists all core, integrated and verified plugins that are currently enabled for your project.
+Lists all core, integrated and verified plugins that are currently enabled for your project. With the --available
+switch, lists all core, integrated and verified plugins that you can enable in your project.
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     add - Enables a core, integrated or verified plugin for your project.
@@ -426,6 +428,10 @@ Lists all core, integrated and verified plugins that are currently enabled for y
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
             URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry.
             The plugin must be Plugman-compatible.
+
+Options:
+    --available - Lists all plugins that you can enable in your project.
+
 --[/]--
 
 --[plugin|add]--
@@ -438,7 +444,7 @@ Enables a core, integrated or verified plugin for your project.
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
 Options:
-    --available - Lists all plugins that are currently available for your project.
+    --available - Lists all plugins that you can enable in your project.
 --[/]--
 
 --[plugin|remove]--
