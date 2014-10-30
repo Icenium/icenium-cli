@@ -33,7 +33,7 @@
     "cookie": "0.1.0",
     "express": "4.8.5",
     "ffi": "https://github.com/icenium/node-ffi/tarball/master",
-    "fibers": "https://github.com/icenium/node-fibers/tarball/master",
+    "fibers": "https://github.com/icenium/node-fibers/tarball/release",
     "filesize": "2.0.3",
     "hex": "0.0.1",
     "iconv-lite": "0.4.3",
@@ -78,7 +78,7 @@
     "grunt": "0.4.2",
     "grunt-ts": "1.11.2",
     "grunt-contrib-clean": "0.5.0",
-    "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
+    "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/release",
     "grunt-contrib-watch": "0.5.3",
     "grunt-shell": "0.6.4",
     "grunt-contrib-copy": "0.5.0"
