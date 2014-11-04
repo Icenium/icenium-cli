@@ -19,7 +19,6 @@ var knownOpts: any = {
 		"device": String,
 		"file": String,
 		"livesync": Boolean,
-		"timeout": String,
 		"save-to": String,
 		"client": String,
 		"available": Boolean
