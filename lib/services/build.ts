@@ -38,7 +38,7 @@ class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
 $injector.register("buildPropertiesAdjustment", BuildPropertiesAdjustment);
 
 export class BuildService implements Project.IBuildService {
-	private static WinPhoneAetPath = "install/WinPhoneAet";
+	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
 
 	constructor(private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
@@ -64,7 +64,7 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			// escape URLs twice to work around a bug in bit.ly
-			var fullDownloadPath = util.format("%s://%s/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+			var fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
 				this.$config.AB_SERVER_PROTO,
 				this.$config.AB_SERVER, urlKind,
 				querystring.escape(querystring.escape(filesystemPath)),
@@ -491,7 +491,7 @@ export class BuildService implements Project.IBuildService {
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
-			var hostPart = util.format("%s://%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			var hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, appIdentifier.encodeLiveSyncHostUri(hostPart), querystring.escape(liveSyncToken));
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);

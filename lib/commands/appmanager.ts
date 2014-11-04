@@ -45,7 +45,7 @@ class AppManagerUploadCommand implements ICommand {
 
 			this.$logger.info("Successfully uploaded package.");
 
-			var tamUrl = util.format("%s://%s/Services/tam", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			var tamUrl = util.format("%s://%s/appbuilder/Services/tam", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			this.$logger.info("Go to %s to manage your apps.", tamUrl);
 			this.$opener.open(tamUrl);
 		}).future<void>()();

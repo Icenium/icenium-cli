@@ -137,7 +137,7 @@ export class LoginManager implements ILoginManager {
 
 			this.localLogout().wait();
 
-			var logoutUrl = util.format("%s://%s/Mist/Logout", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			var logoutUrl = util.format("%s://%s/appbuilder/Mist/Logout", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			this.$logger.debug("Logout URL is '%s'", logoutUrl);
 			this.$opener.open(logoutUrl);
 
@@ -215,7 +215,7 @@ export class LoginManager implements ILoginManager {
 			this.$fs.futureFromEvent(localhostServer, "listening").wait();
 
 			var port = localhostServer.address().port;
-			var loginUrl = util.format("%s://%s/Mist/ClientLogin?port=%s&client_name=AppBuilderCLI", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
+			var loginUrl = util.format("%s://%s/appbuilder/Mist/ClientLogin?port=%s&client_name=AppBuilderCLI", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
 
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
@@ -260,7 +260,7 @@ export class LoginManager implements ILoginManager {
 
 			var response = this.$httpClient.httpRequest({
 				method: "POST",
-				url: util.format("%s://%s/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
+				url: util.format("%s://%s/appbuilder/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},

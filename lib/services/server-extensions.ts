@@ -91,7 +91,7 @@ export class ServerExtensionsService implements IServerExtensionsService {
 			var downloadUri: string;
 
 			if (this.$config.USE_CDN_FOR_EXTENSION_DOWNLOAD) {
-				var servicesExtensionsUri = serverUri + "/services/extensions";
+				var servicesExtensionsUri = serverUri + "/appbuilder/services/extensions";
 
 				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 
@@ -99,7 +99,7 @@ export class ServerExtensionsService implements IServerExtensionsService {
 				downloadUri = (<any>_.findWhere(extensions["$values"],
 					{ Identifier: packageName })).DownloadUri;
 			} else {
-				downloadUri = serverUri + "/ClientBin/" + packageName + '.xap';
+				downloadUri = serverUri + "/appbuilder/ClientBin/" + packageName + '.xap';
 			}
 
 			return downloadUri;

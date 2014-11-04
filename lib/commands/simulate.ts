@@ -9,7 +9,7 @@ import hostInfo = require("../host-info");
 
 export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
-	private static PLUGINS_API_CONTRACT: string = "/api/cordova/plugins/package";
+	private static PLUGINS_API_CONTRACT: string = "/appbuilder/api/cordova/plugins/package";
 
 	private projectData: IProjectData;
 	private pluginsPath: string;
