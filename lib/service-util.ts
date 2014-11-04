@@ -46,7 +46,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 			var requestOpts: any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
-				path: "/api" + path,
+				path: "/appbuilder/api" + path,
 				method: method,
 				headers: headers,
 				pipeTo: resultStream
@@ -172,7 +172,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 		var req:any = {
 			proto: this.$config.AB_SERVER_PROTO,
 			host: this.$config.AB_SERVER,
-			path: "/api",
+			path: "/appbuilder/api",
 			method: "GET"
 		};
 
