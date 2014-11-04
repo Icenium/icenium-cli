@@ -21,6 +21,7 @@ var knownOpts: any = {
 		"livesync": Boolean,
 		"timeout": String,
 		"save-to": String,
+		"saveTo": String,
 		"client": String,
 		"available": Boolean
 	},
