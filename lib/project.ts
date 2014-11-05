@@ -169,8 +169,18 @@ export class Project implements Project.IProject {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
 			if (projectDir) {
-				var data = this.$fs.readJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait();
-				this.projectData = data;
+				var projFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+				try {
+					var data = this.$fs.readJson(projFile).wait();
+					this.projectData = data;
+				} catch (err) {
+					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
+						"Consider restoring an earlier version from your source control or backup." + os.EOL +
+						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
+						"Additional technical info: %s",
+						suppressCommandHelp: true},
+						projFile, err.toString());
+				}
 
 				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
