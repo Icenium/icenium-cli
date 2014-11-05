@@ -20,6 +20,7 @@ var knownOpts: any = {
 		"file": String,
 		"livesync": Boolean,
 		"save-to": String,
+		"saveTo": String,
 		"client": String,
 		"available": Boolean
 	},
