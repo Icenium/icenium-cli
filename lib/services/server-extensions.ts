@@ -35,8 +35,6 @@ export class ServerExtensionsService implements IServerExtensionsService {
 	public prepareExtension(packageName: string): IFuture<void> {
 		return ((): void => {
 			var extensionPath = this.getExtensionPath(packageName);
-			this.$fs.createDirectory(extensionPath).wait();
-			this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
 
 			var cachedVersion = "0.0.0.0";
 			var serverVersion = this.$serverConfiguration.assemblyVersion.wait();
@@ -50,12 +48,24 @@ export class ServerExtensionsService implements IServerExtensionsService {
 			if (helpers.versionCompare(cachedVersion, serverVersion) < 0) {
 				this.$logger.info("Updating %s package...", packageName);
 				var zipFileName = path.join(this.cacheDir, packageName + ".zip");
-				this.downloadPackage(packageName, zipFileName).wait();
-				this.$fs.deleteDirectory(extensionPath).wait();
-				this.$fs.unzip(zipFileName, extensionPath).wait();
-				this.$fs.deleteFile(zipFileName).wait();
-				this.extensionVersions[packageName] = serverVersion;
-				this.saveVersionsFile().wait();
+
+				if(this.$fs.exists(extensionPath).wait()) {
+					this.$fs.deleteDirectory(extensionPath).wait();
+				}
+
+				this.$fs.createDirectory(extensionPath).wait();
+				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
+
+				try {
+					this.downloadPackage(packageName, zipFileName).wait();
+					this.$fs.unzip(zipFileName, extensionPath).wait();
+					this.$fs.deleteFile(zipFileName).wait();
+					this.extensionVersions[packageName] = serverVersion;
+					this.saveVersionsFile().wait();
+				} catch(err) {
+					this.$fs.deleteDirectory(extensionPath).wait();
+					throw err;
+				}
 				this.$logger.info("Finished updating %s package.", packageName);
 			}
 		}).future<void>()();
