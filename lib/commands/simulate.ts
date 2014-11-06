@@ -60,19 +60,24 @@ export class SimulateCommand implements ICommand {
 			var pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + SimulateCommand.PLUGINS_API_CONTRACT;
 
 			if (!this.$fs.exists(this.pluginsPath).wait()) {
-				this.$logger.info("Downloading core Cordova plugins...");
+				try {
+					this.$logger.info("Downloading core Cordova plugins...");
 
-				this.$fs.createDirectory(this.pluginsPath).wait();
-				var zipPath = path.join(this.pluginsPath, "plugins.zip");
+					this.$fs.createDirectory(this.pluginsPath).wait();
+					var zipPath = path.join(this.pluginsPath, "plugins.zip");
 
-				this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
-				var zipFile = this.$fs.createWriteStream(zipPath);
-				this.$server.cordova.getPluginsPackage(zipFile).wait();
+					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
+					var zipFile = this.$fs.createWriteStream(zipPath);
+					this.$server.cordova.getPluginsPackage(zipFile).wait();
 
-				this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
-				this.$fs.unzip(zipPath, this.pluginsPath).wait();
+					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
+					this.$fs.unzip(zipPath, this.pluginsPath).wait();
 
-				this.$logger.info("Finished downloading plugins.");
+					this.$logger.info("Finished downloading plugins.");
+				} catch(err) {
+					this.$fs.deleteDirectory(this.pluginsPath).wait();
+					throw err;
+				}
 			}
 		}).future<void>()();
 	}
