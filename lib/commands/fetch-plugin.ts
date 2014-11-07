@@ -3,15 +3,15 @@
 
 import service = require("../services/cordova-plugins");
 import validUrl = require("valid-url");
-import commandParams = require("../common/command-params");
 
 export class FetchPluginCommand implements ICommand {
 	constructor(private $logger: ILogger,
 				private $fs: IFileSystem,
-				private $cordovaPluginsService: service.CordovaPluginsService) {
+				private $cordovaPluginsService: service.CordovaPluginsService,
+				private $stringParameterBuilder: IStringParameterBuilder) {
 	}
 
-	public allowedParameters = [new commandParams.StringCommandParameter(true, "You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.")];
+	public allowedParameters = [this.$stringParameterBuilder.createMandatoryParameter("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.")];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

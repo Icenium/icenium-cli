@@ -4,7 +4,7 @@
 
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
-var options:any = require("../options");
+var options: any = require("../options");
 
 interface IAppStoreApplication {
 	AppleID: number;
@@ -56,7 +56,7 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 		super($server, $logger, $prompter, $errors);
 	}
 
-    allowedParameters = [new commandParams.StringCommandParameter(false), new commandParams.StringCommandParameter(false)];
+    allowedParameters = [new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
 	
     execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -93,12 +93,13 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		public $prompter: IPrompter,
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
-		private $identityManager: Server.IIdentityManager) {
+		private $identityManager: Server.IIdentityManager,
+		private $stringParameterBuilder: IStringParameterBuilder) {
 		super($server, $logger, $prompter, $errors);
 	}
     
-    allowedParameters = [new commandParams.StringCommandParameter(true, "No application specified. Specify an application that is ready for upload in iTunes Connect."),
-		new commandParams.StringCommandParameter(false), new commandParams.StringCommandParameter(false)];
+	allowedParameters = [this.$stringParameterBuilder.createMandatoryParameter("No application specified. Specify an application that is ready for upload in iTunes Connect."),
+		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
         
 	execute(args:string[]): IFuture<void> {
 		return (() => {
