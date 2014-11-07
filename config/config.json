@@ -1,7 +1,7 @@
 {
-	"AB_SERVER_PROTO": "http",
-	"AB_SERVER": "localhost",
-	"DEBUG": true,
+	"AB_SERVER_PROTO": "https",
+	"AB_SERVER": "icelocal.icenium.com",
+	"DEBUG": false,
 	"PROXY_TO_FIDDLER": false,
 	"DEFAULT_CORDOVA_PROJECT_TEMPLATE": "KendoUI.TabStrip",
 	"DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE": "Blank",
