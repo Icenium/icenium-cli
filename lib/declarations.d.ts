@@ -18,11 +18,11 @@ declare module Server {
 	}
 
 	interface IServiceContractGenerator {
-		generate(): IServiceContractClientCode;
+		generate(): IFuture<Server.IServiceContractClientCode>;
 	}
 
 	interface IServiceContractProvider {
-		getApi(): Server.Contract.IService[];
+		getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract>;
 	}
 
 	interface IIdentityManager {

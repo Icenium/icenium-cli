@@ -64,14 +64,14 @@ export class RemoteProjectService implements IRemoteProjectService {
 	public getProjectProperties(projectName: string): IFuture<any> {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
-			var properties = solutionData.Items[0].Properties;
+			var properties = solutionData.Items[0]["Properties"];
 			properties.ProjectName = projectName;
 			return properties;
 		}).future()();
 	}
 
-	private getSolutionData(projectName: string): IFuture<any> {
-		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, "True"));
+	private getSolutionData(projectName: string): IFuture<Server.SolutionData> {
+		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, true));
 	}
 }
 $injector.register("remoteProjectService", RemoteProjectService);
