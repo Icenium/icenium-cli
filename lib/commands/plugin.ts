@@ -7,13 +7,7 @@ export class ListPluginCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var plugins: IPlugin[] = [];
-			if(options.available) {
-				plugins = this.$pluginsService.getAvailablePlugins().wait();
-			} else {
-				plugins = this.$pluginsService.getInstalledPlugins().wait();
-			}
-
+			var plugins = options.available ? this.$pluginsService.getAvailablePlugins() : this.$pluginsService.getInstalledPlugins();
 			this.$pluginsService.printPlugins(plugins);
 		}).future<void>()();
 	}
@@ -26,8 +20,8 @@ export class AddPluginCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if(options.available){
-				var installedPlugins = this.$pluginsService.getInstalledPlugins().wait();
-				var plugins = _.reject(this.$pluginsService.getAvailablePlugins().wait(), plugin => _.any(installedPlugins, installedPlugin => installedPlugin.name === plugin.name));
+				var installedPlugins = this.$pluginsService.getInstalledPlugins();
+				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), plugin => _.any(installedPlugins, installedPlugin => installedPlugin.name === plugin.name));
 				this.$pluginsService.printPlugins(plugins);
 			} else {
 				this.$pluginsService.addPlugin(args[0]).wait();

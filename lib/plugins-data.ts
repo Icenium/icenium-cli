@@ -11,36 +11,50 @@ export enum PluginType {
 
 export class CordovaPluginData implements IPlugin {
 	constructor(public name: string,
-		public type: PluginType) { }
+		public identifier: string,
+		public version: string,
+		public description: string,
+		public url: string,
+		public type: PluginType,
+		public variables: string[],
+		public platforms: string[]) { }
 
 	public get pluginInformation(): string[] {
 		var nameRow = util.format("    Plugin: %s", this.name);
-		return [nameRow];
+		var identifierRow = util.format("    Identifier: %s", this.identifier);
+		var versionRow = util.format("    Version: %s", this.version);
+		var urlRow = util.format("    Url: %s", this.url);
+		var platformsRow = util.format("    Platforms: %s", this.platforms.join(","));
+		return [nameRow, identifierRow, versionRow, urlRow, platformsRow];
 	}
 
 	public toProjectDataRecord(): string {
-		return this.name;
+		return this.identifier;
 	}
 }
 
 export class MarketplacePluginData extends CordovaPluginData {
-	constructor(public name: string,
-		public identifier: string,
-		public version: string,
+	constructor(name: string,
+		identifier: string,
+		version: string,
+		description: string,
+		url: string,
+		variables: string[],
+		platforms: string[],
 		public downloads: number,
-		public gitRepoUrl: string,
 		public demoAppRepositoryUrl: string) {
-		super(name, PluginType.MarketplacePlugin);
+		super(name, identifier, version, description, url, PluginType.MarketplacePlugin, variables, platforms);
 	}
 
 	public get pluginInformation(): string[] {
 		var nameRow = util.format("    Plugin: %s", this.name);
+		var identifierRow = util.format("    Identifier: %s", this.identifier);
 		var versionRow = util.format("    Version: %s", this.version);
-		var urlRow = util.format("    Url: %s", this.gitRepoUrl);
+		var urlRow = util.format("    Url: %s", this.url);
 		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
 		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
 
-		return [nameRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
+		return [nameRow, identifierRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
 	}
 
 	public toProjectDataRecord(): string {

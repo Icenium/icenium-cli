@@ -82,6 +82,10 @@ export class CordovaService implements Server.ICordovaServiceContract {
 		return this.$serviceProxy.call<any>('GetLiveSyncUrl', 'GET', '/cordova/liveSyncUrl' + '?' + querystring.stringify({ 'longUrl': longUrl }), 'application/json', null, null);
 	}
 
+	getMarketplacePluginData(pluginId: string, version: string): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetMarketplacePluginData', 'GET', ['/cordova/marketplace', encodeURI(pluginId.replace(/\\/g, '/')), encodeURI(version.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+
 	getMigrationData(): IFuture<any> {
 		return this.$serviceProxy.call<any>('GetMigrationData', 'GET', '/cordova/migration-data', 'application/json', null, null);
 	}
@@ -98,14 +102,16 @@ export class CordovaService implements Server.ICordovaServiceContract {
 		return this.$serviceProxy.call<any>('GetProjectCordovaPlugins', 'GET', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
-	migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<any> {
-		return this.$serviceProxy.call<any>('Migrate', 'POST', ['/cordova/migrate', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+	migrate(solutionName: string, projectName: string, targetVersion: string, sourceVersion?: string): IFuture<any> {
+		if(sourceVersion) {
+			return this.$serviceProxy.call<any>('Migrate', 'POST', ['/cordova/migrate', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+		}
+		return this.$serviceProxy.call<any>('Migrate', 'POST', ['/cordova/migrate', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'framework'].join('/') + '?' + querystring.stringify({ 'sourceVersion': sourceVersion, 'targetVersion': targetVersion }), 'application/json', null, null);
 	}
 
-	setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('SetCordovaPluginVariable', 'POST', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'variables', encodeURI(pluginId.replace(/\\/g, '/')), encodeURI(variableName.replace(/\\/g, '/'))].join('/'), null, [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
+	setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, value: any, configuration: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('SetCordovaPluginVariable', 'POST', ['/cordova/plugins', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), 'variables', encodeURI(pluginId.replace(/\\/g, '/')), encodeURI(variableName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
 	}
-
 }
 
 export class CryptographicIdentityStoreService implements Server.ICryptographicIdentityStoreServiceContract {
@@ -284,12 +290,12 @@ export class ProjectService implements Server.IProjectServiceContract {
 		return this.$serviceProxy.call<any>('CanLoadSolution', 'EXISTS', ['/projects', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 
-	createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('CreateNewProjectItem', 'POST', ['/projects', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(itemIdentifier.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: any): IFuture<any> {
+		return this.$serviceProxy.call<any>('CreateNewProjectItem', 'POST', ['/projects', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/')), encodeURI(itemIdentifier.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 
-	createProject(solutionName: string, expansionData: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['/projects', encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	createProject(solutionName: string, projectName: string, expansionData: any): IFuture<void> {
+		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['/projects', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 
 	deleteProject(solutionName: string, projectName: string): IFuture<void> {
@@ -348,8 +354,8 @@ export class ProjectService implements Server.IProjectServiceContract {
 		return this.$serviceProxy.call<void>('SaveProjectContents', 'PUT', ['/projects/contents', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'projectContents', value: JSON.stringify(projectContents), contentType: 'application/json'}], null);
 	}
 
-	setProjectProperty(solutionName: string, projectName: string, changeset: any): IFuture<void> {
-		return this.$serviceProxy.call<void>('SetProjectProperty', 'PATCH', ['/projects', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'changeset', value: JSON.stringify(changeset), contentType: 'application/json'}], null);
+	setProjectProperty(solutionName: string, projectName: string, changeset: any, configuration: string): IFuture<void> {
+		return this.$serviceProxy.call<void>('SetProjectProperty', 'PATCH', ['/projects', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{name: 'changeset', value: JSON.stringify(changeset), contentType: 'application/json'}], null);
 	}
 
 	upgradeSolution(solutionName: string): IFuture<void> {
@@ -402,6 +408,20 @@ export class SettingsService implements Server.ISettingsServiceContract {
 
 	updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: any): IFuture<void> {
 		return this.$serviceProxy.call<void>('UpdateSettingsProjectIdentifier', 'PATCH', ['/settings/updateProjectIdentifier', encodeURI(solutionName.replace(/\\/g, '/')), encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'newProjectIdentity', value: JSON.stringify(newProjectIdentity), contentType: 'application/json'}], null);
+	}
+
+}
+
+export class StatusService implements Server.IStatusServiceContract {
+	constructor(private $serviceProxy: Server.IServiceProxy) {
+	}
+
+	getLinuxBuildMachineStatus(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetLinuxBuildMachineStatus', 'GET', '/status/build/android', 'application/json', null, null);
+	}
+
+	getMacBuildMachineStatus(): IFuture<any> {
+		return this.$serviceProxy.call<any>('GetMacBuildMachineStatus', 'GET', '/status/build/iOS', 'application/json', null, null);
 	}
 
 }
@@ -603,6 +623,7 @@ export class Server {
 	public projects = $injector.resolve(ProjectService);
 	public rawSettings = $injector.resolve(RawSettingsService);
 	public settings = $injector.resolve(SettingsService);
+	public status = $injector.resolve(StatusService);
 	public tam = $injector.resolve(TamService);
 	public tap = $injector.resolve(TapService);
 	public versioncontrol = $injector.resolve(VersionControlService);
