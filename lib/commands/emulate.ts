@@ -17,6 +17,8 @@ export class EmulateAndroidCommand implements ICommand {
 				private $buildService: Project.IBuildService,
 				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices) { }
 
+	public allowedParameters: ICommandParameter[] = [];
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$androidEmulatorServices.checkAvailability().wait();
@@ -46,6 +48,8 @@ export class EmulateIosCommand implements ICommand {
 		this.$project.ensureProject();
 	}
 
+	public allowedParameters: ICommandParameter[] = [];
+
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$iOSEmulatorServices.checkAvailability().wait();
@@ -74,6 +78,8 @@ export class EmulateWp8Command implements ICommand {
 		,private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices) {
 		this.$project.ensureProject();
 	}
+
+	public allowedParameters: ICommandParameter[] = [];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

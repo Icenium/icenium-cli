@@ -6,7 +6,16 @@ import util = require("util");
 import os = require("os");
 
 export class FindPluginsCommand implements ICommand {
-	constructor(private $cordovaPluginsService: service.CordovaPluginsService) {
+	constructor(private $cordovaPluginsService: service.CordovaPluginsService,
+		private $errors: IErrors) {
+	}
+
+	public allowedParameters: ICommandParameter[] = [];
+
+	public canExecute(args: string[]): IFuture<boolean> {
+		return (() => {
+			return true;
+		}).future<boolean>()();
 	}
 
 	public execute(args: string[]): IFuture<void> {

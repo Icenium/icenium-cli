@@ -64,7 +64,7 @@ export class SamplesService implements ISamplesService {
 	public cloneSample(sampleName: string): IFuture<void> {
 		return (() => {
 			var cloneTo = options.path || sampleName;
-			if(this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
+			if (this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 
@@ -84,7 +84,7 @@ export class SamplesService implements ISamplesService {
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
-				var projectFile = _.first(commonHelpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME ));
+				var projectFile = _.first(commonHelpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
 				var projectDir = path.dirname(projectFile);
 				var files = commonHelpers.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {
@@ -118,7 +118,7 @@ export class SamplesService implements ISamplesService {
 				}
 			});
 
-			var outputLines:string[] = [];
+			var outputLines: string[] = [];
 			_.each(categories, category => {
 				if (category.samples.length == 0) {
 					return;
@@ -185,6 +185,3 @@ export class SamplesService implements ISamplesService {
 	}
 }
 $injector.register("samplesService", SamplesService);
-helpers.registerCommand("samplesService", "sample|*list", (samplesService, args) => samplesService.printSamplesInformation());
-helpers.registerCommand("samplesService", "sample|clone", (samplesService, args) => samplesService.cloneSample(args[0]));
-

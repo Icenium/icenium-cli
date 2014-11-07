@@ -129,7 +129,7 @@ export class ErrorsStub implements IErrors {
 	}
 
 	beginCommand(action:() => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		throw new Error("not supported");
+		return action();
 	}
 
 	verifyHeap(message: string): void {
@@ -159,6 +159,10 @@ export class LoginManager implements ILoginManager {
 	}
 
 	ensureLoggedIn(): IFuture<void> {
+		return undefined;
+	}
+
+	telerikLogin(user: string, password: string): IFuture<void> {
 		return undefined;
 	}
 }
@@ -217,5 +221,32 @@ export class PathFilteringServiceStub implements IPathFilteringService {
 	}
 	filterIgnoredFiles(files: string[], rules: string[]) : string[] {
 		return files;
+	}
+}
+
+export class StaticConfig implements IStaticConfig {
+	public PROJECT_FILE_NAME = ".abproject";
+	public CLIENT_NAME = "appbuilder";
+	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
+	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
+	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
+
+	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
+
+	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
+	public QR_SIZE = 300;
+	public version = "1";
+	helpTextPath = "help";
+	adbFilePath = "adbFilePath";
+}
+
+export class HooksService implements IHooksService {
+	initialize(commandName: string): void {
+	}
+	executeBeforeHooks(): IFuture<void> {
+		return (() => { }).future<void>()();
+	}
+	executeAfterHooks(): IFuture<void> {
+		return (() => { }).future<void>()();
 	}
 }

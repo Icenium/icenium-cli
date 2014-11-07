@@ -18,8 +18,8 @@ $injector.require("pluginsService", "./services/plugins-service");
 
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
 $injector.require("samplesService", "./services/samples-service");
-$injector.requireCommand("sample|*list", "./services/samples-service");
-$injector.requireCommand("sample|clone", "./services/samples-service");
+$injector.requireCommand("sample|*list", "./commands/samples");
+$injector.requireCommand("sample|clone", "./commands/samples");
 $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
@@ -47,11 +47,13 @@ $injector.requireCommand("dev-generate-api", "./commands/generate-server-api");
 
 $injector.require("loginManager", "./login");
 $injector.require("userDataStore", "./login");
-$injector.requireCommand("login", "./login");
-$injector.requireCommand("logout", "./login");
+
 $injector.requireCommand("dev-telerik-login", "./login");
 
 $injector.require("buildPropertiesAdjustment", "./services/build");
+$injector.requireCommand("login", "./commands/authentication");
+$injector.requireCommand("logout", "./commands/authentication");
+
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
 
@@ -60,6 +62,7 @@ $injector.require("project", "./project");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.requireCommand("create|hybrid", "./commands/project");
 $injector.requireCommand("create|native", "./commands/project");
+
 $injector.requireCommand("init|hybrid", "./commands/project");
 $injector.requireCommand("init|native", "./commands/project");
 $injector.requireCommand("prop|add", "./project");
@@ -68,9 +71,8 @@ $injector.requireCommand("prop|rm", "./project");
 $injector.requireCommand("prop|remove", "./project");
 $injector.requireCommand("prop|print", "./project");
 
-
-$injector.requireCommand("cloud|*list", "./remote-projects");
-$injector.requireCommand("cloud|export", "./remote-projects");
+$injector.requireCommand("cloud|*list", "./commands/cloud-projects");
+$injector.requireCommand("cloud|export", "./commands/cloud-projects");
 
 $injector.requireCommand("device|*list", "./commands/list-devices");
 $injector.requireCommand("device|log", "./commands/open-device-log-stream");
@@ -96,7 +98,6 @@ $injector.requireCommand("certificate-request|remove", "./commands/cryptographic
 $injector.requireCommand("certificate-request|download", "./commands/cryptographic-identities");
 
 $injector.requireCommand("user", "./commands/user-status");
-
 $injector.requireCommand("appstore|list", "./commands/itunes-connect");
 $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 $injector.requireCommand("appmanager|upload", "./commands/appmanager");
@@ -118,4 +119,4 @@ $injector.require("pathFilteringService", "./services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
-
+$injector.require("remoteProjectService", "./services/remote-projects-service");

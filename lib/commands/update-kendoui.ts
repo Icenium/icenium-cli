@@ -15,6 +15,8 @@ class UpdateKendoUICommand implements ICommand {
 		,private $httpClient: Server.IHttpClient
 		) {	}
 
+	allowedParameters: ICommandParameter[] = [];
+
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();

@@ -50,5 +50,7 @@ class AppManagerUploadCommand implements ICommand {
 			this.$opener.open(tamUrl);
 		}).future<void>()();
 	}
+
+	allowedParameters : ICommandParameter[] = [];
 }
 $injector.registerCommand("appmanager|upload", AppManagerUploadCommand);

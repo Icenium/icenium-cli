@@ -8,6 +8,7 @@ import helpers = require("./../helpers");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
+import commandParams = require("../common/command-params");
 
 interface IPlatformSpecificFileName {
 	platform: string;
@@ -26,7 +27,10 @@ export class LiveSyncCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $project: Project.IProject,
-		private $dispatcher: IFutureDispatcher) { }
+		private $dispatcher: IFutureDispatcher,
+		private $stringParameter: ICommandParameter) { }
+
+	public allowedParameters = [this.$stringParameter];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

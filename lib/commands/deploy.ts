@@ -5,6 +5,8 @@ import util = require("util");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import iOSDeploymentValidatorLib = require("./../validators/ios-deployment-validator");
+import commandParams = require("../common/command-params");
+
 
 export class DeployCommand implements ICommand {
 	constructor(private $devicesServices: Mobile.IDevicesServices,
@@ -13,7 +15,10 @@ export class DeployCommand implements ICommand {
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
 		private $commandsService: ICommandsService,
-		private $errors: IErrors) { }
+		private $errors: IErrors,
+		private $stringParameter: ICommandParameter) { }
+
+	public allowedParameters = [this.$stringParameter];
 
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {

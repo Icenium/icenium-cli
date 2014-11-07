@@ -7,6 +7,7 @@ export class PostInstallCommand implements ICommand {
 		private $staticConfig: IStaticConfig) { }
 
 	public disableAnalytics = true;
+	public allowedParameters: ICommandParameter[] = [];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

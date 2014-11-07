@@ -2,7 +2,7 @@
 "use strict";
 import minimatch = require("minimatch");
 import path = require("path");
-var options:any = require("./options");
+var options: any = require("./options");
 import util = require("util");
 import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
@@ -32,11 +32,11 @@ export class Project implements Project.IProject {
 			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
 			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
 
-			if (this.projectData && this.projectData["TemplateAppName"]) {
+			if(this.projectData && this.projectData["TemplateAppName"]) {
 				this.$errors.fail({
 					formatStr: "This hybrid project targets Apache Cordova 2.x. " +
-						"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
-						"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.",
+					"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
+					"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.",
 					suppressCommandHelp: true
 				});
 			}
@@ -71,7 +71,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			var result: string[] = [], dir: string, fileMask: RegExp;
 
-			if (this.projectType === this.$projectTypes.Cordova) {
+			if(this.projectType === this.$projectTypes.Cordova) {
 				dir = this.getProjectDir().wait();
 				fileMask = /^cordova\.(\w*)\.js$/i;
 			} else { // NativeScript
@@ -82,7 +82,7 @@ export class Project implements Project.IProject {
 			var files = this.$fs.readDirectory(dir).wait();
 			var platformFiles = _.each(files, (file) => {
 				var matches = file.match(fileMask);
-				if (matches) {
+				if(matches) {
 					result.push(matches[1].toLowerCase());
 				}
 			});
@@ -93,23 +93,23 @@ export class Project implements Project.IProject {
 
 	public getProjectDir(): IFuture<string> {
 		return (() => {
-			if (this.cachedProjectDir !== "") {
+			if(this.cachedProjectDir !== "") {
 				return this.cachedProjectDir;
 			}
 			this.cachedProjectDir = null;
 
 			var projectDir = path.resolve(options.path || ".");
-			while (true) {
+			while(true) {
 				this.$logger.trace("Looking for project in '%s'", projectDir);
 
-				if (this.$fs.exists(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait()) {
+				if(this.$fs.exists(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait()) {
 					this.$logger.debug("Project directory is '%s'.", projectDir);
 					this.cachedProjectDir = projectDir;
 					break;
 				}
 
 				var dir = path.dirname(projectDir);
-				if (dir === projectDir) {
+				if(dir === projectDir) {
 					this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
 					break;
 				}
@@ -154,7 +154,7 @@ export class Project implements Project.IProject {
 	}
 
 	private isFileExcluded(path: string, exclusionList: string[]): boolean {
-		return Boolean(_.find(exclusionList, (pattern) => minimatch(path, pattern, {nocase: true})));
+		return Boolean(_.find(exclusionList, (pattern) => minimatch(path, pattern, { nocase: true })));
 	}
 
 	public saveProject(projectDir?: string): IFuture<void> {
@@ -182,7 +182,7 @@ export class Project implements Project.IProject {
 						projFile, err.toString());
 				}
 
-				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if(this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
@@ -195,9 +195,10 @@ export class Project implements Project.IProject {
 
 	public createNewProject(projectType: number, projectName: string): IFuture<void> {
 		return ((): void => {
-			if (!projectName) {
+			if(!projectName) {
 				this.$errors.fail("No project name specified.")
 			}
+
 			this.$projectNameValidator.validate(projectName);
 
 			var projectDir = this.getNewProjectDir();
@@ -208,19 +209,18 @@ export class Project implements Project.IProject {
 	public createProjectFileFromExistingProject(projectType: number): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
-
-			if (!this.$fs.exists(projectDir).wait()) {
+			if(!this.$fs.exists(projectDir).wait()) {
 				this.$errors.fail({ formatStr: util.format("The specified folder '%s' does not exist!", projectDir), suppressCommandHelp: true });
 			}
 
 			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
-			if (this.$fs.exists(projectFile).wait()) {
+			if(this.$fs.exists(projectFile).wait()) {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
 
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
-			if (!properties) {
+			if(!properties) {
 				properties = this.alterPropertiesForNewProject({}, appname);
 			}
 
@@ -228,7 +228,7 @@ export class Project implements Project.IProject {
 				this.createProjectFile(projectDir, projectType, properties).wait();
 				this.$logger.info("Successfully initialized project in the folder.");
 			}
-			catch (e) {
+			catch(e) {
 				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
 			}
 
@@ -238,19 +238,19 @@ export class Project implements Project.IProject {
 	public getSupportedPlugins(): IFuture<string[]> {
 		return (() => {
 			var version: string;
-			if (this.projectData) {
+			if(this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
 				version = _.last(this.$cordovaMigrationService.getSupportedVersions().wait());
 			}
-			
+
 			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
 		}).future<string[]>()();
 	}
 
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return ((): void => {
-			if (newVersion === this.projectData.FrameworkVersion) {
+			if(newVersion === this.projectData.FrameworkVersion) {
 				return;
 			}
 
@@ -271,7 +271,7 @@ export class Project implements Project.IProject {
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
 					successfullyChanged.push(cordovaJsFileName);
 				});
-			} catch (error) {
+			} catch(error) {
 				_.each(successfullyChanged, file => {
 					this.$logger.trace("Reverting %s", file);
 					this.$fs.copyFile(file + backupSuffix, file).wait();
@@ -291,11 +291,11 @@ export class Project implements Project.IProject {
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<IProjectData> {
 		return ((): any => {
 			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
- 				var extension = path.extname(file);
- 				return extension == ".proj" || extension == ".iceproj";
+				var extension = path.extname(file);
+				return extension == ".proj" || extension == ".iceproj";
 			});
 
-			if (projectFile) {
+			if(projectFile) {
 				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), false).wait();
 			}
 
@@ -312,7 +312,7 @@ export class Project implements Project.IProject {
 
 			templateFileName = path.join(templatesDir, this.$templatesService.getTemplateFilename(projectType, template));
 			this.$logger.trace("Using template '%s'", templateFileName);
-			if (this.$fs.exists(templateFileName).wait()) {
+			if(this.$fs.exists(templateFileName).wait()) {
 				projectDir = path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
@@ -330,7 +330,7 @@ export class Project implements Project.IProject {
 					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				}
-				catch (ex) {
+				catch(ex) {
 					this.$fs.deleteDirectory(projectDir).wait();
 					throw ex;
 				}
@@ -339,7 +339,7 @@ export class Project implements Project.IProject {
 					options.template,
 					os.EOL,
 					(projectType === this.$projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
-				this.$errors.fail({formatStr: message, suppressCommandHelp: true});
+				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 			}
 		}).future<void>()();
 	}
@@ -355,7 +355,7 @@ export class Project implements Project.IProject {
 		properties.ProjectName = projectName;
 		properties.DisplayName = projectName;
 		var appid = options.appid;
-		if (!options.appid) {
+		if(!options.appid) {
 			appid = this.generateDefaultAppId(projectName);
 			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
 		}
@@ -363,17 +363,17 @@ export class Project implements Project.IProject {
 		properties.AppIdentifier = appid;
 		properties.ProjectGuid = commonHelpers.createGUID();
 
-		if (!properties.WP8ProductID) {
+		if(!properties.WP8ProductID) {
 			properties.WP8ProductID = commonHelpers.createGUID();
 		}
-		if (!properties.WP8PublisherID) {
+		if(!properties.WP8PublisherID) {
 			properties.WP8PublisherID = commonHelpers.createGUID();
 		}
 
 		return properties;
 	}
 
-	private getNewProjectDir() {
+	public getNewProjectDir() {
 		return options.path || process.cwd();
 	}
 
@@ -397,11 +397,14 @@ export class Project implements Project.IProject {
 	private validateProjectData(projectType: number, properties: any): IFuture<void> {
 		return (() => {
 			var updateData: any;
-			var projectSchema = helpers.getProjectFileSchema(projectType).wait();
+			if(!this.propSchema) {
+				this.propSchema = helpers.getProjectFileSchema(projectType).wait();
+			}
+
 			Object.keys(properties).forEach(propertyName => {
-				if (_.has(projectSchema, propertyName)) {
-					if (projectSchema[propertyName].flags) {
-						if (_.isArray(properties[propertyName])) {
+				if(_.has(this.propSchema, propertyName)) {
+					if(this.propSchema[propertyName].flags) {
+						if(_.isArray(properties[propertyName])) {
 							this.projectData[propertyName] = properties[propertyName];
 						} else {
 							this.projectData[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
@@ -413,7 +416,7 @@ export class Project implements Project.IProject {
 					}
 
 					//triggers validation logic
-					this.$projectPropertiesService.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
+					this.$projectPropertiesService.updateProjectProperty({}, "set", propertyName, updateData, this.propSchema, false).wait();
 				}
 			});
 		}).future<void>()();
@@ -423,7 +426,7 @@ export class Project implements Project.IProject {
 		return ((): any => {
 			this.$fs.createDirectory(projectDir).wait();
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
-			if (projectDirFiles.length != 0) {
+			if(projectDirFiles.length != 0) {
 				throw new Error("The specified directory must be empty to create a new project.");
 			}
 		}).future<any>()();
@@ -431,8 +434,8 @@ export class Project implements Project.IProject {
 
 	private generateDefaultAppId(appName: string): string {
 		var sanitizedName = _.filter(appName.split(""), (c) => /[a-zA-Z0-9]/.test(c)).join("");
-		if (sanitizedName) {
-			if (/^\d+$/.test(sanitizedName)) {
+		if(sanitizedName) {
+			if(/^\d+$/.test(sanitizedName)) {
 				sanitizedName = "the" + sanitizedName;
 			}
 			return "com.telerik." + sanitizedName;
@@ -444,9 +447,11 @@ export class Project implements Project.IProject {
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
+			if(!this.propSchema) {
+				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+			}
 
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
-			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, propSchema, true).wait();
+			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, this.propSchema, true).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
 		}).future<void>()();
@@ -455,32 +460,69 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			var propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
-			property = this.$projectPropertiesService.normalizePropertyName(property, propSchema);
+			if(!this.propSchema) {
+				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+			}
+			property = this.$projectPropertiesService.normalizePropertyName(property, this.propSchema);
 
-			if (this.projectData.hasOwnProperty(property)) {
+			if(this.projectData.hasOwnProperty(property)) {
 				this.$logger.out(this.projectData[property]);
-			} else if (property) {
+			} else if(property) {
 				this.$errors.fail("Unrecognized project property '%s'", property);
 			} else {
 				Object.keys(this.projectData).forEach((propName) => {
+					// We get here in case you do not pass property, so we'll print all properties - appbuilder prop print
 					this.$logger.out(propName + ": " + this.projectData[propName]);
 				});
 			}
 		}).future<void>()();
 	}
 
+	private propSchema: any;
+	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
+		return (() => {
+			this.ensureProject();
+
+			if(!this.propSchema) {
+				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+			}
+
+			property = this.$projectPropertiesService.normalizePropertyName(property, this.propSchema);
+
+			if(this.projectData.hasOwnProperty(property)) {
+				var propData = this.propSchema[property];
+				if(!propData) {
+					this.$errors.fail("Unrecognized project property '%s'", property);
+				}
+
+				if(!propData.flags) {
+					if(args.length !== 1) {
+						this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
+					}
+
+					if(mode === "add" || mode === "del") {
+						this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
+					}
+				}
+
+				return true;
+			}
+
+			return false;
+		}).future<boolean>()();
+	}
+
 	public ensureProject() {
-		if (!this.projectData) {
+		if(!this.projectData) {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}
 	}
 
-	public getTempDir(extraSubdir?:string): IFuture<string> {
-		return(() => {
+	public getTempDir(extraSubdir?: string): IFuture<string> {
+		return (() => {
 			var dir = path.join(this.getProjectDir().wait(), ".ab");
 			this.$fs.createDirectory(dir).wait();
-			if (extraSubdir) {
+			if(extraSubdir) {
 				dir = path.join(dir, extraSubdir);
 				this.$fs.createDirectory(dir).wait();
 			}
@@ -490,15 +532,114 @@ export class Project implements Project.IProject {
 }
 $injector.register("project", Project);
 
-// register prop * commands
-_.each(["add", "set", ["del", "rm"], ["del", "remove"]], (operation) => {
-	var propOperation = operation;
-	if (_.isArray(operation)) {
-		propOperation = operation[1];
-		operation = operation[0];
+export class SetProjectPropertyCommand implements ICommand {
+	constructor(private $project: Project.IProject) { }
+
+	canExecute(args: string[]): IFuture<boolean> {
+		return (() => {
+			var property = args[0];
+			var propertyValues = _.rest(args, 1);
+			if(this.$project.validateProjectProperty(property, propertyValues, "set").wait()) {
+				if(propertyValues.length === 1 && propertyValues[0]) {
+					return true;
+				}
+			}
+
+			return false;
+		}).future<boolean>()();
 	}
 
-	helpers.registerCommand("project", "prop|" + propOperation,
-		(project, args) => project.updateProjectPropertyAndSave(operation, args[0], _.rest(args, 1)));
-});
-helpers.registerCommand("project", "prop|print", (project, args) => project.printProjectProperty(args[0]));
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			this.$project.updateProjectPropertyAndSave("set", args[0], _.rest(args, 1)).wait();
+		}).future<void>()();
+	}
+
+	allowedParameters: ICommandParameter[] = [];
+}
+$injector.registerCommand("prop|set", SetProjectPropertyCommand);
+
+export class RemoveProjectPropertyCommand implements ICommand {
+	constructor(private $project: Project.IProject) { }
+
+	canExecute(args: string[]): IFuture<boolean> {
+		return (() => {
+			if(this.$project.validateProjectProperty(args[0], _.rest(args, 1), "del").wait()) {
+				// there's at least one value passed to validateProjectProperty
+				if(args[1]) {
+					return true;
+				}
+			}
+			return false;
+		}).future<boolean>()();
+	}
+
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			this.$project.updateProjectPropertyAndSave("del", args[0], _.rest(args, 1)).wait();
+		}).future<void>()();
+	}
+
+	allowedParameters: ICommandParameter[] = [];
+}
+$injector.registerCommand("prop|rm", RemoveProjectPropertyCommand);
+$injector.registerCommand("prop|remove", RemoveProjectPropertyCommand);
+
+
+export class AddProjectPropertyCommand implements ICommand {
+	constructor(private $project: Project.IProject) {
+	}
+
+	canExecute(args: string[]): IFuture<boolean> {
+		return (() => {
+			if(this.$project.validateProjectProperty(args[0], _.rest(args), "add").wait()) {
+				// there's at least one value passed to validateProjectProperty
+				if(args[1]) {
+					return true;
+				}
+			}
+
+			return false;
+		}).future<boolean>()();
+	}
+
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			this.$project.updateProjectPropertyAndSave("add", args[0], _.rest(args, 1)).wait();
+		}).future<void>()();
+	}
+
+	allowedParameters: ICommandParameter[] = [];
+}
+$injector.registerCommand("prop|add", AddProjectPropertyCommand);
+
+class ProjectCommandParameter implements ICommandParameter {
+	constructor(private $project: Project.IProject) { }
+
+	mandatory = false;
+
+	validate(validationValue: string): IFuture<boolean> {
+		return (() => {
+			this.$project.ensureProject();
+
+			if(validationValue) {
+				return true;
+			}
+
+			return false;
+		}).future<boolean>()();
+	}
+}
+
+export class PrintProjectCommand implements ICommand {
+	constructor(private $project: Project.IProject) { }
+
+	execute(args: string[]): IFuture<void> {
+		return (() => {
+			this.$project.printProjectProperty(args[0]).wait();
+		}).future<void>()();
+	}
+
+	allowedParameters: ICommandParameter[] = [new ProjectCommandParameter(this.$project)];
+}
+$injector.registerCommand("prop|print", PrintProjectCommand);

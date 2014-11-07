@@ -27,7 +27,7 @@ declare module Server {
 
 	interface IIdentityManager {
 		listCertificates(): IFuture<void>;
-		listProvisions(): IFuture<void>;
+		listProvisions(provisionStr?: string): IFuture<void>;
 		findCertificate(identityStr: string): IFuture<ICryptographicIdentity>;
 		findProvision(provisionStr: string): IFuture<IProvision>;
 		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision>;
@@ -75,6 +75,7 @@ interface ILoginManager {
 	logout(): IFuture<void>;
 	isLoggedIn(): IFuture<boolean>;
 	ensureLoggedIn(): IFuture<void>;
+	telerikLogin(user: string, password: string): IFuture<void>;
 }
 
 declare module Server.Contract {
@@ -157,6 +158,8 @@ declare module Project {
 		createTemplateFolder(projectDir: string): IFuture<any>;
 		getTempDir(extraSubdir?:string): IFuture<string>;
 		saveProject(projectDir?: string): IFuture<void>;
+		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
+		getNewProjectDir(): void;
 	}
 
 	interface IPlatformMigrator {
@@ -350,6 +353,7 @@ interface IPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;
+	isPluginInstalled(pluginName: string): boolean;
 }
 
 interface IPlugin {
