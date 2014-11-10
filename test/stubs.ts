@@ -116,6 +116,10 @@ export class FileSystemStub implements IFileSystem {
 	rename(oldPath: string, newPath: string): IFuture<void> {
 		return undefined;
 	}
+
+	closeStream(stream: any): IFuture<void> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
