@@ -8,6 +8,7 @@ var commandsServiceFile = require("../lib/common/services/commands-service");
 var configFile = require("../lib/config");
 import util = require("util");
 var assert = require("chai").assert;
+var commandParams = require("../lib/common/command-params");
 
 class ErrorsNoFailStub implements IErrors {
 	fail(formatStr: string, ...args: any[]): void;
@@ -57,6 +58,8 @@ testInjector.register("injector", testInjector);
 testInjector.register("staticConfig", stubs.StaticConfig);
 testInjector.register("hooksService", stubs.HooksService);
 testInjector.register("commandsService", commandsServiceFile.CommandsService);
+testInjector.register("stringParameter", commandParams.StringCommandParameter);
+testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
 var commandsService = testInjector.resolve("commandsService");
 var isCommandExecuted = false;
 
@@ -152,8 +155,89 @@ class MockCommandWithCanExecuteImplemented implements ICommand {
 }
 testInjector.registerCommand("commandWithCanExecute", MockCommandWithCanExecuteImplemented);
 
+class MockCommandWithStringCommandParameter implements ICommand {
+	// Make sure stringParameter can be resolved
+	constructor(private $stringParameter: ICommandParameter) { }
+	execute(args: string[]): IFuture<void> {
+		return (() => isCommandExecuted = true).future<void>()();
+	}
+
+	disableAnalytics = true;
+	allowedParameters: ICommandParameter[] = [this.$stringParameter];
+}
+testInjector.registerCommand("commandWithStringParam", MockCommandWithStringCommandParameter);
+
+class MockCommandWithStringParamBuilder implements ICommand {
+	// Make sure stringParameter can be resolved
+	constructor(private $stringParameter: ICommandParameter,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
+	execute(args: string[]): IFuture<void> {
+		return (() => isCommandExecuted = true).future<void>()();
+	}
+
+	disableAnalytics = true;
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Missing mandatory Parameter")];
+}
+testInjector.registerCommand("commandWithStringParamBuilder", MockCommandWithStringParamBuilder);
+
 describe("commands service", () => {
 	describe("tryExecuteCommand", () => {
+		it("executes command which has only StringCommandParameter when param is NOT passed", () => {
+			isCommandExecuted = false;
+
+			commandsService.executeCommandUnchecked = (): IFuture<boolean> => {
+				return (() => {
+					isCommandExecuted = true;
+					return false;
+				}).future<boolean>()();
+			}
+
+			commandsService.tryExecuteCommand("commandWithStringParam", []).wait();
+			assert.isTrue(isCommandExecuted);
+		});
+
+		it("executes command which has only StringCommandParameter when param is passed", () => {
+			isCommandExecuted = false;
+
+			commandsService.executeCommandUnchecked = (): IFuture<boolean> => {
+				return (() => {
+					isCommandExecuted = true;
+					return false;
+				}).future<boolean>()();
+			}
+
+			commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]).wait();
+			assert.isTrue(isCommandExecuted);
+		});
+
+		it("does not execute command which has mandatory StringCommandParameter created with StringParameterBuilder and param is not passed", () => {
+			isCommandExecuted = false;
+
+			commandsService.executeCommandUnchecked = (): IFuture<boolean> => {
+				return (() => {
+					isCommandExecuted = true;
+					return false;
+				}).future<boolean>()();
+			}
+
+			commandsService.tryExecuteCommand("commandWithStringParamBuilder", []).wait();
+			assert.isFalse(isCommandExecuted);
+		});
+
+		it("executes command which has mandatory StringCommandParameter created with StringParameterBuilder and param is passed", () => {
+			isCommandExecuted = false;
+
+			commandsService.executeCommandUnchecked = (): IFuture<boolean> => {
+				return (() => {
+					isCommandExecuted = true;
+					return false;
+				}).future<boolean>()();
+			}
+
+			commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]).wait();
+			assert.isTrue(isCommandExecuted);
+		});
+
 		it("calls executeCommand when command name is valid", () => {
 			isCommandExecuted = false;
 			commandsService.executeCommandUnchecked = (): IFuture<boolean> => {
