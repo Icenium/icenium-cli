@@ -481,9 +481,10 @@ export class RemoveCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
 		private $errors: IErrors,
 		private $prompter: IPrompter,
-		private $identityManager: Server.IIdentityManager) { }
+		private $identityManager: Server.IIdentityManager,
+		private $stringParameterBuilder : IStringParameterBuilder) { }
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Specify certificate name or index.")];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index.")];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -504,9 +505,10 @@ export class ExportCryptographicIdentity implements ICommand {
 		private $prompter: IPrompter,
 		private $fs: IFileSystem,
 		private $logger: ILogger,
-		private $errors: IErrors) { }
+		private $errors: IErrors,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Specify certificate name or index."), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index."), new commandParams.StringCommandParameter()];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -561,10 +563,11 @@ export class ImportCryptographicIdentity implements ICommand {
 		private $fs: IFileSystem,
 		private $prompter: IPrompter,
 		private $logger: ILogger,
-		private $errors: IErrors) {
+		private $errors: IErrors,
+		private $stringParameterBuilder: IStringParameterBuilder) {
 	}
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "No certificate file specified."), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("No certificate file specified."), new commandParams.StringCommandParameter()];
 
 
 	execute(args: string[]): IFuture<void> {
@@ -672,9 +675,10 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 		private $errors: IErrors,
 		private $injector: IInjector,
 		private $prompter: IPrompter,
-		private $server: Server.IServer) { }
+		private $server: Server.IServer,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Specify certificate signing request index to delete.")];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate signing request index to delete.")];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -700,9 +704,10 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 		private $injector: IInjector,
 		private $errors: IErrors,
 		private $fs: IFileSystem,
-		private $server: Server.IServer) { }
+		private $server: Server.IServer,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Specify certificate signing request index to delete.")];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate signing request index to delete.")];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {

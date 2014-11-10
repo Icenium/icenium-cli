@@ -1,11 +1,11 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-import commandParams = require("../../common/command-params");
 
 export class DevConfigApplyCommand implements ICommand {
-	constructor(private $config: IConfiguration) { }
+	constructor(private $config: IConfiguration,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 
-	public allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true)];
+	public allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify dev environment to be applied")];
 	public disableAnalytics = true;
 
 	public execute(args: string[]): IFuture<void> {

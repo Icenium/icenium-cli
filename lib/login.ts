@@ -277,14 +277,15 @@ export class LoginManager implements ILoginManager {
 $injector.register("loginManager", LoginManager);
 
 export class TelerikLoginCommand implements ICommand {
-	constructor(private $loginManager: ILoginManager) { }
+	constructor(private $loginManager: ILoginManager,
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$loginManager.telerikLogin(args[0], args[1]).wait();
 		}).future<void>()();
 	}
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(true, "Missing user name or password."), new commandParams.StringCommandParameter(true, "Missing user name or password.")];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password."), this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password.")];
 
 	disableAnalytics = true;
 }
