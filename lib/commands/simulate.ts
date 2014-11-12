@@ -77,6 +77,7 @@ export class SimulateCommand implements ICommand {
 
 					this.$logger.info("Finished downloading plugins.");
 				} catch(err) {
+					this.$fs.closeStream(zipFile).wait();
 					this.$fs.deleteDirectory(this.pluginsPath).wait();
 					throw err;
 				}
