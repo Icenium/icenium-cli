@@ -1,6 +1,8 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
+import options = require("../../common/options");
+
 export class PostInstallCommand implements ICommand {
 	constructor(private $autoCompletionService: IAutoCompletionService,
 		private $fs: IFileSystem,
@@ -13,6 +15,11 @@ export class PostInstallCommand implements ICommand {
 		return (() => {
 			if(process.platform !== "win32") {
 				this.$fs.chmod(this.$staticConfig.adbFilePath, "0777").wait();
+				// when running under 'sudo' we create ~/.appbuilder-cli with wrong owner (root) and it is no longer accessible for the user initiating the installation
+				// patch the owner here
+				if (process.env.SUDO_USER) {
+					this.$fs.setCurrentUserAsOwner(options.profileDir, process.env.SUDO_USER).wait();
+				}
 			}
 
 			this.$autoCompletionService.enableAutoCompletion().wait();
