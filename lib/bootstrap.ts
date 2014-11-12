@@ -105,7 +105,7 @@ $injector.requireCommand("appmanager|upload", "./commands/appmanager");
 $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
 $injector.requireCommand("dev-post-install", "./commands/dev/post-install");
-$injector.requireCommand("dev-prepackage", "./commands/post-install");
+$injector.requireCommand("dev-prepackage", "./commands/dev/prepackage");
 $injector.require("platformServices", "./commands/simulate");
 $injector.requireCommand("remote", "./commands/remote");
 $injector.require("clientUserSettingsFileService", "./services/user-settings-service");

@@ -1,10 +1,9 @@
-///<reference path="../.d.ts"/>
-
+///<reference path="../../.d.ts"/>
 "use strict";
 
 import Future = require("fibers/future");
 
-export class PostInstallCommand implements ICommand {
+export class PrePackageCommand implements ICommand {
 	constructor(private $templatesService: ITemplatesService,
 		private $resourceDownloader: IResourceDownloader,
 		private $cordovaMigrationService: ICordovaMigrationService,
@@ -36,4 +35,4 @@ export class PostInstallCommand implements ICommand {
 	}
 }
 
-$injector.registerCommand("dev-prepackage", PostInstallCommand);
+$injector.registerCommand("dev-prepackage", PrePackageCommand);
