@@ -9,6 +9,7 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 
 	public canStart(platform: string): IFuture<boolean> {
 		return (() => {
+			this.$project.ensureProject();
 			return _.contains(this.$project.projectTargets.wait(), platform.toLowerCase());
 		}).future<boolean>()();
 	}
