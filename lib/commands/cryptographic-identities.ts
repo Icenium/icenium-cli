@@ -13,14 +13,8 @@ import os = require("os");
 import commandParams = require("../common/command-params");
 
 class CryptographicIdentityConstants {
-	public static PKCS12_TYPE = "Pkcs12";
 	public static PKCS12_EXTENSION = "p12";
-	public static X509_TYPE = "X509Certificate";
 	public static X509_EXTENSION = "cer";
-	public static ExtensionToTypeMap: IStringDictionary = {
-		".p12": CryptographicIdentityConstants.PKCS12_TYPE,
-		".cer": CryptographicIdentityConstants.X509_TYPE
-	};
 }
 
 interface IFailedProvision {
@@ -228,29 +222,29 @@ export class IdentityManager implements Server.IIdentityManager {
 }
 $injector.register("identityManager", IdentityManager);
 
-class IdentityGenerationData {
+class IdentityGenerationDataFactory {
 	private static derObjectIdentifierNames = {
 		C: "2.5.4.6",
 		CN: "2.5.4.3",
 		EmailAddress: "1.2.840.113549.1.9.1"
 	};
 
-	public SubjectNameValues: any[];
-	public StartDate: Date;
-	public EndDate: Date;
-
-	public constructor(identityModel: ISelfSignedIdentityModel) {
-		this.StartDate = new Date(identityModel.StartDate);
-		this.EndDate = new Date(identityModel.EndDate);
-		this.SubjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
-			identityModel.Name, identityModel.Email, identityModel.Country);
+	public static create(identityModel: ISelfSignedIdentityModel): Server.IdentityGenerationData {
+		var identityGenerationData = <Server.IdentityGenerationData> {
+			StartDate: new Date(identityModel.StartDate),
+			Attributes: {},
+			EndDate: new Date(identityModel.EndDate),
+			SubjectNameValues: IdentityGenerationDataFactory.getDistinguishedNameValues(
+				identityModel.Name, identityModel.Email, identityModel.Country)
+		};
+		return identityGenerationData;
 	}
 
 	public static getDistinguishedNameValues(name: string, email: string, countryCode: string): any {
-		var distinguishedNameValues: any = {};
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.CN] = name;
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.EmailAddress] = email;
-		distinguishedNameValues[IdentityGenerationData.derObjectIdentifierNames.C] = countryCode;
+		var distinguishedNameValues = {};
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.CN] = name;
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.EmailAddress] = email;
+		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.C] = countryCode;
 		return distinguishedNameValues;
 	}
 }
@@ -376,7 +370,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			this.model = this.$prompter.get(promptSchema).wait();
 			_.extend(this.model, identityInfo);
 
-			var identityGenerationData = new IdentityGenerationData(this.model);
+			var identityGenerationData = IdentityGenerationDataFactory.create(this.model);
 			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
 			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
 		}).future<void>()();
@@ -583,7 +577,7 @@ export class ImportCryptographicIdentity implements ICommand {
 					"that contains an existing cryptographic identity or a CER file that contains the " +
 					"certificate generated from a certificate signing request.")
 			}
-			var importType = CryptographicIdentityConstants.ExtensionToTypeMap[extension];
+			var importType = extension === ".p12" ? Server.ImportType.Pkcs12 : Server.ImportType.X509Certificate;
 
 			if(!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
@@ -621,7 +615,7 @@ class CreateCertificateSigningRequest implements ICommand {
 
 			model = this.$identityInformationGatherer.gatherIdentityInformation(model).wait();
 
-			var subjectNameValues = IdentityGenerationData.getDistinguishedNameValues(
+			var subjectNameValues = IdentityGenerationDataFactory.getDistinguishedNameValues(
 				model.Name, model.Email, model.Country);
 			var certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
 

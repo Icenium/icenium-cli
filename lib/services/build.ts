@@ -88,14 +88,14 @@ export class BuildService implements Project.IBuildService {
 
 			this.$projectNameValidator.validate(projectName);
 
-			this.$server.projects.setProjectProperty(solutionName, projectName, { AppIdentifier: buildProperties.AppIdentifier }).wait();
+			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration,{ AppIdentifier: buildProperties.AppIdentifier }).wait();
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
 			buildProperties.LiveSyncToken = liveSyncToken;
 
-			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties }).wait();
+			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: []}).wait();
 
-			var buildResults: Server.IPackageDef[] = body.ResultsByTarget.Build.Items.map((buildResult: any) => {
+			var buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
 				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
 				var solutionPath = util.format("%s/%s", projectName, fullPath);
 
@@ -110,7 +110,7 @@ export class BuildService implements Project.IBuildService {
 			return {
 				buildResults: buildResults,
 				output: body.Output,
-				errors: body.Errors
+				errors: body.Errors.map(error => error.Message)
 			};
 		}).future<Server.IBuildResult>()();
 	}
