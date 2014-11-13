@@ -382,7 +382,9 @@ export class CreateSelfSignedIdentity implements ICommand {
 		}).future<void>()();
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter(),
+		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter(),
+		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
 
 	private getPromptSchema(defaults: any): IPromptSchema {
 		var promptSchema: IPromptSchema = {
