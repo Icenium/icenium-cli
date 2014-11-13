@@ -7,6 +7,7 @@ import _ = require("underscore");
 import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");
+import hostInfo = require("./host-info");
 
 var knownOpts: any = {
 		"companion": Boolean,
@@ -31,7 +32,16 @@ var knownOpts: any = {
 _.extend(knownOpts, commonOptions.knownOpts);
 _.extend(shorthands, commonOptions.shorthands);
 
-commonOptions.setProfileDir(".appbuilder-cli");
+var defaultProfileDir = "";
+var blackDragonCacheFolder = "Telerik/BlackDragon";
+var appBuilderCacheFolder = ".appbuilder-cli";
+if(hostInfo.isWindows()) {
+	defaultProfileDir = path.join(process.env.LocalAppData, blackDragonCacheFolder, appBuilderCacheFolder);
+} else {
+	defaultProfileDir = path.join(osenv.home(), ".local/share", blackDragonCacheFolder, appBuilderCacheFolder);
+}
+
+commonOptions.setProfileDir(defaultProfileDir);
 var parsed = helpers.getParsedOptions(knownOpts, shorthands);
 
 Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
