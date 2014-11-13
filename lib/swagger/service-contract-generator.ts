@@ -58,7 +58,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 				var service = this.generateService(swaggerService, serverModuleName);
 
-				_.each(_.keys(service), (modelName: string) => {
+				_.each(_.keys(this.pendingModels), (modelName: string) => {
 					var model = this.pendingModels[modelName];
 					if(model) {
 						serverModuleDeclaration.addBlock(model);
@@ -93,11 +93,13 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	private generateModels(models: IDictionary<Swagger.IModel>): Swagger.IBlock[] {
 		var modelsBlocks: Swagger.IBlock[] = [];
 		_.each(models, (model: Swagger.IModel) => {
-			var typeName = this.tsTypeSystemHelpers.translate(model.id);
-			if(!this.tsTypeSystemHelpers.isModel(typeName)) {
-				this.visitModel(model);
-				if(this.tsTypeSystemHelpers.isModel(typeName)) {
-					modelsBlocks.push(this.generateModel(model));
+			if(model.id.indexOf("`") < 0) {
+				var typeName = this.tsTypeSystemHelpers.translate(model.id);
+				if (!this.tsTypeSystemHelpers.isModel(typeName)) {
+					this.visitModel(model);
+					if (this.tsTypeSystemHelpers.isModel(typeName)) {
+						modelsBlocks.push(this.generateModel(model));
+					}
 				}
 			}
 		});

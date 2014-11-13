@@ -5,14 +5,14 @@ import util = require("util");
 
 export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	private static ARRAY_START_CHAR = "[";
-	private static ARRAY_END_CHAR = "[";
+	private static ARRAY_END_CHAR = "]";
 	private static COMMA_CHAR = ",";
 
 	private static NUMBER_TYPE_NAME = "number";
 	private static ANY_TYPE_NAME = "any";
 	private static STRING_TYPE_NAME = "string";
 
-	private static BUILT_IN_TYPES = ["StringMap", "boolean", "number", "string", "Date", "void", "ReadableStream", "WritableStream", "any"];
+	private static BUILT_IN_TYPES = ["IDictionary", "boolean", "number", "string", "Date", "void", "ReadableStream", "WritableStream", "any"];
 	private models: boolean[] = [];
 
 	public getWritableStreamTypeName(): string {
@@ -49,7 +49,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	public isBuiltIn(typeName: string): boolean {
-		return !!_.find(TSTypeSystemHelpers.BUILT_IN_TYPES, (builtInType: string) => builtInType.startsWith(builtInType));
+		return !!_.find(TSTypeSystemHelpers.BUILT_IN_TYPES, (builtInType: string) => typeName.startsWith(builtInType));
 	}
 
 	public isModel(modelName: string): boolean {
@@ -82,7 +82,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 			return TSTypeSystemHelpers.ANY_TYPE_NAME;
 		} else {
 			var value = typeName.substr(keyValueSeparatorIndex + 1, typeName.indexOf(TSTypeSystemHelpers.ARRAY_END_CHAR) - keyValueSeparatorIndex - 1);
-			return util.format("StringMap<%s>", this.translate(value));
+			return util.format("IDictionary<%s>", this.translate(value));
 		}
 	}
 }
