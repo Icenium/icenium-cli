@@ -1,5 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
+import os = require("os");
 import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
@@ -17,7 +18,8 @@ export class DebugCommand implements ICommand {
 		private $debuggerPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
 		private $sharedUserSettingsService: IUserSettingsService,
-		private $sharedUserSettingsFileService: IUserSettingsFileService) {
+		private $sharedUserSettingsFileService: IUserSettingsFileService,
+		private $processInfo: IProcessInfo) {
 	}
 
 	allowedParameters: ICommandParameter[];
@@ -32,7 +34,7 @@ export class DebugCommand implements ICommand {
 
 			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
 			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
-			this.$serverExtensionsService.prepareExtension(debuggerPackageName).wait();
+			this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this)).wait();
 
 			this.runDebugger().wait();
 		}).future<void>()();
@@ -49,6 +51,14 @@ export class DebugCommand implements ICommand {
 
 			this.$debuggerPlatformServices.runApplication(this.debuggerPath, debuggerParams);
 		}).future<void >()();
+	}
+
+	private ensureDebuggerIsNotRunning(): void {
+		var isRunning = this.$processInfo.isRunning(this.$debuggerPlatformServices.executableName).wait();
+		if (isRunning) {
+			this.$errors.fail({formatStr: "AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
+			"Close it and run $ appbuilder debug again.", suppressCommandHelp: true});
+		}
 	}
 }
 $injector.registerCommand("debug", DebugCommand);
@@ -108,6 +118,10 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 		return WinDebuggerPlatformServices.PACKAGE_NAME_WIN;
 	}
 
+	public get executableName(): string {
+		return WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN;
+	}
+
 	public runApplication(applicationPath: string, applicationParams: string[]): void {
 		this.startWatchingUserSettingsFile();
 
@@ -119,7 +133,8 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Tools.Mac.Package";
-	private static EXECUTABLE_NAME_OSX = "AppBuilder Debugger.app";
+	private static EXECUTABLE_NAME_OSX_SHORT = "AppBuilder Debugger.app";
+	private static EXECUTABLE_NAME_OSX = DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX_SHORT + ".app";
 
 	constructor(private $childProcess: IChildProcess,
 		$errors: IErrors,
@@ -132,6 +147,10 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 
 	public getPackageName(): string {
 		return DarwinDebuggerPlatformServices.PACKAGE_NAME_OSX;
+	}
+
+	public get executableName(): string {
+		return DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX_SHORT;
 	}
 
 	public runApplication(applicationPath: string, applicationParams: string[]): void {
