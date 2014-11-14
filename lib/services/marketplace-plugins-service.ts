@@ -26,7 +26,7 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 				rowPluginData.Description,
 				rowPluginData.Url,
 				rowPluginData.Variables,
-				rowPluginData.Platforms,
+				rowPluginData.Platforms ? rowPluginData.Platforms.map(platform => Server.DevicePlatform[platform]): [],
 				plugin.downloadsCount,
 				plugin.demoAppRepositoryLink);
 		}).future<IMarketplacePlugin>()();
