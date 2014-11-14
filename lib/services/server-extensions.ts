@@ -32,7 +32,7 @@ export class ServerExtensionsService implements IServerExtensionsService {
 		return path.join(this.cacheDir, packageName);
 	}
 
-	public prepareExtension(packageName: string): IFuture<void> {
+	public prepareExtension(packageName: string, ensureAppIsNotRunning: () => IFuture<void>): IFuture<void> {
 		return ((): void => {
 			var extensionPath = this.getExtensionPath(packageName);
 
@@ -48,6 +48,8 @@ export class ServerExtensionsService implements IServerExtensionsService {
 			if (helpers.versionCompare(cachedVersion, serverVersion) < 0) {
 				this.$logger.info("Updating %s package...", packageName);
 				var zipFileName = path.join(this.cacheDir, packageName + ".zip");
+
+				ensureAppIsNotRunning();
 
 				if(this.$fs.exists(extensionPath).wait()) {
 					this.$fs.deleteDirectory(extensionPath).wait();

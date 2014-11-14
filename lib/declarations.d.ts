@@ -257,6 +257,7 @@ interface IServerConfiguration {
 
 interface IExtensionPlatformServices {
 	getPackageName() : string;
+	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
 }
 
@@ -309,7 +310,7 @@ interface IUserSettingsService extends UserSettings.IUserSettingsService {
 }
 
 interface IServerExtensionsService {
-	prepareExtension(packageName: string): IFuture<void>;
+	prepareExtension(packageName: string, ensureAppIsNotRunning: () => void): IFuture<void>;
 	getExtensionVersion(packageName: string): string;
 	getExtensionPath(packageName: string): string;
 	cacheDir: string;
@@ -388,3 +389,6 @@ interface ITypeScriptCompilerOptions {
 	targetVersion: string;  // Specify ECMAScript target version: 'ES3' (default), or 'ES5'.
 }
 
+interface IProcessInfo {
+	isRunning(name: string): IFuture<string[]>;
+}

@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import child_process = require("child_process");
+
+import os = require("os");
 import path = require("path");
 import Future = require("fibers/future");
-import helpers = require("../helpers");
-import MobileHelper = require("../common/mobile/mobile-helper");
 import hostInfo = require("../host-info");
 
 export class SimulateCommand implements ICommand {
@@ -17,6 +16,7 @@ export class SimulateCommand implements ICommand {
 
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
+		private $processInfo: IProcessInfo,
 		private $config: IConfiguration,
 		private $server: Server.IServer,
 		private $project: Project.IProject,
@@ -44,7 +44,7 @@ export class SimulateCommand implements ICommand {
 
 			var simulatorPackageName = this.$simulatorPlatformServices.getPackageName();
 			this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
-			this.$serverExtensionsService.prepareExtension(simulatorPackageName).wait();
+			this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 			this.prepareCordovaPlugins(simulatorPackageName).wait();
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
 
@@ -53,6 +53,14 @@ export class SimulateCommand implements ICommand {
 	}
 
 	allowedParameters: ICommandParameter[] = [];
+
+	private ensureSimulatorIsNotRunning(): void {
+		var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
+		if (isRunning) {
+			this.$errors.fail({formatStr: "AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
+				"Close it and run $ appbuilder simulate again.", suppressCommandHelp: true});
+		}
+	}
 
 	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<void> {
 		return (() => {
@@ -130,6 +138,10 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 		return WinSimulatorPlatformServices.PACKAGE_NAME_WIN;
 	}
 
+	public get executableName(): string {
+		return WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN;
+	}
+
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
 		this.$childProcess.spawn(simulatorBinary, applicationParams,
@@ -146,6 +158,10 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	public getPackageName() : string {
 		return MacSimulatorPlatformServices.PACKAGE_NAME_MAC;
+	}
+
+	public get executableName(): string {
+		return MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC;
 	}
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {

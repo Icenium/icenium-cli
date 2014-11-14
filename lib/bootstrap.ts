@@ -121,3 +121,4 @@ $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
 $injector.require("remoteProjectService", "./services/remote-projects-service");
 $injector.require("optionsService", "./services/options-service");
+$injector.require("processInfo", "./process-info");
