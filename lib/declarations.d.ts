@@ -390,5 +390,5 @@ interface ITypeScriptCompilerOptions {
 }
 
 interface IProcessInfo {
-	isRunning(name: string): IFuture<string[]>;
+	isRunning(name: string): IFuture<boolean>;
 }

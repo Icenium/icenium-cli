@@ -133,8 +133,8 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_OSX: string = "Telerik.BlackDragon.Client.Mobile.Tools.Mac.Package";
-	private static EXECUTABLE_NAME_OSX_SHORT = "AppBuilder Debugger.app";
-	private static EXECUTABLE_NAME_OSX = DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX_SHORT + ".app";
+	private static EXECUTABLE_NAME_OSX_SHORT = "AppBuilder Debugger";
+	public static EXECUTABLE_NAME_OSX = DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX_SHORT + ".app";
 
 	constructor(private $childProcess: IChildProcess,
 		$errors: IErrors,
