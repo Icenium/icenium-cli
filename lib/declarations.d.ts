@@ -354,6 +354,7 @@ interface IPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;
+	configurePlugin(pluginName: string): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;
 }
 
