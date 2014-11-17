@@ -51,6 +51,17 @@ class AppManagerUploadCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	allowedParameters : ICommandParameter[] = [];
+	allowedParameters : ICommandParameter[] = [new PlatformNameCommandParameter(this.$errors)];
 }
 $injector.registerCommand("appmanager|upload", AppManagerUploadCommand);
+
+class PlatformNameCommandParameter implements ICommandParameter {
+	constructor(private $errors: IErrors) { }
+	mandatory = true;
+	validate(value: string, errorMessage?: string): IFuture<boolean> {
+		return ((): boolean => {
+			MobileHelper.validatePlatformName(value, this.$errors);
+			return true;
+		}).future<boolean>()();
+	}
+}
