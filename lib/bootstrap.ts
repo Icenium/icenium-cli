@@ -27,6 +27,7 @@ $injector.require("qr", "./qr");
 $injector.requireCommand("plugin|*list", "./commands/plugin");
 $injector.requireCommand("plugin|add", "./commands/plugin");
 $injector.requireCommand("plugin|remove", "./commands/plugin");
+$injector.requireCommand("plugin|configure", "./commands/plugin");
 $injector.requireCommand("plugin|find", "./commands/find-plugins");
 $injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
 

@@ -42,23 +42,7 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("Plugin %s is already installed", pluginName);
 			}
 
-			var plugin = this.getPluginByName(pluginName);
-			var variables = plugin.variables;
-			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
-
-			if(variables) {
-				if (variables.length && !cordovaPluginVariables[plugin.identifier]) {
-					cordovaPluginVariables[plugin.identifier] = {};
-				}
-
-				_.each(variables, variableName => {
-					var variableInformation = this.gatherVariableInformation(variableName).wait();
-					cordovaPluginVariables[plugin.identifier][variableName] = variableInformation[variableName];
-				});
-			}
-
-			this.$project.projectData.CorePlugins.push(plugin.toProjectDataRecord());
-			this.$project.saveProject().wait();
+			this.configurePlugin(pluginName).wait();
 			this.$logger.out("Plugin %s was successfully added", pluginName);
 
 		}).future<void>()();
@@ -112,6 +96,29 @@ export class PluginsService implements IPluginsService {
 		return _.any(this.getInstalledPlugins(), (plugin) => plugin.name.toLowerCase() === pluginName);
 	}
 
+	public configurePlugin(pluginName: string): IFuture<void> {
+		return (() => {
+			var plugin = this.getPluginByName(pluginName);
+			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
+
+			var variables = plugin.variables;
+			if(variables) {
+				if(!cordovaPluginVariables[plugin.identifier]) {
+					cordovaPluginVariables[plugin.identifier] = {};
+				}
+
+				_.each(variables, (variableName: string) => {
+					var variableInformation = this.gatherVariableInformation(plugin, variableName).wait();
+					cordovaPluginVariables[plugin.identifier][variableName] = variableInformation[variableName];
+				});
+			}
+
+			this.$project.projectData.CorePlugins.push(plugin.toProjectDataRecord());
+			this.$project.saveProject().wait();
+
+		}).future<void>()();
+	}
+
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
@@ -122,7 +129,7 @@ export class PluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
-	private gatherVariableInformation(variableName: string): IFuture<string> {
+	private gatherVariableInformation(plugin: IPlugin, variableName: string): IFuture<string> {
 		return (() => {
 			var schema: IPromptSchema = {
 				properties: { }
@@ -131,6 +138,11 @@ export class PluginsService implements IPluginsService {
 				required: true,
 				type: "string"
 			};
+
+			var pluginVariables = this.$project.projectData.CordovaPluginVariables[plugin.identifier]
+			if(pluginVariables && pluginVariables[variableName]) {
+				schema["properties"][variableName]["default"] = () => pluginVariables[variableName];
+			}
 
 			this.$prompter.start();
 			return this.$prompter.get(schema).wait();

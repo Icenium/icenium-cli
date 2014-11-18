@@ -457,6 +457,15 @@ Disables a core, integrated or verified plugin from your project.
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin
 --[/]--
 
+--[plugin|configure]--
+Usage:
+    $ appbuilder plugin configure <Name>
+
+Configure plugin variables for selected plugin.
+
+<Name> is the name of the plugin as listed by $ appbuilder plugin
+--[/]--
+
 --[plugin|find]--
 Usage:
     $ appbuilder plugin find [<Keyword> [<Keyword>]*>]
