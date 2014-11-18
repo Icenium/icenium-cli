@@ -32,7 +32,7 @@ export class ListDevicesCommand implements ICommand {
 				};
 			} else {
 				action = (device) => {
-					return (() => { this.$logger.out("#%d: '%s'", (index++).toString(), device.getDisplayName(), device.getPlatform(), device.getIdentifier()); }).future<void>()();
+					return (() => { this.$logger.out("%s: '%s'", (index++).toString(), device.getDisplayName(), device.getPlatform(), device.getIdentifier()); }).future<void>()();
 				};
 			}
 
