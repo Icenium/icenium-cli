@@ -41,8 +41,10 @@ $injector.requireCommand("debug", "./commands/debug");
 $injector.require("server", "./server-api");
 $injector.require("httpServer", "./http-server");
 $injector.require("serviceProxy", "./service-util");
-$injector.require("serviceContractGenerator", "./service-util");
-$injector.require("serviceContractProvider", "./service-util");
+
+$injector.require("serviceContractGenerator", "./swagger/service-contract-generator");
+$injector.require("serviceContractProvider", "./swagger/service-contract-provider");
+
 $injector.requireCommand("dev-generate-api", "./commands/generate-server-api");
 
 $injector.require("loginManager", "./login");

@@ -87,10 +87,10 @@ describe("ServiceProxy", () => {
 
 		httpClient.setResponse({});
 
-		var result = proxy.call("test1", "GET", "/authenticate", null, null, null).wait();
+		var result = proxy.call("test1", "GET", "authenticate", null, null, null).wait();
 
 		assert.equal("GET", httpClient.options.method);
-		assert.equal("/appbuilder/api/authenticate", httpClient.options.path);
+		assert.equal("/appbuilder/authenticate", httpClient.options.path);
 		assert.notOk(result);
 
 		assert.ok(httpClient.options.headers["X-Icenium-SolutionSpace"]);
