@@ -264,11 +264,16 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 		private $selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>,
 		private $userDataStore: IUserDataStore,
 		private $prompter: IPrompter,
-		private $httpClient: Server.IHttpClient) { }
+		private $httpClient: Server.IHttpClient,
+		private $logger: ILogger) { }
 
 	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
 		return ((): IIdentityInformation => {
-			var myCountry = this.getDefaultCountry().wait();
+			var myCountry = model.Country;
+			if(!myCountry) {
+				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
+				myCountry = this.getDefaultCountry().wait();
+			}
 
 			var user = this.$userDataStore.getUser().wait();
 			var schema: IPromptSchema = {
