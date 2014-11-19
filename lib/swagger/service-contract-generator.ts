@@ -161,14 +161,95 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		var serviceInterface = new codeEntityLib.Block(util.format("interface %s", swaggerServiceContractName));
 		var serviceImplementation = new codeEntityLib.Block(util.format("export class %s implements %s.%s", this.getSwaggerServiceName(swaggerService), serverModuleName, swaggerServiceContractName));
 		serviceImplementation.addBlock(new codeEntityLib.Block(util.format("constructor(private $serviceProxy: %s.IServiceProxy)", serverModuleName)));
+
+		var map: IDictionary<Swagger.IServiceEndpoint[]> = Object.create(null);
+
 		_.each(swaggerService.apis, (api: Swagger.ISwaggerApi) => {
 			_.each(api.operations, (operation: Swagger.IOperation) => {
 				if (!this.hasFormParamType(operation)) {
+					if(!map[operation.nickname]) {
+						map[operation.nickname] = [];
+					}
 					var generatedOperation = this.generateOperation(operation, swaggerService.basePath, api.path);
-					serviceInterface.addLine(generatedOperation.endpointInterface);
-					serviceImplementation.addBlock(generatedOperation.endpointImplementation);
+					map[operation.nickname].push(generatedOperation);
 				}
 			});
+		});
+
+		var values = _.values(map);
+
+		_.each(values, (endpoints: Swagger.IServiceEndpoint[]) => {
+			if(endpoints.length > 1) { // we have overloaded methods
+				var allParams: IDictionary<string> = Object.create(null);
+				var commonParams: IDictionary<string> = Object.create(null);
+
+				_.each(endpoints, (endpoint: Swagger.IServiceEndpoint) => {
+
+					// Union
+					var keys = _.keys(allParams);
+					_.each(_.keys(endpoint.paramsMap), p => {
+						if(!_.contains(keys, p)) {
+							allParams[p] = endpoint.paramsMap[p];
+						}
+					});
+
+					// Intersection
+					if(_.isEmpty(commonParams)) {
+						_.each(_.keys(endpoint.paramsMap), p => {
+							commonParams[p] = endpoint.paramsMap[p];
+						});
+					} else {
+						keys = _.keys(commonParams);
+						_.each(_.keys(endpoint.paramsMap), p => {
+							if(_.contains(keys, p)) {
+								commonParams[p] = endpoint.paramsMap[p];
+							}
+						});
+					}
+				});
+
+				var commonParamsKeys = _.keys(commonParams);
+				var allParamsKeys = _.keys(allParams);
+				var parameters: string[] = [];
+
+				_.each(commonParamsKeys, key => parameters.push(util.format("%s: %s", key, commonParams[key])));
+
+				var notObligatoryParams = _.difference(allParamsKeys, commonParamsKeys);
+				_.each(notObligatoryParams, key => parameters.push(util.format("%s?: %s", key, allParams[key])));
+
+				var endpoint = endpoints[0];
+				var implementationOpener = util.format("public %s(%s): IFuture<%s>", endpoint.operationContractName, parameters.join(", "), endpoint.callResultType);
+				var interfaceOpener = util.format("%s(%s): IFuture<%s>;", endpoint.operationContractName, parameters.join(", "), endpoint.callResultType);
+
+				var interfaceLine = codeEntityLib.Line.create(interfaceOpener);
+				var implementationBlock = new codeEntityLib.Block(implementationOpener);
+
+				// Compose blocks
+				var currentParams: string[] = [];
+				var commonParamsLength = _.keys(commonParams).length;
+
+				_.each(notObligatoryParams, notObligatoryParam => {
+					currentParams.push(notObligatoryParam);
+
+					// find the most appropriate implementation by params;
+					var endpoint = _.find(endpoints, e =>_.keys(e.paramsMap).length === currentParams.length + commonParamsLength);
+
+					implementationBlock.writeLine(util.format("if(%s) { ", currentParams.join("&& ")));
+					implementationBlock.writeLine("\t" + _.map(endpoint.endpointImplementation.codeEntities, (codeEntity: Swagger.ILine) => codeEntity.content).join("\n"));
+					implementationBlock.writeLine("} \n");
+				});
+
+				var endpoint = _.find(endpoints, e =>_.keys(e.paramsMap).length === commonParamsLength);
+				implementationBlock.writeLine(_.map(endpoint.endpointImplementation.codeEntities, (codeEntity: Swagger.ILine) => codeEntity.content).join("\n"));
+
+				serviceInterface.addLine(interfaceLine);
+				serviceImplementation.addBlock(implementationBlock);
+
+			} else {
+				var endpoint = endpoints[0];
+				serviceInterface.addLine(endpoint.endpointInterface);
+				serviceImplementation.addBlock(endpoint.endpointImplementation);
+			}
 		});
 
 		return {serviceInterface: serviceInterface, serviceImplementation: serviceImplementation};
@@ -250,6 +331,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			}
 		});
 
+		var paramsMap: IDictionary<string> = Object.create(null);
+
 		_.each(operation.parameters, (parameter: Swagger.IParameter) => {
 			var tsTypeName = this.tsTypeSystemHelpers.translate(parameter.dataType);
 			if (this.tsTypeSystemHelpers.isStream(tsTypeName)) {
@@ -266,6 +349,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 			parameter.name = this.escapeKeyword(parameter.name);
 			parameters.push(util.format("%s: %s", parameter.name, tsTypeName));
+
+			paramsMap[parameter.name] = tsTypeName;
 		});
 
 		var responseType = this.tsTypeSystemHelpers.translate(operation.responseClass);
@@ -296,7 +381,13 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		var generatedOperation = new codeEntityLib.Block(util.format("public %s(%s): IFuture<%s>", operationContractName, parameters.join(", "), callResultType));
 		generatedOperation.writeLine(util.format("return this.$serviceProxy.call<%s>(%s);", callResultType, httpCallParameters.join(", ")));
 
-		return {endpointInterface: generatedContract, endpointImplementation: generatedOperation};
+		return {
+			operationContractName: operationContractName,
+			endpointInterface: generatedContract,
+			endpointImplementation: generatedOperation,
+			paramsMap: paramsMap,
+			callResultType: callResultType
+		};
 	}
 
 	private getOperationContractName(operation: Swagger.IOperation): string {
