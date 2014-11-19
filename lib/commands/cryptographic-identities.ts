@@ -61,7 +61,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
 				var cert = this.$x509.load(identity.Certificate);
-				this.$logger.out("#%d: '%s', expires on %s, issued by %s", (index + 1).toString(), identity.Alias,
+				this.$logger.out("%s: '%s', expires on %s, issued by %s", (index + 1).toString(), identity.Alias,
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
 			if(!identities.length) {
@@ -72,7 +72,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	private printProvisionData(provision: IProvision, provisionIndex: number): void {
-		this.$logger.out("#%d: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
+		this.$logger.out("%s: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
 			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 		if (options.verbose || options.v) {
 			var devices = provision.ProvisionedDevices;
@@ -637,7 +637,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 			var requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
-				this.$logger.out("#%s: %s", (i + 1).toString(), req.Subject);
+				this.$logger.out("%s: %s", (i + 1).toString(), req.Subject);
 			})
 			if(!requests.length) {
 				this.$logger.info("No certificate signing requests.");

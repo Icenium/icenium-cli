@@ -34,7 +34,7 @@ export class CloudListProjectsCommand implements ICommand {
 	private printProjects(projects: any) {
 		this.$logger.out("Projects:");
 		projects.forEach((project: any, index: number) => {
-			this.$logger.out("#%s: '%s'", (index + 1).toString(), project.name);
+			this.$logger.out("%s: '%s'", (index + 1).toString(), project.name);
 		});
 	}
 
