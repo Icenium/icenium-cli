@@ -344,7 +344,7 @@ interface IDomainNameSystem {
 }
 
 interface ICordovaPluginsService {
-	getAvailablePlugins(): IFuture<any[]>;
+	getAvailablePlugins(): IFuture<Server.CordovaPluginData[]>;
 	createPluginData(plugin: any): IFuture<IPlugin>;
 }
 
@@ -359,14 +359,8 @@ interface IPluginsService {
 }
 
 interface IPlugin {
-	name: string;
-	identifier: string;
-	version: string;
-	description: string;
-	url: string;
+	data: Server.CordovaPluginData;
 	type: any;
-	variables: string[];
-	platforms: string[];
 	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }

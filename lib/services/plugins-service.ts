@@ -59,14 +59,15 @@ export class PluginsService implements IPluginsService {
 			}
 
 			var plugin = this.getPluginByName(pluginName);
+			var pluginData = plugin.data;
 			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
 
-			_.each(plugin.variables, variableName => {
-				delete cordovaPluginVariables[plugin.identifier][variableName];
+			_.each(pluginData.Variables, variableName => {
+				delete cordovaPluginVariables[pluginData.Identifier][variableName];
 			});
 
-			if(cordovaPluginVariables && _.keys(cordovaPluginVariables[plugin.identifier]).length === 0) {
-				delete cordovaPluginVariables[plugin.identifier];
+			if(cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
+				delete cordovaPluginVariables[pluginData.Identifier];
 			}
 
 			this.$project.projectData.CorePlugins = _.without(this.$project.projectData.CorePlugins, plugin.toProjectDataRecord());
@@ -82,7 +83,7 @@ export class PluginsService implements IPluginsService {
 		_.each(Object.keys(groups), (group: string) => {
 			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[group], os.EOL));
 
-			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.name);
+			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
 			_.each(sortedPlugins, (plugin: IPlugin) => {
 				outputLines.push(plugin.pluginInformation.join(os.EOL));
 			});
@@ -93,23 +94,24 @@ export class PluginsService implements IPluginsService {
 
 	public isPluginInstalled(pluginName: string): boolean {
 		pluginName = pluginName.toLowerCase();
-		return _.any(this.getInstalledPlugins(), (plugin) => plugin.name.toLowerCase() === pluginName);
+		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName);
 	}
 
 	public configurePlugin(pluginName: string): IFuture<void> {
 		return (() => {
 			var plugin = this.getPluginByName(pluginName);
+			var pluginData = plugin.data;
 			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
 
-			var variables = plugin.variables;
+			var variables = pluginData.Variables;
 			if(variables) {
-				if(!cordovaPluginVariables[plugin.identifier]) {
-					cordovaPluginVariables[plugin.identifier] = {};
+				if(!cordovaPluginVariables[pluginData.Identifier]) {
+					cordovaPluginVariables[pluginData.Identifier] = {};
 				}
 
 				_.each(variables, (variableName: string) => {
-					var variableInformation = this.gatherVariableInformation(plugin, variableName).wait();
-					cordovaPluginVariables[plugin.identifier][variableName] = variableInformation[variableName];
+					var variableInformation = this.gatherVariableInformation(pluginData, variableName).wait();
+					cordovaPluginVariables[pluginData.Identifier][variableName] = variableInformation[variableName];
 				});
 			}
 
@@ -122,14 +124,14 @@ export class PluginsService implements IPluginsService {
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
-			_.each(plugins, (plugin: any) => {
+			_.each(plugins, (plugin: Server.CordovaPluginData) => {
 				var pluginData = pluginsService.createPluginData(plugin).wait();
 				this.identifierToPlugin[pluginData.toProjectDataRecord()] = pluginData;
 			});
 		}).future<void>()();
 	}
 
-	private gatherVariableInformation(plugin: IPlugin, variableName: string): IFuture<string> {
+	private gatherVariableInformation(plugin: Server.CordovaPluginData, variableName: string): IFuture<string> {
 		return (() => {
 			var schema: IPromptSchema = {
 				properties: { }
@@ -139,7 +141,7 @@ export class PluginsService implements IPluginsService {
 				type: "string"
 			};
 
-			var pluginVariables = this.$project.projectData.CordovaPluginVariables[plugin.identifier]
+			var pluginVariables = this.$project.projectData.CordovaPluginVariables[plugin.Identifier]
 			if(pluginVariables && pluginVariables[variableName]) {
 				schema["properties"][variableName]["default"] = () => pluginVariables[variableName];
 			}
@@ -154,7 +156,7 @@ export class PluginsService implements IPluginsService {
 		var plugins = this.getAvailablePlugins();
 		var toLowerCasePluginName = pluginName.toLowerCase();
 
-		var plugin = _.find(plugins, (plugin) => plugin.name.toLowerCase() === toLowerCasePluginName);
+		var plugin = _.find(plugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === toLowerCasePluginName);
 		if(!plugin) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}

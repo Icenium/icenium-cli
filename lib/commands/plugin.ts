@@ -24,7 +24,7 @@ export class AddPluginCommand implements ICommand {
 		return (() => {
 			if(options.available){
 				var installedPlugins = this.$pluginsService.getInstalledPlugins();
-				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), plugin => _.any(installedPlugins, installedPlugin => installedPlugin.name === plugin.name));
+				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => _.any(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name));
 				this.$pluginsService.printPlugins(plugins);
 			} else {
 				this.$pluginsService.addPlugin(args[0]).wait();
