@@ -405,7 +405,7 @@ export class BuildService implements Project.IBuildService {
 	}
 
 	private getBuildConfiguration(): string {
-		return options["livesync"] === false ? "Release" : "Debug";
+		return options.release || options.r ? "Release" : "Debug";
 	}
 
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {

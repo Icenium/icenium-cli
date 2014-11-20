@@ -10,47 +10,41 @@ export enum PluginType {
 }
 
 export class CordovaPluginData implements IPlugin {
-	constructor(public name: string,
-		public identifier: string,
-		public version: string,
-		public description: string,
-		public url: string,
-		public type: PluginType,
-		public variables: string[],
-		public platforms: Server.DevicePlatform[]) { }
+	public configurations: string[];
+
+	constructor(public data: Server.CordovaPluginData,
+		public type: PluginType) {
+		this.configurations = [];
+	}
 
 	public get pluginInformation(): string[] {
-		var nameRow = util.format("    Plugin: %s", this.name);
-		var identifierRow = util.format("    Identifier: %s", this.identifier);
-		var versionRow = util.format("    Version: %s", this.version);
-		var urlRow = util.format("    Url: %s", this.url);
-		var platformsRow = util.format("    Platforms: %s", this.platforms.join(","));
-		return [nameRow, identifierRow, versionRow, urlRow, platformsRow];
+		var nameRow = util.format("    Plugin: %s", this.data.Name);
+		var identifierRow = util.format("    Identifier: %s", this.data.Identifier);
+		var versionRow = util.format("    Version: %s", this.data.Version);
+		var urlRow = util.format("    Url: %s", this.data.Url);
+		var platformsRow = util.format("    Platforms: %s", this.data.Platforms.join(", "));
+		var configurationsRow = util.format("    Configuration: %s", this.configurations.join(", "));
+
+		return [nameRow, identifierRow, versionRow, urlRow, platformsRow, configurationsRow];
 	}
 
 	public toProjectDataRecord(): string {
-		return this.identifier;
+		return this.data.Identifier;
 	}
 }
 
 export class MarketplacePluginData extends CordovaPluginData {
-	constructor(name: string,
-		identifier: string,
-		version: string,
-		description: string,
-		url: string,
-		variables: string[],
-		platforms: Server.DevicePlatform[],
+	constructor(public data: Server.CordovaPluginData,
 		public downloads: number,
 		public demoAppRepositoryUrl: string) {
-		super(name, identifier, version, description, url, PluginType.MarketplacePlugin, variables, platforms);
+		super(data, PluginType.MarketplacePlugin);
 	}
 
 	public get pluginInformation(): string[] {
-		var nameRow = util.format("    Plugin: %s", this.name);
-		var identifierRow = util.format("    Identifier: %s", this.identifier);
-		var versionRow = util.format("    Version: %s", this.version);
-		var urlRow = util.format("    Url: %s", this.url);
+		var nameRow = util.format("    Plugin: %s", this.data.Name);
+		var identifierRow = util.format("    Identifier: %s", this.data.Identifier);
+		var versionRow = util.format("    Version: %s", this.data.Version);
+		var urlRow = util.format("    Url: %s", this.data.Url);
 		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
 		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
 
@@ -58,6 +52,6 @@ export class MarketplacePluginData extends CordovaPluginData {
 	}
 
 	public toProjectDataRecord(): string {
-		return util.format("%s@%s", this.identifier, this.version);
+		return util.format("%s@%s", this.data.Identifier, this.data.Version);
 	}
 }

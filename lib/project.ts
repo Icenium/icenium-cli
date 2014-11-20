@@ -15,6 +15,16 @@ export class Project implements Project.IProject {
 	public projectData: IProjectData;
 	public PROJECT_FILE = ".abproject";
 
+	private static DEBUG_CONFIGURATION_NAME = "debug";
+	private static RELEASE_CONFIGURATION_NAME = "release";
+
+	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
+	private static CONFIGURATION_FILE_SEARCH_PATTERN: RegExp = new RegExp(".*.abproject$", "i");
+	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
+	private static CONFIGURATION_FROM_FILE_NAME_REGEX =  new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
+
+	public configurationSpecificData: IDictionary<IDictionary<any>>;
+
 	constructor(private $fs: IFileSystem,
 		private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
@@ -26,6 +36,9 @@ export class Project implements Project.IProject {
 		private $pathFilteringService: IPathFilteringService,
 		private $cordovaMigrationService: ICordovaMigrationService,
 		private $projectPropertiesService: IProjectPropertiesService) {
+
+			this.configurationSpecificData = Object.create(null);
+
 			this.readProjectData().wait();
 
 			this.defaultProjectForType = Object.create(null);
@@ -160,29 +173,50 @@ export class Project implements Project.IProject {
 	public saveProject(projectDir?: string): IFuture<void> {
 		return (() => {
 			projectDir = projectDir || this.getProjectDir().wait();
-
 			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t").wait();
+
+			_.each(this.configurations, (configuration: string) => {
+				var configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.PROJECT_FILE));
+				if(this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
+					this.$fs.writeJson(configFilePath, this.configurationSpecificData[configuration]).wait();
+				}
+			});
 		}).future<void>()();
 	}
 
 	private readProjectData(): IFuture<void> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
+
 			if (projectDir) {
-				var projFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
-					var data = this.$fs.readJson(projFile).wait();
+					var data = this.$fs.readJson(projectFilePath).wait();
 					this.projectData = data;
+
+					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
+						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
+					});
+
+					_.each(allProjectFiles, (configProjectFile: string) => {
+						var configMatch = path.basename(configProjectFile).match(Project.CONFIGURATION_FROM_FILE_NAME_REGEX);
+						if(configMatch && configMatch.length > 1) {
+							var configurationName = configMatch[1];
+							var configProjectContent = this.$fs.readJson(configProjectFile).wait();
+							this.configurationSpecificData[configurationName.toLowerCase()] = configProjectContent;
+						}
+					});
+
 				} catch (err) {
 					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
 						"Consider restoring an earlier version from your source control or backup." + os.EOL +
 						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
 						"Additional technical info: %s",
 						suppressCommandHelp: true},
-						projFile, err.toString());
+						projectFilePath, err.toString());
 				}
 
-				if(this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
@@ -191,6 +225,43 @@ export class Project implements Project.IProject {
 
 	public get projectType(): number {
 		return projectTypes[this.projectData.Framework];
+	}
+
+	public get configurations(): string[] {
+		var configurations: string[] = [];
+		if(options.debug || options.d) {
+			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
+		} else if(options.release || options.r) {
+			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
+		} else {
+			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
+			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
+		}
+
+		return configurations;
+	}
+
+	public getProperty(propertyName: string, configuration: string): any {
+		var propertyValue: any = null;
+
+		if(configuration) {
+			var configData = this.configurationSpecificData[configuration];
+			if(configData) {
+				propertyValue = configData[propertyName];
+			}
+		}
+
+		return propertyValue;
+	}
+
+	public setProperty(propertyName: string, value: any, configuration: string): void {
+		var configData = this.configurationSpecificData[configuration];
+		if (!configData) {
+			configData = Object.create(null);
+			this.configurationSpecificData[configuration] = configData;
+		}
+
+		configData[propertyName] = value;
 	}
 
 	public createNewProject(projectType: number, projectName: string): IFuture<void> {

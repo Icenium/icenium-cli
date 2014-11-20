@@ -99,22 +99,13 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		future.wait();
 	}
 
-	public getAvailablePlugins(): IFuture<any[]> {
+	public getAvailablePlugins(): IFuture<Server.CordovaPluginData[]> {
 		return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion);
 	}
 
-	public createPluginData(plugin: any): IFuture<IPlugin> {
+	public createPluginData(plugin: Server.CordovaPluginData): IFuture<IPlugin> {
 		return (() => {
-			return new PluginsDataLib.CordovaPluginData(
-				plugin.Name,
-				plugin.Identifier,
-				plugin.Version,
-				plugin.Description,
-				plugin.Url,
-				this.getPluginTypeByIdentifier(plugin.Identifier),
-				plugin.Variables,
-				plugin.Platforms
-			);
+			return new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier));
 		}).future<IPlugin>()();
 	}
 

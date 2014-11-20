@@ -7,7 +7,10 @@ import options = require("./../options");
 import projectTypes = require("../project-types");
 
 export class PluginsService implements IPluginsService {
+	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
+	private static CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
 	private static MESSAGES = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
+
 	private identifierToPlugin: IDictionary<IPlugin>;
 
 	constructor($cordovaPluginsService: ICordovaPluginsService,
@@ -32,7 +35,16 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		return _.map(this.$project.projectData.CorePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+		var corePlugins: any = null;
+		if(options.debug || options.d) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
+		} else if(options.release || options.r) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
+		} else {
+			corePlugins = _.intersection(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
+		}
+
+		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
@@ -49,8 +61,11 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("Plugin %s is already installed", pluginName);
 			}
 
-			this.configurePlugin(pluginName).wait();
-			this.$logger.out("Plugin %s was successfully added", pluginName);
+			var configurations = this.$project.configurations;
+			_.each(configurations, (configuration: string) => {
+				this.configurePlugin(pluginName, configuration).wait();
+				this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
+			});
 
 		}).future<void>()();
 	}
@@ -61,24 +76,30 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified.");
 			}
 
-			if(!this.isPluginInstalled(pluginName)) {
-			 	this.$errors.fail("Could not find plugin with name %s.", pluginName);
+			if (!this.isPluginInstalled(pluginName)) {
+				this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}
 
-			var plugin = this.getPluginByName(pluginName);
-			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
+			var configurations = this.$project.configurations;
+			_.each(configurations, (configuration: string) => {
 
-			_.each(plugin.variables, variableName => {
-				delete cordovaPluginVariables[plugin.identifier][variableName];
+				var plugin = this.getPluginByName(pluginName);
+				var pluginData = plugin.data;
+				var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+
+				_.each(pluginData.Variables, variableName => {
+					delete cordovaPluginVariables[pluginData.Identifier][variableName];
+				});
+
+				if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
+					delete cordovaPluginVariables[pluginData.Identifier];
+				}
+
+				var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
+				this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+				this.$project.saveProject().wait();
+				this.$logger.out("Plugin %s was successfully removed for configuration %s", pluginName, configuration);
 			});
-
-			if(cordovaPluginVariables && _.keys(cordovaPluginVariables[plugin.identifier]).length === 0) {
-				delete cordovaPluginVariables[plugin.identifier];
-			}
-
-			this.$project.projectData.CorePlugins = _.without(this.$project.projectData.CorePlugins, plugin.toProjectDataRecord());
-			this.$project.saveProject().wait();
-			this.$logger.out("Plugin %s was successfully removed", pluginName);
 		}).future<void>()();
 	}
 
@@ -89,7 +110,7 @@ export class PluginsService implements IPluginsService {
 		_.each(Object.keys(groups), (group: string) => {
 			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
 
-			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.name);
+			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
 			_.each(sortedPlugins, (plugin: IPlugin) => {
 				outputLines.push(plugin.pluginInformation.join(os.EOL));
 			});
@@ -100,27 +121,31 @@ export class PluginsService implements IPluginsService {
 
 	public isPluginInstalled(pluginName: string): boolean {
 		pluginName = pluginName.toLowerCase();
-		return _.any(this.getInstalledPlugins(), (plugin) => plugin.name.toLowerCase() === pluginName);
+		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName);
 	}
 
-	public configurePlugin(pluginName: string): IFuture<void> {
+	public configurePlugin(pluginName: string, configuration?: string): IFuture<void> {
 		return (() => {
 			var plugin = this.getPluginByName(pluginName);
-			var cordovaPluginVariables:any = this.$project.projectData.CordovaPluginVariables;
+			var pluginData = plugin.data;
+			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 
-			var variables = plugin.variables;
+			var variables = pluginData.Variables;
 			if(variables) {
-				if(!cordovaPluginVariables[plugin.identifier]) {
-					cordovaPluginVariables[plugin.identifier] = {};
+				if(!cordovaPluginVariables[pluginData.Identifier]) {
+					cordovaPluginVariables[pluginData.Identifier] = {};
 				}
 
 				_.each(variables, (variableName: string) => {
-					var variableInformation = this.gatherVariableInformation(plugin, variableName).wait();
-					cordovaPluginVariables[plugin.identifier][variableName] = variableInformation[variableName];
+					var variableInformation = this.gatherVariableInformation(pluginData, variableName, configuration).wait();
+					cordovaPluginVariables[pluginData.Identifier][variableName] = variableInformation[variableName];
 				});
+				this.$project.setProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
 			}
 
-			this.$project.projectData.CorePlugins.push(plugin.toProjectDataRecord());
+			var newCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+			newCorePlugins.push(plugin.toProjectDataRecord());
+			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();
 
 		}).future<void>()();
@@ -129,19 +154,38 @@ export class PluginsService implements IPluginsService {
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
-			_.each(plugins, (plugin: any) => {
+
+			_.each(plugins, (plugin: Server.CordovaPluginData) => {
+
 				try {
 					var pluginData = pluginsService.createPluginData(plugin).wait();
-					this.identifierToPlugin[pluginData.toProjectDataRecord()] = pluginData;
 				} catch(e) {
-					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", plugin.title);
-					this.$logger.trace((<Error>e).message);
+					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", plugin.Name);
+					this.$logger.trace(e);
+				}
+
+				if(pluginData) {
+
+					var projectDataRecord = pluginData.toProjectDataRecord();
+					var configurations = _.keys(this.$project.configurationSpecificData);
+
+					_.each(configurations, (configuration:string) => {
+						var configData = this.$project.configurationSpecificData[configuration];
+						if (configData) {
+							var corePlugins = configData[PluginsService.CORE_PLUGINS_PROPERTY_NAME];
+							if (corePlugins && _.contains(corePlugins, projectDataRecord)) {
+								pluginData.configurations.push(configuration);
+							}
+						}
+					});
+
+					this.identifierToPlugin[projectDataRecord] = pluginData;
 				}
 			});
 		}).future<void>()();
 	}
 
-	private gatherVariableInformation(plugin: IPlugin, variableName: string): IFuture<any> {
+	private gatherVariableInformation(plugin: Server.CordovaPluginData, variableName: string, configuration: string): IFuture<any> {
 		return (() => {
 			var schema: IPromptSchema = {
 				properties: { }
@@ -151,7 +195,8 @@ export class PluginsService implements IPluginsService {
 				type: "string"
 			};
 
-			var pluginVariables = this.$project.projectData.CordovaPluginVariables[plugin.identifier]
+			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+			var pluginVariables = cordovaPluginVariables[plugin.Identifier];
 			if(pluginVariables && pluginVariables[variableName]) {
 				schema["properties"][variableName]["default"] = () => pluginVariables[variableName];
 			}
@@ -166,7 +211,7 @@ export class PluginsService implements IPluginsService {
 		var plugins = this.getAvailablePlugins();
 		var toLowerCasePluginName = pluginName.toLowerCase();
 
-		var plugin = _.find(plugins, (plugin) => plugin.name.toLowerCase() === toLowerCasePluginName);
+		var plugin = _.find(plugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === toLowerCasePluginName);
 		if(!plugin) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}

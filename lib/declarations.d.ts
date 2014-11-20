@@ -160,6 +160,10 @@ declare module Project {
 		saveProject(projectDir?: string): IFuture<void>;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		getNewProjectDir(): void;
+		getProperty(propertyName: string, configuration: string): any;
+		setProperty(propertyName: string, value: any, configuration: string): void;
+		configurationSpecificData: IDictionary<IDictionary<any>>;
+		configurations: string[];
 	}
 
 	interface IPlatformMigrator {
@@ -248,6 +252,8 @@ interface IConfiguration extends Config.IConfig {
 interface IStaticConfig extends Config.IStaticConfig {
 	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
+	DEBUG_PROJECT_FILE_NAME: string;
+	RELEASE_PROJECT_FILE_NAME: string;
 }
 
 interface IServerConfiguration {
@@ -344,7 +350,7 @@ interface IDomainNameSystem {
 }
 
 interface ICordovaPluginsService {
-	getAvailablePlugins(): IFuture<any[]>;
+	getAvailablePlugins(): IFuture<Server.CordovaPluginData[]>;
 	createPluginData(plugin: any): IFuture<IPlugin>;
 }
 
@@ -354,19 +360,14 @@ interface IPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;
-	configurePlugin(pluginName: string): IFuture<void>;
+	configurePlugin(pluginName: string, configuration?: string): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;
 }
 
 interface IPlugin {
-	name: string;
-	identifier: string;
-	version: string;
-	description: string;
-	url: string;
+	data: Server.CordovaPluginData;
 	type: any;
-	variables: string[];
-	platforms: Server.DevicePlatform[];
+	configurations: string[];
 	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }
@@ -392,4 +393,15 @@ interface ITypeScriptCompilerOptions {
 
 interface IProcessInfo {
 	isRunning(name: string): IFuture<boolean>;
+}
+
+interface IBuildConfigurationService {
+	BuildConfigurationData: IFuture<IBuildConfigurationData>;
+	saveBuildConfigurationData(): IFuture<void>;
+	readBuildConfigurationData(): IFuture<void>;
+}
+
+interface IBuildConfigurationData {
+	CorePlugins: string[];
+	CordovaPluginVariables: any;
 }
