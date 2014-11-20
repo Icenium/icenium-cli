@@ -180,8 +180,10 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
-				if(this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
-					this.saveProject(projectDir).wait();
+				if(!options.debug && !options.release) {
+					if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+						this.saveProject(projectDir).wait();
+					}
 				}
 			}
 		}).future<void>()();
