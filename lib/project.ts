@@ -169,9 +169,9 @@ export class Project implements Project.IProject {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
 			if (projectDir) {
-				var projFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+				var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
-					var data = this.$fs.readJson(projFile).wait();
+					var data = this.$fs.readJson(projectFile).wait();
 					this.projectData = data;
 				} catch (err) {
 					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
@@ -179,7 +179,7 @@ export class Project implements Project.IProject {
 						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
 						"Additional technical info: %s",
 						suppressCommandHelp: true},
-						projFile, err.toString());
+						projectFile, err.toString());
 				}
 
 				if(this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {

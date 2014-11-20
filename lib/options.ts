@@ -19,11 +19,12 @@ var knownOpts: any = {
 		"deploy": String,
 		"device": String,
 		"file": String,
-		"livesync": Boolean,
 		"save-to": String,
 		"saveTo": String,
 		"client": String,
-		"available": Boolean
+		"available": Boolean,
+		"release": Boolean,
+		"debug": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template"

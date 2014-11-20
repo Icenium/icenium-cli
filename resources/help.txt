@@ -260,12 +260,12 @@ To list all connected devices, grouped by platform, run $ appbuilder device.
 
 --[build]--
 Usage:
-    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--no-livesync]
+    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--release]
 
 Platform-specific usage:
-    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--no-livesync]
-    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--no-livesync]
-    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--no-livesync]
+    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--release]
+    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--release]
+    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--release]
 
 Builds the project for the target platform and produces an application package or a QR code for deployment.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
@@ -293,7 +293,7 @@ Options:
         If you build for iOS, unless the --companion switch is set, you must specify a provisioning profile. The 
         provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --no-livesync - If set, disables LiveSync with the three-finger tap and hold gesture.
+    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
     --save-to - If set, downloads the application package and saves it to the specified file path,
         instead of the project root. The file path must be complete with file name and extension.
         You do not need to set the --download switch.
@@ -380,7 +380,7 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform> [--device <Device ID>] [--no-livesync]
+    $ appbuilder deploy <Platform> [--device <Device ID>] [--release]
 
 Platform-specific usages:
     $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
@@ -410,7 +410,7 @@ Options:
         provisioning profile by index or name.
         If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --no-livesync - If set, disables LiveSync with the three-finger tap and hold gesture.
+    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
 --[/]--
 
 --[plugin]--
