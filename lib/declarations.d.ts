@@ -248,6 +248,8 @@ interface IConfiguration extends Config.IConfig {
 interface IStaticConfig extends Config.IStaticConfig {
 	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
+	DEBUG_PROJECT_FILE_NAME: string;
+	RELEASE_PROJECT_FILE_NAME: string;
 }
 
 interface IServerConfiguration {
