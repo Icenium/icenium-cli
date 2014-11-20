@@ -159,9 +159,7 @@ export class Project implements Project.IProject {
 
 	public saveProject(projectDir?: string): IFuture<void> {
 		return (() => {
-			projectDir = projectDir || this.getProjectDir().wait();
-
-			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t").wait();
+			this.$fs.writeJson(this.getProjectFilePath(projectDir).wait(), this.projectData, "\t").wait();
 		}).future<void>()();
 	}
 
@@ -169,9 +167,9 @@ export class Project implements Project.IProject {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
 			if (projectDir) {
-				var projFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+				var projectFilePath = this.getProjectFilePath(projectDir).wait();
 				try {
-					var data = this.$fs.readJson(projFile).wait();
+					var data = this.$fs.readJson(projectFilePath).wait();
 					this.projectData = data;
 				} catch (err) {
 					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
@@ -179,11 +177,13 @@ export class Project implements Project.IProject {
 						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
 						"Additional technical info: %s",
 						suppressCommandHelp: true},
-						projFile, err.toString());
+						projectFilePath, err.toString());
 				}
 
-				if(this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
-					this.saveProject(projectDir).wait();
+				if(!options.debug && !options.release) {
+					if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+						this.saveProject(projectDir).wait();
+					}
 				}
 			}
 		}).future<void>()();
@@ -527,6 +527,22 @@ export class Project implements Project.IProject {
 				this.$fs.createDirectory(dir).wait();
 			}
 			return dir;
+		}).future<string>()();
+	}
+
+	private getProjectFilePath(projectDir?: string): IFuture<string> {
+		return (() => {
+			projectDir = projectDir || this.getProjectDir().wait();
+
+			var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+
+			if(options.release) {
+				projectFilePath = path.join(projectDir, this.$staticConfig.RELEASE_PROJECT_FILE_NAME);
+			} else if(options.debug) {
+				projectFilePath = path.join(projectDir, this.$staticConfig.DEBUG_PROJECT_FILE_NAME);
+			}
+
+			return projectFilePath;
 		}).future<string>()();
 	}
 }

@@ -248,6 +248,8 @@ interface IConfiguration extends Config.IConfig {
 interface IStaticConfig extends Config.IStaticConfig {
 	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
+	DEBUG_PROJECT_FILE_NAME: string;
+	RELEASE_PROJECT_FILE_NAME: string;
 }
 
 interface IServerConfiguration {
@@ -344,7 +346,7 @@ interface IDomainNameSystem {
 }
 
 interface ICordovaPluginsService {
-	getAvailablePlugins(): IFuture<any[]>;
+	getAvailablePlugins(): IFuture<Server.CordovaPluginData[]>;
 	createPluginData(plugin: any): IFuture<IPlugin>;
 }
 
@@ -359,14 +361,8 @@ interface IPluginsService {
 }
 
 interface IPlugin {
-	name: string;
-	identifier: string;
-	version: string;
-	description: string;
-	url: string;
+	data: Server.CordovaPluginData;
 	type: any;
-	variables: string[];
-	platforms: string[];
 	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }

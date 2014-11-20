@@ -1,13 +1,12 @@
-///<reference path="../.d.ts"/>
+///<reference path="../../.d.ts"/>
 "use strict";
 
-import service = require("../services/cordova-plugins");
+import service = require("../../services/cordova-plugins");
 import util = require("util");
 import os = require("os");
 
 export class FindPluginsCommand implements ICommand {
-	constructor(private $cordovaPluginsService: service.CordovaPluginsService,
-		private $errors: IErrors) {
+	constructor(private $cordovaPluginsService: service.CordovaPluginsService) {
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -33,9 +32,9 @@ export class FindPluginsCommand implements ICommand {
 	}
 
 	private composePluginDescription(plugin: IPlugin) {
-		var description = util.format("Name: %s%s", plugin.name, os.EOL);
-		description += util.format("Description: %s%s", this.trim(plugin.description), os.EOL);
-		description += util.format("Version: %s%s", plugin.version, os.EOL);
+		var description = util.format("Name: %s%s", plugin.data.Name, os.EOL);
+		description += util.format("Description: %s%s", this.trim(plugin.data.Description), os.EOL);
+		description += util.format("Version: %s%s", plugin.data.Version, os.EOL);
 		return description;
 	}
 
