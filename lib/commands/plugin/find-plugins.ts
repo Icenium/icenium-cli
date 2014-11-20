@@ -1,7 +1,7 @@
-///<reference path="../.d.ts"/>
+///<reference path="../../.d.ts"/>
 "use strict";
 
-import service = require("../services/cordova-plugins");
+import service = require("../../services/cordova-plugins");
 import util = require("util");
 import os = require("os");
 
