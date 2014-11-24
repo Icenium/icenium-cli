@@ -65,7 +65,7 @@
     "watchr": "2.4.11",
     "xml-mapping": "1.5.2",
     "xml2js": "0.4.1",
-    "xmlhttprequest": "1.6.0",
+    "xmlhttprequest": "https://github.com/telerik/node-XMLHttpRequest/tarball/master",
     "yargs": "1.2.2",
     "zipstream": "https://github.com/Icenium/node-zipstream/tarball/master"
   },
