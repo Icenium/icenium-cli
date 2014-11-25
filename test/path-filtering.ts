@@ -57,4 +57,34 @@ describe("PathFilteringService", () => {
 		var expected:string[] = [];
 		assert.deepEqual(actual, expected);
 	});
+
+	it("different OS line endings -> \\n", () => {
+		var fs: IFileSystem = testInjector.resolve("fs");
+		var ignoreRules = "a\nb";
+		fs.readText = () => ((_:string) => ignoreRules).future<string>()();
+
+		var actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
+		var expected = ["a","b"];
+		assert.deepEqual(actual, expected);
+	});
+
+	it("different OS line endings -> \\r", () => {
+		var fs = testInjector.resolve("fs");
+		var ignoreRules = "a\rb";
+		fs.readText = () => (() => ignoreRules).future<string>()();
+
+		var actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
+		var expected = ["a","b"];
+		assert.deepEqual(actual, expected);
+	});
+
+	it("different OS line endings -> \\r\\n", () => {
+		var fs = testInjector.resolve("fs");
+		var ignoreRules = "a\r\nb";
+		fs.readText = () => (() => ignoreRules).future<string>()();
+
+		var actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
+		var expected = ["a","b"];
+		assert.deepEqual(actual, expected);
+	});
 });
