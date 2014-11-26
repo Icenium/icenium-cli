@@ -87,6 +87,6 @@ declare module Swagger {
 		callResultType: string;
 		endpointInterface: ILine;
 		endpointImplementation: IBlock;
-		paramsMap: IDictionary<string>;
+		parameters: string[];
 	}
 }

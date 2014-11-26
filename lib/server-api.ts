@@ -118,6 +118,19 @@ export class EverliveService implements Server.IEverliveServiceContract{
 		return this.$serviceProxy.call<Server.EverliveApplicationData[]>('GetEverliveApplications', 'GET', ['api','everlive','applications',encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 }
+export class UploadService implements Server.IUploadServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public completeUpload(path: string, originalFileHash: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('CompleteUpload', 'POST', ['api','upload','complete',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'originalFileHash': originalFileHash }), null, null, null);
+	}
+	public initUpload(path: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public uploadChunk(path: string, hash: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'hash': hash }), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+}
 export class FilesystemService implements Server.IFilesystemServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -211,6 +224,9 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public importProject(solutionName: string, projectName: string, package_: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('ImportProject', 'POST', ['api','projects','importProject',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
 	}
+	public importProject1(solutionName: string, projectName: string, bucketKey: string): IFuture<void>{
+			return this.$serviceProxy.call<void>('ImportProject', 'POST', ['api','projects','importProject',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(bucketKey.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
 	public getProjectContents(solutionName: string, projectName: string): IFuture<string>{
 		return this.$serviceProxy.call<string>('GetProjectContents', 'GET', ['api','projects','contents',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
@@ -229,12 +245,11 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public deleteSolution(solutionName: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('DeleteSolution', 'DELETE', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
-	public createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData, projectName?: string): IFuture<void>{
-		if(projectName) { 
-			return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
-		} 
-
+	public createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
 		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	}
+	public createProject1(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
+			return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 	public renameSolution(solutionName: string, newSolutionName: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('RenameSolution', 'PUT', ['api','projects','rename',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(newSolutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
@@ -444,6 +459,7 @@ export class ServiceContainer implements Server.IServer{
 	public cordova: Server.ICordovaServiceContract = $injector.resolve(CordovaService);
 	public identityStore: Server.IIdentityStoreServiceContract = $injector.resolve(IdentityStoreService);
 	public everlive: Server.IEverliveServiceContract = $injector.resolve(EverliveService);
+	public upload: Server.IUploadServiceContract = $injector.resolve(UploadService);
 	public filesystem: Server.IFilesystemServiceContract = $injector.resolve(FilesystemService);
 	public images: Server.IImagesServiceContract = $injector.resolve(ImagesService);
 	public itmstransporter: Server.IItmstransporterServiceContract = $injector.resolve(ItmstransporterService);

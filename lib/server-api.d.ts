@@ -145,6 +145,11 @@ declare module Server{
 		getAuthorizationHeader(): IFuture<string>;
 		getEverliveApplications(accountId: string): IFuture<Server.EverliveApplicationData[]>;
 	}
+	interface IUploadServiceContract{
+		completeUpload(path: string, originalFileHash: string): IFuture<void>;
+		initUpload(path: string): IFuture<void>;
+		uploadChunk(path: string, hash: string, content: any): IFuture<void>;
+	}
 	interface SolutionInfo{
 		SolutionName: string;
 		SolutionSpaceName: string;
@@ -309,13 +314,15 @@ declare module Server{
 		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
 		importPackage(solutionName: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>;
 		importProject(solutionName: string, projectName: string, package_: any): IFuture<void>;
+		importProject1(solutionName: string, projectName: string, bucketKey: string): IFuture<void>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<string>;
 		saveProjectContents(solutionName: string, projectName: string, projectContents: string): IFuture<void>;
 		upgradeSolution(solutionName: string): IFuture<void>;
 		getSolution(solutionName: string, checkUpgradability: boolean): IFuture<Server.SolutionData>;
 		canLoadSolution(solutionName: string): IFuture<boolean>;
 		deleteSolution(solutionName: string): IFuture<void>;
-		createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData, projectName?: string): IFuture<void>;
+		createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
+		createProject1(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
 		renameSolution(solutionName: string, newSolutionName: string): IFuture<void>;
 		deleteProject(solutionName: string, projectName: string): IFuture<void>;
 		setProjectProperty(solutionName: string, projectName: string, configuration: string, changeset: IDictionary<string>): IFuture<void>;
@@ -525,6 +532,7 @@ declare module Server{
 		cordova: Server.ICordovaServiceContract;
 		identityStore: Server.IIdentityStoreServiceContract;
 		everlive: Server.IEverliveServiceContract;
+		upload: Server.IUploadServiceContract;
 		filesystem: Server.IFilesystemServiceContract;
 		images: Server.IImagesServiceContract;
 		itmstransporter: Server.IItmstransporterServiceContract;
