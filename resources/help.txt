@@ -745,8 +745,7 @@ You must run the appstore command with a related command.
 Usage:
     $ appbuilder appstore list [<AppleID>] [<Password>]
 
-Lists all application records in iTunes Connect that are in the Waiting for Upload state. The list contains name, version, and
-bundle ID for each application record.
+Lists all application records in iTunes Connect. The list contains name, version, and bundle ID for each application record.
 <Apple ID> and <Password> are your credentials for logging in iTunes Connect. If you do not provide them when
         running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 
@@ -760,10 +759,10 @@ Usage:
                  --certificate <Certificate ID> --provision <Provision ID>
 
 Builds the project and uploads the application to iTunes Connect.
-<Application Name> is the name for an application record in the Waiting for Upload state. To retrieve the names of your application
-        records that are in the Waiting for Upload state in iTunes Connect, run $ appbuilder appstore list.
+<Application Name> is the name for the application record that you want to upload for publishing. To retrieve the names of your
+        application records available in iTunes Connect, run $ appbuilder appstore list.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect. If you do not provide them when
-        running the command, Telerik AppBuilder will prompt you to provide them.
+        running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
