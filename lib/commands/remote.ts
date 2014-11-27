@@ -8,6 +8,7 @@ import os = require("os");
 import minimatch = require("minimatch");
 import ip = require("ip");
 import hostInfo = require("../common/host-info");
+import options = require("./../options");
 
 export class PortCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors) { }
@@ -104,8 +105,9 @@ export class RemoteCommand implements ICommand {
 
 			var appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
 
+			options.deviceType = deviceFamily;
 			this.$iOSEmulatorServices.checkAvailability(false).wait();
-			this.$iOSEmulatorServices.startEmulator(appLocation, <Mobile.IEmulatorOptions>{ deviceFamily: deviceFamily }).wait();
+			this.$iOSEmulatorServices.startEmulator(appLocation).wait();
 
 			res.status(200).end();
 		}).future<void>()();
