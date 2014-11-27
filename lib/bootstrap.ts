@@ -59,6 +59,8 @@ $injector.requireCommand("logout", "./commands/authentication");
 
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
+$injector.require("multipartUploadService", "./services/multipart-upload");
+$injector.require("hashService", "./services/hash-service");
 
 $injector.require("project", "./project");
 $injector.require("projectPropertiesService", "./services/project-properties-service");

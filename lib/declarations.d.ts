@@ -7,7 +7,7 @@ declare module Server {
 	}
 
 	interface IServiceProxy {
-		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream): IFuture<T>;
+		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: WritableStream, headers?: any): IFuture<T>;
 		setShouldAuthenticate(shouldAuthenticate: boolean): void;
 		setSolutionSpaceName(solutionSpaceName: string): void;
 	}
