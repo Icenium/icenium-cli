@@ -5,17 +5,17 @@ import util = require("util");
 import path = require("path");
 import helpers = require("../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
+import projectTypes = require("../project-types");
 
 export class PlatformMigrationService implements Project.IPlatformMigrator {
 	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $project: Project.IProject,
-		private $projectTypes: IProjectTypes,
 		private $resources: IResourceLoader) {}
 
 	public ensureAllPlatformAssets(): IFuture<void> {
 		return ((): void => {
-			if (this.$project.projectType === this.$projectTypes.Cordova) {
+			if (this.$project.projectType === projectTypes.Cordova) {
 				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
 					this.ensureCordovaJs(platform).wait();
 				});

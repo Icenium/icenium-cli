@@ -28,7 +28,7 @@ declare module "saxjs" {
 			normalize: boolean;
 			xmlns: boolean;
 			lowercase: any;
-		}
+		};
 		looseCase: string;
 		tags: any[];
 		sawRoot: boolean;
@@ -39,7 +39,7 @@ declare module "saxjs" {
 			name: string;
 			attributes: Object;
 			isSelfClosing: boolean;
-		}
+		};
 		strict: boolean;
 		noscript: boolean;
 		state: number;

@@ -64,7 +64,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	public getProjectProperties(projectName: string): IFuture<any> {
 		return (() => {
 			var solutionData = this.getSolutionData(projectName).wait();
-			var properties = solutionData.Items[0]["Properties"];
+			var properties = (<any>solutionData.Items[0])["Properties"];
 			properties.ProjectName = projectName;
 			return properties;
 		}).future()();

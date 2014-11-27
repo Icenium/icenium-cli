@@ -241,7 +241,7 @@ class IdentityGenerationDataFactory {
 	}
 
 	public static getDistinguishedNameValues(name: string, email: string, countryCode: string): any {
-		var distinguishedNameValues = {};
+		var distinguishedNameValues: IStringDictionary = Object.create(null);
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.CN] = name;
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.EmailAddress] = email;
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.C] = countryCode;
@@ -319,7 +319,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 						}
 					}
 				}
-			}
+			};
 
 			this.$prompter.start();
 			this.$prompter.override(model);
@@ -570,7 +570,6 @@ export class ImportCryptographicIdentity implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("No certificate file specified."), new commandParams.StringCommandParameter()];
 
-
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			var certificateFile = args[0];
@@ -595,7 +594,7 @@ export class ImportCryptographicIdentity implements ICommand {
 			var targetFile = this.$fs.createReadStream(certificateFile);
 			var result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
 
-			result.forEach((identity: ICryptographicIdentity) => {
+			_.each(result, identity => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
 			});
 		}).future<void>()();
@@ -643,7 +642,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
 				this.$logger.out("%s: %s", (i + 1).toString(), req.Subject);
-			})
+			});
 			if(!requests.length) {
 				this.$logger.info("No certificate signing requests.");
 			}

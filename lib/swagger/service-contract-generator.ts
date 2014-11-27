@@ -252,7 +252,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		var operationContractName = this.getOperationContractName(operation);
 		var parameters: string[] = [];
 
-		var enumPathParameters = {};
+		var enumPathParameters: IStringDictionary = {};
 		operation.parameters.sort((parameter: Swagger.IParameter, otherParameter: Swagger.IParameter) => {
 			var parameterType = this.getParameterType(parameter);
 			var otherParameterType = this.getParameterType(otherParameter);

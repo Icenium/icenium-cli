@@ -80,7 +80,7 @@ export class PluginsService implements IPluginsService {
 		var outputLines:string[] = [];
 
 		_.each(Object.keys(groups), (group: string) => {
-			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[group], os.EOL));
+			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
 
 			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.name);
 			_.each(sortedPlugins, (plugin: IPlugin) => {
@@ -99,7 +99,7 @@ export class PluginsService implements IPluginsService {
 	public configurePlugin(pluginName: string): IFuture<void> {
 		return (() => {
 			var plugin = this.getPluginByName(pluginName);
-			var cordovaPluginVariables = this.$project.projectData.CordovaPluginVariables;
+			var cordovaPluginVariables:any = this.$project.projectData.CordovaPluginVariables;
 
 			var variables = plugin.variables;
 			if(variables) {
@@ -129,7 +129,7 @@ export class PluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
-	private gatherVariableInformation(plugin: IPlugin, variableName: string): IFuture<string> {
+	private gatherVariableInformation(plugin: IPlugin, variableName: string): IFuture<any> {
 		return (() => {
 			var schema: IPromptSchema = {
 				properties: { }
@@ -146,7 +146,7 @@ export class PluginsService implements IPluginsService {
 
 			this.$prompter.start();
 			return this.$prompter.get(schema).wait();
-		}).future<string>()();
+		}).future<any>()();
 
 	}
 

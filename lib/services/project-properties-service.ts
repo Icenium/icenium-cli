@@ -7,13 +7,13 @@ import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
+import projectTypes = require("../project-types");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	constructor(private $fs: IFileSystem,
 				private $errors: IErrors,
 				private $injector: IInjector,
-				private $resources: IResourceLoader,
-				private $projectTypes: IProjectTypes) {
+				private $resources: IResourceLoader) {
 	}
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
@@ -56,7 +56,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		});
 
 		if(!_.has(properties, "Framework")) {
-			properties["Framework"] = this.$projectTypes[this.$projectTypes.Cordova];
+			properties["Framework"] = projectTypes[projectTypes.Cordova];
 			updated = true;
 		}
 
@@ -125,11 +125,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 					validValues = helpers.toHash(range, keySelector, (value, key) => key);
 				}
 
-				var badValues = _.reject(newValue, (value) => validValues[value]);
+				var badValues = _.reject(newValue, (value: string) => validValues[value]);
 
 				validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
 
-				newValue = _.map(newValue, (value) => validValues[value]);
+				newValue = _.map(newValue, (value: string) => validValues[value]);
 			}
 
 			if (!propData.flags) {
@@ -176,15 +176,15 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
 			var result: string[] = [];
-			var schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Cordova]).wait();
-			var title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.Cordova]);
+			var schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.Cordova]).wait();
+			var title = util.format("Project properties for %s projects:", projectTypes[projectTypes.Cordova]);
 			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.NativeScript]).wait();
-			title = util.format("Project properties for %s projects:", this.$projectTypes[this.$projectTypes.NativeScript]);
+			schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.NativeScript]).wait();
+			title = util.format("Project properties for %s projects:", projectTypes[projectTypes.NativeScript]);
 			result.push(this.getProjectSchemaPartHelp(schema, title));
 
-			schema = helpers.getProjectFilePartSchema(this.$projectTypes[this.$projectTypes.Common]).wait();
+			schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.Common]).wait();
 			title = "Common properties for all projects:";
 			result.push(this.getProjectSchemaPartHelp(schema, title));
 
@@ -243,14 +243,14 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var parser = new xml2js.Parser();
 			var contents = this.$fs.readText(projectFile).wait();
 
-			var parseString = Future.wrap((str, callback) => {
+			var parseString = Future.wrap((str:string, callback:(error: any, data: any) => void) => {
 				return parser.parseString(str, callback);
 			});
 
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = helpers.getProjectFileSchema(this.$projectTypes.Cordova).wait();
+			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];

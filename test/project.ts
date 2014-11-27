@@ -11,7 +11,7 @@ import path = require("path");
 import temp = require("temp");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
-import projectTypeslib = require("../lib/project-types");
+import projectTypes = require("../lib/project-types");
 var assert = require("chai").assert;
 temp.track();
 
@@ -46,19 +46,17 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
-	testInjector.register("projectTypes", projectTypeslib);
 
 	return testInjector;
 }
 
 describe("project integration tests", () => {
-	var project: Project.IProject, testInjector: IInjector, projectTypes: IProjectTypes;
+	var project: Project.IProject, testInjector: IInjector;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
 		project = testInjector.resolve("project");
-		projectTypes = testInjector.resolve("projectTypes");
 	});
 
 	describe("createNewProject", () => {
@@ -159,12 +157,11 @@ describe("project integration tests", () => {
 });
 
 describe("project unit tests", () => {
-	var project: Project.IProject, projectTypes: IProjectTypes, projectProperties: IProjectPropertiesService,  testInjector: IInjector, propSchemaCordova: any;
+	var project: Project.IProject, projectProperties: IProjectPropertiesService,  testInjector: IInjector, propSchemaCordova: any;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
-		projectTypes = testInjector.resolve("projectTypes");
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("staticConfig", require("../lib/config").StaticConfig);

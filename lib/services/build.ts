@@ -12,10 +12,10 @@ import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
 import AppIdentifier = require("../common/mobile/app-identifier");
+import projectTypes = require("../project-types");
 
 class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
-	constructor(private $project: Project.IProject,
-				private $projectTypes: IProjectTypes) {
+	constructor(private $project: Project.IProject) {
 	}
 
 	private adjustBuildPropertiesCordova(buildProperties: any): any {
@@ -28,9 +28,9 @@ class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
 	}
 
 	public adjustBuildProperties(oldBuildProperties: any): any {
-		if (this.$project.projectType === this.$projectTypes.Cordova) {
+		if (this.$project.projectType === projectTypes.Cordova) {
 			return this.adjustBuildPropertiesCordova(oldBuildProperties);
-		} else if (this.$project.projectType === this.$projectTypes.NativeScript) {
+		} else if (this.$project.projectType === projectTypes.NativeScript) {
 			return this.adjustBuildPropertiesNativeScript(oldBuildProperties);
 		}
 	}

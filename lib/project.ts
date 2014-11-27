@@ -8,6 +8,7 @@ import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
 import os = require("os");
 import MobileHelper = require("./common/mobile/mobile-helper");
+import projectTypes = require("./project-types");
 
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
@@ -24,13 +25,12 @@ export class Project implements Project.IProject {
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
 		private $cordovaMigrationService: ICordovaMigrationService,
-		private $projectPropertiesService: IProjectPropertiesService,
-		private $projectTypes: IProjectTypes) {
+		private $projectPropertiesService: IProjectPropertiesService) {
 			this.readProjectData().wait();
 
 			this.defaultProjectForType = Object.create(null);
-			this.defaultProjectForType[this.$projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
-			this.defaultProjectForType[this.$projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
+			this.defaultProjectForType[projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
+			this.defaultProjectForType[projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
 
 			if(this.projectData && this.projectData["TemplateAppName"]) {
 				this.$errors.fail({
@@ -71,7 +71,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			var result: string[] = [], dir: string, fileMask: RegExp;
 
-			if(this.projectType === this.$projectTypes.Cordova) {
+			if(this.projectType === projectTypes.Cordova) {
 				dir = this.getProjectDir().wait();
 				fileMask = /^cordova\.(\w*)\.js$/i;
 			} else { // NativeScript
@@ -190,7 +190,7 @@ export class Project implements Project.IProject {
 	}
 
 	public get projectType(): number {
-		return this.$projectTypes[this.projectData.Framework];
+		return projectTypes[this.projectData.Framework];
 	}
 
 	public createNewProject(projectType: number, projectName: string): IFuture<void> {
@@ -338,7 +338,7 @@ export class Project implements Project.IProject {
 				var message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
 					options.template,
 					os.EOL,
-					(projectType === this.$projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
+					(projectType === projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
 				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 			}
 		}).future<void>()();
@@ -385,7 +385,7 @@ export class Project implements Project.IProject {
 			this.cachedProjectDir = projectDir;
 			this.projectData = this.$fs.readJson(
 				path.join(__dirname,
-					util.format("../resources/default-project-%s.json", this.$projectTypes[projectType].toLowerCase()))).wait();
+					util.format("../resources/default-project-%s.json", projectTypes[projectType].toLowerCase()))).wait();
 
 			this.validateProjectData(projectType, properties).wait();
 			this.$projectPropertiesService.completeProjectProperties(this.projectData);
@@ -448,7 +448,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 			if(!this.propSchema) {
-				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+				this.propSchema = helpers.getProjectFileSchema(projectTypes[this.projectData.Framework]).wait();
 			}
 
 			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, this.propSchema, true).wait();
@@ -461,7 +461,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 			if(!this.propSchema) {
-				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+				this.propSchema = helpers.getProjectFileSchema(projectTypes[this.projectData.Framework]).wait();
 			}
 			property = this.$projectPropertiesService.normalizePropertyName(property, this.propSchema);
 
@@ -484,7 +484,7 @@ export class Project implements Project.IProject {
 			this.ensureProject();
 
 			if(!this.propSchema) {
-				this.propSchema = helpers.getProjectFileSchema(this.$projectTypes[this.projectData.Framework]).wait();
+				this.propSchema = helpers.getProjectFileSchema(projectTypes[this.projectData.Framework]).wait();
 			}
 
 			property = this.$projectPropertiesService.normalizePropertyName(property, this.propSchema);

@@ -9,6 +9,7 @@ import Future = require("fibers/future");
 import util = require("util");
 import unzip = require("unzip");
 import MobileHelper = require("./common/mobile/mobile-helper");
+import projectTypes = require("./project-types");
 
 export class ConfigurationFile {
 	constructor(public template: string,
@@ -22,8 +23,7 @@ export class TemplatesService implements ITemplatesService {
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $resources: IResourceLoader,
-		private $httpClient: Server.IHttpClient,
-		private $projectTypes: IProjectTypes) {
+		private $httpClient: Server.IHttpClient) {
 			this.configFiles = [
 				new ConfigurationFile(
 					"android-manifest",
@@ -103,7 +103,7 @@ export class TemplatesService implements ITemplatesService {
 	}
 
 	public getTemplateFilename(projectType: number, name: string): string {
-		return util.format("Telerik.Mobile.%s.%s.zip", this.$projectTypes[projectType], name);
+		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
 	}
 
 	public downloadProjectTemplates(): IFuture<void> {
