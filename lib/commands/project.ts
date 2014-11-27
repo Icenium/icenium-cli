@@ -1,5 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
+import projectTypes = require("../project-types");
 
 export class ProjectCommandBase implements ICommand {
 	public enableHooks = false;
@@ -13,7 +14,6 @@ export class ProjectCommandBase implements ICommand {
 
 export class CreateHybridCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes,
 		private $errors: IErrors,
         private $projectNameValidator: IProjectNameValidator) {
 		super();
@@ -25,7 +25,7 @@ export class CreateHybridCommand extends ProjectCommandBase {
 				this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}
 
-			this.$project.createNewProject(this.$projectTypes.Cordova, args[0]).wait();
+			this.$project.createNewProject(projectTypes.Cordova, args[0]).wait();
 		}).future<void>()();
 	}
     
@@ -50,7 +50,6 @@ $injector.register("nameCommandParameter", NameParameter);
 
 export class CreateNativeCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes,
 		private $errors: IErrors,
 		private $projectNameValidator: IProjectNameValidator) {
 		super();
@@ -62,7 +61,7 @@ export class CreateNativeCommand extends ProjectCommandBase {
 				this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}
 
-			this.$project.createNewProject(this.$projectTypes.NativeScript, args[0]).wait();
+			this.$project.createNewProject(projectTypes.NativeScript, args[0]).wait();
 		}).future<void>()();
 	}
 
@@ -72,7 +71,6 @@ $injector.registerCommand("create|native", CreateNativeCommand);
 
 export class InitHybridCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes,
 		private $errors: IErrors) {
 		super();
 	}
@@ -85,7 +83,7 @@ export class InitHybridCommand extends ProjectCommandBase {
 				this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}
 
-			this.$project.createProjectFileFromExistingProject(this.$projectTypes.Cordova).wait();
+			this.$project.createProjectFileFromExistingProject(projectTypes.Cordova).wait();
 		}).future<void>()();
 	}
 
@@ -94,7 +92,6 @@ $injector.registerCommand("init|hybrid", InitHybridCommand);
 
 export class InitNativeCommand extends ProjectCommandBase {
 	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes,
 		private $errors: IErrors) {
 		super();
 	}
@@ -107,7 +104,7 @@ export class InitNativeCommand extends ProjectCommandBase {
 				this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}
 
-			this.$project.createProjectFileFromExistingProject(this.$projectTypes.NativeScript).wait();
+			this.$project.createProjectFileFromExistingProject(projectTypes.NativeScript).wait();
 		}).future<void>()();
 	}
 }

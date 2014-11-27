@@ -1,11 +1,12 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
+
 import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
 var options: any = require("../options");
+import projectTypes = require("../project-types");
 
 class ProjectIdCommandParameter implements ICommandParameter {
 	constructor(private $remoteProjectService: IRemoteProjectService) { }
@@ -51,11 +52,8 @@ export class CloudExportProjectsCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $server: Server.IServer,
 		private $fs: IFileSystem,
-		private $userDataStore: IUserDataStore,
-		private $serviceProxy: Server.IServiceProxy,
 		private $project: Project.IProject,
 		private $errors: IErrors,
-		private $projectTypes: IProjectTypes,
 		private $remoteProjectService: IRemoteProjectService) { }
 
 	allowedParameters: ICommandParameter[] = [new ProjectIdCommandParameter(this.$remoteProjectService)];
@@ -83,7 +81,7 @@ export class CloudExportProjectsCommand implements ICommand {
 				var projectFile = path.join(projectDir, this.$project.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile).wait()) {
 					var properties = this.$remoteProjectService.getProjectProperties(remoteProjectName).wait();
-					this.$project.createProjectFile(projectDir, this.$projectTypes.Cordova, properties).wait();
+					this.$project.createProjectFile(projectDir, projectTypes.Cordova, properties).wait();
 				}
 			}
 			catch(e) {

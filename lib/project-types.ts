@@ -1,7 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-var ProjectTypes = {
+var ProjectTypes: any  = {
 	1: "Cordova",
 	"Cordova": 1,
 
@@ -13,4 +13,3 @@ var ProjectTypes = {
 };
 
 export = ProjectTypes;
-$injector.register("projectTypes", ProjectTypes);

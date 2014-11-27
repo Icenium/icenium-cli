@@ -17,7 +17,7 @@ var knownOpts = {
 
 var shorthands = {
 	"v": "verbose"
-}
+};
 
 describe("common helpers", () => {
 	describe("validateYargsArguments", () => {

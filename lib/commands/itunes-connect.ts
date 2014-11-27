@@ -65,9 +65,9 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			apps = _.sortBy(apps, (app) => app.Name);
 
-			apps.forEach((app) => {
-				this.$logger.out("%s %s (%s)", app.Name, app["Version Number"], app.BundleIdentifier);
-			})
+			apps.forEach((app:Server.Application) => {
+				this.$logger.out("%s %s (%s)", app.Name, (<any>app)["Version Number"], app.BundleIdentifier);
+			});
 
 			if(!apps.length) {
 				this.$logger.out("No applications are ready for upload.");

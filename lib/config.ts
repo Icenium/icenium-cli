@@ -52,8 +52,7 @@ export class Configuration implements IConfiguration { // User specific config
 
 	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
 		var configNoFunctions = Object.create(null);
-		Object.keys(config).forEach((key) => {
-			var entry = config[key];
+		_.each(<any>config, (entry, key) => {
 			if (typeof entry !== "function") {
 				configNoFunctions[key] = entry;
 			}

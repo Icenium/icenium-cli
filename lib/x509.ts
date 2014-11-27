@@ -43,7 +43,7 @@ class X509Certificate implements IX509Certificate {
 	}
 
 	private static parseKeyValues(keyValueStr: string): any {
-		var result = {};
+		var result:any = {};
 		var keyValues = keyValueStr.split("/");
 		keyValues.forEach((kv) => {
 			var keyAndValue = kv.split("=");

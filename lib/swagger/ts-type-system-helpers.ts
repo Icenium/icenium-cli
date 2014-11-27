@@ -13,7 +13,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	private static STRING_TYPE_NAME = "string";
 
 	private static BUILT_IN_TYPES = ["IDictionary", "boolean", "number", "string", "Date", "void", "ReadableStream", "WritableStream", "any"];
-	private models: boolean[] = [];
+	private models: IDictionary<boolean> = Object.create(null);
 
 	public getWritableStreamTypeName(): string {
 		return TSTypeSystemHelpers.ANY_TYPE_NAME;

@@ -221,7 +221,7 @@ export class LoginManager implements ILoginManager {
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
 
-			var timeoutID: number = undefined;
+			var timeoutID: Timer = undefined;
 
 			if(!helpers.isInteractive()) {
 				var timeout = options.hasOwnProperty("timeout")

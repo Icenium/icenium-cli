@@ -60,7 +60,6 @@ $injector.requireCommand("logout", "./commands/authentication");
 $injector.require("buildService", "./services/build");
 $injector.requireCommand("build", "./services/build");
 
-$injector.require("projectTypes", "./project-types");
 $injector.require("project", "./project");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.requireCommand("create|hybrid", "./commands/project");

@@ -7,7 +7,7 @@ import Future = require("fibers/future");
 import helpers = require("../helpers");
 
 export class ServerExtensionsService implements IServerExtensionsService {
-	private extensionVersions = {};
+	private extensionVersions: IStringDictionary = {};
 
 	constructor(private $logger: ILogger,
 		private $httpClient: Server.IHttpClient,

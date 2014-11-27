@@ -21,7 +21,7 @@ export function isNumber(n: any): boolean {
 }
 
 export function toHash(collection: any, keySelector: (value: any, positionOrKey: any, collection: any) => string, valueSelector: (value: any, positionOrKey: any, collection: any) => any): any {
-	var result = {};
+	var result:any = {};
 	if (_.isArray(collection)) {
 		for (var i = 0; i < collection.length; ++i) {
 			result[keySelector(collection[i], i, collection)] =

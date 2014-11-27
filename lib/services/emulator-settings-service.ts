@@ -1,11 +1,12 @@
 ///<reference path="../.d.ts"/>
+"use strict";
+import projectTypes = require("../project-types");
 
 export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService {
 	private static CORDOVA_REQURED_ANDROID_APILEVEL = 10; // 2.3 Gingerbread
 	private static NATIVESCRIPT_REQURED_ANDROID_APILEVEL = 17; // 4.2 JellyBean
 
-	constructor(private $project: Project.IProject,
-		private $projectTypes: IProjectTypes) { }
+	constructor(private $project: Project.IProject) { }
 
 	public canStart(platform: string): IFuture<boolean> {
 		return (() => {
@@ -15,7 +16,7 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 	}
 
 	public get minVersion(): number {
-		if(this.$project.projectType === this.$projectTypes.Cordova) {
+		if(this.$project.projectType === projectTypes.Cordova) {
 			return EmulatorSettingsService.CORDOVA_REQURED_ANDROID_APILEVEL;
 		}
 
