@@ -1,13 +1,13 @@
 Command-Line Interface for Telerik AppBuilder
 ===========
 
-*Build and publish iOS and Android hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
+*Build and publish iOS, Android and Windows Phone 8 hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
 
 [![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
-The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store or Google Play.
+The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
 
 * [Installation](#installation "How to install the Telerik AppBuilder CLI")
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.6.2  
-Release date: 2014, November 20
+Latest version: Telerik AppBuilder 2.6.3  
+Release date: 2014, November 27
 
-> Telerik AppBuilder 2.6.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-2" target="_blank">Telerik AppBuilder 2.6.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
+> Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
 
 ### System Requirements
 
@@ -239,10 +239,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.6.2  
-Release date: 2014, November 20
+Latest version: Telerik AppBuilder 2.6.3  
+Release date: 2014, November 27
 
-> Telerik AppBuilder 2.6.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-2" target="_blank">Telerik AppBuilder 2.6.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
+> Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
