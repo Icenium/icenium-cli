@@ -513,7 +513,7 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds for device boot>]
+    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
@@ -522,8 +522,6 @@ To list the available AVDs, run $ android list avd
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
-<Seconds for device boot> is the maximum amount of time (in seconds) that the AppBuilder CLI will wait for the virtual device to boot before quitting the operation and releasing the console.
-If not set, the default value is 120 seconds.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -544,7 +542,8 @@ Options:
             To list available certificates, run $ appbuilder certificate
     --avd - Sets the Android virtual device on which you want to run your app. 
             To list the available Android virtual devices, run $ android list avd
-    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot.
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
+            before quitting the operation and releasing the console.
             If not set, the default timeout is 120 seconds.
 --[/]--
 
