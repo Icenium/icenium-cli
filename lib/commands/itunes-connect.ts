@@ -63,10 +63,10 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 			}
 
 			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
-			apps = _.sortBy(apps, (app) => app.Name);
+			apps = _.sortBy(apps, (app: Server.Application) => app.Application);
 
 			apps.forEach((app:Server.Application) => {
-				this.$logger.out("%s %s (%s)", app.Name, (<any>app)["Version Number"], app.BundleIdentifier);
+				this.$logger.out("%s %s (%s)", app.Application, (<any>app)["Version Number"], app.ReservedBundleIdentifier);
 			});
 
 			if(!apps.length) {
@@ -123,7 +123,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
 			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
-			var theApp = _.find(apps, (app: Server.Application) => app.Name === application);
+			var theApp = _.find(apps, (app: Server.Application) => app.Application === application);
 			if(!theApp) {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
 			}
@@ -144,7 +144,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 
 			var projectData = this.$project.projectData;
 			this.$server.itmstransporter.uploadApplication(projectData.ProjectName, projectData.ProjectName,
-				projectPath, theApp.Id, userName, password).wait();
+				projectPath, theApp.AppleID, userName, password).wait();
 
 			this.$logger.info("Upload complete.")
 		}).future<void>()();
