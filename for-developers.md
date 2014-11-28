@@ -75,10 +75,11 @@ To add a test for a new module, do the following:
 To compile and run all unit tests, run the following in the console:
 
 ```
-   $ grunt test
+   $ grunt ts:devall
+   $ npm test
 ```
 
-Just running the tests is done using `$ npm test`. Just compiling the tests is done using `$ grunt ts:devall`.
+The first command compiles the tests, the second one runs them.
 
 Deploying to iOS
 ===
