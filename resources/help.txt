@@ -234,6 +234,8 @@ Platform-specific usage:
 Lists all recognized connected devices with serial number and index, grouped by platform. In this version of the Telerik AppBuilder CLI,
 you can connect only iOS and Android devices.
 
+When the target platform is Android, the Telerik AppBuilder CLI lists all connected physical and running Android virtual devices.
+
 If a connected Android device is not shown in the list, make sure that you have installed the required Android USB drivers on your system
 and that USB debugging is enabled on the device.
 
@@ -386,7 +388,8 @@ Platform-specific usages:
     $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
     $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
 
-Builds the project for the selected platform and deploys it to connected devices. 
+Builds the project for the selected platform and deploys it to connected physical devices. When you build for Android,
+deploys the project on all connected physical devices and running Android virtual devices. 
 
 In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone 8 connected devices. 
 
