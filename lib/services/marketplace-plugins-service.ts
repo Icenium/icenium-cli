@@ -5,7 +5,7 @@ import util = require("util");
 import PluginsDataLib = require("./../plugins-data");
 
 export class MarketplacePluginsService implements ICordovaPluginsService {
-	private static MARKET_PLACE_PLUGINS_URL = "http://plugins.telerik.com/api/plugins";
+	private static MARKET_PLACE_PLUGINS_URL = "https://plugins.telerik.com/api/plugins";
 
 	constructor(private $httpClient: Server.IHttpClient,
 		private $server: Server.IServer) { }
@@ -26,7 +26,7 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 				rowPluginData.Description,
 				rowPluginData.Url,
 				rowPluginData.Variables,
-				rowPluginData.Platforms ? rowPluginData.Platforms.map(platform => Server.DevicePlatform[platform]): [],
+				rowPluginData.Platforms,
 				plugin.downloadsCount,
 				plugin.demoAppRepositoryLink);
 		}).future<IMarketplacePlugin>()();

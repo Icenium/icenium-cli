@@ -32,7 +32,7 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	var testInjector = new yok.Yok();
-	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
+	testInjector.register("cordovaPluginsService", cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
@@ -93,7 +93,7 @@ describe("plugins-service", () => {
 			Version: "1.0.4"
 		}];
 
-	 	var testInjector = createTestInjector(cordovaPlugins, marketplacePlugins, marketplacePlugins);
+		var testInjector = createTestInjector(cordovaPlugins, marketplacePlugins, marketplacePlugins);
 
 		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
 		var installedPlugins = service.getInstalledPlugins();
@@ -164,5 +164,50 @@ describe("plugins-service", () => {
 		service.removePlugin("Stripe").wait();
 
 		assert.equal(3, service.getInstalledPlugins().length);
+	});
+	it("does not fail if data for one of the plugins cannot be fetched", () => {
+		var cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			},
+			{
+				Identifier: "com.phonegap.plugins.PushPlugin",
+				Name: "PushPlugin"
+			}
+		];
+
+		var installedMarketplacePlugins = [{
+			Identifier: "com.telerik.stripe",
+			Name: "Stripe",
+			Version: "1.0.4"
+		}];
+
+		var availableMarketplacePlugins = [
+			{
+				Identifier: "nl.x-services.plugins.toast",
+				Name: "Toast",
+				Version: "2.0.1"
+			},
+			{
+				Identifier: "com.telerik.stripe",
+				Name: "Stripe",
+				Version: "1.0.4"
+			}
+		];
+
+		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+		var marketPlaceService: ICordovaPluginsService = testInjector.resolve("marketplacePluginsService");
+		marketPlaceService.createPluginData = (plugin: any): IFuture<IMarketplacePlugin> => {
+			return (() => {
+				throw new Error("MockMarketPlace throws error when creating plugin data.");
+			}).future<IMarketplacePlugin>()();
+		};
+
+		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+		var availablePlugins = service.getAvailablePlugins();
+
+		// Only cordovaPlugins are counted, availableMarketplacePlugins cannot fetched, but we still receive correct data for other plugins
+		assert.equal(2, availablePlugins.length);
 	});
 });

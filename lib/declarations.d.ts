@@ -366,7 +366,7 @@ interface IPlugin {
 	url: string;
 	type: any;
 	variables: string[];
-	platforms: string[];
+	platforms: Server.DevicePlatform[];
 	pluginInformation: string[];
 	toProjectDataRecord(): string;
 }
