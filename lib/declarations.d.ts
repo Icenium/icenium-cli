@@ -155,7 +155,7 @@ declare module Project {
 		createNewProject(projectType: number, projectName: string): IFuture<void>;
 		createProjectFileFromExistingProject(projectType: number): IFuture<void>;
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
-		createTemplateFolder(projectDir: string): IFuture<any>;
+		createTemplateFolder(projectDir: string): IFuture<void>;
 		getTempDir(extraSubdir?:string): IFuture<string>;
 		saveProject(projectDir?: string): IFuture<void>;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;

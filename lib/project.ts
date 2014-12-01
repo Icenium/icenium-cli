@@ -422,14 +422,14 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createTemplateFolder(projectDir: string): IFuture<any> {
-		return ((): any => {
+	public createTemplateFolder(projectDir: string): IFuture<void> {
+		return (() => {
 			this.$fs.createDirectory(projectDir).wait();
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
 			if(projectDirFiles.length != 0) {
 				throw new Error("The specified directory must be empty to create a new project.");
 			}
-		}).future<any>()();
+		}).future<void>()();
 	}
 
 	private generateDefaultAppId(appName: string): string {
