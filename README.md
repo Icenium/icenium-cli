@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.6.3  
-Release date: 2014, November 27
+Release date: 2014, December 2
 
 > Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
 
@@ -33,6 +33,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * Windows 7 or later
+* .NET 4.0 or later
 * Node.js 0.10.22 or a later stable official release (32-bit)
 
 > **IMPORTANT:** Download and install the 32-bit Node.js. Otherwise, you will not be able to install and run the AppBuilder CLI properly.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
@@ -240,7 +241,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.6.3  
-Release date: 2014, November 27
+Release date: 2014, December 2
 
 > Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
 
