@@ -33,6 +33,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * Windows 7 or later
+* .NET 4.0 or later
 * Node.js 0.10.22 or a later stable official release (32-bit)
 
 > **IMPORTANT:** Download and install the 32-bit Node.js. Otherwise, you will not be able to install and run the AppBuilder CLI properly.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
