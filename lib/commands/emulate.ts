@@ -53,20 +53,24 @@ export class EmulateIosCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$iOSEmulatorServices.checkAvailability().wait();
+			var app = "";
 
-			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
-			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS],
-				configuration: "Debug",
-				showQrCodes: false,
-				downloadFiles: true,
-				downloadedFilePath: path.join(tempDir, "package.ipa"),
-				buildForiOSSimulator: true
-			}).wait();
-			this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
+			if(!options.availableDeviceTypes) {
+				var tempDir = this.$project.getTempDir("emulatorfiles").wait();
+				var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+					platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS],
+					configuration: "Debug",
+					showQrCodes: false,
+					downloadFiles: true,
+					downloadedFilePath: path.join(tempDir, "package.ipa"),
+					buildForiOSSimulator: true
+				}).wait();
+				this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
+			 	app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			}
 
-			var app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
 			this.$iOSEmulatorServices.startEmulator(app).wait();
+
 		}).future<void>()();
 	}
 }
