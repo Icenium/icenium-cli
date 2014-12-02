@@ -73,7 +73,7 @@ export class CloudExportProjectsCommand implements ICommand {
 			}
 
 			var projectExtractor = unzip.Extract({ path: projectDir });
-			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, projectExtractor)).wait();
+			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, projectExtractor)).wait();
 			this.$fs.futureFromEvent(projectExtractor, "close").wait();
 
 			try {

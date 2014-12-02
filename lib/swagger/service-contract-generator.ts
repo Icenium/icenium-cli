@@ -114,7 +114,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			if(!this.tsTypeSystemHelpers.isBuiltIn(typeName)) {
 				typeName = util.format("Server.%s", typeName);
 			}
-			modelBlock.writeLine(util.format("%s: %s;", propertyName, typeName));
+			modelBlock.writeLine(util.format("%s: %s;", propertyName.replace(" ", ""), typeName));
 		});
 
 		return modelBlock;

@@ -4,15 +4,15 @@
 ///<reference path=".d.ts"/>
 declare module Server{
 	interface Tenant{
-		Id: string;
-		Name: string;
-		ExpirationUtcSoft: Date;
-		ExpirationUtcStrict: Date;
-		EditionType: string;
-		Status: string;
-		ProjectSlots: number;
-		LicenseType: string;
-		Features: IDictionary<boolean>;
+		id: string;
+		name: string;
+		expSoft: Date;
+		expStrict: Date;
+		edition: string;
+		status: string;
+		projectSlots: number;
+		license: string;
+		features: IDictionary<boolean>;
 	}
 	interface IUser{
 		Email: string;
@@ -138,8 +138,8 @@ declare module Server{
 		getCertificateRequest(uniqueName: string, $resultStream: any): IFuture<void>;
 	}
 	interface EverliveApplicationData{
-		Id: string;
-		Name: string;
+		originalId: string;
+		name: string;
 	}
 	interface IEverliveServiceContract{
 		getAuthorizationHeader(): IFuture<string>;
@@ -169,12 +169,12 @@ declare module Server{
 		resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>;
 	}
 	interface Application{
-		Id: number;
-		BundleIdentifier: string;
-		Name: string;
-		Sku: string;
-		Version: string;
-		IconUri: string;
+		AppleID: number;
+		ReservedBundleIdentifier: string;
+		Application: string;
+		SKUNumber: string;
+		VersionNumber: string;
+		IconURL: string;
 	}
 	interface IItmstransporterServiceContract{
 		getApplicationsReadyForUpload(username: string, password: string): IFuture<Server.Application[]>;
@@ -310,8 +310,8 @@ declare module Server{
 		getProjectFileSchema($resultStream: any): IFuture<void>;
 		getProjectTemplates(): IFuture<Server.ProjectTemplateData[]>;
 		getItemTemplates(): IFuture<Server.ItemTemplateData[]>;
-		exportSolution(solutionSpaceName: string, solutionName: string, $resultStream: any): IFuture<void>;
-		getExportedSolution(solutionName: string, $resultStream: any): IFuture<void>;
+		exportSolution(solutionSpaceName: string, solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
+		getExportedSolution(solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
 		importPackage(solutionName: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>;
 		importProject(solutionName: string, projectName: string, package_: any): IFuture<void>;
 		importProject1(solutionName: string, projectName: string, bucketKey: string): IFuture<void>;
@@ -338,6 +338,7 @@ declare module Server{
 		DuplicatesList: IDictionary<string>;
 	}
 	interface IPackagesServiceContract{
+		installDependencies(solutionName: string, projectName: string): IFuture<void>;
 		installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void>;
 		getInstalledPackages(solutionName: string, projectName: string): IFuture<Server.PackageData[]>;
 		getFilters(): IFuture<Server.BowerPackagesFilters>;
@@ -397,20 +398,20 @@ declare module Server{
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
 	}
 	interface TapSolutionData{
-		Id: string;
-		Name: string;
-		AccountId: string;
-		WorkspaceId: string;
-		Description: string;
+		id: string;
+		name: string;
+		accountId: string;
+		workspaceId: string;
+		description: string;
 	}
 	interface Collaborator{
-		Email: string;
-		UniqueIdentifier: string;
-		UserName: string;
+		email: string;
+		id: string;
+		name: string;
 	}
 	interface TapWorkspaceData{
-		Id: string;
-		Name: string;
+		id: string;
+		name: string;
 	}
 	interface ITapServiceContract{
 		getFeatures(accountId: string, serviceType: string): IFuture<string[]>;
