@@ -64,10 +64,11 @@ export class DebugCommand implements ICommand {
 $injector.registerCommand("debug", DebugCommand);
 
 class BaseDebuggerPlatformServices {
+	private static ERROR_FAILED_TO_LOAD_RUNTIME = -2146232576;
 
 	constructor(private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $sharedUserSettingsService: IUserSettingsService,
-		private $errors: IErrors,
+		protected $errors: IErrors,
 		private $logger: ILogger,
 		private $dispatcher: IFutureDispatcher) { }
 
@@ -95,7 +96,13 @@ class BaseDebuggerPlatformServices {
 		//TODO: Darwin only - Prevent printing of all devtools log on the console.
 
 		childProcess.stderr.pipe(process.stderr);
-		childProcess.stdin.on("end", () => process.exit());
+		childProcess.on("exit", (exitCode) => {
+			if (exitCode === BaseDebuggerPlatformServices.ERROR_FAILED_TO_LOAD_RUNTIME) {
+				this.$errors.fail({ formatStr: "Unable to start the debug tools. Verify that you have installed .NET 4.0 or later and try again.", suppressCommandHelp: true });
+			} else {
+				process.exit();
+			}
+		});
 		helpers.exitOnStdinEnd();
 		this.$dispatcher.run();
 	}
