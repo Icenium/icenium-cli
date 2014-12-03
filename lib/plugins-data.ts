@@ -17,7 +17,7 @@ export class CordovaPluginData implements IPlugin {
 		public url: string,
 		public type: PluginType,
 		public variables: string[],
-		public platforms: string[]) { }
+		public platforms: Server.DevicePlatform[]) { }
 
 	public get pluginInformation(): string[] {
 		var nameRow = util.format("    Plugin: %s", this.name);
@@ -40,7 +40,7 @@ export class MarketplacePluginData extends CordovaPluginData {
 		description: string,
 		url: string,
 		variables: string[],
-		platforms: string[],
+		platforms: Server.DevicePlatform[],
 		public downloads: number,
 		public demoAppRepositoryUrl: string) {
 		super(name, identifier, version, description, url, PluginType.MarketplacePlugin, variables, platforms);

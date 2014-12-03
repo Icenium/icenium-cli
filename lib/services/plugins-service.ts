@@ -123,8 +123,13 @@ export class PluginsService implements IPluginsService {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
 			_.each(plugins, (plugin: any) => {
-				var pluginData = pluginsService.createPluginData(plugin).wait();
-				this.identifierToPlugin[pluginData.toProjectDataRecord()] = pluginData;
+				try {
+					var pluginData = pluginsService.createPluginData(plugin).wait();
+					this.identifierToPlugin[pluginData.toProjectDataRecord()] = pluginData;
+				} catch(e) {
+					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", plugin.title);
+					this.$logger.trace(e);
+				}
 			});
 		}).future<void>()();
 	}
