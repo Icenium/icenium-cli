@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.6.3  
-Release date: 2014, December 2
+Latest version: Telerik AppBuilder 2.7  
+Release date: 2014, December 19
 
-> Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
+> For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
 ### System Requirements
 
@@ -57,8 +57,6 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * OS X Mavericks
 * Node.js 0.10.22 or a later stable official release
 
-> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager or Homebrew. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.<br/>For more information about Homebrew, see <a href="http://brew.sh/" target="_blank">the Homebrew web page</a>.
-
 **Additional Software Requirements for iOS On-Device Deployment**
 
 * iTunes
@@ -75,12 +73,10 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Minimum Software Requirements** 
 
-* Ubuntu 14.04 LTS
+* Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 * Node.js 0.10.22 or a later stable official release
 
-> The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
-
-> **IMPORTANT:** Verify that you have installed Node.js via Node Version Manager. For more information about Node Version Manager, see <a href="https://github.com/creationix/nvm" target="_blank">Node Version Manager in GitHub</a>.
+> **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -105,9 +101,11 @@ The Telerik AppBuilder CLI is available for installing as an npm package.
 
 In the command prompt, run the following command.
 
-```bash
-$ npm install appbuilder -g
-```
+OS | Node.js installed from http://nodejs.org/ | Node.js installed via package manager
+---|---------------------|----
+Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
+OS X | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
+Linux | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
 
 [Back to Top][1]
 
@@ -240,10 +238,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.6.3  
-Release date: 2014, December 2
+Latest version: Telerik AppBuilder 2.7  
+Release date: 2014, December 19
 
-> Telerik AppBuilder 2.6.3 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.6.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6-3" target="_blank">Telerik AppBuilder 2.6.3 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.6, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-6" target="_blank">Telerik AppBuilder 2.6 Release Notes</a>.
+> For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
