@@ -57,7 +57,7 @@ Certificate management and publishing commands:
     provision                       Lists all configured provisioning profiles for code signing iOS applications.
     provision import                Imports a provisioning profile from file.
     provision remove                Removes a registered provisioning profile.
-    appstore list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    appstore list                   Lists all applications in iTunes Connect.
     appstore upload                 Builds the project and uploads the binary to iTunes Connect.
     appmanager upload               Builds the project and uploads the binary to Telerik AppManager.
 
@@ -756,7 +756,7 @@ Usage:
 You must run the appstore command with a related command.
 
 <Command> is a related command that extends the appstore command. You can run the following related commands:
-    list - Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    list - Lists all application records in iTunes Connect.
     upload - Builds the project and uploads the binary to iTunes Connect.
 --[/]--
 
