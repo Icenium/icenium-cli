@@ -96,7 +96,7 @@ class BaseDebuggerPlatformServices {
 		//TODO: Darwin only - Prevent printing of all devtools log on the console.
 
 		childProcess.stderr.pipe(process.stderr);
-		childProcess.on("exit", (exitCode) => {
+		childProcess.on("exit", (exitCode: number) => {
 			if (exitCode === BaseDebuggerPlatformServices.ERROR_FAILED_TO_LOAD_RUNTIME) {
 				this.$errors.fail({ formatStr: "Unable to start the debug tools. Verify that you have installed .NET 4.0 or later and try again.", suppressCommandHelp: true });
 			} else {

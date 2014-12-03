@@ -4,6 +4,7 @@
 import os = require("os");
 import util = require("util");
 import options = require("./../options");
+import projectTypes = require("../project-types");
 
 export class PluginsService implements IPluginsService {
 	private static MESSAGES = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
@@ -15,7 +16,13 @@ export class PluginsService implements IPluginsService {
 		private $logger: ILogger,
 		private $project: Project.IProject,
 		private $prompter: IPrompter) {
+
 		this.$project.ensureProject();
+
+		// Cordova plugin commands are only applicable to Cordova projects
+		if (this.$project.projectData.Framework !== projectTypes[projectTypes.Cordova]) {
+			this.$errors.fail("This operation is not applicable to your project type.");
+		}
 
 		this.$logger.info("Gathering information for plugins...");
 
@@ -128,7 +135,7 @@ export class PluginsService implements IPluginsService {
 					this.identifierToPlugin[pluginData.toProjectDataRecord()] = pluginData;
 				} catch(e) {
 					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", plugin.title);
-					this.$logger.trace(e);
+					this.$logger.trace((<Error>e).message);
 				}
 			});
 		}).future<void>()();
