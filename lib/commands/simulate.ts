@@ -130,9 +130,10 @@ $injector.registerCommand("simulate", SimulateCommand);
 class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
 	private static EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
+	private static ERROR_FAILED_TO_LOAD_RUNTIME = -2146232576;
 
-	constructor(private $childProcess: IChildProcess) {
-	}
+	constructor(private $childProcess: IChildProcess,
+				private $errors: IErrors) { }
 
 	public getPackageName(): string {
 		return WinSimulatorPlatformServices.PACKAGE_NAME_WIN;
@@ -144,8 +145,14 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
-		this.$childProcess.spawn(simulatorBinary, applicationParams,
-			{ stdio: ["ignore", "ignore", "ignore"], detached: true }).unref();
+		var proc = this.$childProcess.spawn(simulatorBinary, applicationParams,
+			{ stdio: ["ignore", "ignore", "ignore"], detached: true });
+
+		proc.on("exit", (exitCode: number) => {
+			if (exitCode === WinSimulatorPlatformServices.ERROR_FAILED_TO_LOAD_RUNTIME) {
+				this.$errors.fail({ formatStr: "Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.", suppressCommandHelp: true });
+			}
+		});
 	}
 }
 
