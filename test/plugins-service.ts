@@ -43,6 +43,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	// Register mocked project
 	testInjector.register("project", {
 		projectData: {
+			Framework: "Cordova",
 			FrameworkVersion: "",
 			CorePlugins: _.map(cordovaPlugins, p => p.Identifier).concat(_.map(installedMarketplacePlugins, m => util.format("%s@%s", m.Identifier, m.Version)))
 		},
