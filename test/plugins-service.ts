@@ -1,11 +1,13 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import yok = require("../lib/common/yok");
-import stubs = require("./stubs");
-import pluginsService = require("./../lib/services/plugins-service");
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
+import helpers = require("../lib/common/helpers");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
+import pluginsService = require("./../lib/services/plugins-service");
+import stubs = require("./stubs");
+import yok = require("../lib/common/yok");
+
 import assert = require("assert");
 import Future = require("fibers/future");
 import util = require("util");
@@ -31,6 +33,9 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 }
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
+
+	helpers.enumerateFilesInDirectorySync = (directoryPath: string): string[] => [];
+
 	var testInjector = new yok.Yok();
 	testInjector.register("cordovaPluginsService", cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
@@ -43,14 +48,22 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	// Register mocked project
 	testInjector.register("project", {
 		projectData: {
-			Framework: "Cordova",
 			FrameworkVersion: "",
-			CorePlugins: _.map(cordovaPlugins, p => p.Identifier).concat(_.map(installedMarketplacePlugins, m => util.format("%s@%s", m.Identifier, m.Version)))
+			CorePlugins: _.map(cordovaPlugins, p => p.Identifier).concat(_.map(installedMarketplacePlugins, m => util.format("%s@%s", m.Identifier, m.Version))),
+			Framework: "Cordova",
+		},
+		getProperty(propertyName:string, configuration: string):any {
+			return this.projectData[propertyName];
+		},
+		setProperty(propertyName:string, value:any, configuration: string): void {
+			this.projectData[propertyName] = value;
+		},
+		saveProject: () => {
+			return (() => {
+			}).future<void>()();
 		},
 		ensureProject: () => { },
-		saveProject: () => {
-			return (() => { }).future<void>()();
-		}
+		configurations:  ["debug"]
 	});
 
 	testInjector.register("server", {
@@ -126,15 +139,15 @@ describe("plugins-service", () => {
 				Identifier: "com.telerik.stripe",
 				Name: "Stripe",
 				Version: "1.0.4"
-			}
-		];
+			}];
 
-		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
-		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-		service.addPlugin("toast").wait();
+			var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-		assert.equal(4, service.getInstalledPlugins().length);
-	});
+			var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			var installedPlugins = service.getInstalledPlugins();
+
+			assert.equal(3, installedPlugins.length);
+		});
 	it("decrement installed plugins count after remove plugin", () => {
 		var cordovaPlugins = [
 			{
@@ -212,3 +225,4 @@ describe("plugins-service", () => {
 		assert.equal(2, availablePlugins.length);
 	});
 });
+

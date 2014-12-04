@@ -24,12 +24,12 @@ $injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
 
-$injector.requireCommand("plugin|*list", "./commands/plugin");
-$injector.requireCommand("plugin|add", "./commands/plugin");
-$injector.requireCommand("plugin|remove", "./commands/plugin");
-$injector.requireCommand("plugin|configure", "./commands/plugin");
-$injector.requireCommand("plugin|find", "./commands/find-plugins");
-$injector.requireCommand("plugin|fetch", "./commands/fetch-plugin");
+$injector.requireCommand("plugin|*list", "./commands/plugin/list-plugin");
+$injector.requireCommand("plugin|add", "./commands/plugin/add-plugin");
+$injector.requireCommand("plugin|remove", "./commands/plugin/remove-plugin");
+$injector.requireCommand("plugin|configure", "./commands/plugin/configure-plugin");
+$injector.requireCommand("plugin|find", "./commands/plugin/find-plugin");
+$injector.requireCommand("plugin|fetch", "./commands/plugin/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");
 $injector.requireCommand("simulate", "./commands/simulate");
