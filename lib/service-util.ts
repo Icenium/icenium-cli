@@ -23,13 +23,12 @@ export class ServiceProxy implements Server.IServiceProxy {
 		private $errors: IErrors) {
 	}
 
-	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream): IFuture<Т> {
-		return <any> (() => {
+	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream, headers?: any): IFuture<Т> {
+		return(() => {
 			this.ensureUpToDate().wait();
+			headers = headers || Object.create(null);
 
-			var headers: any = {
-				"X-Icenium-SolutionSpace": this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME
-			};
+			headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 
 			if (this.shouldAuthenticate) {
 				var cookies = this.$userDataStore.getCookies().wait();
@@ -64,7 +63,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 			try {
 				var response = this.$httpClient.httpRequest(requestOpts).wait();
-			} catch (err) {
+			} catch(err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
 				}
@@ -80,7 +79,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 			var resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
 			return resultValue;
-		}).future()();
+		}).future<any>()();
 	}
 
 	public setShouldAuthenticate(shouldAuthenticate: boolean): void {

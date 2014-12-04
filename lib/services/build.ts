@@ -39,6 +39,7 @@ $injector.register("buildPropertiesAdjustment", BuildPropertiesAdjustment);
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
+	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
 
 	constructor(private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
@@ -54,7 +55,8 @@ export class BuildService implements Project.IBuildService {
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $projectNameValidator: IProjectNameValidator) { }
+		private $projectNameValidator: IProjectNameValidator,
+		private $multipartUploadService: IMultipartUploadService) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -509,12 +511,19 @@ export class BuildService implements Project.IBuildService {
 			this.$project.ensureProject();
 
 			this.$loginManager.ensureLoggedIn().wait();
-
 			var projectZipFile = this.zipProject().wait();
-			this.$logger.debug("zipping completed, result file size: %d", this.$fs.getFileSize(projectZipFile).wait().toString());
-
-			this.$server.projects.importProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
-				this.$fs.createReadStream(projectZipFile)).wait();
+			var fileSize = this.$fs.getFileSize(projectZipFile).wait();
+			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
+			var projectName = this.$project.projectData.ProjectName;
+			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
+			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
+				this.$logger.trace("Start uploading file by chunks.");
+				this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey).wait();
+				this.$server.projects.importProject1(projectName, projectName, bucketKey).wait();
+			} else {
+				this.$server.projects.importProject(projectName, projectName,
+					this.$fs.createReadStream(projectZipFile)).wait();
+			}
 			this.$logger.trace("Project imported");
 		}).future<void>()();
 	}
