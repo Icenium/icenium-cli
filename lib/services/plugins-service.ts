@@ -47,6 +47,20 @@ export class PluginsService implements IPluginsService {
 		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 
+	// return plugins that are enabled in one or more configurations
+	public getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[] {
+		var corePlugins: any = null;
+		if(options.debug || options.d) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
+		} else if(options.release || options.r) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
+		} else {
+			corePlugins = _.union(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
+		}
+
+		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+	}
+
 	public getAvailablePlugins(): IPlugin[] {
 		return _.values(this.identifierToPlugin);
 	}
@@ -61,11 +75,7 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("Plugin %s is already installed", pluginName);
 			}
 
-			var configurations = this.$project.configurations;
-			_.each(configurations, (configuration: string) => {
-				this.configurePlugin(pluginName, configuration).wait();
-				this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
-			});
+			this.configurePlugin(pluginName).wait();
 
 		}).future<void>()();
 	}
@@ -80,26 +90,15 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}
 
-			var configurations = this.$project.configurations;
-			_.each(configurations, (configuration: string) => {
+			var plugin = this.getPluginByName(pluginName);
 
-				var plugin = this.getPluginByName(pluginName);
-				var pluginData = plugin.data;
-				var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
-
-				_.each(pluginData.Variables, variableName => {
-					delete cordovaPluginVariables[pluginData.Identifier][variableName];
+			if(this.$project.hasBuildConfigurations()) {
+				_.each(plugin.configurations, (configuration:string) => {
+					this.removePluginCore(pluginName, plugin, configuration).wait();
 				});
-
-				if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
-					delete cordovaPluginVariables[pluginData.Identifier];
-				}
-
-				var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
-				this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
-				this.$project.saveProject().wait();
-				this.$logger.out("Plugin %s was successfully removed for configuration %s", pluginName, configuration);
-			});
+			} else {
+				this.removePluginCore(pluginName, plugin).wait();
+			}
 		}).future<void>()();
 	}
 
@@ -124,7 +123,22 @@ export class PluginsService implements IPluginsService {
 		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName);
 	}
 
-	public configurePlugin(pluginName: string, configuration?: string): IFuture<void> {
+	public configurePlugin(pluginName: string): IFuture<void> {
+		return (() => {
+			if(this.$project.hasBuildConfigurations()) {
+				var configurations = this.$project.configurations;
+				_.each(configurations, (configuration:string) => {
+					this.configurePluginCore(pluginName, configuration).wait();
+					this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
+				});
+			} else {
+				this.configurePluginCore(pluginName).wait();
+				this.$logger.out("Plugin %s was successfully added.", pluginName);
+			}
+		}).future<void>()();
+	}
+
+	private configurePluginCore(pluginName: string, configuration?: string): IFuture<void> {
 		return (() => {
 			var plugin = this.getPluginByName(pluginName);
 			var pluginData = plugin.data;
@@ -151,6 +165,26 @@ export class PluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
+	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): IFuture<void> {
+		return (() => {
+			var pluginData = plugin.data;
+			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+
+			_.each(pluginData.Variables, variableName => {
+				delete cordovaPluginVariables[pluginData.Identifier][variableName];
+			});
+
+			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
+				delete cordovaPluginVariables[pluginData.Identifier];
+			}
+
+			var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
+			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+			this.$project.saveProject().wait();
+			this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+		}).future<void>()();
+	}
+
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
@@ -160,12 +194,11 @@ export class PluginsService implements IPluginsService {
 				try {
 					var pluginData = pluginsService.createPluginData(plugin).wait();
 				} catch(e) {
-					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", plugin.Name);
+					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", (<any>plugin).title);
 					this.$logger.trace(e);
 				}
 
 				if(pluginData) {
-
 					var projectDataRecord = pluginData.toProjectDataRecord();
 					var configurations = _.keys(this.$project.configurationSpecificData);
 

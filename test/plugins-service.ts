@@ -50,8 +50,9 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		projectData: {
 			FrameworkVersion: "",
 			CorePlugins: _.map(cordovaPlugins, p => p.Identifier).concat(_.map(installedMarketplacePlugins, m => util.format("%s@%s", m.Identifier, m.Version))),
-			Framework: "Cordova",
+			Framework: "Cordova"
 		},
+		hasBuildConfigurations: () => false,
 		getProperty(propertyName:string, configuration: string):any {
 			return this.projectData[propertyName];
 		},

@@ -23,9 +23,17 @@ export class CordovaPluginData implements IPlugin {
 		var versionRow = util.format("    Version: %s", this.data.Version);
 		var urlRow = util.format("    Url: %s", this.data.Url);
 		var platformsRow = util.format("    Platforms: %s", this.data.Platforms.join(", "));
-		var configurationsRow = util.format("    Configuration: %s", this.configurations.join(", "));
 
-		return [nameRow, identifierRow, versionRow, urlRow, platformsRow, configurationsRow];
+		var result = [nameRow, identifierRow, versionRow, urlRow, platformsRow];
+		if(this.configurations && this.configurations.length > 0) {
+			result.push(util.format("    Configuration: %s", this.configurations.join(", ")));
+		}
+
+		if(this.data.Variables && this.data.Variables.length > 0) {
+			result.push(util.format("    Variables: %s", this.data.Variables.join(", ")));
+		}
+
+		return result;
 	}
 
 	public toProjectDataRecord(): string {
@@ -48,7 +56,13 @@ export class MarketplacePluginData extends CordovaPluginData {
 		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
 		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
 
-		return [nameRow, identifierRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
+		var result = [nameRow, identifierRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
+
+		if(this.data.Variables && this.data.Variables.length > 0) {
+			result.push(util.format("    Variables: %s", this.data.Variables.join(", ")));
+		}
+
+		return  result;
 	}
 
 	public toProjectDataRecord(): string {
