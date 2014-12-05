@@ -4,6 +4,7 @@ require("./common/bootstrap");
 $injector.require("serverConfiguration", "./server-config");
 $injector.require("config", "./config");
 $injector.require("staticConfig", "./config");
+$injector.requireCommand("dev-config", "./commands/dev/config");
 $injector.requireCommand("dev-config-apply", "./commands/dev/config-apply");
 $injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
 $injector.require("resources", "./resource-loader");

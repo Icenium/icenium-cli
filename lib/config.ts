@@ -19,11 +19,17 @@ export class Configuration implements IConfiguration { // User specific config
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
-		this.mergeConfig(this, this.loadConfig("config").wait());
+		var configPath = this.getConfigPath("config");
+		if(!this.$fs.exists(configPath).wait()) {
+			var configBase = this.loadConfig("config-base").wait();
+			this.$fs.writeJson(configPath, configBase).wait();
+		} else {
+			this.mergeConfig(this, this.loadConfig("config").wait());
+		}
 	}
 
 	public reset(): IFuture<void> {
-		return this.copyFile(this.getConfigName("config-base"), this.getConfigName("config"));
+		return this.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
 	}
 
 	public apply(configName: string): IFuture<void> {
@@ -35,7 +41,14 @@ export class Configuration implements IConfiguration { // User specific config
 		}).future<void>()();
 	}
 
-	private getConfigName(filename: string) : string {
+	public printConfigData(): IFuture<void> {
+		return (() => {
+			var config = this.loadConfig("config").wait();
+			console.log(config);
+		}).future<void>()();
+	}
+
+	private getConfigPath(filename: string) : string {
 		return path.join(__dirname, "../config/", filename + ".json");
 	}
 
@@ -44,10 +57,8 @@ export class Configuration implements IConfiguration { // User specific config
 	}
 
 	private loadConfig(name: string): IFuture<any> {
-		return ((): any => {
-			var configFileName = this.getConfigName(name);
-			return this.$fs.readJson(configFileName).wait();
-		}).future<any>()();
+		var configFileName = this.getConfigPath(name);
+		return this.$fs.readJson(configFileName);
 	}
 
 	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
@@ -58,11 +69,11 @@ export class Configuration implements IConfiguration { // User specific config
 			}
 		});
 
-		var configFileName = this.getConfigName(name);
+		var configFileName = this.getConfigPath(name);
 		return this.$fs.writeJson(configFileName, configNoFunctions, "\t");
 	}
 
-	private mergeConfig(config: IConfiguration, mergeFrom: IConfiguration) {
+	private mergeConfig(config: IConfiguration, mergeFrom: IConfiguration): void {
 		_.extend(config, mergeFrom);
 	}
 }
