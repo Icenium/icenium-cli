@@ -40,6 +40,10 @@ export class DebugCommand implements ICommand {
 		}).future<void>()();
 	}
 
+	public canExecute(args: string[]): IFuture<boolean> {
+		return this.$debuggerPlatformServices.canRunApplication();
+	}
+
 	private runDebugger(): IFuture<void>{
 		return (() => {
 			this.$logger.info("Starting debugger...");
@@ -64,7 +68,6 @@ export class DebugCommand implements ICommand {
 $injector.registerCommand("debug", DebugCommand);
 
 class BaseDebuggerPlatformServices {
-	private static ERROR_FAILED_TO_LOAD_RUNTIME = -2146232576;
 
 	constructor(private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $sharedUserSettingsService: IUserSettingsService,
@@ -96,13 +99,7 @@ class BaseDebuggerPlatformServices {
 		//TODO: Darwin only - Prevent printing of all devtools log on the console.
 
 		childProcess.stderr.pipe(process.stderr);
-		childProcess.on("exit", (exitCode: number) => {
-			if (exitCode === BaseDebuggerPlatformServices.ERROR_FAILED_TO_LOAD_RUNTIME) {
-				this.$errors.fail({ formatStr: "Unable to start the debug tools. Verify that you have installed .NET 4.0 or later and try again.", suppressCommandHelp: true });
-			} else {
-				process.exit();
-			}
-		});
+		childProcess.stdin.on("end", () => process.exit());
 		helpers.exitOnStdinEnd();
 		this.$dispatcher.run();
 	}
@@ -136,6 +133,10 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 		var childProcess: child_process.ChildProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
 		this.waitDebuggerExit(childProcess);
 	}
+
+	public canRunApplication(): IFuture<boolean> {
+		return hostInfo.isDotNet40Installed("Unable to start the debug tool. Verify that you have installed .NET 4.0 or later and try again.");
+	}
 }
 
 class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implements IExtensionPlatformServices {
@@ -167,6 +168,10 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 		var commandLine = [debuggerBinary, '--args'].concat(applicationParams);
 		this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+	}
+
+	public canRunApplication(): IFuture<boolean> {
+		return (() => true).future<boolean>()();
 	}
 }
 

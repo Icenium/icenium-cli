@@ -54,6 +54,10 @@ export class SimulateCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
+	public canExecute(args: string[]): IFuture<boolean> {
+		return this.$simulatorPlatformServices.canRunApplication();
+	}
+
 	private ensureSimulatorIsNotRunning(): void {
 		var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
 		if (isRunning) {
@@ -130,7 +134,6 @@ $injector.registerCommand("simulate", SimulateCommand);
 class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
 	private static EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
-	private static ERROR_FAILED_TO_LOAD_RUNTIME = -2146232576;
 
 	constructor(private $childProcess: IChildProcess,
 				private $errors: IErrors) { }
@@ -145,14 +148,12 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
 		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
-		var proc = this.$childProcess.spawn(simulatorBinary, applicationParams,
-			{ stdio: ["ignore", "ignore", "ignore"], detached: true });
+		this.$childProcess.spawn(simulatorBinary, applicationParams,
+			{ stdio: "ignore", detached: true }).unref();
+	}
 
-		proc.on("exit", (exitCode: number) => {
-			if (exitCode === WinSimulatorPlatformServices.ERROR_FAILED_TO_LOAD_RUNTIME) {
-				this.$errors.fail({ formatStr: "Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.", suppressCommandHelp: true });
-			}
-		});
+	public canRunApplication(): IFuture<boolean> {
+		return hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 }
 
@@ -176,6 +177,10 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 		var commandLine = [simulatorBinary, '--args'].concat(applicationParams);
 		this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
+	}
+
+	public canRunApplication(): IFuture<boolean> {
+		return (() => true).future<boolean>()();
 	}
 }
 

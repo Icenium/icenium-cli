@@ -265,6 +265,7 @@ interface IExtensionPlatformServices {
 	getPackageName() : string;
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
+	canRunApplication(): IFuture<boolean>;
 }
 
 interface IX509Certificate {
