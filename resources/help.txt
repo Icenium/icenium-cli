@@ -1,7 +1,7 @@
 --[]--
 
 Usage:
-    $ appbuilder <command> [command parameters] [--command <options>]
+    $ appbuilder <command> [parameters] [--options <values>]
 
 General commands:
     help <command>                  Shows additional information about the commands in this list.
