@@ -55,7 +55,7 @@ export class EmulateIosCommand implements ICommand {
 			this.$iOSEmulatorServices.checkAvailability().wait();
 			var app = "";
 
-			if(!options.availableDeviceTypes) {
+			if(!options.availableDevices) {
 				var tempDir = this.$project.getTempDir("emulatorfiles").wait();
 				var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 					platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS],
