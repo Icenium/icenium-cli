@@ -1,5 +1,5 @@
 ///<reference path=".d.ts"/>
-
+"use strict";
 import http = require("http");
 import url = require("url");
 import path = require("path");
