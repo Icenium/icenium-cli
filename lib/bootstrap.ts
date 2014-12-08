@@ -78,8 +78,6 @@ $injector.requireCommand("prop|print", "./project");
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
 
-$injector.requireCommand("device|*list", "./commands/list-devices");
-$injector.requireCommand("device|log", "./commands/open-device-log-stream");
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
