@@ -12,6 +12,8 @@ import projectTypes = require("./project-types");
 
 export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
+	private _hasBuildConfigurations: boolean = false;
+
 	public projectData: IProjectData;
 	public PROJECT_FILE = ".abproject";
 
@@ -204,6 +206,7 @@ export class Project implements Project.IProject {
 							var configurationName = configMatch[1];
 							var configProjectContent = this.$fs.readJson(configProjectFile).wait();
 							this.configurationSpecificData[configurationName.toLowerCase()] = configProjectContent;
+							this._hasBuildConfigurations = true;
 						}
 					});
 
@@ -241,27 +244,37 @@ export class Project implements Project.IProject {
 		return configurations;
 	}
 
+	public hasBuildConfigurations(): boolean {
+		return this._hasBuildConfigurations;
+	}
+
 	public getProperty(propertyName: string, configuration: string): any {
 		var propertyValue: any = null;
 
-		if(configuration) {
+		if(this._hasBuildConfigurations) {
 			var configData = this.configurationSpecificData[configuration];
 			if(configData) {
 				propertyValue = configData[propertyName];
 			}
+		} else {
+			propertyValue = this.projectData[propertyName];
 		}
 
 		return propertyValue;
 	}
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
-		var configData = this.configurationSpecificData[configuration];
-		if (!configData) {
-			configData = Object.create(null);
-			this.configurationSpecificData[configuration] = configData;
-		}
+		if(this._hasBuildConfigurations) {
+			var configData = this.configurationSpecificData[configuration];
+			if (!configData) {
+				configData = Object.create(null);
+				this.configurationSpecificData[configuration] = configData;
+			}
 
-		configData[propertyName] = value;
+			configData[propertyName] = value;
+		} else {
+			this.projectData[propertyName] = value;
+		}
 	}
 
 	public createNewProject(projectType: number, projectName: string): IFuture<void> {

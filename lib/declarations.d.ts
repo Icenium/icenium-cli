@@ -164,6 +164,7 @@ declare module Project {
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
+		hasBuildConfigurations(): boolean;
 	}
 
 	interface IPlatformMigrator {
@@ -358,6 +359,7 @@ interface ICordovaPluginsService {
 interface IPluginsService {
 	getAvailablePlugins(): IPlugin[];
 	getInstalledPlugins(): IPlugin[];
+	getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[];
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;

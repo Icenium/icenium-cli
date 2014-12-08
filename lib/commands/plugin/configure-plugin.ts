@@ -4,16 +4,10 @@ import pluginConfigureCommandParameterLib = require("./plugin-configure-command-
 
 export class ConfigurePluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
-		private $project: Project.IProject,
 		private $injector: IInjector) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			var configurations = this.$project.configurations;
-			_.each(configurations, (configuration:string) => {
-				this.$pluginsService.configurePlugin(args[0], configuration).wait();
-			});
-		}).future<void>()();
+		return	this.$pluginsService.configurePlugin(args[0]);
 	}
 
 	allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
