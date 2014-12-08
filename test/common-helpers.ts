@@ -28,7 +28,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -41,7 +41,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -53,7 +53,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -65,7 +65,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -77,7 +77,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -89,7 +89,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 			assert.isTrue(isExecutionStopped);
 		});
 
@@ -100,7 +100,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -112,7 +112,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -124,7 +124,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -137,7 +137,7 @@ describe("common helpers", () => {
 			};
 
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -150,7 +150,7 @@ describe("common helpers", () => {
 
 			parsed.path = null;
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -163,7 +163,7 @@ describe("common helpers", () => {
 
 			parsed.path = undefined;
 			helpers.breakExecution = mockBreakExecution;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, true);
+			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
