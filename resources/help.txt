@@ -572,18 +572,21 @@ Usage:
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
-<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ isim device-types
 
 --availableDevices - Lists all available device type identifiers for the current XCode.
 <Device Name> is the device type identifier as listed by run $ appbuilder emulate ios --availableDevices.
 
 Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
-    You are running the Telerik AppBuilder CLI on OS X. You have installed Xcode.
+    You are running the Telerik AppBuilder CLI on OS X.
+    You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the 
+    Telerik AppBuilder CLI depends. For more information, visit https://www.npmjs.org/package/ios-sim-portable
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
-For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
@@ -596,6 +599,8 @@ Options:
             a provisioning profile by index or name.
             If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate.
             To list available provisioning profiles, run $ appbuilder provision.
+    --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
+            To list the available iOS Simulator devices, run $ isim device-types
 
 --[/]--
 
@@ -945,7 +950,7 @@ All data gathered is used strictly for improving the product and will never be u
 --[remote]--
 
 Usage:
-    $ appbuilder remote <Port>
+    $ appbuilder remote <Port> [--device <Device Name>]
 
 Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. 
 
@@ -956,6 +961,13 @@ IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run t
 <Port> is a non-negative integer that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ isim device-types
+
+Options:
+    --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
+            When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
+            from the other Telerik AppBuilder clients. 
+            To list the available iOS Simulator devices, run $ isim device-types
 --[/]--
 
 --[mobileframework]--
