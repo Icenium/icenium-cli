@@ -67,9 +67,14 @@ declare module Server{
 		OldName: string;
 		NewName: string;
 	}
+	interface FrameworkVersion{
+		Version: string;
+		DisplayName: string;
+	}
 	interface CordovaMigrationData{
 		RenamedPlugins: Server.CordovaRenamedPlugin[];
 		SupportedVersions: string[];
+		SupportedFrameworkVersions: Server.FrameworkVersion[];
 		IntegratedPlugins: any;
 	}
 	interface PropertyMigration{
@@ -98,6 +103,7 @@ declare module Server{
 		getMigrationData(): IFuture<Server.CordovaMigrationData>;
 		getPluginsPackage($resultStream: any): IFuture<void>;
 		getCordovaVersions(): IFuture<string[]>;
+		getCordovaFrameworkVersions(): IFuture<Server.FrameworkVersion[]>;
 		getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>;
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>;
 		addPlatform(platform: Server.DevicePlatform, solutionName: string, projectName: string): IFuture<Server.MigrationResult>;
