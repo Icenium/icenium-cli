@@ -507,16 +507,12 @@ Options:
 
 --[emulate]--
 Usage:
-    $ appbuilder emulate <Command> [--device <Device Name>] [--availableDevices]
+    $ appbuilder emulate <Command>
 
 You must run the emulate command with a related command.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
-
---device and --availableDevices options are available only for ios command.
---availableDevices - Lists all available device type identifiers for the current XCode.
-<Device Name> is the device type identifier as listed by run $ appbuilder emulate ios --availableDevices.
 
 <Command> is a related command that sets a target platform for the emulate command. You can run the following related commands:
     android - Builds the specified project in the cloud and runs it in the native Android emulator.
@@ -563,18 +559,19 @@ Options:
 
 --[emulate|ios]--
 Usage:
-    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>]
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices]
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
+--availableDevices - Lists all available device type identifiers for the current XCode.
+<Device Name> is the device type identifier as listed by run $ appbuilder emulate ios --availableDevices.
+
 Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
-    You are running the Telerik AppBuilder CLI on OS X.
-    You have installed the ios-sim npm package globally. For more information, see https://www.npmjs.org/package/ios-sim.
-    You have installed Xcode. The version of Xcode must be compatible with the ios-sim npm package.
+    You are running the Telerik AppBuilder CLI on OS X. You have installed Xcode.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
