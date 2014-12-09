@@ -37,7 +37,8 @@ export class Project implements Project.IProject {
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
 		private $cordovaMigrationService: ICordovaMigrationService,
-		private $projectPropertiesService: IProjectPropertiesService) {
+		private $projectPropertiesService: IProjectPropertiesService,
+		private $server: Server.IServer) {
 
 			this.configurationSpecificData = Object.create(null);
 
@@ -325,7 +326,8 @@ export class Project implements Project.IProject {
 			if(this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
-				version = _.last(this.$cordovaMigrationService.getSupportedVersions().wait());
+				var selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf("Experimental") === -1));
+				version = selectedFramework.Version;
 			}
 
 			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
@@ -338,7 +340,8 @@ export class Project implements Project.IProject {
 				return;
 			}
 
-			this.$logger.info("Migrating to cordova version %s", newVersion);
+			var versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
+			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			var oldVersion = this.projectData.FrameworkVersion;
 			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
 			this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
@@ -368,7 +371,7 @@ export class Project implements Project.IProject {
 				});
 			}
 
-			this.$logger.info("Successfully migrated to version %s", newVersion);
+			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
 		}).future<void>()();
 	}
 
@@ -599,6 +602,16 @@ export class Project implements Project.IProject {
 	public ensureProject() {
 		if(!this.projectData) {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
+		}
+	}
+
+	public ensureCordovaProject() {
+		if(!this.projectData) {
+			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
+		}
+
+		if(this.projectType !== projectTypes.Cordova) {
+			this.$errors.fail("This is not a valid Cordova project.");
 		}
 	}
 
