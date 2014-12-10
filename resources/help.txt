@@ -464,11 +464,15 @@ Disables a core, integrated or verified plugin from your project.
 
 --[plugin|configure]--
 Usage:
-    $ appbuilder plugin configure <Name>
+    $ appbuilder plugin configure <Name> [--debug] [--release]
 
 Configures plugin variables for selected core, integrated or verified plugin.
 
 <Name> is the name of the plugin as listed by $ appbuilder plugin
+
+Options:
+    --debug - Sets the plugin variable for the Debug build configuration only. 
+    --release - Sets the plugin variable for the Release build configuration only. 
 --[/]--
 
 --[plugin|find]--
