@@ -26,6 +26,7 @@ Project development commands:
     remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
     plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
     plugin add                      Enables a core, integrated or verified plugin for your project.
+    plugin configure                Configures plugin variables for the selected core, integrated or verified plugin.
     plugin remove                   Disables a core, integrated, or verified plugin for your project.
     plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
     plugin fetch                    Imports an Apache Cordova plugin into your project.
@@ -431,6 +432,7 @@ If neither --debug or --release option is specified lists all core, integrated a
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     add - Enables a core, integrated or verified plugin for your project.
+    configure - Configures plugin variables for the selected core, integrated or verified plugin.
     remove - Disables a core, integrated or verified plugin for your project.
     find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
@@ -475,7 +477,7 @@ If neither --debug or --release options are specified disables the plugin for bo
 Usage:
     $ appbuilder plugin configure <Name>
 
-Configure plugin variables for selected plugin.
+Configures plugin variables for selected core, integrated or verified plugin.
 
 <Name> is the name of the plugin as listed by $ appbuilder plugin
 --[/]--
