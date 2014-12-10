@@ -43,7 +43,8 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 	constructor(public $server: Server.IServer,
 		public $logger: ILogger,
 		public $prompter: IPrompter,
-		public $errors: IErrors) {
+		public $errors: IErrors,
+		private $loginManager: ILoginManager) {
 		super($server, $logger, $prompter, $errors);
 	}
 
@@ -51,6 +52,8 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 	
     execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
+
 			var userName = args[0];
 			var password = args[1];
 
@@ -85,7 +88,8 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
 		private $identityManager: Server.IIdentityManager,
-		private $stringParameterBuilder: IStringParameterBuilder) {
+		private $stringParameterBuilder: IStringParameterBuilder,
+		private $loginManager: ILoginManager) {
 		super($server, $logger, $prompter, $errors);
 	}
     
@@ -94,6 +98,8 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
         
 	execute(args:string[]): IFuture<void> {
 		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
+
 			var application = args[0];
 			var userName = args[1];
 			var password = args[2];
