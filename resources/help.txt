@@ -37,6 +37,8 @@ Project development commands:
     cloud                           Lists all projects associated with your Telerik Platform account.
     cloud export                    Exports a selected project from the cloud and initializes it for development.
     update-kendoui                  Updates or adds Kendo UI Core or Kendo UI Professional to your project.
+    mobileframework                 Lists all supported versions of the mobile framework.
+    mobileframework set             Sets the selected framework version for the project and updates the plugins according to the new version.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -948,4 +950,32 @@ IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run t
 <Port> is a non-negative integer that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
+--[/]--
+
+--[mobileframework]--
+Usage:
+    $appbuilder mobileframework [<Command>] [--path <Directory>]
+
+Lists all supported versions of the mobile framework for the current hybrid project.
+
+<Command> is a related command that extends the mobileframework command. You can run the following related commands:
+	set - Sets the selected framework version for the project and updates the plugins according to the new version.
+
+Options:
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
+            for in the current directory and all directories above it.
+--[/]--
+
+--[mobileframework|set]--
+Usage:
+    $ appbuilder mobileframework set <Version> [--path <Directory>]
+
+Sets the selected framework version for the project and updates the plugins according to the new version.
+<Version> is the version of the framework in the 
+        following format Major.Minor.Patch
+You can use appbuilder mobileframework to get list of supported versions.
+
+Options:
+    --path - Specifies the directory that contains the project. If not specified, the project is searched
+            for in the current directory and all directories above it.
 --[/]--

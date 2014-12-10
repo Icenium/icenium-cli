@@ -19,23 +19,57 @@ class MigrationData {
 	}
 }
 
+export class FrameworkVersion implements Server.FrameworkVersion {
+	constructor(public DisplayName: string,
+		public Version: string) { }
+}
+
 export class CordovaMigrationService implements ICordovaMigrationService {
 	private _migrationData: MigrationData;
 	private minSupportedVersion: string = "3.0.0";
 	private cordovaMigrationFile: string = path.join(__dirname, "../../resources/Cordova", "cordova-migration-data.json");
 
 	constructor(private $fs: IFileSystem,
-		private $server: Server.IServer) {
+		private $server: Server.IServer,
+		private $errors: IErrors,
+		private $loginManager:ILoginManager) {
 	}
 
 	private get migrationData(): IFuture<MigrationData> {
 		return (() => {
-			if (!this._migrationData) {
+			if(!this._migrationData) {
 				this._migrationData = this.$fs.readJson(this.cordovaMigrationFile).wait();
 			}
 
 			return this._migrationData;
 		}).future<MigrationData>()();
+	}
+
+	public getDisplayNameForVersion(version: string): IFuture<string> {
+		return ((): string => {
+			var framework = _.find(this.getSupportedFrameworks().wait(), (fw: Server.FrameworkVersion) => fw.Version === version);
+			if(framework) {
+				return framework.DisplayName;
+			}
+
+			this.$errors.fail("Cannot find version %s in the supported versions.", version);
+		}).future<string>()();
+	}
+
+	public getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]> {
+		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
+
+			var cliSupportedVersions: Server.FrameworkVersion[] = [];
+			_.each(this.$server.cordova.getCordovaFrameworkVersions().wait(), (fw: Server.FrameworkVersion) => {
+				var version = this.parseMscorlibVersion(fw.Version);
+				if(helpers.versionCompare(version, this.minSupportedVersion) >= 0) {
+					cliSupportedVersions.push(new FrameworkVersion(fw.DisplayName, version));
+				}
+			});
+
+			return cliSupportedVersions;
+		}).future<Server.FrameworkVersion[]>()();
 	}
 
 	public getSupportedVersions(): IFuture<string[]> {
@@ -44,7 +78,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}).future<string[]>()();
 	}
 
-	public pluginsForVersion(version: string): IFuture<string[]>{
+	public pluginsForVersion(version: string): IFuture<string[]> {
 		return (() => {
 			return this.migrationData.wait().integratedPlugins[version] || [];
 		}).future<string[]>()();
@@ -64,7 +98,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			plugins = _.map(plugins, plugin => {
 				_.each(transitions, transition => {
-					if (transition.from == plugin) {
+					if(transition.from == plugin) {
 						plugin = transition.to;
 					}
 				});
