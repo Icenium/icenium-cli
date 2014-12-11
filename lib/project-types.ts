@@ -9,7 +9,10 @@ var ProjectTypes: any  = {
 	"NativeScript": 2,
 
 	4: "Common",
-	"Common" : 4
+	"Common" : 4,
+
+	8: "MobileWebsite",
+	"MobileWebsite": 8
 };
 
 export = ProjectTypes;

@@ -220,6 +220,11 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
+				if (this.projectType === projectTypes.MobileWebsite) {
+					this.$errors.fail("This is a mobile website project. In this version of the Telerik AppBuilder CLI, you cannot work with mobile website projects." +
+					" You will be able to develop mobile website projects in a future release.");
+				}
+
 				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
