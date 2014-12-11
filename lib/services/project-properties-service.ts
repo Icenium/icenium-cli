@@ -32,32 +32,34 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public completeProjectProperties(properties: any): boolean {
 		var updated = false;
 
-		if (_.has(properties, "name")) {
-			properties.ProjectName = properties.name;
-			delete properties.name;
-			updated = true;
-		}
-
-		if (_.has(properties, "iOSDisplayName")) {
-			properties.DisplayName = properties.iOSDisplayName;
-			delete properties.iOSDisplayName;
-			updated = true;
-		}
-		if (!properties.DisplayName) {
-			properties.DisplayName = properties.ProjectName;
-			updated = true;
-		}
-
-		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
-				properties[wp8guid] = MobileHelper.generateWP8GUID();
-				updated = true;
-			}
-		});
-
 		if(!_.has(properties, "Framework")) {
 			properties["Framework"] = projectTypes[projectTypes.Cordova];
 			updated = true;
+		}
+
+		if (properties["Framework"] !== projectTypes[projectTypes.MobileWebsite]) {
+			if (_.has(properties, "name")) {
+				properties.ProjectName = properties.name;
+				delete properties.name;
+				updated = true;
+			}
+
+			if (_.has(properties, "iOSDisplayName")) {
+				properties.DisplayName = properties.iOSDisplayName;
+				delete properties.iOSDisplayName;
+				updated = true;
+			}
+			if (!properties.DisplayName) {
+				properties.DisplayName = properties.ProjectName;
+				updated = true;
+			}
+
+			["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
+				if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
+					properties[wp8guid] = MobileHelper.generateWP8GUID();
+					updated = true;
+				}
+			});
 		}
 
 		var defaultProject = this.$resources.readJson(

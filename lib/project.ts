@@ -1,5 +1,6 @@
 ///<reference path=".d.ts"/>
 "use strict";
+
 import minimatch = require("minimatch");
 import path = require("path");
 var options: any = require("./options");
@@ -46,6 +47,7 @@ export class Project implements Project.IProject {
 			this.defaultProjectForType = Object.create(null);
 			this.defaultProjectForType[projectTypes.Cordova] = this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE;
 			this.defaultProjectForType[projectTypes.NativeScript] = this.$config.DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE;
+			this.defaultProjectForType[projectTypes.MobileWebsite] = this.$config.DEFAULT_WEBSITE_PROJECT_TEMPLATE;
 
 			if(this.projectData && this.projectData["TemplateAppName"]) {
 				this.$errors.fail({
@@ -75,6 +77,15 @@ export class Project implements Project.IProject {
 			livesync: false,
 			livesyncCompanion: true,
 			updateKendo: false
+		},
+		MobileWebsite: {
+			build: false,
+			buildCompanion: false,
+			deploy: false,
+			simulate: true,
+			livesync: false,
+			livesyncCompanion: false,
+			updateKendo: false
 		}
 	};
 
@@ -89,18 +100,20 @@ export class Project implements Project.IProject {
 			if(this.projectType === projectTypes.Cordova) {
 				dir = this.getProjectDir().wait();
 				fileMask = /^cordova\.(\w*)\.js$/i;
-			} else { // NativeScript
+			} else if(this.projectType === projectTypes.NativeScript) {
 				dir = path.join(this.getProjectDir().wait(), "app");
 				fileMask = /^bootstrap\.(\w*)\.js$/i;
 			}
 
-			var files = this.$fs.readDirectory(dir).wait();
-			var platformFiles = _.each(files, (file) => {
-				var matches = file.match(fileMask);
-				if(matches) {
-					result.push(matches[1].toLowerCase());
-				}
-			});
+			if (dir) {
+				var files = this.$fs.readDirectory(dir).wait();
+				var platformFiles = _.each(files, (file) => {
+					var matches = file.match(fileMask);
+					if(matches) {
+						result.push(matches[1].toLowerCase());
+					}
+				});
+			}
 
 			return result;
 		}).future<string[]>()();
@@ -287,16 +300,12 @@ export class Project implements Project.IProject {
 	}
 
 	public createNewProject(projectType: number, projectName: string): IFuture<void> {
-		return ((): void => {
-			if(!projectName) {
-				this.$errors.fail("No project name specified.")
-			}
+		if(!projectName) {
+			this.$errors.fail("No project name specified.")
+		}
 
-			this.$projectNameValidator.validate(projectName);
-
-			var projectDir = this.getNewProjectDir();
-			this.createFromTemplate(projectName, projectType, projectDir).wait();
-		}).future<void>()();
+		var projectDir = this.getNewProjectDir();
+		return this.createFromTemplate(projectName, projectType, projectDir);
 	}
 
 	public createProjectFileFromExistingProject(projectType: number): IFuture<void> {
@@ -430,10 +439,24 @@ export class Project implements Project.IProject {
 					throw ex;
 				}
 			} else {
+				var templates: string;
+
+				switch(projectType) {
+					case projectTypes.Cordova:
+						templates = this.$templatesService.projectCordovaTemplatesString().wait();
+						break;
+					case projectTypes.NativeScript:
+						templates = this.$templatesService.projectNativeScriptTemplatesString().wait();
+						break;
+					case projectTypes.MobileWebsite:
+						templates = this.$templatesService.projectMobileWebsiteTemplatesString().wait();
+						break;
+				}
+
 				var message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
 					options.template,
 					os.EOL,
-					(projectType === projectTypes.Cordova) ? this.$templatesService.projectCordovaTemplatesString() : this.$templatesService.projectNativeScriptTemplatesString());
+					templates);
 				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 			}
 		}).future<void>()();
@@ -447,19 +470,22 @@ export class Project implements Project.IProject {
 	}
 
 	private alterPropertiesForNewProject(properties: any, projectName: string): IProjectData {
-		properties.ProjectName = projectName;
-		properties.DisplayName = projectName;
-		var appid = options.appid;
-		if(!options.appid) {
-			appid = this.generateDefaultAppId(projectName);
-			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
-		}
-
-		properties.AppIdentifier = appid;
 		properties.ProjectGuid = commonHelpers.createGUID();
+		properties.ProjectName = projectName;
 
-		properties.WP8ProductID = commonHelpers.createGUID();
-		properties.WP8PublisherID = commonHelpers.createGUID();
+		if (properties.Framework !== projectTypes[projectTypes.MobileWebsite]) {
+			properties.DisplayName = projectName;
+			var appid = options.appid;
+			if(!options.appid) {
+				appid = this.generateDefaultAppId(projectName);
+				this.$logger.warn("--appid was not specified. Defaulting to " + appid)
+			}
+
+			properties.AppIdentifier = appid;
+
+			properties.WP8ProductID = commonHelpers.createGUID();
+			properties.WP8PublisherID = commonHelpers.createGUID();
+			}
 
 		return properties;
 	}

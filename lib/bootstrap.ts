@@ -66,9 +66,11 @@ $injector.require("project", "./project");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.requireCommand("create|hybrid", "./commands/project");
 $injector.requireCommand("create|native", "./commands/project");
-
+$injector.requireCommand("create|website", "./commands/project");
 $injector.requireCommand("init|hybrid", "./commands/project");
 $injector.requireCommand("init|native", "./commands/project");
+$injector.requireCommand("init|website", "./commands/project");
+
 $injector.requireCommand("prop|add", "./project");
 $injector.requireCommand("prop|set", "./project");
 $injector.requireCommand("prop|rm", "./project");
@@ -77,7 +79,6 @@ $injector.requireCommand("prop|print", "./project");
 
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
-
 
 $injector.requireCommand("deploy", "./commands/deploy");
 
