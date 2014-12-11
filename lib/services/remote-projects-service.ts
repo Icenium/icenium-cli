@@ -4,7 +4,6 @@
 import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
-import unzip = require("unzip");
 var options:any = require("../options");
 
 export class RemoteProjectService implements IRemoteProjectService {
