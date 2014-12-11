@@ -129,11 +129,9 @@ export class PluginsService implements IPluginsService {
 				var configurations = this.$project.configurations;
 				_.each(configurations, (configuration:string) => {
 					this.configurePluginCore(pluginName, configuration).wait();
-					this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
 				});
 			} else {
 				this.configurePluginCore(pluginName).wait();
-				this.$logger.out("Plugin %s was successfully added.", pluginName);
 			}
 		}).future<void>()();
 	}
@@ -162,6 +160,12 @@ export class PluginsService implements IPluginsService {
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();
 
+			if(configuration) {
+				this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
+			} else {
+				this.$logger.out("Plugin %s was successfully added.", pluginName);
+			}
+
 		}).future<void>()();
 	}
 
@@ -181,7 +185,13 @@ export class PluginsService implements IPluginsService {
 			var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();
-			this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+
+			if(configuration) {
+				this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+			} else {
+				this.$logger.out("Plugin %s was successfully removed.", pluginName);
+			}
+
 		}).future<void>()();
 	}
 
@@ -194,7 +204,7 @@ export class PluginsService implements IPluginsService {
 				try {
 					var pluginData = pluginsService.createPluginData(plugin).wait();
 				} catch(e) {
-					this.$logger.warn("Unable to fetch data for %s. Please, try again in a few minutes.", (<any>plugin).title);
+					this.$logger.warn("Unable to fetch data for %s plugin. Please, try again in a few minutes.", (<any>plugin).title);
 					this.$logger.trace(e);
 				}
 
@@ -225,7 +235,8 @@ export class PluginsService implements IPluginsService {
 			};
 			schema["properties"][variableName] = {
 				required: true,
-				type: "string"
+				type: "string",
+				description: configuration ? util.format("Set value for variable %s in %s configuration", variableName, configuration) : util.format("Set value for variable %s", variableName)
 			};
 
 			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};

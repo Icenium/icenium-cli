@@ -37,8 +37,7 @@ export class Project implements Project.IProject {
 		private $templatesService: ITemplatesService,
 		private $pathFilteringService: IPathFilteringService,
 		private $cordovaMigrationService: ICordovaMigrationService,
-		private $projectPropertiesService: IProjectPropertiesService,
-		private $server: Server.IServer) {
+		private $projectPropertiesService: IProjectPropertiesService) {
 
 			this.configurationSpecificData = Object.create(null);
 
@@ -235,9 +234,13 @@ export class Project implements Project.IProject {
 		var configurations: string[] = [];
 		if(options.debug || options.d) {
 			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
-		} else if(options.release || options.r) {
+		}
+
+		if(options.release || options.r) {
 			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
-		} else {
+		}
+
+		if(configurations.length === 0) {
 			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
 			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
 		}
