@@ -72,9 +72,12 @@ export class CloudExportProjectsCommand implements ICommand {
 				this.$errors.fail("The folder %s already exists!", projectDir);
 			}
 
-			var projectExtractor = unzip.Extract({ path: projectDir });
-			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, projectExtractor)).wait();
-			this.$fs.futureFromEvent(projectExtractor, "close").wait();
+			var projectZipFilePath = path.join(projectDir, "project");
+			this.$fs.writeFile(projectZipFilePath, "").wait();
+			var unzipStream = this.$fs.createWriteStream(projectZipFilePath);
+			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, unzipStream)).wait();
+			this.$fs.unzip(projectZipFilePath, projectDir).wait();
+			this.$fs.deleteFile(projectZipFilePath).wait();
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
