@@ -31,7 +31,7 @@ export function isDotNet40Installed(message: string) : IFuture<boolean> {
 	});
 	regKey.get("Version", (err: Error, value: string) => {
 		if (err) {
-			this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
+			(<IErrors>$injector.resolve("$errors")).fail({ formatStr: message, suppressCommandHelp: true });
 		}
 		result.return(true);
 	});
