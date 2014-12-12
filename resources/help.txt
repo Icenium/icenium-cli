@@ -265,12 +265,12 @@ To list all connected devices, grouped by platform, run $ appbuilder device.
 
 --[build]--
 Usage:
-    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--release]
+    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--debug] [--release]
 
 Platform-specific usage:
-    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--release]
-    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--release]
-    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--release]
+    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--debug] [--release]
 
 Builds the project for the target platform and produces an application package or a QR code for deployment.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
@@ -280,6 +280,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --download - If set, downloads the application package to the root of the project, instead
         of producing a QR code. Set this option if you want to manually deploy the app package later.
         You cannot set both the --companion and --download switches.
@@ -385,11 +389,11 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform> [--device <Device ID>] [--release]
+    $ appbuilder deploy <Platform> [--device <Device ID>] [--debug] [--release]
 
 Platform-specific usages:
-    $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
-    $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
+    $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>] [--debug] [--release]
+    $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID> [--debug] [--release]
 
 Builds the project for the selected platform and deploys it to connected physical devices. When you build for Android,
 deploys the project on all connected physical devices and running Android virtual devices. 
@@ -406,6 +410,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         To list all connected devices, grouped by platform, run $ appbuilder device.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
@@ -425,7 +433,7 @@ Usage:
     $ appbuilder plugin [<Command>]
 
 Lists all core, integrated and verified plugins that are currently enabled for your project. With the --available
-switch, lists all core, integrated and verified plugins that you can enable in your project.
+switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
 
 If --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for selected configuration.
 If neither --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for both debug and release configuration.
@@ -440,14 +448,19 @@ If neither --debug or --release option is specified lists all core, integrated a
             The plugin must be Plugman-compatible.
 
 Options:
-    --available - Lists all plugins that you can enable in your project.
+    --available - Lists all plugins that are currently enabled in your project and
+            all plugins that you can enable in your project.
+    --debug - Lists all plugins enabled for the Debug build configuration. If --available is set, also lists all plugins
+            that you can enable for the Debug build configuration.
+    --release - Lists all plugins enabled for the Release build configuration. If --available is set, also lists all plugins
+            that you can enable for the Release build configuration.
 
 --[/]--
 
 --[plugin|add]--
 Usage:
     $ appbuilder plugin add --available [--debug] [--release]
-    $ appbuilder plugin add <Name>
+    $ appbuilder plugin add <Name> [--debug] [--release]
 
 Enables a core, integrated or verified plugin for your project.
 If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set value for each plugin variable.
@@ -459,6 +472,10 @@ If neither --debug or --release options are specified enables the plugin for bot
 
 Options:
     --available - Lists all plugins that you can enable in your project.
+    --debug - Enables the specified plugin for the Debug build configuration only. If --available is set, lists all plugins
+            that you can enable for the Debug build configuration.
+    --release - Enables the specified plugin for the Release build configuration only. If --available is set, lists all plugins
+            that you can enable for the Release build configuration.
 --[/]--
 
 --[plugin|remove]--
@@ -471,6 +488,10 @@ If --release option is specified disables the plugin only in release configurati
 If neither --debug or --release options are specified disables the plugin for both debug and release configuration.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin
+
+Options:
+    --debug - Disables the specified plugin for the Debug build configuration only. 
+    --release - Disables the specified plugin for the Release build configuration only.
 --[/]--
 
 --[plugin|configure]--
@@ -518,7 +539,7 @@ Options:
 
 --[emulate]--
 Usage:
-    $ appbuilder emulate <Command>
+    $ appbuilder emulate <Command> [--debug] [--release]
 
 You must run the emulate command with a related command.
 
@@ -529,11 +550,17 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
     android - Builds the specified project in the cloud and runs it in the native Android emulator.
     ios - Builds the specified project in the cloud and runs it in the native iOS Simulator.
     wp8 - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+
+Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
 --[/]--
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
@@ -559,6 +586,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
@@ -575,6 +606,7 @@ Options:
 --[emulate|ios]--
 Usage:
     $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices]
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
@@ -595,6 +627,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
@@ -612,7 +648,7 @@ Options:
 
 --[emulate|wp8]--
 Usage:
-    $ appbuilder emulate wp8 [--path <Directory>]
+    $ appbuilder emulate wp8 [--path <Directory>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
 
@@ -625,6 +661,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
 
@@ -915,15 +955,27 @@ Usage:
 Enables more options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
+Options:
+    --debug - Only applicable to the CorePlugins property. Enables the selected plugins for the Debug
+        build configuration only.
+    --release - Only applicable to the CorePlugins property. Enables the selected plugins for the Release
+        build configuration only.
+
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|set]--
 Usage:
-    $ appbuilder prop set <Property Name> <Value> [Value]*
+    $ appbuilder prop set <Property Name> <Value> [Value]* [--debug] [--release]
 
 Sets the selected project property and overwrites its current value.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
+
+Options:
+    --debug - Only applicable to the CorePlugins property. Enables the selected plugins for the Debug
+        build configuration only.
+    --release - Only applicable to the CorePlugins property. Enables the selected plugins for the Release
+        build configuration only.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
@@ -934,6 +986,12 @@ Usage:
 
 Disables options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
+
+Options:
+    --debug - Only applicable to the CorePlugins property. Disables the selected plugins for the Debug
+        build configuration only.
+    --release - Only applicable to the CorePlugins property. Disables the selected plugins for the Release
+        build configuration only.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
