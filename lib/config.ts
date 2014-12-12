@@ -91,5 +91,9 @@ export class StaticConfig implements IStaticConfig {
 	public get adbFilePath() {
 		return path.join(__dirname, util.format("../resources/platform-tools/android/%s/adb", process.platform));
 	}
+
+	public get sevenZipFilePath() {
+		return path.join(__dirname, util.format("../resources/platform-tools/unzip/%s/7za", process.platform));
+	}
 }
 $injector.register("staticConfig", StaticConfig);
