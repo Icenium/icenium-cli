@@ -97,7 +97,7 @@ export class LiveSyncCommand implements ICommand {
 	}
 
 	private parseFile(fileName: string, validValues: string[], value: string): any {
-		var regex = util.format("^(.+?)\.(%s)(\..+?)$", validValues.join("|"));
+		var regex = util.format("^(.+?)[.](%s)([.].+?)$", validValues.join("|"));
 		var parsed = fileName.match(new RegExp(regex, "i"));
 		if (parsed) {
 			return {
