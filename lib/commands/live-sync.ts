@@ -10,9 +10,10 @@ import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
 
-interface IPlatformSpecificFileName {
-	platform: string;
+interface IProjectFileInfo {
+	fileName: string;
 	onDeviceName: string;
+	shouldIncludeFile: boolean;
 }
 
 export class LiveSyncCommand implements ICommand {
@@ -63,16 +64,12 @@ export class LiveSyncCommand implements ICommand {
 			if (options.file) {
 				var isExistFile = this.$fs.exists(options.file).wait();
 				if (isExistFile) {
-					if (LiveSyncCommand.shouldIncludeFile(platform, options.file)) {
-						var projectFiles = [path.resolve(options.file)];
-						this.sync(appIdentifier, projectDir, projectFiles).wait();
-					}
+					this.sync(appIdentifier, projectDir, [path.resolve(options.file)]).wait();
 				} else {
 					this.$errors.fail("The file %s does not exist.", options.file);
 				}
 			} else {
 				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
-				projectFiles = _.filter(projectFiles, (fileName) => LiveSyncCommand.shouldIncludeFile(platform, fileName));
 
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
 
@@ -85,26 +82,48 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private static shouldIncludeFile(platform: string, fileName: string): boolean {
-		var platformInfo = LiveSyncCommand.parsePlatformSpecificFileName(fileName);
-		return !platformInfo || platformInfo.platform === platform;
+	private getProjectFileInfo(fileName: string): IProjectFileInfo {
+		var platforms = _.map(MobileHelper.PlatformNames, (platformName: string) => MobileHelper.normalizePlatformName(platformName));
+		var parsed = this.parseFile(fileName, platforms, this.$devicesServices.platform);
+		if(!parsed) {
+			parsed = this.parseFile(fileName, ["debug", "release"], "debug");
+		}
+
+		return parsed || {
+			fileName: fileName,
+			onDeviceName: fileName,
+			shouldIncludeFile: true
+		};
 	}
 
-	private static parsePlatformSpecificFileName(fileName: string): IPlatformSpecificFileName {
-		var platforms = MobileHelper.PlatformNames.join("|");
-		var regex = util.format("^(.+?)\.(%s)(\..+?)$", platforms);
+	private parseFile(fileName: string, validValues: string[], value: string): any {
+		var regex = util.format("^(.+?)[.](%s)([.].+?)$", validValues.join("|"));
 		var parsed = fileName.match(new RegExp(regex, "i"));
 		if (parsed) {
-			var result = {
-				platform: MobileHelper.normalizePlatformName(parsed[2]),
-				onDeviceName: parsed[1] + parsed[3]
+			return {
+				fileName: fileName,
+				onDeviceName: parsed[1] + parsed[3],
+				shouldIncludeFile: parsed[2] === value
 			};
-			return result;
 		}
+
 		return undefined;
 	}
 
 	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
+		var projectFilesInfo: IProjectFileInfo[] = [];
+
+		_.each(projectFiles, (projectFile: string) => {
+			var projectFileInfo = this.getProjectFileInfo(projectFile);
+			if(projectFileInfo.shouldIncludeFile) {
+				projectFilesInfo.push(projectFileInfo);
+			}
+		});
+
+		return this.syncCore(appIdentifier, projectDir, projectFilesInfo);
+	}
+
+	private syncCore(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: IProjectFileInfo[]): IFuture<void> {
 		return(() => {
 			var action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
@@ -118,14 +137,11 @@ export class LiveSyncCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private getLocalToDevicePaths(localProjectPath: string, projectFiles: string[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
-		var localToDevicePaths = _.map(projectFiles, (projectFile: string) => {
-			var platformInfo = LiveSyncCommand.parsePlatformSpecificFileName(projectFile);
-			var renamedFile = platformInfo ? platformInfo.onDeviceName : projectFile;
-
-			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, renamedFile);
+	private getLocalToDevicePaths(localProjectPath: string, projectFiles: IProjectFileInfo[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
+		var localToDevicePaths = _.map(projectFiles, (projectFileInfo: IProjectFileInfo) => {
+			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFileInfo.onDeviceName);
 			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
-			return new MobileHelper.LocalToDevicePathData(projectFile, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
+			return new MobileHelper.LocalToDevicePathData(projectFileInfo.fileName, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
 		});
 
 		return localToDevicePaths;
@@ -139,9 +155,7 @@ export class LiveSyncCommand implements ICommand {
 				change: (changeType: string, filePath: string) => {
 					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
-						if (LiveSyncCommand.shouldIncludeFile(this.$devicesServices.platform, filePath)) {
-							this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
-						}
+						this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
 					}
 				},
 				next: (error: Error, _watchers: any) => {
