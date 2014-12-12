@@ -402,13 +402,9 @@ interface IProcessInfo {
 	isRunning(name: string): IFuture<boolean>;
 }
 
-interface IBuildConfigurationService {
-	BuildConfigurationData: IFuture<IBuildConfigurationData>;
-	saveBuildConfigurationData(): IFuture<void>;
-	readBuildConfigurationData(): IFuture<void>;
-}
-
-interface IBuildConfigurationData {
-	CorePlugins: string[];
-	CordovaPluginVariables: any;
+interface IRemoteProjectService {
+	makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T>;
+	getProjectProperties(projectName: string): IFuture<any>;
+	getProjects(): IFuture<Server.TapSolutionData[]>;
+	getProjectName(projectId: string): IFuture<string>;
 }

@@ -8,13 +8,12 @@ import unzip = require("unzip");
 var options:any = require("../options");
 
 export class RemoteProjectService implements IRemoteProjectService {
-	private projectName: string;
+	private clientSolutions: Server.TapSolutionData[];
 
-	constructor(
-		private $server: Server.IServer,
-		private $userDataStore: IUserDataStore,
-		private $serviceProxy: Server.IServiceProxy,
-		private $errors: IErrors) { }
+	constructor(private $server: Server.IServer,
+				private $userDataStore: IUserDataStore,
+				private $serviceProxy: Server.IServiceProxy,
+				private $errors: IErrors) { }
 
 	public  makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T> {
 		return (() => {
@@ -31,34 +30,26 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public getProjectName(projectId: string): IFuture<string> {
 		return ((): string => {
-			if (!this.projectName) {
-				var data = this.getProjects().wait();
+			var clientSolutions = this.getProjects().wait();
 
-				if(_.findWhere(data, { name: projectId })) {
-					this.projectName = projectId;
-				} else if(helpers.isNumber(projectId)) {
-					var index = parseInt(projectId, 10);
-					if(index < 1 || index > data.length) {
-						if(data.length === 0) {
-							this.$errors.fail("You do not have any projects.");
-						}
-						else {
-							this.$errors.fail("The project index must be between 1 and %s", data.length);
-						}
-					} else {
-						this.projectName = data[index - 1].name;
-					}
-				} else {
-					this.$errors.fail("The project '%s' was not found.", projectId);
-				}
+			var result = helpers.findByNameOrIndex(projectId, clientSolutions, (clientSolution: Server.TapSolutionData) => clientSolution.name);
+			if(!result) {
+				this.$errors.fail("Could not find project named '%s' or was not given a valid index. List available projects with 'cloud list' command", projectId);
 			}
 
-			return this.projectName;
+			return result.name;
 		}).future<string>()();
 	}
 
-	public getProjects(): IFuture<any> {
-		return this.makeTapServiceCall(() => this.$server.tap.getExistingClientSolutions());
+	public getProjects(): IFuture<Server.TapSolutionData[]> {
+		return (() => {
+			if (!this.clientSolutions) {
+				var existingClientSolutions = this.makeTapServiceCall(() => this.$server.tap.getExistingClientSolutions()).wait();
+				this.clientSolutions = _.sortBy(existingClientSolutions, (clientSolution: Server.TapSolutionData) => clientSolution.name);
+			}
+
+			return this.clientSolutions;
+		}).future<Server.TapSolutionData[]>()();
 	}
 
 	public getProjectProperties(projectName: string): IFuture<any> {
