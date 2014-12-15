@@ -7,7 +7,7 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 		private $staticConfig: IStaticConfig) {}
 
 	public generateQrCode(data: string) {
-		for (var i = 1; i <= 10; ++i) {
+		for (var i = 1; i <= 40; ++i) {
 			var qr = qrlib(i, "L");
 			try {
 				qr.addData(data);
