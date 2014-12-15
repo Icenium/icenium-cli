@@ -48,6 +48,8 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 	}
 
 	write(...args: string[]): void { }
+
+	prepare(item: any): string { return item; }
 }
 
 testInjector.register("config", configFile.Configuration);

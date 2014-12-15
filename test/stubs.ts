@@ -21,6 +21,8 @@ export class LoggerStub implements ILogger {
 	}
 
 	write(...args:string[]): void { }
+
+	prepare(item: any): string { return item; }
 }
 
 export class FileSystemStub implements IFileSystem {
