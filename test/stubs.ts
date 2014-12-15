@@ -211,11 +211,11 @@ export class TemplateServiceStub implements ITemplatesService {
 	}
 
 	get projectTemplatesDir(): string {
-		return path.join(__dirname, "/resources/");
+		return path.join(__dirname, "../resources/ProjectTemplates");
 	}
 
 	get itemTemplatesDir(): string {
-		return path.join(__dirname, "/resources/");
+		return path.join(__dirname, "../resources/ItemTemplates");
 	}
 
 	downloadProjectTemplates(): IFuture<void> {
