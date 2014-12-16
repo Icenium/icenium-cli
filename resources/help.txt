@@ -78,6 +78,7 @@ Usage:
     $ appbuilder help [<Command>]
 
 Lists the available commands or shows information about the selected command.
+
 <Command> is any of the available commands as listed by $ appbuilder help.
 --[/]--
 
@@ -435,6 +436,8 @@ Usage:
 Lists all core, integrated and verified plugins that are currently enabled for your project. With the --available
 switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
 
+This command and its related commands are not applicable to NativeScript projects.
+
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     add - Enables a core, integrated or verified plugin for your project.
     configure - Configures plugin variables for the selected core, integrated or verified plugin.
@@ -464,6 +467,8 @@ If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interact
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
+This command is not applicable to NativeScript projects.
+
 Options:
     --available - Lists all plugins that you can enable in your project.
     --debug - Enables the specified plugin for the Debug build configuration only. If --available is set, lists all plugins
@@ -480,6 +485,8 @@ Disables a core, integrated or verified plugin from your project.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin
 
+This command is not applicable to NativeScript projects.
+
 Options:
     --debug - Disables the specified plugin for the Debug build configuration only. 
     --release - Disables the specified plugin for the Release build configuration only.
@@ -493,6 +500,8 @@ Configures plugin variables for selected core, integrated or verified plugin.
 
 <Name> is the name of the plugin as listed by $ appbuilder plugin
 
+This command is not applicable to NativeScript projects.
+
 Options:
     --debug - Sets the plugin variable for the Debug build configuration only. 
     --release - Sets the plugin variable for the Release build configuration only. 
@@ -504,6 +513,8 @@ Usage:
 
 Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
 
+This command is not applicable to NativeScript projects.
+
 --[/]--
 
 --[plugin|fetch]--
@@ -513,6 +524,9 @@ Usage:
 Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, name or keyword of a plugin published in the Apache Cordova Plugin Registry. 
 The plugin must be Plugman-compatible.
+
+This command is not applicable to NativeScript projects.
+
 --[/]--
 
 --[simulate]--
@@ -640,6 +654,8 @@ Usage:
 
 Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
 
+This command is not applicable to NativeScript projects.
+
 Prerequisites:
 Before running the Windows Phone 8.0 emulator, verify that your system meets the following requirements.
 	You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
@@ -665,6 +681,8 @@ Usage:
 Shows the debug tools to let you debug applications on connected devices.
 
 In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux systems.
+
+This command is not applicable to NativeScript projects.
 
 --[/]--
 
@@ -700,7 +718,7 @@ Usage:
 
 Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory. 
 
-This operation is applicable only to hybrid projects.
+This command is not applicable to NativeScript projects.
 
 --[/]--
 
@@ -824,6 +842,8 @@ Builds the project and uploads the application to iTunes Connect.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
 
+This command is not applicable to NativeScript projects.
+
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name.
         You must specify a production certificate. The certificate must match the provisioning profile.
@@ -859,6 +879,8 @@ After the upload completes, you need to go to your app in Telerik AppManager, ma
 <Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
+
+This command is not applicable to NativeScript projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
@@ -916,7 +938,7 @@ Options:
 
 --[prop]--
 Usage:
-    $appbuilder prop <Command>
+    $ appbuilder prop <Command>
 
 You must run the prop command with a related command.
 
@@ -1026,7 +1048,9 @@ Options:
 Usage:
     $ appbuilder mobileframework [<Command>] [--path <Directory>]
 
-Lists all supported versions of the mobile framework for the current hybrid project.
+Lists all supported versions of Apache Cordova.
+
+This command and its related commands are not applicable to NativeScript projects.
 
 <Command> is a related command that extends the mobileframework command. You can run the following related commands:
 	set - Sets the selected framework version for the project and updates the plugins according to the new version.
@@ -1040,9 +1064,11 @@ Options:
 Usage:
     $ appbuilder mobileframework set <Version> [--path <Directory>]
 
-Sets the selected framework version for the project and updates the enabled core or integrated plugins to match it.
+Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.
 
 <Version> is the version of the framework as listed by $ appbuilder mobileframework
+
+This command is not applicable to NativeScript projects.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
