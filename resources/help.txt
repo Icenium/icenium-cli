@@ -24,12 +24,6 @@ Project development commands:
     simulate                        Runs the current project in the device simulator.
     emulate                         Runs the current project in the selected platform emulator.
     remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
-    plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
-    plugin add                      Enables a core, integrated or verified plugin for your project.
-    plugin configure                Configures plugin variables for the selected core, integrated or verified plugin.
-    plugin remove                   Disables a core, integrated, or verified plugin for your project.
-    plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
     prop print                      Prints the current project configuration or the value for the selected project property.
     prop add                        Enables more options for the selected project property, if the property accepts multiple values.
@@ -40,6 +34,14 @@ Project development commands:
     update-kendoui                  Updates or adds Kendo UI Core or Kendo UI Professional to your project.
     mobileframework                 Lists all supported versions of the mobile framework.
     mobileframework set             Sets the selected framework version for the project and updates the plugins according to the new version.
+
+Plugin management commands:
+    plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
+    plugin add                      Enables a core, integrated or verified plugin for your project.
+    plugin configure                Configures plugin variables for the selected core, integrated or verified plugin.
+    plugin remove                   Disables a core, integrated, or verified plugin for your project.
+    plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    plugin fetch                    Imports an Apache Cordova plugin into your project.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -302,7 +304,6 @@ Options:
         If you build for iOS, unless the --companion switch is set, you must specify a provisioning profile. The 
         provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
     --save-to - If set, downloads the application package and saves it to the specified file path,
         instead of the project root. The file path must be complete with file name and extension.
         You do not need to set the --download switch.
@@ -424,7 +425,6 @@ Options:
         provisioning profile by index or name.
         If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
 --[/]--
 
 --[plugin]--
@@ -434,9 +434,6 @@ Usage:
 
 Lists all core, integrated and verified plugins that are currently enabled for your project. With the --available
 switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
-
-If --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for selected configuration.
-If neither --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for both debug and release configuration.
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     add - Enables a core, integrated or verified plugin for your project.
@@ -463,10 +460,7 @@ Usage:
     $ appbuilder plugin add <Name> [--debug] [--release]
 
 Enables a core, integrated or verified plugin for your project.
-If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set value for each plugin variable.
-If --debug option is specified enables the plugin only in debug configuration.
-If --release option is specified enables the plugin only in release configuration.
-If neither --debug or --release options are specified enables the plugin for both debug and release configuration.
+If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set values for each plugin variable.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
@@ -483,9 +477,6 @@ Usage:
     $ appbuilder plugin remove <Name> [--debug] [--release]
 
 Disables a core, integrated or verified plugin from your project.
-If --debug option is specified disables the plugin only in debug configuration.
-If --release option is specified disables the plugin only in release configuration.
-If neither --debug or --release options are specified disables the plugin for both debug and release configuration.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin
 
@@ -605,17 +596,13 @@ Options:
 
 --[emulate|ios]--
 Usage:
-    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices]
-    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--debug] [--release]
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
-<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ isim device-types
-
---availableDevices - Lists all available device type identifiers for the current XCode.
-<Device Name> is the device type identifier as listed by run $ appbuilder emulate ios --availableDevices.
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
 
 Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
@@ -627,6 +614,7 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md
 
 Options:
+    --availableDevices - Lists all available device type identifiers for the current XCode.
     --debug - If set, applies the Debug build configuration. For more information about build configurations,
         see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --release - If set, applies the Release build configuration. For more information about build configurations,
@@ -1025,18 +1013,18 @@ IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run t
 <Port> is a non-negative integer that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
-<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ isim device-types
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
 
 Options:
     --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
             When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
             from the other Telerik AppBuilder clients. 
-            To list the available iOS Simulator devices, run $ isim device-types
+            To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
 --[/]--
 
 --[mobileframework]--
 Usage:
-    $appbuilder mobileframework [<Command>] [--path <Directory>]
+    $ appbuilder mobileframework [<Command>] [--path <Directory>]
 
 Lists all supported versions of the mobile framework for the current hybrid project.
 
@@ -1052,10 +1040,9 @@ Options:
 Usage:
     $ appbuilder mobileframework set <Version> [--path <Directory>]
 
-Sets the selected framework version for the project and updates the plugins according to the new version.
-<Version> is the version of the framework in the 
-        following format Major.Minor.Patch
-You can use appbuilder mobileframework to get list of supported versions.
+Sets the selected framework version for the project and updates the enabled core or integrated plugins to match it.
+
+<Version> is the version of the framework as listed by $ appbuilder mobileframework
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
