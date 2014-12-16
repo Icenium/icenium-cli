@@ -458,12 +458,8 @@ export class Project implements Project.IProject {
 		properties.AppIdentifier = appid;
 		properties.ProjectGuid = commonHelpers.createGUID();
 
-		if(!properties.WP8ProductID) {
-			properties.WP8ProductID = commonHelpers.createGUID();
-		}
-		if(!properties.WP8PublisherID) {
-			properties.WP8PublisherID = commonHelpers.createGUID();
-		}
+		properties.WP8ProductID = commonHelpers.createGUID();
+		properties.WP8PublisherID = commonHelpers.createGUID();
 
 		return properties;
 	}
