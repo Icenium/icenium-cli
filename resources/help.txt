@@ -1,7 +1,7 @@
 --[]--
 
 Usage:
-    $ appbuilder <command> [command parameters] [--command <options>]
+    $ appbuilder <command> [parameters] [--options <values>]
 
 General commands:
     help <command>                  Shows additional information about the commands in this list.
@@ -24,11 +24,6 @@ Project development commands:
     simulate                        Runs the current project in the device simulator.
     emulate                         Runs the current project in the selected platform emulator.
     remote                          Starts a remote server to let you run your app in the iOS Simulator from a Windows system.
-    plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
-    plugin add                      Enables a core, integrated or verified plugin for your project.
-    plugin remove                   Disables a core, integrated, or verified plugin for your project.
-    plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-    plugin fetch                    Imports an Apache Cordova plugin into your project.
     edit-configuration              Opens a configuration file for editing.
     prop print                      Prints the current project configuration or the value for the selected project property.
     prop add                        Enables more options for the selected project property, if the property accepts multiple values.
@@ -39,6 +34,14 @@ Project development commands:
     update-kendoui                  Updates or adds Kendo UI Core or Kendo UI Professional to your project.
     mobileframework                 Lists all supported versions of the mobile framework.
     mobileframework set             Sets the selected framework version for the project and updates the plugins according to the new version.
+
+Plugin management commands:
+    plugin                          Lists all core, integrated and verified plugins that are currently enabled for your project.
+    plugin add                      Enables a core, integrated or verified plugin for your project.
+    plugin configure                Configures plugin variables for the selected core, integrated or verified plugin.
+    plugin remove                   Disables a core, integrated, or verified plugin for your project.
+    plugin find                     Searches for plugins in the Apache Cordova Plugin Registry by keyword.
+    plugin fetch                    Imports an Apache Cordova plugin into your project.
 
 Device commands:
     device                          Lists all recognized connected devices.
@@ -57,7 +60,7 @@ Certificate management and publishing commands:
     provision                       Lists all configured provisioning profiles for code signing iOS applications.
     provision import                Imports a provisioning profile from file.
     provision remove                Removes a registered provisioning profile.
-    appstore list                   Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    appstore list                   Lists all applications in iTunes Connect.
     appstore upload                 Builds the project and uploads the binary to iTunes Connect.
     appmanager upload               Builds the project and uploads the binary to Telerik AppManager.
 
@@ -75,6 +78,7 @@ Usage:
     $ appbuilder help [<Command>]
 
 Lists the available commands or shows information about the selected command.
+
 <Command> is any of the available commands as listed by $ appbuilder help.
 --[/]--
 
@@ -236,6 +240,8 @@ Platform-specific usage:
 Lists all recognized connected devices with serial number and index, grouped by platform. In this version of the Telerik AppBuilder CLI,
 you can connect only iOS and Android devices.
 
+When the target platform is Android, the Telerik AppBuilder CLI lists all connected physical and running Android virtual devices.
+
 If a connected Android device is not shown in the list, make sure that you have installed the required Android USB drivers on your system
 and that USB debugging is enabled on the device.
 
@@ -262,12 +268,12 @@ To list all connected devices, grouped by platform, run $ appbuilder device.
 
 --[build]--
 Usage:
-    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--release]
+    $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--debug] [--release]
 
 Platform-specific usage:
-    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--release]
-    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--release]
-    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--release]
+    $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--debug] [--release]
 
 Builds the project for the target platform and produces an application package or a QR code for deployment.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
@@ -277,6 +283,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --download - If set, downloads the application package to the root of the project, instead
         of producing a QR code. Set this option if you want to manually deploy the app package later.
         You cannot set both the --companion and --download switches.
@@ -295,7 +305,6 @@ Options:
         If you build for iOS, unless the --companion switch is set, you must specify a provisioning profile. The 
         provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
     --save-to - If set, downloads the application package and saves it to the specified file path,
         instead of the project root. The file path must be complete with file name and extension.
         You do not need to set the --download switch.
@@ -382,13 +391,14 @@ appears. When the download completes, the app refreshes automatically.
 
 --[deploy]--
 Usage:
-    $ appbuilder deploy <Platform> [--device <Device ID>] [--release]
+    $ appbuilder deploy <Platform> [--device <Device ID>] [--debug] [--release]
 
 Platform-specific usages:
-    $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>]
-    $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID>
+    $ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>] [--debug] [--release]
+    $ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID> [--debug] [--release]
 
-Builds the project for the selected platform and deploys it to connected devices. 
+Builds the project for the selected platform and deploys it to connected physical devices. When you build for Android,
+deploys the project on all connected physical devices and running Android virtual devices. 
 
 In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone 8 connected devices. 
 
@@ -402,6 +412,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --device - Specifies the serial number or the index of the connected device on which you want to deploy the app.
         To list all connected devices, grouped by platform, run $ appbuilder device.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
@@ -412,7 +426,6 @@ Options:
         provisioning profile by index or name.
         If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate. 
         To list available provisioning profiles, run $ appbuilder provision.
-    --release - If set, disables LiveSync with the three-finger tap and hold gesture.
 --[/]--
 
 --[plugin]--
@@ -421,13 +434,13 @@ Usage:
     $ appbuilder plugin [<Command>]
 
 Lists all core, integrated and verified plugins that are currently enabled for your project. With the --available
-switch, lists all core, integrated and verified plugins that you can enable in your project.
+switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
 
-If --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for selected configuration.
-If neither --debug or --release option is specified lists all core, integrated and verified plugins that are enabled for both debug and release configuration.
+This command and its related commands are not applicable to NativeScript projects.
 
 <Command> is a related command that extends the plugin command. You can run the following related commands:
     add - Enables a core, integrated or verified plugin for your project.
+    configure - Configures plugin variables for the selected core, integrated or verified plugin.
     remove - Disables a core, integrated or verified plugin for your project.
     find - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
     fetch - Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
@@ -435,25 +448,33 @@ If neither --debug or --release option is specified lists all core, integrated a
             The plugin must be Plugman-compatible.
 
 Options:
-    --available - Lists all plugins that you can enable in your project.
+    --available - Lists all plugins that are currently enabled in your project and
+            all plugins that you can enable in your project.
+    --debug - Lists all plugins enabled for the Debug build configuration. If --available is set, also lists all plugins
+            that you can enable for the Debug build configuration.
+    --release - Lists all plugins enabled for the Release build configuration. If --available is set, also lists all plugins
+            that you can enable for the Release build configuration.
 
 --[/]--
 
 --[plugin|add]--
 Usage:
     $ appbuilder plugin add --available [--debug] [--release]
-    $ appbuilder plugin add <Name>
+    $ appbuilder plugin add <Name> [--debug] [--release]
 
 Enables a core, integrated or verified plugin for your project.
-If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set value for each plugin variable.
-If --debug option is specified enables the plugin only in debug configuration.
-If --release option is specified enables the plugin only in release configuration.
-If neither --debug or --release options are specified enables the plugin for both debug and release configuration.
+If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set values for each plugin variable.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
+This command is not applicable to NativeScript projects.
+
 Options:
     --available - Lists all plugins that you can enable in your project.
+    --debug - Enables the specified plugin for the Debug build configuration only. If --available is set, lists all plugins
+            that you can enable for the Debug build configuration.
+    --release - Enables the specified plugin for the Release build configuration only. If --available is set, lists all plugins
+            that you can enable for the Release build configuration.
 --[/]--
 
 --[plugin|remove]--
@@ -461,20 +482,29 @@ Usage:
     $ appbuilder plugin remove <Name> [--debug] [--release]
 
 Disables a core, integrated or verified plugin from your project.
-If --debug option is specified disables the plugin only in debug configuration.
-If --release option is specified disables the plugin only in release configuration.
-If neither --debug or --release options are specified disables the plugin for both debug and release configuration.
 
 <Name> is the name or ID of the plugin as listed by $ appbuilder plugin
+
+This command is not applicable to NativeScript projects.
+
+Options:
+    --debug - Disables the specified plugin for the Debug build configuration only. 
+    --release - Disables the specified plugin for the Release build configuration only.
 --[/]--
 
 --[plugin|configure]--
 Usage:
-    $ appbuilder plugin configure <Name>
+    $ appbuilder plugin configure <Name> [--debug] [--release]
 
-Configure plugin variables for selected plugin.
+Configures plugin variables for selected core, integrated or verified plugin.
 
 <Name> is the name of the plugin as listed by $ appbuilder plugin
+
+This command is not applicable to NativeScript projects.
+
+Options:
+    --debug - Sets the plugin variable for the Debug build configuration only. 
+    --release - Sets the plugin variable for the Release build configuration only. 
 --[/]--
 
 --[plugin|find]--
@@ -482,6 +512,8 @@ Usage:
     $ appbuilder plugin find [<Keyword> [<Keyword>]*>]
 
 Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
+
+This command is not applicable to NativeScript projects.
 
 --[/]--
 
@@ -492,6 +524,9 @@ Usage:
 Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
 URL to a plugin repository, name or keyword of a plugin published in the Apache Cordova Plugin Registry. 
 The plugin must be Plugman-compatible.
+
+This command is not applicable to NativeScript projects.
+
 --[/]--
 
 --[simulate]--
@@ -509,7 +544,7 @@ Options:
 
 --[emulate]--
 Usage:
-    $ appbuilder emulate <Command>
+    $ appbuilder emulate <Command> [--debug] [--release]
 
 You must run the emulate command with a related command.
 
@@ -520,21 +555,29 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
     android - Builds the specified project in the cloud and runs it in the native Android emulator.
     ios - Builds the specified project in the cloud and runs it in the native iOS Simulator.
     wp8 - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+
+Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
 --[/]--
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd Name] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds for device boot>]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
-your app runs in the default emulator or the currently running emulator, if any.
+your app runs in the default emulator or a currently running emulator, if any. 
 To list the available AVDs, run $ android list avd
+
+To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name>
+for each virtual device.
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
-<Seconds for device boot> is the maximum amount of time (in seconds) that the AppBuilder CLI will wait for the virtual device to boot before quitting the operation and releasing the console.
-If not set, the default value is 120 seconds.
+    You can specify only one name at a time.
 
 Prerequisites:
 Before running your app in the Android emulator, verify that your system meets the following requirements.
@@ -548,37 +591,48 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
             a certificate by index or name.
             To list available certificates, run $ appbuilder certificate
     --avd - Sets the Android virtual device on which you want to run your app. 
+            You can set only one device at a time.
             To list the available Android virtual devices, run $ android list avd
-    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot.
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
+            before quitting the operation and releasing the console.
             If not set, the default timeout is 120 seconds.
 --[/]--
 
 --[emulate|ios]--
 Usage:
-    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices]
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
-<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
-<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
-
---availableDevices - Lists all available device type identifiers for the current XCode.
-<Device Name> is the device type identifier as listed by run $ appbuilder emulate ios --availableDevices.
+<Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
+<Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
 
 Prerequisites:
 Before running the iOS Simulator, verify that you have met the following requirements.
-    You are running the Telerik AppBuilder CLI on OS X. You have installed Xcode.
+    You are running the Telerik AppBuilder CLI on OS X.
+    You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the 
+    Telerik AppBuilder CLI depends. For more information, visit https://www.npmjs.org/package/ios-sim-portable
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
-For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
+For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md
 
 Options:
+    --availableDevices - Lists all available device type identifiers for the current XCode.
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
@@ -589,14 +643,18 @@ Options:
             a provisioning profile by index or name.
             If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate.
             To list available provisioning profiles, run $ appbuilder provision.
+    --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
+            To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
 
 --[/]--
 
 --[emulate|wp8]--
 Usage:
-    $ appbuilder emulate wp8 [--path <Directory>]
+    $ appbuilder emulate wp8 [--path <Directory>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+
+This command is not applicable to NativeScript projects.
 
 Prerequisites:
 Before running the Windows Phone 8.0 emulator, verify that your system meets the following requirements.
@@ -607,6 +665,10 @@ You can choose which files from your project to exclude or include in your appli
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
 
 Options:
+    --debug - If set, applies the Debug build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
+    --release - If set, applies the Release build configuration. For more information about build configurations,
+        see http://docs.telerik.com/platform/appbuilder/build-configurations/overview
     --path - Specifies the directory that contains the project. If not specified, the project is searched
             for in the current directory and all directories above it.
 
@@ -619,6 +681,8 @@ Usage:
 Shows the debug tools to let you debug applications on connected devices.
 
 In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux systems.
+
+This command is not applicable to NativeScript projects.
 
 --[/]--
 
@@ -654,7 +718,7 @@ Usage:
 
 Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory. 
 
-This operation is applicable only to hybrid projects.
+This command is not applicable to NativeScript projects.
 
 --[/]--
 
@@ -749,7 +813,7 @@ Usage:
 You must run the appstore command with a related command.
 
 <Command> is a related command that extends the appstore command. You can run the following related commands:
-    list - Lists all applications in iTunes Connect that are in the Waiting for Upload state.
+    list - Lists all application records in iTunes Connect.
     upload - Builds the project and uploads the binary to iTunes Connect.
 --[/]--
 
@@ -757,8 +821,7 @@ You must run the appstore command with a related command.
 Usage:
     $ appbuilder appstore list [<AppleID>] [<Password>]
 
-Lists all application records in iTunes Connect that are in the Waiting for Upload state. The list contains name, version, and
-bundle ID for each application record.
+Lists all application records in iTunes Connect. The list contains name, version, and bundle ID for each application record.
 <Apple ID> and <Password> are your credentials for logging in iTunes Connect. If you do not provide them when
         running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 
@@ -772,12 +835,14 @@ Usage:
                  --certificate <Certificate ID> --provision <Provision ID>
 
 Builds the project and uploads the application to iTunes Connect.
-<Application Name> is the name for an application record in the Waiting for Upload state. To retrieve the names of your application
-        records that are in the Waiting for Upload state in iTunes Connect, run $ appbuilder appstore list.
+<Application Name> is the name for the application record that you want to upload for publishing. To retrieve the names of your
+        application records available in iTunes Connect, run $ appbuilder appstore list.
 <AppleID> and <Password> are your credentials for logging into iTunes Connect. If you do not provide them when
-        running the command, Telerik AppBuilder will prompt you to provide them.
+        running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
+
+This command is not applicable to NativeScript projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name.
@@ -814,6 +879,8 @@ After the upload completes, you need to go to your app in Telerik AppManager, ma
 <Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
+
+This command is not applicable to NativeScript projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
@@ -871,7 +938,7 @@ Options:
 
 --[prop]--
 Usage:
-    $appbuilder prop <Command>
+    $ appbuilder prop <Command>
 
 You must run the prop command with a related command.
 
@@ -896,7 +963,10 @@ Usage:
     $ appbuilder prop add <Property Name> <Value> [Value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
+
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
+
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
@@ -906,7 +976,10 @@ Usage:
     $ appbuilder prop set <Property Name> <Value> [Value]*
 
 Sets the selected project property and overwrites its current value.
+
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
+
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
@@ -917,6 +990,8 @@ Usage:
 
 Disables options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
+
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
@@ -939,7 +1014,7 @@ All data gathered is used strictly for improving the product and will never be u
 --[remote]--
 
 Usage:
-    $ appbuilder remote <Port>
+    $ appbuilder remote <Port> [--device <Device Name>]
 
 Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. 
 
@@ -950,13 +1025,22 @@ IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run t
 <Port> is a non-negative integer that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
+<Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
+
+Options:
+    --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
+            When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
+            from the other Telerik AppBuilder clients. 
+            To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
 --[/]--
 
 --[mobileframework]--
 Usage:
-    $appbuilder mobileframework [<Command>] [--path <Directory>]
+    $ appbuilder mobileframework [<Command>] [--path <Directory>]
 
-Lists all supported versions of the mobile framework for the current hybrid project.
+Lists all supported versions of Apache Cordova.
+
+This command and its related commands are not applicable to NativeScript projects.
 
 <Command> is a related command that extends the mobileframework command. You can run the following related commands:
 	set - Sets the selected framework version for the project and updates the plugins according to the new version.
@@ -970,10 +1054,11 @@ Options:
 Usage:
     $ appbuilder mobileframework set <Version> [--path <Directory>]
 
-Sets the selected framework version for the project and updates the plugins according to the new version.
-<Version> is the version of the framework in the 
-        following format Major.Minor.Patch
-You can use appbuilder mobileframework to get list of supported versions.
+Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.
+
+<Version> is the version of the framework as listed by $ appbuilder mobileframework
+
+This command is not applicable to NativeScript projects.
 
 Options:
     --path - Specifies the directory that contains the project. If not specified, the project is searched
