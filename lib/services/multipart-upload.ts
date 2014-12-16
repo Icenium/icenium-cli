@@ -51,7 +51,8 @@ export class MultipartUploadService implements IMultipartUploadService {
 	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: ReadableStream, fileSize: number): IFuture<void> {
 		return (() => {
 			var headers = {
-				"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize)
+				"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize),
+				"Content-Length": endIndex - startingIndex
 			};
 
 			this.$logger.trace("Uploading chunk with Content-Range: %s", headers["Content-Range"]);
