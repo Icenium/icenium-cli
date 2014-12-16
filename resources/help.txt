@@ -644,7 +644,7 @@ Options:
             If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate.
             To list available provisioning profiles, run $ appbuilder provision.
     --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
-            To list the available iOS Simulator devices, run $ isim device-types
+            To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
 
 --[/]--
 
@@ -963,29 +963,23 @@ Usage:
     $ appbuilder prop add <Property Name> <Value> [Value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
+
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-Options:
-    --debug - Only applicable to the CorePlugins property. Enables the selected plugins for the Debug
-        build configuration only.
-    --release - Only applicable to the CorePlugins property. Enables the selected plugins for the Release
-        build configuration only.
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|set]--
 Usage:
-    $ appbuilder prop set <Property Name> <Value> [Value]* [--debug] [--release]
+    $ appbuilder prop set <Property Name> <Value> [Value]*
 
 Sets the selected project property and overwrites its current value.
+
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-Options:
-    --debug - Only applicable to the CorePlugins property. Enables the selected plugins for the Debug
-        build configuration only.
-    --release - Only applicable to the CorePlugins property. Enables the selected plugins for the Release
-        build configuration only.
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
@@ -997,11 +991,7 @@ Usage:
 Disables options for the selected project property, if the property accepts multiple values.
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
-Options:
-    --debug - Only applicable to the CorePlugins property. Disables the selected plugins for the Debug
-        build configuration only.
-    --release - Only applicable to the CorePlugins property. Disables the selected plugins for the Release
-        build configuration only.
+IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 
 #{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
