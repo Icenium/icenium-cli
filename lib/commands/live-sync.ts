@@ -103,7 +103,7 @@ export class LiveSyncCommand implements ICommand {
 			return {
 				fileName: fileName,
 				onDeviceName: parsed[1] + parsed[3],
-				shouldIncludeFile: parsed[2] === value
+				shouldIncludeFile: parsed[2].toLowerCase() === value.toLowerCase()
 			};
 		}
 
