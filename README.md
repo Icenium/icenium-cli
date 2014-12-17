@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.7  
-Release date: 2014, December 17
+Release date: 2014, December 18
 
 > For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
@@ -40,7 +40,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
-* iTunes
+* iTunes (latest official)
 * 32-bit Node.js
 
 **Additional Software Requirements for Android On-Device Deployment**
@@ -60,7 +60,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
-* iTunes
+* iTunes (latest official)
 
 **Additional Software Requirements for Android On-Device Deployment**
 
@@ -240,7 +240,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.7  
-Release date: 2014, December 17
+Release date: 2014, December 18
 
 > For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
