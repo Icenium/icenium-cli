@@ -254,6 +254,7 @@ export class StaticConfig implements IStaticConfig {
 	public version = "1";
 	helpTextPath = "help";
 	adbFilePath = "adbFilePath";
+	sevenZipFilePath = "7za";
 }
 
 export class HooksService implements IHooksService {

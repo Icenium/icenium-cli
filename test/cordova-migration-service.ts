@@ -11,6 +11,8 @@ var assert: chai.Assert = chai.assert;
 
 var testInjector = new yok.Yok();
 testInjector.register("server", {});
+testInjector.register("errors", {});
+testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() }});
 
 function registerMockedFS(mockResult: any): void {
     testInjector.register("fs", {

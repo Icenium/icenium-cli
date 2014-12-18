@@ -20,10 +20,15 @@ export class ConfigurationFile {
 
 export class TemplatesService implements ITemplatesService {
 	private configFiles: ConfigurationFile[];
+	private configFilesPerProjectType: IDictionary<string[]> = {
+		"NativeScript":  ["ios-info", "android-manifest"]
+	};
+
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $resources: IResourceLoader,
-		private $httpClient: Server.IHttpClient) {
+		private $httpClient: Server.IHttpClient,
+		private $injector: IInjector) {
 			this.configFiles = [
 				new ConfigurationFile(
 					"android-manifest",
@@ -73,6 +78,14 @@ export class TemplatesService implements ITemplatesService {
 	}
 
 	public get configurationFiles(): IConfigurationFile[] {
+		var project = this.$injector.resolve("project"); // we need to resolve project here due to cyclic dependency
+		var projectSpecificConfigFiles: string[] = this.configFilesPerProjectType[projectTypes[project.projectType]];
+		if(projectSpecificConfigFiles) {
+			this.configFiles = _.reject(this.configFiles, (configurationFile: IConfigurationFile) => {
+				return !_.contains(projectSpecificConfigFiles, configurationFile.template)
+			});
+		}
+
 		return this.configFiles;
 	}
 

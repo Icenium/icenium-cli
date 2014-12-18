@@ -7,6 +7,7 @@ import helpers = require("../helpers");
 import unzip = require("unzip");
 var options: any = require("../options");
 import projectTypes = require("../project-types");
+import temp = require("temp");
 
 class ProjectIdCommandParameter implements ICommandParameter {
 	constructor(private $remoteProjectService: IRemoteProjectService) { }
@@ -72,9 +73,11 @@ export class CloudExportProjectsCommand implements ICommand {
 				this.$errors.fail("The folder %s already exists!", projectDir);
 			}
 
-			var projectExtractor = unzip.Extract({ path: projectDir });
-			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, projectExtractor)).wait();
-			this.$fs.futureFromEvent(projectExtractor, "close").wait();
+			temp.track();
+			var projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
+			var unzipStream = this.$fs.createWriteStream(projectZipFilePath);
+			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, unzipStream)).wait();
+			this.$fs.unzip(projectZipFilePath, projectDir).wait();
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side

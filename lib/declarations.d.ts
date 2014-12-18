@@ -148,6 +148,7 @@ declare module Project {
 		projectTargets: IFuture<string[]>;
 		getProjectDir(): IFuture<string>;
 		ensureProject(): void;
+		ensureCordovaProject(): void;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
@@ -156,7 +157,7 @@ declare module Project {
 		createProjectFileFromExistingProject(projectType: number): IFuture<void>;
 		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<void>;
-		getTempDir(extraSubdir?:string): IFuture<string>;
+		getTempDir(extraSubdir?: string): IFuture<string>;
 		saveProject(projectDir?: string): IFuture<void>;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		getNewProjectDir(): void;
@@ -165,6 +166,7 @@ declare module Project {
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
 		hasBuildConfigurations(): boolean;
+		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
 	}
 
 	interface IPlatformMigrator {
@@ -334,6 +336,8 @@ interface ICordovaMigrationService {
 	getSupportedVersions(): IFuture<string[]>;
 	pluginsForVersion(version: string): IFuture<string[]>;
 	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+	getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]>;
+	getDisplayNameForVersion(version: string): IFuture<string>;
 }
 
 interface ISamplesService {
@@ -398,13 +402,9 @@ interface IProcessInfo {
 	isRunning(name: string): IFuture<boolean>;
 }
 
-interface IBuildConfigurationService {
-	BuildConfigurationData: IFuture<IBuildConfigurationData>;
-	saveBuildConfigurationData(): IFuture<void>;
-	readBuildConfigurationData(): IFuture<void>;
-}
-
-interface IBuildConfigurationData {
-	CorePlugins: string[];
-	CordovaPluginVariables: any;
+interface IRemoteProjectService {
+	makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T>;
+	getProjectProperties(projectName: string): IFuture<any>;
+	getProjects(): IFuture<Server.TapSolutionData[]>;
+	getProjectName(projectId: string): IFuture<string>;
 }
