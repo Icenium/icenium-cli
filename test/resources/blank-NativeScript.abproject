@@ -16,7 +16,7 @@
     ,"WP8Publisher": ""
     ,"WP8Capabilities": []
     ,"WP8Requirements": []
-    ,"FrameworkVersion": "0.4.0"
+    ,"FrameworkVersion": "0.4.2"
     ,"AndroidPermissions": [ ]
     ,"DeviceOrientations": [
       "Portrait",

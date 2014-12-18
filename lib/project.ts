@@ -219,6 +219,11 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
+				if (this.projectType === projectTypes.MobileWebsite) {
+					this.$errors.fail("This is a mobile website project. In this version of the Telerik AppBuilder CLI, you cannot work with mobile website projects." +
+					" You will be able to develop mobile website projects in a future release.");
+				}
+
 				if (this.$projectPropertiesService.completeProjectProperties(this.projectData) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
@@ -234,9 +239,13 @@ export class Project implements Project.IProject {
 		var configurations: string[] = [];
 		if(options.debug || options.d) {
 			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
-		} else if(options.release || options.r) {
+		}
+
+		if(options.release || options.r) {
 			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
-		} else {
+		}
+
+		if(configurations.length === 0) {
 			configurations.push(Project.DEBUG_CONFIGURATION_NAME);
 			configurations.push(Project.RELEASE_CONFIGURATION_NAME);
 		}
@@ -325,7 +334,8 @@ export class Project implements Project.IProject {
 			if(this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
-				version = _.last(this.$cordovaMigrationService.getSupportedVersions().wait());
+				var selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf("Experimental") === -1));
+				version = selectedFramework.Version;
 			}
 
 			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
@@ -338,7 +348,8 @@ export class Project implements Project.IProject {
 				return;
 			}
 
-			this.$logger.info("Migrating to cordova version %s", newVersion);
+			var versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
+			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			var oldVersion = this.projectData.FrameworkVersion;
 			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
 			this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
@@ -368,7 +379,7 @@ export class Project implements Project.IProject {
 				});
 			}
 
-			this.$logger.info("Successfully migrated to version %s", newVersion);
+			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
 		}).future<void>()();
 	}
 
@@ -447,12 +458,8 @@ export class Project implements Project.IProject {
 		properties.AppIdentifier = appid;
 		properties.ProjectGuid = commonHelpers.createGUID();
 
-		if(!properties.WP8ProductID) {
-			properties.WP8ProductID = commonHelpers.createGUID();
-		}
-		if(!properties.WP8PublisherID) {
-			properties.WP8PublisherID = commonHelpers.createGUID();
-		}
+		properties.WP8ProductID = commonHelpers.createGUID();
+		properties.WP8PublisherID = commonHelpers.createGUID();
 
 		return properties;
 	}
@@ -599,6 +606,16 @@ export class Project implements Project.IProject {
 	public ensureProject() {
 		if(!this.projectData) {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
+		}
+	}
+
+	public ensureCordovaProject() {
+		if(!this.projectData) {
+			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
+		}
+
+		if(this.projectType !== projectTypes.Cordova) {
+			this.$errors.fail("This is not a valid Cordova project.");
 		}
 	}
 

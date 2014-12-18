@@ -52,6 +52,9 @@ export class CordovaService implements Server.ICordovaServiceContract{
 	public getCordovaVersions(): IFuture<string[]>{
 		return this.$serviceProxy.call<string[]>('GetCordovaVersions', 'GET', ['api','cordova','versions'].join('/'), 'application/json', null, null);
 	}
+	public getCordovaFrameworkVersions(): IFuture<Server.FrameworkVersion[]>{
+		return this.$serviceProxy.call<Server.FrameworkVersion[]>('GetCordovaFrameworkVersions', 'GET', ['api','cordova','frameworkVersions'].join('/'), 'application/json', null, null);
+	}
 	public getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>{
 		return this.$serviceProxy.call<Server.CordovaPluginData>('GetMarketplacePluginData', 'GET', ['api','cordova','marketplace',encodeURI(pluginId.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
