@@ -1,0 +1,10 @@
+{
+	"FrameworkVersion": {
+		"description": "Mobile Website framework version.",
+		"range": ["0.0.1"]
+	},
+	"ProjectTypeGuids": {
+		"description": "Unique identifier for the project type",
+		"range": [ "{da2f9169-4696-40a5-919b-f73985228cac}" ]
+	}
+}

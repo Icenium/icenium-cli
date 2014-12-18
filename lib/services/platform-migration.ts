@@ -21,19 +21,21 @@ export class PlatformMigrationService implements Project.IPlatformMigrator {
 				});
 			}
 
-			var appResourcesDir = this.$resources.appResourcesDir;
-			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
-			var projectDir = this.$project.getProjectDir().wait();
-			appResourceFiles.forEach((appResourceFile) => {
-				var relativePath = path.relative(appResourcesDir, appResourceFile);
-				var targetFilePath = path.join(projectDir, relativePath);
-				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
-					this.printAssetUpdateMessage();
-					this.$logger.trace("File not found, copying %s", appResourceFile);
-					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
-				}
-			});
+			if (this.$project.projectType !== projectTypes.MobileWebsite) {
+				var appResourcesDir = this.$resources.appResourcesDir;
+				var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
+				var projectDir = this.$project.getProjectDir().wait();
+				appResourceFiles.forEach((appResourceFile) => {
+					var relativePath = path.relative(appResourcesDir, appResourceFile);
+					var targetFilePath = path.join(projectDir, relativePath);
+					this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
+					if (!this.$fs.exists(targetFilePath).wait()) {
+						this.printAssetUpdateMessage();
+						this.$logger.trace("File not found, copying %s", appResourceFile);
+						this.$fs.copyFile(appResourceFile, targetFilePath).wait();
+					}
+				});
+			}
 		}).future<void>()();
 	}
 

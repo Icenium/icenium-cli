@@ -89,24 +89,29 @@ export class TemplatesService implements ITemplatesService {
 		return this.configFiles;
 	}
 
-	public projectCordovaTemplatesString(): string {
-		var templates = _.map(this.$fs.readDirectory(this.projectTemplatesDir).wait(), (file) => {
-			var match = file.match(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
-			return match && match[1];
-		})
-		.filter((file: string) => file !== null);
-
-		templates = _.select(templates, (template: string) => template != null);
-		return helpers.formatListOfNames(templates);
+	public projectCordovaTemplatesString(): IFuture<string> {
+		return this.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
 	}
 
-	public projectNativeScriptTemplatesString(): string {
-		var templates = _.map(this.$fs.readDirectory(this.projectTemplatesDir).wait(), (file) => {
-			var match = file.match(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
-			return match && match[1];
-		})
-		.filter((file: string) => file !== null);
-		return helpers.formatListOfNames(templates);
+	public projectNativeScriptTemplatesString(): IFuture<string> {
+		return this.getTemplatesString(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
+	}
+
+	public projectMobileWebsiteTemplatesString(): IFuture<string> {
+		return this.getTemplatesString(/.*Telerik\.Mobile\.MobileWebsite\.(.+)\.zip/);
+	}
+
+	private getTemplatesString(regexp: RegExp): IFuture<string> {
+		return (() => {
+			var templates = _.chain(this.$fs.readDirectory(this.projectTemplatesDir).wait())
+				.map((file) => {
+				var match = file.match(regexp);
+				return match && match[1];
+			})
+			.filter((file: string) => file !== null)
+			.value();
+			return helpers.formatListOfNames(templates);
+		}).future<string>()();
 	}
 
 	public configurationFilesString(): string {

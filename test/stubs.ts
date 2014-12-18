@@ -1,17 +1,27 @@
 ///<reference path=".d.ts"/>
+"use strict";
 
 import Future = require("fibers/future");
 import util = require("util");
 import path = require("path");
 
 export class LoggerStub implements ILogger {
+	constructor() {
+		// uncomment when debugging unit tests to print to the console
+		//this.setLevel("DEBUG");
+	}
+
 	setLevel(level: string): void {}
 	fatal(formatStr: string, ...args:string[]): void {}
 	error(formatStr: string, ...args:string[]): void {}
 	warn(formatStr: string, ...args:string[]): void {}
 	info(formatStr: string, ...args:string[]): void {}
 	debug(formatStr: string, ...args:string[]): void {}
-	trace(formatStr: string, ...args:string[]): void {}
+	trace(formatStr: string, ...args:string[]): void {
+		// uncomment when debugging unit tests to print to the console
+		//args.unshift(formatStr);
+		//console.log(util.format.apply(null, args));
+	}
 
 	public output = "";
 
@@ -205,11 +215,16 @@ export class TemplateServiceStub implements ITemplatesService {
 		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
 	}
 
-	projectCordovaTemplatesString(): string {
-		return "";
+	projectCordovaTemplatesString(): IFuture<string> {
+		return undefined;
 	}
-	projectNativeScriptTemplatesString(): string {
-		return "";
+
+	projectNativeScriptTemplatesString(): IFuture<string> {
+		return undefined;
+	}
+
+	projectMobileWebsiteTemplatesString(): IFuture<string> {
+		return undefined;
 	}
 
 	get projectTemplatesDir(): string {
