@@ -35,6 +35,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Windows 7 or later
 * .NET 4.0 or later
 * Node.js 0.10.26 or a later stable official release
+* An Internet browser (latest official release)
 
 > To be able to work with connected iOS devices from the command line, download and install the 32-bit Node.js.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
 
@@ -57,6 +58,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * OS X Mavericks
 * Node.js 0.10.26 or a later stable official release
+* An Internet browser (latest official release)
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -76,6 +78,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 * Node.js 0.10.26 or a later stable official release
+* An Internet browser (latest official release)
 
 > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
 
