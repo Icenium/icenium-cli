@@ -9,12 +9,13 @@ import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
-	constructor(private $fs: IFileSystem,
+	constructor(private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
+		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $injector: IInjector,
-		private $resources: IResourceLoader,
+		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $projectConstants: Project.IProjectConstants,
-		private $frameworkProjectResolver: Project.IFrameworkProjectResolver) { }
+		private $resources: IResourceLoader)  { }
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData> {
 		return ((): any => {
@@ -52,129 +53,80 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return updated;
 	}
 
-	public updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping: boolean = true) : IFuture<void> {
-		return ((): any => {
-			property = this.normalizePropertyName(property, propSchema);
-			var propData = propSchema[property];
+	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : void {
+		var normalizedProperty = this.normalizePropertyName(property, projectData);
+		var propertyValue = projectData[normalizedProperty];
 
-			var validate = (condition: boolean, ...args: string[]) => {
-				if(condition) {
-					if(propData.validationMessage) {
-						this.$errors.fail(propData.validationMessage);
-					} else {
-						this.$errors.fail.apply(this.$errors, _.rest(args, 0));
-					}
-				}
-			};
-
-			if (!propData) {
-				this.$errors.fail("Unrecognized project property '%s'", property);
+		if (mode === "set") {
+			propertyValue = newValue.join(" ");
+		} else if (mode === "del") {
+			if(!(propertyValue instanceof Array)) {
+				this.$errors.fail("Unable to remove value to non-flags property");
 			}
-
-			if (!propData.flags) {
-				if (newValue.length !== 1) {
-					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
-				}
-				if (mode === "add" || mode === "del") {
-					this.$errors.fail("Property '%s' is not a collection of flags. Use prop-set to set a property value.", property);
-				}
-			} else {
-				newValue = _.flatten(_.map(newValue, (value: string)  => value.split(";")));
+			propertyValue = _.difference(propertyValue, newValue);
+		} else if (mode === "add") {
+			if(!(propertyValue instanceof Array)) {
+				this.$errors.fail("Unable to add value to non-flags property");
 			}
-
-			var range = this.getPropRange(propData).wait();
-			if (range) {
-				newValue = _.map(newValue, (value: string) => value.toLowerCase());
-
-				var validValues: any;
-				if (_.isArray(range)) {
-					validValues = helpers.toHash(range, (value) => value.toLowerCase(), _.identity);
-				} else {
-					var keySelector = (value: any, key: string) => {
-						var result: string;
-						if (useMapping && value.input) {
-							result = value.input;
-						} else {
-							result = key;
-						}
-
-						return result.toLowerCase();
-					};
-
-					validValues = helpers.toHash(range, keySelector, (value, key) => key);
-				}
-
-				var badValues = _.reject(newValue, (value: string) => validValues[value]);
-
-				validate(badValues.length > 0, "Invalid property value%s for property '%s': '%s'", badValues.length > 1 ? "s" : "", property, badValues.join("; "));
-
-				newValue = _.map(newValue, (value: string) => validValues[value]);
-			}
-
-			if (!propData.flags) {
-				newValue = newValue[0];
-
-				if (propData.regex) {
-					var matchRegex = new RegExp(propData.regex);
-					validate(!matchRegex.test(newValue), "Value '%s' is not in the format expected by property %s. Expected to match /%s/", newValue, property, propData.regex);
-				}
-
-				if (propData.validator) {
-					var validator = this.$injector.resolve(propData.validator);
-					validator.validate(newValue);
-				}
-			}
-
-			var propertyValue = projectData[property];
-			if (propData.flags && _.isString(propertyValue)) {
-				propertyValue = propertyValue.split(";");
-			}
-
-			if (mode === "set") {
-				propertyValue = newValue;
-			} else if (mode === "del") {
-				propertyValue = _.difference(propertyValue, newValue);
-			} else if (mode === "add") {
-				propertyValue = _.union(propertyValue, newValue);
-			} else {
-				this.$errors.fail("Unknown property update mode '%s'", mode);
-			}
-
-			if (propertyValue.sort) {
-				propertyValue.sort();
-			}
-
-			if (propData.onChanging) {
-				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
-			}
-
-			projectData[property] = propertyValue;
-		}).future<void>()();
-	}
-
-	public normalizePropertyName(property: string, schema: any): string {
-		if (!property) {
-			return property;
+			propertyValue = _.union(propertyValue, newValue);
+		} else {
+			this.$errors.fail("Unknown property update mode '%s'", mode);
 		}
 
-		var propLookup = helpers.toHash(schema, (value, key) => key.toLowerCase(), (value, key) => key);
-		return propLookup[property.toLowerCase()] || property;
+		projectData[normalizedProperty] = propertyValue;
+		this.$jsonSchemaValidator.validate(projectData);
+	}
+
+	public normalizePropertyName(propertyName: string, projectData: IProjectData): string {
+		var validProperties = this.getValidProperties(projectData);
+		var normalizedPropertyName = validProperties[propertyName.toLowerCase()];
+
+		if(!normalizedPropertyName) {
+			var message = util.format("Unrecognized project property '%s'. Use 'appbuilder prop print' command to lists all available property names.", propertyName);
+			this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
+		}
+
+		return normalizedPropertyName;
 	}
 
 	public getProjectSchemaHelp(): IFuture<string> {
 		return (() => {
 			var result: string[] = [];
+			var schemas: IDictionary<IDictionary<any>> = Object.create(null);
 
 			var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
 			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
-				var frameworkProject = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier, null); // We need this function only to show the help so it is ok to pass null for projectInformation
-				var schema = frameworkProject.getProjectFileSchema().wait();
-				var title = util.format("Project properties for %s projects:", frameworkProject.name);
-				result.push(this.getProjectSchemaPartHelp(schema, title));
+				var projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
+				schemas[targetFrameworkIdentifier] = projectSchema;
 			});
+
+			// Get common properties
+			var schemaValues = _.values(schemas);
+			var firstArray = _.first(schemaValues);
+			var commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
+				return _.all(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
+			});
+
+			_.each(_.keys(schemas), (targetFrameworkIdentifier: string) => {
+				var specificFrameworkPropertyNames = _.difference(_.keys(schemas[targetFrameworkIdentifier]), commonPropertyNames);
+				var specificFrameworkProperties: IDictionary<any> = Object.create(null);
+				_.each(specificFrameworkPropertyNames, (propertyName: string) => {
+					specificFrameworkProperties[propertyName] = schemas[targetFrameworkIdentifier][propertyName];
+				});
+				var title = util.format("Project properties for %s projects:", targetFrameworkIdentifier);
+				result.push(this.getProjectSchemaPartHelp(specificFrameworkProperties, title));
+			});
+
+			var commonProperties: IDictionary<string> = Object.create(null);
+			 _.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
+			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
 			return result.join(os.EOL + os.EOL);
 		}).future<string>()();
+	}
+
+	private getValidProperties(projectData: IProjectData): any {
+		return this.$jsonSchemaValidator.getValidProperties(projectData.Framework, projectData.FrameworkVersion);
 	}
 
 	private getPropRange(propData: any): IFuture<string[]>{
@@ -182,14 +134,23 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			if (propData.dynamicRange) {
 				return this.$injector.dynamicCall(propData.dynamicRange).wait();
 			}
+			if(propData.enum) {
+				return propData.enum;
+			}
+			if(propData.items) {
+				if(propData.items.enum) {
+					return propData.items.enum;
+				}
+			}
 			return propData.range;
 		}).future<string[]>()();
 	}
 
-	private getProjectSchemaPartHelp(schema: string, title: string): string {
+	private getProjectSchemaPartHelp(schema: any, title: string): string {
 		var help = [title];
-		_.each(schema, (value: any, key: any) => {
-			help.push(util.format("  %s - %s", key, value.description));
+		_.each(_.keys(schema), (propertyName: string) => {
+			var value = schema[propertyName];
+			help.push(util.format("  %s - %s", propertyName, value.description));
 			var range = this.getPropRange(value).wait();
 			if (range) {
 				help.push("    Valid values:");
@@ -218,14 +179,14 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var result: any = xmlMapping.tojson(this.$fs.readText(projectFile).wait());
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = frameworkProject.getFullProjectFileSchema().wait();
+			var projectSchema = frameworkProject.getProjectFileSchema();
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];
 
-					if (projectSchema[propertyName].flags) {
+					/* if (projectSchema[propertyName].flags) {
 						properties[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
-					}
+					} */
 				}
 			});
 

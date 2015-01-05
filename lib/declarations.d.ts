@@ -120,7 +120,6 @@ declare module Project {
 
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
-		buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult>;
 		importProject(): IFuture<void>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
@@ -198,8 +197,8 @@ interface IProjectData extends IDictionary<any> {
 interface IProjectPropertiesService {
 	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData>;
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
-	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any, propSchema: any, useMapping?: boolean) : IFuture<void>;
-	normalizePropertyName(property: string, schema: any): string;
+	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any): void;
+	normalizePropertyName(property: string, projectData: IProjectData): string;
 }
 
 interface IServerConfigurationData {

@@ -13,12 +13,14 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		private $config: IConfiguration,
 		$errors: IErrors,
 		$fs: IFileSystem,
+		private $jsonSchemaConstants: IJsonSchemaConstants,
+		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		$resources: IResourceLoader,
 		private $templatesService: ITemplatesService) {
-		super(projectInformation, $logger, $fs, $resources, $errors);
+		super(projectInformation, $logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
 	public get name(): string {
@@ -57,6 +59,10 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		]
 	}
 
+	public getValidationSchemaId(): string {
+		return this.$jsonSchemaConstants.NATIVESCRIPT_SCHEMA_ID;
+	}
+
 	public getTemplateFilename(name: string): string {
 		return util.format("Telerik.Mobile.NativeScript.%s.zip", name);
 	}
@@ -69,12 +75,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
 	}
 
-	public getProjectFileSchema(): IFuture<any> {
+	public getProjectFileSchema(): IDictionary<any> {
 		return this.getProjectFileSchemaByName(this.name);
-	}
-
-	public getFullProjectFileSchema(): IFuture<any> {
-		return this.getFullProjectFileSchemaByName(this.name);
 	}
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
@@ -123,13 +125,6 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			properties.DisplayName = properties.ProjectName;
 			updated = true;
 		}
-
-		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-			if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
-				properties[wp8guid] = MobileHelper.generateWP8GUID();
-				updated = true;
-			}
-		});
 
 		return updated;
 	}

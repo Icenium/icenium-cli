@@ -10,8 +10,8 @@ export class FrameworkProjectResolver extends frameworkProjectResolverBaseLib.Fr
 		super($errors, $injector, $projectConstants);
 	}
 
-	public resolve(framework: string, projectInformation: Project.IProjectInformation): Project.IFrameworkProject {
-		return this.resolveByName<Project.IFrameworkProject>("Project", framework, { projectInformation: projectInformation });
+	public resolve(framework: string, projectInformation?: Project.IProjectInformation): Project.IFrameworkProject {
+		return this.resolveByName<Project.IFrameworkProject>("Project", framework, { projectInformation: projectInformation || {} });
 	}
 }
 $injector.register("frameworkProjectResolver", FrameworkProjectResolver);

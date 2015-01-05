@@ -12,11 +12,12 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		private $config: IConfiguration,
 		$errors: IErrors,
 		$fs: IFileSystem,
+		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader) {
-		super(projectInformation, $logger, $fs, $resources, $errors);
+		super(projectInformation, $logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
 	public get name(): string {
@@ -51,6 +52,10 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return [];
 	}
 
+	public getValidationSchemaId(): string {
+		return null;
+	}
+
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
 		var result: string[] = [];
 		return (() => { return result; }).future<string[]>()();
@@ -66,16 +71,12 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.MobileWebsite\.(.+)\.zip/);
 	}
 
-	public getProjectFileSchema(): IFuture<any> {
+	public getProjectFileSchema(): IDictionary<any> {
 		return this.getProjectFileSchemaByName(this.name);
 	}
 
-	public getFullProjectFileSchema(): IFuture<any> {
-		return this.getFullProjectFileSchemaByName(this.name);
-	}
-
-	public adjustBuildProperties(buildProperties: any): any {
-		return buildProperties;
+	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any {
+		return (() => { }).future<any>()();
 	}
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {

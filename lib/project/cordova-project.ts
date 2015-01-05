@@ -14,12 +14,14 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $config: IConfiguration,
 		$fs: IFileSystem,
 		$errors: IErrors,
+		private $jsonSchemaConstants: IJsonSchemaConstants,
+		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader) {
-		super(projectInformation, $logger, $fs, $resources, $errors);
+		super(projectInformation, $logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
 	public get name(): string {
@@ -55,6 +57,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		return _.values(allConfigFiles);
 	}
 
+	public getValidationSchemaId(): string {
+		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
+	}
+
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
 		var fileMask = /^cordova\.(\w*)\.js$/i;
 		return this.getProjectTargetsBase(projectDir, fileMask);
@@ -66,18 +72,17 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void {
 		this.alterPropertiesForNewProjectBase(properties, projectName);
+
+		properties.WP8ProductID = helpers.createGUID();
+		properties.WP8PublisherID = helpers.createGUID();
 	}
 
 	public projectTemplatesString(): IFuture<string> {
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
 	}
 
-	public getProjectFileSchema(): IFuture<any> {
+	public getProjectFileSchema(): IDictionary<any> {
 		return this.getProjectFileSchemaByName(this.name);
-	}
-
-	public getFullProjectFileSchema(): IFuture<any> {
-		return this.getFullProjectFileSchemaByName(this.name);
 	}
 
 	public adjustBuildProperties(buildProperties: any): any {

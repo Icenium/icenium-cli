@@ -12,10 +12,6 @@
         "2"
     ]
     ,"iOSBackgroundMode": []
-    ,"WP8TileTitle": ""
-    ,"WP8Publisher": ""
-    ,"WP8Capabilities": []
-    ,"WP8Requirements": []
     ,"FrameworkVersion": "0.5.0"
     ,"AndroidPermissions": [ ]
     ,"DeviceOrientations": [
@@ -24,11 +20,6 @@
     ]
     ,"AndroidHardwareAcceleration": "false"
     ,"iOSStatusBarStyle": "Default"
-    ,"WP8SupportedResolutions": [
-      "ID_RESOLUTION_WVGA",
-      "ID_RESOLUTION_WXGA",
-      "ID_RESOLUTION_HD720P"
-    ]
     ,"Framework": "NativeScript"
     ,"ProjectTypeGuids": "{F0A65104-D4F4-4012-B799-F612D75820F6}"
 }
