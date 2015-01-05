@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.7  
-Release date: 2014, December 17
+Release date: 2014, December 18
 
 > For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
@@ -34,13 +34,13 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Windows 7 or later
 * .NET 4.0 or later
-* Node.js 0.10.26 or a later stable official release
+* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 
 > To be able to work with connected iOS devices from the command line, download and install the 32-bit Node.js.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
-* iTunes
+* iTunes (latest official)
 * 32-bit Node.js
 
 **Additional Software Requirements for Android On-Device Deployment**
@@ -56,11 +56,11 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* Node.js 0.10.26 or a later stable official release
+* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
-* iTunes
+* iTunes (latest official)
 
 **Additional Software Requirements for Android On-Device Deployment**
 
@@ -75,7 +75,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements** 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
-* Node.js 0.10.26 or a later stable official release
+* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 
 > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
 
@@ -240,7 +240,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.7  
-Release date: 2014, December 17
+Release date: 2014, December 18
 
 > For a complete list of the features and updates available in Telerik AppBuilder 2.7, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-7" target="_blank">Telerik AppBuilder 2.7 Release Notes</a>.
 
@@ -285,7 +285,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
          | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Run apps in the native iOS Simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Build for distribution in the App Store | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Upload application packages to iTunes Connect | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
@@ -299,7 +299,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
          | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+         | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Run apps in the native Android emulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Build for distribution in Google Play | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Build and upload your app to Telerik AppManager | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
