@@ -5,7 +5,6 @@ import os = require("os");
 import path = require("path");
 import Future = require("fibers/future");
 import hostInfo = require("../host-info");
-import projectTypes = require("../project-types");
 
 export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
@@ -46,13 +45,10 @@ export class SimulateCommand implements ICommand {
 			var simulatorPackageName = this.$simulatorPlatformServices.getPackageName();
 			this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 			this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
-			if (this.$project.projectType === projectTypes.Cordova) {
-				this.pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
-			}
 
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
 
-			this.runSimulator().wait();
+			this.runSimulator(simulatorPackageName).wait();
 		}).future<void>()();
 	}
 
@@ -70,74 +66,19 @@ export class SimulateCommand implements ICommand {
 		}
 	}
 
-	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<string> {
-		return (() => {
-			var packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
-			var pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
-
-			var pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + SimulateCommand.PLUGINS_API_CONTRACT;
-
-			if (!this.$fs.exists(pluginsPath).wait()) {
-				try {
-					this.$logger.info("Downloading core Cordova plugins...");
-
-					this.$fs.createDirectory(pluginsPath).wait();
-					var zipPath = path.join(pluginsPath, "plugins.zip");
-
-					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
-					var zipFile = this.$fs.createWriteStream(zipPath);
-					this.$server.cordova.getPluginsPackage(zipFile).wait();
-
-					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
-					this.$fs.unzip(zipPath, pluginsPath).wait();
-
-					this.$logger.info("Finished downloading plugins.");
-				} catch(err) {
-					this.$fs.closeStream(zipFile).wait();
-					this.$fs.deleteDirectory(pluginsPath).wait();
-					throw err;
-				}
-			}
-
-			return pluginsPath
-		}).future<string>()();
-	}
-
-	private runSimulator(): IFuture<void> {
+	private runSimulator(simulatorPackageName: string): IFuture<void> {
 		return (() => {
 			this.$logger.info("Starting simulator...");
-
-			var projectTargets = this.$project.projectTargets.wait().join(";");
 
 			var simulatorParams = [
 				"--path", this.$project.getProjectDir().wait(),
 				"--assemblypaths", this.simulatorPath
 			];
 
-			if (this.$project.projectType === projectTypes.Cordova) {
-				simulatorParams = simulatorParams.concat([
-					"--statusbarstyle", this.projectData.iOSStatusBarStyle,
-					"--frameworkversion", this.projectData.FrameworkVersion,
-					"--orientations", this.projectData.DeviceOrientations.join(";"),
-					"--corepluginspath", this.pluginsPath,
-					"--supportedplatforms", projectTargets,
-					"--plugins", this.projectData.CorePlugins.join(";")
-				]);
-			}
+			simulatorParams = simulatorParams.concat(this.$project.getSimulatorParams(simulatorPackageName).wait());
 
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 		}).future<void>()();
-	}
-
-	private getPluginsDirName(serverVersion: string) {
-		var result: string;
-		if (this.$config.DEBUG) {
-			result = SimulateCommand.PLUGINS_PACKAGE_IDENTIFIER;
-		} else {
-			result = SimulateCommand.PLUGINS_PACKAGE_IDENTIFIER + "-" + serverVersion;
-		}
-		this.$logger.debug("PLUGINS dir is: " + result);
-		return result;
 	}
 }
 $injector.registerCommand("simulate", SimulateCommand);

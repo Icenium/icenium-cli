@@ -35,7 +35,7 @@ class PlatformCommandParameter implements ICommandParameter {
 			this.$project.ensureProject();
 
 			if(!this.$project.capabilities.build && !options.companion) {
-				this.$errors.fail("Use $ appbuilder build <Platform> --companion to deploy your application to Telerik Nativescript Companion App. You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			MobileHelper.validatePlatformName(validationValue, this.$errors);

@@ -757,7 +757,7 @@ Usage:
 
 <ConfigurationFile> is the configuration file that you want to open. You can select a configuration file
     for editing by setting any of the following values.
-#{templatesService.configurationFilesString}
+#{project.configurationFilesString}
 
 --[/]--
 

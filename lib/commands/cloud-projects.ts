@@ -6,7 +6,6 @@ import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
 var options: any = require("../options");
-import projectTypes = require("../project-types");
 import temp = require("temp");
 
 class ProjectIdCommandParameter implements ICommandParameter {
@@ -50,12 +49,13 @@ export class CloudListProjectsCommand implements ICommand {
 $injector.registerCommand("cloud|*list", CloudListProjectsCommand);
 
 export class CloudExportProjectsCommand implements ICommand {
-	constructor(private $logger: ILogger,
-		private $server: Server.IServer,
+	constructor(private $errors: IErrors,
 		private $fs: IFileSystem,
+		private $logger: ILogger,
 		private $project: Project.IProject,
-		private $errors: IErrors,
-		private $remoteProjectService: IRemoteProjectService) { }
+		private $projectConstants: Project.IProjectConstants,
+		private $remoteProjectService: IRemoteProjectService,
+		private $server: Server.IServer) { }
 
 	allowedParameters: ICommandParameter[] = [new ProjectIdCommandParameter(this.$remoteProjectService)];
 
@@ -81,10 +81,10 @@ export class CloudExportProjectsCommand implements ICommand {
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
-				var projectFile = path.join(projectDir, this.$project.PROJECT_FILE);
+				var projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile).wait()) {
 					var properties = this.$remoteProjectService.getProjectProperties(remoteProjectName).wait();
-					this.$project.createProjectFile(projectDir, projectTypes.Cordova, properties).wait();
+					this.$project.createProjectFile(projectDir, properties).wait();
 				}
 			}
 			catch(e) {

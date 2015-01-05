@@ -206,33 +206,16 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 
-	get configurationFiles(): IConfigurationFile[] {
-		return [{ template: "android-manifest", filepath: "App_Resources/Android/AndroidManifest.xml", templateFilepath: "Mobile.Android.ManifestXml.zip", helpText: "" }];
-	}
-
-	getTemplateFilename(projectType: number, name: string): string {
-		var projectTypes = require("../lib/project-types");
-		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
-	}
-
-	projectCordovaTemplatesString(): IFuture<string> {
-		return undefined;
-	}
-
-	projectNativeScriptTemplatesString(): IFuture<string> {
-		return undefined;
-	}
-
-	projectMobileWebsiteTemplatesString(): IFuture<string> {
-		return undefined;
-	}
-
 	get projectTemplatesDir(): string {
 		return path.join(__dirname, "../resources/ProjectTemplates");
 	}
 
 	get itemTemplatesDir(): string {
 		return path.join(__dirname, "../resources/ItemTemplates");
+	}
+
+	getTemplatesString(regexp: RegExp): IFuture<string> {
+		return undefined;
 	}
 
 	downloadProjectTemplates(): IFuture<void> {
@@ -250,6 +233,66 @@ export class PathFilteringServiceStub implements IPathFilteringService {
 	}
 	filterIgnoredFiles(files: string[], rules: string[]) : string[] {
 		return files;
+	}
+}
+
+export class FrameworkProjectResolver implements Project.IFrameworkProjectResolver {
+	resolve(framework: string): Project.IFrameworkProject {
+		return new FrameworkProjectStub(framework);
+	}
+}
+
+class FrameworkProjectStub implements Project.IFrameworkProject {
+	constructor(private framework: string) { }
+
+	public get name(): string {
+		return this.framework;
+	}
+
+	public get capabilities(): IProjectCapabilities { return undefined; }
+
+	public get defaultProjectTemplate(): string { return undefined; }
+
+	public get liveSyncUrl(): string { return undefined; }
+
+	public get requiredAndroidApiLevel(): number { return 0; }
+
+	public get configFiles(): Project.IConfigurationFile[] { return undefined; }
+
+	public getTemplateFilename(name: string): string {
+		return util.format("Telerik.Mobile.%s.%s.zip", this.framework, name);
+	}
+
+	public projectTemplatesString(): IFuture<string> { return undefined; }
+
+	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
+
+	public getProjectFileSchema(): IFuture<any> { return undefined; }
+
+	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
+
+	public getProjectTargets(projectDir: string): IFuture<string[]> { return undefined; }
+
+	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any { return undefined; }
+
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
+
+	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
+
+	public completeProjectProperties(properties: any): boolean { return false; }
+}
+
+export class ProjectFilesManager implements Project.IProjectFilesManager {
+	public get availableConfigFiles(): IDictionary<Project.IConfigurationFile> {
+		return undefined;
+	}
+
+	public enumerateProjectFiles(projectDir: string, additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
+		return undefined;
+	}
+
+	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
+		return undefined;
 	}
 }
 

@@ -1,16 +1,10 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import projectTypes = require("../project-types");
-import MobileHelper = require("../common/mobile/mobile-helper");
-import util = require("util");
-import path = require("path");
-import Future = require("fibers/future")
 
 export class ProjectCommandBase implements ICommand {
-	constructor(protected $project: Project.IProject,
-				protected $errors: IErrors,
-				protected $projectNameValidator?: IProjectNameValidator) {
-		if(this.$project.projectData) {
+	constructor(private $project: Project.IProject,
+		private $errors: IErrors) {
+		if (this.$project.projectData) {
 			this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 		}
 	}
@@ -25,12 +19,12 @@ export class ProjectCommandBase implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	protected createNewProject(projectType: number, projectName: string): IFuture<void> {
-		return this.$project.createNewProject(projectType, projectName);
+	protected createNewProject(projectName: string, framework: string): IFuture<void> {
+		return this.$project.createNewProject(projectName, framework);
 	}
 
-	protected createProjectFileFromExistingProject(projectType: number): IFuture<void> {
-		return this.$project.createProjectFileFromExistingProject(projectType);
+	protected createProjectFileFromExistingProject(framework: string): IFuture<void> {
+		return this.$project.createProjectFileFromExistingProject(framework);
 	}
 }
 
@@ -47,11 +41,10 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 	protected projectFilesDescriptors: any;
 
 	constructor(protected $project: Project.IProject,
-				protected $errors: IErrors,
-				protected $fs: IFileSystem,
-				protected $logger: ILogger,
-				protected $projectNameValidator?: IProjectNameValidator) {
-		super($project, $errors, $projectNameValidator);
+		protected $errors: IErrors,
+		protected $fs: IFileSystem,
+		protected $logger: ILogger) {
+		super($project, $errors);
 
 		this.projectDir = this.$project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
@@ -124,29 +117,48 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 }
 
 export class CreateHybridCommand extends ProjectCommandBase {
-	constructor($project: Project.IProject,
-		$errors: IErrors,
-		$projectNameValidator: IProjectNameValidator) {
-		super($project, $errors, $projectNameValidator);
+	constructor($errors: IErrors,
+		$project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
+        private $projectNameValidator: IProjectNameValidator) {
+		super($project, $errors);
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createNewProject(projectTypes.Cordova, args[0]);
+		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 	}
 
 	allowedParameters = [new NameParameter(this.$projectNameValidator)];
 }
 $injector.registerCommand("create|hybrid", CreateHybridCommand);
 
-export class CreateWebSiteCommand extends ProjectCommandBase {
-	constructor($project: Project.IProject,
-		$errors: IErrors,
-		$projectNameValidator: IProjectNameValidator) {
-		super($project, $errors, $projectNameValidator);
+export class CreateNativeCommand extends ProjectCommandBase {
+	constructor($errors: IErrors,
+		$project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
+		private $projectNameValidator: IProjectNameValidator) {
+		super($project, $errors);
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createNewProject(projectTypes.MobileWebsite, args[0]);
+		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+	}
+
+	allowedParameters = [new NameParameter(this.$projectNameValidator)];
+}
+$injector.registerCommand("create|native", CreateNativeCommand);
+
+export class CreateWebSiteCommand extends ProjectCommandBase {
+
+	constructor($errors: IErrors,
+		$project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
+		private $projectNameValidator: IProjectNameValidator) {
+		super($project, $errors);
+	}
+
+	public execute(args: string[]): IFuture<void> {
+		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite);
 	}
 
 	allowedParameters = [new NameParameter(this.$projectNameValidator)];
@@ -167,21 +179,6 @@ export class NameParameter implements ICommandParameter {
 	}
 }
 $injector.register("nameCommandParameter", NameParameter);
-
-export class CreateNativeCommand extends ProjectCommandBase {
-	constructor($project: Project.IProject,
-		$errors: IErrors,
-		$projectNameValidator: IProjectNameValidator) {
-		super($project, $errors, $projectNameValidator);
-	}
-
-	public execute(args: string[]): IFuture<void> {
-		return this.createNewProject(projectTypes.NativeScript, args[0]);
-	}
-
-	allowedParameters = [new NameParameter(this.$projectNameValidator)];
-}
-$injector.registerCommand("create|native", CreateNativeCommand);
 
 export class InitCommand extends InitProjectCommandBase {
 	constructor($project: Project.IProject,
@@ -212,6 +209,7 @@ $injector.registerCommand("init|*unknown", InitCommand);
 
 export class InitHybridCommand extends InitProjectCommandBase {
 	constructor($project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger) {
@@ -219,13 +217,14 @@ export class InitHybridCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(projectTypes.Cordova);
+		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 	}
 }
 $injector.registerCommand("init|hybrid", InitHybridCommand);
 
 export class InitNativeCommand extends InitProjectCommandBase {
 	constructor($project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger) {
@@ -233,13 +232,14 @@ export class InitNativeCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(projectTypes.NativeScript);
+		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 	}
 }
 $injector.registerCommand("init|native", InitNativeCommand);
 
 export class InitWebsiteCommand extends InitProjectCommandBase {
 	constructor($project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger) {
@@ -247,7 +247,7 @@ export class InitWebsiteCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(projectTypes.MobileWebsite);
+		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite);
 	}
 }
 $injector.registerCommand("init|website", InitWebsiteCommand);

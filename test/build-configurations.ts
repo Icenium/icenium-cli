@@ -2,13 +2,15 @@
 "use strict";
 
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
+import cordovaProjectLib = require("./../lib/project/cordova-project");
+import frameworkProjectResolverLib = require("../lib/project/framework-project-resolver");
 import fslib = require("./../lib/common/file-system");
 import helpers = require("../lib/common/helpers");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
 import pluginsService = require("./../lib/services/plugins-service");
 import projectLib = require("./../lib/project");
 import projectPropertiesLib = require("../lib/services/project-properties-service");
-import projectTypeslib = require("../lib/project-types");
+import projectConstantsLib = require("../lib/project/project-constants");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 
@@ -80,7 +82,11 @@ function createTestInjector() {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
-	testInjector.register("projectTypes", projectTypeslib);
+	testInjector.register("frameworkProjectResolver", frameworkProjectResolverLib.FrameworkProjectResolver);
+	testInjector.register("cordovaProject", cordovaProjectLib.CordovaProject);
+	testInjector.register("serverExtensionsService", {});
+	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
+	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
@@ -131,7 +137,7 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	var testInjector = createTestInjector();
-	var projectTypes = testInjector.resolve("projectTypes");
+	var projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
 	var project = testInjector.resolve("project");
 	var fs = testInjector.resolve("fs");
 
@@ -143,7 +149,7 @@ function assertCorePluginsCount(configuration?: string) {
 	options.path = tempFolder;
 	options.template = "Blank";
 	options.appid = "com.telerik.Test";
-	project.createNewProject(projectTypes.Cordova, projectName).wait();
+	project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 	var availableMarketplacePlugins = [
 		{

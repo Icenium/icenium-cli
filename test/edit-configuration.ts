@@ -23,7 +23,11 @@ testInjector.register("project", {
 	getProjectDir: (): IFuture<string> => {
 		return (() => options.path).future<string>()();
 	},
-	ensureProject: () => {}
+	ensureProject: () => {},
+	projectConfigFiles: [{ template: "android-manifest",
+		filepath: "App_Resources/Android/AndroidManifest.xml",
+		templateFilepath: "Mobile.Android.ManifestXml.zip",
+		helpText: "" }]
 });
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("opener", stubs.OpenerStub);
@@ -55,7 +59,7 @@ describe("edit-configuration", () => {
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
 		var tempDir = setTempDir();
-		var template = testInjector.resolve("templatesService").configurationFiles[0];
+		var template = testInjector.resolve("project").projectConfigFiles[0];
 		var openArgument: string;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
@@ -71,7 +75,7 @@ describe("edit-configuration", () => {
 
 	it("opens and doesn't modify file if correct configuration file is given and it exists", () => {
 		var tempDir = setTempDir();
-		var template = testInjector.resolve("templatesService").configurationFiles[0];
+		var template = testInjector.resolve("project").projectConfigFiles[0];
 		var openArgument: string;
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {

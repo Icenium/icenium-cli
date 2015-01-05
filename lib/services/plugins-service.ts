@@ -4,7 +4,6 @@
 import os = require("os");
 import util = require("util");
 import options = require("./../options");
-import projectTypes = require("../project-types");
 
 export class PluginsService implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
@@ -20,12 +19,8 @@ export class PluginsService implements IPluginsService {
 		private $project: Project.IProject,
 		private $prompter: IPrompter) {
 
-		this.$project.ensureProject();
-
 		// Cordova plugin commands are only applicable to Cordova projects
-		if (this.$project.projectData.Framework !== projectTypes[projectTypes.Cordova]) {
-			this.$errors.fail("This operation is not applicable to your project type.");
-		}
+		this.$project.ensureCordovaProject();
 
 		this.$logger.info("Gathering information for plugins...");
 

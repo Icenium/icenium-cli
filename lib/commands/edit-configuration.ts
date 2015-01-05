@@ -9,13 +9,14 @@ import hostInfo = require("../host-info");
 
 export class EditConfigurationCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors,
-		private $templatesService: ITemplatesService) { }
+		private $templatesService: ITemplatesService,
+		private $project: Project.IProject) { }
 
 	mandatory = true;
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			var template = _.findWhere(this.$templatesService.configurationFiles, { template: validationValue });
+			var template = _.findWhere(this.$project.projectConfigFiles, { template: validationValue });
 			if(!template) {
 				if(validationValue) {
 					this.$errors.fail("There is no matching configuration file for: %s", validationValue);
@@ -39,17 +40,17 @@ export class EditConfigurationCommand implements ICommand {
 		private $templatesService: ITemplatesService) {
 	}
 
-	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$templatesService)];
+	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$templatesService, this.$project)];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			var file = args[0];
-			var template = _.findWhere(this.$templatesService.configurationFiles, { template: file });
+			var template = _.findWhere(this.$project.projectConfigFiles, { template: file });
 			this.executeImplementation(template).wait();
 		}).future<void>()();
 	}
 
-	private executeImplementation(template: IConfigurationFile): IFuture<void> {
+	private executeImplementation(template: Project.IConfigurationFile): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
 			var projectPath = this.$project.getProjectDir().wait();

@@ -6,7 +6,7 @@ export class ProjectPropertyCommandBase {
 	protected projectSchema: any;
 
 	constructor(public $project: Project.IProject) {
-		this.projectSchema = helpers.getProjectFileSchema(this.$project.projectType).wait();
+		this.projectSchema = this.$project.getProjectSchema().wait();
 	}
 
 	public get completionData(): string[] {
