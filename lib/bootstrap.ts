@@ -58,7 +58,8 @@ $injector.requireCommand("login", "./commands/authentication");
 $injector.requireCommand("logout", "./commands/authentication");
 
 $injector.require("buildService", "./services/build");
-$injector.requireCommand("build", "./services/build");
+$injector.requireCommand("build", "./commands/build");
+
 $injector.require("multipartUploadService", "./services/multipart-upload");
 $injector.require("hashService", "./services/hash-service");
 
@@ -71,11 +72,11 @@ $injector.requireCommand("init|hybrid", "./commands/project");
 $injector.requireCommand("init|native", "./commands/project");
 $injector.requireCommand("init|website", "./commands/project");
 
-$injector.requireCommand("prop|add", "./project");
-$injector.requireCommand("prop|set", "./project");
-$injector.requireCommand("prop|rm", "./project");
-$injector.requireCommand("prop|remove", "./project");
-$injector.requireCommand("prop|print", "./project");
+$injector.requireCommand("prop|add", "./commands/prop/prop-add");
+$injector.requireCommand("prop|set", "./commands/prop/prop-set");
+$injector.requireCommand("prop|rm", "./commands/prop/prop-remove");
+$injector.requireCommand("prop|remove", "./commands/prop/prop-remove");
+$injector.requireCommand("prop|print", "./commands/prop/prop-print");
 
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
@@ -83,7 +84,7 @@ $injector.requireCommand("cloud|export", "./commands/cloud-projects");
 $injector.requireCommand("deploy", "./commands/deploy");
 
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
-$injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./services/build");
+$injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./commands/livesync-cloud");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|*list", "./commands/cryptographic-identities");

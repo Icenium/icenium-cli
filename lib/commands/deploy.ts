@@ -31,11 +31,11 @@ export class DeployCommand implements ICommand {
 				this.$errors.fail("On your current OS, you cannot deploy apps on connected %s devices.", MobileHelper.normalizePlatformName(args[0]));
 			}
 
-			this.deployCordova(args).wait();
+			this.deployCore(args).wait();
 		}).future<void>()();
 	}
 
-	private deployCordova(args: string[]): IFuture<void> {
+	private deployCore(args: string[]): IFuture<void> {
 		return ((): void => {
 			if (options.companion) {
 				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
@@ -61,6 +61,10 @@ export class DeployCommand implements ICommand {
 
 			this.$devicesServices.execute(action).wait();
 		}).future<void>()();
+	}
+
+	get completionData(): string[] {
+		return _.map(MobileHelper.PlatformNames, (platformName: string) => platformName.toLowerCase());
 	}
 }
 $injector.registerCommand("deploy", DeployCommand);
