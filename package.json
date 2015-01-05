@@ -52,6 +52,7 @@
     "prompt": "https://github.com/Icenium/prompt/tarball/master",
     "properties-parser": "0.2.3",
     "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",
+    "qrcode-generator": "1.0.0",
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ref-struct": "0.0.5",
     "rimraf": "2.2.6",
