@@ -1,7 +1,6 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import _ = require("underscore");
 import path = require("path");
 import helpers = require("./helpers");
 import options = require("./options");
@@ -103,7 +102,7 @@ export class TemplatesService implements ITemplatesService {
 
 	private getTemplatesString(regexp: RegExp): IFuture<string> {
 		return (() => {
-			var templates = _.chain(this.$fs.readDirectory(this.projectTemplatesDir).wait())
+			var templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
 				.map((file) => {
 				var match = file.match(regexp);
 				return match && match[1];

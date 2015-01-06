@@ -2,7 +2,6 @@
 "use strict";
 
 import options = require("../lib/options");
-import _ = require("underscore");
 var assert = require("chai").assert;
 var yargs: any = require("yargs");
 
