@@ -1,14 +1,14 @@
 ///<reference path=".d.ts"/>
 "use strict";
-var qrlib: any = require("../vendor/qrcode");
+var qrcode = require("qrcode-generator");
 
 export class QrCodeGenerator implements IQrCodeGenerator {
-	constructor(private $config: IConfiguration,
+	constructor(private $errors: IErrors,
 		private $staticConfig: IStaticConfig) {}
 
 	public generateQrCode(data: string) {
 		for (var i = 1; i <= 40; ++i) {
-			var qr = qrlib(i, "L");
+			var qr = qrcode(i, "L");
 			try {
 				qr.addData(data);
 				qr.make();
@@ -23,7 +23,8 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 
 			return qr;
 		}
-		throw new Error("code length overflow.");
+
+		this.$errors.fail("code length overflow.");
 	}
 
 	generateDataUri(data: string): string {
@@ -32,7 +33,9 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 		var size = this.$staticConfig.QR_SIZE;
 		var cellSize = Math.ceil(size / (cells + 2*4 /* margin */));
 
-		return qr.createDataUri(cellSize);
+		var imgTag = qr.createImgTag(cellSize);
+		var dataUri = imgTag.split('src="')[1].split('"')[0];
+		return dataUri;
 	}
 }
 $injector.register("qr", QrCodeGenerator);
