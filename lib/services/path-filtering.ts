@@ -1,6 +1,5 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import _ = require("underscore");
 import os = require("os");
 import minimatch = require("minimatch");
 

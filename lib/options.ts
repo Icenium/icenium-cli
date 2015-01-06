@@ -2,8 +2,7 @@
 "use strict";
 
 import helpers = require("./common/helpers");
-
-import _ = require("underscore"); 
+import _ = require("lodash");
 import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");

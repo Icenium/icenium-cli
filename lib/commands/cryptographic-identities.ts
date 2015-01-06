@@ -166,10 +166,9 @@ export class IdentityManager implements Server.IIdentityManager {
 				}
 			});
 
-			var provision = _.chain(provisionTypes)
+			var provision = _(provisionTypes)
 				.map((type) => _.find(passedProvisions, (prov) => prov.ProvisionType === type))
-				.find((prov) => Boolean(prov))
-				.value();
+				.find((prov) => Boolean(prov));
 
 			if(provision) {
 				return provision;
