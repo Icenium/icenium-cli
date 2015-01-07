@@ -115,7 +115,7 @@ export class SimulateCommand implements ICommand {
 			];
 
 			if (this.$project.projectType === projectTypes.Cordova) {
-				simulatorParams.concat([
+				simulatorParams = simulatorParams.concat([
 					"--statusbarstyle", this.projectData.iOSStatusBarStyle,
 					"--frameworkversion", this.projectData.FrameworkVersion,
 					"--orientations", this.projectData.DeviceOrientations.join(";"),
