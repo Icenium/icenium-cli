@@ -14,7 +14,10 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
-		private $server: Server.IServer) { }
+		private $server: Server.IServer) {
+
+		this.$project.ensureCordovaProject();
+	}
 
 	public getPlugins(keywords: string[]): IPlugin[] {
 		this.configure();
