@@ -24,7 +24,7 @@ export class Project implements Project.IProject {
 	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
 	private static CONFIGURATION_FILE_SEARCH_PATTERN: RegExp = new RegExp(".*.abproject$", "i");
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
-	private static CONFIGURATION_FROM_FILE_NAME_REGEX =  new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
+	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 
 	public configurationSpecificData: IDictionary<IDictionary<any>>;
 
@@ -149,7 +149,7 @@ export class Project implements Project.IProject {
 	}
 
 	private static IGNORE_FILE = ".abignore";
-	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.IGNORE_FILE, "**/*.ipa", "**/*.apk", "**/*.xap"];
+	private static INTERNAL_NONPROJECT_FILES = [".ab", Project.IGNORE_FILE, ".*" + Project.IGNORE_FILE, "**/*.ipa", "**/*.apk", "**/*.xap"];
 	private defaultProjectForType: any;
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
@@ -164,7 +164,10 @@ export class Project implements Project.IProject {
 				return !isExcluded && !isSubprojectDir;
 			});
 
-			var ignoreFilesRules = this.$pathFilteringService.getRulesFromFile(path.join(projectDir, Project.IGNORE_FILE));
+			var ignoreFilesRules = <string[]>_(this.ignoreFilesConfigurations)
+				.map(configFile => this.$pathFilteringService.getRulesFromFile(path.join(projectDir, configFile)))
+				.flatten()
+				.value();
 
 			projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, projectDir);
 
@@ -268,6 +271,20 @@ export class Project implements Project.IProject {
 
 	public hasBuildConfigurations(): boolean {
 		return this._hasBuildConfigurations;
+	}
+
+	public getBuildConfiguration(): string {
+		return options.release || options.r ? "Release" : "Debug";
+	}
+
+	private get ignoreFilesConfigurations(): string[] {
+		var configurations: string[] = [ Project.IGNORE_FILE ];
+		// unless release is explicitly set, we use debug config
+		var configFileName = "." +
+			((options.release || options.r) ? Project.RELEASE_CONFIGURATION_NAME : Project.DEBUG_CONFIGURATION_NAME) +
+			Project.IGNORE_FILE;
+		configurations.push(configFileName);
+		return configurations;
 	}
 
 	public getProperty(propertyName: string, configuration: string): any {

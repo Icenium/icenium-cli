@@ -406,17 +406,13 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IPackageDef[]>()();
 	}
 
-	private getBuildConfiguration(): string {
-		return options.release || options.r ? "Release" : "Debug";
-	}
-
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
 		return (() => {
 			platform = MobileHelper.validatePlatformName(platform, this.$errors);
 			this.$project.ensureProject();
 			var result = this.build({
 				platform: platform,
-				configuration: this.getBuildConfiguration(),
+				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
 				downloadedFilePath: options["save-to"],
 				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
@@ -468,7 +464,7 @@ export class BuildService implements Project.IBuildService {
 
 				this.build({
 					platform: platform,
-					configuration: this.getBuildConfiguration(),
+					configuration: this.$project.getBuildConfiguration(),
 					showQrCodes: !options.download,
 					downloadFiles: options.download,
 					downloadedFilePath: options["save-to"],

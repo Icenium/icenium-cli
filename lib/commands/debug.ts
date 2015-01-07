@@ -79,8 +79,8 @@ class BaseDebuggerPlatformServices {
 		watchr.watch({
 			paths: [this.$sharedUserSettingsFileService.userSettingsFilePath],
 			listeners: {
-				error: (error: Error) => this.$errors.fail(error.toString()),
-				change: (changeType: string, filePath: string) => this.$dispatcher.dispatch(() => this.$sharedUserSettingsService.saveSettings({})),
+				error: (error: Error) => { this.$errors.fail(error.toString()); },
+				change: (changeType: string, filePath: string) => { this.$dispatcher.dispatch(() => this.$sharedUserSettingsService.saveSettings({})); },
 				next: (error: Error, _watchers: any) => {
 					var watchers: watchr.IWatcherInstance[] = _watchers;
 					if (error) {

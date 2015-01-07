@@ -167,6 +167,7 @@ declare module Project {
 		configurations: string[];
 		hasBuildConfigurations(): boolean;
 		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
+		getBuildConfiguration(): string;
 	}
 
 	interface IPlatformMigrator {
