@@ -64,6 +64,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 			}).future<void>()();
 		},
 		ensureProject: () => { },
+		ensureCordovaProject: () => {},
 		configurations:  ["debug"]
 	});
 
