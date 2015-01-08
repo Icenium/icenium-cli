@@ -12,6 +12,8 @@ import temp = require("temp");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
 import projectTypes = require("../lib/project-types");
+import MobileHelper = require("../lib/common/mobile/mobile-helper");
+import util = require("util");
 var assert = require("chai").assert;
 temp.track();
 
@@ -87,7 +89,7 @@ describe("project integration tests", () => {
 			delete testProperties.WP8PublisherID;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for (var key in testProperties) {
+			for(var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
@@ -118,9 +120,159 @@ describe("project integration tests", () => {
 			delete testProperties.WP8PublisherID;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for (var key in testProperties) {
+			for(var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
+		});
+	});
+
+	describe("Init command mandatory files tests", () => {
+		describe("NativeScript project", () => {
+			it("Blank template has all mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "Blank";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
+				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
+
+				var tnsDir = path.join(projectDir, "tns_modules");
+				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
+			});
+
+			it("TypeScript.Blank template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "TypeScript.Blank";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
+				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript TypeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
+
+				var tnsDir = path.join(projectDir, "tns_modules");
+				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
+			});
+		});
+
+		describe("Cordova project", () => {
+			it("Blank template has all mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "Blank";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
+
+			it("TypeScript.Blank template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "TypeScript.Blank";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova TypeScript.Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
+
+			it("Friends template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "Friends";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Friends template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
+
+			it("KendoUI.Drawer template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "KendoUI.Drawer";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Drawer template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
+
+			it("KendoUI.Empty template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "KendoUI.Empty";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Empty template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
+
+			it("KendoUI.TabStrip template has mandatory files)", () => {
+				var options: any = require("./../lib/options");
+				var tempFolder = temp.mkdirSync("template");
+				var projectName = "Test";
+
+				options.path = tempFolder;
+				options.template = "KendoUI.TabStrip";
+				options.appid = "com.telerik.Test";
+
+				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				var projectDir = project.getProjectDir().wait();
+
+				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.TabStrip template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+				});
+			});
 		});
 	});
 
@@ -157,7 +309,7 @@ describe("project integration tests", () => {
 });
 
 describe("project unit tests", () => {
-	var project: Project.IProject, projectProperties: IProjectPropertiesService,  testInjector: IInjector, propSchemaCordova: any;
+	var project: Project.IProject, projectProperties: IProjectPropertiesService, testInjector: IInjector, propSchemaCordova: any;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", stubs.FileSystemStub);
@@ -177,52 +329,52 @@ describe("project unit tests", () => {
 
 	describe("updateProjectProperty", () => {
 		it("sets unconstrained string property", () => {
-			var projectData = {DisplayName: "wrong"};
+			var projectData = { DisplayName: "wrong" };
 			projectProperties.updateProjectProperty(projectData, "set", "DisplayName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", () => {
-			var projectData = {ProjectName: "wrong"};
+			var projectData = { ProjectName: "wrong" };
 			projectProperties.updateProjectProperty(projectData, "set", "ProjectName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.ProjectName);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
-			var projectData = {ProjectName: "wrong"};
+			var projectData = { ProjectName: "wrong" };
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
-			var projectData = {ProjectName: "wrong"};
+			var projectData = { ProjectName: "wrong" };
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "del", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
-			var projectData = {"BundleVersion": "0"};
+			var projectData = { "BundleVersion": "0" };
 			projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"], propSchemaCordova).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", () => {
-			var projectData = {"BundleVersion": "0"};
+			var projectData = { "BundleVersion": "0" };
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"], propSchemaCordova).wait());
 		});
 
 		it("sets enumerated property", () => {
-			var projectData = {iOSStatusBarStyle: "Default"};
+			var projectData = { iOSStatusBarStyle: "Default" };
 			projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"], propSchemaCordova).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", () => {
-			var projectData = {iOSStatusBarStyle: "Default"};
+			var projectData = { iOSStatusBarStyle: "Default" };
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"], propSchemaCordova).wait());
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
-			var projectData: any = {DeviceOrientations: []};
+			var projectData: any = { DeviceOrientations: [] };
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"], propSchemaCordova).wait();
@@ -230,7 +382,7 @@ describe("project unit tests", () => {
 		});
 
 		it("appends to enumerated collection property with shorthand", () => {
-			var projectData: any = {iOSDeviceFamily: []};
+			var projectData: any = { iOSDeviceFamily: [] };
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"], propSchemaCordova).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"], propSchemaCordova).wait();
@@ -238,13 +390,13 @@ describe("project unit tests", () => {
 		});
 
 		it("appends multiple values to enumerated collection property", () => {
-			var projectData: any = {iOSDeviceFamily: []};
+			var projectData: any = { iOSDeviceFamily: [] };
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"], propSchemaCordova).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", () => {
-			var projectData: any = {DeviceOrientations: ["Landscape", "Portrait"]};
+			var projectData: any = { DeviceOrientations: ["Landscape", "Portrait"] };
 			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
@@ -252,18 +404,18 @@ describe("project unit tests", () => {
 		});
 
 		it("disallows unrecognized values for enumerated collection property", () => {
-			var projectData: any = {DeviceOrientations: []};
+			var projectData: any = { DeviceOrientations: [] };
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"], propSchemaCordova).wait());
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
-			var projectData: any = {DeviceOrientations: []};
+			var projectData: any = { DeviceOrientations: [] };
 			projectProperties.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", () => {
-			var projectData: any = {DeviceOrientations: []};
+			var projectData: any = { DeviceOrientations: [] };
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
