@@ -120,7 +120,7 @@ export class PluginsService implements IPluginsService {
 
 	public isPluginInstalled(pluginName: string): boolean {
 		pluginName = pluginName.toLowerCase();
-		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName);
+		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
 	}
 
 	public configurePlugin(pluginName: string): IFuture<void> {
@@ -255,7 +255,7 @@ export class PluginsService implements IPluginsService {
 		var plugins = this.getAvailablePlugins();
 		var toLowerCasePluginName = pluginName.toLowerCase();
 
-		var plugin = _.find(plugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === toLowerCasePluginName);
+		var plugin = _.find(plugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName);
 		if(!plugin) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}
