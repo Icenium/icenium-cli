@@ -37,8 +37,9 @@ $injector.register("clientSpecificUserSettingsService", ClientSpecificUserSettin
 export class SharedUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
 
-	constructor(private $fs: IFileSystem) {
-		this.userSettingsFile = path.join(options["profile-dir"], "user-settings.xml");
+	constructor(private $fs: IFileSystem,
+				private $config: Config.IConfig) {
+		this.userSettingsFile = path.join(options["profile-dir"], this.$config.AB_SERVER + ".user-settings.xml");
 	}
 
 	public get userSettingsFilePath(): string {
