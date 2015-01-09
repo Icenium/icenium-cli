@@ -68,6 +68,7 @@ $injector.require("projectPropertiesService", "./services/project-properties-ser
 $injector.requireCommand("create|hybrid", "./commands/project");
 $injector.requireCommand("create|native", "./commands/project");
 $injector.requireCommand("create|website", "./commands/project");
+$injector.requireCommand("init|*unknown", "./commands/project");
 $injector.requireCommand("init|hybrid", "./commands/project");
 $injector.requireCommand("init|native", "./commands/project");
 $injector.requireCommand("init|website", "./commands/project");

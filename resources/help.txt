@@ -203,13 +203,16 @@ Options:
 --[init]--
 
 Usage:
+    $appbuilder init
     $appbuilder init [<Command>]
 
-Initializes an existing hybrid or native project for development. You must run the init command with a related command.
+Initializes an existing project for development. 
+The command attempts to determine the project type based on the files in the working directory. To specify the project type yourself, run $ appbuilder init <Command>
 
 <Command> is a related command that extends the init command. You can run the following related commands:
     hybrid - Initializes an existing Apache Cordova project for development in the current directory.
     native - Initializes an existing NativeScript project for development in the current directory.
+    website - Initializes an existing Mobile Website project for development in the current directory.
 
 --[/]--
 
@@ -218,7 +221,7 @@ Initializes an existing hybrid or native project for development. You must run t
 Usage:
     $ appbuilder init hybrid [--appid <App ID>]
 
-Initializes an existing Apache Cordova project for development in the current directory. If the folder contains an existing AppBuilder project (created with
+Initializes an existing Apache Cordova project for development in the current directory. If the directory contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
 
 Options:
@@ -234,7 +237,7 @@ Options:
 Usage:
     $ appbuilder init native [--appid <App ID>]
 
-Initializes an existing NativeScript project for development in the current directory. If the folder contains an existing AppBuilder project (created with
+Initializes an existing NativeScript project for development in the current directory. If the directory contains an existing AppBuilder project (created with
 the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
 
 Options:
@@ -242,6 +245,16 @@ Options:
         alphanumeric strings, separated by a dot (.). Each string must start with a letter.
         The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps.
         If not specified, the application identifier is set to com.telerik.<current directory name>.
+
+--[/]--
+
+--[init|website]--
+
+Usage:
+    $ appbuilder init website
+
+Initializes an existing Mobile Website project for development in the current directory. If the directory contains an existing AppBuilder project 
+synchronized from GitHub, the project retains the existing project configuration.
 
 --[/]--
 

@@ -160,7 +160,7 @@ declare module Project {
 		getTempDir(extraSubdir?: string): IFuture<string>;
 		saveProject(projectDir?: string): IFuture<void>;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
-		getNewProjectDir(): void;
+		getNewProjectDir(): string;
 		getProperty(propertyName: string, configuration: string): any;
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		configurationSpecificData: IDictionary<IDictionary<any>>;

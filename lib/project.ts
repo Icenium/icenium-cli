@@ -507,7 +507,7 @@ export class Project implements Project.IProject {
 		return properties;
 	}
 
-	public getNewProjectDir() {
+	public getNewProjectDir(): string {
 		return options.path || process.cwd();
 	}
 
