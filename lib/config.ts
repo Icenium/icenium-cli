@@ -3,6 +3,7 @@
 import path = require("path");
 import util = require("util");
 import helpers = require("./helpers");
+import staticConfigBaseLib = require("./common/static-config-base");
 
 export class Configuration implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
@@ -69,7 +70,7 @@ export class Configuration implements IConfiguration { // User specific config
 }
 $injector.register("config", Configuration);
 
-export class StaticConfig implements IStaticConfig {
+export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implements IStaticConfig {
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "appbuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
@@ -87,10 +88,6 @@ export class StaticConfig implements IStaticConfig {
 
 	public get helpTextPath() {
 		return path.join(__dirname, "../resources/help.txt");
-	}
-
-	public get adbFilePath() {
-		return path.join(__dirname, util.format("../resources/platform-tools/android/%s/adb", process.platform));
 	}
 
 	public get sevenZipFilePath() {
