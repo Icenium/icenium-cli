@@ -21,6 +21,7 @@ export class EmulateAndroidCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$androidEmulatorServices.checkDependencies().wait();
 			this.$androidEmulatorServices.checkAvailability().wait();
 
 			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
@@ -52,6 +53,7 @@ export class EmulateIosCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$iOSEmulatorServices.checkDependencies().wait();
 			this.$iOSEmulatorServices.checkAvailability().wait();
 			var app = "";
 
@@ -87,6 +89,7 @@ export class EmulateWp8Command implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$wp8EmulatorServices.checkDependencies().wait();
 			this.$wp8EmulatorServices.checkAvailability().wait();
 
 			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
