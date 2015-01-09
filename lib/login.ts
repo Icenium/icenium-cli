@@ -16,6 +16,7 @@ export class UserDataStore implements IUserDataStore {
 	private user: any;
 
 	constructor(private $fs: IFileSystem,
+		private $config: Config.IConfig,
 		private $logger: ILogger) { }
 
 	public hasCookie(): IFuture<boolean> {
@@ -30,13 +31,13 @@ export class UserDataStore implements IUserDataStore {
 	}
 
 	public getCookies(): IFuture<IStringDictionary> {
-		return this.readAndCache(UserDataStore.getCookieFilePath(),
+		return this.readAndCache(this.getCookieFilePath(),
 			() => this.cookies,
 			(value: string) => this.cookies = JSON.parse(value));
 	}
 
 	public getUser(): IFuture<any> {
-		return this.readAndCache(UserDataStore.getUserStateFilePath(),
+		return this.readAndCache(this.getUserStateFilePath(),
 			() => this.user,
 			(value: string) => this.user = JSON.parse(value));
 	}
@@ -44,9 +45,9 @@ export class UserDataStore implements IUserDataStore {
 	public setCookies(cookies?: IStringDictionary): IFuture<void> {
 		this.cookies = cookies;
 		if(this.cookies) {
-			return this.$fs.writeFile(UserDataStore.getCookieFilePath(), JSON.stringify(this.cookies));
+			return this.$fs.writeFile(this.getCookieFilePath(), JSON.stringify(this.cookies));
 		} else {
-			return this.$fs.deleteFile(UserDataStore.getCookieFilePath());
+			return this.$fs.deleteFile(this.getCookieFilePath());
 		}
 	}
 
@@ -66,9 +67,9 @@ export class UserDataStore implements IUserDataStore {
 	public setUser(user?: any): IFuture<void> {
 		this.user = user;
 		if(user) {
-			return this.$fs.writeJson(UserDataStore.getUserStateFilePath(), user);
+			return this.$fs.writeJson(this.getUserStateFilePath(), user);
 		} else {
-			return this.$fs.deleteFile(UserDataStore.getUserStateFilePath());
+			return this.$fs.deleteFile(this.getUserStateFilePath());
 		}
 	}
 
@@ -107,12 +108,12 @@ export class UserDataStore implements IUserDataStore {
 		}).future<T>()();
 	}
 
-	private static getCookieFilePath(): string {
-		return path.join(options["profile-dir"], "cookie");
+	private getCookieFilePath(): string {
+		return path.join(options["profile-dir"], this.$config.AB_SERVER + ".cookie");
 	}
 
-	private static getUserStateFilePath(): string {
-		return path.join(options["profile-dir"], "user");
+	private getUserStateFilePath(): string {
+		return path.join(options["profile-dir"], this.$config.AB_SERVER + ".user");
 	}
 }
 $injector.register("userDataStore", UserDataStore);
@@ -121,7 +122,6 @@ export class LoginManager implements ILoginManager {
 	public static DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS = 15 * 60 * 1000;
 
 	constructor(private $logger: ILogger,
-		private $errors: IErrors,
 		private $config: IConfiguration,
 		private $fs: IFileSystem,
 		private $userDataStore: IUserDataStore,
