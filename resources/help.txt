@@ -310,9 +310,7 @@ Options:
         If you want to download the application package to a specified file path, use the --save-to option instead.
     --companion - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the
         companion app, you do not need to set a certificate or provision.
-        In this version of the Telerik AppBuilder CLI, you cannot build for the companion app for Windows Phone 8.
-        You cannot set both the --companion and --download switches.
-    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
+    --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set
         a certificate by index or name.
         If you build for iOS, unless the --companion switch is set, you must specify a certificate. The certificate
         must match the provisioning profile.
