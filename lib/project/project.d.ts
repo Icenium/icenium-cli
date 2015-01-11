@@ -15,14 +15,14 @@ declare module Project {
 		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
 		hasBuildConfigurations(): boolean;
 
-		getNewProjectDir(): void;
+		getNewProjectDir(): string;
 		getProjectSchema(): IFuture<any>;
 		getLiveSyncUrl(): string;
 		getProjectDir(): IFuture<string>;
-		getSimulatorParams(simulatorPackageName: string): IFuture<string[]>;
 		getBuildConfiguration(): string;
 		getTempDir(extraSubdir?: string): IFuture<string>;
 		getProperty(propertyName: string, configuration: string): any;
+		getProjectTargets(): IFuture<string[]>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
 		setProperty(propertyName: string, value: any, configuration: string): void;
@@ -44,15 +44,14 @@ declare module Project {
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
 		getTemplateFilename(name: string): string;
-		projectTemplatesString(): IFuture<string>;
-		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		getProjectFileSchema(): IFuture<any>;
 		getFullProjectFileSchema(): IFuture<any>;
 		getProjectTargets(projectDir: string): IFuture<string[]>;
+		projectTemplatesString(): IFuture<string>;
+		alterPropertiesForNewProject(properties: any, projectName: string): void;
+		completeProjectProperties(properties: any): boolean;
 		adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any;
 		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void>;
-		getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]>;
-		completeProjectProperties(properties: any): boolean;
 	}
 
 	interface IFrameworkProjectBase {
@@ -63,8 +62,16 @@ declare module Project {
 		printAssetUpdateMessage(): void;
 	}
 
+	interface IFrameworkProjectResolverBase {
+		resolveByName<T>(name: string, framework: string): T;
+	}
+
 	interface IFrameworkProjectResolver {
 		resolve(framework: string): IFrameworkProject;
+	}
+
+	interface IFrameworkSimulatorServiceResolver {
+		resolve(framework: string): IProjectSimulatorService;
 	}
 
 	interface IProjectFilesManager {

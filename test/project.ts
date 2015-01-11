@@ -9,14 +9,16 @@ import stubs = require("./stubs");
 import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
+import util = require("util");
+import MobileHelper = require("./../lib/common/mobile/mobile-helper");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
 import nativeScriptProjectLib = require("./../lib/project/nativescript-project");
-import frameworkProjectResolverLib = require("../lib/project/framework-project-resolver");
+import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
 import projectFilesManagerLib = require("../lib/project/project-files-manager");
 import projectConstantsLib = require("../lib/project/project-constants");
-var projectConstans = new projectConstantsLib.ProjectConstants();
+var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
 temp.track();
 
@@ -87,7 +89,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, projectConstans.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
@@ -119,7 +121,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, projectConstans.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
@@ -153,7 +155,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
 				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -171,7 +173,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
 				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript TypeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -191,7 +193,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -209,7 +211,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -227,7 +229,7 @@ describe("project integration tests", () => {
 				options.template = "Friends";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -245,7 +247,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.Drawer";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -263,7 +265,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.Empty";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -281,7 +283,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.TabStrip";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {

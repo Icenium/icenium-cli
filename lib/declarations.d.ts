@@ -140,36 +140,6 @@ declare module Project {
 		showWp8SigningMessage?: boolean;
 	}
 
-	interface IProject {
-		PROJECT_FILE: string;
-		projectData: IProjectData;
-		projectType: number;
-		capabilities: IProjectCapabilities;
-		projectTargets: IFuture<string[]>;
-		getProjectDir(): IFuture<string>;
-		ensureProject(): void;
-		ensureCordovaProject(): void;
-		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
-		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
-		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
-		printProjectProperty(property: string): IFuture<void>;
-		createNewProject(projectType: number, projectName: string): IFuture<void>;
-		createProjectFileFromExistingProject(projectType: number): IFuture<void>;
-		createProjectFile(projectDir: string, projectType: number, properties: any): IFuture<void>;
-		createTemplateFolder(projectDir: string): IFuture<void>;
-		getTempDir(extraSubdir?: string): IFuture<string>;
-		saveProject(projectDir?: string): IFuture<void>;
-		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
-		getNewProjectDir(): string;
-		getProperty(propertyName: string, configuration: string): any;
-		setProperty(propertyName: string, value: any, configuration: string): void;
-		configurationSpecificData: IDictionary<IDictionary<any>>;
-		configurations: string[];
-		hasBuildConfigurations(): boolean;
-		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
-		getBuildConfiguration(): string;
-	}
-
 	interface IPlatformMigrator {
 		ensureAllPlatformAssets(): IFuture<void>;
 	}
@@ -409,4 +379,8 @@ interface IRemoteProjectService {
 	getProjectProperties(projectName: string): IFuture<any>;
 	getProjects(): IFuture<Server.TapSolutionData[]>;
 	getProjectName(projectId: string): IFuture<string>;
+}
+
+interface IProjectSimulatorService {
+	getSimulatorParams(simulatorPackageName: string): IFuture<string[]>;
 }

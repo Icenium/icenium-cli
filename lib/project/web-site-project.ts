@@ -80,13 +80,6 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return (() => { }).future<void>()();
 	}
 
-	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> {
-		return (() => {
-			var result: string[] = [];
-			return result;
-		}).future<string[]>()();
-	}
-
 	public completeProjectProperties(properties: IProjectData): boolean {
 		return false;
 	}

@@ -9,18 +9,13 @@ import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
-	private static PLUGINS_API_CONTRACT: string = "/appbuilder/api/cordova/plugins/package";
-
 	constructor(private $config: IConfiguration,
 		$fs: IFileSystem,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
-		$resources: IResourceLoader,
-		private $serverExtensionsService: IServerExtensionsService,
-		private $server: Server.IServer) {
+		$resources: IResourceLoader) {
 		super($logger, $fs, $resources);
 	}
 
@@ -119,21 +114,6 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		}).future<void>()();
 	}
 
-	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> {
-		return (() => {
-			var pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
-
-			return [
-				"--statusbarstyle", projectData.iOSStatusBarStyle,
-				"--frameworkversion", projectData.FrameworkVersion,
-				"--orientations", projectData.DeviceOrientations.join(";"),
-				"--corepluginspath", pluginsPath,
-				"--supportedplatforms", this.getProjectTargets(projectDir).wait().join(";"),
-				"--plugins", projectData.CorePlugins.join(";")
-			];
-		}).future<string[]>()();
-	}
-
 	public completeProjectProperties(properties: any): boolean {
 		var updated = false;
 
@@ -161,50 +141,6 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		});
 
 		return updated;
-	}
-
-	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<string> {
-		return (() => {
-			var packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
-			var pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
-
-			var pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + CordovaProject.PLUGINS_API_CONTRACT;
-
-			if (!this.$fs.exists(pluginsPath).wait()) {
-				try {
-					this.$logger.info("Downloading core Cordova plugins...");
-
-					this.$fs.createDirectory(pluginsPath).wait();
-					var zipPath = path.join(pluginsPath, "plugins.zip");
-
-					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
-					var zipFile = this.$fs.createWriteStream(zipPath);
-					this.$server.cordova.getPluginsPackage(zipFile).wait();
-
-					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
-					this.$fs.unzip(zipPath, pluginsPath).wait();
-
-					this.$logger.info("Finished downloading plugins.");
-				} catch(err) {
-					this.$fs.closeStream(zipFile).wait();
-					this.$fs.deleteDirectory(pluginsPath).wait();
-					throw err;
-				}
-			}
-
-			return pluginsPath;
-		}).future<string>()();
-	}
-
-	private getPluginsDirName(serverVersion: string) {
-		var result: string;
-		if (this.$config.DEBUG) {
-			result = CordovaProject.PLUGINS_PACKAGE_IDENTIFIER;
-		} else {
-			result = CordovaProject.PLUGINS_PACKAGE_IDENTIFIER + "-" + serverVersion;
-		}
-		this.$logger.debug("PLUGINS dir is: " + result);
-		return result;
 	}
 }
 $injector.register("cordovaProject", CordovaProject);

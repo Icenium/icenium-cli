@@ -103,10 +103,6 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		}).future<void>()();
 	}
 
-	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> {
-		return (() => { var result: string[] = []; return result; }).future<string[]>()();
-	}
-
 	public completeProjectProperties(properties: any): boolean {
 		var updated = false;
 

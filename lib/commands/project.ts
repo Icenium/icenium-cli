@@ -1,9 +1,13 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
+import path = require("path");
+import util = require("util");
+import MobileHelper = require("./../common/mobile/mobile-helper");
+
 export class ProjectCommandBase implements ICommand {
-	constructor(private $project: Project.IProject,
-		private $errors: IErrors) {
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors) {
 		if (this.$project.projectData) {
 			this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 		}
@@ -40,13 +44,13 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 	protected indexHtml: FileDescriptor;
 	protected projectFilesDescriptors: any;
 
-	constructor(protected $project: Project.IProject,
-		protected $errors: IErrors,
+	constructor($project: Project.IProject,
+		$errors: IErrors,
 		protected $fs: IFileSystem,
 		protected $logger: ILogger) {
 		super($project, $errors);
 
-		this.projectDir = this.$project.getNewProjectDir();
+		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
 		this.bootstrapFile = new FileDescriptor(path.join(this.projectDir, "app", "bootstrap.js"), "file");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
@@ -184,7 +188,8 @@ export class InitCommand extends InitProjectCommandBase {
 	constructor($project: Project.IProject,
 		$errors: IErrors,
 		$fs: IFileSystem,
-		$logger: ILogger) {
+		$logger: ILogger,
+		private $projectConstants: Project.IProjectConstants) {
 		super($project, $errors, $fs, $logger);
 	}
 
@@ -192,13 +197,13 @@ export class InitCommand extends InitProjectCommandBase {
 		return (() => {
 			if(this.isProjectType("Apache Cordova").wait()) {
 				this.$logger.info("Attempting to initialize Apache Cordova project.");
-				this.createProjectFileFromExistingProject(projectTypes.Cordova).wait();
+				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 			} else if(this.isProjectType("NativeScript").wait()) {
 				this.$logger.info("Attempting to initialize  NativeScript project.");
-				this.createProjectFileFromExistingProject(projectTypes.NativeScript).wait();
+				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			} else if(this.isProjectType("Mobile Website").wait()) {
 				this.$logger.info("Attempting to initialize Mobile Website project.");
-				this.createProjectFileFromExistingProject(projectTypes.MobileWebsite).wait();
+				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite).wait();
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}

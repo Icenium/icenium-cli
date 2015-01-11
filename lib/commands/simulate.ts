@@ -14,17 +14,16 @@ export class SimulateCommand implements ICommand {
 	private pluginsPath: string;
 	private simulatorPath: string;
 
-	constructor(private $logger: ILogger,
-		private $fs: IFileSystem,
-		private $processInfo: IProcessInfo,
-		private $config: IConfiguration,
-		private $server: Server.IServer,
-		private $project: Project.IProject,
+
+	constructor(private $errors: IErrors,
+		private $logger: ILogger,
 		private $loginManager: ILoginManager,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $simulatorPlatformServices: IExtensionPlatformServices,
+		private $processInfo: IProcessInfo,
+		private $project: Project.IProject,
+		private $projectSimulatorService: IProjectSimulatorService,
 		private $serverExtensionsService: IServerExtensionsService,
-		private $errors: IErrors) {
+		private $simulatorPlatformServices: IExtensionPlatformServices) {
 			this.projectData = $project.projectData;
 		}
 
@@ -75,7 +74,7 @@ export class SimulateCommand implements ICommand {
 				"--assemblypaths", this.simulatorPath
 			];
 
-			simulatorParams = simulatorParams.concat(this.$project.getSimulatorParams(simulatorPackageName).wait());
+			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
 
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 		}).future<void>()();

@@ -63,6 +63,14 @@ export class Project implements Project.IProject {
 		return this.frameworkProject.configFiles;
 	}
 
+	public getProjectTargets(): IFuture<string[]> {
+		return (() => {
+			var projectDir = this.getProjectDir().wait();
+			var projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
+			return projectTargets;
+		}).future<string[]>()();
+	}
+
 	public configurationFilesString(): string {
 		return _.map(this.projectConfigFiles, (file) => {
 			return util.format("        %s - %s", file.template, file.helpText);
@@ -158,8 +166,8 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.$fs.createDirectory(projectDir).wait();
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
-			if(projectDirFiles.length != 0) {
-				throw new Error("The specified directory must be empty to create a new project.");
+			if(projectDirFiles.length !== 0) {
+				this.$errors.fail("The specified directory must be empty to create a new project.");
 			}
 		}).future<void>()();
 	}
@@ -407,13 +415,6 @@ export class Project implements Project.IProject {
 			var projectDir = this.getProjectDir().wait();
 			this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion).wait();
 		}).future<void>()();
-	}
-
-	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
-		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			return this.frameworkProject.getSimulatorParams(projectDir, this.projectData, simulatorPackageName).wait();
-		}).future<string[]>()();
 	}
 
 	private validateProjectData(properties: any): IFuture<void> {

@@ -3,7 +3,7 @@
 
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
-import frameworkProjectResolverLib = require("../lib/project/framework-project-resolver");
+import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
 import fslib = require("./../lib/common/file-system");
 import helpers = require("../lib/common/helpers");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");

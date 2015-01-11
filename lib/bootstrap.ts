@@ -63,8 +63,15 @@ $injector.requireCommand("build", "./commands/build");
 $injector.require("multipartUploadService", "./services/multipart-upload");
 $injector.require("hashService", "./services/hash-service");
 
+$injector.require("frameworkProjectResolver", "./project/resolvers/framework-project-resolver");
+$injector.require("frameworkSimulatorServiceResolver", "./project/resolvers/framework-simulator-service-resolver");
+
+$injector.require("projectSimulatorService", "./services/project-simulator-service");
+$injector.require("cordovaSimulatorService", "./services/project-simulator-service");
+$injector.require("nativeScriptSimulatorService", "./services/project-simulator-service");
+$injector.require("mobileWebSiteSimulatorService", "./services/project-simulator-service");
+
 $injector.require("project", "./project");
-$injector.require("frameworkProjectResolver", "./project/framework-project-resolver");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
 $injector.require("webSiteProject", "./project/web-site-project");
