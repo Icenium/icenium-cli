@@ -137,6 +137,8 @@ A new tab opens in your default browser. Provide your login credentials, confirm
 
 <a name="create"><b>2. Create project</b></a>
 
+**Create new project from template**
+
 To create a new hybrid project from the default template, navigate to an empty directory and run the following command. 
 
 ```bash
@@ -145,6 +147,8 @@ $ appbuilder create hybrid MyApp
 
 The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI TabStrip template.
 
+**Create new project from existing project**
+
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
 ```bash
@@ -152,6 +156,18 @@ $ appbuilder init hybrid
 ```
 
 The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
+
+**Create new project from sample**
+
+To create a new project from the AppBuilder sample apps from the command line, navigate to an empty directory and run the following command.
+
+```bash
+appbuilder sample clone <Sample>
+```
+
+To list the available sample apps, run `appbuilder sample`.
+
+The Telerik AppBuilder CLI creates a new subdirectory in the current directory and clones the sample inside it.
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 
