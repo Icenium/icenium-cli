@@ -66,6 +66,8 @@ export class ServiceProxy implements Server.IServiceProxy {
 			} catch(err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
+				} else if (err.response && err.response.statusCode === 402) {
+					this.$errors.fail({formatStr: "%s", suppressCommandHelp: true}, JSON.parse(err.body).Message);
 				}
 				throw err;
 			}
