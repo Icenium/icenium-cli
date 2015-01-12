@@ -98,6 +98,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
         
 	execute(args:string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var application = args[0];
@@ -110,8 +111,6 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 			if(!userName) {
 				userName = this.getAppleId().wait();
 			}
-            
-			this.$project.ensureProject();
 
 			if(options.provision) {
 				this.$logger.info("Checking provision.");
@@ -134,7 +133,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
 			}
 
-			this.$logger.info("Building release package.")
+			this.$logger.info("Building release package.");
 			var buildResult = this.$buildService.build({
 				platform: "iOS",
 				configuration: "Release",
