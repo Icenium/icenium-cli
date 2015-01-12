@@ -155,7 +155,8 @@ To initialize an existing project for development from the command line, navigat
 $ appbuilder init hybrid
 ```
 
-The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
+The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually update the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+For more information about how to configure your project properties, run `appbuilder prop --help`.
 
 **Create new project from sample**
 
@@ -167,7 +168,9 @@ appbuilder sample clone <Sample>
 
 To list the available sample apps, run `appbuilder sample`.
 
-The Telerik AppBuilder CLI creates a new subdirectory in the current directory and clones the sample inside it.
+The Telerik AppBuilder CLI creates a new subdirectory in the current directory, clones the sample inside it and preserves the existing project configuration of the sample app.
+
+If you want to develop for {{site.wp8}}, make sure to manually update the `WP8PublisherID` and `WP8ProductID` properties to avoid issues when running your app on device. For more information about how to configure your project properties, run `appbuilder prop --help`.
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 
