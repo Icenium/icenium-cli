@@ -594,18 +594,21 @@ Options:
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--avd <Name>] [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in the native Android emulator.
 If you do not select an Android virtual device (AVD) with the avd option,
 your app runs in the default emulator or a currently running emulator, if any. 
 To list the available AVDs, run $ android list avd
+You cannot use --avd and --geny option simultaneously.
 
-To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name>
+To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name> or $ appbuilder emulate android --geny <GenyName>
 for each virtual device.
 
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
+    You can specify only one name at a time.
+<GenyName> is the name of the Genymotion virtual device that you want to use as listed by Genyshell's `devices list` command.
     You can specify only one name at a time.
 
 Prerequisites:
@@ -615,6 +618,7 @@ Before running your app in the Android emulator, verify that your system meets t
     * Verify that you have added the following Android SDK directories to the PATH environment variable:
         platform-tools
         tools
+    * In case you use Genymotion emulator, verify that you have added its installation directory to the PATH environment variable.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
@@ -632,6 +636,9 @@ Options:
     --avd - Sets the Android virtual device on which you want to run your app. 
             You can set only one device at a time.
             To list the available Android virtual devices, run $ android list avd
+    --geny - Sets the Genymotion virtual device on which you want to run your app. 
+            You can set only one device at a time.
+            To list the available Android virtual devices, run $ android list avd        
     --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
             before quitting the operation and releasing the console.
             If not set, the default timeout is 120 seconds.
