@@ -329,9 +329,13 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 
 	private getDefaultCountry(): IFuture<string> {
 		return (() => {
-			var locationResponse: Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
-			var location: any = JSON.parse(locationResponse.body);
-			return location.country_name;
+			try {
+				var locationResponse:Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
+				var location:any = JSON.parse(locationResponse.body);
+				return location.country_name;
+			} catch(err) {
+				return "";
+			}
 		}).future<string>()();
 	}
 }
