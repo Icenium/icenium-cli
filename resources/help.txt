@@ -176,7 +176,7 @@ run it in the simulator, and build and deploy it on your devices. To list all av
 run $ appbuilder sample.
 
 The Telerik AppBuilder CLI clones the sample and preserves its existing project configuration.
-If you want to develop for {{site.wp8}}, make sure to manually update the WP8PublisherID and WP8ProductID properties
+If you want to develop for Windows Phone 8, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties
 to avoid issues when running your app on device. For more information about how to configure your project properties,
 run $ appbuilder prop --help
 
@@ -213,9 +213,9 @@ Usage:
 Initializes an existing Apache Cordova project for development in the current directory. 
 
 If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio
-or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually update
-the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. For more information about
-how to configure your project properties, run $ appbuilder prop --help
+or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually
+set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device.
+For more information about how to configure your project properties, run $ appbuilder prop --help
 
 Options:
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
