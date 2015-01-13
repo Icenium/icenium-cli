@@ -69,6 +69,7 @@ Global Options:
     --path <Directory>    Specifies the directory that contains the project. If not set, the project is searched for
                           in the current directory and all directories above it.
     --version             Prints the client version.
+    --log trace           Prints a detailed diagnostic log for the execution of the current command.
 
 --[/]--
 
