@@ -14,7 +14,6 @@ var knownOpts: any = {
 		"certificate": String,
 		"provision": String,
 		"template": String,
-		"appid": String,
 		"deploy": String,
 		"device": String,
 		"file": String,
