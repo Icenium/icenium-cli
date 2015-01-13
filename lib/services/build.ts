@@ -19,7 +19,7 @@ class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
 	}
 
 	private adjustBuildPropertiesCordova(buildProperties: any): any {
-		buildProperties.CorePlugins = this.$project.projectData.CorePlugins;
+		buildProperties.CorePlugins = this.$project.projectData.CorePlugins || [];
 		return buildProperties;
 	}
 
