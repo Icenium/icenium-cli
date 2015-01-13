@@ -102,6 +102,7 @@ export class SimulateCommand implements ICommand {
 			this.$logger.info("Starting simulator...");
 
 			var projectTargets = this.$project.projectTargets.wait().join(";");
+			var corePlugins = this.$project.getProperty("CorePlugins", "debug");
 
 			var simulatorParams = [
 				"--path", this.$project.getProjectDir().wait(),
@@ -111,7 +112,7 @@ export class SimulateCommand implements ICommand {
 				"--assemblypaths", this.simulatorPath,
 				"--corepluginspath", this.pluginsPath,
 				"--supportedplatforms", projectTargets,
-				"--plugins", this.projectData.CorePlugins.join(";")
+				"--plugins", corePlugins.join(";")
 			];
 
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
