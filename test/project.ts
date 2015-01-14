@@ -9,11 +9,16 @@ import stubs = require("./stubs");
 import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
+import util = require("util");
+import MobileHelper = require("./../lib/common/mobile/mobile-helper");
 import options = require("./../lib/options");
 import helpers = require("../lib/helpers");
-import projectTypes = require("../lib/project-types");
-import MobileHelper = require("../lib/common/mobile/mobile-helper");
-import util = require("util");
+import cordovaProjectLib = require("./../lib/project/cordova-project");
+import nativeScriptProjectLib = require("./../lib/project/nativescript-project");
+import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
+import projectFilesManagerLib = require("../lib/project/project-files-manager");
+import projectConstantsLib = require("../lib/project/project-constants");
+var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
 temp.track();
 
@@ -48,6 +53,19 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
+	testInjector.register("frameworkProjectResolver", {
+		resolve: (framework: string) => {
+			if(!framework || framework === "Cordova") {
+				return testInjector.resolve("cordovaProject");
+			}
+			return testInjector.resolve("nativeScriptProject");
+		}
+	});
+	testInjector.register("cordovaProject", cordovaProjectLib.CordovaProject);
+	testInjector.register("nativeScriptProject", nativeScriptProjectLib.NativeScriptProject);
+	testInjector.register("serverExtensionsService", {});
+	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
+	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 
 	return testInjector;
 }
@@ -71,14 +89,14 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectTypes.Cordova, projectName).wait();
+			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
+			var projectSchema = project.getProjectSchema().wait();
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
@@ -103,13 +121,13 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectTypes.NativeScript, projectName).wait();
+			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = helpers.getProjectFileSchema(projectTypes.NativeScript).wait();
+			var projectSchema = project.getProjectSchema().wait();
 			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
@@ -137,7 +155,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
 				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -155,7 +173,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.NativeScript, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
 				assert.isTrue(fs.existsSync(bootstrapJsFile), "NativeScript TypeScript Blank template does not contain mandatory 'app/bootstrap.js' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -175,7 +193,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -193,7 +211,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -211,7 +229,7 @@ describe("project integration tests", () => {
 				options.template = "Friends";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -229,7 +247,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.Drawer";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -247,7 +265,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.Empty";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -265,7 +283,7 @@ describe("project integration tests", () => {
 				options.template = "KendoUI.TabStrip";
 				options.appid = "com.telerik.Test";
 
-				project.createNewProject(projectTypes.Cordova, projectName).wait();
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
 				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
@@ -322,59 +340,95 @@ describe("project unit tests", () => {
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 
-		project = testInjector.resolve("project");
 		projectProperties = testInjector.resolve("projectPropertiesService");
-		propSchemaCordova = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
+
+		propSchemaCordova = {
+			"DisplayName": {
+				"description": "The display name of the app."
+			},
+			"DeviceOrientations": {
+				"description": "List of supported device orientations",
+				"range": ["Portrait", "Landscape"],
+				"flags": true
+			},
+			"ProjectName": {
+				"description": "The project name identifies this project to the cloud build.",
+				"validator": "projectNameValidator"
+			},
+			"BundleVersion": {
+				"description": "The application (or bundle) version.",
+				"regex": "^(\\d+)(\\.\\d+)?(\\.\\d+)?(\\.\\d+)?$",
+				"validationMessage": "The version must consist of two, three or four numbers separated with dots."
+			},
+			"iOSStatusBarStyle": {
+				"description": "iOS status bar style",
+				"range": ["Default","BlackTranslucent","BlackOpaque","Hidden"]
+			},
+			"iOSDeviceFamily": {
+				"description": "List of supported iOS device families",
+				"range": {
+					"1": {
+						"input": "iPhone",
+						"description": "iPhone/iPod Touch device family"
+					},
+					"2": {
+						"input": "iPad",
+						"description": "iPad device family"
+					}
+				},
+				"flags": true
+			}
+		}
 	});
 
 	describe("updateProjectProperty", () => {
 		it("sets unconstrained string property", () => {
-			var projectData = { DisplayName: "wrong" };
+			var projectData = {DisplayName: "wrong", Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "set", "DisplayName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", () => {
-			var projectData = { ProjectName: "wrong" };
+			var projectData = {ProjectName: "wrong", Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "set", "ProjectName", ["fine"], propSchemaCordova).wait();
 			assert.equal("fine", projectData.ProjectName);
 			assert.ok(mockProjectNameValidator.validateCalled);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
-			var projectData = { ProjectName: "wrong" };
+			var projectData = {ProjectName: "wrong", Framework: "Cordova"};
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
-			var projectData = { ProjectName: "wrong" };
+			var projectData = {ProjectName: "wrong", Framework: "Cordova"};
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "del", "ProjectName", ["fine"], propSchemaCordova).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
-			var projectData = { "BundleVersion": "0" };
+			var projectData = {"BundleVersion": "0", Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"], propSchemaCordova).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", () => {
-			var projectData = { "BundleVersion": "0" };
+			var projectData = {"BundleVersion": "0", Framework: "Cordova"};
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"], propSchemaCordova).wait());
 		});
 
 		it("sets enumerated property", () => {
-			var projectData = { iOSStatusBarStyle: "Default" };
+			var projectData = {iOSStatusBarStyle: "Default", Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"], propSchemaCordova).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", () => {
-			var projectData = { iOSStatusBarStyle: "Default" };
+			var projectData = {iOSStatusBarStyle: "Default", Framework: "Cordova"};
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"], propSchemaCordova).wait());
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
-			var projectData: any = { DeviceOrientations: [] };
+			var projectData: any = {DeviceOrientations: [], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"], propSchemaCordova).wait();
@@ -382,7 +436,7 @@ describe("project unit tests", () => {
 		});
 
 		it("appends to enumerated collection property with shorthand", () => {
-			var projectData: any = { iOSDeviceFamily: [] };
+			var projectData: any = {iOSDeviceFamily: [], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone"], propSchemaCordova).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPad"], propSchemaCordova).wait();
@@ -390,13 +444,13 @@ describe("project unit tests", () => {
 		});
 
 		it("appends multiple values to enumerated collection property", () => {
-			var projectData: any = { iOSDeviceFamily: [] };
+			var projectData: any = {iOSDeviceFamily: [], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["iPhone", "iPad"], propSchemaCordova).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", () => {
-			var projectData: any = { DeviceOrientations: ["Landscape", "Portrait"] };
+			var projectData: any = {DeviceOrientations: ["Landscape", "Portrait"], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"], propSchemaCordova).wait();
@@ -404,18 +458,18 @@ describe("project unit tests", () => {
 		});
 
 		it("disallows unrecognized values for enumerated collection property", () => {
-			var projectData: any = { DeviceOrientations: [] };
+			var projectData: any = {DeviceOrientations: [], Framework: "Cordova"};
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"], propSchemaCordova).wait());
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
-			var projectData: any = { DeviceOrientations: [] };
+			var projectData: any = {DeviceOrientations: [], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", () => {
-			var projectData: any = { DeviceOrientations: [] };
+			var projectData: any = {DeviceOrientations: [], Framework: "Cordova"};
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["landscape"], propSchemaCordova).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
@@ -431,6 +485,9 @@ describe("project unit tests (canonical paths)", () => {
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
 		testInjector.resolve("staticConfig").PROJECT_FILE_NAME = "";
+
+		project = testInjector.resolve("project");
+
 		oldPath = options.path;
 	});
 	after(() => {

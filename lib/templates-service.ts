@@ -8,7 +8,6 @@ import Future = require("fibers/future");
 import util = require("util");
 import unzip = require("unzip");
 import MobileHelper = require("./common/mobile/mobile-helper");
-import projectTypes = require("./project-types");
 
 export class ConfigurationFile {
 	constructor(public template: string,
@@ -18,55 +17,12 @@ export class ConfigurationFile {
 }
 
 export class TemplatesService implements ITemplatesService {
-	private configFiles: ConfigurationFile[];
-	private configFilesPerProjectType: IDictionary<string[]> = {
-		"NativeScript":  ["ios-info", "android-manifest"]
-	};
-
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $resources: IResourceLoader,
 		private $httpClient: Server.IHttpClient,
-		private $injector: IInjector) {
-			this.configFiles = [
-				new ConfigurationFile(
-					"android-manifest",
-					"App_Resources/Android/AndroidManifest.xml",
-					"Mobile.Android.ManifestXml.zip",
-					"Opens AndroidManifest.xml for editing and creates it, if needed."
-					),
-				new ConfigurationFile(
-					"android-config",
-					"App_Resources/Android/xml/config.xml",
-					"Mobile.Cordova.Android.ConfigXml.zip",
-					"Opens config.xml for Android for editing and creates it, if needed."
-					),
-				new ConfigurationFile(
-					"ios-info",
-					"App_Resources/iOS/Info.plist",
-					"Mobile.iOS.InfoPlist.zip",
-					"Opens Info.plist for editing and creates it, if needed."
-					),
-				new ConfigurationFile(
-					"ios-config",
-					"App_Resources/iOS/config.xml",
-					"Mobile.Cordova.iOS.ConfigXml.zip",
-					"Opens config.xml for iOS for editing and creates it, if needed."
-					),
-				new ConfigurationFile(
-					"wp8-manifest",
-					"App_Resources/WP8/WMAppManifest.xml",
-					"Mobile.WP8.WMAppManifestXml.zip",
-					"Opens WMAppManifest.xml for editing and creates it, if needed."
-					),
-				new ConfigurationFile(
-					"wp8-config",
-					"App_Resources/WP8/config.xml",
-					"Mobile.Cordova.WP8.ConfigXml.zip",
-					"Opens config.xml for Windows Phone 8 for editing and creates it, if needed."
-					),
-			];
-	}
+		private $injector: IInjector,
+		private $frameworkProjectResolver: Project.IFrameworkProjectResolver) { }
 
 	public get projectTemplatesDir(): string {
 		return this.$resources.resolvePath("ProjectTemplates");
@@ -76,51 +32,17 @@ export class TemplatesService implements ITemplatesService {
 		return this.$resources.resolvePath("ItemTemplates");
 	}
 
-	public get configurationFiles(): IConfigurationFile[] {
-		var project = this.$injector.resolve("project"); // we need to resolve project here due to cyclic dependency
-		var projectSpecificConfigFiles: string[] = this.configFilesPerProjectType[projectTypes[project.projectType]];
-		if(projectSpecificConfigFiles) {
-			this.configFiles = _.reject(this.configFiles, (configurationFile: IConfigurationFile) => {
-				return !_.contains(projectSpecificConfigFiles, configurationFile.template)
-			});
-		}
-
-		return this.configFiles;
-	}
-
-	public projectCordovaTemplatesString(): IFuture<string> {
-		return this.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
-	}
-
-	public projectNativeScriptTemplatesString(): IFuture<string> {
-		return this.getTemplatesString(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
-	}
-
-	public projectMobileWebsiteTemplatesString(): IFuture<string> {
-		return this.getTemplatesString(/.*Telerik\.Mobile\.MobileWebsite\.(.+)\.zip/);
-	}
-
-	private getTemplatesString(regexp: RegExp): IFuture<string> {
+	public getTemplatesString(regexp: RegExp): IFuture<string> {
 		return (() => {
 			var templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
 				.map((file) => {
-				var match = file.match(regexp);
-				return match && match[1];
-			})
-			.filter((file: string) => file !== null)
-			.value();
+					var match = file.match(regexp);
+					return match && match[1];
+				})
+				.filter((file: string) => file !== null)
+				.value();
 			return helpers.formatListOfNames(templates);
 		}).future<string>()();
-	}
-
-	public configurationFilesString(): string {
-		return _.map(this.configurationFiles, (file) => {
-			return util.format("        %s - %s", file.template, file.helpText);
-		}).join("\n");
-	}
-
-	public getTemplateFilename(projectType: number, name: string): string {
-		return util.format("Telerik.Mobile.%s.%s.zip", projectTypes[projectType], name);
 	}
 
 	public downloadProjectTemplates(): IFuture<void> {

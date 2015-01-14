@@ -1,8 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import projectTypes = require("../../project-types");
-
 export class PrintFrameworkVersionsCommand implements ICommand {
 	constructor(private $cordovaMigrationService: ICordovaMigrationService,
 		private $project: Project.IProject,
@@ -29,10 +27,6 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 	public canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
 			this.$project.ensureCordovaProject();
-
-			if(this.$project.projectType !== projectTypes.Cordova) {
-				this.$errors.fail("This command is valid only for hybrid projects.");
-			}
 
 			return true;
 		}).future<boolean>()();

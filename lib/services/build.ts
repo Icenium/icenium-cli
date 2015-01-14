@@ -12,27 +12,12 @@ import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
 import AppIdentifier = require("../common/mobile/app-identifier");
-import projectTypes = require("../project-types");
 
 class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
-	constructor(private $project: Project.IProject) {
-	}
-
-	private adjustBuildPropertiesCordova(buildProperties: any): any {
-		buildProperties.CorePlugins = this.$project.projectData.CorePlugins;
-		return buildProperties;
-	}
-
-	private adjustBuildPropertiesNativeScript(buildProperties: any): any {
-		return buildProperties;
-	}
+	constructor(private $project: Project.IProject) { }
 
 	public adjustBuildProperties(oldBuildProperties: any): any {
-		if (this.$project.projectType === projectTypes.Cordova) {
-			return this.adjustBuildPropertiesCordova(oldBuildProperties);
-		} else if (this.$project.projectType === projectTypes.NativeScript) {
-			return this.adjustBuildPropertiesNativeScript(oldBuildProperties);
-		}
+		return this.$project.adjustBuildProperties(oldBuildProperties);
 	}
 }
 $injector.register("buildPropertiesAdjustment", BuildPropertiesAdjustment);
@@ -56,7 +41,8 @@ export class BuildService implements Project.IBuildService {
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $projectNameValidator: IProjectNameValidator,
-		private $multipartUploadService: IMultipartUploadService) { }
+		private $multipartUploadService: IMultipartUploadService,
+		private $projectFilesManager: Project.IProjectFilesManager) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -485,8 +471,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.importProject().wait();
 
-			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
-				this.$project.projectData.AppIdentifier, true, this.$project.projectType);
+			var appIdentifier = AppIdentifier.createAppIdentifier(platform, this.$project.projectData.AppIdentifier, true);
 
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 

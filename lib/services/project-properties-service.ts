@@ -7,65 +7,42 @@ import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
-import projectTypes = require("../project-types");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	constructor(private $fs: IFileSystem,
-				private $errors: IErrors,
-				private $injector: IInjector,
-				private $resources: IResourceLoader) {
-	}
+		private $errors: IErrors,
+		private $injector: IInjector,
+		private $resources: IResourceLoader,
+		private $projectConstants: Project.IProjectConstants,
+		private $frameworkProjectResolver: Project.IFrameworkProjectResolver) { }
 
-	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean): IFuture<IProjectData> {
+	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData> {
 		return ((): any => {
 			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
-				this.getProjectPropertiesFromXmlProjectFile(projectFile).wait();
+				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject).wait();
 
 			if (properties) {
-				this.completeProjectProperties(properties);
+				this.completeProjectProperties(properties, frameworkProject);
 			}
 
 			return properties;
 		}).future<IProjectData>()();
 	}
 
-	public completeProjectProperties(properties: any): boolean {
+	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {
 		var updated = false;
 
 		if(!_.has(properties, "Framework")) {
-			properties["Framework"] = projectTypes[projectTypes.Cordova];
+			properties["Framework"] = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
 			updated = true;
 		}
 
-		if (properties["Framework"] !== projectTypes[projectTypes.MobileWebsite]) {
-			if (_.has(properties, "name")) {
-				properties.ProjectName = properties.name;
-				delete properties.name;
-				updated = true;
-			}
+		updated = frameworkProject.completeProjectProperties(properties);
 
-			if (_.has(properties, "iOSDisplayName")) {
-				properties.DisplayName = properties.iOSDisplayName;
-				delete properties.iOSDisplayName;
-				updated = true;
-			}
-			if (!properties.DisplayName) {
-				properties.DisplayName = properties.ProjectName;
-				updated = true;
-			}
-
-			["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
-				if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
-					properties[wp8guid] = MobileHelper.generateWP8GUID();
-					updated = true;
-				}
-			});
-		}
-
-		var defaultProject = this.$resources.readJson(
-			util.format("default-project-%s.json", properties.Framework.toLowerCase())
-		).wait();
-		Object.keys(defaultProject).forEach((propName) => {
+		var defaultJsonProjectFile = util.format("default-project-%s.json", properties.Framework.toLowerCase());
+		var defaultProject = this.$resources.readJson(defaultJsonProjectFile).wait();
+		var keys = _.keys(defaultProject);
+		_.each(keys, (propName: string) => {
 			if (!_.has(properties, propName)) {
 				properties[propName] = defaultProject[propName];
 				updated = true;
@@ -175,25 +152,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<void>()();
 	}
 
-	public getProjectSchemaHelp(): IFuture<string> {
-		return (() => {
-			var result: string[] = [];
-			var schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.Cordova]).wait();
-			var title = util.format("Project properties for %s projects:", projectTypes[projectTypes.Cordova]);
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.NativeScript]).wait();
-			title = util.format("Project properties for %s projects:", projectTypes[projectTypes.NativeScript]);
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			schema = helpers.getProjectFilePartSchema(projectTypes[projectTypes.Common]).wait();
-			title = "Common properties for all projects:";
-			result.push(this.getProjectSchemaPartHelp(schema, title));
-
-			return result.join(os.EOL + os.EOL);
-		}).future<string>()();
-	}
-
 	public normalizePropertyName(property: string, schema: any): string {
 		if (!property) {
 			return property;
@@ -201,6 +159,31 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 		var propLookup = helpers.toHash(schema, (value, key) => key.toLowerCase(), (value, key) => key);
 		return propLookup[property.toLowerCase()] || property;
+	}
+
+	public getProjectSchemaHelp(): IFuture<string> {
+		return (() => {
+			var result: string[] = [];
+
+			var targetFrameworkIdentifiers = _.keys(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
+				var frameworkProject = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier);
+				var schema = frameworkProject.getProjectFileSchema().wait();
+				var title = util.format("Project properties for %s projects:", frameworkProject.name);
+				result.push(this.getProjectSchemaPartHelp(schema, title));
+			});
+
+			return result.join(os.EOL + os.EOL);
+		}).future<string>()();
+	}
+
+	private getPropRange(propData: any): IFuture<string[]>{
+		return (() => {
+			if (propData.dynamicRange) {
+				return this.$injector.dynamicCall(propData.dynamicRange).wait();
+			}
+			return propData.range;
+		}).future<string[]>()();
 	}
 
 	private getProjectSchemaPartHelp(schema: string, title: string): string {
@@ -229,16 +212,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return help.join(os.EOL);
 	}
 
-	private getPropRange(propData: any): IFuture<string[]>{
-		return (() => {
-			if (propData.dynamicRange) {
-				return this.$injector.dynamicCall(propData.dynamicRange).wait();
-			}
-			return propData.range;
-		}).future<string[]>()();
-	}
-
-	private getProjectPropertiesFromXmlProjectFile(projectFile: string): IFuture<any> {
+	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): IFuture<any> {
 		return ((): any => {
 			var properties: any = {};
 
@@ -252,7 +226,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var result: any = parseString(contents).wait();
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = helpers.getProjectFileSchema(projectTypes.Cordova).wait();
+			var projectSchema = frameworkProject.getFullProjectFileSchema().wait();
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];

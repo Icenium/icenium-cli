@@ -28,6 +28,7 @@ export class LiveSyncCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $project: Project.IProject,
+		private $projectFilesManager: Project.IProjectFilesManager,
 		private $dispatcher: IFutureDispatcher,
 		private $stringParameter: ICommandParameter) { }
 
@@ -59,7 +60,7 @@ export class LiveSyncCommand implements ICommand {
 			var projectDir = this.$project.getProjectDir().wait();
 
 			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
-				this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
+				this.$project.projectData.AppIdentifier, options.companion);
 
 			if (options.file) {
 				var isExistFile = this.$fs.exists(options.file).wait();
@@ -129,7 +130,7 @@ export class LiveSyncCommand implements ICommand {
 				return (() => {
 					var platformSpecificProjectPath = appIdentifier.deviceProjectPath;
 					var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
-					device.sync(localDevicePaths, appIdentifier, this.$project.projectType).wait();
+					device.sync(localDevicePaths, appIdentifier, this.$project.getLiveSyncUrl()).wait();
 				}).future<void>()();
 			};
 
@@ -153,7 +154,7 @@ export class LiveSyncCommand implements ICommand {
 			listeners: {
 				error: (error: Error) => this.$errors.fail(error.toString()),
 				change: (changeType: string, filePath: string) => {
-					if (!this.$project.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
+					if (!this.$projectFilesManager.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
 						this.$logger.trace("Syncing %s", filePath);
 						this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
 					}

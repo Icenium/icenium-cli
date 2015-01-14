@@ -34,7 +34,7 @@ export class EmulateAndroidCommand implements ICommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 
-			var appId = AppIdentifier.createAppIdentifier(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android], this.$project.projectData.AppIdentifier, options.companion, this.$project.projectType);
+			var appId = AppIdentifier.createAppIdentifier(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android], this.$project.projectData.AppIdentifier, options.companion);
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{appId:appId.appIdentifier }).wait();
 		}).future<void>()();
 	}

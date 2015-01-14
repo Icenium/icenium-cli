@@ -63,7 +63,21 @@ $injector.requireCommand("build", "./commands/build");
 $injector.require("multipartUploadService", "./services/multipart-upload");
 $injector.require("hashService", "./services/hash-service");
 
+$injector.require("frameworkProjectResolver", "./project/resolvers/framework-project-resolver");
+$injector.require("frameworkSimulatorServiceResolver", "./project/resolvers/framework-simulator-service-resolver");
+
+$injector.require("projectSimulatorService", "./services/project-simulator-service");
+$injector.require("cordovaSimulatorService", "./services/project-simulator-service");
+$injector.require("nativeScriptSimulatorService", "./services/project-simulator-service");
+$injector.require("mobileWebSiteSimulatorService", "./services/project-simulator-service");
+
 $injector.require("project", "./project");
+$injector.require("cordovaProject", "./project/cordova-project");
+$injector.require("nativeScriptProject", "./project/nativescript-project");
+$injector.require("webSiteProject", "./project/web-site-project");
+$injector.require("mobileWebsiteProject", "./project/web-site-project");
+$injector.require("projectConstants", "./project/project-constants");
+$injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.requireCommand("create|hybrid", "./commands/project");
 $injector.requireCommand("create|native", "./commands/project");
@@ -129,3 +143,4 @@ $injector.require("optionsService", "./services/options-service");
 $injector.require("processInfo", "./process-info");
 $injector.requireCommand("mobileframework|*print", "./commands/framework-versions/print-versions");
 $injector.requireCommand("mobileframework|set", "./commands/framework-versions/set-version");
+

@@ -1,8 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import projectTypes = require("../../project-types");
-
 export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $cordovaMigrationService: ICordovaMigrationService,
 		private $project: Project.IProject) { }
