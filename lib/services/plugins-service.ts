@@ -30,30 +30,12 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		var corePlugins: any = null;
-		if(options.debug || options.d) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
-		} else if(options.release || options.r) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
-		} else {
-			corePlugins = _.intersection(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
-		}
-
-		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+		return this.getAllInstalledPlugins({getPluginsWithoutOptions: _.intersection});
 	}
 
 	// return plugins that are enabled in one or more configurations
 	public getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[] {
-		var corePlugins: any = null;
-		if(options.debug || options.d) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
-		} else if(options.release || options.r) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
-		} else {
-			corePlugins = _.union(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
-		}
-
-		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+		return this.getAllInstalledPlugins({getPluginsWithoutOptions: _.union});
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
@@ -256,6 +238,19 @@ export class PluginsService implements IPluginsService {
 		}
 
 		return plugin;
+	}
+
+	private getAllInstalledPlugins(configuration: {getPluginsWithoutOptions: (...args: any[]) => any[]}): IPlugin[] {
+		var corePlugins: any = null;
+		if(options.debug || options.d) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
+		} else if(options.release || options.r) {
+			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
+		} else {
+			corePlugins = configuration.getPluginsWithoutOptions(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
+		}
+
+		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 }
 $injector.register("pluginsService", PluginsService);
