@@ -29,7 +29,6 @@ export class Project implements Project.IProject {
 		private $errors: IErrors,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
-		private $injector: IInjector,
 		private $logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
@@ -466,6 +465,11 @@ export class Project implements Project.IProject {
 				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
+
+					if (data.projectVersion && data.projectVersion !== 1) {
+						throw "FUTURE_PROJECT_VER";
+					}
+
 					this.projectData = data;
 					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
@@ -484,6 +488,12 @@ export class Project implements Project.IProject {
 					});
 
 				} catch (err) {
+					if (err === "FUTURE_PROJECT_VER") {
+						this.$errors.fail({
+							formatStr: "This project is created by a newer version of AppBuilder. Upgrade AppBuilder CLI to work with it.",
+							suppressCommandHelp: true
+						});
+					}
 					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
 							"Consider restoring an earlier version from your source control or backup." + os.EOL +
 							"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
