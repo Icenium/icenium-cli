@@ -30,12 +30,12 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		return this.getAllInstalledPlugins({getPluginsWithoutOptions: _.intersection});
+		return this.getAllInstalledPlugins({operation: _.intersection});
 	}
 
 	// return plugins that are enabled in one or more configurations
 	public getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[] {
-		return this.getAllInstalledPlugins({getPluginsWithoutOptions: _.union});
+		return this.getAllInstalledPlugins({operation: _.union});
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
