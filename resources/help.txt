@@ -641,7 +641,7 @@ Options:
             To list the available Android virtual devices, run $ android list avd        
     --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
             before quitting the operation and releasing the console.
-            If not set, the default timeout is 120 seconds.
+            If not set, the default timeout is 120 seconds. To wait indefinitely, set 0.
 --[/]--
 
 --[emulate|ios]--
