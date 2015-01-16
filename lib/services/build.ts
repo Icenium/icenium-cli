@@ -489,7 +489,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
 			this.showQRCodes([{
-				instruction: util.format("Scan the QR code below to install %s to AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
+				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
 				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
 			}]).wait();
 		}).future<void>()();
