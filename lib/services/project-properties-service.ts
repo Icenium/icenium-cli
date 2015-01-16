@@ -2,7 +2,7 @@
 "use strict";
 
 import os = require("os");
-import xml2js = require("xml2js");
+import xmlMapping = require("xml-mapping");
 import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
@@ -215,15 +215,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): IFuture<any> {
 		return ((): any => {
 			var properties: any = {};
-
-			var parser = new xml2js.Parser();
-			var contents = this.$fs.readText(projectFile).wait();
-
-			var parseString = Future.wrap((str:string, callback:(error: any, data: any) => void) => {
-				return parser.parseString(str, callback);
-			});
-
-			var result: any = parseString(contents).wait();
+			var result: any = xmlMapping.tojson(this.$fs.readText(projectFile).wait());
 			var propertyGroup: any = result.Project.PropertyGroup[0];
 
 			var projectSchema = frameworkProject.getFullProjectFileSchema().wait();
