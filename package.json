@@ -67,7 +67,6 @@
     "watchr": "2.4.11",
     "winreg": "0.0.12",
     "xml-mapping": "1.5.2",
-    "xml2js": "0.4.1",
     "xmlhttprequest": "https://github.com/telerik/node-XMLHttpRequest/tarball/master",
     "yargs": "1.2.2",
     "zipstream": "https://github.com/Icenium/node-zipstream/tarball/master"
