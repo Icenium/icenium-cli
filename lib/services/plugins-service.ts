@@ -240,14 +240,14 @@ export class PluginsService implements IPluginsService {
 		return plugin;
 	}
 
-	private getAllInstalledPlugins(configuration: {getPluginsWithoutOptions: (...args: any[]) => any[]}): IPlugin[] {
+	private getAllInstalledPlugins(configuration: {operation: (...args: any[]) => any[]}): IPlugin[] {
 		var corePlugins: any = null;
 		if(options.debug || options.d) {
 			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
 		} else if(options.release || options.r) {
 			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
 		} else {
-			corePlugins = configuration.getPluginsWithoutOptions(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
+			corePlugins = configuration.operation(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
 		}
 
 		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
