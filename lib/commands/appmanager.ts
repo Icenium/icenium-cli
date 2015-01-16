@@ -25,7 +25,7 @@ class AppManagerUploadCommand implements ICommand {
 			this.$logger.info("Accessing Telerik AppManager store.");
 			this.$server.tam.verifyStoreCreated().wait();
 
-			this.$logger.info("Building release package.")
+			this.$logger.info("Building release package.");
 			var buildResult = this.$buildService.build({
 				platform: platform,
 				configuration: "Release",
