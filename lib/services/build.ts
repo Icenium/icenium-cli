@@ -4,6 +4,7 @@
 import util = require("util");
 import querystring = require("querystring");
 import path = require("path");
+import os = require("os");
 var options: any = require("../options");
 import MobileHelper = require("../common/mobile/mobile-helper");
 import Future = require("fibers/future");
@@ -73,6 +74,7 @@ export class BuildService implements Project.IBuildService {
 	public buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
 		return ((): Server.IBuildResult => {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+			commonHelpers.printInfoMessageOnSameLine("Building...");
 
 			this.$projectNameValidator.validate(projectName);
 
@@ -81,7 +83,13 @@ export class BuildService implements Project.IBuildService {
 			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
 			buildProperties.LiveSyncToken = liveSyncToken;
 
-			var body = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: []}).wait();
+			var buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
+			while(!buildProjectFuture.isResolved()) {
+				commonHelpers.printMsgWithTimeout(".", 2000).wait();
+			}
+			commonHelpers.printInfoMessageOnSameLine(os.EOL);
+
+			var body = buildProjectFuture.get();
 			var buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
 				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
 				var solutionPath = util.format("%s/%s", projectName, fullPath);
