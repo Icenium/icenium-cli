@@ -916,8 +916,6 @@ After the upload completes, you need to go to your app in Telerik AppManager, ma
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
 
-This command is not applicable to NativeScript projects.
-
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
         a certificate by index or name.

@@ -1,4 +1,5 @@
 ///<reference path="../.d.ts"/>
+"use strict";
 
 import options = require("./../options");
 import util = require("util");
@@ -39,7 +40,7 @@ export class DeployCommand implements ICommand {
 		return ((): void => {
 			if (options.companion) {
 				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
-					" Use the `livesync` command instead to avoid this warning.")
+					" Use the `livesync` command instead to avoid this warning.");
 				this.$commandsService.executeCommandUnchecked("livesync", args).wait();
 				return;
 			}
