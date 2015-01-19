@@ -18,6 +18,7 @@ lib-cov
 tscommand*.tmp.txt
 .tscache/
 /lib/.d.ts
+/config/config.json
 
 pids
 logs

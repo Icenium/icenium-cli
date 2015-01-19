@@ -222,6 +222,7 @@ interface IConfiguration extends Config.IConfig {
 
 	reset(): IFuture<void>;
 	apply(configName: string): IFuture<void>;
+	printConfigData(): IFuture<void>;
 }
 
 interface IStaticConfig extends Config.IStaticConfig {
