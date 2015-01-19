@@ -1,10 +1,10 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
 
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
 var options: any = require("../options");
+var Table = require("cli-table");
 
 export class AppstoreApplicationCommandBase implements ICommand {
 	constructor(public $server: Server.IServer,
@@ -67,14 +67,20 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 
 			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			apps = _.sortBy(apps, (app: Server.Application) => app.Application);
-
-			apps.forEach((app:Server.Application) => {
-				this.$logger.out("%s %s (%s)", app.Application, (<any>app)["Version Number"], app.ReservedBundleIdentifier);
-			});
-
 			if(!apps.length) {
 				this.$logger.out("No applications are ready for upload.");
+				return;
 			}
+
+			var table = new Table({
+				head: ["Application", "Version", "Bundle ID"],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+			});
+			_.each(apps, (app:Server.Application) => {
+				table.push([app.Application, (<any>app)["Version Number"], app.ReservedBundleIdentifier]);
+			});
+			this.$logger.out(table.toString());
+
 		}).future<void>()();
 	}
 }
