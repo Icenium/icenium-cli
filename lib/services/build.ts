@@ -19,7 +19,8 @@ class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
 	}
 
 	private adjustBuildPropertiesCordova(buildProperties: any): any {
-		buildProperties.CorePlugins = this.$project.projectData.CorePlugins || [];
+		var configurationName = (options.release || options.r) ? "release" : "debug";
+		buildProperties.CorePlugins = this.$project.getProperty("CorePlugins", configurationName);
 		return buildProperties;
 	}
 
