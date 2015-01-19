@@ -45,7 +45,14 @@ if(hostInfo.isWindows()) {
 commonOptions.setProfileDir(defaultProfileDir);
 var parsed = helpers.getParsedOptions(knownOpts, shorthands, "appbuilder");
 
-Object.keys(parsed).forEach((opt) => exports[opt] = parsed[opt]);
+Object.keys(parsed).forEach(opt => {
+	var key = opt;
+	if(shorthands[opt]) {
+		key = shorthands[opt];
+	}
+
+	exports[key] = parsed[opt];
+});
 exports.knownOpts = knownOpts;
 
 declare var exports: any;
