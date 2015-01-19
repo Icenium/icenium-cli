@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "preferGlobal": true,
-  "version": "2.7.0",
+  "version": "2.7.2",
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
