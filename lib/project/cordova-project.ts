@@ -78,7 +78,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any {
-		buildProperties.CorePlugins = projectData.CorePlugins;
+		buildProperties.CorePlugins = projectData.CorePlugins || [];
 		return buildProperties;
 	}
 

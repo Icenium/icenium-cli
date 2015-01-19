@@ -34,7 +34,8 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Windows 7 or later
 * .NET 4.0 or later
-* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* An Internet browser (latest official release)
 
 > To be able to work with connected iOS devices from the command line, download and install the 32-bit Node.js.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
 
@@ -56,7 +57,8 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* An Internet browser (latest official release)
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -75,7 +77,8 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements** 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
-* Any Node.js stable official release between 0.10.26 and 0.10.33<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* An Internet browser (latest official release)
 
 > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
 
@@ -134,6 +137,8 @@ A new tab opens in your default browser. Provide your login credentials, confirm
 
 <a name="create"><b>2. Create project</b></a>
 
+**Create new project from template**
+
 To create a new hybrid project from the default template, navigate to an empty directory and run the following command. 
 
 ```bash
@@ -142,13 +147,30 @@ $ appbuilder create hybrid MyApp
 
 The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI TabStrip template.
 
+**Create new project from existing project**
+
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
 ```bash
 $ appbuilder init hybrid
 ```
 
-The Telerik AppBuilder CLI creates the `.abproject` file required for working from the command-line. 
+The Telerik AppBuilder CLI creates the `.abproject` file required for development with AppBuilder. If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+For more information about how to configure your project properties, run `appbuilder prop --help`.
+
+**Create new project from sample**
+
+To create a new project from the AppBuilder sample apps from the command line, navigate to an empty directory and run the following command.
+
+```bash
+appbuilder sample clone <Sample>
+```
+
+To list the available sample apps, run `appbuilder sample`.
+
+The Telerik AppBuilder CLI creates a new subdirectory in the current directory, clones the sample inside it and preserves the existing project configuration of the sample app.
+
+If you want to develop for Windows Phone 8, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. For more information about how to configure your project properties, run `appbuilder prop --help`.
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 

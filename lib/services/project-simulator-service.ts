@@ -33,6 +33,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		return (() => {
 			var pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
 			var projectData = this.$project.projectData;
+            var corePlugins = this.$project.getProperty("CorePlugins", "debug");
 
 			return [
 				"--statusbarstyle", projectData.iOSStatusBarStyle,
@@ -40,7 +41,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 				"--orientations", projectData.DeviceOrientations.join(";"),
 				"--corepluginspath", pluginsPath,
 				"--supportedplatforms", this.$project.getProjectTargets().wait().join(";"),
-				"--plugins", projectData.CorePlugins.join(";")
+				"--plugins", corePlugins.join(";")
 			];
 		}).future<string[]>()();
 	}
