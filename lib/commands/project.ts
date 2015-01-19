@@ -162,7 +162,7 @@ export class CreateWebSiteCommand extends ProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite);
+		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
 	}
 
 	allowedParameters = [new NameParameter(this.$projectNameValidator)];
@@ -203,7 +203,7 @@ export class InitCommand extends InitProjectCommandBase {
 				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			} else if(this.isProjectType("Mobile Website").wait()) {
 				this.$logger.info("Attempting to initialize Mobile Website project.");
-				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite).wait();
+				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite).wait();
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}
@@ -252,7 +252,7 @@ export class InitWebsiteCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite);
+		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
 	}
 }
 $injector.registerCommand("init|website", InitWebsiteCommand);

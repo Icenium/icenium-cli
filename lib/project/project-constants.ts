@@ -8,7 +8,7 @@ export class ProjectConstants implements Project.IProjectConstants {
 	public TARGET_FRAMEWORK_IDENTIFIERS = {
 		Cordova: "Cordova",
 		NativeScript: "NativeScript",
-		MobileWebSite: "MobileWebSite"
+		MobileWebsite: "MobileWebsite"
 	};
 }
 $injector.register("projectConstants", ProjectConstants);
