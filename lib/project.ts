@@ -446,7 +446,7 @@ export class Project implements Project.IProject {
 	public saveProject(projectDir: string): IFuture<void> {
 		return (() => {
 			projectDir = projectDir || this.getProjectDir().wait();
-			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData, "\t").wait();
+			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
 
 			_.each(this.configurations, (configuration: string) => {
 				var configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));

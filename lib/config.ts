@@ -72,7 +72,7 @@ export class Configuration implements IConfiguration { // User specific config
 		});
 
 		var configFileName = this.getConfigPath(name);
-		return this.$fs.writeJson(configFileName, configNoFunctions, "\t");
+		return this.$fs.writeJson(configFileName, configNoFunctions);
 	}
 
 	private mergeConfig(config: IConfiguration, mergeFrom: IConfiguration): void {
