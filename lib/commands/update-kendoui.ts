@@ -2,6 +2,7 @@
 "use strict";
 import temp = require("temp");
 import path = require("path");
+var Table = require("cli-table");
 
 class UpdateKendoUICommand implements ICommand {
 	constructor(
@@ -28,9 +29,17 @@ class UpdateKendoUICommand implements ICommand {
 			var packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 
 			this.$logger.out("You can download and install the following Kendo UI Core or Kendo UI Professional packages.");
-			_.each(packages, (update: Server.IKendoDownloadablePackageData, idx: number) => {
-				this.$logger.out("\t[%s] %s %s", (idx+1).toString().cyan.toString(), update.Name, update.Version);
+			var table = new Table({
+				head: ["#", "KendoUI", "Version", "Tags"],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
+			_.each(packages, (update: Server.IKendoDownloadablePackageData, idx: number) => table.push([
+					(idx + 1).toString().cyan.toString(),
+					update.Name,
+					update.Version,
+					(update.VersionTags || []).join(", ").cyan.toString()
+				]));
+			this.$logger.out(table.toString());
 
 			var schema: IPromptSchema = {
 				properties: {

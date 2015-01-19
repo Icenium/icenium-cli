@@ -28,6 +28,7 @@
     "binary-reader": "0.1.0",
     "bufferpack": "0.0.6",
     "byline": "4.1.1",
+    "cli-table": "0.3.1",
     "colors": "0.6.2",
     "cookie": "0.1.0",
     "express": "4.8.5",

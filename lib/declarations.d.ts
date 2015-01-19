@@ -57,6 +57,7 @@ declare module Server {
 		Name: string;
 		Version: string;
 		NeedPurchase: boolean;
+		VersionTags: string[];
 	}
 }
 
