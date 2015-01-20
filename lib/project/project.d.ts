@@ -50,7 +50,7 @@ declare module Project {
 		projectTemplatesString(): IFuture<string>;
 		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		completeProjectProperties(properties: any): boolean;
-		adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any;
+		adjustBuildProperties(buildProperties: any): any;
 		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void>;
 	}
 
@@ -60,18 +60,25 @@ declare module Project {
 		getFullProjectFileSchemaByName(name: string): IFuture<any>;
 		getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]>;
 		printAssetUpdateMessage(): void;
+		getProperty(propertyName: string, configuration: string): any;
 	}
 
 	interface IFrameworkProjectResolverBase {
-		resolveByName<T>(name: string, framework: string): T;
+		resolveByName<T>(name: string, framework: string, ctorArguments?: IDictionary<any>): T;
 	}
 
 	interface IFrameworkProjectResolver {
-		resolve(framework: string): IFrameworkProject;
+		resolve(framework: string, projectInformation: Project.IProjectInformation): IFrameworkProject;
 	}
 
 	interface IFrameworkSimulatorServiceResolver {
 		resolve(framework: string): IProjectSimulatorService;
+	}
+
+	interface IProjectInformation {
+		projectData: IProjectData;
+		configurationSpecificData: IDictionary<any>;
+		hasBuildConfigurations: boolean;
 	}
 
 	interface IProjectFilesManager {

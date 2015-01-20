@@ -104,18 +104,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getProperty(propertyName: string, configuration: string): any {
-		var propertyValue: any = null;
-
-		if(this._hasBuildConfigurations) {
-			var configData = this.configurationSpecificData[configuration];
-			if(configData) {
-				propertyValue = configData[propertyName];
-			}
-		} else {
-			propertyValue = this.projectData[propertyName];
-		}
-
-		return propertyValue;
+		return (<any>this.frameworkProject).getProperty(propertyName, configuration);
 	}
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
@@ -179,7 +168,7 @@ export class Project implements Project.IProject {
 			this.cachedProjectDir = projectDir;
 			var defaultProjectFilePath = this.$resources.resolvePath(util.format("default-project-%s.json", this.frameworkProject.name.toLowerCase()));
 			this.projectData = this.$fs.readJson(defaultProjectFilePath).wait();
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
 
 			this.validateProjectData(properties).wait();
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
@@ -194,7 +183,7 @@ export class Project implements Project.IProject {
 		}
 
 		var projectDir = this.getNewProjectDir();
-		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
@@ -210,7 +199,7 @@ export class Project implements Project.IProject {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
 
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
 			this.createProjectFileFromExistingProject(projectDir).wait();
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
@@ -407,7 +396,7 @@ export class Project implements Project.IProject {
 	}
 
 	public adjustBuildProperties(buildProperties: any): any {
-		return this.frameworkProject.adjustBuildProperties(buildProperties, this.projectData);
+		return this.frameworkProject.adjustBuildProperties(buildProperties);
 	}
 
 	public get requiredAndroidApiLevel(): number {
@@ -462,6 +451,14 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
+	private get projectInformation(): Project.IProjectInformation {
+		return {
+			projectData: this.projectData,
+			configurationSpecificData: this.configurationSpecificData,
+			hasBuildConfigurations: this._hasBuildConfigurations
+		}
+	}
+
 	private readProjectData(): IFuture<void> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
@@ -476,7 +473,6 @@ export class Project implements Project.IProject {
 					}
 
 					this.projectData = data;
-					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
 					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
@@ -491,6 +487,8 @@ export class Project implements Project.IProject {
 							this._hasBuildConfigurations = true;
 						}
 					});
+
+					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
 
 				} catch (err) {
 					if (err === "FUTURE_PROJECT_VER") {

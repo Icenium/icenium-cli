@@ -8,13 +8,15 @@ import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("../common/helpers");
 
 export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	constructor(private $config: IConfiguration,
+	constructor(projectInformation: Project.IProjectInformation,
+		private $config: IConfiguration,
+		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader) {
-		super($logger, $fs, $resources);
+		super(projectInformation, $logger, $fs, $resources, $errors);
 	}
 
 	public get name(): string {
@@ -72,7 +74,7 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return this.getFullProjectFileSchemaByName(this.name);
 	}
 
-	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any {
+	public adjustBuildProperties(buildProperties: any): any {
 		return buildProperties;
 	}
 

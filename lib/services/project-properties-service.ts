@@ -167,7 +167,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 			var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
 			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
-				var frameworkProject = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier);
+				var frameworkProject = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier, null); // We need this function only to show the help so it is ok to pass null for projectInformation
 				var schema = frameworkProject.getProjectFileSchema().wait();
 				var title = util.format("Project properties for %s projects:", frameworkProject.name);
 				result.push(this.getProjectSchemaPartHelp(schema, title));

@@ -9,14 +9,16 @@ import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	constructor(private $config: IConfiguration,
+	constructor(projectInformation: Project.IProjectInformation,
+		private $config: IConfiguration,
+		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		$resources: IResourceLoader,
 		private $templatesService: ITemplatesService) {
-		super($logger, $fs, $resources);
+		super(projectInformation, $logger, $fs, $resources, $errors);
 	}
 
 	public get name(): string {

@@ -3,15 +3,19 @@
 
 import commonHelpers = require("./../common/helpers");
 import options = require("./../options");
+
+import assert = require("assert");
 import path = require("path");
 import util = require("util");
 
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	private projectSchema: any;
 
-	constructor(protected $logger: ILogger,
+	constructor(protected projectInformation: Project.IProjectInformation,
+		protected $logger: ILogger,
 		protected $fs: IFileSystem,
-		protected $resources: IResourceLoader) { }
+		protected $resources: IResourceLoader,
+		protected $errors: IErrors) { }
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void {
 		properties.DisplayName = projectName;
@@ -67,6 +71,21 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 			this.$logger.info("Setting up missing asset files. Commit these assets into your source control repository.");
 			this._assetUpdateMessagePrinted = true;
 		}
+	}
+
+	public getProperty(propertyName: string, configuration: string): any {
+		assert.ok(this.projectInformation, "ProjectInformation object is null or undefined.");
+
+		var propertyValue: any = null;
+
+		var configData = this.projectInformation.configurationSpecificData[configuration];
+		if(configData) {
+			propertyValue = configData[propertyName];
+		} else {
+			propertyValue = this.projectInformation.projectData[propertyName];
+		}
+
+		return propertyValue;
 	}
 
 	private generateDefaultAppId(appName: string): string {
