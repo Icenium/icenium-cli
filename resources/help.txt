@@ -113,6 +113,7 @@ Creates a project for hybrid or native development. You must run the create comm
 <Command> is a related command that extends the create command. You can run the following related commands:
     hybrid - Creates a new project from an Apache Cordova-based template.
     native - Creates a new project from a NativeScript-based template.
+    website - Creates a new project from a Mobile Website template.
 --[/]--
 
 --[create|hybrid]--
