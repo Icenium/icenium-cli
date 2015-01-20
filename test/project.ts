@@ -146,7 +146,7 @@ describe("project integration tests", () => {
 
 	describe("Init command mandatory files tests", () => {
 		describe("NativeScript project", () => {
-			it("Blank template has all mandatory files)", () => {
+			it("Blank template has all mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -164,7 +164,7 @@ describe("project integration tests", () => {
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
-			it("TypeScript.Blank template has mandatory files)", () => {
+			it("TypeScript.Blank template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -184,7 +184,7 @@ describe("project integration tests", () => {
 		});
 
 		describe("Cordova project", () => {
-			it("Blank template has all mandatory files)", () => {
+			it("Blank template has all mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -202,7 +202,7 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("TypeScript.Blank template has mandatory files)", () => {
+			it("TypeScript.Blank template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -220,7 +220,7 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("Friends template has mandatory files)", () => {
+			it("Friends template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -238,7 +238,7 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.Drawer template has mandatory files)", () => {
+			it("KendoUI.Drawer template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -256,7 +256,7 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.Empty template has mandatory files)", () => {
+			it("KendoUI.Empty template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
@@ -274,7 +274,7 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.TabStrip template has mandatory files)", () => {
+			it("KendoUI.TabStrip template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
