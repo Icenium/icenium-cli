@@ -7,16 +7,19 @@ import util = require("util");
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
+import options = require("../options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	constructor(private $config: IConfiguration,
+	constructor(projectInformation: Project.IProjectInformation,
+		private $config: IConfiguration,
 		$fs: IFileSystem,
+		$errors: IErrors,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader) {
-		super($logger, $fs, $resources);
+		super(projectInformation, $logger, $fs, $resources, $errors);
 	}
 
 	public get name(): string {
@@ -77,8 +80,9 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		return this.getFullProjectFileSchemaByName(this.name);
 	}
 
-	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any {
-		buildProperties.CorePlugins = projectData.CorePlugins || [];
+	public adjustBuildProperties(buildProperties: any): any {
+		var configurationName = options.release ? "release" : "debug";
+		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName);
 		return buildProperties;
 	}
 

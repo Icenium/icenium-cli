@@ -56,9 +56,9 @@ function createTestInjector(): IInjector {
 	testInjector.register("frameworkProjectResolver", {
 		resolve: (framework: string) => {
 			if(!framework || framework === "Cordova") {
-				return testInjector.resolve("cordovaProject");
+				return testInjector.resolve("cordovaProject", { projectInformation: {}});
 			}
-			return testInjector.resolve("nativeScriptProject");
+			return testInjector.resolve("nativeScriptProject", { projectInformation: {}});
 		}
 	});
 	testInjector.register("cordovaProject", cordovaProjectLib.CordovaProject);

@@ -20,9 +20,7 @@ export class TemplatesService implements ITemplatesService {
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $resources: IResourceLoader,
-		private $httpClient: Server.IHttpClient,
-		private $injector: IInjector,
-		private $frameworkProjectResolver: Project.IFrameworkProjectResolver) { }
+		private $httpClient: Server.IHttpClient) { }
 
 	public get projectTemplatesDir(): string {
 		return this.$resources.resolvePath("ProjectTemplates");
