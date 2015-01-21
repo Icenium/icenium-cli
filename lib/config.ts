@@ -10,6 +10,7 @@ export class Configuration implements IConfiguration { // User specific config
 	AB_SERVER: string;
 	DEBUG :boolean;
 	PROXY_TO_FIDDLER: boolean;
+	FIDDLER_HOSTNAME: string;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	DEFAULT_WEBSITE_PROJECT_TEMPLATE: string;
