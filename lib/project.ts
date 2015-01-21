@@ -198,8 +198,7 @@ export class Project implements Project.IProject {
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
-
-	public createProjectFileFromExistingProject(framework: string): IFuture<void> {
+	public initializeProjectFromExistingFiles(framework: string): IFuture<void> {
 		return ((): void => {
 			var projectDir = this.getNewProjectDir();
 			if(!this.$fs.exists(projectDir).wait()) {
@@ -212,7 +211,14 @@ export class Project implements Project.IProject {
 			}
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+			this.createProjectFileFromExistingProject(projectDir).wait();
+			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
+			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
+		}).future<void>()();
+	}
 
+	private createProjectFileFromExistingProject(projectDir: string): IFuture<void> {
+		return ((): void => {
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
 			if(!properties) {
@@ -226,7 +232,6 @@ export class Project implements Project.IProject {
 			catch(e) {
 				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
 			}
-
 		}).future<void>()();
 	}
 

@@ -27,8 +27,8 @@ export class ProjectCommandBase implements ICommand {
 		return this.$project.createNewProject(projectName, framework);
 	}
 
-	protected createProjectFileFromExistingProject(framework: string): IFuture<void> {
-		return this.$project.createProjectFileFromExistingProject(framework);
+	protected initializeProjectFromExistingFiles(framework: string): IFuture<void> {
+		return this.$project.initializeProjectFromExistingFiles(framework);
 	}
 }
 
@@ -197,13 +197,13 @@ export class InitCommand extends InitProjectCommandBase {
 		return (() => {
 			if(this.isProjectType("Apache Cordova").wait()) {
 				this.$logger.info("Attempting to initialize Apache Cordova project.");
-				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 			} else if(this.isProjectType("NativeScript").wait()) {
 				this.$logger.info("Attempting to initialize  NativeScript project.");
-				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			} else if(this.isProjectType("Mobile Website").wait()) {
 				this.$logger.info("Attempting to initialize Mobile Website project.");
-				this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite).wait();
+				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite).wait();
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}
@@ -222,7 +222,7 @@ export class InitHybridCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
+		return this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 	}
 }
 $injector.registerCommand("init|hybrid", InitHybridCommand);
@@ -237,7 +237,7 @@ export class InitNativeCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+		return this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 	}
 }
 $injector.registerCommand("init|native", InitNativeCommand);
@@ -252,7 +252,7 @@ export class InitWebsiteCommand extends InitProjectCommandBase {
 	}
 
 	public execute(args: string[]): IFuture<void> {
-		return this.createProjectFileFromExistingProject(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
+		return this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
 	}
 }
 $injector.registerCommand("init|website", InitWebsiteCommand);
