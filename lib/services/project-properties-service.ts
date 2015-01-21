@@ -165,7 +165,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return (() => {
 			var result: string[] = [];
 
-			var targetFrameworkIdentifiers = _.keys(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+			var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
 			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
 				var frameworkProject = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier);
 				var schema = frameworkProject.getProjectFileSchema().wait();

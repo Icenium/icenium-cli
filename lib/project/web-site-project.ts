@@ -18,7 +18,7 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public get name(): string {
-		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebSite;
+		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite;
 	}
 
 	public get capabilities(): IProjectCapabilities {
@@ -55,7 +55,7 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public getTemplateFilename(name: string): string {
-		return util.format("Telerik.Mobile.MobileWebSite.%s.zip", name);
+		return util.format("Telerik.Mobile.MobileWebsite.%s.zip", name);
 	}
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
@@ -84,5 +84,4 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return false;
 	}
 }
-$injector.register("webSiteProject", MobileWebSiteProject);
 $injector.register("mobileWebsiteProject", MobileWebSiteProject);

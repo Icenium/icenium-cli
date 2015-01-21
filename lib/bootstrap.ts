@@ -75,7 +75,6 @@ $injector.require("mobileWebSiteSimulatorService", "./services/project-simulator
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
-$injector.require("webSiteProject", "./project/web-site-project");
 $injector.require("mobileWebsiteProject", "./project/web-site-project");
 $injector.require("projectConstants", "./project/project-constants");
 $injector.require("projectFilesManager", "./project/project-files-manager");

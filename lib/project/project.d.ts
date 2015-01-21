@@ -90,7 +90,7 @@ declare module Project {
 	interface ITargetFrameworkIdentifiers {
 		Cordova: string;
 		NativeScript: string;
-		MobileWebSite: string;
+		MobileWebsite: string;
 	}
 
 	interface IConfigurationFile {
