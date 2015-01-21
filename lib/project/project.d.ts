@@ -9,7 +9,7 @@ declare module Project {
 		projectConfigFiles: Project.IConfigurationFile[];
 
 		createNewProject(projectName: string, framework: string): IFuture<void>;
-		createProjectFileFromExistingProject(framework: string): IFuture<void>;
+		initializeProjectFromExistingFiles(framework: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<void>;
 		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
