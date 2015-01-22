@@ -6,7 +6,8 @@ import util = require("util");
 import os = require("os");
 
 export class FindPluginsCommand implements ICommand {
-	constructor(private $cordovaPluginsService: service.CordovaPluginsService) {
+	constructor(private $cordovaPluginsService: service.CordovaPluginsService,
+				private $logger: ILogger) {
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -24,17 +25,17 @@ export class FindPluginsCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private printPlugins(plugins: IPlugin[]) {
+	private printPlugins(plugins: IBasicPluginInformation[]) {
 		_.each(plugins, (plugin) => {
 			var pluginDescription = this.composePluginDescription(plugin);
-			console.log(pluginDescription);
+			this.$logger.info(pluginDescription);
 		});
 	}
 
-	private composePluginDescription(plugin: IPlugin) {
-		var description = util.format("Name: %s%s", plugin.data.Name, os.EOL);
-		description += util.format("Description: %s%s", this.trim(plugin.data.Description), os.EOL);
-		description += util.format("Version: %s%s", plugin.data.Version, os.EOL);
+	private composePluginDescription(plugin: IBasicPluginInformation) {
+		var description = util.format("Name: %s%s", plugin.name, os.EOL);
+		description += util.format("Description: %s%s", this.trim(plugin.description), os.EOL);
+		description += util.format("Version: %s%s", plugin.version, os.EOL);
 		return description;
 	}
 

@@ -29,7 +29,7 @@ $injector.requireCommand("plugin|*list", "./commands/plugin/list-plugin");
 $injector.requireCommand("plugin|add", "./commands/plugin/add-plugin");
 $injector.requireCommand("plugin|remove", "./commands/plugin/remove-plugin");
 $injector.requireCommand("plugin|configure", "./commands/plugin/configure-plugin");
-$injector.requireCommand("plugin|find", "./commands/plugin/find-plugin");
+$injector.requireCommand("plugin|find", "./commands/plugin/find-plugins");
 $injector.requireCommand("plugin|fetch", "./commands/plugin/fetch-plugin");
 
 $injector.requireCommand("edit-configuration", "./commands/edit-configuration");

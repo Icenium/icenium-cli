@@ -19,13 +19,13 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		this.$project.ensureCordovaProject();
 	}
 
-	public getPlugins(keywords: string[]): IPlugin[] {
+	public getPlugins(keywords: string[]): IBasicPluginInformation[] {
 		this.configure();
 		return this.search(keywords);
 	}
 
-	public search(keywords: string[]): IPlugin[] {
-		var future = new Future<IPlugin[]>();
+	public search(keywords: string[]): IBasicPluginInformation[] {
+		var future = new Future<IBasicPluginInformation[]>();
 		plugman.search(keywords, (result) => {
 			if (this.isError(result)) {
 				future.throw(result);
