@@ -353,6 +353,12 @@ interface IPlugin {
 	toProjectDataRecord(): string;
 }
 
+interface IBasicPluginInformation {
+	name: string;
+	description: string;
+	version: string;
+}
+
 interface IMarketplacePlugin extends IPlugin {
 	downloads: number;
 	demoAppRepositoryUrl: string;
