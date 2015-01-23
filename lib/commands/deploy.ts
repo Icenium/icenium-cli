@@ -45,7 +45,7 @@ export class DeployCommand implements ICommand {
 				return;
 			}
 
-			this.$devicesServices.initialize(args[0], options.device).wait();
+			this.$devicesServices.initialize({platform: args[0], deviceId: options.device}).wait();
 			var packageName = this.$project.projectData.AppIdentifier;
 			var packageFile: string = null;
 

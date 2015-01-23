@@ -38,7 +38,7 @@ export class LiveSyncCommand implements ICommand {
 		return (() => {
 			this.$project.ensureProject();
 
-			this.$devicesServices.initialize(args[0], options.device).wait();
+			this.$devicesServices.initialize({platform: args[0], deviceId: options.device}).wait();
 			var platform = this.$devicesServices.platform;
 
 			if (!MobileHelper.platformCapabilities[platform].companion && options.companion) {
