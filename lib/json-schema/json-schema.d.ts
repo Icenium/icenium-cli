@@ -21,6 +21,7 @@ interface IJsonSchemaResolver {
 
 interface IJsonSchemaValidator {
 	getValidProperties(framework: string, frameworkVersion: string): IStringDictionary;
+	validateProperty(propertyName: string, propertyValue: string, framework?: string): void;
 	validate(data: IProjectData): void;
 	isValid(data: IProjectData): boolean;
 	tryResolveValidationSchema(framework: string): IDictionary<any>;

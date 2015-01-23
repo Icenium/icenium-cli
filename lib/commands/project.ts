@@ -125,7 +125,7 @@ export class CreateHybridCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-        private $projectNameValidator: IProjectNameValidator) {
+		private $jsonSchemaValidator: IJsonSchemaValidator) {
 		super($project, $errors);
 	}
 
@@ -133,7 +133,7 @@ export class CreateHybridCommand extends ProjectCommandBase {
 		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 	}
 
-	allowedParameters = [new NameParameter(this.$projectNameValidator)];
+	allowedParameters = [new NameParameter(this.$jsonSchemaValidator)];
 }
 $injector.registerCommand("create|hybrid", CreateHybridCommand);
 
@@ -141,7 +141,7 @@ export class CreateNativeCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-		private $projectNameValidator: IProjectNameValidator) {
+		private $jsonSchemaValidator: IJsonSchemaValidator) {
 		super($project, $errors);
 	}
 
@@ -149,7 +149,7 @@ export class CreateNativeCommand extends ProjectCommandBase {
 		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 	}
 
-	allowedParameters = [new NameParameter(this.$projectNameValidator)];
+	allowedParameters = [new NameParameter(this.$jsonSchemaValidator)];
 }
 $injector.registerCommand("create|native", CreateNativeCommand);
 
@@ -157,7 +157,7 @@ export class CreateWebSiteCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-		private $projectNameValidator: IProjectNameValidator) {
+		private $jsonSchemaValidator: IJsonSchemaValidator) {
 		super($project, $errors);
 	}
 
@@ -165,17 +165,18 @@ export class CreateWebSiteCommand extends ProjectCommandBase {
 		return this.createNewProject(args[0], this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
 	}
 
-	allowedParameters = [new NameParameter(this.$projectNameValidator)];
+	allowedParameters = [new NameParameter(this.$jsonSchemaValidator)];
 }
 $injector.registerCommand("create|website", CreateWebSiteCommand);
 
 export class NameParameter implements ICommandParameter {
-	constructor(private $projectNameValidator: IProjectNameValidator) { }
+	constructor(private $jsonSchemaValidator: IJsonSchemaValidator) { }
 	mandatory = true;
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				return this.$projectNameValidator.validate(validationValue);
+				this.$jsonSchemaValidator.validateProperty("ProjectName", validationValue);
+				return true;
 			}
 
 			return false;

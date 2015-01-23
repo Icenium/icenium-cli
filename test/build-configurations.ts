@@ -22,10 +22,10 @@ import temp = require("temp");
 import util = require("util");
 temp.track();
 
-var mockProjectNameValidator = {
+var mockJsonSchemaValidator = {
 	validateCalled: false,
 	validate: () => {
-		mockProjectNameValidator.validateCalled = true;
+		mockJsonSchemaValidator.validateCalled = true;
 		return true;
 	}
 };
@@ -75,7 +75,7 @@ function createTestInjector() {
 	testInjector.register("server", {});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
-	testInjector.register("projectNameValidator", mockProjectNameValidator);
+	testInjector.register("jsonSchemaValidator", mockJsonSchemaValidator);
 	testInjector.register("loginManager", stubs.LoginManager);
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
