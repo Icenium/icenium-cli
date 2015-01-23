@@ -311,6 +311,27 @@ To list all connected devices, grouped by platform, run $ appbuilder device.
 
 --[/]--
 
+--[device|list-applications]--
+
+Usage:
+    $ appbuilder device list-applications
+    $ appbuilder device list-applications
+
+Lists all installed applications on device.
+
+--[/]--
+
+--[device|run]--
+
+Usage:
+    $ appbuilder device run <ApplicationId>
+    $ appbuilder device run <ApplicationId>
+
+Run the selected application on device.
+<ApplicationId> is the application id as listed from $tns device list-applications
+
+--[/]--
+
 --[build]--
 Usage:
     $ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--debug] [--release]
