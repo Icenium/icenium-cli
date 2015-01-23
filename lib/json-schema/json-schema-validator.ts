@@ -58,8 +58,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		var schema = this.tryResolveValidationSchemaCore(framework);
 		var result: IDictionary<any> = schema.properties;
 		if(schema.extends) {
-			_.each(_.keys(schema.extends.properties), (key: string) => result[key] = schema.extends.properties[key]);
-			var projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s",framework.toLowerCase()));
+			_.each(_.keys(schema.extends.properties), (key: string) => {
+				if(!result[key]) {
+					result[key] = schema.extends.properties[key];
+				}
+			});
+			var projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json",framework.toLowerCase()));
 			if(this.$fs.exists(projectPropertiesFilePath).wait()) {
 				var fileContent = this.$fs.readJson(projectPropertiesFilePath).wait();
 				var additionalProperties = _.keys(fileContent);
