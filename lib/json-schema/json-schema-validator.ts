@@ -41,16 +41,26 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return this._validPropertiesCache[key];
 	}
 
+	public validateProperty(propertyName: string, propertyValue: string, framework?: string): void {
+		var data: IProjectData = Object.create(null);
+		data[propertyName] = propertyValue;
+
+		var errors = this.getValidationErrors(data, framework);
+		if(errors && errors[propertyName]) {
+			this.throwValidationError(errors[propertyName]);
+		}
+	}
+
 	public validate(data: IProjectData): void {
-		var validationErrors = this.getValidationErrors(data);
+		var validationErrors = this.getValidationErrors(data, data.Framework);
 		if(_.keys(validationErrors).length !== 0) {
 			var output = _.values(validationErrors).join("\n");
-			this.$errors.fail("Schema validation failed with following errors: \n %s", output);
+			this.throwValidationError(output);
 		}
 	}
 
 	public isValid(data: IProjectData): boolean {
-		var errors = this.getValidationErrors(data);
+		var errors = this.getValidationErrors(data, data.Framework);
 		return _.keys(errors).length !== 0;
 	}
 
@@ -78,8 +88,8 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return result;
 	}
 
-	private getValidationErrors(data: IProjectData): IStringDictionary {
-		var validationSchema = this.tryResolveValidationSchemaCore(data.Framework);
+	private getValidationErrors(data: IProjectData, framework: string): IStringDictionary {
+		var validationSchema = this.tryResolveValidationSchemaCore(framework);
 		var schema = this.environment.createSchema(validationSchema);
 		var validationResult = this.environment.validate(data, schema);
 		var errors = validationResult.errors;
@@ -121,6 +131,10 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		}
 
 		return validationSchemaName;
+	}
+
+	private throwValidationError(error: string): void {
+		this.$errors.fail("Schema validation failed with following errors: \n %s", error);
 	}
 }
 $injector.register("jsonSchemaValidator", JsonSchemaValidator);

@@ -26,10 +26,10 @@ var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
 temp.track();
 
-var mockProjectNameValidator = {
+var mockJsonSchemaValidator = {
 	validateCalled: false,
 	validate: () => {
-		mockProjectNameValidator.validateCalled = true;
+		mockJsonSchemaValidator.validateCalled = true;
 		return true;
 	}
 };
@@ -49,7 +49,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("server", {});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
-	testInjector.register("projectNameValidator", mockProjectNameValidator);
+	testInjector.register("projectNameValidator", mockJsonSchemaValidator);
 	testInjector.register("loginManager", stubs.LoginManager);
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
