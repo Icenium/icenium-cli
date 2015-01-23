@@ -58,8 +58,14 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			var normalizedProperty = this.normalizePropertyName(property, projectData);
 			var propertyValue = projectData[normalizedProperty];
 
+			if(typeof(propertyValue) === "string") {
+				if (newValue.length > 1) {
+					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
+				}
+			}
+
 			if (mode === "set") {
-				propertyValue = newValue.join(" ");
+				propertyValue = typeof(propertyValue) === "string" ? newValue[0] : newValue;
 			} else if (mode === "del") {
 				if(!(propertyValue instanceof Array)) {
 					this.$errors.fail("Unable to remove value to non-flags property");
