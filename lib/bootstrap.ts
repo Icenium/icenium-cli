@@ -143,3 +143,7 @@ $injector.require("processInfo", "./process-info");
 $injector.requireCommand("mobileframework|*print", "./commands/framework-versions/print-versions");
 $injector.requireCommand("mobileframework|set", "./commands/framework-versions/set-version");
 
+$injector.require("jsonSchemaLoader", "./json-schema/json-schema-loader");
+$injector.require("jsonSchemaResolver", "./json-schema/json-schema-resolver");
+$injector.require("jsonSchemaValidator", "./json-schema/json-schema-validator");
+$injector.require("jsonSchemaConstants", "./json-schema/json-schema-constants");

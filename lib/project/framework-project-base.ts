@@ -4,18 +4,17 @@
 import commonHelpers = require("./../common/helpers");
 import options = require("./../options");
 
-import assert = require("assert");
 import path = require("path");
 import util = require("util");
 
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	private projectSchema: any;
 
-	constructor(protected projectInformation: Project.IProjectInformation,
-		protected $logger: ILogger,
+	constructor(protected $logger: ILogger,
 		protected $fs: IFileSystem,
 		protected $resources: IResourceLoader,
-		protected $errors: IErrors) { }
+		protected $errors: IErrors,
+		protected $jsonSchemaValidator: IJsonSchemaValidator) { }
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void {
 		properties.DisplayName = projectName;
@@ -26,25 +25,10 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		}
 
 		properties.AppIdentifier = appid;
-
-		properties.WP8ProductID = commonHelpers.createGUID();
-		properties.WP8PublisherID = commonHelpers.createGUID();
 	}
 
-	public getProjectFileSchemaByName(name: string): IFuture<any> {
-		var propPath = this.$resources.resolvePath(util.format("project-properties-%s.json", name.toLowerCase()));
-		return this.$fs.readJson(propPath, "utf8");
-	}
-
-	public getFullProjectFileSchemaByName(name: string): IFuture<any> {
-		return(() => {
-			if (!this.projectSchema) {
-				this.projectSchema = this.getProjectFileSchemaByName(name).wait();
-				var commonSchema = this.getProjectFileSchemaByName("common").wait();
-				_.extend(this.projectSchema, commonSchema);
-			}
-			return this.projectSchema;
-		}).future<any>()();
+	public getProjectFileSchemaByName(name: string): IDictionary<any> {
+		return this.$jsonSchemaValidator.tryResolveValidationSchema(name);
 	}
 
 	public getProjectTargetsBase(dir: string, fileMask: RegExp): IFuture<string[]> {
@@ -73,16 +57,14 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		}
 	}
 
-	public getProperty(propertyName: string, configuration: string): any {
-		assert.ok(this.projectInformation, "ProjectInformation object is null or undefined.");
-
+	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
 		var propertyValue: any = null;
 
-		var configData = this.projectInformation.configurationSpecificData[configuration];
+		var configData = projectInformation.configurationSpecificData[configuration];
 		if(configData) {
 			propertyValue = configData[propertyName];
 		} else {
-			propertyValue = this.projectInformation.projectData[propertyName];
+			propertyValue = projectInformation.projectData[propertyName];
 		}
 
 		return propertyValue;

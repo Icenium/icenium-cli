@@ -1,16 +1,9 @@
 {
 	"FrameworkVersion": {
-		"description": "Cordova framework version.",
 		"dynamicRange": "#{cordovaMigrationService.getSupportedVersions}",
 		"onChanging": "#{project.onFrameworkVersionChanging}"
 	},
 	"CorePlugins": {
-		"description": "List of core Cordova plugins required by the app.",
-		"dynamicRange": "#{project.getSupportedPlugins}",
-		"flags": true
-	},
-	"ProjectTypeGuids": {
-		"description": "Unique identifier for the project type",
-		"range": [ "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}" ]
+		"dynamicRange": "#{project.getSupportedPlugins}"
 	}
 }

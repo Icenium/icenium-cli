@@ -9,6 +9,7 @@ import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
 import MobileHelper = require("./common/mobile/mobile-helper");
 import options = require("./options");
+import projectPropertiesServiceLib = require("./services/project-properties-service");
 
 export class Project implements Project.IProject {
 	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
@@ -19,8 +20,8 @@ export class Project implements Project.IProject {
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
 	private cachedProjectDir: string = "";
-	private frameworkProject: Project.IFrameworkProject;
 
+	private frameworkProject: Project.IFrameworkProject;
 	public projectData: IProjectData;
 	public configurationSpecificData: IDictionary<IDictionary<any>>;
 
@@ -29,6 +30,7 @@ export class Project implements Project.IProject {
 		private $errors: IErrors,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
+		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
@@ -71,7 +73,25 @@ export class Project implements Project.IProject {
 	}
 
 	public configurationFilesString(): string {
-		return _.map(this.projectConfigFiles, (file) => {
+		if(!this.frameworkProject) {
+			var result: string[] = [];
+
+			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
+				var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+				var configFiles = frameworkProject.configFiles;
+				var title = util.format("Configuration files for %s projects:", framework);
+				result.push(title);
+				result.push(this.configurationFilesStringCore(configFiles));
+			});
+
+			return result.join("\n")
+		}
+
+		return this.configurationFilesStringCore(this.frameworkProject.configFiles);
+	}
+
+	private configurationFilesStringCore(configFiles: Project.IConfigurationFile[]) {
+		return _.map(configFiles, (file) => {
 			return util.format("        %s - %s", file.template, file.helpText);
 		}).join("\n");
 	}
@@ -104,7 +124,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getProperty(propertyName: string, configuration: string): any {
-		return (<any>this.frameworkProject).getProperty(propertyName, configuration);
+		return (<any>this.frameworkProject).getProperty(propertyName, configuration, this.projectInformation);
 	}
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
@@ -154,6 +174,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.$fs.createDirectory(projectDir).wait();
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
+
 			if(projectDirFiles.length !== 0) {
 				this.$errors.fail("The specified directory must be empty to create a new project.");
 			}
@@ -166,11 +187,10 @@ export class Project implements Project.IProject {
 
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
-			var defaultProjectFilePath = this.$resources.resolvePath(util.format("default-project-%s.json", this.frameworkProject.name.toLowerCase()));
-			this.projectData = this.$fs.readJson(defaultProjectFilePath).wait();
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
+			this.projectData = properties;
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
-			this.validateProjectData(properties).wait();
+			this.validateProjectData(this.projectData);
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
 
 			this.saveProject(projectDir).wait();
@@ -183,7 +203,7 @@ export class Project implements Project.IProject {
 		}
 
 		var projectDir = this.getNewProjectDir();
-		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
+		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
@@ -199,7 +219,7 @@ export class Project implements Project.IProject {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
 
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 			this.createProjectFileFromExistingProject(projectDir).wait();
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
@@ -330,7 +350,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues, this.getProjectSchema().wait(), true).wait();
+			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
 		}).future<void>()();
@@ -338,37 +358,37 @@ export class Project implements Project.IProject {
 
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
-			this.ensureProject();
-
-			property = this.$projectPropertiesService.normalizePropertyName(property, this.getProjectSchema().wait());
-
-			if(this.projectData.hasOwnProperty(property)) {
-				this.$logger.out(this.projectData[property]);
-			} else if(property) {
-				this.$errors.fail("Unrecognized project property '%s'", property);
-			} else {
-				Object.keys(this.projectData).forEach((propName) => {
-					// We get here in case you do not pass property, so we'll print all properties - appbuilder prop print
-					this.$logger.out(propName + ": " + this.projectData[propName]);
+			if(!property) {
+				var names = _.keys(this.projectData);
+				var sortedProperties = _.sortBy(names, (propertyName: string) => {
+					return propertyName.toLowerCase();
 				});
+				_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
+				return;
 			}
+
+			var normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
+
+			if(_.has(this.projectData, normalizedPropertyName)) {
+				this.$logger.out(this.projectData[normalizedPropertyName]);
+			} else {
+				this.$errors.fail("Unrecognized project property '%s'", property);
+			}
+
 		}).future<void>()();
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
 		return (() => {
-			this.ensureProject();
-			var projectSchema = this.getProjectSchema().wait();
-
-			property = this.$projectPropertiesService.normalizePropertyName(property, projectSchema);
-
-			if(this.projectData.hasOwnProperty(property)) {
-				var propData = projectSchema[property];
+			var validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
+			if(_.contains(validProperties, property)) {
+				var normalizedPropertyName =  this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
+				var propData = this.projectData[normalizedPropertyName];
 				if(!propData) {
 					this.$errors.fail("Unrecognized project property '%s'", property);
 				}
 
-				if(!propData.flags) {
+				if(!(propData instanceof Array)) {
 					if(args.length !== 1) {
 						this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 					}
@@ -388,7 +408,7 @@ export class Project implements Project.IProject {
 	public getProjectSchema(): IFuture<any> {
 		return (() => {
 			if(!this._projectSchema) {
-				this._projectSchema = this.frameworkProject.getFullProjectFileSchema().wait();
+				this._projectSchema = this.frameworkProject.getProjectFileSchema();
 			}
 
 			return this._projectSchema;
@@ -396,7 +416,7 @@ export class Project implements Project.IProject {
 	}
 
 	public adjustBuildProperties(buildProperties: any): any {
-		return this.frameworkProject.adjustBuildProperties(buildProperties);
+		return this.frameworkProject.adjustBuildProperties(buildProperties, this.projectInformation);
 	}
 
 	public get requiredAndroidApiLevel(): number {
@@ -410,31 +430,8 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private validateProjectData(properties: any): IFuture<void> {
-		return (() => {
-			var updateData: any;
-			var projectSchema = this.getProjectSchema().wait();
-
-			var keys = _.keys(properties);
-			_.each(keys, (propertyName: string) => {
-				if(_.has(projectSchema, propertyName)) {
-					if(projectSchema[propertyName].flags) {
-						if(_.isArray(properties[propertyName])) {
-							this.projectData[propertyName] = properties[propertyName];
-						} else {
-							this.projectData[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
-						}
-						updateData = this.projectData[propertyName];
-					} else {
-						this.projectData[propertyName] = properties[propertyName];
-						updateData = [this.projectData[propertyName]];
-					}
-
-					//triggers validation logic
-					this.$projectPropertiesService.updateProjectProperty({}, "set", propertyName, updateData, projectSchema, false).wait();
-				}
-			});
-		}).future<void>()();
+	private validateProjectData(properties: any): void {
+		this.$jsonSchemaValidator.validate(properties);
 	}
 
 	public saveProject(projectDir: string): IFuture<void> {
@@ -444,6 +441,7 @@ export class Project implements Project.IProject {
 
 			_.each(this.configurations, (configuration: string) => {
 				var configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
+
 				if(this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
 					this.$fs.writeJson(configFilePath, this.configurationSpecificData[configuration]).wait();
 				}
@@ -469,10 +467,13 @@ export class Project implements Project.IProject {
 					var data = this.$fs.readJson(projectFilePath).wait();
 
 					if (data.projectVersion && data.projectVersion !== 1) {
-						throw "FUTURE_PROJECT_VER";
+						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
 
 					this.projectData = data;
+					if(_.keys(this.projectData).length !== 0) {
+						this.$jsonSchemaValidator.validate(this.projectData);
+					}
 
 					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
@@ -488,7 +489,7 @@ export class Project implements Project.IProject {
 						}
 					});
 
-					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
+					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
 				} catch (err) {
 					if (err === "FUTURE_PROJECT_VER") {
@@ -505,7 +506,9 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
-				if (this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if(this.$projectPropertiesService &&
+					this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) &&
+					this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
@@ -527,6 +530,7 @@ export class Project implements Project.IProject {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir).wait();
 					this.$logger.trace("Reading template project properties.");
+
 					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);

@@ -44,23 +44,24 @@ declare module Project {
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
 		getTemplateFilename(name: string): string;
-		getProjectFileSchema(): IFuture<any>;
-		getFullProjectFileSchema(): IFuture<any>;
+		projectTemplatesString(): IFuture<string>;
+		alterPropertiesForNewProject(properties: any, projectName: string): void;
+		getValidationSchemaId(): string;
+		getProjectFileSchema(): IDictionary<any>;
 		getProjectTargets(projectDir: string): IFuture<string[]>;
 		projectTemplatesString(): IFuture<string>;
 		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		completeProjectProperties(properties: any): boolean;
-		adjustBuildProperties(buildProperties: any): any;
+		adjustBuildProperties(buildProperties: any, projectInformation?: IProjectInformation): any;
 		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void>;
 	}
 
 	interface IFrameworkProjectBase {
 		alterPropertiesForNewProjectBase(properties: any, projectName: string): void;
-		getProjectFileSchemaByName(name: string): IFuture<any>;
-		getFullProjectFileSchemaByName(name: string): IFuture<any>;
+		getProjectFileSchemaByName(name: string): IDictionary<any>;
 		getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]>;
 		printAssetUpdateMessage(): void;
-		getProperty(propertyName: string, configuration: string): any;
+		getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any;
 	}
 
 	interface IFrameworkProjectResolverBase {
@@ -68,7 +69,7 @@ declare module Project {
 	}
 
 	interface IFrameworkProjectResolver {
-		resolve(framework: string, projectInformation: Project.IProjectInformation): IFrameworkProject;
+		resolve(framework: string): IFrameworkProject;
 	}
 
 	interface IFrameworkSimulatorServiceResolver {

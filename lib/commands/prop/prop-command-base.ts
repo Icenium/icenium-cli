@@ -6,6 +6,7 @@ export class ProjectPropertyCommandBase {
 	protected projectSchema: any;
 
 	constructor(public $project: Project.IProject) {
+		this.$project.ensureProject();
 		this.projectSchema = this.$project.getProjectSchema().wait();
 	}
 

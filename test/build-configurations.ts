@@ -11,6 +11,7 @@ import pluginsService = require("./../lib/services/plugins-service");
 import projectLib = require("./../lib/project");
 import projectPropertiesLib = require("../lib/services/project-properties-service");
 import projectConstantsLib = require("../lib/project/project-constants");
+import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 
@@ -87,6 +88,9 @@ function createTestInjector() {
 	testInjector.register("serverExtensionsService", {});
 	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
+	testInjector.register("jsonSchemaValidator", {
+		validate: (data: IProjectData) => { }
+	});
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
@@ -94,6 +98,7 @@ function createTestInjector() {
 
 	testInjector.register("fs", fslib.FileSystem);
 	testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
+	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
 
 	return testInjector;
 }

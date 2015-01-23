@@ -68,7 +68,7 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	readDirectory(path:string):IFuture<string[]> {
-		return undefined;
+		return Future.fromResult([]);
 	}
 
 	readFile(filename:string):IFuture<NodeBuffer> {
@@ -259,6 +259,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public get configFiles(): Project.IConfigurationFile[] { return undefined; }
 
+	public getValidationSchemaId(): string { return ""; }
+
 	public getTemplateFilename(name: string): string {
 		return util.format("Telerik.Mobile.%s.%s.zip", this.framework, name);
 	}
@@ -267,13 +269,13 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
 
-	public getProjectFileSchema(): IFuture<any> { return undefined; }
+	public getProjectFileSchema(): IDictionary<any> { return undefined; }
 
 	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> { return undefined; }
 
-	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any { return undefined; }
+	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any { return undefined; }
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
 

@@ -41,9 +41,8 @@ export class BuildService implements Project.IBuildService {
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $projectNameValidator: IProjectNameValidator,
 		private $multipartUploadService: IMultipartUploadService,
-		private $projectFilesManager: Project.IProjectFilesManager) { }
+		private $jsonSchemaValidator: IJsonSchemaValidator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -71,12 +70,10 @@ export class BuildService implements Project.IBuildService {
 		}).future<string>()();
 	}
 
-	public buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
+	private buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
 		return ((): Server.IBuildResult => {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 			commonHelpers.printInfoMessageOnSameLine("Building...");
-
-			this.$projectNameValidator.validate(projectName);
 
 			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration,{ AppIdentifier: buildProperties.AppIdentifier }).wait();
 
@@ -273,8 +270,7 @@ export class BuildService implements Project.IBuildService {
 				}
 			});
 
-			var result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName,
-				this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
+			var result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if(result.output) {
 				var buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
@@ -325,6 +321,8 @@ export class BuildService implements Project.IBuildService {
 	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
 		return ((): Server.IPackageDef[]=> {
 			this.$project.ensureProject();
+
+			this.$jsonSchemaValidator.validate(this.$project.projectData);
 
 			settings.configuration = settings.configuration || "Debug";
 			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);

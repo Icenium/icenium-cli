@@ -39,6 +39,7 @@
     "iconv-lite": "0.4.3",
     "ios-sim-portable": "https://github.com/telerik/ios-sim-portable/tarball/master",
     "ip": "0.3.2",
+    "JSV": "4.0.2",
     "lodash": "2.4.1",
     "log4js": "0.6.9",
     "minimatch": "0.2.14",

@@ -8,6 +8,7 @@ import MobileHelper = require("./../common/mobile/mobile-helper");
 export class ProjectCommandBase implements ICommand {
 	constructor(protected $project: Project.IProject,
 		protected $errors: IErrors) {
+
 		if (this.$project.projectData) {
 			this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 		}
@@ -153,7 +154,6 @@ export class CreateNativeCommand extends ProjectCommandBase {
 $injector.registerCommand("create|native", CreateNativeCommand);
 
 export class CreateWebSiteCommand extends ProjectCommandBase {
-
 	constructor($errors: IErrors,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
@@ -213,11 +213,11 @@ export class InitCommand extends InitProjectCommandBase {
 $injector.registerCommand("init|*unknown", InitCommand);
 
 export class InitHybridCommand extends InitProjectCommandBase {
-	constructor($project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
-		$errors: IErrors,
+	constructor($errors: IErrors,
+		$project: Project.IProject,
 		$fs: IFileSystem,
-		$logger: ILogger) {
+		$logger: ILogger,
+		private $projectConstants: Project.IProjectConstants) {
 		super($project, $errors, $fs, $logger);
 	}
 
@@ -228,11 +228,11 @@ export class InitHybridCommand extends InitProjectCommandBase {
 $injector.registerCommand("init|hybrid", InitHybridCommand);
 
 export class InitNativeCommand extends InitProjectCommandBase {
-	constructor($project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
-		$errors: IErrors,
+	constructor($errors: IErrors,
+		$project: Project.IProject,
 		$fs: IFileSystem,
-		$logger: ILogger) {
+		$logger: ILogger,
+		private $projectConstants: Project.IProjectConstants) {
 		super($project, $errors, $fs, $logger);
 	}
 
@@ -243,11 +243,11 @@ export class InitNativeCommand extends InitProjectCommandBase {
 $injector.registerCommand("init|native", InitNativeCommand);
 
 export class InitWebsiteCommand extends InitProjectCommandBase {
-	constructor($project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
-		$errors: IErrors,
-		$fs: IFileSystem,
-		$logger: ILogger) {
+	constructor($errors: IErrors,
+	$project: Project.IProject,
+	$fs: IFileSystem,
+	$logger: ILogger,
+	private $projectConstants: Project.IProjectConstants) {
 		super($project, $errors, $fs, $logger);
 	}
 
