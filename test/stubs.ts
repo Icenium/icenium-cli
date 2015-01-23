@@ -275,7 +275,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> { return undefined; }
 
-	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any { return undefined; }
+	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any { return undefined; }
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
 

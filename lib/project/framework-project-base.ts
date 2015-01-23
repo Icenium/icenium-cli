@@ -4,15 +4,13 @@
 import commonHelpers = require("./../common/helpers");
 import options = require("./../options");
 
-import assert = require("assert");
 import path = require("path");
 import util = require("util");
 
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	private projectSchema: any;
 
-	constructor(protected projectInformation: Project.IProjectInformation,
-		protected $logger: ILogger,
+	constructor(protected $logger: ILogger,
 		protected $fs: IFileSystem,
 		protected $resources: IResourceLoader,
 		protected $errors: IErrors,
@@ -59,16 +57,14 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		}
 	}
 
-	public getProperty(propertyName: string, configuration: string): any {
-		assert.ok(this.projectInformation, "ProjectInformation object is null or undefined.");
-
+	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
 		var propertyValue: any = null;
 
-		var configData = this.projectInformation.configurationSpecificData[configuration];
+		var configData = projectInformation.configurationSpecificData[configuration];
 		if(configData) {
 			propertyValue = configData[propertyName];
 		} else {
-			propertyValue = this.projectInformation.projectData[propertyName];
+			propertyValue = projectInformation.projectData[propertyName];
 		}
 
 		return propertyValue;

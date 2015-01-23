@@ -8,7 +8,6 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	private static ENVIRONMENT_ID = "json-schema-draft-03";
 	private static DEFAULT_SCHEMA_URI = "http://json-schema.org/draft-03/schema#";
 	private static INSTANCE_IS_NOT_A_REQUIRED_TYPE_ERROR_MESSAGE = "Instance is not a required type";
-	private static BASE_VALIDATION_SCHEMA_NAME = "Base";
 
 	private environment: any = null;
 	private _validationSchemasCache: IDictionary<any>;
@@ -16,8 +15,11 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 
 	constructor(private $errors: IErrors,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
+		private $fs: IFileSystem,
+		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $jsonSchemaLoader: IJsonSchemaLoader, // Don't delete this row, we need it
-		private $jsonSchemaResolver: IJsonSchemaResolver) {
+		private $jsonSchemaResolver: IJsonSchemaResolver,
+		private $resources: IResourceLoader) {
 		this.environment = jsv.createEnvironment(JsonSchemaValidator.ENVIRONMENT_ID);
 		this.environment.setDefaultSchemaURI(JsonSchemaValidator.DEFAULT_SCHEMA_URI);
 
@@ -57,6 +59,16 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		var result: IDictionary<any> = schema.properties;
 		if(schema.extends) {
 			_.each(_.keys(schema.extends.properties), (key: string) => result[key] = schema.extends.properties[key]);
+			var projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s",framework.toLowerCase()));
+			if(this.$fs.exists(projectPropertiesFilePath).wait()) {
+				var fileContent = this.$fs.readJson(projectPropertiesFilePath).wait();
+				var additionalProperties = _.keys(fileContent);
+				_.each(additionalProperties, (propertyName: string) => {
+					_.each(_.keys(fileContent[propertyName]), (value: string) => {
+						result[propertyName][value] = fileContent[propertyName][value];
+					});
+				});
+			}
 		}
 
 		return result;
@@ -95,13 +107,13 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 
 	private getValidationSchemaName(framework: string): string {
 		if(!framework) {
-			return JsonSchemaValidator.BASE_VALIDATION_SCHEMA_NAME;
+			return this.$jsonSchemaConstants.BASE_VALIDATION_SCHEMA_ID;
 		}
 
 		var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 		var validationSchemaName = frameworkProject.getValidationSchemaId();
 		if(!validationSchemaName) {
-			return JsonSchemaValidator.BASE_VALIDATION_SCHEMA_NAME;
+			return this.$jsonSchemaConstants.BASE_VALIDATION_SCHEMA_ID;
 		}
 
 		return validationSchemaName;

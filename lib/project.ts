@@ -73,7 +73,25 @@ export class Project implements Project.IProject {
 	}
 
 	public configurationFilesString(): string {
-		return _.map(this.projectConfigFiles, (file) => {
+		if(!this.frameworkProject) {
+			var result: string[] = [];
+
+			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
+				var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+				var configFiles = frameworkProject.configFiles;
+				var title = util.format("Configuration files for %s projects:", framework);
+				result.push(title);
+				result.push(this.configurationFilesStringCore(configFiles));
+			});
+
+			return result.join("\n")
+		}
+
+		return this.configurationFilesStringCore(this.frameworkProject.configFiles);
+	}
+
+	private configurationFilesStringCore(configFiles: Project.IConfigurationFile[]) {
+		return _.map(configFiles, (file) => {
 			return util.format("        %s - %s", file.template, file.helpText);
 		}).join("\n");
 	}
@@ -106,7 +124,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getProperty(propertyName: string, configuration: string): any {
-		return (<any>this.frameworkProject).getProperty(propertyName, configuration);
+		return (<any>this.frameworkProject).getProperty(propertyName, configuration, this.projectInformation);
 	}
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
@@ -170,9 +188,9 @@ export class Project implements Project.IProject {
 			this.$fs.createDirectory(projectDir).wait();
 			this.cachedProjectDir = projectDir;
 			this.projectData = properties;
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
-			this.validateProjectData(properties);
+			this.validateProjectData(this.projectData);
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
 
 			this.saveProject(projectDir).wait();
@@ -185,7 +203,7 @@ export class Project implements Project.IProject {
 		}
 
 		var projectDir = this.getNewProjectDir();
-		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
+		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
@@ -201,7 +219,7 @@ export class Project implements Project.IProject {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
 
-			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework, this.projectInformation);
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 			this.createProjectFileFromExistingProject(projectDir).wait();
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
@@ -332,7 +350,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
-			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues);
+			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
 		}).future<void>()();
@@ -398,7 +416,7 @@ export class Project implements Project.IProject {
 	}
 
 	public adjustBuildProperties(buildProperties: any): any {
-		return this.frameworkProject.adjustBuildProperties(buildProperties);
+		return this.frameworkProject.adjustBuildProperties(buildProperties, this.projectInformation);
 	}
 
 	public get requiredAndroidApiLevel(): number {
@@ -453,6 +471,9 @@ export class Project implements Project.IProject {
 					}
 
 					this.projectData = data;
+					if(_.keys(this.projectData).length !== 0) {
+						this.$jsonSchemaValidator.validate(this.projectData);
+					}
 
 					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
@@ -468,7 +489,7 @@ export class Project implements Project.IProject {
 						}
 					});
 
-					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework, this.projectInformation);
+					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
 				} catch (err) {
 					if (err === "FUTURE_PROJECT_VER") {

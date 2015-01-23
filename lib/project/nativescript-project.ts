@@ -9,8 +9,7 @@ import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	constructor(projectInformation: Project.IProjectInformation,
-		private $config: IConfiguration,
+	constructor(private $config: IConfiguration,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
@@ -20,7 +19,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		private $projectFilesManager: Project.IProjectFilesManager,
 		$resources: IResourceLoader,
 		private $templatesService: ITemplatesService) {
-		super(projectInformation, $logger, $fs, $resources, $errors, $jsonSchemaValidator);
+		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
 	public get name(): string {
@@ -86,7 +85,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		return this.getProjectTargetsBase(dir, fileMask);
 	}
 
-	public adjustBuildProperties(buildProperties: any, projectData?: IProjectData): any {
+	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
 		return buildProperties;
 	}
 

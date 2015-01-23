@@ -197,7 +197,7 @@ interface IProjectData extends IDictionary<any> {
 interface IProjectPropertiesService {
 	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData>;
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
-	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any): void;
+	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any): IFuture<void>;
 	normalizePropertyName(property: string, projectData: IProjectData): string;
 }
 

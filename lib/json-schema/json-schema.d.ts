@@ -27,6 +27,7 @@ interface IJsonSchemaValidator {
 }
 
 interface IJsonSchemaConstants {
+	BASE_VALIDATION_SCHEMA_ID: string;
 	BASE_CORDOVA_SCHEMA_ID: string;
 	CORDOVA_VERSION_3_SCHEMA_ID: string;
 	NATIVESCRIPT_SCHEMA_ID: string;

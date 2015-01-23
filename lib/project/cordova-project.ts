@@ -10,8 +10,7 @@ import MobileHelper = require("../common/mobile/mobile-helper");
 import options = require("../options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
-	constructor(projectInformation: Project.IProjectInformation,
-		private $config: IConfiguration,
+	constructor(private $config: IConfiguration,
 		$fs: IFileSystem,
 		$errors: IErrors,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
@@ -21,7 +20,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader) {
-		super(projectInformation, $logger, $fs, $resources, $errors, $jsonSchemaValidator);
+		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
 	public get name(): string {
@@ -85,9 +84,9 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		return this.getProjectFileSchemaByName(this.name);
 	}
 
-	public adjustBuildProperties(buildProperties: any): any {
+	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
 		var configurationName = options.release ? "release" : "debug";
-		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName);
+		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 		return buildProperties;
 	}
 

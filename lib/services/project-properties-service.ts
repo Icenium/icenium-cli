@@ -53,28 +53,38 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return updated;
 	}
 
-	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : void {
-		var normalizedProperty = this.normalizePropertyName(property, projectData);
-		var propertyValue = projectData[normalizedProperty];
+	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
+		return (() => {
+			var normalizedProperty = this.normalizePropertyName(property, projectData);
+			var propertyValue = projectData[normalizedProperty];
 
-		if (mode === "set") {
-			propertyValue = newValue.join(" ");
-		} else if (mode === "del") {
-			if(!(propertyValue instanceof Array)) {
-				this.$errors.fail("Unable to remove value to non-flags property");
+			if (mode === "set") {
+				propertyValue = newValue.join(" ");
+			} else if (mode === "del") {
+				if(!(propertyValue instanceof Array)) {
+					this.$errors.fail("Unable to remove value to non-flags property");
+				}
+				propertyValue = _.difference(propertyValue, newValue);
+			} else if (mode === "add") {
+				if(!(propertyValue instanceof Array)) {
+					this.$errors.fail("Unable to add value to non-flags property");
+				}
+				propertyValue = _.union(propertyValue, newValue);
+			} else {
+				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
-			propertyValue = _.difference(propertyValue, newValue);
-		} else if (mode === "add") {
-			if(!(propertyValue instanceof Array)) {
-				this.$errors.fail("Unable to add value to non-flags property");
-			}
-			propertyValue = _.union(propertyValue, newValue);
-		} else {
-			this.$errors.fail("Unknown property update mode '%s'", mode);
-		}
 
-		projectData[normalizedProperty] = propertyValue;
-		this.$jsonSchemaValidator.validate(projectData);
+			if(projectData.Framework) {
+				var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
+				var propData = projectSchema[normalizedProperty];
+				if(propData && propData.onChanging) {
+					this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+				}
+			}
+
+			projectData[normalizedProperty] = propertyValue;
+			this.$jsonSchemaValidator.validate(projectData);
+		}).future<void>()();
 	}
 
 	public normalizePropertyName(propertyName: string, projectData: IProjectData): string {
@@ -183,10 +193,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];
-
-					/* if (projectSchema[propertyName].flags) {
-						properties[propertyName] = properties[propertyName] !== "" ? properties[propertyName].split(";") : [];
-					} */
 				}
 			});
 
