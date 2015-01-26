@@ -8,9 +8,11 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	private static ENVIRONMENT_ID = "json-schema-draft-03";
 	private static DEFAULT_SCHEMA_URI = "http://json-schema.org/draft-03/schema#";
 	private static INSTANCE_IS_NOT_A_REQUIRED_TYPE_ERROR_MESSAGE = "Instance is not a required type";
+	private static PREDEFINED_ERRORS: IStringDictionary = {
+		AppIdentifier: "The application identifier must consist of at least three alphanumeric strings separated by a dot. The alphanumeric strings must start with a letter."
+	}
 
 	private environment: any = null;
-	private _validationSchemasCache: IDictionary<any>;
 	private _validPropertiesCache: IDictionary<any>;
 
 	constructor(private $errors: IErrors,
@@ -19,6 +21,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $jsonSchemaLoader: IJsonSchemaLoader, // Don't delete this row, we need it
 		private $jsonSchemaResolver: IJsonSchemaResolver,
+		private $logger: ILogger,
 		private $resources: IResourceLoader) {
 		this.environment = jsv.createEnvironment(JsonSchemaValidator.ENVIRONMENT_ID);
 		this.environment.setDefaultSchemaURI(JsonSchemaValidator.DEFAULT_SCHEMA_URI);
@@ -92,7 +95,11 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 			if(error.message === JsonSchemaValidator.INSTANCE_IS_NOT_A_REQUIRED_TYPE_ERROR_MESSAGE) { // ugly hack :(
 				error.details = util.format("Expected %s but got %s", error.details, data[propertyName]);
 			}
-			result[propertyName] = util.format("Property %s: %s. %s", propertyName, error.message, error.details);
+
+			var errorMessage =  util.format("Property %s: %s. %s", propertyName, error.message, error.details);
+			this.$logger.trace("JSV error: %s", errorMessage);
+
+			result[propertyName] = JsonSchemaValidator.PREDEFINED_ERRORS[propertyName] || errorMessage;
 		});
 
 		return result;
