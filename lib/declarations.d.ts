@@ -195,6 +195,8 @@ interface IProjectPropertiesService {
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
 	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any): IFuture<void>;
 	normalizePropertyName(property: string, projectData: IProjectData): string;
+	getValidValuesForProperty(propData: any): IFuture<string[]>;
+	getPropertiesForAllSupportedProjects(): IFuture<string>;
 }
 
 interface IServerConfigurationData {

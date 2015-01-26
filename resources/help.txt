@@ -1020,11 +1020,12 @@ You must run the prop command with a related command.
 
 --[prop|print]--
 Usage:
-    $ appbuilder prop print <PropertyName>
+    $ appbuilder prop print <PropertyName> [--validValue]
 
-Shows the value for the selected project property.
+Shows the value for the selected project property. When executed without <Property Name> command prints all project properties and their values.
 
-#{projectPropertiesService.getProjectSchemaHelp}
+  --validValue - If set, prints valid values for the selected property. In case <Property Name> is not specified, command will print all valid values 
+for all project properties.
 --[/]--
 
 --[prop|add]--
@@ -1032,12 +1033,11 @@ Usage:
     $ appbuilder prop add <Property Name> <Value> [Value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
+Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
 
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
-
-#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|set]--
@@ -1045,12 +1045,11 @@ Usage:
     $ appbuilder prop set <Property Name> <Value> [Value]*
 
 Sets the selected project property and overwrites its current value.
+Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
 
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
-
-#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[prop|remove]--
@@ -1061,8 +1060,6 @@ Disables options for the selected project property, if the property accepts mult
 <Property Name> is the name of the project property as listed by $ appbuilder prop print.
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
-
-#{projectPropertiesService.getProjectSchemaHelp}
 --[/]--
 
 --[feature-usage-tracking]--

@@ -44,8 +44,6 @@ declare module Project {
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
 		getTemplateFilename(name: string): string;
-		projectTemplatesString(): IFuture<string>;
-		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;
 		getProjectTargets(projectDir: string): IFuture<string[]>;

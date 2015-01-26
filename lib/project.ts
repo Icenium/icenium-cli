@@ -16,6 +16,7 @@ export class Project implements Project.IProject {
 	private static CONFIGURATION_FILE_SEARCH_PATTERN: RegExp = new RegExp(".*.abproject$", "i");
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
+	private static INDENTATION = "     ";
 
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
@@ -363,23 +364,77 @@ export class Project implements Project.IProject {
 
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
-			if(!property) {
-				var names = _.keys(this.projectData);
-				var sortedProperties = _.sortBy(names, (propertyName: string) => {
-					return propertyName.toLowerCase();
-				});
-				_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
-				return;
-			}
+			if(this.projectData) {
+				var schema: any = this.getProjectSchema().wait();
 
-			var normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
+				if(property) {
+					var normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
 
-			if(_.has(this.projectData, normalizedPropertyName)) {
-				this.$logger.out(this.projectData[normalizedPropertyName]);
+					if(options.validValue) {
+						// '$ appbuilder prop print <PropName> --validValue' called inside project dir
+						var prop: any = schema[normalizedPropertyName];
+						this.printValidValuesOfProperty(prop).wait();
+					} else {
+						// '$ appbuilder prop print <PropName>' called inside project dir
+						if(_.has(this.projectData, normalizedPropertyName)) {
+							this.$logger.out(this.projectData[normalizedPropertyName]);
+						} else {
+							this.$errors.fail("Unrecognized project property '%s'", property);
+						}
+					}
+				} else {
+					if(options.validValue) {
+						// 'appbuilder prop print --validValue' called inside project dir
+						var propKeys: any = _.keys(schema);
+						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
+						_.each(sortedProperties, propKey => {
+							var prop = schema[propKey];
+							this.$logger.info("  " + propKey);
+							this.printValidValuesOfProperty(prop).wait();
+						});
+					} else {
+						// 'appbuilder prop print' called inside project dir
+						var propKeys: any = _.keys(this.projectData);
+						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
+						_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
+					}
+				}
 			} else {
-				this.$errors.fail("Unrecognized project property '%s'", property);
+				// We'll get here only when command is called outside of project directory and --validValue is specified
+				if(property) {
+					var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+					_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
+						var projectSchema: IDictionary<any> = this.$jsonSchemaValidator.tryResolveValidationSchema(targetFrameworkIdentifier);
+						var currentProp = _.find(_.keys(projectSchema), key => key === property);
+						if(currentProp) {
+							this.$logger.out("  Project type %s:", targetFrameworkIdentifier);
+							this.printValidValuesOfProperty(projectSchema[currentProp]).wait();
+						}
+					});
+				} else {
+					this.$logger.out(this.$projectPropertiesService.getPropertiesForAllSupportedProjects().wait());
+				}
+			}
+		}).future<void>()();
+	}
+
+	private printValidValuesOfProperty(property: any): IFuture<void> {
+		return (() => {
+			if(property.description) {
+				this.$logger.info("%s%s", Project.INDENTATION, property.description);
 			}
 
+			if(property.pattern) {
+				this.$logger.trace("%sDesired pattern is: %s", Project.INDENTATION, property.pattern);
+			}
+
+			var validValues: string[] = this.$projectPropertiesService.getValidValuesForProperty(property).wait();
+			if(validValues) {
+				this.$logger.out("%sValid values:", Project.INDENTATION);
+				_.forEach(validValues, value => {
+					this.$logger.out("%s  %s", Project.INDENTATION, value);
+				});
+			}
 		}).future<void>()();
 	}
 
@@ -465,7 +520,7 @@ export class Project implements Project.IProject {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
 
-			if (projectDir) {
+			if(projectDir) {
 				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
@@ -502,11 +557,13 @@ export class Project implements Project.IProject {
 							suppressCommandHelp: true
 						});
 					}
-					this.$errors.fail({formatStr: "The project file %s is corrupted." + os.EOL +
-							"Consider restoring an earlier version from your source control or backup." + os.EOL +
-							"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
-							"Additional technical info: %s",
-							suppressCommandHelp: true},
+					this.$errors.fail({
+						formatStr: "The project file %s is corrupted." + os.EOL +
+						"Consider restoring an earlier version from your source control or backup." + os.EOL +
+						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
+						"Additional technical info: %s",
+						suppressCommandHelp: true
+					},
 						projectFilePath, err.toString());
 				}
 

@@ -6,6 +6,7 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 	constructor($staticConfig: IStaticConfig,
 		$injector: IInjector) {
 		super($staticConfig, $injector);
+		this.$project.ensureProject();
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {

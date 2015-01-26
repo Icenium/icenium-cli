@@ -107,7 +107,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return normalizedPropertyName;
 	}
 
-	public getProjectSchemaHelp(): IFuture<string> {
+	public getPropertiesForAllSupportedProjects(): IFuture<string> {
 		return (() => {
 			var result: string[] = [];
 			var schemas: IDictionary<IDictionary<any>> = Object.create(null);
@@ -136,7 +136,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			});
 
 			var commonProperties: IDictionary<string> = Object.create(null);
-			 _.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
+			_.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
 			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
 			return result.join(os.EOL + os.EOL);
@@ -161,6 +161,19 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			}
 			return propData.range;
+		}).future<string[]>()();
+	}
+
+	public getValidValuesForProperty(propData: any): IFuture<string[]> {
+		return ((): string[] => {
+			var range = this.getPropRange(propData).wait();
+			if(range) {
+				return _.sortBy(_.values(range), (val: string) => {
+					return val.toUpperCase();
+				});
+			}
+
+			return null;
 		}).future<string[]>()();
 	}
 

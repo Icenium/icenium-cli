@@ -66,16 +66,17 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 					result[key] = schema.extends.properties[key];
 				}
 			});
-			var projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json",framework.toLowerCase()));
-			if(this.$fs.exists(projectPropertiesFilePath).wait()) {
-				var fileContent = this.$fs.readJson(projectPropertiesFilePath).wait();
-				var additionalProperties = _.keys(fileContent);
-				_.each(additionalProperties, (propertyName: string) => {
-					_.each(_.keys(fileContent[propertyName]), (value: string) => {
-						result[propertyName][value] = fileContent[propertyName][value];
-					});
+		}
+
+		var projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json",framework.toLowerCase()));
+		if(this.$fs.exists(projectPropertiesFilePath).wait()) {
+			var fileContent = this.$fs.readJson(projectPropertiesFilePath).wait();
+			var additionalProperties = _.keys(fileContent);
+			_.each(additionalProperties, (propertyName: string) => {
+				_.each(_.keys(fileContent[propertyName]), (key: string) => {
+					result[propertyName][key] = fileContent[propertyName][key];
 				});
-			}
+			});
 		}
 
 		return result;

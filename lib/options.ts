@@ -22,7 +22,9 @@ var knownOpts: any = {
 		"client": String,
 		"available": Boolean,
 		"release": Boolean,
-		"debug": Boolean
+		"debug": Boolean,
+		"valid-value": Boolean,
+		"validValue": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",

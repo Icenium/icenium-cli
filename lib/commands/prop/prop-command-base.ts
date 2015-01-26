@@ -10,9 +10,9 @@ export class ProjectPropertyCommandBase {
 		private $injector: IInjector) {
 		this.$staticConfig.triggerJsonSchemaValidation = false;
 		this.$project = this.$injector.resolve("project");
-
-		this.$project.ensureProject();
-		this.projectSchema = this.$project.getProjectSchema().wait();
+		if (this.$project.projectData) {
+			this.projectSchema = this.$project.getProjectSchema().wait();
+		}
 	}
 
 	public get completionData(): string[] {
