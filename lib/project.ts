@@ -279,9 +279,13 @@ export class Project implements Project.IProject {
 			var versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
 			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			var oldVersion = this.projectData.FrameworkVersion;
-			var newPluginsList = this.$cordovaMigrationService.migratePlugins(this.projectData.CorePlugins, oldVersion, newVersion).wait();
-			this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
-			this.projectData.CorePlugins = newPluginsList;
+
+			_.each(this.configurations, (configuration: string) => {
+				var oldPluginsList = this.getProperty("CorePlugins", configuration);
+				var newPluginsList = this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
+				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
+				this.setProperty("CorePlugins", newPluginsList, configuration);
+			});
 
 			var successfullyChanged: string[] = [],
 				backupSuffix = ".backup";
