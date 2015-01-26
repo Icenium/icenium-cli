@@ -98,6 +98,8 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 
 	public version = require("../package.json").version;
 
+	public triggerJsonSchemaValidation = true;
+
 	public get helpTextPath() {
 		return path.join(__dirname, "../resources/help.txt");
 	}

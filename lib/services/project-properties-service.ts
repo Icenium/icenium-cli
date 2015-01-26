@@ -55,17 +55,19 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
 		return (() => {
-			var normalizedProperty = this.normalizePropertyName(property, projectData);
-			var propertyValue = projectData[normalizedProperty];
 
-			if(typeof(propertyValue) === "string") {
+			var normalizedProperty = this.normalizePropertyName(property, projectData);
+			var isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
+			if(isString) {
 				if (newValue.length > 1) {
 					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 				}
 			}
 
+			var propertyValue = projectData[normalizedProperty];
+
 			if (mode === "set") {
-				propertyValue = typeof(propertyValue) === "string" ? newValue[0] : newValue;
+				propertyValue = isString ? newValue[0] : newValue;
 			} else if (mode === "del") {
 				if(!(propertyValue instanceof Array)) {
 					this.$errors.fail("Unable to remove value to non-flags property");
@@ -80,7 +82,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			if(projectData.Framework) {
+			if(normalizedProperty === "Framework") {
 				var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
 				var propData = projectSchema[normalizedProperty];
 				if(propData && propData.onChanging) {

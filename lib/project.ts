@@ -388,12 +388,8 @@ export class Project implements Project.IProject {
 			var validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
 			if(_.contains(validProperties, property)) {
 				var normalizedPropertyName =  this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
-				var propData = this.projectData[normalizedPropertyName];
-				if(!propData) {
-					this.$errors.fail("Unrecognized project property '%s'", property);
-				}
-
-				if(!(propData instanceof Array)) {
+				var isArray = this.$jsonSchemaValidator.getPropertyType(this.projectData.Framework, normalizedPropertyName) === "array";
+				if(!isArray) {
 					if(!args || args.length === 0 ) {
 						this.$errors.fail("Property %s requires a single value.", property);
 					}
@@ -479,7 +475,7 @@ export class Project implements Project.IProject {
 					}
 
 					this.projectData = data;
-					if(_.keys(this.projectData).length !== 0) {
+					if(_.keys(this.projectData).length !== 0 && this.$staticConfig.triggerJsonSchemaValidation) {
 						this.$jsonSchemaValidator.validate(this.projectData);
 					}
 
@@ -514,9 +510,7 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
-				if(this.$projectPropertiesService &&
-					this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) &&
-					this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if(this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}

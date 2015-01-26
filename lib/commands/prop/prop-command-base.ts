@@ -4,8 +4,13 @@ import helpers = require("./../../helpers");
 
 export class ProjectPropertyCommandBase {
 	protected projectSchema: any;
+	public $project: Project.IProject;
 
-	constructor(public $project: Project.IProject) {
+	constructor(private $staticConfig: IStaticConfig,
+		private $injector: IInjector) {
+		this.$staticConfig.triggerJsonSchemaValidation = false;
+		this.$project = this.$injector.resolve("project");
+
 		this.$project.ensureProject();
 		this.projectSchema = this.$project.getProjectSchema().wait();
 	}

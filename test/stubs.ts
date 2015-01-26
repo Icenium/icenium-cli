@@ -315,6 +315,7 @@ export class StaticConfig implements IStaticConfig {
 	helpTextPath = "help";
 	adbFilePath = "adbFilePath";
 	sevenZipFilePath = "7za";
+	triggerJsonSchemaValidation = true;
 }
 
 export class HooksService implements IHooksService {

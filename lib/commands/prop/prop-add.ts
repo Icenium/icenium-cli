@@ -3,8 +3,9 @@
 import ProjectPropertyCommandBaseLib = require("./prop-command-base");
 
 export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
-	constructor($project: Project.IProject) {
-		super($project);
+	constructor($staticConfig: IStaticConfig,
+		$injector: IInjector) {
+		super($staticConfig, $injector);
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {
