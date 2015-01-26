@@ -389,6 +389,9 @@ export class Project implements Project.IProject {
 				}
 
 				if(!(propData instanceof Array)) {
+					if(!args || args.length === 0 ) {
+						this.$errors.fail("Property %s requires a single value.", property);
+					}
 					if(args.length !== 1) {
 						this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 					}
@@ -401,7 +404,7 @@ export class Project implements Project.IProject {
 				return true;
 			}
 
-			return false;
+			this.$errors.fail("Invalid property name '%s'.", property);
 		}).future<boolean>()();
 	}
 
