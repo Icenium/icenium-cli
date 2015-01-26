@@ -21,7 +21,6 @@ $injector.require("cordovaMigrationService", "./services/cordova-migration-servi
 $injector.require("samplesService", "./services/samples-service");
 $injector.requireCommand("sample|*list", "./commands/samples");
 $injector.requireCommand("sample|clone", "./commands/samples");
-$injector.require("opener", "./opener");
 $injector.require("x509", "./x509");
 $injector.require("qr", "./qr");
 
