@@ -190,9 +190,9 @@ export class Project implements Project.IProject {
 			this.projectData = properties;
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
-			this.validateProjectData(this.projectData);
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
 
+			this.validateProjectData(this.projectData);
 			this.saveProject(projectDir).wait();
 		}).future<void>()();
 	}
@@ -220,19 +220,20 @@ export class Project implements Project.IProject {
 			}
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
-			this.createProjectFileFromExistingProject(projectDir).wait();
+			this.createProjectFileFromExistingProject(projectDir, framework).wait();
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
 		}).future<void>()();
 	}
 
-	private createProjectFileFromExistingProject(projectDir: string): IFuture<void> {
+	private createProjectFileFromExistingProject(projectDir: string, framework: string): IFuture<void> {
 		return ((): void => {
 			var appname = path.basename(projectDir);
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
 			if(!properties) {
 				properties = this.alterPropertiesForNewProject({}, appname);
 			}
+			properties.Framework = framework;
 
 			try {
 				this.createProjectFile(projectDir, properties).wait();
