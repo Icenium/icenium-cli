@@ -161,10 +161,6 @@ interface IProjectCapabilities {
 	updateKendo: boolean;
 }
 
-interface IOpener {
-	open(filename: string): void;
-}
-
 interface IProjectData extends IDictionary<any> {
 	ProjectName: string;
 	ProjectGuid: string;
