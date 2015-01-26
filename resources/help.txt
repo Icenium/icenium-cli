@@ -787,7 +787,8 @@ Options:
 Usage:
     $ appbuilder update-kendoui
 
-Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory. 
+Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory.
+The verified tag marks stable Kendo UI Service Pack releases. 
 
 This command is not applicable to NativeScript projects.
 
