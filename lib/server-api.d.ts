@@ -108,7 +108,6 @@ declare module Server{
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>;
 		addPlatform(platform: Server.DevicePlatform, solutionName: string, projectName: string): IFuture<Server.MigrationResult>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
-		applyMigration(solutionName: string, projectName: string, sourceVersion: string, targetVersion: string): IFuture<Server.MigrationResult>;
 		getProjectCordovaPlugins(solutionName: string, projectName: string): IFuture<Server.CordovaPluginData[]>;
 		getCordovaPluginVariables(solutionName: string, projectName: string): IFuture<Server.CordovaPluginVariablesData>;
 		setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, configuration: string, value: string): IFuture<void>;
@@ -151,10 +150,20 @@ declare module Server{
 		getAuthorizationHeader(): IFuture<string>;
 		getEverliveApplications(accountId: string): IFuture<Server.EverliveApplicationData[]>;
 	}
+	interface Object{
+	}
+	interface IExtensionsServiceContract{
+		getExtensions(frameworkVersion: string): IFuture<any>;
+		getFile(path: string, $resultStream: any): IFuture<void>;
+	}
+	interface IInternalExtensionsServiceContract{
+		publish(package_: any): IFuture<void>;
+		deleteExtension(extensionName: string, version: string): IFuture<void>;
+	}
 	interface IUploadServiceContract{
 		completeUpload(path: string, originalFileHash: string): IFuture<void>;
 		initUpload(path: string): IFuture<void>;
-		uploadChunk(path: string, hash: string, content: any): IFuture<void>;
+		uploadChunk(path: string, content: any): IFuture<void>;
 	}
 	interface SolutionInfo{
 		SolutionName: string;
@@ -190,6 +199,7 @@ declare module Server{
 		Id: string;
 		DownloadUrl: string;
 		NeedPurchase: boolean;
+		VersionTags: string[];
 		Name: string;
 		Version: string;
 	}
@@ -320,7 +330,7 @@ declare module Server{
 		getExportedSolution(solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
 		importPackage(solutionName: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>;
 		importProject(solutionName: string, projectName: string, package_: any): IFuture<void>;
-		importProject1(solutionName: string, projectName: string, bucketKey: string): IFuture<void>;
+		importLocalProject(solutionName: string, projectName: string, bucketKey: string): IFuture<void>;
 		getProjectContents(solutionName: string, projectName: string): IFuture<string>;
 		saveProjectContents(solutionName: string, projectName: string, projectContents: string): IFuture<void>;
 		upgradeSolution(solutionName: string): IFuture<void>;
@@ -539,6 +549,8 @@ declare module Server{
 		cordova: Server.ICordovaServiceContract;
 		identityStore: Server.IIdentityStoreServiceContract;
 		everlive: Server.IEverliveServiceContract;
+		extensions: Server.IExtensionsServiceContract;
+		internalExtensions: Server.IInternalExtensionsServiceContract;
 		upload: Server.IUploadServiceContract;
 		filesystem: Server.IFilesystemServiceContract;
 		images: Server.IImagesServiceContract;

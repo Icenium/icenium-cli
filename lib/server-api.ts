@@ -67,9 +67,6 @@ export class CordovaService implements Server.ICordovaServiceContract{
 	public migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>{
 		return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','cordova','migrate',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
 	}
-	public applyMigration(solutionName: string, projectName: string, sourceVersion: string, targetVersion: string): IFuture<Server.MigrationResult>{
-		return this.$serviceProxy.call<Server.MigrationResult>('ApplyMigration', 'POST', ['api','cordova','apply-migration',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'sourceVersion': sourceVersion, 'targetVersion': targetVersion }), 'application/json', null, null);
-	}
 	public getProjectCordovaPlugins(solutionName: string, projectName: string): IFuture<Server.CordovaPluginData[]>{
 		return this.$serviceProxy.call<Server.CordovaPluginData[]>('GetProjectCordovaPlugins', 'GET', ['api','cordova','plugins',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
@@ -121,6 +118,26 @@ export class EverliveService implements Server.IEverliveServiceContract{
 		return this.$serviceProxy.call<Server.EverliveApplicationData[]>('GetEverliveApplications', 'GET', ['api','everlive','applications',encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 }
+export class ExtensionsService implements Server.IExtensionsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public getExtensions(frameworkVersion: string): IFuture<any>{
+		return this.$serviceProxy.call<any>('GetExtensions', 'GET', ['api','extensions',encodeURI(frameworkVersion.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public getFile(path: string, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GetFile', 'GET', ['api','extensions','files',encodeURI(path.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
+	}
+}
+export class InternalExtensionsService implements Server.IInternalExtensionsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public publish(package_: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('Publish', 'POST', ['api','internal','extensions','publish'].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
+	}
+	public deleteExtension(extensionName: string, version: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+}
 export class UploadService implements Server.IUploadServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -130,8 +147,8 @@ export class UploadService implements Server.IUploadServiceContract{
 	public initUpload(path: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
-	public uploadChunk(path: string, hash: string, content: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'hash': hash }), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	public uploadChunk(path: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
 	}
 }
 export class FilesystemService implements Server.IFilesystemServiceContract{
@@ -227,8 +244,8 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public importProject(solutionName: string, projectName: string, package_: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('ImportProject', 'POST', ['api','projects','importProject',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
 	}
-	public importProject1(solutionName: string, projectName: string, bucketKey: string): IFuture<void>{
-			return this.$serviceProxy.call<void>('ImportProject', 'POST', ['api','projects','importProject',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(bucketKey.replace(/\\/g, '/'))].join('/'), null, null, null);
+	public importLocalProject(solutionName: string, projectName: string, bucketKey: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('ImportLocalProject', 'POST', ['api','projects','importProject',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(bucketKey.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 	public getProjectContents(solutionName: string, projectName: string): IFuture<string>{
 		return this.$serviceProxy.call<string>('GetProjectContents', 'GET', ['api','projects','contents',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
@@ -465,6 +482,8 @@ export class ServiceContainer implements Server.IServer{
 	public cordova: Server.ICordovaServiceContract = $injector.resolve(CordovaService);
 	public identityStore: Server.IIdentityStoreServiceContract = $injector.resolve(IdentityStoreService);
 	public everlive: Server.IEverliveServiceContract = $injector.resolve(EverliveService);
+	public extensions: Server.IExtensionsServiceContract = $injector.resolve(ExtensionsService);
+	public internalExtensions: Server.IInternalExtensionsServiceContract = $injector.resolve(InternalExtensionsService);
 	public upload: Server.IUploadServiceContract = $injector.resolve(UploadService);
 	public filesystem: Server.IFilesystemServiceContract = $injector.resolve(FilesystemService);
 	public images: Server.IImagesServiceContract = $injector.resolve(ImagesService);

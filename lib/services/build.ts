@@ -506,7 +506,7 @@ export class BuildService implements Project.IBuildService {
 			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
 				this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey).wait();
-				this.$server.projects.importProject1(projectName, projectName, bucketKey).wait();
+				this.$server.projects.importLocalProject(projectName, projectName, bucketKey).wait();
 			} else {
 				this.$server.projects.importProject(projectName, projectName,
 					this.$fs.createReadStream(projectZipFile)).wait();
