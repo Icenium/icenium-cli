@@ -85,8 +85,20 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
+		var projectData = projectInformation.projectData;
 		var configurationName = options.release ? "release" : "debug";
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
+
+		if(buildProperties.Platform === "WP8") {
+			buildProperties.WP8ProductID = projectData.WP8ProductID || MobileHelper.generateWP8GUID();
+			buildProperties.WP8PublisherID = projectData.WP8PublisherID;
+			buildProperties.WP8Publisher = projectData.WP8Publisher;
+			buildProperties.WP8TileTitle = projectData.WP8TileTitle;
+			buildProperties.WP8Capabilities = projectData.WP8Capabilities;
+			buildProperties.WP8Requirements = projectData.WP8Requirements;
+			buildProperties.WP8SupportedResolutions = projectData.WP8SupportedResolutions;
+		}
+
 		return buildProperties;
 	}
 

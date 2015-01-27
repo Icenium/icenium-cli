@@ -86,6 +86,10 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
+		if(buildProperties.Platform === "WP8") {
+			this.$errors.fail("You will be able to build NativeScript based applications for WP8 platform in a future release of the Telerik AppBuilder CLI.");
+		}
+
 		return buildProperties;
 	}
 
