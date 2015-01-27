@@ -5,5 +5,8 @@
 	},
 	"CorePlugins": {
 		"dynamicRange": "#{project.getSupportedPlugins}"
+	},
+	"WPSdk": {
+		"onChanging": "#{project.onWPSdkVersionChanging}"
 	}
 }

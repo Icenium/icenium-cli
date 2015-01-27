@@ -88,6 +88,14 @@
 					"ID_RESOLUTION_HD720P"
 				]
 			}
+		},
+		"WPSdk": {
+			"type": "string",
+			"description": "List of supported Windows Phone 8 SDKs.",
+			"enum": [
+				"8.0",
+				"8.1"
+			]
 		}
 	}
 }

@@ -82,12 +82,18 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			if(normalizedProperty === "Framework") {
-				var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
-				var propData = projectSchema[normalizedProperty];
-				if(propData && propData.onChanging) {
-					this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+            var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
+
+			// HACK - yargs parses double values (8.0) as integers (8)
+			if(normalizedProperty === "WPSdk") {
+				if(propertyValue.indexOf(".") === -1) {
+					propertyValue += ".0";
 				}
+			}
+
+			var propData = projectSchema[normalizedProperty];
+			if(propData && propData.onChanging) {
+				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
 
 			projectData[normalizedProperty] = propertyValue;
