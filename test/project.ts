@@ -224,24 +224,6 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("Friends template has mandatory files", () => {
-				var options: any = require("./../lib/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
-				options.template = "Friends";
-				options.appid = "com.telerik.Test";
-
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
-
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Friends template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
-				});
-			});
-
 			it("KendoUI.Drawer template has mandatory files", () => {
 				var options: any = require("./../lib/options");
 				var tempFolder = temp.mkdirSync("template");
