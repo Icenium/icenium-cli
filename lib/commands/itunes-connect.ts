@@ -13,8 +13,8 @@ export class AppstoreApplicationCommandBase implements ICommand {
 		public $errors: IErrors) { }
 
 	execute(args: string[]): IFuture<void> {
-		return (() => {
-		}).future<void>()();
+		this.$errors.fail("This function should never execute.");
+		return null;
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -104,7 +104,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
         
 	execute(args:string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureProject();
+			this.$project.ensureCordovaProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var application = args[0];

@@ -260,7 +260,7 @@ export class Project implements Project.IProject {
 		this.ensureProject();
 
 		if(this.projectData.Framework !== this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova) {
-			this.$errors.fail("This is not a valid Cordova project.");
+			this.$errors.fail("This command is applicable only to Cordova projects.");
 		}
 	}
 
