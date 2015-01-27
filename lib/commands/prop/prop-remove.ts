@@ -6,6 +6,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 	constructor($staticConfig: IStaticConfig,
 		$injector: IInjector) {
 		super($staticConfig, $injector);
+		this.$project.ensureProject();
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {
