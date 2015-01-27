@@ -69,9 +69,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 				var serviceName = swaggerService.resourcePath.substr(1);
 
-				serverInterface.writeLine(util.format( "%s: Server.I%sServiceContract;", serviceName, this.toPascalCase(serviceName)));
+				var name = this.getNameWithoutSlash(serviceName);
+				serverInterface.writeLine(util.format("%s: Server.I%sServiceContract;", name, this.toPascalCase(name)));
 				serverClass.writeLine(util.format("public %s: Server.I%sServiceContract = $injector.resolve(%sService);",
-					serviceName, this.toPascalCase(serviceName), this.toPascalCase(serviceName)));
+					name, this.toPascalCase(name), this.toPascalCase(name)));
 			});
 
 			serverModuleDeclaration.addBlock(serverInterface);
@@ -106,8 +107,19 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		return modelsBlocks;
 	}
 
+	private getNameWithoutSlash(name: string) {
+		var result = name;
+		var index = name.indexOf("/");
+		if(index !== -1) {
+			result = name.substring(0, index) + name[index + 1].toUpperCase() + name.substr(index + 2);
+		}
+
+		return result;
+	}
+
 	private generateModel(model: Swagger.IModel): Swagger.IBlock {
-		var modelBlock: Swagger.IBlock = new codeEntityLib.Block(util.format("interface %s", model.id));
+		var name = this.getNameWithoutSlash(model.id);
+		var modelBlock: Swagger.IBlock = new codeEntityLib.Block(util.format("interface %s", name));
 		var properties = _.keys(model.properties);
 		_.each(properties, (propertyName: string) => {
 			var typeName = this.getModelPropertyTypeName(model.properties[propertyName]);
@@ -182,7 +194,9 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			var index = 0;
 			_.each(endpoints, (endpoint: Swagger.IServiceEndpoint) => {
 				if(index === 0) {
+
 					serviceInterface.addLine(endpoint.endpointInterface);
+
 					serviceImplementation.addBlock(endpoint.endpointImplementation);
 				} else {
 					var implementationOpener = util.format("public %s(%s): IFuture<%s>", endpoint.operationContractName + index, endpoint.parameters.join(", "), endpoint.callResultType);
@@ -203,12 +217,14 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 	private getSwaggerServiceContractName(swaggerService: Swagger.ISwaggerServiceContract): string {
 		var swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
-		return util.format("I%sServiceContract", swaggerServiceName);
+		var name = this.getNameWithoutSlash(swaggerServiceName);
+		return util.format("I%sServiceContract", name);
 	}
 
 	private getSwaggerServiceName(swaggerService: Swagger.ISwaggerServiceContract): string {
 		var swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
-		return util.format("%sService", swaggerServiceName);
+		var name = this.getNameWithoutSlash(swaggerServiceName);
+		return util.format("%sService", name);
 	}
 
 	private getSwaggerServiceClassName(swaggerService: Swagger.ISwaggerServiceContract): string {
