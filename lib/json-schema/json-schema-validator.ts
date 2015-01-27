@@ -81,6 +81,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return result;
 	}
 
+	public getPropertyType(framework: string, propertyName: string): string {
+		var schema = this.tryResolveValidationSchema(framework);
+		var propertyType = schema[propertyName].type;
+		return propertyType;
+	}
+
 	private getValidationErrors(data: IProjectData): IStringDictionary {
 		var validationSchema = this.tryResolveValidationSchemaCore(data.Framework);
 		var schema = this.environment.createSchema(validationSchema);

@@ -226,6 +226,7 @@ interface IStaticConfig extends Config.IStaticConfig {
 	SOLUTION_SPACE_NAME: string;
 	DEBUG_PROJECT_FILE_NAME: string;
 	RELEASE_PROJECT_FILE_NAME: string;
+	triggerJsonSchemaValidation: boolean;
 }
 
 interface IServerConfiguration {

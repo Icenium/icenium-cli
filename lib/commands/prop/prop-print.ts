@@ -4,8 +4,9 @@ import helpers = require("./../../helpers");
 import projectPropertyCommandBaseLib = require("./prop-command-base");
 
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
-	constructor($project:Project.IProject) {
-		super($project);
+	constructor($staticConfig: IStaticConfig,
+		$injector: IInjector) {
+		super($staticConfig, $injector);
 	}
 
 	execute(args:string[]): IFuture<void> {
