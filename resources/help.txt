@@ -148,7 +148,7 @@ Creates a new project from a Telerik Mobile Website-based template.
 
 Options:
     --template <Template> - Sets the source template for the project. You can use the following templates:
-        #{mobileWebSiteProject.projectTemplatesString}. The default value is KendoUI.TabStrip.
+        #{mobileWebsiteProject.projectTemplatesString}. The default value is KendoUI.TabStrip.
     --path - Specifies the path where you want to create the project, if different from the current directory.
         The directory must be empty.
 
