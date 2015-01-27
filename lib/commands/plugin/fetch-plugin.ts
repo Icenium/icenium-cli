@@ -22,13 +22,14 @@ export class FetchPluginCommand implements ICommand {
 				this.$logger.out(result);
 			} else {
 				var plugins = this.$cordovaPluginsService.getPlugins(args);
-				var pluginsCount = Object.keys(plugins).length;
+				var pluginKeys = Object.keys(plugins);
+				var pluginsCount = pluginKeys.length;
 				if (pluginsCount === 0) {
 					this.$logger.out("There are 0 matching plugins.");
-				} else if (pluginsCount > 1) {
+				} else if (pluginsCount > 1 && pluginKeys[0] !== args[0]) {
 					this.$logger.out("There are more then 1 matching plugins.");
 				} else {
-					this.$logger.out(this.$cordovaPluginsService.fetch(Object.keys(plugins)[0]).wait());
+					this.$logger.out(this.$cordovaPluginsService.fetch(pluginKeys[0]).wait());
 				}
 			}
 		}).future<void>()();
