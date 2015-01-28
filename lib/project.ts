@@ -17,6 +17,7 @@ export class Project implements Project.IProject {
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 	private static INDENTATION = "     ";
+	private static EXPERIMENTAL_TAG = "Experimental";
 
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
@@ -291,15 +292,16 @@ export class Project implements Project.IProject {
 					var cordovaVersions = this.$cordovaMigrationService.getSupportedFrameworks().wait();
 
 					// Find last framework which is not experimental.
-					var selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf("Exprimental") === -1);
+					var selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1);
 					if(helpers.versionCompare(selectedFramework.Version, "3.7.0") < 0) {
 						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
-						selectedFramework = _.findLast(cordovaVersions, cv => helpers.versionCompare("3.7.0", cv.Version) < 0);
+						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
 					}
 
 					var shouldUpdateFramework = this.$prompter.confirm(util.format("You are trying to use version of Windows Phone SDK that is not supported for your project's Cordova version. Do you want to use %s?", selectedFramework.DisplayName)).wait()
 					if(shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
+						this.projectData.FrameworkVersion = selectedFramework.Version;
 					} else {
 						this.$errors.failWithoutHelp("Unable to use Windows Phone SDK %s as the current Cordova version %s does not support it. You should target at least Cordova 3.7.0 in order to use Windows Phone 8.1 SDK.", newVersion, selectedFramework.Version);
 					}
@@ -314,10 +316,11 @@ export class Project implements Project.IProject {
 				return;
 			}
 
-			if(this.projectData["WP8Sdk"] && helpers.versionCompare(this.projectData["WP8Sdk"], "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
+			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
 				var shouldUpdateWPSdk = this.$prompter.confirm("You are trying to use version of Cordova that does not support current Windows Phone SDK version. Do you want to use Windows Phone SDK 8.0?").wait();
 				if(shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
+					this.projectData.WPSdk = "8.0";
 				} else {
 					this.$errors.failWithoutHelp("Unable to use Cordova version %s. The project uses Windows Phone SDK %s which is not supported in this Cordova version.", newVersion, this.projectData["WPSdk"]);
 				}
@@ -368,7 +371,7 @@ export class Project implements Project.IProject {
 			if(this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
-				var selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf("Experimental") === -1));
+				var selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1));
 				version = selectedFramework.Version;
 			}
 
