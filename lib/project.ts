@@ -38,7 +38,8 @@ export class Project implements Project.IProject {
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $resources: IResourceLoader,
 		private $staticConfig: IStaticConfig,
-		private $templatesService: ITemplatesService) {
+		private $templatesService: ITemplatesService,
+		private $prompter: IPrompter) {
 
 		this.configurationSpecificData = Object.create(null);
 		this.readProjectData().wait();
@@ -272,10 +273,54 @@ export class Project implements Project.IProject {
 		}).future<string[]>()();
 	}
 
+	public onWPSdkVersionChanging(newVersion: string): IFuture<void> {
+		return ((): void => {
+			if(newVersion === this.projectData["WPSdk"]) {
+				return;
+			}
+
+			var validWPSdks = this.getSupportedWPFrameworks().wait();
+			if(!_.contains(validWPSdks, newVersion)) {
+				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
+			}
+
+			this.$logger.info("Migrating to WPSdk version %s", newVersion);
+			if(helpers.versionCompare(newVersion, "8.0") > 0) {
+				// at least Cordova 3.7 is required
+				if(helpers.versionCompare(this.projectData.FrameworkVersion, "3.7.0") < 0) {
+					var cordovaVersions = this.$cordovaMigrationService.getSupportedFrameworks().wait();
+
+					// Find last framework which is not experimental.
+					var selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf("Exprimental") === -1);
+					if(helpers.versionCompare(selectedFramework.Version, "3.7.0") < 0) {
+						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
+						selectedFramework = _.findLast(cordovaVersions, cv => helpers.versionCompare("3.7.0", cv.Version) < 0);
+					}
+
+					var shouldUpdateFramework = this.$prompter.confirm(util.format("You are trying to use version of Windows Phone SDK that is not supported for your project's Cordova version. Do you want to use %s?", selectedFramework.DisplayName)).wait()
+					if(shouldUpdateFramework) {
+						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
+					} else {
+						this.$errors.failWithoutHelp("Unable to use Windows Phone SDK %s as the current Cordova version %s does not support it. You should target at least Cordova 3.7.0 in order to use Windows Phone 8.1 SDK.", newVersion, selectedFramework.Version);
+					}
+				}
+			}
+		}).future<void>()();
+	}
+
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return ((): void => {
 			if(newVersion === this.projectData.FrameworkVersion) {
 				return;
+			}
+
+			if(this.projectData["WP8Sdk"] && helpers.versionCompare(this.projectData["WP8Sdk"], "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
+				var shouldUpdateWPSdk = this.$prompter.confirm("You are trying to use version of Cordova that does not support current Windows Phone SDK version. Do you want to use Windows Phone SDK 8.0?").wait();
+				if(shouldUpdateWPSdk) {
+					this.onWPSdkVersionChanging("8.0").wait();
+				} else {
+					this.$errors.failWithoutHelp("Unable to use Cordova version %s. The project uses Windows Phone SDK %s which is not supported in this Cordova version.", newVersion, this.projectData["WPSdk"]);
+				}
 			}
 
 			var versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
@@ -328,6 +373,18 @@ export class Project implements Project.IProject {
 			}
 
 			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
+		}).future<string[]>()();
+	}
+
+	public getSupportedWPFrameworks(): IFuture<string[]>{
+		return ((): string[]=> {
+			var validValues: string[] = [];
+			var projectSchema = this.getProjectSchema().wait();
+			if(projectSchema) {
+				validValues = this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]).wait();
+			}
+
+			return validValues;
 		}).future<string[]>()();
 	}
 
@@ -525,7 +582,7 @@ export class Project implements Project.IProject {
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
 
-					if (data.projectVersion && data.projectVersion !== 1) {
+					if(data.projectVersion && data.projectVersion !== 1) {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
 
@@ -550,8 +607,8 @@ export class Project implements Project.IProject {
 
 					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 
-				} catch (err) {
-					if (err === "FUTURE_PROJECT_VER") {
+				} catch(err) {
+					if(err === "FUTURE_PROJECT_VER") {
 						this.$errors.fail({
 							formatStr: "This project is created by a newer version of AppBuilder. Upgrade AppBuilder CLI to work with it.",
 							suppressCommandHelp: true

@@ -57,6 +57,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
+	testInjector.register("prompter", {});
 	testInjector.register("jsonSchemaLoader", jsonSchemaLoaderLib.JsonSchemaLoader);
 	testInjector.register("jsonSchemaResolver", jsonSchemaResolverLib.JsonSchemaResolver);
 	testInjector.register("jsonSchemaValidator", jsonSchemaValidatorLib.JsonSchemaValidator),
