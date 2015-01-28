@@ -14,15 +14,6 @@ import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validat
 import constants = require("../common/mobile/constants");
 import AppIdentifier = require("../common/mobile/app-identifier");
 
-class BuildPropertiesAdjustment implements Project.IBuildPropertiesAdjustment {
-	constructor(private $project: Project.IProject) { }
-
-	public adjustBuildProperties(oldBuildProperties: any): any {
-		return this.$project.adjustBuildProperties(oldBuildProperties);
-	}
-}
-$injector.register("buildPropertiesAdjustment", BuildPropertiesAdjustment);
-
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
 	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
@@ -33,7 +24,6 @@ export class BuildService implements Project.IBuildService {
 		private $errors: IErrors,
 		private $server: Server.IServer,
 		private $project: Project.IProject,
-		private $buildPropertiesAdjustment: Project.IBuildPropertiesAdjustment,
 		private $fs: IFileSystem,
 		private $injector: IInjector,
 		private $identityManager: Server.IIdentityManager,
@@ -142,7 +132,6 @@ export class BuildService implements Project.IBuildService {
 			var buildProperties: any = {
 				Configuration: settings.configuration,
 				Platform: settings.platform,
-
 				AppIdentifier: projectData.AppIdentifier,
 				ProjectName: projectData.ProjectName,
 				Author: projectData.Author,
@@ -152,7 +141,8 @@ export class BuildService implements Project.IBuildService {
 				DeviceOrientations: projectData.DeviceOrientations,
 				BuildForiOSSimulator: settings.buildForiOSSimulator || false
 			};
-			this.$buildPropertiesAdjustment.adjustBuildProperties(buildProperties);
+
+			this.$project.adjustBuildProperties(buildProperties);
 
 			if(settings.platform === "Android") {
 				buildProperties.AndroidPermissions = projectData.AndroidPermissions;
@@ -232,14 +222,6 @@ export class BuildService implements Project.IBuildService {
 				}
 				return buildResult;
 			} else if(settings.platform === "WP8") {
-				buildProperties.WP8ProductID = projectData.WP8ProductID || MobileHelper.generateWP8GUID();
-				buildProperties.WP8PublisherID = projectData.WP8PublisherID;
-				buildProperties.WP8Publisher = projectData.WP8Publisher;
-				buildProperties.WP8TileTitle = projectData.WP8TileTitle;
-				buildProperties.WP8Capabilities = projectData.WP8Capabilities;
-				buildProperties.WP8Requirements = projectData.WP8Requirements;
-				buildProperties.WP8SupportedResolutions = projectData.WP8SupportedResolutions;
-
 				var buildCompanyHubApp = !settings.downloadFiles;
 				if(buildCompanyHubApp) {
 					buildProperties.WP8CompanyHubApp = true;
@@ -262,7 +244,7 @@ export class BuildService implements Project.IBuildService {
 		return ((): Project.IBuildResult => {
 			Object.keys(buildProperties).forEach((prop) => {
 				if(buildProperties[prop] === undefined) {
-					throw new Error(util.format("Build property '%s' is undefined.", prop));
+					this.$errors.fail(util.format("Build property '%s' is undefined.", prop));
 				}
 
 				if(_.isArray(buildProperties[prop])) {

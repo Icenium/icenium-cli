@@ -53,7 +53,6 @@ $injector.require("userDataStore", "./login");
 
 $injector.requireCommand("dev-telerik-login", "./login");
 
-$injector.require("buildPropertiesAdjustment", "./services/build");
 $injector.requireCommand("login", "./commands/authentication");
 $injector.requireCommand("logout", "./commands/authentication");
 
