@@ -38,17 +38,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			updated = true;
 		}
 
-		updated = frameworkProject.completeProjectProperties(properties);
-
-		var defaultJsonProjectFile = util.format("default-project-%s.json", properties.Framework.toLowerCase());
-		var defaultProject = this.$resources.readJson(defaultJsonProjectFile).wait();
-		var keys = _.keys(defaultProject);
-		_.each(keys, (propName: string) => {
-			if (!_.has(properties, propName)) {
-				properties[propName] = defaultProject[propName];
-				updated = true;
-			}
-		});
+		if(frameworkProject.completeProjectProperties(properties)) {
+			updated = true;
+		}
 
 		return updated;
 	}
