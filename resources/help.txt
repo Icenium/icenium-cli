@@ -524,12 +524,12 @@ Options:
 --[plugin|add]--
 Usage:
     $ appbuilder plugin add --available [--debug] [--release]
-    $ appbuilder plugin add <Name> [--debug] [--release]
+    $ appbuilder plugin add <Name or ID> [--debug] [--release]
 
 Enables a core, integrated or verified plugin for your project.
 If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set values for each plugin variable.
 
-<Name> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
+<Name or ID> is the name or ID of the plugin as listed by $ appbuilder plugin add --available. 
 
 This command is not applicable to NativeScript projects.
 
@@ -543,11 +543,11 @@ Options:
 
 --[plugin|remove]--
 Usage:
-    $ appbuilder plugin remove <Name> [--debug] [--release]
+    $ appbuilder plugin remove <Name or ID> [--debug] [--release]
 
 Disables a core, integrated or verified plugin from your project.
 
-<Name> is the name or ID of the plugin as listed by $ appbuilder plugin
+<Name or ID> is the name or ID of the plugin as listed by $ appbuilder plugin
 
 This command is not applicable to NativeScript projects.
 
@@ -558,11 +558,11 @@ Options:
 
 --[plugin|configure]--
 Usage:
-    $ appbuilder plugin configure <Name> [--debug] [--release]
+    $ appbuilder plugin configure <Name or ID> [--debug] [--release]
 
 Configures plugin variables for selected core, integrated or verified plugin.
 
-<Name> is the name of the plugin as listed by $ appbuilder plugin
+<Name or ID> is the name or ID of the plugin as listed by $ appbuilder plugin
 
 This command is not applicable to NativeScript projects.
 
@@ -583,10 +583,10 @@ This command is not applicable to NativeScript projects.
 
 --[plugin|fetch]--
 Usage:
-    $ appbuilder plugin fetch <Name | Path | URL | [<Keyword> [<Keyword>]*>] >
+    $ appbuilder plugin fetch <Name | ID | Path | URL | [<Keyword> [<Keyword>]*>] >
 
 Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
-URL to a plugin repository, name or keyword of a plugin published in the Apache Cordova Plugin Registry. 
+URL to a plugin repository, name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry. 
 The plugin must be Plugman-compatible.
 
 This command is not applicable to NativeScript projects.
