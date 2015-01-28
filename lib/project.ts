@@ -223,24 +223,23 @@ export class Project implements Project.IProject {
 			}
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
-			this.createProjectFileFromExistingProject(projectDir, framework).wait();
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
-			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, [".*.abproject", ".abignore"]).wait();
+			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
+
+			this.createProjectFileFromExistingProject(projectDir, framework).wait();
 		}).future<void>()();
 	}
 
 	private createProjectFileFromExistingProject(projectDir: string, framework: string): IFuture<void> {
 		return ((): void => {
 			var appname = path.basename(projectDir);
+
 			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
-			if(!properties) {
-				properties = this.alterPropertiesForNewProject({}, appname);
-			}
-			properties.Framework = framework;
+			this.projectData = this.alterPropertiesForNewProject(properties, appname);
 
 			try {
-				this.createProjectFile(projectDir, properties).wait();
-				this.$logger.info("Successfully initialized project in the folder.");
+				this.validateProjectData(this.projectData);
+				this.saveProject(projectDir).wait();
 			}
 			catch(e) {
 				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
@@ -696,11 +695,12 @@ export class Project implements Project.IProject {
 		return ((): any => {
 			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
 				var extension = path.extname(file);
-				return extension == ".proj" || extension == ".iceproj";
+				return extension == ".proj" || extension == ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
 			});
 
 			if(projectFile) {
-				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), false, this.frameworkProject).wait();
+				var isJsonProjectFile = projectFile === this.$projectConstants.PROJECT_FILE;
+				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject).wait();
 			}
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");
