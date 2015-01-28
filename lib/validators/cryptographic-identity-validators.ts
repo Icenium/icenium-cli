@@ -93,8 +93,8 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 		if (commonHelpers.isNullOrWhitespace(forGooglePlayPublishing)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "For Google Play Publishing"));
 		}
-		if ("true".equals(forGooglePlayPublishing, false) ||
-			"false".equals(forGooglePlayPublishing, false)) {
+		if(forGooglePlayPublishing.equals("true", false) ||
+			forGooglePlayPublishing.equals("false", false)) {
 			return ValidationResult.ValidationResult.Successful;
 		}
 		return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.INVALID_FIELD_ERROR_MESSAGE_PATTERN, "For Google Play Publishing"));
@@ -134,7 +134,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 			return new ValidationResult.ValidationResult(SelfSignedIdentityValidator.NEGATIVE_EXPIRATION_ERROR_MESSAGE);
 		}
 
-		if ("true".equals(forGooglePlayPublishing, false) &&
+		if(forGooglePlayPublishing.equals("true", false) &&
 			endDate < SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE) {
 			return new ValidationResult.ValidationResult(SelfSignedIdentityValidator.INVALID_GOOGLE_PLAY_IDENTITY_EXPIRATION_DATE_ERROR_MESSAGE);
 		}

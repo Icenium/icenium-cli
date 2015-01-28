@@ -29,8 +29,9 @@ class AppManagerUploadCommand implements ICommand {
 			var buildResult = this.$buildService.build({
 				platform: platform,
 				configuration: "Release",
-				provisionTypes: [constants.ProvisionType.AppStore],
-				showWp8SigningMessage: false
+				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
+				showWp8SigningMessage: false,
+				buildForTAM: true
 			}).wait();
 
 			if (!buildResult[0] || !buildResult[0].solutionPath) {

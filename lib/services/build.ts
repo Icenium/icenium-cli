@@ -152,7 +152,10 @@ export class BuildService implements Project.IBuildService {
 				var certificateData: ICryptographicIdentity;
 				if(options.certificate) {
 					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
-				} else if(settings.configuration === "Release") {
+				} else if(settings.buildForTAM) {
+					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
+						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
+				} else if(settings.configuration === "Release" ) {
 					certificateData = this.$identityManager.findReleaseCertificate().wait();
 
 					if(!certificateData) {
@@ -183,6 +186,10 @@ export class BuildService implements Project.IBuildService {
 				var provisionData: IProvision;
 				if(options.provision) {
 					provisionData = this.$identityManager.findProvision(options.provision).wait();
+					if(settings.buildForTAM && provisionData.ProvisionType === Server.ProvisionType.AppStore.toString()) {
+						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
+							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
+					}
 				} else if(!settings.buildForiOSSimulator) {
 					var deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
 					provisionData = this.$identityManager.autoselectProvision(
