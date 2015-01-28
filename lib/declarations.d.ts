@@ -138,6 +138,7 @@ declare module Project {
 
 		buildForiOSSimulator?: boolean;
 		showWp8SigningMessage?: boolean;
+		buildForTAM?: boolean;
 	}
 
 	interface IPlatformMigrator {
