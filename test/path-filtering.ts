@@ -26,21 +26,21 @@ describe("PathFilteringService", () => {
 	it("test ** rule", () => {
 		var projectFiles = prefixWithProjectDir([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"]);
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["**/.DS_Store"], projectDir);
-		var expected = _.reject(projectFiles, file => _.contains([".DS_Store", "x/.DS_Store"], file.replace(projectDir, "")))
+		var expected = _.reject(projectFiles, file => _.contains([".DS_Store", "x/.DS_Store"], file.replace(projectDir, "")));
 		assert.deepEqual(actual, expected);
 	});
 
 	it("test ! rule", () => {
 		var projectFiles = prefixWithProjectDir(["scripts/app.js", "scripts/login.js", "allow"]);
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["**/scripts/**", "!**/scripts/login.js"], projectDir);
-		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "scripts/app.js")
+		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "scripts/app.js");
 		assert.deepEqual(actual, expected);
 	});
 
 	it("test \\! rule", () => {
 		var projectFiles = prefixWithProjectDir(["!z", "allow"]);
 		var actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["\\!z"], projectDir);
-		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "!z")
+		var expected = _.reject(projectFiles, file => file.replace(projectDir, "") === "!z");
 		assert.deepEqual(actual, expected);
 	});
 
