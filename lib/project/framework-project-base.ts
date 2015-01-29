@@ -61,7 +61,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		var propertyValue: any = null;
 
 		var configData = projectInformation.configurationSpecificData[configuration];
-		if(configData) {
+		if(configData && configData[propertyName]) {
 			propertyValue = configData[propertyName];
 		} else {
 			propertyValue = projectInformation.projectData[propertyName];
