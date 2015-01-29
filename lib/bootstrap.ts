@@ -68,7 +68,7 @@ $injector.require("frameworkSimulatorServiceResolver", "./project/resolvers/fram
 $injector.require("projectSimulatorService", "./services/project-simulator-service");
 $injector.require("cordovaSimulatorService", "./services/project-simulator-service");
 $injector.require("nativeScriptSimulatorService", "./services/project-simulator-service");
-$injector.require("mobileWebSiteSimulatorService", "./services/project-simulator-service");
+$injector.require("mobileWebsiteSimulatorService", "./services/project-simulator-service");
 
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");

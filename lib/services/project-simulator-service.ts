@@ -104,4 +104,4 @@ export class MobileWebSiteSimulatorService implements IProjectSimulatorService {
 		return (() => <string[]>[]).future<string[]>()();
 	}
 }
-$injector.register("mobileWebSiteSimulatorService", MobileWebSiteSimulatorService);
+$injector.register("mobileWebsiteSimulatorService", MobileWebSiteSimulatorService);
