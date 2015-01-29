@@ -8,6 +8,7 @@ import helpers = require("../helpers");
 import watchr = require("watchr");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import hostInfo = require("../host-info");
+import commonHostInfo = require("../common/host-info");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
@@ -175,9 +176,9 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	}
 }
 
-if (hostInfo.isWindows()) {
+if(commonHostInfo.isWindows()) {
 	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
-} else if (hostInfo.isDarwin()) {
+} else if(commonHostInfo.isDarwin()) {
 	$injector.register("debuggerPlatformServices", DarwinDebuggerPlatformServices);
 } else {
 	$injector.register("debuggerPlatformServices", {}); // for unsupported OSes

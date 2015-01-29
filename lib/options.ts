@@ -6,7 +6,7 @@ import _ = require("lodash");
 import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");
-import hostInfo = require("./host-info");
+import hostInfo = require("./common/host-info");
 
 var knownOpts: any = {
 		"companion": Boolean,
