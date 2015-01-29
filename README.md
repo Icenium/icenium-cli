@@ -78,9 +78,17 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 * Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
-* An Internet browser (latest official release)
 
-> **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
+   > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
+
+* An Internet browser (latest official release)
+* (64-bit systems) The runtime libraries for the ia32/i386 architecture
+   * In the terminal, run the following commands.
+      
+      ```
+      sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 libstdc++6:i386
+      sudo apt-get install libgl1-mesa-dri:i386
+      ```
 
 **Additional Software Requirements for iOS On-Device Deployment**
 
@@ -91,9 +99,6 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Device drivers required by your system to recognize the connected Android device
 * G++ compiler
    * In the terminal, run `sudo apt-get install g++`
-* On 64-bit systems, you need to install the runtime libraries for the ia32/i386 architecture.
-   * In the terminal, run `sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0`.
-   * In the terminal, run `sudo apt-get install libgl1-mesa-dri:i386`.
 
 **Additional Software Requirements for Windows Phone 8 On-Device Deployment**
 
