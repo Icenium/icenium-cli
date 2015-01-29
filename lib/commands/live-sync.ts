@@ -155,8 +155,7 @@ export class LiveSyncCommand implements ICommand {
 				error: (error: Error) => this.$errors.fail(error.toString()),
 				change: (changeType: string, filePath: string) => {
 					if (!this.$projectFilesManager.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
-						this.$logger.trace("Syncing %s", filePath);
-						this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, [filePath]));
+						this.batchLiveSync(filePath, projectDir, appIdentifier);
 					}
 				},
 				next: (error: Error, _watchers: any) => {
@@ -170,6 +169,22 @@ export class LiveSyncCommand implements ICommand {
 				}
 			}
 		});
+	}
+
+	private timer: Timer = null;
+	private syncQueue: string[] = [];
+	private batchLiveSync(filePath: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
+		if (!this.timer) {
+			this.timer = setInterval(() => {
+				var filesToSync = this.syncQueue;
+				if (filesToSync.length > 0) {
+					this.syncQueue = [];
+					this.$logger.trace("Syncing %s", filesToSync.join(", "));
+					this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, filesToSync));
+				}
+			}, 500);
+		}
+		this.syncQueue.push(filePath);
 	}
 }
 $injector.registerCommand(["livesync|*devices", "live-sync|*devices"], LiveSyncCommand);
