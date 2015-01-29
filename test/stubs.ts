@@ -238,6 +238,10 @@ export class PathFilteringServiceStub implements IPathFilteringService {
 	filterIgnoredFiles(files: string[], rules: string[]) : string[] {
 		return files;
 	}
+
+	isFileExcluded(file: string, rules: string[], rootDir: string): boolean {
+		return false;
+	}
 }
 
 export class FrameworkProjectResolver implements Project.IFrameworkProjectResolver {

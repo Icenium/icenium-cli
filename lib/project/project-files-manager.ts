@@ -72,17 +72,10 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 				concat(additionalExcludedProjectDirsAndFiles || []);
 
 			var projectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
-				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles);
+				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles, projectDir);
 				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
 			});
-
-			var ignoreFilesRules = <string[]>_(this.ignoreFilesConfigurations)
-				.map(configFile => this.$pathFilteringService.getRulesFromFile(path.join(projectDir, configFile)))
-				.flatten()
-				.value();
-
-			projectFiles = this.$pathFilteringService.filterIgnoredFiles(projectFiles, ignoreFilesRules, projectDir);
 
 			this.$logger.trace("enumerateProjectFiles: %s", util.inspect(projectFiles));
 			return projectFiles;
@@ -94,7 +87,7 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 			concat(additionalExcludedDirsAndFiles || []);
 
 		var relativeToProjectPath = path.relative(projectDir, filePath);
-		return this.isFileExcluded(relativeToProjectPath, excludedProjectDirsAndFiles);
+		return this.isFileExcluded(relativeToProjectPath, excludedProjectDirsAndFiles, projectDir);
 	}
 
 	private get ignoreFilesConfigurations(): string[] {
@@ -107,8 +100,20 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 		return configurations;
 	}
 
-	private isFileExcluded(path: string, exclusionList: string[]): boolean {
-		return Boolean(_.find(exclusionList, (pattern) => minimatch(path, pattern, { nocase: true })));
+	private isFileExcluded(path: string, exclusionList: string[], projectDir: string): boolean {
+		return !!_.find(exclusionList, (pattern) => minimatch(path, pattern, { nocase: true })) ||
+		       this.$pathFilteringService.isFileExcluded(path, this.getIgnoreFilesRules(projectDir), projectDir);
+	}
+
+	private ignoreFilesRules: string[] = null;
+	private getIgnoreFilesRules(projectDir: string): string[] {
+		if (!this.ignoreFilesRules) {
+			this.ignoreFilesRules = <string[]>_(this.ignoreFilesConfigurations)
+				.map(configFile => this.$pathFilteringService.getRulesFromFile(path.join(projectDir, configFile)))
+				.flatten()
+				.value();
+		}
+		return this.ignoreFilesRules;
 	}
 }
 $injector.register("projectFilesManager", ProjectFilesManager);

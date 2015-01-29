@@ -303,6 +303,7 @@ interface IServerExtensionsService {
 interface IPathFilteringService {
 	getRulesFromFile(file: string) : string[];
 	filterIgnoredFiles(files: string[], rules: string[], rootDir: string) :string[];
+	isFileExcluded(file: string, rules: string[], rootDir: string): boolean
 }
 
 interface ICordovaMigrationService {
