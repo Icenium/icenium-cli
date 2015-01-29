@@ -152,7 +152,7 @@ The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current direc
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
 ```bash
-$ appbuilder init hybrid
+$ appbuilder init
 ```
 
 The Telerik AppBuilder CLI creates the `.abproject` file required for development with AppBuilder. If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
