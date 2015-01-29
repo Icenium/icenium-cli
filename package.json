@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "binary-reader": "0.1.0",
+    "bplist-parser": "0.0.6",
     "bufferpack": "0.0.6",
     "byline": "4.1.1",
     "cli-table": "0.3.1",
