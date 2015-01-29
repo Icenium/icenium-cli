@@ -26,7 +26,6 @@
   ],
   "dependencies": {
     "binary-reader": "0.1.0",
-    "bplist-parser": "0.0.6",
     "bufferpack": "0.0.6",
     "byline": "4.1.1",
     "cli-table": "0.3.1",
@@ -57,6 +56,7 @@
     "properties-parser": "0.2.3",
     "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",
     "qrcode-generator": "1.0.0",
+    "plist": "1.1.0",
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ref-struct": "0.0.5",
     "rimraf": "2.2.6",
