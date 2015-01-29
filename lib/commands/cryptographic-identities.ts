@@ -15,6 +15,8 @@ import commandParams = require("../common/command-params");
 class CryptographicIdentityConstants {
 	public static PKCS12_EXTENSION = "p12";
 	public static X509_EXTENSION = "cer";
+	public static PKCS12CERTIFICATE = "Pkcs12";
+	public static X509CERTIFICATE = "X509Certificate";
 }
 
 interface IFailedProvision {
@@ -584,13 +586,13 @@ export class ImportCryptographicIdentity implements ICommand {
 					"that contains an existing cryptographic identity or a CER file that contains the " +
 					"certificate generated from a certificate signing request.")
 			}
-			var importType = extension === ".p12" ? "Pkcs12" : "X509Certificate";
+			var importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
 
 			if(!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
 
-			if(!password) {
+			if(!password && importType === CryptographicIdentityConstants.PKCS12CERTIFICATE) {
 				password = this.$prompter.getPassword("Certificate file password", { allowEmpty: true }).wait();
 			}
 
