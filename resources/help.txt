@@ -65,7 +65,7 @@ Certificate management and publishing commands:
     appmanager upload               Builds the project and uploads the binary to Telerik AppManager.
 
 Global Options:
-    --help                Prints help about the selected command.
+    --help, -h, /?        Prints help about the selected command.
     --path <Directory>    Specifies the directory that contains the project. If not set, the project is searched for
                           in the current directory and all directories above it.
     --version             Prints the client version.
