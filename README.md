@@ -159,7 +159,9 @@ To initialize an existing project for development from the command line, navigat
 $ appbuilder init
 ```
 
-The Telerik AppBuilder CLI creates the `.abproject` file required for development with AppBuilder. If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+The Telerik AppBuilder CLI attempts to retain any existing project configuration and, if missing, creates any AppBuilder-specific files required for development.
+If the directory contains an existing AppBuilder project, after the operation completes, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+
 For more information about how to configure your project properties, run `appbuilder prop --help`.
 
 **Create new project from sample**
