@@ -71,9 +71,7 @@ export class BuildService implements Project.IBuildService {
 			buildProperties.LiveSyncToken = liveSyncToken;
 
 			var buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
-			while(!buildProjectFuture.isResolved()) {
-				commonHelpers.printMsgWithTimeout(".", 2000).wait();
-			}
+			this.showProgressIndicator(buildProjectFuture, 2000).wait();
 			commonHelpers.printInfoMessageOnSameLine(os.EOL);
 
 			var body = buildProjectFuture.get();
@@ -496,15 +494,28 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
 			var projectName = this.$project.projectData.ProjectName;
 			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
+			commonHelpers.printInfoMessageOnSameLine("Uploading...");
 			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
-				this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey).wait();
-				this.$server.projects.importLocalProject(projectName, projectName, bucketKey).wait();
+				this.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
+				this.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
 			} else {
-				this.$server.projects.importProject(projectName, projectName,
-					this.$fs.createReadStream(projectZipFile)).wait();
+				this.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
+					this.$fs.createReadStream(projectZipFile)), 2000).wait();
 			}
+
+			commonHelpers.printInfoMessageOnSameLine(os.EOL);
 			this.$logger.trace("Project imported");
+		}).future<void>()();
+	}
+
+	private showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void> {
+		return (() => {
+			while(!future.isResolved()) {
+				commonHelpers.printMsgWithTimeout(".", timeout).wait();
+			}
+			// Make sure future is not left behind and prevent "There are outstanding futures." error.
+			future.wait();
 		}).future<void>()();
 	}
 }
