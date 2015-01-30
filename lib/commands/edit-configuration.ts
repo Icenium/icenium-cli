@@ -5,7 +5,7 @@
 import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
-import hostInfo = require("../host-info");
+import hostInfo = require("../common/host-info");
 
 export class EditConfigurationCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors,
