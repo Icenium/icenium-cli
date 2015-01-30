@@ -83,11 +83,10 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * An Internet browser (latest official release)
 * (64-bit systems) The runtime libraries for the ia32/i386 architecture
-   * In the terminal, run the following commands.
+   * In the terminal, run the following command.
       
       ```
       sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 libstdc++6:i386
-      sudo apt-get install libgl1-mesa-dri:i386
       ```
 
 **Additional Software Requirements for iOS On-Device Deployment**
