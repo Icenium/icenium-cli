@@ -25,6 +25,7 @@
     "mobile"
   ],
   "dependencies": {
+    "JSV": "4.0.2",
     "binary-reader": "0.1.0",
     "bufferpack": "0.0.6",
     "byline": "4.1.1",
@@ -39,8 +40,7 @@
     "iconv-lite": "0.4.3",
     "ios-sim-portable": "https://github.com/telerik/ios-sim-portable/tarball/master",
     "ip": "0.3.2",
-    "JSV": "4.0.2",
-    "lodash": "2.4.1",
+    "lodash": "3.0.0",
     "log4js": "0.6.9",
     "minimatch": "2.0.1",
     "mkdirp": "0.3.5",
@@ -49,6 +49,7 @@
     "node-uuid": "1.4.1",
     "open": "0.0.4",
     "osenv": "0.1.0",
+    "plist": "1.1.0",
     "plistlib": "0.2.1",
     "plugman": "0.16.0",
     "progress-stream": "0.5.0",
@@ -56,7 +57,6 @@
     "properties-parser": "0.2.3",
     "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",
     "qrcode-generator": "1.0.0",
-    "plist": "1.1.0",
     "ref": "https://github.com/icenium/ref/tarball/master",
     "ref-struct": "0.0.5",
     "rimraf": "2.2.6",
