@@ -184,7 +184,7 @@ export class BuildService implements Project.IBuildService {
 				var provisionData: IProvision;
 				if(options.provision) {
 					provisionData = this.$identityManager.findProvision(options.provision).wait();
-					if(settings.buildForTAM && provisionData.ProvisionType === Server.ProvisionType.AppStore.toString()) {
+					if(settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
 						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
 					}
