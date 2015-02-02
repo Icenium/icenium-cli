@@ -588,9 +588,20 @@ export class Project implements Project.IProject {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
 
+					if(!_.has(data, "Framework")) {
+						if(_.has(data, "projectType")) {
+							data["Framework"] = data["projectType"];
+							delete data["projectType"];
+						} else {
+							data["Framework"] = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
+						}
+
+						shouldSaveProject = true;
+					}
+
 					this.projectData = data;
 					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
-					shouldSaveProject = this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) && this.$config.AUTO_UPGRADE_PROJECT_FILE;
+					shouldSaveProject = this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || shouldSaveProject;
 					
 					if(this.$staticConfig.triggerJsonSchemaValidation) {
 						this.$jsonSchemaValidator.validate(this.projectData);
@@ -626,7 +637,7 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
-				if(shouldSaveProject) {
+				if(shouldSaveProject && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
