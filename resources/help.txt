@@ -358,7 +358,7 @@ Usage:
 Platform-specific usage:
     $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
     $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
-    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build wp8 [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
 
 Builds the project for the target platform and produces an application package or a QR code for deployment.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
