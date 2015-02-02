@@ -46,6 +46,8 @@ Plugin management commands:
 Device commands:
     device                          Lists all recognized connected devices.
     device log                      Opens the log stream for the selected device.
+    device run                      Runs the application on device
+    device list-applications        Lists all installed applications for the connected device(s).
 
 Certificate management and publishing commands:
     certificate-request             Lists all pending certificate signing requests (.csr).
@@ -347,8 +349,12 @@ Usage:
     $ appbuilder device run <ApplicationId>
 
 Run the selected application on device.
-<ApplicationId> is the application id as listed from $tns device list-applications
-
+<ApplicationId> is the application id as listed from $appbuilder device list-applications
+Prerequisites:
+Before running the application on device, verify that you have met the following requirements.
+    You are running the Telerik AppBuilder CLI on OS X.
+    You have installed Xcode.
+    Your application is built with the debug build configuration.
 --[/]--
 
 --[build]--
@@ -700,7 +706,7 @@ Options:
             You cannot use --avd and --geny simultaneously.
     --geny - Sets the Genymotion virtual device on which you want to run your app. 
             You can set only one device at a time.
-            To list the available Genymotion virtual devices, run $ genyshell -c "devices list"  
+            To list the available Genymotion virtual devices, run $ genyshell -c "devices list"
             You cannot use --avd and --geny simultaneously.      
     --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
             before quitting the operation and releasing the console.
