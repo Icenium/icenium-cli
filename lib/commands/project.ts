@@ -7,7 +7,8 @@ import MobileHelper = require("./../common/mobile/mobile-helper");
 
 export class ProjectCommandBase implements ICommand {
 	constructor(protected $project: Project.IProject,
-		protected $errors: IErrors) {
+		protected $errors: IErrors,
+		protected $logger: ILogger) {
 
 		if (this.$project.projectData) {
 			this.$errors.fail("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
@@ -29,7 +30,10 @@ export class ProjectCommandBase implements ICommand {
 	}
 
 	protected initializeProjectFromExistingFiles(framework: string): IFuture<void> {
-		return this.$project.initializeProjectFromExistingFiles(framework);
+		return (() => {
+			this.$project.initializeProjectFromExistingFiles(framework).wait();
+			this.$logger.out("Successfully initialized %s project.", framework);
+		}).future<void>()();
 	}
 }
 
@@ -49,7 +53,7 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 		$errors: IErrors,
 		protected $fs: IFileSystem,
 		protected $logger: ILogger) {
-		super($project, $errors);
+		super($project, $errors, $logger);
 
 		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
@@ -124,9 +128,10 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 export class CreateHybridCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
+		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
-        private $projectNameValidator: IProjectNameValidator) {
-		super($project, $errors);
+		private $projectNameValidator: IProjectNameValidator) {
+		super($project, $errors, $logger);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -140,9 +145,10 @@ $injector.registerCommand("create|hybrid", CreateHybridCommand);
 export class CreateNativeCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
+		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectNameValidator: IProjectNameValidator) {
-		super($project, $errors);
+		super($project, $errors, $logger);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -156,9 +162,10 @@ $injector.registerCommand("create|native", CreateNativeCommand);
 export class CreateWebSiteCommand extends ProjectCommandBase {
 	constructor($errors: IErrors,
 		$project: Project.IProject,
+		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectNameValidator: IProjectNameValidator) {
-		super($project, $errors);
+		super($project, $errors, $logger);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -196,13 +203,13 @@ export class InitCommand extends InitProjectCommandBase {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if(this.isProjectType("Apache Cordova").wait()) {
-				this.$logger.info("Attempting to initialize Apache Cordova project.");
+				this.$logger.info("Attempting to initialize Cordova project.");
 				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 			} else if(this.isProjectType("NativeScript").wait()) {
-				this.$logger.info("Attempting to initialize  NativeScript project.");
+				this.$logger.info("Attempting to initialize NativeScript project.");
 				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			} else if(this.isProjectType("Mobile Website").wait()) {
-				this.$logger.info("Attempting to initialize Mobile Website project.");
+				this.$logger.info("Attempting to initialize MobileWebsite project.");
 				this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite).wait();
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");

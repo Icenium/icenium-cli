@@ -2,26 +2,6 @@
 "use strict";
 import Future = require("fibers/future");
 
-export function isWindows() {
-	return process.platform === "win32";
-}
-
-export function isWindows64() {
-	return isWindows() && (process.arch === "x64" || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"));
-}
-
-export function isWindows32() {
-	return isWindows() && !isWindows64();
-}
-
-export function isDarwin() {
-	return process.platform.toUpperCase() === "DARWIN";
-}
-
-export function isLinux() {
-	return process.platform === "linux";
-}
-
 export function isDotNet40Installed(message: string) : IFuture<boolean> {
 	var result = new Future<boolean>();
 	var Winreg = require("winreg");
@@ -38,8 +18,8 @@ export function isDotNet40Installed(message: string) : IFuture<boolean> {
 	return result;
 }
 
-export var hostCapabilities: { [key:string]: IHostCapabilities } = {
-	"win32": { 
+export var hostCapabilities: { [key: string]: IHostCapabilities } = {
+	"win32": {
 		debugToolsSupported: true
 	},
 	"darwin": {
@@ -48,4 +28,4 @@ export var hostCapabilities: { [key:string]: IHostCapabilities } = {
 	"linux": {
 		debugToolsSupported: false
 	}
-};
+}

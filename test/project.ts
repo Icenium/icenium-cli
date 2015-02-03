@@ -484,7 +484,8 @@ describe("project unit tests (canonical paths)", () => {
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.resolve("staticConfig").PROJECT_FILE_NAME = "";
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
-
+		var staticConfig = testInjector.resolve("staticConfig");
+		staticConfig.triggerJsonSchemaValidation = false;
 		project = testInjector.resolve("project");
 
 		oldPath = options.path;

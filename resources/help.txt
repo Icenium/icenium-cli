@@ -65,7 +65,7 @@ Certificate management and publishing commands:
     appmanager upload               Builds the project and uploads the binary to Telerik AppManager.
 
 Global Options:
-    --help                Prints help about the selected command.
+    --help, -h, /?        Prints help about the selected command.
     --path <Directory>    Specifies the directory that contains the project. If not set, the project is searched for
                           in the current directory and all directories above it.
     --version             Prints the client version.
@@ -218,7 +218,8 @@ Usage:
     $appbuilder init [<Command>]
 
 Initializes an existing project for development. 
-The command attempts to determine the project type based on the files in the working directory. To specify the project type yourself, run $ appbuilder init <Command>
+The command attempts to determine the project type and retain any existing configuration based on the files in the working directory.
+To specify the project type yourself, run $ appbuilder init <Command>
 
 <Command> is a related command that extends the init command. You can run the following related commands:
     hybrid - Initializes an existing Apache Cordova project for development in the current directory.
@@ -234,8 +235,14 @@ Usage:
 
 Initializes an existing Apache Cordova project for development in the current directory. 
 
+The operation creates one or more of the following AppBuilder-specific files, if missing:
+.abproject
+.debug.abproject
+.release.abproject
+.abignore
+
 If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio
-or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually
+or synchronized from GitHub), the project retains any existing project configuration. In this case, you might want to manually
 set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device.
 For more information about how to configure your project properties, run $ appbuilder prop --help
 
@@ -252,8 +259,14 @@ Options:
 Usage:
     $ appbuilder init native [--appid <App ID>]
 
-Initializes an existing NativeScript project for development in the current directory. If the directory contains an existing AppBuilder project (created with
-the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration.
+Initializes an existing NativeScript project for development in the current directory. 
+
+The operation creates one or more of the following AppBuilder-specific files, if missing:
+.abproject
+.abignore
+
+If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio
+or synchronized from GitHub), the project retains any existing project configuration.
 
 Options:
     --appid - Sets the application identifier for your app. The application identifier must consist of at least three
@@ -268,8 +281,14 @@ Options:
 Usage:
     $ appbuilder init website
 
-Initializes an existing Mobile Website project for development in the current directory. If the directory contains an existing AppBuilder project 
-synchronized from GitHub, the project retains the existing project configuration.
+Initializes an existing Mobile Website project for development in the current directory. 
+
+The operation creates one or more of the following AppBuilder-specific files, if missing:
+.abproject
+.abignore
+
+If the directory contains an existing AppBuilder project synchronized from GitHub,
+the project retains any existing project configuration.
 
 --[/]--
 
@@ -339,7 +358,7 @@ Usage:
 Platform-specific usage:
     $ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
     $ appbuilder build ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
-    $ appbuilder build wp8 [--download] [--save-to <File Path>] [--debug] [--release]
+    $ appbuilder build wp8 [--companion] [--download] [--save-to <File Path>] [--debug] [--release]
 
 Builds the project for the target platform and produces an application package or a QR code for deployment.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
@@ -932,6 +951,8 @@ Usage:
 
 You must run the appmanager command with a related command.
 
+This command is not applicable to NativeScript and Mobile Website projects.
+
 <Command> is a related command that extends the appmanager command. You can run the following related commands:
     upload - Builds the project and uploads the binary to Telerik AppManager.
 --[/]--
@@ -951,6 +972,8 @@ After the upload completes, you need to go to your app in Telerik AppManager, ma
 <Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
+
+This command is not applicable to NativeScript and Mobile Website projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 

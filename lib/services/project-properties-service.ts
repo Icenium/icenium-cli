@@ -15,7 +15,8 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		private $injector: IInjector,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $projectConstants: Project.IProjectConstants,
-		private $resources: IResourceLoader)  { }
+		private $resources: IResourceLoader,
+		private $logger: ILogger) { }
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData> {
 		return ((): any => {
@@ -33,8 +34,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {
 		var updated = false;
 
-		if(!_.has(properties, "Framework")) {
-			properties["Framework"] = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
+		if(!_.has(properties, "projectVersion")) {
+			this.$logger.warn("Missing 'projectVersion' property in .abproject. Default value '1' will be used.");
+			properties["projectVersion"] = "1";
 			updated = true;
 		}
 

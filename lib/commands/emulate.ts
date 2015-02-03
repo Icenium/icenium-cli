@@ -28,7 +28,6 @@ export class EmulateAndroidCommand implements ICommand {
 			var packageFilePath = path.join(tempDir, "package.apk");
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 				platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android],
-				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath

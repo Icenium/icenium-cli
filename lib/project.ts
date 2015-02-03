@@ -578,18 +578,31 @@ export class Project implements Project.IProject {
 	private readProjectData(): IFuture<void> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
-
+			var shouldSaveProject = false;
 			if(projectDir) {
 				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
-
 					if(data.projectVersion && data.projectVersion !== 1) {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
 
+					if(!_.has(data, "Framework")) {
+						if(_.has(data, "projectType")) {
+							data["Framework"] = data["projectType"];
+							delete data["projectType"];
+						} else {
+							data["Framework"] = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
+						}
+
+						shouldSaveProject = true;
+					}
+
 					this.projectData = data;
-					if(_.keys(this.projectData).length !== 0 && this.$staticConfig.triggerJsonSchemaValidation) {
+					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
+					shouldSaveProject = this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || shouldSaveProject;
+					
+					if(this.$staticConfig.triggerJsonSchemaValidation) {
 						this.$jsonSchemaValidator.validate(this.projectData);
 					}
 
@@ -606,9 +619,6 @@ export class Project implements Project.IProject {
 							this._hasBuildConfigurations = true;
 						}
 					});
-
-					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
-
 				} catch(err) {
 					if(err === "FUTURE_PROJECT_VER") {
 						this.$errors.fail({
@@ -626,7 +636,7 @@ export class Project implements Project.IProject {
 						projectFilePath, err.toString());
 				}
 
-				if(this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+				if(shouldSaveProject && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
 					this.saveProject(projectDir).wait();
 				}
 			}
