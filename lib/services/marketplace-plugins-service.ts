@@ -19,6 +19,9 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 	public createPluginData(plugin: any): IFuture<IMarketplacePlugin> {
 		return (() => {
 			var rowPluginData = this.$server.cordova.getMarketplacePluginData(plugin.uniqueId, plugin.pluginVersion).wait();
+			if(!rowPluginData.Url) {
+				rowPluginData.Url = plugin.repositoryUrl;
+			}
 			return new PluginsDataLib.MarketplacePluginData(rowPluginData, plugin.downloadsCount, plugin.demoAppRepositoryLink);
 		}).future<IMarketplacePlugin>()();
 	}
