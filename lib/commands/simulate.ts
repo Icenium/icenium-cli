@@ -5,6 +5,7 @@ import os = require("os");
 import path = require("path");
 import Future = require("fibers/future");
 import hostInfo = require("../host-info");
+import commonHostInfo = require("../common/host-info");
 
 export class SimulateCommand implements ICommand {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
@@ -135,9 +136,9 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-if (hostInfo.isWindows()) {
+if(commonHostInfo.isWindows()) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
-} else if (hostInfo.isDarwin()) {
+} else if(commonHostInfo.isDarwin()) {
 	$injector.register("simulatorPlatformServices", MacSimulatorPlatformServices);
 } else {
 	$injector.register("simulatorPlatformServices", {});

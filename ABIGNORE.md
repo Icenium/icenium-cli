@@ -30,6 +30,8 @@ The AppBuilder CLI does not respect `.abignore` during the following operations.
 
 Starting with AppBuilder 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of AppBuilder, you need to manually add `.abignore` to your project.
 
+### Create non-configuration-specific .abignore
+
 * If you are running the AppBuilder CLI on a Windows system, complete these steps to create `.abignore`.
    1. From the command prompt, navigate to the root of your project.
    1. Run the following command.
@@ -44,6 +46,35 @@ Starting with AppBuilder 2.6, all newly created projects or cloned sample apps c
       ```Shell
       touch .abignore
       ```
+
+### Create configuration-specific .abignore
+
+* If you are running the AppBuilder CLI on a Windows system, complete these steps to create `.abignore`.
+   1. From the command prompt, navigate to the root of your project.
+   1. To create an `.abignore` file which AppBuilder respects when you build for debugging, run the following command.
+
+      ```Shell
+      type nul > .debug.abignore
+      ```
+   1. To create an `.abignore` file which AppBuilder respects when you build for production, run the following command.
+
+      ```Shell
+      type nul > .release.abignore
+      ```
+* If you are running the AppBuilder CLI on an OS X or Linux system, complete these steps to create `.abignore`.
+   1. From the command prompt, navigate to the root of your project.
+   1. To create an `.abignore` file which AppBuilder respects when you build for debugging, run the following command.
+
+      ```Shell
+      touch .debug.abignore
+      ```
+   1. To create an `.abignore` file which AppBuilder respects when you build for production, run the following command.
+
+      ```Shell
+      touch .release.abignore
+      ```
+
+For more information about working with build configurations in the AppBuilder CLI, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).
 
 ## Adding rules and comments
 
@@ -94,6 +125,14 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    # The following rule excludes the build.js file located in the scripts subdirectory.
    scripts/build.js
    ```
+* To include or exclude a build configuration-specific file, reference the configuration-specific file.<br/>For example:
+
+   ```
+   # The following rule excludes the main.debug.js file located in the scripts subdirectory.
+   scripts/main.debug.js
+   ```
+
+   For more information about configuration-specific files in AppBuilder, see [Managing Configuration-Specific Files](http://docs.telerik.com/platform/appbuilder/build-configurations/configuration-specific-files).
 * Preserve the casing of file paths to ensure that your `.abignore` file works across Windows, OS X, and Linux.
 * To introduce an include rule, place an exclamation mark (`!`) before the rule.<br/>For example: 
 
@@ -120,7 +159,7 @@ This is the markup of a sample `.abignore` file. This sample is based on the def
 # This file contains sample exclude and include rules for my application package.
 
 # The following rule excludes any .DS_Store files and __MACOSX subdirectories and their contents from your project. This rule is useful for projects developed on OS X systems or projects in which you have added files or subdirectories created on an OS X system.
-*/**/.DS_Store
+**/.DS_Store
 */**/__MACOSX/**/*
 
 # The following rule excludes any Thumbs.db files from your projects. Thumbs.db is a thumbnails cache file managed by Windows. This rule is useful for projects developed on Windows systems or projects in which you have added files or subdirectories created on a Windows system.

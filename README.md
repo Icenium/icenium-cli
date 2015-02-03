@@ -159,7 +159,9 @@ To initialize an existing project for development from the command line, navigat
 $ appbuilder init
 ```
 
-The Telerik AppBuilder CLI creates the `.abproject` file required for development with AppBuilder. If the folder contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains the existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+The Telerik AppBuilder CLI attempts to retain any existing project configuration and, if missing, creates any AppBuilder-specific files required for development.
+If the directory contains an existing AppBuilder project, after the operation completes, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
+
 For more information about how to configure your project properties, run `appbuilder prop --help`.
 
 **Create new project from sample**
@@ -215,10 +217,12 @@ With the Telerik AppBuilder companion app, you can deploy and test your iOS apps
 To run your app on a Windows Phone 8 device, install a QR code reader on the device, navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
-$ appbuilder build wp8
+$ appbuilder build wp8 --companion
 ```
 
-The Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment. On your device, scan the QR code for the Telerik Application Enrollment Token (Telerik AET) and install it on your device. Next, scan the QR code for your app and install the app on your device.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app, with two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
+
+With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="http://www.windowsphone.com/en-us/store/app/appbuilder/0171d46b-b5f2-43d9-a36b-0a78c9692aab" target="_blank">Windows Phone Store</a>. 
 
 <a name="code"><b>5. Modify your code</b></a>
 
@@ -335,7 +339,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
          | Build and deploy via QR code | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Build and deploy manually | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | Build and deploy via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
-         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+         | Run in the companion app | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes wirelessly with the three-finger gesture | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
          | LiveSync changes via cable connection | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
          | Debug apps while running on connected device | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">

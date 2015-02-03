@@ -44,23 +44,19 @@ export class MultipartUploadService implements IMultipartUploadService {
 				var future = this.uploadChunk(bucketKey, chunkStartByte, endByte, chunkStream, fileSize);
 				chunks.push(future);
 				chunkStartByte = endByte;
+				if(chunks.length === MultipartUploadService.MAX_CONCURRENT_UPLOADS) {
+					Future.wait(chunks);
+					chunks = [];
+				}
 			}
-			this.waitForChunksUpload(chunks).wait();
+
+			if(chunks.length > 0) {
+				Future.wait(chunks);
+			}
 
 			var fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
 
 			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
-		}).future<void>()();
-	}
-
-	private waitForChunksUpload(chunkUploadFutures: IFuture<void>[]): IFuture<void> {
-		return (() => {
-			var batchChunks: IFuture<void>[][]= [];
-			for(var index = 0; index < chunkUploadFutures.length; index += MultipartUploadService.MAX_CONCURRENT_UPLOADS) {
-				batchChunks.push(chunkUploadFutures.slice(index, index + MultipartUploadService.MAX_CONCURRENT_UPLOADS));
-			}
-
-			batchChunks.forEach((batch: IFuture<void>[]) => Future.wait(batch));
 		}).future<void>()();
 	}
 
