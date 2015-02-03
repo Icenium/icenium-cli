@@ -308,8 +308,6 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 
 export class StaticConfig implements IStaticConfig {
 	public PROJECT_FILE_NAME = ".abproject";
-	public DEBUG_PROJECT_FILE_NAME = ".debug.abproject";
-	public RELEASE_PROJECT_FILE_NAME = ".release.abproject";
 	public CLIENT_NAME = "appbuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";

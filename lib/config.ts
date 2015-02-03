@@ -93,8 +93,6 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;
-	public DEBUG_PROJECT_FILE_NAME = ".debug.abproject";
-	public RELEASE_PROJECT_FILE_NAME = ".release.abproject";
 
 	public version = require("../package.json").version;
 

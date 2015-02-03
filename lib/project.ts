@@ -606,6 +606,16 @@ export class Project implements Project.IProject {
 						this.$jsonSchemaValidator.validate(this.projectData);
 					}
 
+					var debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
+					if(options.debug && !this.$fs.exists(debugProjectFile).wait()) {
+						this.$fs.writeJson(debugProjectFile, {}).wait();
+					}
+
+					var releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
+					if(options.release && !this.$fs.exists(releaseProjectFile).wait()) {
+						this.$fs.writeJson(releaseProjectFile, {}).wait();
+					}
+
 					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
 					});
