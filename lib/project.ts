@@ -583,7 +583,6 @@ export class Project implements Project.IProject {
 				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
-				
 					if(data.projectVersion && data.projectVersion !== 1) {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
