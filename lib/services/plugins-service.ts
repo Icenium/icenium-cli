@@ -133,6 +133,9 @@ export class PluginsService implements IPluginsService {
 			}
 
 			var newCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+			if(!newCorePlugins) {
+				newCorePlugins = [];
+			}
 			newCorePlugins.push(plugin.toProjectDataRecord());
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();

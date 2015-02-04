@@ -90,6 +90,8 @@ declare module Project {
 		PROJECT_FILE: string;
 		RELEASE_CONFIGURATION_NAME: string;
 		DEBUG_CONFIGURATION_NAME: string;
+		DEBUG_PROJECT_FILE_NAME: string;
+		RELEASE_PROJECT_FILE_NAME: string;
 		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
 	}
 
