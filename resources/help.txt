@@ -974,7 +974,7 @@ This command is not applicable to Mobile Website projects.
 
 --[appmanager|upload]--
 Usage:
-    $ appbuilder appmanager upload <Platform> [--certificate <Certificate ID>] [--provision <Provision ID>]
+    $ appbuilder appmanager upload <Platform> [--certificate <Certificate ID>] [--provision <Provision ID>] [--download]
 
 Platform-specific usage:
     $ appbuilder appmanager upload android --certificate <Certificate ID>
@@ -997,6 +997,7 @@ Options:
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
         To list available provisioning profiles, run $ appbuilder provision
+    --download - If set, downloads the application package to the root of the project
 --[/]--
 
 --[certificate-request]--
