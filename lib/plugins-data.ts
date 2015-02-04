@@ -42,9 +42,13 @@ export class CordovaPluginData implements IPlugin {
 }
 
 export class MarketplacePluginData extends CordovaPluginData {
+	private static TELERIK_PUBLISHER_NAME = "Telerik plugins";
+	private static TELERIK_PARTNER_PUBLISHER_NAME = "Telerik partner plugins";
+
 	constructor(public data: Server.CordovaPluginData,
 		public downloads: number,
-		public demoAppRepositoryUrl: string) {
+		public demoAppRepositoryUrl: string,
+		public publisher: IPublisher) {
 		super(data, PluginType.MarketplacePlugin);
 	}
 
@@ -55,8 +59,13 @@ export class MarketplacePluginData extends CordovaPluginData {
 		var urlRow = util.format("    Url: %s", this.data.Url);
 		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
 		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
+		var publisherName = this.getPublisherName(this.publisher);
 
 		var result = [nameRow, identifierRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
+
+		if(publisherName) {
+			result.push(util.format("    Publisher: %s", publisherName));
+		}
 
 		if(this.data.Variables && this.data.Variables.length > 0) {
 			result.push(util.format("    Variables: %s", this.data.Variables.join(", ")));
@@ -67,5 +76,19 @@ export class MarketplacePluginData extends CordovaPluginData {
 
 	public toProjectDataRecord(): string {
 		return util.format("%s@%s", this.data.Identifier, this.data.Version);
+	}
+
+	private getPublisherName(publisher: IPublisher): string {
+		if(publisher && publisher.name) {
+			if(publisher.name === MarketplacePluginData.TELERIK_PUBLISHER_NAME) {
+				return "Telerik";
+			}
+
+			if(publisher.name === MarketplacePluginData.TELERIK_PARTNER_PUBLISHER_NAME) {
+				return "Telerik Partner";
+			}
+		}
+
+		return "";
 	}
 }

@@ -346,6 +346,11 @@ interface IPluginsService {
 	isPluginInstalled(pluginName: string): boolean;
 }
 
+interface IPublisher {
+	name: string;
+	url: string;
+}
+
 interface IPlugin {
 	data: Server.CordovaPluginData;
 	type: any;
