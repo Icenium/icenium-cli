@@ -648,13 +648,14 @@ Options:
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd <Name>] [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
-Builds the specified project in the cloud and runs it in the native Android emulator.
-If you do not select an Android virtual device (AVD) with the avd option,
+Builds the specified project in the cloud and runs it in a native Android emulator.
+If you do not select an Android virtual device (AVD) with the --avd or the --geny option,
 your app runs in the default emulator or a currently running emulator, if any. 
-To list the available AVDs, run $ android list avd
-You cannot use --avd and --geny option simultaneously.
+To list the available AVDs, run $ android list avd or $ genyshell -c "devices list"
 
 To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name> or $ appbuilder emulate android --geny <GenyName>
 for each virtual device.
@@ -662,17 +663,22 @@ for each virtual device.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
     You can specify only one name at a time.
-<GenyName> is the name of the Genymotion virtual device that you want to use as listed by Genyshell's `devices list` command.
+<GenyName> is the name of the Genymotion virtual device that you want to use as listed by $ genyshell -c "devices list"
     You can specify only one name at a time.
 
 Prerequisites:
-Before running your app in the Android emulator, verify that your system meets the following requirements.
-    * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X, or Linux system.
+Before running your app in the Android emulator from the Android SDK, verify that your system meets the following requirements.
+    * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X or Linux system.
     * Verify that you have installed the Android SDK.
     * Verify that you have added the following Android SDK directories to the PATH environment variable:
         platform-tools
         tools
-    * In case you use Genymotion emulator, verify that you have added its installation directory to the PATH environment variable.
+Before running your app in the Genymotion emulator, verify that your system meets the following requirements.
+    * Verify that you have installed Genymotion.
+    * On Windows and Linux systems, verify that you have added the Genymotion installation directory to the PATH environment variable.
+    * On OS X systems, verify that you have added the following paths to the PATH environment variable.
+        * /Applications/Genymotion.app/Contents/MacOS/
+        * /Applications/Genymotion Shell.app/Contents/MacOS/
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
@@ -688,11 +694,13 @@ Options:
             a certificate by index or name.
             To list available certificates, run $ appbuilder certificate
     --avd - Sets the Android virtual device on which you want to run your app. 
-            You can set only one device at a time.
+            You can set only one device at a time. 
             To list the available Android virtual devices, run $ android list avd
+            You cannot use --avd and --geny simultaneously.
     --geny - Sets the Genymotion virtual device on which you want to run your app. 
             You can set only one device at a time.
-            To list the available Android virtual devices, run $ android list avd        
+            To list the available Genymotion virtual devices, run $ genyshell -c "devices list"  
+            You cannot use --avd and --geny simultaneously.      
     --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
             before quitting the operation and releasing the console.
             If not set, the default timeout is 120 seconds. To wait indefinitely, set 0.
@@ -973,7 +981,7 @@ After the upload completes, you need to go to your app in Telerik AppManager, ma
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
 
-This command is not applicable to NativeScript and Mobile Website projects.
+This command is not applicable to Mobile Website projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
