@@ -8,7 +8,9 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 	private static MARKET_PLACE_PLUGINS_URL = "https://plugins.telerik.com/api/plugins";
 
 	constructor(private $httpClient: Server.IHttpClient,
-		private $server: Server.IServer) { }
+		private $server: Server.IServer,
+		private $project: Project.IProject,
+		private $projectConstants: Project.IProjectConstants) { }
 
 	public getAvailablePlugins(): IFuture<any> {
 		return (() => {
@@ -22,7 +24,7 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 			if(!rowPluginData.Url) {
 				rowPluginData.Url = plugin.repositoryUrl;
 			}
-			return new PluginsDataLib.MarketplacePluginData(rowPluginData, plugin.downloadsCount, plugin.demoAppRepositoryLink, plugin.publisher);
+			return new PluginsDataLib.MarketplacePluginData(rowPluginData, plugin.downloadsCount, plugin.demoAppRepositoryLink, plugin.publisher, this.$project, this.$projectConstants);
 		}).future<IMarketplacePlugin>()();
 	}
 }

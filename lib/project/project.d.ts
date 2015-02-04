@@ -88,10 +88,12 @@ declare module Project {
 
 	interface IProjectConstants {
 		PROJECT_FILE: string;
-		RELEASE_CONFIGURATION_NAME: string;
 		DEBUG_CONFIGURATION_NAME: string;
 		DEBUG_PROJECT_FILE_NAME: string;
+		RELEASE_CONFIGURATION_NAME: string;
 		RELEASE_PROJECT_FILE_NAME: string;
+		CORE_PLUGINS_PROPERTY_NAME: string;
+		CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME: string;
 		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
 	}
 

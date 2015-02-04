@@ -1,6 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
+import os = require("os");
 import util = require("util");
 
 export enum PluginType {
@@ -13,31 +14,65 @@ export class CordovaPluginData implements IPlugin {
 	public configurations: string[];
 
 	constructor(public data: Server.CordovaPluginData,
-		public type: PluginType) {
+		public type: PluginType,
+		protected $project: Project.IProject,
+		protected $projectConstants: Project.IProjectConstants) {
 		this.configurations = [];
 	}
 
 	public get pluginInformation(): string[] {
-		var nameRow = util.format("    Plugin: %s", this.data.Name);
-		var identifierRow = util.format("    Identifier: %s", this.data.Identifier);
-		var versionRow = util.format("    Version: %s", this.data.Version);
-		var urlRow = util.format("    Url: %s", this.data.Url);
-		var platformsRow = util.format("    Platforms: %s", this.data.Platforms.join(", "));
+		var additionalPluginData = [this.buildRow("Platforms", this.data.Platforms.join(", "))];
+		return this.composePluginInformation(additionalPluginData);
+	}
 
-		var result = [nameRow, identifierRow, versionRow, urlRow, platformsRow];
+	public toProjectDataRecord(): string {
+		return this.data.Identifier;
+	}
+
+	protected buildRow(key: string, value: string): string {
+		return util.format("    %s: %s", key, value);
+	}
+
+	protected composePluginInformation(additionalPluginData: string[]): string[] {
+		var result = <string[]>(_.flatten([this.getBasicPluginInformation(), additionalPluginData, this.getPluginVariablesInfo()]));
+		return result;
+	}
+
+	private getBasicPluginInformation(): string[] {
+		var nameRow = this.buildRow("Plugin", this.data.Name);
+		var identifierRow = this.buildRow("Identifier", this.data.Identifier);
+		var versionRow = this.buildRow("Version", this.data.Version);
+		var urlRow = this.buildRow("Url", this.data.Url);
+
+		var result = [nameRow, identifierRow, versionRow, urlRow];
+
 		if(this.configurations && this.configurations.length > 0) {
 			result.push(util.format("    Configuration: %s", this.configurations.join(", ")));
-		}
-
-		if(this.data.Variables && this.data.Variables.length > 0) {
-			result.push(util.format("    Variables: %s", this.data.Variables.join(", ")));
 		}
 
 		return result;
 	}
 
-	public toProjectDataRecord(): string {
-		return this.data.Identifier;
+	private getPluginVariablesInfo(): string[] {
+		var result: string[] = [];
+		_.each(this.configurations, (configuration: string) => {
+			var pluginVariablesData = this.$project.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+			if(pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
+				var variables = pluginVariablesData[this.data.Identifier];
+				var variableNames = _.keys(variables);
+				if(variableNames.length > 0) {
+					var output:string[] = [];
+					output.push(util.format("    Variables for %s configuration:", configuration));
+					_.each(variableNames, (variableName:string) => {
+						output.push(util.format("        %s: %s", variableName, variables[variableName]));
+					});
+
+					result.push(output.join(os.EOL));
+				}
+			}
+		});
+
+		return result;
 	}
 }
 
@@ -48,30 +83,24 @@ export class MarketplacePluginData extends CordovaPluginData {
 	constructor(public data: Server.CordovaPluginData,
 		public downloads: number,
 		public demoAppRepositoryUrl: string,
-		public publisher: IPublisher) {
-		super(data, PluginType.MarketplacePlugin);
+		public publisher: IPublisher,
+		$project: Project.IProject,
+		$projectConstants: Project.IProjectConstants) {
+		super(data, PluginType.MarketplacePlugin, $project, $projectConstants);
 	}
 
 	public get pluginInformation(): string[] {
-		var nameRow = util.format("    Plugin: %s", this.data.Name);
-		var identifierRow = util.format("    Identifier: %s", this.data.Identifier);
-		var versionRow = util.format("    Version: %s", this.data.Version);
-		var urlRow = util.format("    Url: %s", this.data.Url);
-		var demoAppRepositoryUrlRow = util.format("    Demo app repository url: %s", this.demoAppRepositoryUrl);
-		var downloadsCountRow = util.format("    Downloads count: %s", this.downloads);
+		var additionalPluginData = [
+			this.buildRow("Demo app repository url", this.demoAppRepositoryUrl),
+			this.buildRow("Downloads count", this.downloads.toString())
+		];
+
 		var publisherName = this.getPublisherName(this.publisher);
-
-		var result = [nameRow, identifierRow, versionRow, urlRow, demoAppRepositoryUrlRow, downloadsCountRow];
-
 		if(publisherName) {
-			result.push(util.format("    Publisher: %s", publisherName));
+			additionalPluginData.push(this.buildRow("Publisher", publisherName));
 		}
 
-		if(this.data.Variables && this.data.Variables.length > 0) {
-			result.push(util.format("    Variables: %s", this.data.Variables.join(", ")));
-		}
-
-		return  result;
+		return this.composePluginInformation(additionalPluginData);
 	}
 
 	public toProjectDataRecord(): string {
