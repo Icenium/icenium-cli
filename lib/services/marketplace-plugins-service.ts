@@ -22,7 +22,7 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 			if(!rowPluginData.Url) {
 				rowPluginData.Url = plugin.repositoryUrl;
 			}
-			return new PluginsDataLib.MarketplacePluginData(rowPluginData, plugin.downloadsCount, plugin.demoAppRepositoryLink);
+			return new PluginsDataLib.MarketplacePluginData(rowPluginData, plugin.downloadsCount, plugin.demoAppRepositoryLink, plugin.publisher);
 		}).future<IMarketplacePlugin>()();
 	}
 }
