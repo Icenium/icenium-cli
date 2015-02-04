@@ -653,9 +653,10 @@ Usage:
     $ appbuilder emulate android [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in a native Android emulator.
-If you do not select an Android virtual device (AVD) with the --avd or the --geny option,
-your app runs in the default emulator or a currently running emulator, if any. 
-To list the available AVDs, run $ android list avd or $ genyshell -c "devices list"
+If you do not select an Android virtual device (AVD) with the --avd or a Genymotion
+virtual device with the --geny option, your app runs in the default AVD or a currently running emulator, if any. 
+To list the available AVDs, run $ android list avd
+TO list the available Genymotion devices, run $ genyshell -c "devices list"
 
 To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name> or $ appbuilder emulate android --geny <GenyName>
 for each virtual device.
