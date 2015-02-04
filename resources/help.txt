@@ -951,7 +951,7 @@ Usage:
 
 You must run the appmanager command with a related command.
 
-This command is not applicable to NativeScript and Mobile Website projects.
+This command is not applicable to Mobile Website projects.
 
 <Command> is a related command that extends the appmanager command. You can run the following related commands:
     upload - Builds the project and uploads the binary to Telerik AppManager.
@@ -969,11 +969,11 @@ Platform-specific usage:
 Builds the project and uploads the application to Telerik AppManager.
 After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
 
+This command is not applicable to Mobile Website projects.
+
 <Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
-
-This command is not applicable to NativeScript and Mobile Website projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
