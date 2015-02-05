@@ -1062,7 +1062,9 @@ Usage:
     $ appbuilder prop print [--validValue]
     $ appbuilder prop print <Property Name> [--validValue]
 
-Prints the current configuration or its valid values of the project or the selected property. 
+Prints information about the configuration of the project or the selected property.
+If --validValue is set, prints the valid configuration values. 
+If not set, prints the current configuration. 
 
 <Property Name> is the name of the project property as listed by $ appbuilder prop print
 
