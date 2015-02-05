@@ -1059,12 +1059,15 @@ You must run the prop command with a related command.
 
 --[prop|print]--
 Usage:
-    $ appbuilder prop print <PropertyName> [--validValue]
+    $ appbuilder prop print [--validValue]
+    $ appbuilder prop print <Property Name> [--validValue]
 
-Shows the value for the selected project property. When executed without <Property Name> command prints all project properties and their values.
+Prints the current configuration or its valid values of the project or the selected property. 
 
-  --validValue - If set, prints valid values for the selected property. In case <Property Name> is not specified, command will print all valid values 
-for all project properties.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
+
+Options:
+    --validValue - When set, prints the valid values for all valid project properties or for the selected property.
 --[/]--
 
 --[prop|add]--
@@ -1072,9 +1075,9 @@ Usage:
     $ appbuilder prop add <Property Name> <Value> [Value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
-Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
+Run $ appbuilder prop print <Property Name> --validValue to print the valid values for the property.
 
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
@@ -1084,9 +1087,9 @@ Usage:
     $ appbuilder prop set <Property Name> <Value> [Value]*
 
 Sets the selected project property and overwrites its current value.
-Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
+Run $ appbuilder prop print <Property Name> --validValue to print the valid values for the property.
 
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
@@ -1096,7 +1099,7 @@ Usage:
     $ appbuilder prop remove <Property Name> <Value> [Value]*
 
 Disables options for the selected project property, if the property accepts multiple values.
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
