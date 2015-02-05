@@ -160,6 +160,7 @@ interface IProjectCapabilities {
 	livesync: boolean;
 	livesyncCompanion: boolean;
 	updateKendo: boolean;
+	emulate: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {

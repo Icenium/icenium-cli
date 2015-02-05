@@ -35,7 +35,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			simulate: true,
 			livesync: true,
 			livesyncCompanion: true,
-			updateKendo: true
+			updateKendo: true,
+			emulate: true
 		};
 	}
 
