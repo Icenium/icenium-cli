@@ -144,8 +144,8 @@ Options:
 Usage:
     $ appbuilder create website <Site name> [--template <Template>] [--path <path>]
 
-Creates a new project from a Telerik Mobile Website-based template.
-<Site name> is the name of the web site project. The maximum length is 30 characters. You can use only the following characters:
+Creates a new project from a Mobile Website-based template.
+<Site name> is the name of the website project. The maximum length is 30 characters. You can use only the following characters:
     A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 
 Options:
