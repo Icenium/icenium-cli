@@ -2,7 +2,6 @@ declare module Project {
 	interface IProject {
 		projectData: IProjectData;
 		capabilities: IProjectCapabilities;
-		projectTargets: IFuture<string[]>;
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
 		requiredAndroidApiLevel: number;

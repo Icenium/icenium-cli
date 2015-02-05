@@ -390,15 +390,6 @@ export class Project implements Project.IProject {
 		}).future<string[]>()();
 	}
 
-	public get projectTargets(): IFuture<string[]> {
-		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			var projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
-
-			return projectTargets;
-		}).future<string[]>()();
-	}
-
 	public getTempDir(extraSubdir?: string): IFuture<string> {
 		return (() => {
 			var dir = path.join(this.getProjectDir().wait(), ".ab");

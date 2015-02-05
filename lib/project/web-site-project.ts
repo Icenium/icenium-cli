@@ -31,7 +31,8 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 			simulate: true,
 			livesync: false,
 			livesyncCompanion: false,
-			updateKendo: false
+			updateKendo: false,
+			emulate: false
 		};
 	}
 

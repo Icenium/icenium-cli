@@ -3,6 +3,7 @@
 
 import path = require("path");
 import util = require("util");
+import Future = require("fibers/future");
 
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
@@ -34,7 +35,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			simulate: false,
 			livesync: false,
 			livesyncCompanion: true,
-			updateKendo: false
+			updateKendo: false,
+			emulate: true
 		};
 	}
 
@@ -79,10 +81,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
-		var dir = path.join(projectDir, "app");
-		var fileMask = /^bootstrap\.(\w*)\.js$/i;
-
-		return this.getProjectTargetsBase(dir, fileMask);
+		return Future.fromResult(["android", "ios"]);
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
