@@ -4,6 +4,7 @@
 import MobileHelper = require("../common/mobile/mobile-helper");
 import constants = require("../common/mobile/constants");
 import util = require("util");
+import options = require("../options");
 
 class AppManagerUploadCommand implements ICommand {
 	constructor(
@@ -31,7 +32,8 @@ class AppManagerUploadCommand implements ICommand {
 				configuration: "Release",
 				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
 				showWp8SigningMessage: false,
-				buildForTAM: true
+				buildForTAM: true,
+				downloadFiles: options.download
 			}).wait();
 
 			if (!buildResult[0] || !buildResult[0].solutionPath) {
