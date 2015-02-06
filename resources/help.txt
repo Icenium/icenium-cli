@@ -46,8 +46,8 @@ Plugin management commands:
 Device commands:
     device                          Lists all recognized connected devices.
     device log                      Opens the log stream for the selected device.
-    device run                      Runs the application on device
-    device list-applications        Lists all installed applications for the connected device(s).
+    device run                      Runs the selected application on a connected device.
+    device list-applications        Lists the installed applications on all connected devices.
 
 Certificate management and publishing commands:
     certificate-request             Lists all pending certificate signing requests (.csr).
@@ -318,6 +318,8 @@ Options:
 
 <Command> is a related command that extends the device command. You can run the following related commands:
     log - Opens the device log stream for a selected connected device.
+    list-applications - Lists the installed applications on all connected Android or iOS devices.
+    run - Runs the selected application on a connected Android or iOS device.
 
 --[/]--
 
@@ -326,35 +328,51 @@ Usage:
     $ appbuilder device log --device <Device ID>
 
 Opens the device log stream for a selected connected device. 
-<Device ID> is the device index or identifier as listed by run $ appbuilder device.
 
-To list all connected devices, grouped by platform, run $ appbuilder device.
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+To list all connected devices, grouped by platform, run $ appbuilder device
+
+Options:
+   --device - If multiple devices are connected, sets the device for which you want to stream the log in the console.
 
 --[/]--
 
 --[device|list-applications]--
 
 Usage:
-    $ appbuilder device list-applications
+    $ appbuilder device list-applications [--device <Device ID>]
 
-Lists all installed applications on device.
+Lists the installed applications on all connected Android and iOS devices. 
+This operation is not applicable to Windows Phone devices.
 
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+Options:
+   --device - If multiple devices are connected, sets the device for which you want to list all currently installed applications. 
 --[/]--
 
 --[device|run]--
 
 Usage:
-    $ appbuilder device run <ApplicationId>
+    $ appbuilder device run <Application ID> [--device <Device ID>]
 
-Run the selected application on Android and iOS devices.
-<ApplicationId> is the application id as listed from $appbuilder device list-applications.
-Only one connected device through USB is supported.
+Runs the selected application on a connected Android or iOS device.
+You can run this command on one connected device at a time.
+This operation is not applicable to Windows Phone devices.
 
-Prerequisites for iOS:
-Before running the application on device, verify that you have met the following requirements.
-    You are running the Telerik AppBuilder CLI on OS X.
-    You have installed Xcode.
-    Your application is built with the debug build configuration.
+<Application ID> is the application identifier as listed by $ appbuilder device list-applications
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+Prerequisites:
+Before running your app on an iOS device, verify that your system meets the following requirements.
+    * You are running the Telerik AppBuilder CLI on an OS X system.
+    * You have installed Xcode 6 or later.
+    * You have built your app with the debug build configuration.
+
+Options:
+   --device - If multiple devices are connected, sets the device on which you want to run the app.
+        You can run this command on one connected device at a time.
 --[/]--
 
 --[build]--
