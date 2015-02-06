@@ -95,6 +95,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    * `.git`: A subdirectory in which Git stores your version control history and other relevant version control data. 
    * `.abignore`: This file contains exclude and include rules for your application package.
    * `.ab`: The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
+   * Files associated with popular development environments. 
 * For projects created with AppBuilder 2.5.2 or earlier, you need to manually create `.abignore`. For such projects, by default, the AppBuilder CLI excludes the following files and subdirectories. You do not need to manually list these files in your `.abignore` file.
    * `.ab:` The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
    * `.abignore:` This file contains exclude and include rules for your application package.
