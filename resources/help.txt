@@ -365,9 +365,11 @@ This operation is not applicable to Windows Phone devices.
 <Device ID> is the device index or identifier as listed by run $ appbuilder device
 
 Prerequisites:
-Before running your app on an iOS device, verify that your system meets the following requirements.
+Before running your app on an iOS device, verify that your system and app meet the following requirements.
     * You are running the Telerik AppBuilder CLI on an OS X system.
     * You have installed Xcode 6 or later.
+    * You have built your app with the debug build configuration.
+Before running your app on an Android device, verify that your app meets the following requirement.
     * You have built your app with the debug build configuration.
 
 Options:
