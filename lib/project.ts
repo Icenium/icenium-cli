@@ -297,12 +297,12 @@ export class Project implements Project.IProject {
 						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
 					}
 
-					var shouldUpdateFramework = this.$prompter.confirm(util.format("You are trying to use version of Windows Phone SDK that is not supported for your project's Cordova version. Do you want to use %s?", selectedFramework.DisplayName)).wait()
+					var shouldUpdateFramework = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to %s?", newVersion, selectedFramework.DisplayName)).wait()
 					if(shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
 						this.projectData.FrameworkVersion = selectedFramework.Version;
 					} else {
-						this.$errors.failWithoutHelp("Unable to use Windows Phone SDK %s as the current Cordova version %s does not support it. You should target at least Cordova 3.7.0 in order to use Windows Phone 8.1 SDK.", newVersion, selectedFramework.Version);
+						this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
 					}
 				}
 			}
@@ -316,12 +316,12 @@ export class Project implements Project.IProject {
 			}
 
 			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
-				var shouldUpdateWPSdk = this.$prompter.confirm("You are trying to use version of Cordova that does not support current Windows Phone SDK version. Do you want to use Windows Phone SDK 8.0?").wait();
+				var shouldUpdateWPSdk = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?", this.projectData.WPSdk)).wait();
 				if(shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
 					this.projectData.WPSdk = "8.0";
 				} else {
-					this.$errors.failWithoutHelp("Unable to use Cordova version %s. The project uses Windows Phone SDK %s which is not supported in this Cordova version.", newVersion, this.projectData["WPSdk"]);
+					this.$errors.failWithoutHelp("Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.", newVersion);
 				}
 			}
 
