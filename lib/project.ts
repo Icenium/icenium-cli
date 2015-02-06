@@ -428,6 +428,8 @@ export class Project implements Project.IProject {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if(_.has(this.projectData, normalizedPropertyName)) {
 							this.$logger.out(this.projectData[normalizedPropertyName]);
+						} else if(this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
+							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);
 						} else {
 							this.$errors.fail("Unrecognized project property '%s'", property);
 						}
@@ -447,6 +449,7 @@ export class Project implements Project.IProject {
 						var propKeys: any = _.keys(this.projectData);
 						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
 						_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
+						this.printConfigurationSpecificData();
 					}
 				}
 			} else {
@@ -486,6 +489,61 @@ export class Project implements Project.IProject {
 				});
 			}
 		}).future<void>()();
+	}
+
+	private hasConfigurationSpecificDataForProperty(normalizedPropertyName: string): boolean {
+		var properties = _(this.configurationSpecificData)
+			.values()
+			.map(val => _.keys(val))
+			.flatten()
+			.value();
+		return _.some(properties, prop => prop === normalizedPropertyName);
+	}
+
+	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string): any[] {
+		
+		var numberOfConfigs = _.keys(this.configurationSpecificData).length;
+		var configsDataForProperty: any[] = _(this.configurationSpecificData)
+			.values()
+			.map(config => _.flatten([config[normalizedPropertyName]]))
+			.value();
+
+		var sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
+		var valuesInAllConfigs = _.map(sharedValues, value => helpers.fill(value, numberOfConfigs));
+		var configSpecificValues = _.map(configsDataForProperty, config => _.difference(config, sharedValues));
+
+		var maxLength = _(configSpecificValues)
+			.values()
+			.map(value => value.length)
+			.max()
+			.value();
+
+		_.range(maxLength)
+			.map(valueIndex => _.map(configSpecificValues, config => config[valueIndex] || ""))
+			.forEach(propertyValues => valuesInAllConfigs.push(propertyValues));
+
+		return valuesInAllConfigs;
+	}
+
+	private printConfigurationSpecificData(): void {
+		var properties = <string[]>_(this.configurationSpecificData)
+			.values()
+			.map(properties => _.keys(properties))
+			.flatten()
+			.uniq()
+			.value();
+
+		if(properties.length > 0) {
+			this.$logger.out("%sConfiguration specific properties: ", os.EOL);
+			_.forEach(properties, property => this.printConfigurationSpecificDataForProperty(property));
+		}
+	}
+
+	private printConfigurationSpecificDataForProperty(property: string): void {
+		var data = this.getConfigurationSpecificDataForProperty(property);
+		var headers = _.keys(this.configurationSpecificData);
+		var table = commonHelpers.createTable(headers, data);
+		this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
