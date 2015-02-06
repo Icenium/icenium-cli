@@ -320,7 +320,7 @@ export class BuildService implements Project.IBuildService {
 			var buildResult = this.requestCloudBuild(settings).wait();
 			var packageDefs = buildResult.packageDefs;
 
-			if(buildResult.provisionType === constants.ProvisionType.Development && !settings.downloadFiles && !settings.buildForTAM) {
+			if((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
 				this.$logger.info("Package built with 'Development' provision type. Downloading package, instead of generating QR code.");
 				this.$logger.info("Deploy manually to your device using iTunes.");
 				settings.showQrCodes = false;
