@@ -504,12 +504,23 @@ export class Project implements Project.IProject {
 		return _.some(properties, prop => prop === normalizedPropertyName);
 	}
 
+	private getPropertyValueAsArray(property: any, indentation: string): any {
+		if (typeof property === "string" || property instanceof Array) {
+			return [property];
+		}
+
+		return _.map(property,  (value, key) => {
+			// use '\n' not os.EOL as cli-table does not handle \r\n very well
+			var delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
+			return util.format('%s%s:%s%s', indentation, key, delimiter, this.getPropertyValueAsArray(value, indentation + '   ').join('\n'));
+		});
+	}
+
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string): any[] {
-		
 		var numberOfConfigs = _.keys(this.configurationSpecificData).length;
 		var configsDataForProperty: any[] = _(this.configurationSpecificData)
 			.values()
-			.map(config => _.flatten([config[normalizedPropertyName]]))
+			.map(config => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
 			.value();
 
 		var sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
