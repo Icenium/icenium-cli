@@ -20,11 +20,15 @@ The AppBuilder CLI respects `.abignore` during the following operations.
 * Build and deploy in the companion app from QR code.
 * Build and deploy in the native emulators.
 * LiveSync changes to remote devices.
+* LiveSync changes to connected devices.
 
 The AppBuilder CLI does not respect `.abignore` during the following operations.
 
 * Build and deploy in the device simulator.
-* LiveSync changes to connected devices.
+
+> **Do you develop your project in multiple AppBuilder clients?**
+>
+> When you work with connected physical or virtual devices, the AppBuilder Windows client and the AppBuilder extension for Visual Studio respect `.abignore` during LiveSync operations to application packages and the companion app. 
 
 ## Create .abignore
 
