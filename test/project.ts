@@ -22,10 +22,28 @@ import jsonSchemaLoaderLib = require("../lib/json-schema/json-schema-loader");
 import jsonSchemaResolverLib = require("../lib/json-schema/json-schema-resolver");
 import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validator");
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
-import childProcess = require("../lib/common/child-process");
+import childProcessLib = require("../lib/common/child-process");
+import Future = require("fibers/future");
 var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
 temp.track();
+
+
+class PrompterStub implements IPrompter {
+	public confirmResult: boolean = false;
+	public confirmCalled: boolean = false;
+
+	start(): void {}
+	get(schema: IPromptSchema): IFuture<any> { return Future.fromResult("");}
+	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
+	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
+		this.confirmCalled = true;
+		return Future.fromResult(this.confirmResult);
+	}
+	history(name: string): IPromptHistoryValue { return undefined; }
+	override(object: any): void {}
+	public dispose() {}
+}
 
 var mockProjectNameValidator = {
 	validateCalled: false,
@@ -54,13 +72,31 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
-	testInjector.register("cordovaMigrationService", require("../lib/services/cordova-migration-service").CordovaMigrationService);
+	testInjector.register("cordovaMigrationService", {
+		getSupportedVersions: (): IFuture<string[]> => {
+				return Future.fromResult(["3.2.0", "3.5.0", "3.7.0"]);
+		},
+
+		getSupportedFrameworks: (): IFuture<Server.FrameworkVersion[]> => {
+			return Future.fromResult([{ DisplayName: "version_3_2_0", Version: "3.2.0" },
+				{ DisplayName: "version_3_5_0", Version: "3.5.0" },
+				{ DisplayName: "version_3_7_0", Version: "3.7.0" }]);
+		},
+
+		getDisplayNameForVersion: (version: string): IFuture<string> => {
+			return Future.fromResult("version_3_5_0");
+		},
+
+		migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]> { return Future.fromResult([""]) }
+	});
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
-	testInjector.register("prompter", {});
+	testInjector.register("prompter", PrompterStub);
 	testInjector.register("jsonSchemaLoader", jsonSchemaLoaderLib.JsonSchemaLoader);
 	testInjector.register("jsonSchemaResolver", jsonSchemaResolverLib.JsonSchemaResolver);
-	testInjector.register("jsonSchemaValidator", jsonSchemaValidatorLib.JsonSchemaValidator),
+	testInjector.register("jsonSchemaValidator", jsonSchemaValidatorLib.JsonSchemaValidator);
+	testInjector.register("childProcess", childProcessLib.ChildProcess);
+	testInjector.register("injector", testInjector);
 	testInjector.register("frameworkProjectResolver", {
 		resolve: (framework: string) => {
 			if(!framework || framework === "Cordova") {
@@ -75,8 +111,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
-	testInjector.register("childProcess", childProcess.ChildProcess);
-
+	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() } });
 	return testInjector;
 }
 
@@ -86,11 +121,12 @@ describe("project integration tests", () => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
-		project = testInjector.resolve(projectlib.Project);
+
 	});
 
 	describe("createNewProject", () => {
 		it("creates a valid project folder (Cordova project)", () => {
+			project = testInjector.resolve(projectlib.Project);
 			var options: any = require("./../lib/common/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
@@ -123,6 +159,7 @@ describe("project integration tests", () => {
 		});
 
 		it("creates a valid project folder (NativeScript project)", () => {
+			project = testInjector.resolve(projectlib.Project);
 			var options: any = require("./../lib/common/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
@@ -150,17 +187,94 @@ describe("project integration tests", () => {
 		});
 	});
 
-	describe("Init command mandatory files tests", () => {
+	describe("updateProjectPropertiesAndSave",() => {
+		var prompter: PrompterStub;
+		beforeEach(() => {
+			prompter = testInjector.resolve("prompter");
+			prompter.confirmResult = true;
+			var options: any = require("../lib/common/options");
+			var tempFolder = temp.mkdirSync("template");
+
+			options.path = tempFolder;
+			options.template = "Blank";
+			options.appid = "com.telerik.Test";
+			var projectName = "Test";
+			project = testInjector.resolve("project");
+			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+		});
+
+		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0",() => {
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk must be 8.1");
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
+
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
+			
+			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk must be downgraded to 8.0 when downgrading Cordova version from 3.7.0");
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
+		});
+
+		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1",() => {
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be updated to 3.7.0 when WPSdk is updated to 8.1");
+			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk should have been updated to 8.1");
+		});
+
+		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses",() => {
+			prompter.confirmResult = false;
+			assert.throws(() => project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait());
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
+			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
+		});
+
+		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses",() => {
+			// First set WPSdk to 8.1 and FrameworkVersion to 3.7.0
+			prompter.confirmResult = true;
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait()
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
+
+			prompter.confirmResult = false;
+			assert.throws(() => project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait());
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
+			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
+		});
+
+		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0",() => {
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
+			prompter.confirmCalled = false;
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
+			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change WPSdk to 8.0, but it is already 8.0. DO NOT PROMPT HERE!");
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.5.0");
+		});
+
+		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0",() => {
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
+			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
+			
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.0"]).wait();
+			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version should have been migrated to 8.0");
+			prompter.confirmCalled = false;
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change Cordova version to 3.7.0, but it is already 3.7.0. DO NOT PROMPT HERE!");
+			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version should have been migrated to 8.0");
+		});
+	});
+
+	describe("Init command tests",() => {
+		var options: any;
+		var tempFolder: string;
+		var projectName = "Test";
+		beforeEach(() => {
+			options = require("../lib/common/options");
+			tempFolder = temp.mkdirSync("template");
+			options.path = tempFolder;
+			options.appid = "com.telerik.Test";
+		});
+
 		describe("NativeScript project", () => {
 			it("Blank template has all mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "Blank";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
@@ -171,14 +285,7 @@ describe("project integration tests", () => {
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "TypeScript.Blank";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
 				var bootstrapJsFile = path.join(projectDir, "app", "bootstrap.js");
@@ -187,18 +294,60 @@ describe("project integration tests", () => {
 				var tnsDir = path.join(projectDir, "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
+
+			it("existing TypeScript.Blank project has project files after init",() => {
+				options.template = "TypeScript.Blank";
+				var project: Project.IProject = testInjector.resolve("project");
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				var projectDir = project.getProjectDir().wait();
+				var projectFile = path.join(projectDir, ".abproject");
+				var abignoreFile = path.join(projectDir, ".abignore");
+				fs.unlinkSync(projectFile);
+				fs.unlinkSync(abignoreFile);
+				options.path = projectDir;
+				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
+				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
+			});
+
+			it("existing project has .abproject and .abignore files after init",() => {
+				options.template = "Blank";
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				var projectDir = project.getProjectDir().wait();
+				var projectFile = path.join(projectDir, ".abproject");
+				var abignoreFile = path.join(projectDir, ".abignore");
+				fs.unlinkSync(projectFile);
+				fs.unlinkSync(abignoreFile);
+				options.path = projectDir;
+				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
+				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
+			});
 		});
 
-		describe("Cordova project", () => {
-			it("Blank template has all mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
+		describe("Cordova project",() => {
+			it("existing project has configuration specific files and .abignore files after init",() => {
 				options.template = "Blank";
-				options.appid = "com.telerik.Test";
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				var projectDir = project.getProjectDir().wait();
+				var projectFile = path.join(projectDir, projectConstants.PROJECT_FILE);
+				var releaseProjectFile = path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME);
+				var debugProjectFile = path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME);
+				var abignoreFile = path.join(projectDir, ".abignore");
+				fs.unlinkSync(projectFile);
+				fs.unlinkSync(releaseProjectFile);
+				fs.unlinkSync(debugProjectFile);
+				fs.unlinkSync(abignoreFile);
+				options.path = projectDir;
+				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
+				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
+				assert.isTrue(fs.existsSync(debugProjectFile), "After initialization, project does not have .debug.abproject file.");
+				assert.isTrue(fs.existsSync(releaseProjectFile), "After initialization, project does not have .release.abproject file.");
+			});
 
+			it("Blank template has all mandatory files", () => {
+				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
@@ -209,14 +358,7 @@ describe("project integration tests", () => {
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "TypeScript.Blank";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
@@ -227,14 +369,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.Drawer template has mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "KendoUI.Drawer";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
@@ -245,14 +380,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.Empty template has mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "KendoUI.Empty";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
@@ -263,14 +391,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.TabStrip template has mandatory files", () => {
-				var options: any = require("./../lib/common/options");
-				var tempFolder = temp.mkdirSync("template");
-				var projectName = "Test";
-
-				options.path = tempFolder;
 				options.template = "KendoUI.TabStrip";
-				options.appid = "com.telerik.Test";
-
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
@@ -327,13 +448,13 @@ function getProjectData(): IProjectData {
 		"AndroidVersionCode": "1",
 		"iOSDeviceFamily": ["1", "2"],
 		"iOSBackgroundMode": [],
-		"ProjectTypeGuids": "{F0A65104-D4F4-4012-B799-F612D75820F6}",
-		"FrameworkVersion": "0.4.0",
+		"ProjectTypeGuids": "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}",
+		"FrameworkVersion": "3.5.0",
 		"AndroidPermissions": [],
 		"DeviceOrientations": ["Portrait", "Landscape"],
 		"AndroidHardwareAcceleration": "false",
 		"iOSStatusBarStyle": "Default",
-		"Framework": "NativeScript",
+		"Framework": "Cordova",
 		"WP8TileTitle": "",
 		"WP8Publisher": "",
 		"WP8Capabilities": [],
@@ -346,7 +467,8 @@ function getProjectData(): IProjectData {
 			"ID_RESOLUTION_HD720P"
 		],
 		"CorePlugins": [ ],
-		"CordovaPluginVariables": {}
+		"CordovaPluginVariables": {},
+		"WPSdk": "8.0"
 	};
 }
 
@@ -363,7 +485,6 @@ describe("project unit tests", () => {
 		var staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
-
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
 	});
 

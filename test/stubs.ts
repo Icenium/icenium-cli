@@ -126,6 +126,10 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
+	isRelativePath(path: string): boolean {
+		return false;
+	}
+
 	ensureDirectoryExists(directoryPath: string): IFuture<void> {
 		return undefined;
 	}
@@ -384,4 +388,38 @@ export class HooksService implements IHooksService {
 	executeAfterHooks(): IFuture<void> {
 		return (() => { }).future<void>()();
 	}
+}
+
+export class JsonSchemaValidator implements IJsonSchemaValidator {
+	getValidProperties(framework: string, frameworkVersion: string): IStringDictionary {
+		return null;
+	}
+
+	validate(data: IProjectData): void { }
+
+	isValid(data: IProjectData): boolean {
+		return true;
+	}
+
+	tryResolveValidationSchema(framework: string): IDictionary<any> {
+		return null;
+	}
+
+	getPropertyType(framework: string, propertyName: string): string {
+		return "";
+	}
+}
+
+export class PrompterStub implements IPrompter {
+	public confirmResult = false;
+
+	start(): void {}
+	get(schema: IPromptSchema): IFuture<any> { return Future.fromResult("");}
+	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
+	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
+		return Future.fromResult(this.confirmResult);
+	}
+	history(name: string): IPromptHistoryValue { return undefined; }
+	override(object: any): void {}
+	public dispose() {}
 }

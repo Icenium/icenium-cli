@@ -76,7 +76,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-            var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
+			var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
 
 			// HACK - yargs parses double values (8.0) as integers (8)
 			if(normalizedProperty === "WPSdk") {
