@@ -57,6 +57,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		return _.values(allConfigFiles);
 	}
 
+	public get startPackageActivity(): string {
+		return ".TelerikCallbackActivity";
+	}
+
 	public getValidationSchemaId(): string {
 		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
 	}

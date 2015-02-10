@@ -52,6 +52,10 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		return [];
 	}
 
+	public get startPackageActivity(): string {
+		throw new Error("Not applicable.");
+	}
+
 	public getValidationSchemaId(): string {
 		return null;
 	}

@@ -60,6 +60,10 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		]
 	}
 
+	public get startPackageActivity(): string {
+		return "com.tns.NativeScriptActivity";
+	}
+
 	public getValidationSchemaId(): string {
 		return this.$jsonSchemaConstants.NATIVESCRIPT_SCHEMA_ID;
 	}

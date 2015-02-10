@@ -265,7 +265,9 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public get requiredAndroidApiLevel(): number { return 0; }
 
-	public get configFiles(): Project.IConfigurationFile[] { return undefined; }
+	public get configFiles(): Project.IConfigurationFile[]{ return undefined; }
+
+	public get startPackageActivity(): string { return ""; }
 
 	public getValidationSchemaId(): string { return ""; }
 

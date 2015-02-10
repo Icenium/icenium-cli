@@ -6,6 +6,7 @@ declare module Project {
 		configurations: string[];
 		requiredAndroidApiLevel: number;
 		projectConfigFiles: Project.IConfigurationFile[];
+		startPackageActivity: string;
 
 		createNewProject(projectName: string, framework: string): IFuture<void>;
 		initializeProjectFromExistingFiles(framework: string): IFuture<void>;
@@ -42,6 +43,7 @@ declare module Project {
 		liveSyncUrl: string;
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
+		startPackageActivity: string;
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;
