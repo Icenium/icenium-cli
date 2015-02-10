@@ -67,6 +67,10 @@ export class Project implements Project.IProject {
 		return this.frameworkProject.configFiles;
 	}
 
+	public get startPackageActivity(): string {
+		return this.frameworkProject.startPackageActivity;
+	}
+
 	public getProjectTargets(): IFuture<string[]> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
