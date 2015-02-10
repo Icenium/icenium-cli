@@ -120,7 +120,7 @@ export class PluginsService implements IPluginsService {
 			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 
 			var variables = pluginData.Variables;
-			if(variables) {
+			if(variables && variables.length > 0) {
 				if(!cordovaPluginVariables[pluginData.Identifier]) {
 					cordovaPluginVariables[pluginData.Identifier] = {};
 				}
