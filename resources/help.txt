@@ -770,9 +770,10 @@ Options:
             To list available provisioning profiles, run $ appbuilder provision.
     --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
             To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
-    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the simulator's session to start. It should be greater than 0.
-            If not set, the default timeout is 90 seconds.
-
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start
+            before quitting the operation and releasing the console.
+            The value must be a positive integer. 
+            If not set, the default timeout is 90 seconds. 
 --[/]--
 
 --[emulate|wp8]--
