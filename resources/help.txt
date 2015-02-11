@@ -1154,9 +1154,7 @@ Starts a remote server to let you run your app in the iOS Simulator from a Windo
 
 This operation is applicable only to OS X systems.
 
-IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run the command using sudo. For example: $ sudo appbuilder remote 443 
-
-<Port> is a non-negative integer that specifies a port on your OS X system. 
+<Port> is an integer greater than 1023 that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
 <Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
