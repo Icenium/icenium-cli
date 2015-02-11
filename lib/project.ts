@@ -656,7 +656,7 @@ export class Project implements Project.IProject {
 				this.createTemplateFolder(projectDir).wait();
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
-					this.$fs.unzip(templateFileName, projectDir).wait();
+					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
 					this.$logger.trace("Reading template project properties.");
 
 					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
