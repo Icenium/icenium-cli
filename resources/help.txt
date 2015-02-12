@@ -1020,7 +1020,7 @@ Options:
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
         To list available provisioning profiles, run $ appbuilder provision
-    --download - If set, downloads the application package to the root of the project
+    --download - If set, downloads the application package to the root of the project.
 --[/]--
 
 --[certificate-request]--
