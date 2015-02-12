@@ -8,7 +8,7 @@ import util = require("util");
 import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
 import MobileHelper = require("./common/mobile/mobile-helper");
-import options = require("./options");
+import options = require("./common/options");
 import projectPropertiesServiceLib = require("./services/project-properties-service");
 
 export class Project implements Project.IProject {

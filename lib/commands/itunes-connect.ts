@@ -3,7 +3,7 @@
 
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
-var options: any = require("../options");
+var options: any = require("../common/options");
 var Table = require("cli-table");
 
 export class AppstoreApplicationCommandBase implements ICommand {

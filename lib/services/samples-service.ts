@@ -8,7 +8,7 @@ import os = require("os");
 import temp = require("temp");
 import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
-var options: any = require("../options");
+var options: any = require("../common/options");
 
 class Sample {
 	constructor(public name: string,

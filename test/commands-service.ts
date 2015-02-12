@@ -10,30 +10,6 @@ import util = require("util");
 var assert = require("chai").assert;
 var commandParams = require("../lib/common/command-params");
 
-class ErrorsNoFailStub implements IErrors {
-	fail(formatStr: string, ...args: any[]): void;
-	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
-
-	fail(...args: any[]) { throw new Error(); }
-	failWithoutHelp(message: string, ...args: any[]): void {
-		throw new Error();
-	}
-
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		return (() => {
-			try {
-				var result = action().wait();
-			} catch(ex) {
-				return false;
-			}
-
-			return result;
-		}).future<boolean>()();
-	}
-
-	verifyHeap(message: string): void { }
-}
-
 export class LoggerStubWithErrorOnFatal implements ILogger {
 	setLevel(level: string): void { }
 	fatal(formatStr: string, ...args: string[]): void { throw new Error();}
@@ -58,7 +34,7 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 testInjector.register("config", configFile.Configuration);
 testInjector.register("logger", LoggerStubWithErrorOnFatal);
 testInjector.register("fs", stubs.FileSystemStub);
-testInjector.register("errors", ErrorsNoFailStub);
+testInjector.register("errors", stubs.ErrorsNoFailStub);
 testInjector.register("injector", testInjector);
 testInjector.register("staticConfig", stubs.StaticConfig);
 testInjector.register("hooksService", stubs.HooksService);

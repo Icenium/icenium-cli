@@ -5,9 +5,33 @@ import helpers = require("../lib/common/helpers");
 var assert = require("chai").assert;
 
 var isExecutionStopped = false;
-var mockBreakExecution = (message: string): void => {
-	isExecutionStopped = true;
-};
+
+class ErrorsNoFailStub implements IErrors {
+	fail(formatStr: string, ...args: any[]): void;
+	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
+
+	fail(...args: any[]) { throw new Error(); }
+
+	failWithoutHelp(message: string, ...args: any[]): void {
+		isExecutionStopped = true;
+	}
+
+	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
+		return (() => {
+			try {
+				return action().wait();
+			} catch(ex) {
+				return false;
+			}
+		}).future<boolean>()();
+	}
+
+	executeAction(action: Function): any {
+		return action();
+	}
+
+	verifyHeap(message: string): void { }
+}
 
 var knownOpts = {
 	"path": String,
@@ -20,6 +44,16 @@ var shorthands = {
 };
 
 describe("common helpers", () => {
+	var oldInjector: IInjector;
+	before(() => {
+		oldInjector = $injector;
+		$injector.register("errors", ErrorsNoFailStub);
+	});
+
+	after(() => {
+		$injector = oldInjector;
+	});
+
 	describe("validateYargsArguments", () => {
 		it("breaks execution when option is not valid", () => {
 			isExecutionStopped = false;
@@ -27,7 +61,6 @@ describe("common helpers", () => {
 				"pathr": "incorrect argument"
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -40,7 +73,6 @@ describe("common helpers", () => {
 				"path": true
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -52,7 +84,6 @@ describe("common helpers", () => {
 				"path": "SomeDir"
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
@@ -64,7 +95,6 @@ describe("common helpers", () => {
 				"help": "Invalid string value" // help requires boolean value.
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -76,7 +106,6 @@ describe("common helpers", () => {
 				"path": ""
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -88,7 +117,6 @@ describe("common helpers", () => {
 				"path": "  "
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 			assert.isTrue(isExecutionStopped);
 		});
@@ -99,7 +127,6 @@ describe("common helpers", () => {
 				"r": "incorrect shorthand"
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -111,7 +138,6 @@ describe("common helpers", () => {
 				"v": true
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
@@ -123,7 +149,6 @@ describe("common helpers", () => {
 				"v": "invalid string value" // v requires boolean value
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -136,7 +161,6 @@ describe("common helpers", () => {
 				"path": "1"
 			};
 
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
@@ -149,7 +173,6 @@ describe("common helpers", () => {
 			};
 
 			parsed.path = null;
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
@@ -162,7 +185,6 @@ describe("common helpers", () => {
 			};
 
 			parsed.path = undefined;
-			helpers.breakExecution = mockBreakExecution;
 			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);

@@ -2,7 +2,7 @@
 "use strict";
 
 import path = require("path");
-import options = require("../options");
+import options = require("../common/options");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 

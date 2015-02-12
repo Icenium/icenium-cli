@@ -1,9 +1,11 @@
-require("./options");
 require("./common/bootstrap");
+$injector.require("staticConfig", "./config");
+$injector.require("config", "./config");
+$injector.require("userSettingsService", "./services/user-settings-service");
+require("./options");
+// note: order above is important!
 
 $injector.require("serverConfiguration", "./server-config");
-$injector.require("config", "./config");
-$injector.require("staticConfig", "./config");
 $injector.requireCommand("dev-config", "./commands/dev/config");
 $injector.requireCommand("dev-config-apply", "./commands/dev/config-apply");
 $injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
@@ -128,7 +130,6 @@ $injector.require("clientUserSettingsFileService", "./services/user-settings-ser
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsFileService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
-$injector.require("userSettingsService", "./services/user-settings-service");
 $injector.require("analyticsSettingsService", "./services/analytics-settings-service");
 
 $injector.require("pathFilteringService", "./services/path-filtering");

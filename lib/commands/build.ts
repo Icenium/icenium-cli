@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 import MobileHelper = require("./../common/mobile/mobile-helper");
-import options = require("./../options");
+import options = require("../common/options");
 
 export class BuildCommand implements ICommand {
 	constructor(private $buildService: Project.IBuildService,

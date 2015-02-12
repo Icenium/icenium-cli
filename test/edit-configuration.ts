@@ -1,4 +1,5 @@
 ///<reference path=".d.ts"/>
+"use strict";
 
 import chai = require("chai");
 import fs = require("fs");
@@ -8,7 +9,7 @@ import stubs = require("./stubs");
 import childProcess = require("../lib/common/child-process");
 import fileSystem = require("../lib/common/file-system");
 import project = require("../lib/project");
-import options = require("../lib/options");
+import options = require("../lib/common/options");
 import editConfiguration = require("../lib/commands/edit-configuration");
 import yok = require("../lib/common/yok");
 import temp = require("temp");
@@ -80,7 +81,7 @@ describe("edit-configuration", () => {
 		var opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
 			openArgument = filepath;
-		}
+		};
 
 		var templateFilePath = path.join(tempDir, template.filepath);
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath)).wait();

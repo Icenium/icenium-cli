@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-var options: any = require("../options");
+var options: any = require("../common/options");
 import Future = require("fibers/future");
 import util = require("util");
 import helpers = require("../helpers");
@@ -804,7 +804,7 @@ class ImportProvisionCommand implements ICommand {
 			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("provision", []).wait();
+			this.$commandsService.tryExecuteCommand("provision", []).wait();
 		}).future<void>()();
 	}
 }
@@ -837,7 +837,7 @@ class RemoveProvisionCommand implements ICommand {
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
-			this.$commandsService.executeCommand("provision", []).wait();
+			this.$commandsService.tryExecuteCommand("provision", []).wait();
 		}).future<void>()();
 	}
 }

@@ -3,7 +3,7 @@
 import util = require("util");
 import path = require("path");
 import watchr = require("watchr");
-var options: any = require("./../options");
+var options: any = require("../common/options");
 import helpers = require("./../helpers");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");

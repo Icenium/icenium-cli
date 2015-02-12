@@ -3,7 +3,7 @@
 
 import os = require("os");
 import util = require("util");
-import options = require("./../options");
+import options = require("../common/options");
 
 export class PluginsService implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";

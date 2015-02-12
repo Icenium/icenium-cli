@@ -10,7 +10,7 @@ import osenv = require("osenv");
 import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");
-import options = require("../options");
+import options = require("../common/options");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,

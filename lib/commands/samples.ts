@@ -2,7 +2,7 @@
 "use strict";
 
 import path = require("path");
-var options: any = require("../options");
+var options: any = require("../common/options");
 
 export class PrintSamplesInformationCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService) { }

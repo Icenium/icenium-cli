@@ -3,7 +3,7 @@
 
 import path = require("path");
 import helpers = require("./helpers");
-import options = require("./options");
+import options = require("./common/options");
 import Future = require("fibers/future");
 import util = require("util");
 import unzip = require("unzip");

@@ -11,7 +11,7 @@ import path = require("path");
 import temp = require("temp");
 import util = require("util");
 import MobileHelper = require("./../lib/common/mobile/mobile-helper");
-import options = require("./../lib/options");
+import options = require("./../lib/common/options");
 import helpers = require("../lib/helpers");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
 import nativeScriptProjectLib = require("./../lib/project/nativescript-project");
@@ -90,7 +90,7 @@ describe("project integration tests", () => {
 
 	describe("createNewProject", () => {
 		it("creates a valid project folder (Cordova project)", () => {
-			var options: any = require("./../lib/options");
+			var options: any = require("./../lib/common/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
 
@@ -122,7 +122,7 @@ describe("project integration tests", () => {
 		});
 
 		it("creates a valid project folder (NativeScript project)", () => {
-			var options: any = require("./../lib/options");
+			var options: any = require("./../lib/common/options");
 			var tempFolder = temp.mkdirSync("template");
 			var projectName = "Test";
 
@@ -152,7 +152,7 @@ describe("project integration tests", () => {
 	describe("Init command mandatory files tests", () => {
 		describe("NativeScript project", () => {
 			it("Blank template has all mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -170,7 +170,7 @@ describe("project integration tests", () => {
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -190,7 +190,7 @@ describe("project integration tests", () => {
 
 		describe("Cordova project", () => {
 			it("Blank template has all mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -208,7 +208,7 @@ describe("project integration tests", () => {
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -226,7 +226,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.Drawer template has mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -244,7 +244,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.Empty template has mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 
@@ -262,7 +262,7 @@ describe("project integration tests", () => {
 			});
 
 			it("KendoUI.TabStrip template has mandatory files", () => {
-				var options: any = require("./../lib/options");
+				var options: any = require("./../lib/common/options");
 				var tempFolder = temp.mkdirSync("template");
 				var projectName = "Test";
 

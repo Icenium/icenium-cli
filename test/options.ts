@@ -1,7 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import options = require("../lib/options");
+import options = require("../lib/common/options");
 var assert = require("chai").assert;
 var yargs: any = require("yargs");
 
