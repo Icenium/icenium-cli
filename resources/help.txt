@@ -1164,8 +1164,10 @@ Options:
             When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
             from the other Telerik AppBuilder clients. 
             To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
-    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the simulator's session to start. It should be greater than 0.
-                 If not set, the default timeout is 90 seconds.
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start
+            before quitting the operation and releasing the console.
+            The value must be a positive integer. 
+            If not set, the default timeout is 90 seconds.
 --[/]--
 
 --[mobileframework]--
