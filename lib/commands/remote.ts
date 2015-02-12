@@ -55,7 +55,7 @@ export class RemoteCommand implements ICommand {
 				this.$errors.fail("You must specify a valid port number. Valid values are between 1 and 65535.");
 			}
 
-			if (!hostInfo.isWindows() && (parsedPortNumber < 1024) && process.getuid() !== 0) {
+			if (!hostInfo.isWindows() && (parsedPortNumber < 1024)) {
 				this.$errors.fail("Port %s is a system port and cannot be used." + os.EOL +
 				"To use a non-system port, re-run the command with a port number greater than 1023.", parsedPortNumber.toString());
 			}
