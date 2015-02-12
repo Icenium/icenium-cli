@@ -46,6 +46,8 @@ Plugin management commands:
 Device commands:
     device                          Lists all recognized connected devices.
     device log                      Opens the log stream for the selected device.
+    device run                      Runs the selected application on a connected device.
+    device list-applications        Lists the installed applications on all connected devices.
 
 Certificate management and publishing commands:
     certificate-request             Lists all pending certificate signing requests (.csr).
@@ -142,8 +144,8 @@ Options:
 Usage:
     $ appbuilder create website <Site name> [--template <Template>] [--path <path>]
 
-Creates a new project from a Telerik Mobile Website-based template.
-<Site name> is the name of the web site project. The maximum length is 30 characters. You can use only the following characters:
+Creates a new project from a Mobile Website-based template.
+<Site name> is the name of the website project. The maximum length is 30 characters. You can use only the following characters:
     A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 
 Options:
@@ -195,7 +197,7 @@ run it in the simulator, and build and deploy it on your devices. To list all av
 run $ appbuilder sample.
 
 The Telerik AppBuilder CLI clones the sample and preserves its existing project configuration.
-If you want to develop for Windows Phone 8, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties
+If you want to develop for Windows Phone, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties
 to avoid issues when running your app on device. For more information about how to configure your project properties,
 run $ appbuilder prop --help
 
@@ -316,6 +318,8 @@ Options:
 
 <Command> is a related command that extends the device command. You can run the following related commands:
     log - Opens the device log stream for a selected connected device.
+    list-applications - Lists the installed applications on all connected Android or iOS devices.
+    run - Runs the selected application on a connected Android or iOS device.
 
 --[/]--
 
@@ -324,31 +328,53 @@ Usage:
     $ appbuilder device log --device <Device ID>
 
 Opens the device log stream for a selected connected device. 
-<Device ID> is the device index or identifier as listed by run $ appbuilder device.
 
-To list all connected devices, grouped by platform, run $ appbuilder device.
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+To list all connected devices, grouped by platform, run $ appbuilder device
+
+Options:
+   --device - If multiple devices are connected, sets the device for which you want to stream the log in the console.
 
 --[/]--
 
 --[device|list-applications]--
 
 Usage:
-    $ appbuilder device list-applications
-    $ appbuilder device list-applications
+    $ appbuilder device list-applications [--device <Device ID>]
 
-Lists all installed applications on device.
+Lists the installed applications on all connected Android and iOS devices. 
+This operation is not applicable to Windows Phone devices.
 
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+Options:
+   --device - If multiple devices are connected, sets the device for which you want to list all currently installed applications. 
 --[/]--
 
 --[device|run]--
 
 Usage:
-    $ appbuilder device run <ApplicationId>
-    $ appbuilder device run <ApplicationId>
+    $ appbuilder device run <Application ID> [--device <Device ID>]
 
-Run the selected application on device.
-<ApplicationId> is the application id as listed from $tns device list-applications
+Runs the selected application on a connected Android or iOS device.
+You can run this command on one connected device at a time.
+This operation is not applicable to Windows Phone devices.
 
+<Application ID> is the application identifier as listed by $ appbuilder device list-applications
+<Device ID> is the device index or identifier as listed by run $ appbuilder device
+
+Prerequisites:
+Before running your app on an iOS device, verify that your system and app meet the following requirements.
+    * You are running the Telerik AppBuilder CLI on an OS X system.
+    * You have installed Xcode 5 or later.
+    * You have built your app with the debug build configuration.
+Before running your app on an Android device, verify that your app meets the following requirement.
+    * You have built your app with the debug build configuration.
+
+Options:
+   --device - If multiple devices are connected, sets the device on which you want to run the app.
+        You can run this command on one connected device at a time.
 --[/]--
 
 --[build]--
@@ -392,13 +418,13 @@ Options:
         instead of the project root. The file path must be complete with file name and extension.
         You do not need to set the --download switch.
 
-When you build for Windows Phone 8 without the --download switch, the Telerik AppBuilder CLI lets you download and install
+When you build for Windows Phone without the --download switch, the Telerik AppBuilder CLI lets you download and install
 the Telerik Application Enrollment Token (AET) on your device via QR code. Always make sure that you have
-installed the Telerik AET on the device before attempting to scan the QR code for your Windows Phone 8 app package.
+installed the Telerik AET on the device before attempting to scan the QR code for your Windows Phone app package.
 If the Telerik AET is not installed on the device, the following error message will appear when you attempt
 to install your app: "Before you install this app, you need to add Telerik AD company account".
 
-When you build for Windows Phone 8 without the --download switch, you can deploy the app
+When you build for Windows Phone without the --download switch, you can deploy the app
 package on device only via QR code or by opening the link in the device browser.
 You cannot install the app package manually via cable connection.
 --[/]--
@@ -445,7 +471,7 @@ Platform-specific usages:
     $ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]
 
 Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
-you cannot synchronize changes to Windows Phone 8 connected devices.
+you cannot synchronize changes to Windows Phone connected devices.
 <Device ID> is the device index or identifier as listed by run $ appbuilder device.
 
 Options:
@@ -483,7 +509,7 @@ Platform-specific usages:
 Builds the project for the selected platform and deploys it to connected physical devices. When you build for Android,
 deploys the project on all connected physical devices and running Android virtual devices. 
 
-In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone 8 connected devices. 
+In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone connected devices. 
 
 In this version of the Telerik AppBuilder CLI, you cannot build and deploy to iOS connected devices on Linux systems.
 
@@ -637,7 +663,7 @@ For more information about .abignore, see https://github.com/Icenium/icenium-cli
 <Command> is a related command that sets a target platform for the emulate command. You can run the following related commands:
     android - Builds the specified project in the cloud and runs it in the native Android emulator.
     ios - Builds the specified project in the cloud and runs it in the native iOS Simulator.
-    wp8 - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+    wp8 - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
 
 Options:
     --debug - If set, applies the Debug build configuration. For more information about build configurations,
@@ -648,13 +674,15 @@ Options:
 
 --[emulate|android]--
 Usage:
-    $ appbuilder emulate android [--avd <Name>] [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
+    $ appbuilder emulate android [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
-Builds the specified project in the cloud and runs it in the native Android emulator.
-If you do not select an Android virtual device (AVD) with the avd option,
-your app runs in the default emulator or a currently running emulator, if any. 
+Builds the specified project in the cloud and runs it in a native Android emulator.
+If you do not select an Android virtual device (AVD) with the --avd or a Genymotion
+virtual device with the --geny option, your app runs in the default AVD or a currently running emulator, if any. 
 To list the available AVDs, run $ android list avd
-You cannot use --avd and --geny option simultaneously.
+To list the available Genymotion devices, run $ genyshell -c "devices list"
 
 To test your app on multiple Android virtual devices, run $ appbuilder emulate android --avd <Name> or $ appbuilder emulate android --geny <GenyName>
 for each virtual device.
@@ -662,17 +690,22 @@ for each virtual device.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Name> is the name of the Android virtual device that you want to use as listed by $ android list avd
     You can specify only one name at a time.
-<GenyName> is the name of the Genymotion virtual device that you want to use as listed by Genyshell's `devices list` command.
+<GenyName> is the name of the Genymotion virtual device that you want to use as listed by $ genyshell -c "devices list"
     You can specify only one name at a time.
 
 Prerequisites:
-Before running your app in the Android emulator, verify that your system meets the following requirements.
-    * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X, or Linux system.
+Before running your app in the Android emulator from the Android SDK, verify that your system meets the following requirements.
+    * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X or Linux system.
     * Verify that you have installed the Android SDK.
     * Verify that you have added the following Android SDK directories to the PATH environment variable:
         platform-tools
         tools
-    * In case you use Genymotion emulator, verify that you have added its installation directory to the PATH environment variable.
+Before running your app in the Genymotion emulator, verify that your system meets the following requirements.
+    * Verify that you have installed Genymotion.
+    * On Windows and Linux systems, verify that you have added the Genymotion installation directory to the PATH environment variable.
+    * On OS X systems, verify that you have added the following paths to the PATH environment variable.
+        * /Applications/Genymotion.app/Contents/MacOS/
+        * /Applications/Genymotion Shell.app/Contents/MacOS/
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
@@ -688,11 +721,13 @@ Options:
             a certificate by index or name.
             To list available certificates, run $ appbuilder certificate
     --avd - Sets the Android virtual device on which you want to run your app. 
-            You can set only one device at a time.
+            You can set only one device at a time. 
             To list the available Android virtual devices, run $ android list avd
+            You cannot use --avd and --geny simultaneously.
     --geny - Sets the Genymotion virtual device on which you want to run your app. 
             You can set only one device at a time.
-            To list the available Android virtual devices, run $ android list avd        
+            To list the available Genymotion virtual devices, run $ genyshell -c "devices list"
+            You cannot use --avd and --geny simultaneously.      
     --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot
             before quitting the operation and releasing the console.
             If not set, the default timeout is 120 seconds. To wait indefinitely, set 0.
@@ -700,7 +735,7 @@ Options:
 
 --[emulate|ios]--
 Usage:
-    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices] [--debug] [--release]
+    $ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices] [--debug] [--release] [--timeout]
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator.
 
@@ -735,21 +770,24 @@ Options:
             To list available provisioning profiles, run $ appbuilder provision.
     --device - Specifies the name of the iOS Simulator device on which you want to run your app. 
             To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
-
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start
+            before quitting the operation and releasing the console.
+            The value must be a positive integer. 
+            If not set, the default timeout is 90 seconds. 
 --[/]--
 
 --[emulate|wp8]--
 Usage:
     $ appbuilder emulate wp8 [--path <Directory>] [--debug] [--release]
 
-Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK.
+Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
 
 This command is not applicable to NativeScript projects.
 
 Prerequisites:
-Before running the Windows Phone 8.0 emulator, verify that your system meets the following requirements.
+Before running the Windows Phone 8.0 or the Windows Phone 8.1 emulator, verify that your system meets the following requirements.
 	You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
-	You have installed the Windows Phone 8.0 SDK.
+	You have installed the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
 For more information about .abignore, see https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md.
@@ -951,7 +989,7 @@ Usage:
 
 You must run the appmanager command with a related command.
 
-This command is not applicable to NativeScript and Mobile Website projects.
+This command is not applicable to Mobile Website projects.
 
 <Command> is a related command that extends the appmanager command. You can run the following related commands:
     upload - Builds the project and uploads the binary to Telerik AppManager.
@@ -959,7 +997,7 @@ This command is not applicable to NativeScript and Mobile Website projects.
 
 --[appmanager|upload]--
 Usage:
-    $ appbuilder appmanager upload <Platform> [--certificate <Certificate ID>] [--provision <Provision ID>]
+    $ appbuilder appmanager upload <Platform> [--certificate <Certificate ID>] [--provision <Provision ID>] [--download]
 
 Platform-specific usage:
     $ appbuilder appmanager upload android --certificate <Certificate ID>
@@ -969,11 +1007,11 @@ Platform-specific usage:
 Builds the project and uploads the application to Telerik AppManager.
 After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
 
+This command is not applicable to Mobile Website projects.
+
 <Platform> is the target distribution platform. You can set ios, android or wp8.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision
-
-This command is not applicable to NativeScript and Mobile Website projects.
 
 Options:
     --certificate - Sets the certificate that you want to use for code signing your iOS or Android app. You can set 
@@ -982,6 +1020,7 @@ Options:
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
         To list available provisioning profiles, run $ appbuilder provision
+    --download - If set, downloads the application package to the root of the project
 --[/]--
 
 --[certificate-request]--
@@ -1044,12 +1083,17 @@ You must run the prop command with a related command.
 
 --[prop|print]--
 Usage:
-    $ appbuilder prop print <PropertyName> [--validValue]
+    $ appbuilder prop print [--validValue]
+    $ appbuilder prop print <Property Name> [--validValue]
 
-Shows the value for the selected project property. When executed without <Property Name> command prints all project properties and their values.
+Prints information about the configuration of the project or the selected property.
+If --validValue is set, prints the valid configuration values. 
+If not set, prints the current configuration. 
 
-  --validValue - If set, prints valid values for the selected property. In case <Property Name> is not specified, command will print all valid values 
-for all project properties.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
+
+Options:
+    --validValue - When set, prints the valid values for all valid project properties or for the selected property.
 --[/]--
 
 --[prop|add]--
@@ -1057,9 +1101,9 @@ Usage:
     $ appbuilder prop add <Property Name> <Value> [Value]*
 
 Enables more options for the selected project property, if the property accepts multiple values.
-Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
+Run $ appbuilder prop print <Property Name> --validValue to print the valid values for the property.
 
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
@@ -1069,9 +1113,9 @@ Usage:
     $ appbuilder prop set <Property Name> <Value> [Value]*
 
 Sets the selected project property and overwrites its current value.
-Use $ appbuilder prop print <Property Name> --validValue to print values of the property.
+Run $ appbuilder prop print <Property Name> --validValue to print the valid values for the property.
 
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
@@ -1081,7 +1125,7 @@ Usage:
     $ appbuilder prop remove <Property Name> <Value> [Value]*
 
 Disables options for the selected project property, if the property accepts multiple values.
-<Property Name> is the name of the project property as listed by $ appbuilder prop print.
+<Property Name> is the name of the project property as listed by $ appbuilder prop print
 
 IMPORTANT: Do not modify the CorePlugins property with this command. Instead, use the $ appbuilder plugin commands.
 --[/]--
@@ -1104,15 +1148,13 @@ All data gathered is used strictly for improving the product and will never be u
 --[remote]--
 
 Usage:
-    $ appbuilder remote <Port> [--device <Device Name>]
+    $ appbuilder remote <Port> [--device <Device Name>] [--timeout]
 
 Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. 
 
 This operation is applicable only to OS X systems.
 
-IMPORTANT: If you want to listen on a port in the range of 0 through 1023, run the command using sudo. For example: $ sudo appbuilder remote 443 
-
-<Port> is a non-negative integer that specifies a port on your OS X system. 
+<Port> is an integer greater than 1023 that specifies a port on your OS X system. 
        Make sure that the port is open and that your firewall allows traffic on it, if configured. 
        Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
 <Device Name> is the name of the iOS Simulator device on which you want to run your app as listed by $ appbuilder emulate ios --availableDevices
@@ -1122,6 +1164,8 @@ Options:
             When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
             from the other Telerik AppBuilder clients. 
             To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the simulator's session to start. It should be greater than 0.
+                 If not set, the default timeout is 90 seconds.
 --[/]--
 
 --[mobileframework]--

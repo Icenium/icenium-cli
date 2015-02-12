@@ -212,3 +212,12 @@ export function block(operation: () => void): void {
 	}
 }
 
+// Remove when node incorporates ES6 array.fill
+export function fill(value: string, times: number): string[]{
+	var repeatedValues: string[] = [];
+	for(var repeat = 0; repeat < times; repeat++) {
+		repeatedValues.push(value);
+	}
+
+	return repeatedValues;
+}

@@ -89,12 +89,13 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 
-	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
+	public get START_PACKAGE_ACTIVITY_NAME(): string {
+		var project: Project.IProject = $injector.resolve("project");
+		return project.startPackageActivity;
+	}
 
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;
-	public DEBUG_PROJECT_FILE_NAME = ".debug.abproject";
-	public RELEASE_PROJECT_FILE_NAME = ".release.abproject";
 
 	public version = require("../package.json").version;
 

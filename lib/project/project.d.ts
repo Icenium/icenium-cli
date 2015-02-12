@@ -2,11 +2,11 @@ declare module Project {
 	interface IProject {
 		projectData: IProjectData;
 		capabilities: IProjectCapabilities;
-		projectTargets: IFuture<string[]>;
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
 		requiredAndroidApiLevel: number;
 		projectConfigFiles: Project.IConfigurationFile[];
+		startPackageActivity: string;
 
 		createNewProject(projectName: string, framework: string): IFuture<void>;
 		initializeProjectFromExistingFiles(framework: string): IFuture<void>;
@@ -43,6 +43,7 @@ declare module Project {
 		liveSyncUrl: string;
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
+		startPackageActivity: string;
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;
@@ -88,8 +89,12 @@ declare module Project {
 
 	interface IProjectConstants {
 		PROJECT_FILE: string;
-		RELEASE_CONFIGURATION_NAME: string;
 		DEBUG_CONFIGURATION_NAME: string;
+		DEBUG_PROJECT_FILE_NAME: string;
+		RELEASE_CONFIGURATION_NAME: string;
+		RELEASE_PROJECT_FILE_NAME: string;
+		CORE_PLUGINS_PROPERTY_NAME: string;
+		CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME: string;
 		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
 	}
 
