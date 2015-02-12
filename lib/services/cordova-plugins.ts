@@ -14,7 +14,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
-		private $server: Server.IServer) {
+		private $server: Server.IServer,
+		private $projectConstants: Project.IProjectConstants) {
 
 		this.$project.ensureCordovaProject();
 	}
@@ -108,7 +109,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	public createPluginData(plugin: Server.CordovaPluginData): IFuture<IPlugin> {
 		return (() => {
-			return new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier));
+			return new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants);
 		}).future<IPlugin>()();
 	}
 

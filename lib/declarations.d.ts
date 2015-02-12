@@ -160,6 +160,7 @@ interface IProjectCapabilities {
 	livesync: boolean;
 	livesyncCompanion: boolean;
 	updateKendo: boolean;
+	emulate: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -228,8 +229,6 @@ interface IConfiguration extends Config.IConfig {
 interface IStaticConfig extends Config.IStaticConfig {
 	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
-	DEBUG_PROJECT_FILE_NAME: string;
-	RELEASE_PROJECT_FILE_NAME: string;
 	triggerJsonSchemaValidation: boolean;
 }
 
@@ -344,6 +343,11 @@ interface IPluginsService {
 	removePlugin(pluginName: string): IFuture<void>;
 	configurePlugin(pluginName: string, configuration?: string): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;
+}
+
+interface IPublisher {
+	name: string;
+	url: string;
 }
 
 interface IPlugin {

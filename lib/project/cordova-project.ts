@@ -35,7 +35,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			simulate: true,
 			livesync: true,
 			livesyncCompanion: true,
-			updateKendo: true
+			updateKendo: true,
+			emulate: true
 		};
 	}
 
@@ -54,6 +55,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	public get configFiles(): Project.IConfigurationFile[] {
 		var allConfigFiles = this.$projectFilesManager.availableConfigFiles;
 		return _.values(allConfigFiles);
+	}
+
+	public get startPackageActivity(): string {
+		return ".TelerikCallbackActivity";
 	}
 
 	public getValidationSchemaId(): string {
