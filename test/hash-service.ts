@@ -64,6 +64,10 @@ class ErrorsNoFailStub implements IErrors {
 		}).future<boolean>()();
 	}
 
+	executeAction(action: Function): any {
+		return action();
+	}
+
 	verifyHeap(message: string): void { }
 }
 

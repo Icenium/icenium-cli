@@ -5,7 +5,7 @@ import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
-var options:any = require("../options");
+var options:any = require("../common/options");
 
 export class RemoteProjectService implements IRemoteProjectService {
 	private clientSolutions: Server.TapSolutionData[];

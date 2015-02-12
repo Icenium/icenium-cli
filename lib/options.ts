@@ -1,12 +1,12 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import helpers = require("./common/helpers");
-import _ = require("lodash");
 import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");
 import hostInfo = require("./common/host-info");
+
+declare var exports: any;
 
 var knownOpts: any = {
 		"companion": Boolean,
@@ -32,8 +32,8 @@ var knownOpts: any = {
 		"d": "debug"
 	};
 
-_.extend(knownOpts, commonOptions.knownOpts);
-_.extend(shorthands, commonOptions.shorthands);
+_.extend(commonOptions.knownOpts, knownOpts);
+_.extend(commonOptions.shorthands, shorthands);
 
 var defaultProfileDir = "";
 var blackDragonCacheFolder = "Telerik/BlackDragon";
@@ -45,17 +45,10 @@ if(hostInfo.isWindows()) {
 }
 
 commonOptions.setProfileDir(defaultProfileDir);
-var parsed = helpers.getParsedOptions(knownOpts, shorthands, "appbuilder");
-
-Object.keys(parsed).forEach(opt => {
-	var key = opt;
-	if(shorthands[opt]) {
-		key = shorthands[opt];
-	}
-
-	exports[key] = parsed[opt];
+_(commonOptions.validateArgs("appbuilder")).each((val,key) => {
+	key = shorthands[key] || key;
+	commonOptions[key] = val;
 });
 exports.knownOpts = knownOpts;
-
-declare var exports: any;
+exports.shorthands = shorthands;
 export = exports;

@@ -2,7 +2,7 @@
 "use strict";
 
 import commonHelpers = require("./../common/helpers");
-import options = require("./../options");
+import options = require("../common/options");
 
 import path = require("path");
 import util = require("util");

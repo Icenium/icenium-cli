@@ -160,9 +160,39 @@ export class ErrorsStub implements IErrors {
 		return action();
 	}
 
-	verifyHeap(message: string): void {
-
+	executeAction(action: Function): any {
+		return action();
 	}
+
+	verifyHeap(message: string): void { }
+}
+
+export class ErrorsNoFailStub implements IErrors {
+	fail(formatStr: string, ...args: any[]): void;
+	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
+
+	fail(...args: any[]) { throw new Error(); }
+	failWithoutHelp(message: string, ...args: any[]): void {
+		throw new Error();
+	}
+
+	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
+		return (() => {
+			try {
+				var result = action().wait();
+			} catch(ex) {
+				return false;
+			}
+
+			return result;
+		}).future<boolean>()();
+	}
+
+	executeAction(action: Function): any {
+		return action();
+	}
+
+	verifyHeap(message: string): void { }
 }
 
 export class OpenerStub implements IOpener {

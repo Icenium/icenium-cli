@@ -5,8 +5,8 @@ import xmlMapping = require("xml-mapping");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import options = require("./../options");
-import helpers = require("./../helpers");
+import options = require("../common/options");
+import helpers = require("../helpers");
 import userSettingsServiceBaseLib = require("./../common/services/user-settings-service");
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {

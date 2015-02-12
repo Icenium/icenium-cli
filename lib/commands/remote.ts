@@ -8,7 +8,7 @@ import os = require("os");
 import minimatch = require("minimatch");
 import ip = require("ip");
 import hostInfo = require("../common/host-info");
-import options = require("./../options");
+import options = require("../common/options");
 
 export class PortCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors) { }

@@ -4,6 +4,7 @@
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
 import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
+import childProcess = require("../lib/common/child-process");
 import fslib = require("./../lib/common/file-system");
 import helpers = require("../lib/common/helpers");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
@@ -64,8 +65,8 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 
 function createTestInjector() {
 	var testInjector = new yok.Yok();
+	testInjector.register("childProcess", childProcess.ChildProcess);
 	testInjector.register("project", projectLib.Project);
-
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
@@ -142,12 +143,14 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	var testInjector = createTestInjector();
+	var oldGlobalInjector = $injector;
+	$injector = testInjector;
 	var projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
 	var project = testInjector.resolve("project");
 	var fs = testInjector.resolve("fs");
 
 	// Create new project
-	var options:any = require("./../lib/options");
+	var options:any = require("./../lib/common/options");
 	var tempFolder = temp.mkdirSync("template");
 
 	var projectName = "Test";
@@ -184,6 +187,8 @@ function assertCorePluginsCount(configuration?: string) {
 	project.getProperty = (propertyName: string, configuration: string) => {
 		return abProjectContent[propertyName];
 	};
+
+	$injector = oldGlobalInjector;
 
 	assert.equal(abProjectContent["CorePlugins"].length, service.getInstalledPlugins().length);
 }

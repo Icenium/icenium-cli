@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import options = require("./../options");
+import options = require("../common/options");
 import util = require("util");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import Future = require("fibers/future");

@@ -7,7 +7,7 @@ import util = require("util");
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
-import options = require("../options");
+import options = require("../common/options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
