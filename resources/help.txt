@@ -679,7 +679,7 @@ Usage:
     $ appbuilder emulate android [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]
 
 Builds the specified project in the cloud and runs it in a native Android emulator.
-If you do not select an Android virtual device (AVD) with the --avd or a Genymotion
+If you do not select an Android virtual device (AVD) with the --avd option or a Genymotion
 virtual device with the --geny option, your app runs in the default AVD or a currently running emulator, if any. 
 To list the available AVDs, run $ android list avd
 To list the available Genymotion devices, run $ genyshell -c "devices list"
@@ -1020,7 +1020,7 @@ Options:
     --provision - Sets the provisioning profile that you want to use for code signing your iOS app. You can set
         a provisioning profile by index or name.
         To list available provisioning profiles, run $ appbuilder provision
-    --download - If set, downloads the application package to the root of the project
+    --download - If set, downloads the application package to the root of the project.
 --[/]--
 
 --[certificate-request]--
@@ -1164,8 +1164,10 @@ Options:
             When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices
             from the other Telerik AppBuilder clients. 
             To list the available iOS Simulator devices, run $ appbuilder emulate ios --availableDevices
-    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the simulator's session to start. It should be greater than 0.
-                 If not set, the default timeout is 90 seconds.
+    --timeout - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start
+            before quitting the operation and releasing the console.
+            The value must be a positive integer. 
+            If not set, the default timeout is 90 seconds.
 --[/]--
 
 --[mobileframework]--
