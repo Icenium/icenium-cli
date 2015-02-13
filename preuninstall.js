@@ -5,8 +5,12 @@ var fs = require("fs");
 var options = require("./lib/options");
 
 var adbPath = util.format("resources/platform-tools/android/%s/adb", process.platform);
-var killAdbServerCommand = util.format("\"%s\" %s", adbPath, " kill-server");
+var executableAdbPath = process.platform === "win32" ? adbPath + ".exe" : adbPath;
+if(!fs.existsSync(executableAdbPath)) {
+	adbPath = "lib/common/" + adbPath;
+}
 
+var killAdbServerCommand = util.format("\"%s\" %s", adbPath, " kill-server");
 child_process.exec(killAdbServerCommand, function(error) {
 	if(error) {
 		console.log(error.toString());
