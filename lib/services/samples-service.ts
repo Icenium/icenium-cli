@@ -30,7 +30,6 @@ export class SamplesService implements ISamplesService {
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
 	private static NATIVESCRIPT_SAMPLE_CUTENESS_NAME = "nativescript-sample-cuteness";
 	private sampleCategories = [
-		{ id: "chrome-app", regEx: /(^|\s)chrome($|\s)/i, name: "Chrome Applications", order: 4, matchOrder: 1 },
 		{ id: "demo-app", regEx: /(^|\s)demo($|\s)/i, name: "Demo Applications", order: 1, matchOrder: 2 },
 		{ id: "core-api", regEx: /(^|\s)core($|\s)/i, name: "Core APIs", order: 2, matchOrder: 3 },
 		{ id: "advanced", regEx: /\w?/, name: "Advanced APIs", order: 3, matchOrder: 4 }

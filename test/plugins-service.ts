@@ -44,6 +44,8 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
 	testInjector.register("prompter", {});
+	testInjector.register("projectConstants", {});
+	testInjector.register("project", {});
 
 	// Register mocked project
 	testInjector.register("project", {

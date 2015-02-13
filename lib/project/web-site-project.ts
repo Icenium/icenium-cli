@@ -31,7 +31,8 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 			simulate: true,
 			livesync: false,
 			livesyncCompanion: false,
-			updateKendo: false
+			updateKendo: false,
+			emulate: false
 		};
 	}
 
@@ -49,6 +50,10 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 
 	public get configFiles():  Project.IConfigurationFile[] {
 		return [];
+	}
+
+	public get startPackageActivity(): string {
+		throw new Error("Not applicable.");
 	}
 
 	public getValidationSchemaId(): string {

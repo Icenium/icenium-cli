@@ -67,6 +67,10 @@ export class Project implements Project.IProject {
 		return this.frameworkProject.configFiles;
 	}
 
+	public get startPackageActivity(): string {
+		return this.frameworkProject.startPackageActivity;
+	}
+
 	public getProjectTargets(): IFuture<string[]> {
 		return (() => {
 			var projectDir = this.getProjectDir().wait();
@@ -297,12 +301,12 @@ export class Project implements Project.IProject {
 						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
 					}
 
-					var shouldUpdateFramework = this.$prompter.confirm(util.format("You are trying to use version of Windows Phone SDK that is not supported for your project's Cordova version. Do you want to use %s?", selectedFramework.DisplayName)).wait()
+					var shouldUpdateFramework = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to %s?", newVersion, selectedFramework.DisplayName)).wait()
 					if(shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
 						this.projectData.FrameworkVersion = selectedFramework.Version;
 					} else {
-						this.$errors.failWithoutHelp("Unable to use Windows Phone SDK %s as the current Cordova version %s does not support it. You should target at least Cordova 3.7.0 in order to use Windows Phone 8.1 SDK.", newVersion, selectedFramework.Version);
+						this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
 					}
 				}
 			}
@@ -316,12 +320,12 @@ export class Project implements Project.IProject {
 			}
 
 			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
-				var shouldUpdateWPSdk = this.$prompter.confirm("You are trying to use version of Cordova that does not support current Windows Phone SDK version. Do you want to use Windows Phone SDK 8.0?").wait();
+				var shouldUpdateWPSdk = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?", this.projectData.WPSdk)).wait();
 				if(shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
 					this.projectData.WPSdk = "8.0";
 				} else {
-					this.$errors.failWithoutHelp("Unable to use Cordova version %s. The project uses Windows Phone SDK %s which is not supported in this Cordova version.", newVersion, this.projectData["WPSdk"]);
+					this.$errors.failWithoutHelp("Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.", newVersion);
 				}
 			}
 
@@ -390,15 +394,6 @@ export class Project implements Project.IProject {
 		}).future<string[]>()();
 	}
 
-	public get projectTargets(): IFuture<string[]> {
-		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			var projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
-
-			return projectTargets;
-		}).future<string[]>()();
-	}
-
 	public getTempDir(extraSubdir?: string): IFuture<string> {
 		return (() => {
 			var dir = path.join(this.getProjectDir().wait(), ".ab");
@@ -437,6 +432,8 @@ export class Project implements Project.IProject {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if(_.has(this.projectData, normalizedPropertyName)) {
 							this.$logger.out(this.projectData[normalizedPropertyName]);
+						} else if(this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
+							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);
 						} else {
 							this.$errors.fail("Unrecognized project property '%s'", property);
 						}
@@ -456,6 +453,7 @@ export class Project implements Project.IProject {
 						var propKeys: any = _.keys(this.projectData);
 						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
 						_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
+						this.printConfigurationSpecificData();
 					}
 				}
 			} else {
@@ -495,6 +493,72 @@ export class Project implements Project.IProject {
 				});
 			}
 		}).future<void>()();
+	}
+
+	private hasConfigurationSpecificDataForProperty(normalizedPropertyName: string): boolean {
+		var properties = _(this.configurationSpecificData)
+			.values()
+			.map(val => _.keys(val))
+			.flatten()
+			.value();
+		return _.some(properties, prop => prop === normalizedPropertyName);
+	}
+
+	private getPropertyValueAsArray(property: any, indentation: string): any {
+		if (typeof property === "string" || property instanceof Array) {
+			return [property];
+		}
+
+		return _.map(property,  (value, key) => {
+			// use '\n' not os.EOL as cli-table does not handle \r\n very well
+			var delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
+			return util.format('%s%s:%s%s', indentation, key, delimiter, this.getPropertyValueAsArray(value, indentation + '   ').join('\n'));
+		});
+	}
+
+	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string): any[] {
+		var numberOfConfigs = _.keys(this.configurationSpecificData).length;
+		var configsDataForProperty: any[] = _(this.configurationSpecificData)
+			.values()
+			.map(config => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
+			.value();
+
+		var sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
+		var valuesInAllConfigs = _.map(sharedValues, value => helpers.fill(value, numberOfConfigs));
+		var configSpecificValues = _.map(configsDataForProperty, config => _.difference(config, sharedValues));
+
+		var maxLength = _(configSpecificValues)
+			.values()
+			.map(value => value.length)
+			.max()
+			.value();
+
+		_.range(maxLength)
+			.map(valueIndex => _.map(configSpecificValues, config => config[valueIndex] || ""))
+			.forEach(propertyValues => valuesInAllConfigs.push(propertyValues));
+
+		return valuesInAllConfigs;
+	}
+
+	private printConfigurationSpecificData(): void {
+		var properties = <string[]>_(this.configurationSpecificData)
+			.values()
+			.map(properties => _.keys(properties))
+			.flatten()
+			.uniq()
+			.value();
+
+		if(properties.length > 0) {
+			this.$logger.out("%sConfiguration specific properties: ", os.EOL);
+			_.forEach(properties, property => this.printConfigurationSpecificDataForProperty(property));
+		}
+	}
+
+	private printConfigurationSpecificDataForProperty(property: string): void {
+		var data = this.getConfigurationSpecificDataForProperty(property);
+		var headers = _.keys(this.configurationSpecificData);
+		var table = commonHelpers.createTable(headers, data);
+		this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
@@ -604,6 +668,16 @@ export class Project implements Project.IProject {
 					
 					if(this.$staticConfig.triggerJsonSchemaValidation) {
 						this.$jsonSchemaValidator.validate(this.projectData);
+					}
+
+					var debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
+					if(options.debug && !this.$fs.exists(debugProjectFile).wait()) {
+						this.$fs.writeJson(debugProjectFile, {}).wait();
+					}
+
+					var releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
+					if(options.release && !this.$fs.exists(releaseProjectFile).wait()) {
+						this.$fs.writeJson(releaseProjectFile, {}).wait();
 					}
 
 					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {

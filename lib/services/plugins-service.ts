@@ -120,7 +120,7 @@ export class PluginsService implements IPluginsService {
 			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 
 			var variables = pluginData.Variables;
-			if(variables) {
+			if(variables && variables.length > 0) {
 				if(!cordovaPluginVariables[pluginData.Identifier]) {
 					cordovaPluginVariables[pluginData.Identifier] = {};
 				}
@@ -133,6 +133,9 @@ export class PluginsService implements IPluginsService {
 			}
 
 			var newCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+			if(!newCorePlugins) {
+				newCorePlugins = [];
+			}
 			newCorePlugins.push(plugin.toProjectDataRecord());
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();

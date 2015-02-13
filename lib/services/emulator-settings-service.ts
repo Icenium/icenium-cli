@@ -2,12 +2,18 @@
 "use strict";
 
 export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService {
-	constructor(private $project: Project.IProject) { }
+	constructor(private $project: Project.IProject,
+		private $errors: IErrors) { }
 
 	public canStart(platform: string): IFuture<boolean> {
 		return (() => {
 			this.$project.ensureProject();
-			return _.contains(this.$project.projectTargets.wait(), platform.toLowerCase());
+
+			if(this.$project.capabilities.emulate) {
+				return _.contains(this.$project.getProjectTargets().wait(), platform.toLowerCase());
+			}
+
+			this.$errors.fail("The operation is not supported for %s projects.", this.$project.projectData.Framework);
 		}).future<boolean>()();
 	}
 

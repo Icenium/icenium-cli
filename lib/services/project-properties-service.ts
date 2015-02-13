@@ -36,7 +36,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 		if(!_.has(properties, "projectVersion")) {
 			this.$logger.warn("Missing 'projectVersion' property in .abproject. Default value '1' will be used.");
-			properties["projectVersion"] = "1";
+			properties["projectVersion"] = 1;
 			updated = true;
 		}
 

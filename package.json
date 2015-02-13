@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "binary-reader": "0.1.0",
+    "bplist-parser": "0.0.6",
     "bufferpack": "0.0.6",
     "byline": "4.1.1",
     "cli-table": "0.3.1",
@@ -33,11 +34,11 @@
     "cookie": "0.1.0",
     "express": "4.8.5",
     "ffi": "https://github.com/icenium/node-ffi/tarball/master",
-    "fibers": "https://github.com/icenium/node-fibers/tarball/vladimirov/fibers_1_0_5_fixes",
+    "fibers": "https://github.com/icenium/node-fibers/tarball/v1.0.5.1",
     "filesize": "2.0.3",
     "hex": "0.0.1",
     "iconv-lite": "0.4.3",
-    "ios-sim-portable": "https://github.com/telerik/ios-sim-portable/tarball/master",
+    "ios-sim-portable": "1.0.3",
     "ip": "0.3.2",
     "JSV": "4.0.2",
     "lodash": "2.4.1",
@@ -90,6 +91,6 @@
   "bundledDependencies": [],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=0.10.26 <0.10.34 || >=0.10.35"
+    "node": ">=0.10.26 <0.10.34 || >=0.10.35 <0.11.0"
   }
 }
