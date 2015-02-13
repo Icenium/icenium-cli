@@ -15,7 +15,7 @@ export class ProcessInfo implements IProcessInfo {
 			var result: boolean;
 
 			if (hostInfo.isWindows()) {
-				if (!name.toLowerCase().endsWith(".exe")) {
+				if (!_.endsWith(name.toLowerCase(), ".exe")) {
 					name = name + ".exe";
 				}
 				// windows returns localized text whether the app is running or not. But when it is running, the name of the process is in the output

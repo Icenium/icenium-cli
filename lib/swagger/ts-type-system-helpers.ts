@@ -49,7 +49,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	public isBuiltIn(typeName: string): boolean {
-		return !!_.find(TSTypeSystemHelpers.BUILT_IN_TYPES, (builtInType: string) => typeName.startsWith(builtInType));
+		return !!_.find(TSTypeSystemHelpers.BUILT_IN_TYPES, (builtInType: string) => _.startsWith(typeName, builtInType));
 	}
 
 	public isModel(modelName: string): boolean {
@@ -59,7 +59,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 
 	public isStream(typeName: string): boolean {
 		var tsTypeName = this.translate(typeName);
-		return tsTypeName.endsWith("Stream") || tsTypeName.endsWith("file");
+		return _.endsWith(tsTypeName, "Stream") || _.endsWith(tsTypeName, "file");
 	}
 
 	public addModel(modelName: string): void {
@@ -71,7 +71,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	private isMap(typeName: string): boolean {
-		return typeName.startsWith("Map");
+		return _.startsWith(typeName, "Map");
 	}
 
 	private translateMap(typeName: string): string {
