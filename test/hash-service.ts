@@ -44,6 +44,9 @@ function createTempFile(data: string): IFuture<string> {
 var failed = false;
 
 class ErrorsNoFailStub implements IErrors {
+
+	printCallStack: boolean = false;
+
 	fail(formatStr: string, ...args: any[]): void;
 	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
 
