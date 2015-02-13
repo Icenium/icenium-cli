@@ -7,6 +7,9 @@ var assert = require("chai").assert;
 var isExecutionStopped = false;
 
 class ErrorsNoFailStub implements IErrors {
+
+	printCallStack: boolean = false;
+
 	fail(formatStr: string, ...args: any[]): void;
 	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
 

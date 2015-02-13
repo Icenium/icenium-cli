@@ -23,15 +23,13 @@ export class Configuration implements IConfiguration { // User specific config
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
 	constructor(private $fs: IFileSystem) {
-		fiber(() => {
-			var configPath = this.getConfigPath("config");
-			if (!this.$fs.exists(configPath).wait()) {
-				var configBase = this.loadConfig("config-base").wait();
-				this.$fs.writeJson(configPath, configBase).wait();
-			} else {
-				this.mergeConfig(this, this.loadConfig("config").wait());
-			}
-		}).run();
+		var configPath = this.getConfigPath("config");
+		if (!this.$fs.exists(configPath).wait()) {
+			var configBase = this.loadConfig("config-base").wait();
+			this.$fs.writeJson(configPath, configBase).wait();
+		} else {
+			this.mergeConfig(this, this.loadConfig("config").wait());
+		}
 	}
 
 	public reset(): IFuture<void> {

@@ -145,6 +145,8 @@ export class FileSystemStub implements IFileSystem {
 export class ErrorsStub implements IErrors {
 	private impl: IErrors = new (require("../lib/common/errors").Errors)();
 
+	printCallStack: boolean = false;
+
 	fail(formatStr:string, ...args: any[]): void;
 	fail(opts:{formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
 
@@ -168,6 +170,9 @@ export class ErrorsStub implements IErrors {
 }
 
 export class ErrorsNoFailStub implements IErrors {
+
+	printCallStack: boolean = false;
+
 	fail(formatStr: string, ...args: any[]): void;
 	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
 
