@@ -1,5 +1,5 @@
 {
-	"AB_SERVER": "uat-tap.telerik.rocks",
+	"AB_SERVER": "sttap.telerik.com",
 	"AB_SERVER_PROTO": "https",
 	"DEBUG": false
 }
