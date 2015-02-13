@@ -159,12 +159,19 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			_.each(provisions, (prov: IProvision) => {
 				var validationResult = validator.validateProvision(prov);
-				var hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().isSuccessful);
+				var hasCompatibleCertificate = false;
+				var error = validationResult.error;
+				if(validationResult.isSuccessful) {
+					hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().isSuccessful);
+					if(!hasCompatibleCertificate) {
+						error = `Unable to find applicable certificate for provision ${prov.Name}.`;
+					}
+				}
 
 				if(validationResult.isSuccessful && hasCompatibleCertificate) {
 					passedProvisions.push(prov);
 				} else {
-					failedProvisions.push({ provision: prov, error: validationResult.error });
+					failedProvisions.push({ provision: prov, error: error });
 				}
 			});
 
