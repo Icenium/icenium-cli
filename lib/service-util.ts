@@ -146,7 +146,7 @@ class CodePrinter {
 		if (!lineFormat) {
 			this.lines.push("");
 		} else {
-			if (lineFormat.endsWith("}")) {
+			if (_.endsWith(lineFormat, "}")) {
 				this.popIndent();
 				lineFormat += "\r\n";
 			}
@@ -154,7 +154,7 @@ class CodePrinter {
 			args.unshift(lineFormat);
 			this.lines.push(this.indent + util.format.apply(null, args));
 
-			if (lineFormat.endsWith("{")) {
+			if (_.endsWith(lineFormat, "{")) {
 				this.pushIndent();
 			}
 		}

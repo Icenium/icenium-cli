@@ -115,7 +115,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
 		var pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
-		if (pluginIdentifier.startsWith("org.apache.cordova")) {
+		if (_.startsWith(pluginIdentifier, "org.apache.cordova")) {
 			pluginType = PluginsDataLib.PluginType.CorePlugin;
 		}
 

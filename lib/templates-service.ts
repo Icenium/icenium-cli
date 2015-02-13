@@ -79,7 +79,7 @@ export class TemplatesService implements ITemplatesService {
 			var unzipStream = this.$fs.createReadStream(assetsZipFileName)
 				.pipe(unzip.Parse())
 				.on("entry", (entry: ZipEntry) => {
-					if (entry.type !== "File" || !entry.path.toLowerCase().startsWith("app_resources/")) {
+					if (entry.type !== "File" || !_.startsWith(entry.path.toLowerCase(), "app_resources/")) {
 						entry.autodrain();
 						return;
 					}

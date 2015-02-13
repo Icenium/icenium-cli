@@ -97,7 +97,7 @@ export class BuildService implements Project.IBuildService {
 
 	private getProjectRelativePath(fullPath: string, projectDir: string): string {
 		projectDir = path.join(projectDir, path.sep);
-		if(!fullPath.startsWith(projectDir)) {
+		if(!_.startsWith(fullPath, projectDir)) {
 			throw new Error("File is not part of the project.");
 		}
 
