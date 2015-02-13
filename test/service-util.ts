@@ -52,7 +52,13 @@ class MockHttpClient implements Server.IHttpClient {
 
 	httpRequest(options: any): IFuture<Server.IResponse> {
 		this.options = options;
-		return Future.wrap<Server.IResponse>((callback) => callback(this.mockError, this.mockResponse))();
+		var future = new Future<Server.IResponse>();
+		if (this.mockError) {
+			future.throw(this.mockError);
+		} else {
+			future.return(this.mockResponse);
+		}
+		return future;
 	}
 
 	public setResponse(headers: any, body?: any, error?: any) {
