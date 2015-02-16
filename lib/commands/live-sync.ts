@@ -2,8 +2,8 @@
 "use strict";
 import util = require("util");
 import path = require("path");
-import watchr = require("watchr");
 var options: any = require("../common/options");
+var gaze = require("gaze");
 import helpers = require("./../helpers");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");
@@ -149,25 +149,14 @@ export class LiveSyncCommand implements ICommand {
 	}
 
 	private liveSyncDevices(platform: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
-		watchr.watch({
-			paths: [projectDir],
-			listeners: {
-				error: (error: Error) => this.$errors.fail(error.toString()),
-				change: (changeType: string, filePath: string) => {
-					if (!this.$projectFilesManager.isProjectFileExcluded(projectDir, filePath, this.excludedProjectDirsAndFiles)) {
-						this.batchLiveSync(filePath, projectDir, appIdentifier);
-					}
-				},
-				next: (error: Error, _watchers: any) => {
-					var watchers: watchr.IWatcherInstance[] = _watchers;
-					if(error) {
-						this.$errors.fail(error.toString());
-					}
-					this.$logger.trace("File system watchers are stopping.");
-					_.each(watchers, (watcher) => watcher.close());
-					this.$logger.trace("File system watchers are stopped.");
+		var _this = this;
+
+		gaze(projectDir + "/**/*", function(err: any, watcher: any) {
+			this.on('changed', (filePath: string) => {
+				if (!_this.$projectFilesManager.isProjectFileExcluded(projectDir, filePath, _this.excludedProjectDirsAndFiles)) {
+					_this.batchLiveSync(filePath, projectDir, appIdentifier);
 				}
-			}
+			});
 		});
 	}
 

@@ -5,10 +5,10 @@ import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import watchr = require("watchr");
 import MobileHelper = require("./../common/mobile/mobile-helper");
 import hostInfo = require("../host-info");
 import commonHostInfo = require("../common/host-info");
+var gaze = require("gaze");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
@@ -77,22 +77,14 @@ class BaseDebuggerPlatformServices {
 		private $dispatcher: IFutureDispatcher) { }
 
 	public startWatchingUserSettingsFile(): void {
-		watchr.watch({
-			paths: [this.$sharedUserSettingsFileService.userSettingsFilePath],
-			listeners: {
-				error: (error: Error) => { this.$errors.fail(error.toString()); },
-				change: (changeType: string, filePath: string) => { this.$dispatcher.dispatch(() => this.$sharedUserSettingsService.saveSettings({})); },
-				next: (error: Error, _watchers: any) => {
-					var watchers: watchr.IWatcherInstance[] = _watchers;
-					if (error) {
-						this.$errors.fail(error.toString());
-					}
-
-					this.$logger.trace("User settings watchers are stopping.");
-					_.each(watchers, (watcher) => watcher.close());
-					this.$logger.trace("User settings watchers are stopped.");
-				}
+		var _this = this;
+		gaze(this.$sharedUserSettingsFileService.userSettingsFilePath, function(err: Error, watchr: any) {
+			if(err) {
+				this.$errors.fail(err.toString());
 			}
+			this.on("changed", (filePath: string) => {
+				_this.$dispatcher.dispatch(() => _this.$sharedUserSettingsService.saveSettings({}));
+			});
 		});
 	}
 
