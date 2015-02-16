@@ -1,4 +1,5 @@
 var util = require("util");
+var os = require("os");
 
 var now = new Date().toISOString();
 
@@ -11,9 +12,12 @@ function shallowCopy(obj) {
 }
 
 module.exports = function(grunt) {
-	grunt.initConfig({
-		copyPackageTo: "\\\\telerik.com\\Resources\\BlackDragon\\Builds\\appbuilder-cli",
 
+	// Windows cmd does not accept paths with / and unix shell does not accept paths with \\ and we need to execute from a sub-dir.
+	// To circumvent the issue, hack our environment's PATH and let the OS deal with it, which in practice works
+	process.env.path = process.env.path + (os.platform() === "win32" ? ";" : ":") + "node_modules/.bin";
+
+	grunt.initConfig({
 		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
 		resourceDownloadEnvironment: process.env["ResourceDownloadEnvironment"] || "local",
 		jobName: process.env["JOB_NAME"] || "local",
@@ -70,20 +74,25 @@ module.exports = function(grunt) {
 			},
 
 			prepare_resources: {
-				command: [
-					"node bin\\appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>",
-					"node bin\\appbuilder.js dev-prepackage"
-				].join("&&")
+				command: "node bin/appbuilder.js dev-prepackage"
 			},
 
 			ci_unit_tests: {
-				command: [
-					"call node_modules\\.bin\\mocha.cmd --ui mocha-fibers --recursive --reporter xunit --require test/test-bootstrap.js --timeout 15000 test/ > test-reports.xml"
-				].join("&&")
+				command: "npm test",
+				options: {
+					execOptions: {
+						env: (function() {
+							var env = shallowCopy(process.env);
+							env["XUNIT_FILE"] = "test-reports.xml";
+							env["LOG_XUNIT"] = "true";
+							return env;
+						})()
+					}
+				}
 			},
 
 			apply_deployment_environment: {
-				command: "node bin\\appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
+				command: "node bin/appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
 			},
 
 			build_package: {
@@ -100,24 +109,12 @@ module.exports = function(grunt) {
 			}
 		},
 
-		copy: {
-			package_to_drop_folder: {
-				src: "*.tgz",
-				dest: "<%= copyPackageTo %>/<%= jobName %>/<%= deploymentEnvironment %>/<%= dateString %> #<%= buildNumber %>/"
-			},
-			package_to_qa_drop_folder: {
-				src: "*.tgz",
-				dest: "<%= copyPackageTo %>/<%= jobName %>/<%= deploymentEnvironment %>/appbuilder.tgz"
-			}
-		},
-
 		clean: {
 			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/hooks/**/*.js", "*.tgz"]
 		}
 	});
 
 	grunt.loadNpmTasks("grunt-contrib-clean");
-	grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
 	grunt.loadNpmTasks("grunt-ts");
@@ -138,18 +135,14 @@ module.exports = function(grunt) {
 
 	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
-		"clean",
 		"ts:release_build",
+		"shell:apply_deployment_environment",
 		"shell:prepare_resources",
 
-		"shell:apply_deployment_environment",
 		"shell:ci_unit_tests",
 
 		"set_package_version",
-		"shell:build_package",
-
-		"copy:package_to_drop_folder",
-		"copy:package_to_qa_drop_folder"
+		"shell:build_package"
 	]);
 
 	grunt.registerTask("default", "ts:devlib");
