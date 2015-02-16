@@ -329,9 +329,7 @@ Usage:
 
 Opens the device log stream for a selected connected device. 
 
-<Device ID> is the device index or identifier as listed by run $ appbuilder device
-
-To list all connected devices, grouped by platform, run $ appbuilder device
+<Device ID> is the device index or identifier as listed by $ appbuilder device
 
 Options:
    --device - If multiple devices are connected, sets the device for which you want to stream the log in the console.
