@@ -530,8 +530,7 @@ export class Project implements Project.IProject {
 		var maxLength = _(configSpecificValues)
 			.values()
 			.map(value => value.length)
-			.max()
-			.value();
+			.max();
 
 		_.range(maxLength)
 			.map(valueIndex => _.map(configSpecificValues, config => config[valueIndex] || ""))
