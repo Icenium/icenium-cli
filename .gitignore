@@ -29,6 +29,7 @@ scratch/
 .idea/watcherTasks.xml
 
 test-reports.xml
+xunit.xml
 
 npm-debug.log
 node_modules
