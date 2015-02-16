@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.8  
-Release date: 2015, February 13
+Release date: 2015, February 16
 
 > For a complete list of the features available in Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
@@ -272,7 +272,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.8  
-Release date: 2015, February 13
+Release date: 2015, February 16
 
 > For a complete list of the features available in Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
