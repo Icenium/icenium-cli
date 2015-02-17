@@ -9,7 +9,6 @@ var assert = require("chai").assert;
 var commandParams = require("../lib/common/command-params");
 
 testInjector.register("errors", stubs.ErrorsStub);
-testInjector.register("injector", testInjector);
 testInjector.register("stringParameter", commandParams.StringCommandParameter);
 testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
 var stringParamBuilder = testInjector.resolve("stringParameterBuilder");

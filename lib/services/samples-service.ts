@@ -6,7 +6,6 @@ import path = require("path");
 import util = require("util");
 import os = require("os");
 import temp = require("temp");
-import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
 var options: any = require("../common/options");
 
@@ -83,9 +82,9 @@ export class SamplesService implements ISamplesService {
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
-				var projectFile = _.first(commonHelpers.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
+				var projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
 				var projectDir = path.dirname(projectFile);
-				var files = commonHelpers.enumerateFilesInDirectorySync(projectDir);
+				var files = this.$fs.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {
 					var targetDir = path.join(cloneTo, file.replace(projectDir, ""));
 					this.$fs.copyFile(file, targetDir).wait();

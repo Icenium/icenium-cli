@@ -68,7 +68,6 @@ function createTestInjector() {
 	testInjector.register("childProcess", childProcess.ChildProcess);
 	testInjector.register("project", projectLib.Project);
 	testInjector.register("errors", stubs.ErrorsStub);
-	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("opener", stubs.OpenerStub);
 	testInjector.register("config", require("../lib/config").Configuration);
@@ -143,8 +142,6 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	var testInjector = createTestInjector();
-	var oldGlobalInjector = $injector;
-	$injector = testInjector;
 	var projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
 	var project = testInjector.resolve("project");
 	var fs = testInjector.resolve("fs");
@@ -187,8 +184,6 @@ function assertCorePluginsCount(configuration?: string) {
 	project.getProperty = (propertyName: string, configuration: string) => {
 		return abProjectContent[propertyName];
 	};
-
-	$injector = oldGlobalInjector;
 
 	assert.equal(abProjectContent["CorePlugins"].length, service.getInstalledPlugins().length);
 }

@@ -43,11 +43,9 @@ export class EditConfigurationCommand implements ICommand {
 	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$templatesService, this.$project)];
 
 	execute(args: string[]): IFuture<void> {
-		return (() => {
-			var file = args[0];
-			var template = _.findWhere(this.$project.projectConfigFiles, { template: file });
-			this.executeImplementation(template).wait();
-		}).future<void>()();
+		var file = args[0];
+		var template = _.findWhere(this.$project.projectConfigFiles, { template: file });
+		return this.executeImplementation(template);
 	}
 
 	private executeImplementation(template: Project.IConfigurationFile): IFuture<void> {

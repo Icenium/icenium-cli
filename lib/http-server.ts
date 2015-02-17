@@ -6,7 +6,8 @@ import path = require("path");
 import helpers = require("./helpers");
 
 export class HttpServer implements IHttpServer {
-	constructor(private $logger: ILogger) { }
+	constructor(private $logger: ILogger,
+		private $fs: IFileSystem) { }
 
 	public createServer(configuration: IHttpServerConfig): http.Server {
 		if (!configuration.catchAll) {
@@ -48,8 +49,7 @@ export class HttpServer implements IHttpServer {
 			response.statusCode = 200;
 			response.setHeader("Content-Type", mimeType);
 
-			var $fs = $injector.resolve("fs");
-			$fs.createReadStream(fileName).pipe(response);
+			this.$fs.createReadStream(fileName).pipe(response);
 		};
 	}
 

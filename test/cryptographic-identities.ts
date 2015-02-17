@@ -15,7 +15,6 @@ function createTestInjector(): IInjector {
 	require("../lib/common/logger");
 
 	var testInjector = new yok.Yok();
-	testInjector.register("injector", testInjector);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("x509", {});

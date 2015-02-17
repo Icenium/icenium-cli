@@ -29,13 +29,15 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 	write(...args: string[]): void { }
 
 	prepare(item: any): string { return item; }
+
+	printInfoMessageOnSameLine(message: string): void { }
+	printMsgWithTimeout(message: string, timeout: number): IFuture <void> { return null;}
 }
 
 testInjector.register("config", configFile.Configuration);
 testInjector.register("logger", LoggerStubWithErrorOnFatal);
 testInjector.register("fs", stubs.FileSystemStub);
 testInjector.register("errors", stubs.ErrorsNoFailStub);
-testInjector.register("injector", testInjector);
 testInjector.register("staticConfig", stubs.StaticConfig);
 testInjector.register("hooksService", stubs.HooksService);
 testInjector.register("commandsService", commandsServiceFile.CommandsService);

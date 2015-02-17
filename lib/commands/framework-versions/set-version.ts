@@ -2,7 +2,7 @@
 "use strict";
 
 export class SetFrameworkVersionCommand implements ICommand {
-	constructor(private $cordovaMigrationService: ICordovaMigrationService,
+	constructor(private $injector: IInjector,
 		private $project: Project.IProject) { }
 
 	public execute(args: string[]): IFuture<void> {
@@ -13,7 +13,7 @@ export class SetFrameworkVersionCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	public allowedParameters: ICommandParameter[] = [$injector.resolve(MobileFrameworkCommandParameter)];
+	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(MobileFrameworkCommandParameter)];
 }
 $injector.registerCommand("mobileframework|set", SetFrameworkVersionCommand);
 

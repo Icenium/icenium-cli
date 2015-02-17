@@ -9,16 +9,12 @@ import pnv = require("../lib/common/validators/project-name-validator");
 
 describe("project-name-validator smoke tests", () => {
 
-	var oldInjector: IInjector, validator: IProjectNameValidator;
+	var validator: IProjectNameValidator;
 	before(() => {
-		oldInjector = $injector;
-		$injector.register("errors", stubs.ErrorsStub);
-		$injector.register("projectNameValidator", "../lib/common/validators/project-name-validator");
-		validator = $injector.resolve("projectNameValidator");
-	});
-
-	after(() => {
-		$injector = oldInjector;
+		var testInjector = new yok.Yok();
+		testInjector.register("errors", stubs.ErrorsStub);
+		testInjector.register("projectNameValidator", "../lib/common/validators/project-name-validator");
+		validator = testInjector.resolve("projectNameValidator");
 	});
 
 	it("invalid chars in the middle", () => {

@@ -4,10 +4,12 @@
 import ValidationResult = require("../common/validators/validation-result");
 
 export class BaseValidator<Input> implements IValidator<Input> {
+	constructor(private $injector: IInjector) { }
+
 	public throwIfInvalid(data: Input): void {
 		var validationResult: IValidationResult = this.validate(data);
 		if (!validationResult.isSuccessful) {
-			$injector.resolve("$errors").fail(validationResult.error);
+			this.$injector.resolve("$errors").fail(validationResult.error);
 		}
 	}
 
@@ -21,11 +23,13 @@ export class BaseValidator<Input> implements IValidator<Input> {
 }
 
 export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
+	constructor(private $injector: IInjector) { }
+
 	public throwIfInvalid(data: Input): IFuture<void> {
 		return (() => {
 			var validationResult: IValidationResult = this.validate(data).wait();
 			if (!validationResult.isSuccessful) {
-				$injector.resolve("$errors").fail(validationResult.error);
+				this.$injector.resolve("$errors").fail(validationResult.error);
 			}
 		}).future<void>()();
 	}

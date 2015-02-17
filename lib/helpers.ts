@@ -16,10 +16,6 @@ export function getRelativeToRootPath(rootPath: string, filePath: string): strin
 	return relativeToRootPath;
 }
 
-export function isNumber(n: any): boolean {
-	return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
 export function toHash(collection: any, keySelector: (value: any, positionOrKey: any, collection: any) => string, valueSelector: (value: any, positionOrKey: any, collection: any) => any): any {
 	var result:any = {};
 	if (_.isArray(collection)) {

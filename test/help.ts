@@ -15,7 +15,6 @@ describe("help", () => {
 		var logger = new stubs.LoggerStub();
 		injector.register("logger", logger);
 		injector.register("errors", stubs.ErrorsStub);
-		injector.register("injector", injector);
 		injector.register("fs", {
 			readText: () => Future.fromResult("--[foo]-- bla #{module.command} bla --[/]--")
 		});

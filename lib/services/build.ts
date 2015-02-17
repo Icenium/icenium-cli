@@ -8,7 +8,6 @@ import os = require("os");
 var options: any = require("../common/options");
 import MobileHelper = require("../common/mobile/mobile-helper");
 import Future = require("fibers/future");
-import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
@@ -63,7 +62,7 @@ export class BuildService implements Project.IBuildService {
 	private buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
 		return ((): Server.IBuildResult => {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
-			commonHelpers.printInfoMessageOnSameLine("Building...");
+			this.$logger.printInfoMessageOnSameLine("Building...");
 
 			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration,{ AppIdentifier: buildProperties.AppIdentifier }).wait();
 
@@ -72,7 +71,7 @@ export class BuildService implements Project.IBuildService {
 
 			var buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
 			this.showProgressIndicator(buildProjectFuture, 2000).wait();
-			commonHelpers.printInfoMessageOnSameLine(os.EOL);
+			this.$logger.printInfoMessageOnSameLine(os.EOL);
 
 			var body = buildProjectFuture.get();
 			var buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
@@ -284,7 +283,7 @@ export class BuildService implements Project.IBuildService {
 				return;
 			}
 
-			var templateFiles = commonHelpers.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
+			var templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
 			var targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each(zipped => {
@@ -494,7 +493,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
 			var projectName = this.$project.projectData.ProjectName;
 			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
-			commonHelpers.printInfoMessageOnSameLine("Uploading...");
+			this.$logger.printInfoMessageOnSameLine("Uploading...");
 			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
 				this.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
@@ -504,7 +503,7 @@ export class BuildService implements Project.IBuildService {
 					this.$fs.createReadStream(projectZipFile)), 2000).wait();
 			}
 
-			commonHelpers.printInfoMessageOnSameLine(os.EOL);
+			this.$logger.printInfoMessageOnSameLine(os.EOL);
 			this.$logger.trace("Project imported");
 		}).future<void>()();
 	}
@@ -512,7 +511,7 @@ export class BuildService implements Project.IBuildService {
 	private showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void> {
 		return (() => {
 			while(!future.isResolved()) {
-				commonHelpers.printMsgWithTimeout(".", timeout).wait();
+				this.$logger.printMsgWithTimeout(".", timeout).wait();
 			}
 			// Make sure future is not left behind and prevent "There are outstanding futures." error.
 			future.wait();

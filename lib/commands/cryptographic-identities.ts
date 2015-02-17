@@ -357,7 +357,8 @@ export class CreateSelfSignedIdentity implements ICommand {
 		private $selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>,
 		private $prompter: IPrompter,
 		private $logger: ILogger,
-		private $errors: IErrors) { }
+		private $errors: IErrors,
+		private $injector: IInjector) { }
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -393,9 +394,9 @@ export class CreateSelfSignedIdentity implements ICommand {
 		}).future<void>()();
 	}
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter(),
-		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter(),
-		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector),
+		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector),
+		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
 	private getPromptSchema(defaults: any): IPromptSchema {
 		var promptSchema: IPromptSchema = {
@@ -481,9 +482,7 @@ $injector.registerCommand("certificate|create-self-signed", CreateSelfSignedIden
 export class ListCertificatesCommand implements ICommand {
 	constructor(private $identityManager: Server.IIdentityManager) { }
 	execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$identityManager.listCertificates().wait();
-		}).future<void>()();
+		return this.$identityManager.listCertificates();
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -492,7 +491,6 @@ $injector.registerCommand("certificate|*list", ListCertificatesCommand);
 
 export class RemoveCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
-		private $errors: IErrors,
 		private $prompter: IPrompter,
 		private $identityManager: Server.IIdentityManager,
 		private $stringParameterBuilder : IStringParameterBuilder) { }
@@ -519,9 +517,11 @@ export class ExportCryptographicIdentity implements ICommand {
 		private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $errors: IErrors,
-		private $stringParameterBuilder: IStringParameterBuilder) { }
+		private $stringParameterBuilder: IStringParameterBuilder,
+		private $injector: IInjector) { }
 
-	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index."), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index."),
+		new commandParams.StringCommandParameter(this.$injector)];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -577,10 +577,12 @@ export class ImportCryptographicIdentity implements ICommand {
 		private $prompter: IPrompter,
 		private $logger: ILogger,
 		private $errors: IErrors,
-		private $stringParameterBuilder: IStringParameterBuilder) {
+		private $stringParameterBuilder: IStringParameterBuilder,
+		private $injector: IInjector) {
 	}
 
-	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("No certificate file specified."), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("No certificate file specified."),
+		new commandParams.StringCommandParameter(this.$injector)];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -619,7 +621,9 @@ class CreateCertificateSigningRequest implements ICommand {
 		private $injector: IInjector,
 		private $identityInformationGatherer: IIdentityInformationGatherer) { }
 
-	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
+	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(this.$injector),
+		new commandParams.StringCommandParameter(this.$injector),
+		new commandParams.StringCommandParameter(this.$injector)];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {

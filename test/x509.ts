@@ -12,7 +12,6 @@ describe("x509", () => {
 	var x509 = require("../lib/x509");
 
 	var injector = new yok.Yok();
-	injector.register("injector", injector);
 	injector.register("logger", stubs.LoggerStub);
 
 	var loader: IX509CertificateLoader = injector.resolve(x509.X509CertificateLoader);

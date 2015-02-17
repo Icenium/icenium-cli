@@ -113,7 +113,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion).wait());
 
 			var appResourcesDir = this.$resources.appResourcesDir;
-			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
+			var appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
 				var relativePath = path.relative(appResourcesDir, appResourceFile);
 				var targetFilePath = path.join(projectDir, relativePath);

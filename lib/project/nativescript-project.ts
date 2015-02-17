@@ -4,9 +4,7 @@
 import path = require("path");
 import util = require("util");
 import Future = require("fibers/future");
-
 import frameworkProjectBaseLib = require("./framework-project-base");
-import helpers = require("./../common/helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
@@ -99,7 +97,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
 			var appResourcesDir = this.$resources.appResourcesDir;
-			var appResourceFiles = helpers.enumerateFilesInDirectorySync(appResourcesDir);
+			var appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
 				var relativePath = path.relative(appResourcesDir, appResourceFile);
 				var targetFilePath = path.join(projectDir, relativePath);
