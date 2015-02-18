@@ -20,9 +20,9 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	constructor(private appIdentifier: string,
 		private deviceIdentifier: string,
 		private $identityManager: Server.IIdentityManager,
-		private $logger: ILogger,
-		private $x509: IX509CertificateLoader) {
-		super();
+		private $x509: IX509CertificateLoader,
+		$injector: IInjector) {
+		super($injector);
 	}
 
 	public validate(model: IiOSDeploymentValidatorModel): IFuture<IValidationResult> {

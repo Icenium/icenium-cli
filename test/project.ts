@@ -22,6 +22,7 @@ import jsonSchemaLoaderLib = require("../lib/json-schema/json-schema-loader");
 import jsonSchemaResolverLib = require("../lib/json-schema/json-schema-resolver");
 import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validator");
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
+import childProcess = require("../lib/common/child-process");
 var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
 temp.track();
@@ -41,7 +42,6 @@ function createTestInjector(): IInjector {
 	testInjector.register("project", projectlib.Project);
 
 	testInjector.register("errors", stubs.ErrorsStub);
-	testInjector.register("injector", testInjector);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("opener", stubs.OpenerStub);
 	testInjector.register("config", require("../lib/config").Configuration);
@@ -75,6 +75,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
+	testInjector.register("childProcess", childProcess.ChildProcess);
 
 	return testInjector;
 }
@@ -307,7 +308,7 @@ describe("project integration tests", () => {
 			var projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
-			fs.openSync(path.join(projectFolder, "temp"), "a", "0666");
+			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", "0666"));
 			assert.throws(() => project.createTemplateFolder(projectFolder).wait());
 		});
 	});

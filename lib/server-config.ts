@@ -3,13 +3,14 @@
 export class ServerConfiguration implements IServerConfiguration {
 	private cachedServerConfiguration: any = null;
 
-	constructor(private $config: IConfiguration) { }
+	constructor(private $config: IConfiguration,
+		private $injector: IInjector) { }
 
 	private getConfigurationFromServer(): IFuture<any> {
 		return (() => {
 			if(!this.cachedServerConfiguration) {
 				var configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
-				var httpClient = $injector.resolve("httpClient");
+				var httpClient = this.$injector.resolve("httpClient");
 				this.cachedServerConfiguration = JSON.parse(httpClient.httpRequest(configUri).wait().body);
 			}
 

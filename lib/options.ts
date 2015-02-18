@@ -45,7 +45,8 @@ if(hostInfo.isWindows()) {
 }
 
 commonOptions.setProfileDir(defaultProfileDir);
-_(commonOptions.validateArgs("appbuilder")).each((val,key) => {
+var errors: IErrors = $injector.resolve("errors");
+_(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.shorthands)).each((val,key) => {
 	key = shorthands[key] || key;
 	commonOptions[key] = val;
 });

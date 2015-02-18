@@ -2,39 +2,10 @@
 "use strict";
 
 import helpers = require("../lib/common/helpers");
+import errorsLib = require("../lib/common/errors");
 var assert = require("chai").assert;
 
 var isExecutionStopped = false;
-
-class ErrorsNoFailStub implements IErrors {
-
-	printCallStack: boolean = false;
-
-	fail(formatStr: string, ...args: any[]): void;
-	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
-
-	fail(...args: any[]) { throw new Error(); }
-
-	failWithoutHelp(message: string, ...args: any[]): void {
-		isExecutionStopped = true;
-	}
-
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		return (() => {
-			try {
-				return action().wait();
-			} catch(ex) {
-				return false;
-			}
-		}).future<boolean>()();
-	}
-
-	executeAction(action: Function): any {
-		return action();
-	}
-
-	verifyHeap(message: string): void { }
-}
 
 var knownOpts = {
 	"path": String,
@@ -47,14 +18,12 @@ var shorthands = {
 };
 
 describe("common helpers", () => {
-	var oldInjector: IInjector;
+	var errors: IErrors;
 	before(() => {
-		oldInjector = $injector;
-		$injector.register("errors", ErrorsNoFailStub);
-	});
-
-	after(() => {
-		$injector = oldInjector;
+		errors = new errorsLib.Errors();
+		errors.failWithoutHelp = (message: string, ...args: any[]): void => {
+			isExecutionStopped = true;
+		}
 	});
 
 	describe("validateYargsArguments", () => {
@@ -64,7 +33,7 @@ describe("common helpers", () => {
 				"pathr": "incorrect argument"
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -76,7 +45,7 @@ describe("common helpers", () => {
 				"path": true
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -87,7 +56,7 @@ describe("common helpers", () => {
 				"path": "SomeDir"
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -98,7 +67,7 @@ describe("common helpers", () => {
 				"help": "Invalid string value" // help requires boolean value.
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -109,7 +78,7 @@ describe("common helpers", () => {
 				"path": ""
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -120,7 +89,7 @@ describe("common helpers", () => {
 				"path": "  "
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 			assert.isTrue(isExecutionStopped);
 		});
 
@@ -130,7 +99,7 @@ describe("common helpers", () => {
 				"r": "incorrect shorthand"
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -141,7 +110,7 @@ describe("common helpers", () => {
 				"v": true
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -152,7 +121,7 @@ describe("common helpers", () => {
 				"v": "invalid string value" // v requires boolean value
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -164,7 +133,7 @@ describe("common helpers", () => {
 				"path": "1"
 			};
 
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isFalse(isExecutionStopped);
 		});
@@ -176,7 +145,7 @@ describe("common helpers", () => {
 			};
 
 			parsed.path = null;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});
@@ -188,7 +157,7 @@ describe("common helpers", () => {
 			};
 
 			parsed.path = undefined;
-			helpers.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
 		});

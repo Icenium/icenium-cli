@@ -4,8 +4,6 @@
 import minimatch = require("minimatch");
 import path = require("path");
 import util = require("util");
-
-import commonHelpers = require("./../common/helpers");
 import options = require("../common/options");
 
 export class ConfigurationFile implements Project.IConfigurationFile {
@@ -71,7 +69,7 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 			var excludedProjectDirsAndFiles = ProjectFilesManager.INTERNAL_NONPROJECT_FILES.
 				concat(additionalExcludedProjectDirsAndFiles || []);
 
-			var projectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
+			var projectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
 				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles, projectDir);
 				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;

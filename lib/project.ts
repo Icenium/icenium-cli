@@ -680,7 +680,7 @@ export class Project implements Project.IProject {
 						this.$fs.writeJson(releaseProjectFile, {}).wait();
 					}
 
-					var allProjectFiles = commonHelpers.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
+					var allProjectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
 					});
 

@@ -20,7 +20,14 @@ function createTestInjector(): IInjector {
 	testInjector.register("fs", fileSystemFile.FileSystem);
 	testInjector.register("hashService", hashServiceFile.HashService);
 	testInjector.register("logger", stubs.LoggerStub);
-	testInjector.register("errors", ErrorsNoFailStub);
+	testInjector.register("errors", stubs.ErrorsNoFailStub);
+
+	var errors = testInjector.resolve("errors");
+	errors.fail = (...args: any[]) => {
+		failed = true;
+		throw new Error(args[0]);
+	};
+
 	return testInjector;
 }
 
@@ -42,37 +49,6 @@ function createTempFile(data: string): IFuture<string> {
 }
 
 var failed = false;
-
-class ErrorsNoFailStub implements IErrors {
-
-	printCallStack: boolean = false;
-
-	fail(formatStr: string, ...args: any[]): void;
-	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
-
-	fail(...args: any[]) { failed = true; throw new Error(args[0]); }
-	failWithoutHelp(message: string, ...args: any[]): void {
-		throw new Error();
-	}
-
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		return (() => {
-			try {
-				var result = action().wait();
-			} catch(ex) {
-				return false;
-			}
-
-			return result;
-		}).future<boolean>()();
-	}
-
-	executeAction(action: Function): any {
-		return action();
-	}
-
-	verifyHeap(message: string): void { }
-}
 
 describe("hash service", () => {
 	describe("getFileHash", () => {

@@ -33,9 +33,6 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 }
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
-
-	helpers.enumerateFilesInDirectorySync = (directoryPath: string): string[] => [];
-
 	var testInjector = new yok.Yok();
 	testInjector.register("cordovaPluginsService", cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);

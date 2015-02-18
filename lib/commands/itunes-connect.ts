@@ -44,11 +44,12 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 		public $logger: ILogger,
 		public $prompter: IPrompter,
 		public $errors: IErrors,
-		private $loginManager: ILoginManager) {
+		private $loginManager: ILoginManager,
+		private $injector: IInjector) {
 		super($server, $logger, $prompter, $errors);
 	}
 
-    allowedParameters = [new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
+    allowedParameters = [new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 	
     execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -95,12 +96,13 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		private $buildService: Project.IBuildService,
 		private $identityManager: Server.IIdentityManager,
 		private $stringParameterBuilder: IStringParameterBuilder,
-		private $loginManager: ILoginManager) {
+		private $loginManager: ILoginManager,
+		private $injector: IInjector) {
 		super($server, $logger, $prompter, $errors);
 	}
     
 	allowedParameters = [this.$stringParameterBuilder.createMandatoryParameter("No application specified. Specify an application that is ready for upload in iTunes Connect."),
-		new commandParams.StringCommandParameter(), new commandParams.StringCommandParameter()];
+		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
         
 	execute(args:string[]): IFuture<void> {
 		return (() => {
