@@ -478,27 +478,28 @@ export class VersioncontrolService implements Server.IVersioncontrolServiceContr
 	}
 }
 export class ServiceContainer implements Server.IServer{
-	public authentication: Server.IAuthenticationServiceContract = $injector.resolve(AuthenticationService);
-	public cordova: Server.ICordovaServiceContract = $injector.resolve(CordovaService);
-	public identityStore: Server.IIdentityStoreServiceContract = $injector.resolve(IdentityStoreService);
-	public everlive: Server.IEverliveServiceContract = $injector.resolve(EverliveService);
-	public extensions: Server.IExtensionsServiceContract = $injector.resolve(ExtensionsService);
-	public internalExtensions: Server.IInternalExtensionsServiceContract = $injector.resolve(InternalExtensionsService);
-	public upload: Server.IUploadServiceContract = $injector.resolve(UploadService);
-	public filesystem: Server.IFilesystemServiceContract = $injector.resolve(FilesystemService);
-	public images: Server.IImagesServiceContract = $injector.resolve(ImagesService);
-	public itmstransporter: Server.IItmstransporterServiceContract = $injector.resolve(ItmstransporterService);
-	public kendo: Server.IKendoServiceContract = $injector.resolve(KendoService);
-	public mobileprovisions: Server.IMobileprovisionsServiceContract = $injector.resolve(MobileprovisionsService);
-	public build: Server.IBuildServiceContract = $injector.resolve(BuildService);
-	public projects: Server.IProjectsServiceContract = $injector.resolve(ProjectsService);
-	public packages: Server.IPackagesServiceContract = $injector.resolve(PackagesService);
-	public rawSettings: Server.IRawSettingsServiceContract = $injector.resolve(RawSettingsService);
-	public settings: Server.ISettingsServiceContract = $injector.resolve(SettingsService);
-	public status: Server.IStatusServiceContract = $injector.resolve(StatusService);
-	public tam: Server.ITamServiceContract = $injector.resolve(TamService);
-	public tap: Server.ITapServiceContract = $injector.resolve(TapService);
-	public versioncontrol: Server.IVersioncontrolServiceContract = $injector.resolve(VersioncontrolService);
+	constructor(private $injector: IInjector){ }
+	public authentication: Server.IAuthenticationServiceContract = this.$injector.resolve(AuthenticationService);
+	public cordova: Server.ICordovaServiceContract = this.$injector.resolve(CordovaService);
+	public identityStore: Server.IIdentityStoreServiceContract = this.$injector.resolve(IdentityStoreService);
+	public everlive: Server.IEverliveServiceContract = this.$injector.resolve(EverliveService);
+	public extensions: Server.IExtensionsServiceContract = this.$injector.resolve(ExtensionsService);
+	public internalExtensions: Server.IInternalExtensionsServiceContract = this.$injector.resolve(InternalExtensionsService);
+	public upload: Server.IUploadServiceContract = this.$injector.resolve(UploadService);
+	public filesystem: Server.IFilesystemServiceContract = this.$injector.resolve(FilesystemService);
+	public images: Server.IImagesServiceContract = this.$injector.resolve(ImagesService);
+	public itmstransporter: Server.IItmstransporterServiceContract = this.$injector.resolve(ItmstransporterService);
+	public kendo: Server.IKendoServiceContract = this.$injector.resolve(KendoService);
+	public mobileprovisions: Server.IMobileprovisionsServiceContract = this.$injector.resolve(MobileprovisionsService);
+	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
+	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
+	public packages: Server.IPackagesServiceContract = this.$injector.resolve(PackagesService);
+	public rawSettings: Server.IRawSettingsServiceContract = this.$injector.resolve(RawSettingsService);
+	public settings: Server.ISettingsServiceContract = this.$injector.resolve(SettingsService);
+	public status: Server.IStatusServiceContract = this.$injector.resolve(StatusService);
+	public tam: Server.ITamServiceContract = this.$injector.resolve(TamService);
+	public tap: Server.ITapServiceContract = this.$injector.resolve(TapService);
+	public versioncontrol: Server.IVersioncontrolServiceContract = this.$injector.resolve(VersioncontrolService);
 }
 $injector.register('server', ServiceContainer);
 

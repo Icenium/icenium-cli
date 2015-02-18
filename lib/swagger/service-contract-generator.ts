@@ -48,6 +48,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			var serverClass = new codeEntityLib.Block("export class ServiceContainer implements Server.IServer");
 			var serverInterface = new codeEntityLib.Block("interface IServer");
 
+			serverClass.writeLine("constructor(private $injector: IInjector){ }");
+
 			_.each(swagger.apis, (apiPath: Swagger.ISwaggerApi) => {
 				this.pendingModels = {};
 				var swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
@@ -71,7 +73,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 				var name = this.getNameWithoutSlash(serviceName);
 				serverInterface.writeLine(util.format("%s: Server.I%sServiceContract;", name, this.toPascalCase(name)));
-				serverClass.writeLine(util.format("public %s: Server.I%sServiceContract = $injector.resolve(%sService);",
+				serverClass.writeLine(util.format("public %s: Server.I%sServiceContract = this.$injector.resolve(%sService);",
 					name, this.toPascalCase(name), this.toPascalCase(name)));
 			});
 
