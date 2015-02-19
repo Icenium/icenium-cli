@@ -1,46 +1,37 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import MobileHelper = require("./../common/mobile/mobile-helper");
-import options = require("../common/options");
 
-export class BuildCommand implements ICommand {
-	constructor(private $buildService: Project.IBuildService,
-		private $project: Project.IProject,
-		private $errors: IErrors) { }
+import MobileHelper = require("../common/mobile/mobile-helper");
 
-	allowedParameters: ICommandParameter[] = [new PlatformCommandParameter(this.$project, this.$errors)];
+export class BuildAndroidCommand implements ICommand {
+	constructor(private $buildService: Project.IBuildService) { }
 
-	get completionData(): string[] {
-		return _.map(MobileHelper.PlatformNames, (platformName: string) => platformName.toLowerCase());
-	}
+	allowedParameters: ICommandParameter[] = [];
 
 	execute(args: string[]): IFuture<void> {
-		return	this.$buildService.executeBuild(args[0]);
+		return this.$buildService.executeBuild(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android]);
 	}
 }
-$injector.registerCommand("build", BuildCommand);
+$injector.registerCommand("build|android", BuildAndroidCommand);
 
-class PlatformCommandParameter implements ICommandParameter {
-	constructor(private $project: Project.IProject,
-		private $errors: IErrors) { }
+export class BuildIosCommand implements ICommand {
+	constructor(private $buildService: Project.IBuildService) { }
 
-	mandatory = true;
+	allowedParameters: ICommandParameter[] = [];
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
-			if(!validationValue) {
-				return false;
-			}
-
-			this.$project.ensureProject();
-
-			if(!this.$project.capabilities.build && !options.companion) {
-				this.$errors.fail("You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
-			}
-
-			MobileHelper.validatePlatformName(validationValue, this.$errors);
-
-			return true;
-		}).future<boolean>()();
+	execute(args: string[]): IFuture<void> {
+		return this.$buildService.executeBuild(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS]);
 	}
 }
+$injector.registerCommand("build|ios", BuildAndroidCommand);
+
+export class BuildWP8Command implements ICommand {
+	constructor(private $buildService: Project.IBuildService) { }
+
+	allowedParameters: ICommandParameter[] = [];
+
+	execute(args: string[]): IFuture<void> {
+		return this.$buildService.executeBuild(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.WP8]);
+	}
+}
+$injector.registerCommand("build|wp8", BuildAndroidCommand);

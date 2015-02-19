@@ -399,3 +399,15 @@ interface IRemoteProjectService {
 interface IProjectSimulatorService {
 	getSimulatorParams(simulatorPackageName: string): IFuture<string[]>;
 }
+
+interface IDeployHelper {
+	deploy(platform?: string): IFuture<void>;
+}
+
+interface ILiveSyncService {
+	livesync(platform?: string): IFuture<void>;
+}
+
+interface IAppManagerService {
+	upload(platform: string): IFuture<void>;
+}
