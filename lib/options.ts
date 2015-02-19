@@ -49,7 +49,8 @@ var errors: IErrors = $injector.resolve("errors");
 _(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.shorthands)).each((val,key) => {
 	key = shorthands[key] || key;
 	commonOptions[key] = val;
-});
+}).value();
+
 exports.knownOpts = knownOpts;
 exports.shorthands = shorthands;
 export = exports;
