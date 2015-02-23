@@ -34,7 +34,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Windows 7 or later
 * .NET 4.0 or later
-* Node.js 0.10.26 or a later stable official 0.10.x release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 * An Internet browser (latest official release)
 
 > To be able to work with connected iOS devices from the command line, download and install the 32-bit Node.js.<br/>You can download and install the 32-bit Node.js from the <a href="http://nodejs.org/download/" target="_blank">Node.js web site</a>.
@@ -59,7 +59,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* Node.js 0.10.26 or a later stable official 0.10.x release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 * An Internet browser (latest official release)
 
 **Additional Software Requirements for iOS On-Device Deployment**
@@ -79,7 +79,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements** 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
-* Node.js 0.10.26 or a later stable official 0.10.x release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
+* Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 
    > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
 
