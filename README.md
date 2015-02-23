@@ -19,10 +19,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobi
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.8.1  
-Release date: 2015, February 19
+Latest version: Telerik AppBuilder 2.8.2  
+Release date: 2015, February 26
 
-> Telerik AppBuilder 2.8.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-1" target="_blank">Telerik AppBuilder 2.8.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
+> Telerik AppBuilder 2.8.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-2" target="_blank">Telerik AppBuilder 2.8.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
 ### System Requirements
 
@@ -271,10 +271,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.8.1  
-Release date: 2015, February 19
+Latest version: Telerik AppBuilder 2.8.2  
+Release date: 2015, February 26
 
-> Telerik AppBuilder 2.8.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-1" target="_blank">Telerik AppBuilder 2.8.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
+> Telerik AppBuilder 2.8.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-2" target="_blank">Telerik AppBuilder 2.8.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
