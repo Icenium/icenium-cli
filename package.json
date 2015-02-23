@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "preferGlobal": true,
-  "version": "2.8.1",
+  "version": "2.8.2",
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
@@ -38,7 +38,7 @@
     "filesize": "2.0.3",
     "hex": "0.0.1",
     "iconv-lite": "0.4.3",
-    "ios-sim-portable": "1.0.3",
+    "ios-sim-portable": "1.0.4",
     "ip": "0.3.2",
     "JSV": "4.0.2",
     "lodash": "2.4.1",
@@ -59,7 +59,7 @@
     "qrcode-generator": "1.0.0",
     "plist": "1.1.0",
     "ref": "https://github.com/icenium/ref/tarball/master",
-    "ref-struct": "0.0.5",
+    "ref-struct": "https://github.com/telerik/ref-struct/tarball/master",
     "rimraf": "2.2.6",
     "string-to-json": "0.1.0",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
@@ -91,6 +91,6 @@
   "bundledDependencies": [],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=0.10.26 <0.10.34 || >=0.10.35 <0.11.0"
+    "node": ">=0.10.26 <0.10.34 || >=0.10.35"
   }
 }
