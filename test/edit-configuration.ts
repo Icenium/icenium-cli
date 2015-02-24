@@ -26,7 +26,7 @@ testInjector.register("project", {
 	ensureProject: () => {},
 	projectConfigFiles: [{ template: "android-manifest",
 		filepath: "App_Resources/Android/AndroidManifest.xml",
-		templateFilepath: "Mobile.Android.ManifestXml.zip",
+		templateFilepath: "Mobile.Cordova.Android.ManifestXml.zip",
 		helpText: "" }]
 });
 testInjector.register("errors", stubs.ErrorsStub);

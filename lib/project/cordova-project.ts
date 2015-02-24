@@ -54,7 +54,14 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public get configFiles(): Project.IConfigurationFile[] {
 		var allConfigFiles = this.$projectFilesManager.availableConfigFiles;
-		return _.values(allConfigFiles);
+		return [
+			allConfigFiles["cordova-android-manifest"],
+			allConfigFiles["android-config"],
+			allConfigFiles["ios-info"],
+			allConfigFiles["ios-config"],
+			allConfigFiles["wp8-manifest"],
+			allConfigFiles["wp8-config"]
+		]
 	}
 
 	public get startPackageActivity(): string {
