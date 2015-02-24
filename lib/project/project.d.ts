@@ -23,6 +23,7 @@ declare module Project {
 		getTempDir(extraSubdir?: string): IFuture<string>;
 		getProperty(propertyName: string, configuration: string): any;
 		getProjectTargets(): IFuture<string[]>;
+		getConfigFileContent(template: string): IFuture<any>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
 		printProjectProperty(property: string): IFuture<void>;
 		setProperty(propertyName: string, value: any, configuration: string): void;
