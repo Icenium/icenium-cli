@@ -242,6 +242,12 @@ export class BuildService implements Project.IBuildService {
 				return buildResult;
 			} else if(settings.platform === "WP8") {
 				var buildCompanyHubApp = !settings.downloadFiles;
+				if(this.$project.projectData.WPSdk === "8.1" && ((options.release && settings.downloadFiles) || settings.buildForTAM)) {
+					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
+						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
+						"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
+				}
+
 				if(buildCompanyHubApp) {
 					buildProperties.WP8CompanyHubApp = true;
 					if(settings.showWp8SigningMessage === undefined) {

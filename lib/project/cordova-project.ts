@@ -10,6 +10,9 @@ import MobileHelper = require("../common/mobile/mobile-helper");
 import options = require("../options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
+	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
+	private static WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME = "CN=Telerik";
+
 	constructor(private $config: IConfiguration,
 		$fs: IFileSystem,
 		$errors: IErrors,
@@ -86,6 +89,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 		properties.WP8ProductID = helpers.createGUID();
 		properties.WP8PublisherID = helpers.createGUID();
+		properties.WP8PackageIdentityName = CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX + properties.AppIdentifier;
 	}
 
 	public projectTemplatesString(): IFuture<string> {
@@ -109,6 +113,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			buildProperties.WP8Capabilities = projectData.WP8Capabilities;
 			buildProperties.WP8Requirements = projectData.WP8Requirements;
 			buildProperties.WP8SupportedResolutions = projectData.WP8SupportedResolutions;
+			buildProperties.WP8PackageIdentityName = projectData.WP8PackageIdentityName;
+			buildProperties.WP8WindowsPublisherName = projectData.WP8WindowsPublisherName;
 		}
 
 		return buildProperties;
@@ -171,6 +177,21 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 				updated = true;
 			}
 		});
+
+		if(!_.has(properties, "WP8PackageIdentityName")) {
+			var wp8PackageIdentityName = CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX + properties.AppIdentifier;
+			this.$logger.warn("Missing 'WP8PackageIdentityName' property in .abproject. Default value '%s' will be used.", wp8PackageIdentityName);
+			properties.WP8PackageIdentityName = wp8PackageIdentityName;
+			updated = true;
+		}
+
+		if(!_.has(properties, "WP8WindowsPublisherName")) {
+			var wp8WindowsPublisherName = CordovaProject.WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME;
+			this.$logger.warn("Missing 'WP8WindowsPublisherName' property in .abproject. Default value '%s' will be used.", wp8WindowsPublisherName);
+			properties.WP8WindowsPublisherName = wp8WindowsPublisherName;
+			updated = true;
+		}
+
 
 		return updated;
 	}
