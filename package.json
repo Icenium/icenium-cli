@@ -59,7 +59,7 @@
     "qrcode-generator": "1.0.0",
     "plist": "1.1.0",
     "ref": "https://github.com/icenium/ref/tarball/master",
-    "ref-struct": "0.0.5",
+    "ref-struct": "https://github.com/telerik/ref-struct/tarball/master",
     "rimraf": "2.2.6",
     "string-to-json": "0.1.0",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
