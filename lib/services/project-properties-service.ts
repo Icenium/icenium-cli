@@ -9,6 +9,8 @@ import helpers = require("../helpers");
 import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
+	private static PROJECT_VERSION_DEFAULT_VALUE = 1;
+	
 	constructor(private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
@@ -36,7 +38,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 		if(!_.has(properties, "projectVersion")) {
 			this.$logger.warn("Missing 'projectVersion' property in .abproject. Default value '1' will be used.");
-			properties["projectVersion"] = 1;
+			properties.projectVersion = ProjectPropertiesService.PROJECT_VERSION_DEFAULT_VALUE;
 			updated = true;
 		}
 

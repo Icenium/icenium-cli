@@ -79,6 +79,22 @@ export class Project implements Project.IProject {
 		}).future<string[]>()();
 	}
 
+	public getConfigFileContent(template: string): IFuture<any> {
+		return (() => {
+			var configFile = _.find(this.projectConfigFiles, configFile => configFile.template === template);
+			if(configFile) {
+				try {
+					var configFileContent = this.$fs.readText(configFile.filepath).wait();
+					return configFileContent;
+				} catch(e) {
+					return null;
+				}
+			}
+
+			return null;
+		}).future<any>()();
+	}
+
 	public configurationFilesString(): string {
 		if(!this.frameworkProject) {
 			var result: string[] = [];
@@ -646,7 +662,7 @@ export class Project implements Project.IProject {
 				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
 					var data = this.$fs.readJson(projectFilePath).wait();
-					if(data.projectVersion && data.projectVersion !== 1) {
+					if(data.projectVersion && data.projectVersion.toString() !== "1") {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
 

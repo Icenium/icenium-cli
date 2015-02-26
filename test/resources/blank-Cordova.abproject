@@ -25,12 +25,14 @@
     ]
     ,"AndroidHardwareAcceleration": "false"
     ,"iOSStatusBarStyle": "Default"
-	,"WPSdk": "8.0"
+    ,"WPSdk": "8.0"
     ,"WP8SupportedResolutions": [
       "ID_RESOLUTION_WVGA",
       "ID_RESOLUTION_WXGA",
       "ID_RESOLUTION_HD720P"
     ]
+    ,"WP8PackageIdentityName": "1234Telerikcom.telerik.Test"
+    ,"WP8WindowsPublisherName": "CN=Telerik"
     ,"Framework": "Cordova"
     ,"ProjectTypeGuids": "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}"
 }

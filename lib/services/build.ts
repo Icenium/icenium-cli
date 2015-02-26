@@ -6,6 +6,7 @@ import querystring = require("querystring");
 import path = require("path");
 import os = require("os");
 var options: any = require("../common/options");
+import plist = require("plist");
 import MobileHelper = require("../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
@@ -16,6 +17,7 @@ import AppIdentifier = require("../common/mobile/app-identifier");
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
 	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
+	private static APPIDENTIFIER_PLACE_HOLDER = "$AppIdentifier$";
 
 	constructor(private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
@@ -31,7 +33,8 @@ export class BuildService implements Project.IBuildService {
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $multipartUploadService: IMultipartUploadService,
-		private $jsonSchemaValidator: IJsonSchemaValidator) { }
+		private $jsonSchemaValidator: IJsonSchemaValidator,
+		private $projectConstants: Project.IProjectConstants) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -173,6 +176,17 @@ export class BuildService implements Project.IBuildService {
 				var result = this.beginBuild(buildProperties).wait();
 				return result;
 			} else if(settings.platform === "iOS") {
+				var appIdentifier = projectData.AppIdentifier;
+
+				var configFileContent = this.$project.getConfigFileContent("ios-info").wait();
+				if(configFileContent) {
+					var parsed = plist.parse(configFileContent);
+					var cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
+					if(cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
+						appIdentifier = cfBundleIdentifier;
+					}
+				}
+
 				buildProperties.iOSDisplayName = projectData.DisplayName;
 				buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
 				buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
@@ -189,8 +203,7 @@ export class BuildService implements Project.IBuildService {
 					}
 				} else if(!settings.buildForiOSSimulator) {
 					var deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
-					provisionData = this.$identityManager.autoselectProvision(
-						projectData.AppIdentifier, settings.provisionTypes, deviceIdentifier).wait();
+					provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes, deviceIdentifier).wait();
 					options.provision = provisionData.Name;
 				}
 				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
@@ -206,7 +219,7 @@ export class BuildService implements Project.IBuildService {
 
 				if(!completeAutoselect) {
 					var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
-						appIdentifier: projectData.AppIdentifier,
+						appIdentifier: appIdentifier,
 						deviceIdentifier: settings.device ? settings.device.getIdentifier() : null
 					});
 					iOSDeploymentValidator.throwIfInvalid(
@@ -227,6 +240,12 @@ export class BuildService implements Project.IBuildService {
 				return buildResult;
 			} else if(settings.platform === "WP8") {
 				var buildCompanyHubApp = !settings.downloadFiles;
+				if(this.$project.projectData.WPSdk === "8.1" && ((options.release && settings.downloadFiles) || settings.buildForTAM)) {
+					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
+						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
+						"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
+				}
+
 				if(buildCompanyHubApp) {
 					buildProperties.WP8CompanyHubApp = true;
 					if(settings.showWp8SigningMessage === undefined) {
