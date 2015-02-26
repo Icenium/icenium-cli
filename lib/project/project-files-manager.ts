@@ -25,10 +25,16 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 
 	public get availableConfigFiles(): IDictionary<Project.IConfigurationFile> {
 		return {
-			"android-manifest": new ConfigurationFile(
+			"cordova-android-manifest": new ConfigurationFile(
 				"android-manifest",
 				"App_Resources/Android/AndroidManifest.xml",
-				"Mobile.Android.ManifestXml.zip",
+				"Mobile.Cordova.Android.ManifestXml.zip",
+				"Opens AndroidManifest.xml for editing and creates it, if needed."
+			),
+			"nativescript-android-manifest": new ConfigurationFile(
+				"android-manifest",
+				"App_Resources/Android/AndroidManifest.xml",
+				"Mobile.NativeScript.Android.ManifestXml.zip",
 				"Opens AndroidManifest.xml for editing and creates it, if needed."
 			),
 			"android-config": new ConfigurationFile(

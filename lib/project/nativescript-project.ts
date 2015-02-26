@@ -54,7 +54,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		var allConfigFiles = this.$projectFilesManager.availableConfigFiles;
 		return [
 			allConfigFiles["ios-info"],
-			allConfigFiles["android-manifest"]
+			allConfigFiles["nativescript-android-manifest"]
 		]
 	}
 

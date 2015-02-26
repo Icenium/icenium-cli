@@ -190,6 +190,8 @@ interface IProjectData extends IDictionary<any> {
 	WP8Requirements: string[];
 	WP8SupportedResolutions: string[];
 	WPSdk?: string;
+	WP8PackageIdentityName?: string;
+	WP8WindowsPublisherName?: string;
 	CordovaPluginVariables?: any;
 }
 
