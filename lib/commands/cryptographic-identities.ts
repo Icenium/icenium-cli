@@ -17,6 +17,7 @@ class CryptographicIdentityConstants {
 	public static X509_EXTENSION = "cer";
 	public static PKCS12CERTIFICATE = "Pkcs12";
 	public static X509CERTIFICATE = "X509Certificate";
+	public static MAX_ALLOWED_PASSWORD_ATTEMPTS = 3;
 }
 
 interface IFailedProvision {
@@ -588,6 +589,7 @@ export class ImportCryptographicIdentity implements ICommand {
 		return (() => {
 			var certificateFile = args[0];
 			var password = args[1];
+			var isPasswordRequired = false;
 
 			var extension = path.extname(certificateFile).toLowerCase();
 			if(extension !== ".p12" && extension !== ".cer") {
@@ -602,11 +604,35 @@ export class ImportCryptographicIdentity implements ICommand {
 			}
 
 			if(!password && importType === CryptographicIdentityConstants.PKCS12CERTIFICATE) {
-				password = this.$prompter.getPassword("Certificate file password", { allowEmpty: true }).wait();
+				isPasswordRequired = true;
 			}
 
-			var targetFile = this.$fs.createReadStream(certificateFile);
-			var result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
+			var targetFile : any;
+			var result : Server.CryptographicIdentityData[];
+			var noErrorOccurred : boolean;
+
+			for (var i = 0; i < CryptographicIdentityConstants.MAX_ALLOWED_PASSWORD_ATTEMPTS; ++i) {
+				noErrorOccurred = true;
+				targetFile = this.$fs.createReadStream(certificateFile);
+				if (isPasswordRequired) {
+					password = this.$prompter.getPassword("Certificate file password", { allowEmpty: true }).wait();
+				}
+
+				try {
+					result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
+				} catch(err) {
+					noErrorOccurred = false;
+					this.$logger.error(err.message + os.EOL + "Verify that you have provided the correct file and password and try again.");
+				}
+
+				if (noErrorOccurred) {
+					break;
+				}
+			}
+
+			if (!noErrorOccurred) {
+				this.$errors.failWithoutHelp("You have reached the maximum number of authentication attempts for this operation.");
+			}
 
 			_.each(result, identity => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
