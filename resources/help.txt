@@ -694,12 +694,12 @@ for each virtual device.
 Prerequisites:
 Before running your app in the Android emulator from the Android SDK, verify that your system meets the following requirements.
     * Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X or Linux system.
-    * Verify that you have installed the Android SDK.
+    * Verify that you have installed the Android SDK and its dependencies.
     * Verify that you have added the following Android SDK directories to the PATH environment variable:
         platform-tools
         tools
 Before running your app in the Genymotion emulator, verify that your system meets the following requirements.
-    * Verify that you have installed Genymotion.
+    * Verify that you have installed Genymotion and its dependencies.
     * On Windows and Linux systems, verify that you have added the Genymotion installation directory to the PATH environment variable.
     * On OS X systems, verify that you have added the following paths to the PATH environment variable.
         * /Applications/Genymotion.app/Contents/MacOS/

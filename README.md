@@ -20,7 +20,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.8.2  
-Release date: 2015, February 26
+Release date: 2015, March 4
 
 > Telerik AppBuilder 2.8.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-2" target="_blank">Telerik AppBuilder 2.8.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
@@ -49,6 +49,10 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for Android On-Device Deployment**
 
 * Device drivers required by your system to recognize the connected Android device
+* For testing in the native emulators
+	* JDK 7 or later
+	* Android SDK 19 or later
+	* (Optional) Genymotion
 
 **Additional Software Requirements for Windows Phone On-Device Deployment**
 
@@ -65,10 +69,16 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Additional Software Requirements for iOS On-Device Deployment**
 
 * iTunes (latest official)
+* For testing in the native emulator
+	* Xcode 5 or later
 
 **Additional Software Requirements for Android On-Device Deployment**
 
 * Device drivers required by your system to recognize the connected Android device
+* For testing in the native emulators
+	* JDK 7 or later
+	* Android SDK 19 or later
+	* (Optional) Genymotion
 
 **Additional Software Requirements for Windows Phone On-Device Deployment**
 
@@ -100,6 +110,10 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Device drivers required by your system to recognize the connected Android device
 * G++ compiler
    * In the terminal, run `sudo apt-get install g++`
+* For testing in the native emulators
+	* JDK 7 or later
+	* Android SDK 19 or later
+	* (Optional) Genymotion
 
 **Additional Software Requirements for Windows Phone On-Device Deployment**
 
@@ -272,7 +286,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.8.2  
-Release date: 2015, February 26
+Release date: 2015, March 4
 
 > Telerik AppBuilder 2.8.2 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.8.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8-2" target="_blank">Telerik AppBuilder 2.8.2 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.8, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-8" target="_blank">Telerik AppBuilder 2.8 Release Notes</a>.
 
