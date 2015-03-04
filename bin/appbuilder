@@ -1,4 +1,4 @@
 #!/bin/sh
 
 AB_DIR="`dirname \"$0\"`"
-node "$AB_DIR/appbuilder.js" $@
+node "$AB_DIR/appbuilder.js" "$@"
