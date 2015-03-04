@@ -808,8 +808,6 @@ Shows the debug tools to let you debug applications on connected devices.
 
 In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux systems.
 
-This command is not applicable to NativeScript projects.
-
 --[/]--
 
 --[cloud]--
