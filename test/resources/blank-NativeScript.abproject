@@ -12,7 +12,7 @@
         "2"
     ]
     ,"iOSBackgroundMode": []
-    ,"FrameworkVersion": "0.4.2"
+    ,"FrameworkVersion": "0.9.0"
     ,"AndroidPermissions": [ ]
     ,"DeviceOrientations": [
       "Portrait",

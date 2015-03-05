@@ -31,7 +31,7 @@
       "ID_RESOLUTION_WXGA",
       "ID_RESOLUTION_HD720P"
     ]
-    ,"WP8PackageIdentityName": "1234Telerikcom.telerik.Test"
+    ,"WP8PackageIdentityName": "1234Telerik.Test"
     ,"WP8WindowsPublisherName": "CN=Telerik"
     ,"Framework": "Cordova"
     ,"ProjectTypeGuids": "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}"

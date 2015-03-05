@@ -89,7 +89,12 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 		properties.WP8ProductID = helpers.createGUID();
 		properties.WP8PublisherID = helpers.createGUID();
-		properties.WP8PackageIdentityName = CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX + properties.AppIdentifier;
+		properties.WP8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.ProjectName);
+	}
+
+	private getCorrectWP8PackageIdentityName(projectName: string) {
+		var sanitizedName = projectName ? _.filter(projectName.split(""),(c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
+		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName); 
 	}
 
 	public projectTemplatesString(): IFuture<string> {
@@ -179,7 +184,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		});
 
 		if(!_.has(properties, "WP8PackageIdentityName")) {
-			var wp8PackageIdentityName = CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX + properties.AppIdentifier;
+			var wp8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.ProjectName);
 			this.$logger.warn("Missing 'WP8PackageIdentityName' property in .abproject. Default value '%s' will be used.", wp8PackageIdentityName);
 			properties.WP8PackageIdentityName = wp8PackageIdentityName;
 			updated = true;
