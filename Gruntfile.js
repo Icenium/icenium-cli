@@ -17,10 +17,12 @@ module.exports = function(grunt) {
 	// To circumvent the issue, hack our environment's PATH and let the OS deal with it, which in practice works
 	process.env.path = process.env.path + (os.platform() === "win32" ? ";" : ":") + "node_modules/.bin";
 
+	var defaultEnvironment = "sit";
+
 	grunt.initConfig({
-		deploymentEnvironment: process.env["DeploymentEnvironment"] || "local",
-		resourceDownloadEnvironment: process.env["ResourceDownloadEnvironment"] || "local",
-		jobName: process.env["JOB_NAME"] || "local",
+		deploymentEnvironment: process.env["DeploymentEnvironment"] || defaultEnvironment,
+		resourceDownloadEnvironment: process.env["ResourceDownloadEnvironment"] || defaultEnvironment,
+		jobName: process.env["JOB_NAME"] || defaultEnvironment,
 		buildNumber: process.env["BUILD_NUMBER"] || "non-ci",
 		dateString: now.substr(0, now.indexOf("T")),
 
@@ -73,6 +75,10 @@ module.exports = function(grunt) {
 				stderr: true
 			},
 
+			apply_resources_environment: {
+				command: "node bin/appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>"
+			},
+			
 			prepare_resources: {
 				command: "node bin/appbuilder.js dev-prepackage"
 			},
@@ -136,9 +142,10 @@ module.exports = function(grunt) {
 	grunt.registerTask("test", ["ts:devall", "shell:npm_test"]);
 	grunt.registerTask("pack", [
 		"ts:release_build",
-		"shell:apply_deployment_environment",
-		"shell:prepare_resources",
 
+		"shell:apply_resources_environment",
+		"shell:prepare_resources",
+		"shell:apply_deployment_environment", 
 		"shell:ci_unit_tests",
 
 		"set_package_version",
