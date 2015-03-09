@@ -7,7 +7,6 @@ import util = require("util");
 
 import commonHelpers = require("./common/helpers");
 import helpers = require("./helpers");
-import MobileHelper = require("./common/mobile/mobile-helper");
 import options = require("./common/options");
 import projectPropertiesServiceLib = require("./services/project-properties-service");
 
@@ -40,18 +39,16 @@ export class Project implements Project.IProject {
 		private $resources: IResourceLoader,
 		private $staticConfig: IStaticConfig,
 		private $templatesService: ITemplatesService,
-		private $prompter: IPrompter) {
+		private $prompter: IPrompter,
+		private $mobileHelper: Mobile.IMobileHelper) {
 
 		this.configurationSpecificData = Object.create(null);
 		this.readProjectData().wait();
 
 		if(this.projectData && this.projectData["TemplateAppName"]) {
-			this.$errors.fail({
-				formatStr: "This hybrid project targets Apache Cordova 2.x. " +
+			this.$errors.failWithoutHelp("This hybrid project targets Apache Cordova 2.x. " +
 					"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
-					"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.",
-				suppressCommandHelp: true
-			});
+					"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.");
 		}
 	}
 
@@ -359,7 +356,7 @@ export class Project implements Project.IProject {
 			var successfullyChanged: string[] = [],
 				backupSuffix = ".backup";
 			try {
-				Object.keys(MobileHelper.platformCapabilities).forEach((platform) => {
+				_.each(this.$mobileHelper.platformNames, (platform) => {
 					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
 					var cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
 					var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);

@@ -10,7 +10,8 @@ import fs = require("fs");
 import path = require("path");
 import temp = require("temp");
 import util = require("util");
-import MobileHelper = require("./../lib/common/mobile/mobile-helper");
+import mobileHelperLib = require("../lib/common/mobile/mobile-helper");
+import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
 import options = require("./../lib/common/options");
 import helpers = require("../lib/helpers");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
@@ -23,6 +24,7 @@ import jsonSchemaResolverLib = require("../lib/json-schema/json-schema-resolver"
 import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validator");
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import childProcessLib = require("../lib/common/child-process");
+import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
 import Future = require("fibers/future");
 var projectConstants = new projectConstantsLib.ProjectConstants();
 var assert = require("chai").assert;
@@ -97,6 +99,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("jsonSchemaValidator", jsonSchemaValidatorLib.JsonSchemaValidator);
 	testInjector.register("childProcess", childProcessLib.ChildProcess);
 	testInjector.register("injector", testInjector);
+	testInjector.register("mobileHelper", mobileHelperLib.MobileHelper);
+	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("frameworkProjectResolver", {
 		resolve: (framework: string) => {
 			if(!framework || framework === "Cordova") {
@@ -112,6 +116,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
 	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() } });
+	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
+
 	return testInjector;
 }
 
@@ -265,11 +271,13 @@ describe("project integration tests", () => {
 		var options: any;
 		var tempFolder: string;
 		var projectName = "Test";
+		var mobileHelper: Mobile.IMobileHelper;
 		beforeEach(() => {
 			options = require("../lib/common/options");
 			tempFolder = temp.mkdirSync("template");
 			options.path = tempFolder;
 			options.appid = "com.telerik.Test";
+			mobileHelper = testInjector.resolve("mobileHelper");
 		});
 
 		describe("NativeScript project", () => {
@@ -351,7 +359,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
 					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -362,7 +370,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
 					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova TypeScript.Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -373,7 +381,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
 					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Drawer template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -384,7 +392,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
 					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Empty template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -395,7 +403,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				var projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(Object.keys(MobileHelper.platformCapabilities), platform => {
+				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
 					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.TabStrip template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});

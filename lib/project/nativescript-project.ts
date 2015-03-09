@@ -5,7 +5,6 @@ import path = require("path");
 import util = require("util");
 import Future = require("fibers/future");
 import frameworkProjectBaseLib = require("./framework-project-base");
-import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,

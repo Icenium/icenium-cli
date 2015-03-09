@@ -7,7 +7,6 @@ import options = require("./common/options");
 import Future = require("fibers/future");
 import util = require("util");
 import unzip = require("unzip");
-import MobileHelper = require("./common/mobile/mobile-helper");
 
 export class ConfigurationFile {
 	constructor(public template: string,

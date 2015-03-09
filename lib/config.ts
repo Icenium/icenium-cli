@@ -85,7 +85,7 @@ $injector.register("config", Configuration);
 
 export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implements IStaticConfig {
 	public PROJECT_FILE_NAME = ".abproject";
-	public CLIENT_NAME = "appbuilder";
+	public CLIENT_NAME = "AppBuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
@@ -95,6 +95,7 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 		return project.startPackageActivity;
 	}
 
+	public SYS_REQUIREMENTS_LINK = "http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/system-requirements-cli";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;
 

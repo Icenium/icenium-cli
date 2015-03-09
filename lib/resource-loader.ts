@@ -3,11 +3,10 @@
 
 import path = require("path");
 import helpers = require("./helpers");
-import MobileHelper = require("./common/mobile/mobile-helper");
 import util = require("util");
 
 export class ResourceLoader implements IResourceLoader {
-	constructor(private $fs: IFileSystem) {}
+	constructor(private $fs: IFileSystem) { }
 
 	resolvePath(resourcePath: string): string {
 		return path.join(__dirname, "../resources", resourcePath);
@@ -35,12 +34,13 @@ class ResourceDownloader implements IResourceDownloader {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
 		private $resources: IResourceLoader,
-		private $cordovaMigrationService: ICordovaMigrationService) { }
+		private $cordovaMigrationService: ICordovaMigrationService,
+		private $mobileHelper: Mobile.IMobileHelper) { }
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
 			var cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
-			var platforms = Object.keys(MobileHelper.platformCapabilities);
+			var platforms = this.$mobileHelper.platformNames;
 			cordovaVersions.forEach((version) => {
 				platforms.forEach((platform) => {
 					var targetFilePath = this.$resources.buildCordovaJsFilePath(version, platform);

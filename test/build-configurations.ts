@@ -15,6 +15,9 @@ import projectConstantsLib = require("../lib/project/project-constants");
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
+import mobileHelperLib = require("../lib/common/mobile/mobile-helper");
+import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
+import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
 
 import assert = require("assert");
 import Future = require("fibers/future");
@@ -99,6 +102,9 @@ function createTestInjector() {
 	testInjector.register("fs", fslib.FileSystem);
 	testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
+	testInjector.register("mobileHelper", mobileHelperLib.MobileHelper);
+	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
+	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 
 	return testInjector;
 }

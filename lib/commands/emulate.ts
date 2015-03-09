@@ -8,13 +8,13 @@ import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
 import osenv = require("osenv");
 import helpers = require("../helpers");
-import MobileHelper = require("../common/mobile/mobile-helper");
 import options = require("../common/options");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
 				private $buildService: Project.IBuildService,
-				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices) { }
+				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
+				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -26,7 +26,7 @@ export class EmulateAndroidCommand implements ICommand {
 			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			var packageFilePath = path.join(tempDir, "package.apk");
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android],
+				platform: this.$devicePlatformsConstants.Android,
 				showQrCodes: false,
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath
@@ -42,7 +42,8 @@ export class EmulateIosCommand implements ICommand {
 	constructor(private $fs: IFileSystem,
 				private $project: Project.IProject,
 				private $buildService: Project.IBuildService,
-				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices) {
+				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
+				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
 		this.$project.ensureProject();
 	}
 
@@ -57,7 +58,7 @@ export class EmulateIosCommand implements ICommand {
 			if(!options.availableDevices) {
 				var tempDir = this.$project.getTempDir("emulatorfiles").wait();
 				var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-					platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS],
+					platform: this.$devicePlatformsConstants.iOS,
 					configuration: "Debug",
 					showQrCodes: false,
 					downloadFiles: true,
@@ -76,9 +77,10 @@ export class EmulateIosCommand implements ICommand {
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
 
 export class EmulateWp8Command implements ICommand {
-	constructor(private $project: Project.IProject
-		,private $buildService: Project.IBuildService
-		,private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices) {
+	constructor(private $project: Project.IProject,
+		private $buildService: Project.IBuildService,
+		private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
 		this.$project.ensureProject();
 	}
 
@@ -92,7 +94,7 @@ export class EmulateWp8Command implements ICommand {
 			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			var packageFilePath = path.join(tempDir, "package.xap");
 			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-				platform: MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.WP8],
+				platform: this.$devicePlatformsConstants.WP8,
 				configuration: "Debug",
 				showQrCodes: false,
 				downloadFiles: true,

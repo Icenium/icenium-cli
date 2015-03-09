@@ -5,7 +5,6 @@ import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import MobileHelper = require("./../common/mobile/mobile-helper");
 import hostInfo = require("../host-info");
 import commonHostInfo = require("../common/host-info");
 var gaze = require("gaze");

@@ -5,7 +5,6 @@ import path = require("path");
 var options: any = require("../common/options");
 var gaze = require("gaze");
 import helpers = require("./../helpers");
-import MobileHelper = require("./../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
@@ -27,9 +26,10 @@ class LiveSyncDevicesCommand implements ICommand {
 $injector.registerCommand(["livesync|*devices", "live-sync|*devices"], LiveSyncDevicesCommand);
 
 class LiveSyncAndroidCommand implements ICommand {
-	constructor(private $liveSyncService: ILiveSyncService) { }
+	constructor(private $liveSyncService: ILiveSyncService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android]);
+		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -37,9 +37,10 @@ class LiveSyncAndroidCommand implements ICommand {
 $injector.registerCommand(["livesync|android", "live-sync|android"], LiveSyncAndroidCommand);
 
 class LiveSyncIosCommand implements ICommand {
-	constructor(private $liveSyncService: ILiveSyncService) { }
+	constructor(private $liveSyncService: ILiveSyncService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS]);
+		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -47,9 +48,10 @@ class LiveSyncIosCommand implements ICommand {
 $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand);
 
 class LiveSyncWP8Command implements ICommand {
-	constructor(private $liveSyncService: ILiveSyncService) { }
+	constructor(private $liveSyncService: ILiveSyncService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.WP8]);
+		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
 	}
 
 	allowedParameters: ICommandParameter[] = [];
