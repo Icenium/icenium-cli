@@ -519,3 +519,52 @@ describe("project unit tests (canonical paths)", () => {
 	});
 });
 
+describe("cordovaProject unit tests",() => {
+	var projectProperties: IProjectPropertiesService, testInjector: IInjector;
+
+	beforeEach(() => {
+		testInjector = createTestInjector();
+		testInjector.register("fs", fslib.FileSystem);
+
+		testInjector.register("config", require("../lib/config").Configuration);
+		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
+		var config = testInjector.resolve("config");
+		var staticConfig = testInjector.resolve("staticConfig");
+		staticConfig.PROJECT_FILE_NAME = "";
+		config.AUTO_UPGRADE_PROJECT_FILE = false;
+
+		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
+	});
+
+	describe("alterPropertiesForNewProject",() => {
+		it("sets correct WP8PackageIdentityName when appid is short",() => {
+			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			var props: any = {};
+			options.appid = "appId";
+			cordovaProject.alterPropertiesForNewProject(props, "name");
+			assert.equal(props["WP8PackageIdentityName"], "1234Telerik.appId");
+		});
+
+		it("sets correct WP8PackageIdentityName when appid combined with default prefix has 50 symbols length",() => {
+			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			var props: any = {};
+			var defaultPrefix = "1234Telerik.";
+			var value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
+			options.appid = value;
+
+			cordovaProject.alterPropertiesForNewProject(props, "name");
+			assert.equal(props["WP8PackageIdentityName"], defaultPrefix + value);
+		});
+
+		it("sets correct WP8PackageIdentityName when appid combined with default prefix has more than 50 symbols length",() => {
+			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			var props: any = {};
+			var defaultPrefix = "1234Telerik.";
+			var value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
+			options.appid = value + "another long value that should be omitted at the end";
+
+			cordovaProject.alterPropertiesForNewProject(props, "name");
+			assert.equal(props["WP8PackageIdentityName"], defaultPrefix + value);
+		});
+	});
+});
