@@ -24,7 +24,9 @@ export class SimulateCommand implements ICommand {
 		private $project: Project.IProject,
 		private $projectSimulatorService: IProjectSimulatorService,
 		private $serverExtensionsService: IServerExtensionsService,
-		private $simulatorPlatformServices: IExtensionPlatformServices) {
+		private $simulatorPlatformServices: IExtensionPlatformServices,
+		private $staticConfig: IStaticConfig,
+		private $analyticsService: IAnalyticsService) {
 			this.projectData = $project.projectData;
 		}
 
@@ -72,7 +74,9 @@ export class SimulateCommand implements ICommand {
 
 			var simulatorParams = [
 				"--path", this.$project.getProjectDir().wait(),
-				"--assemblypaths", this.simulatorPath
+				"--assemblypaths", this.simulatorPath,
+				"--isfeaturetrackingenabled", this.$analyticsService.isEnabled().wait().toString(),
+				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];
 
 			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
