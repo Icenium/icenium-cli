@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
 import os = require("os");
@@ -22,9 +21,9 @@ class Sample {
 export class SamplesService implements ISamplesService {
 	private static GITHUB_ICENIUM_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
 	private static GITHUB_TELERIK_LOCATION_ENDPOINT = "https://api.github.com/orgs/telerik/repos?per_page=100";
-	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/sample-[\w\W]+[.]git$/i;
+	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/(?!deprecated-)(sample-|.*?-sample-)[\w\W]+[.]git$/i;
 	private static NAME_FORMAT_REGEX = /(sample-|-)/gi;
-	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i
+	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i;
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
 	private static NATIVESCRIPT_SAMPLE_CUTENESS_NAME = "nativescript-sample-cuteness";
@@ -38,7 +37,6 @@ export class SamplesService implements ISamplesService {
 	constructor(private $logger: ILogger,
 		private $errors: IErrors,
 		private $fs: IFileSystem,
-		private $project: Project.IProject,
 		private $httpClient: Server.IHttpClient,
 		private $staticConfig: IStaticConfig) {
 	}
@@ -66,13 +64,15 @@ export class SamplesService implements ISamplesService {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 
-			var sample = _.find(this.samples.wait(), (sample: Sample) => sample.name.toLowerCase() === sampleName.toLowerCase());
+			var sampleNameLower = sampleName.toLowerCase();
+			var sample = _.find(this.samples.wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
 			if (!sample) {
 				this.$errors.fail("There is no sample named '%s'.", sampleName);
 			}
 
 			this.$logger.info("Cloning sample from GitHub...");
 			try {
+				temp.track();
 				var tempDir = temp.mkdirSync("appbuilderSamples");
 				var filepath = path.join(tempDir, sampleName);
 				var file = this.$fs.createWriteStream(filepath);
@@ -127,7 +127,7 @@ export class SamplesService implements ISamplesService {
 				_.each(category.samples, (sample: Sample) => {
 					var nameRow = util.format("    Sample: %s", sample.displayName);
 					var descriptionRow = util.format("    Description: %s", sample.description);
-					var gitClone = util.format("    Github repository page: %s", sample.githubUrl)
+					var gitClone = util.format("    Github repository page: %s", sample.githubUrl);
 					var cloneCommand = util.format("    Clone command: $ appbuilder sample clone %s", sample.name);
 					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL));
 				});
@@ -160,13 +160,30 @@ export class SamplesService implements ISamplesService {
 		}).future<Sample[]>()();
 	}
 
-	private getRepositories(gitHubEndpointUrl: string, filter: (repo: any) => boolean): IFuture<string[]> {
+	private getPagedResult(gitHubEndpointUrl: string, page: number): IFuture<string[]> {
 		return (() => {
 			try {
-				var repos = JSON.parse(this.$httpClient.httpRequest(gitHubEndpointUrl).wait().body);
+				var requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
+				var result = JSON.parse(this.$httpClient.httpRequest(requestUrl).wait().body);
+				return result;
 			} catch (error) {
 				this.$logger.debug(error);
 				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
+			}
+
+		}).future<string[]>()();
+	}
+
+	private getRepositories(gitHubEndpointUrl: string, filter: (repo: any) => boolean): IFuture<string[]> {
+		return (() => {
+			var repos: string[] = [];
+
+			for (var page = 1; ; ++page) {
+				var pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
+				if(_.isEmpty(pagedResult)) {
+					break;
+				}
+				Array.prototype.push.apply(repos, pagedResult);
 			}
 
 			repos = _.select(repos, (repo:any) => filter(repo));
