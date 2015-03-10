@@ -671,9 +671,7 @@ Usage:
 
 Builds the project for android platform and deploys it to connected physical devices. 
 Deploys the project on all connected physical devices and running Android virtual devices. 
-<% if (isLinux) { %>
-In this version of the Telerik AppBuilder CLI, you cannot build and deploy to iOS connected devices on Linux systems.
-<% } %>
+
 <Device ID> is the device index or identifier as listed by run $ appbuilder device.
 <Certificate ID> is the index or name of the certificate as listed by $ appbuilder certificate.
 <Provision ID> is the index or name of the provisioning profile as listed by $ appbuilder provision.
