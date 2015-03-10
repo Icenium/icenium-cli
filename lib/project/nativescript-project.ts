@@ -69,7 +69,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public getTemplateFilename(name: string): string {
-		return util.format("Telerik.Mobile.NativeScript.%s.zip", name);
+		return util.format("Telerik.Mobile.NS.%s.zip", name.replace(/TypeScript/, "TS"));
 	}
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void {
@@ -77,7 +77,10 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public projectTemplatesString(): IFuture<string> {
-		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NativeScript\.(.+)\.zip/);
+		return ((): string => {
+			var templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();
+			return templateStrings.replace(/TS[.]/g, "TypeScript.");
+		}).future<string>()()
 	}
 
 	public getProjectFileSchema(): IDictionary<any> {
