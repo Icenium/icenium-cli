@@ -59,7 +59,9 @@ $injector.requireCommand("login", "./commands/authentication");
 $injector.requireCommand("logout", "./commands/authentication");
 
 $injector.require("buildService", "./services/build");
-$injector.requireCommand("build", "./commands/build");
+$injector.requireCommand("build|android", "./commands/build");
+$injector.requireCommand("build|ios", "./commands/build");
+$injector.requireCommand("build|wp8", "./commands/build");
 
 $injector.require("multipartUploadService", "./services/multipart-upload");
 $injector.require("hashService", "./services/hash-service");
@@ -96,10 +98,17 @@ $injector.requireCommand("prop|print", "./commands/prop/prop-print");
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
 
-$injector.requireCommand("deploy", "./commands/deploy");
+$injector.requireCommand("deployHelper", "./commands/deploy");
+$injector.requireCommand("deploy|*devices", "./commands/deploy");
+$injector.requireCommand("deploy|android", "./commands/deploy");
+$injector.requireCommand("deploy|ios", "./commands/deploy");
+$injector.requireCommand("deploy|wp8", "./commands/deploy");
 
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 $injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./commands/livesync-cloud");
+$injector.requireCommand(["livesync|android", "live-sync|android"], "./commands/livesync-cloud");
+$injector.requireCommand(["livesync|ios", "live-sync|ios"], "./commands/livesync-cloud");
+$injector.requireCommand(["livesync|wp8", "live-sync|wp8"], "./commands/livesync-cloud");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|*list", "./commands/cryptographic-identities");
@@ -119,7 +128,9 @@ $injector.requireCommand("certificate-request|download", "./commands/cryptograph
 $injector.requireCommand("user", "./commands/user-status");
 $injector.requireCommand("appstore|list", "./commands/itunes-connect");
 $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
-$injector.requireCommand("appmanager|upload", "./commands/appmanager");
+$injector.requireCommand("appmanager|upload|android", "./commands/appmanager");
+$injector.requireCommand("appmanager|upload|ios", "./commands/appmanager");
+$injector.requireCommand("appmanager|upload|wp8", "./commands/appmanager");
 
 $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
@@ -146,3 +157,7 @@ $injector.require("jsonSchemaLoader", "./json-schema/json-schema-loader");
 $injector.require("jsonSchemaResolver", "./json-schema/json-schema-resolver");
 $injector.require("jsonSchemaValidator", "./json-schema/json-schema-validator");
 $injector.require("jsonSchemaConstants", "./json-schema/json-schema-constants");
+
+$injector.require("liveSyncService", "./services/livesync-service");
+$injector.require("appManagerService", "./services/appmanager-service");
+$injector.require("dynamicHelpProvider", "./dynamic-help-provider");

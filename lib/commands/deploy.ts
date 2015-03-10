@@ -7,44 +7,36 @@ import MobileHelper = require("./../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import commandParams = require("../common/command-params");
 
+export class DeployHelper implements IDeployHelper {
+	constructor(protected $devicesServices: Mobile.IDevicesServices,
+		protected $logger: ILogger,
+		protected $fs: IFileSystem,
+		protected $project: Project.IProject,
+		protected $buildService: Project.IBuildService,
+		protected $liveSyncService: ILiveSyncService,
+		protected $errors: IErrors) { }
 
-export class DeployCommand implements ICommand {
-	constructor(private $devicesServices: Mobile.IDevicesServices,
-		private $logger: ILogger,
-		private $fs: IFileSystem,
-		private $project: Project.IProject,
-		private $buildService: Project.IBuildService,
-		private $commandsService: ICommandsService,
-		private $errors: IErrors,
-		private $stringParameter: ICommandParameter) { }
+	public deploy(platform?: string): IFuture<void> {
+		this.$project.ensureProject();
 
-	public allowedParameters = [this.$stringParameter];
+		if (!this.$project.capabilities.deploy) {
+			this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+		}
+		if(platform && !MobileHelper.isPlatformSupported(platform)) {
+			this.$errors.fail("On your current OS, you cannot deploy apps on connected %s devices.", MobileHelper.normalizePlatformName(platform));
+		}
 
-	public execute(args: string[]): IFuture<void> {
-		return ((): void => {
-			this.$project.ensureProject();
-
-			if (!this.$project.capabilities.deploy) {
-				this.$errors.fail("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
-			}
-			if (args[0] && !MobileHelper.isPlatformSupported(args[0])) {
-				this.$errors.fail("On your current OS, you cannot deploy apps on connected %s devices.", MobileHelper.normalizePlatformName(args[0]));
-			}
-
-			this.deployCore(args).wait();
-		}).future<void>()();
+		return this.deployCore(platform);
 	}
 
-	private deployCore(args: string[]): IFuture<void> {
+	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
 			if (options.companion) {
-				this.$logger.warn("No deployment necessary when using AppBuilder companion." +
-					" Use the `livesync` command instead to avoid this warning.");
-				this.$commandsService.executeCommandUnchecked("livesync", args).wait();
+				this.$liveSyncService.livesync(platform).wait();
 				return;
 			}
 
-			this.$devicesServices.initialize({platform: args[0], deviceId: options.device}).wait();
+			this.$devicesServices.initialize({ platform: platform, deviceId: options.device}).wait();
 			var packageName = this.$project.projectData.AppIdentifier;
 			var packageFile: string = null;
 
@@ -62,9 +54,51 @@ export class DeployCommand implements ICommand {
 			this.$devicesServices.execute(action).wait();
 		}).future<void>()();
 	}
+}
+$injector.register("deployHelper", DeployHelper);
 
-	get completionData(): string[] {
-		return _.map(MobileHelper.PlatformNames, (platformName: string) => platformName.toLowerCase());
+export class DeployCommand implements ICommand {
+	constructor(private $deployHelper: IDeployHelper) { }
+
+	public allowedParameters: ICommandParameter[] = [];
+
+	public execute(args: string[]): IFuture<void> {
+		return this.$deployHelper.deploy();
 	}
 }
-$injector.registerCommand("deploy", DeployCommand);
+$injector.registerCommand("deploy|*devices", DeployCommand);
+
+export class DeployAndroidCommand implements ICommand {
+	constructor(private $deployHelper: IDeployHelper) { }
+
+	public allowedParameters: ICommandParameter[] = [];
+
+	public execute(args: string[]): IFuture<void> {
+		return this.$deployHelper.deploy(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android]);
+	}
+}
+$injector.registerCommand("deploy|android", DeployAndroidCommand);
+
+export class DeployIosCommand implements ICommand {
+	constructor(private $deployHelper: IDeployHelper) {	}
+
+	public allowedParameters: ICommandParameter[] = [];
+
+	public execute(args: string[]): IFuture<void> {
+		return this.$deployHelper.deploy(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS]);
+	}
+}
+$injector.registerCommand("deploy|ios", DeployIosCommand);
+
+
+export class DeployWP8Command implements ICommand {
+	constructor(private $deployHelper: IDeployHelper) { }
+
+	public allowedParameters: ICommandParameter[] = [];
+
+	public execute(args: string[]): IFuture<void> {
+		return this.$deployHelper.deploy(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.WP8]);
+	}
+}
+$injector.registerCommand("deploy|wp8", DeployWP8Command);
+
