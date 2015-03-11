@@ -60,7 +60,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 		}).future<void>()();
 	}
 
-	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: ReadableStream, fileSize: number): IFuture<void> {
+	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {
 		var headers = {
 			"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize),
 			"Content-Length": endIndex - startingIndex

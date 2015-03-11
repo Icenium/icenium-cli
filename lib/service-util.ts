@@ -23,7 +23,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 		private $errors: IErrors) {
 	}
 
-	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: WritableStream, headers?: any): IFuture<Т> {
+	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
 		return(() => {
 			this.ensureUpToDate().wait();
 			headers = headers || Object.create(null);

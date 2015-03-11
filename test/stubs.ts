@@ -64,7 +64,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	futureFromEvent(eventEmitter: EventEmitter, event:string):IFuture<any> {
+	futureFromEvent(eventEmitter: NodeJS.EventEmitter, event:string):IFuture<any> {
 		return undefined;
 	}
 

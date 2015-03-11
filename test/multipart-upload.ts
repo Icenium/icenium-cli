@@ -16,7 +16,7 @@ var fileSystemFile = require("../lib/common/file-system");
 var hashServiceFile = require("../lib/services/hash-service");
 
 class ServiceProxy implements Server.IServiceProxy {
-	call<T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: WritableStream, headers?: any): IFuture<T> {
+	call<T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> {
 		return (() => { }).future<any>()();
 	}
 	setShouldAuthenticate(shouldAuthenticate: boolean): void {
@@ -76,7 +76,7 @@ function createTestScenarioForContentRangeValidation(data: string): IFuture<stri
 
 		var actualContentRanges: string[] = [];
 		testInjector.register("serviceProxy", {
-			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: WritableStream, headers?: any): IFuture<T> => {
+			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> => {
 				return (() => {
 					actualContentRanges.push(headers["Content-Range"]);
 				}).future<any>()();
