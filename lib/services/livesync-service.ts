@@ -157,7 +157,7 @@ export class LiveSyncService implements ILiveSyncService {
 		});
 	}
 
-	private timer: Timer = null;
+	private timer: NodeJS.Timer = null;
 	private syncQueue: string[] = [];
 	private batchLiveSync(filePath: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
 		if(!this.timer) {

@@ -40,7 +40,7 @@ export class RemoteCommand implements ICommand {
 		private $express: IExpress,
 		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $domainNameSystem: IDomainNameSystem) {
-		this.appBuilderDir = path.join(os.tmpDir(), 'AppBuilder');
+		this.appBuilderDir = path.join(os.tmpdir(), 'AppBuilder');
 		this.packageLocation = path.join(this.appBuilderDir, 'package.zip');
 	}
 
