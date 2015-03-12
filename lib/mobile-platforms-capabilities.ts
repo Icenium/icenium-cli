@@ -11,11 +11,7 @@ export class MobilePlatformsCapabilities implements Mobile.IPlatformsCapabilitie
 	}
 
 	public getAllCapabilities(): IDictionary<Mobile.IPlatformCapabilities> {
-		if(this.platformCapabilities) {
-			return this.platformCapabilities;
-		}
-
-		var platformCapabilities: IDictionary<Mobile.IPlatformCapabilities> = {
+		this.platformCapabilities = this.platformCapabilities || {
 			iOS: {
 				wirelessDeploy: true,
 				cableDeploy: true,
@@ -36,7 +32,7 @@ export class MobilePlatformsCapabilities implements Mobile.IPlatformsCapabilitie
 			}
 		}
 
-		return platformCapabilities;
+		return this.platformCapabilities;
 	}
 }
 $injector.register("mobilePlatformsCapabilities", MobilePlatformsCapabilities);
