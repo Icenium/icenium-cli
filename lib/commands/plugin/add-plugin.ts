@@ -50,10 +50,6 @@ class PluginCommandParameter implements ICommandParameter {
 				this.$errors.fail("No plugin name specified");
 			}
 
-			if(this.$pluginsService.isPluginInstalled(pluginName)) {
-				this.$errors.fail("Plugin %s already exists", pluginName);
-			}
-
 			return true;
 		}).future<boolean>()();
 	}

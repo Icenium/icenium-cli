@@ -25,7 +25,7 @@ export class CordovaPluginData implements IPlugin {
 		return this.composePluginInformation(additionalPluginData);
 	}
 
-	public toProjectDataRecord(): string {
+	public toProjectDataRecord(version: string): string {
 		return this.data.Identifier;
 	}
 
@@ -80,10 +80,8 @@ export class MarketplacePluginData extends CordovaPluginData {
 	private static TELERIK_PUBLISHER_NAME = "Telerik plugins";
 	private static TELERIK_PARTNER_PUBLISHER_NAME = "Telerik partner plugins";
 
-	constructor(public data: Server.CordovaPluginData,
-		public downloads: number,
-		public demoAppRepositoryUrl: string,
-		public publisher: IPublisher,
+	constructor(public pluginVersionsData: Server.MarketplacePluginVersionsData,
+		public data: Server.MarketplacePluginData,
 		$project: Project.IProject,
 		$projectConstants: Project.IProjectConstants) {
 		super(data, PluginType.MarketplacePlugin, $project, $projectConstants);
@@ -91,11 +89,11 @@ export class MarketplacePluginData extends CordovaPluginData {
 
 	public get pluginInformation(): string[] {
 		var additionalPluginData = [
-			this.buildRow("Demo app repository url", this.demoAppRepositoryUrl),
-			this.buildRow("Downloads count", this.downloads.toString())
+			this.buildRow("Downloads count", this.data.DownloadsCount.toString()),
+			this.buildRow("Available versions",  _.map(this.pluginVersionsData.Versions, pl => pl.Version).join(", "))
 		];
 
-		var publisherName = this.getPublisherName(this.publisher);
+		var publisherName = this.getPublisherName(this.data.Publisher);
 		if(publisherName) {
 			additionalPluginData.push(this.buildRow("Publisher", publisherName));
 		}
@@ -103,17 +101,17 @@ export class MarketplacePluginData extends CordovaPluginData {
 		return this.composePluginInformation(additionalPluginData);
 	}
 
-	public toProjectDataRecord(): string {
-		return util.format("%s@%s", this.data.Identifier, this.data.Version);
+	public toProjectDataRecord(version: string): string {
+		return util.format("%s@%s", this.data.Identifier, version || this.data.Version);
 	}
 
-	private getPublisherName(publisher: IPublisher): string {
-		if(publisher && publisher.name) {
-			if(publisher.name === MarketplacePluginData.TELERIK_PUBLISHER_NAME) {
+	private getPublisherName(publisher: Server.MarketplacePluginPublisher): string {
+		if(publisher && publisher.Name) {
+			if(publisher.Name === MarketplacePluginData.TELERIK_PUBLISHER_NAME) {
 				return "Telerik";
 			}
 
-			if(publisher.name === MarketplacePluginData.TELERIK_PARTNER_PUBLISHER_NAME) {
+			if(publisher.Name === MarketplacePluginData.TELERIK_PARTNER_PUBLISHER_NAME) {
 				return "Telerik Partner";
 			}
 		}

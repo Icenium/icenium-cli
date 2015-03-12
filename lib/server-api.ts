@@ -58,6 +58,9 @@ export class CordovaService implements Server.ICordovaServiceContract{
 	public getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>{
 		return this.$serviceProxy.call<Server.CordovaPluginData>('GetMarketplacePluginData', 'GET', ['api','cordova','marketplace',encodeURI(pluginId.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
+	public getMarketplacePluginsData(): IFuture<Server.MarketplacePluginVersionsData[]>{
+		return this.$serviceProxy.call<Server.MarketplacePluginVersionsData[]>('GetMarketplacePluginsData', 'GET', ['api','cordova','marketplace-directory'].join('/'), 'application/json', null, null);
+	}
 	public getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>{
 		return this.$serviceProxy.call<Server.DevicePlatform[]>('GetCurrentPlatforms', 'GET', ['api','cordova','platforms',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
@@ -393,6 +396,15 @@ export class TapService implements Server.ITapServiceContract{
 	}
 	public createServiceApplication(serviceType: string, workspaceId: string, applicationName: string, description: string): IFuture<string>{
 		return this.$serviceProxy.call<string>('CreateServiceApplication', 'POST', ['api','tap','services',encodeURI(serviceType.replace(/\\/g, '/')),encodeURI(workspaceId.replace(/\\/g, '/')),encodeURI(applicationName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'description', value: JSON.stringify(description), contentType: 'application/json'}], null);
+	}
+	public getNotificationSummary(accountId: string): IFuture<Server.TapNotificationSummaryData>{
+		return this.$serviceProxy.call<Server.TapNotificationSummaryData>('GetNotificationSummary', 'GET', ['api','tap','notifications',encodeURI(accountId.replace(/\\/g, '/')),'info'].join('/'), 'application/json', null, null);
+	}
+	public getUnreadNotifications(accountId: string): IFuture<Server.TapNotificationData[]>{
+		return this.$serviceProxy.call<Server.TapNotificationData[]>('GetUnreadNotifications', 'GET', ['api','tap','notifications',encodeURI(accountId.replace(/\\/g, '/')),'unread'].join('/'), 'application/json', null, null);
+	}
+	public getReadNotifications(accountId: string, fromDate: Date): IFuture<Server.TapNotificationData[]>{
+		return this.$serviceProxy.call<Server.TapNotificationData[]>('GetReadNotifications', 'GET', ['api','tap','notifications',encodeURI(accountId.replace(/\\/g, '/')),'read'].join('/') + '?' + querystring.stringify({ 'fromDate': fromDate }), 'application/json', null, null);
 	}
 }
 export class VersioncontrolService implements Server.IVersioncontrolServiceContract{

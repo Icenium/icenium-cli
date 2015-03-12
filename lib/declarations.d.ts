@@ -385,7 +385,7 @@ interface IDomainNameSystem {
 
 interface ICordovaPluginsService {
 	getAvailablePlugins(): IFuture<Server.CordovaPluginData[]>;
-	createPluginData(plugin: any): IFuture<IPlugin>;
+	createPluginData(plugin: any): IPlugin[];
 }
 
 interface IPluginsService {
@@ -399,17 +399,12 @@ interface IPluginsService {
 	isPluginInstalled(pluginName: string): boolean;
 }
 
-interface IPublisher {
-	name: string;
-	url: string;
-}
-
 interface IPlugin {
 	data: Server.CordovaPluginData;
 	type: any;
 	configurations: string[];
 	pluginInformation: string[];
-	toProjectDataRecord(): string;
+	toProjectDataRecord(version?: string): string;
 }
 
 interface IBasicPluginInformation {
@@ -419,8 +414,7 @@ interface IBasicPluginInformation {
 }
 
 interface IMarketplacePlugin extends IPlugin {
-	downloads: number;
-	demoAppRepositoryUrl: string;
+	pluginVersionsData: Server.MarketplacePluginVersionsData;
 }
 
 interface ITypeScriptCompilerOptions {
