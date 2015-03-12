@@ -6,7 +6,6 @@ import xmlMapping = require("xml-mapping");
 import util = require("util");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import MobileHelper = require("../common/mobile/mobile-helper");
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	private static PROJECT_VERSION_DEFAULT_VALUE = 1;

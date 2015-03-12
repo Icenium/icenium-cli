@@ -1,13 +1,12 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import MobileHelper = require("../common/mobile/mobile-helper");
-
 class AppManagerUploadAndroidCommand implements ICommand {
-	constructor(private $appManagerService: IAppManagerService) { }
+	constructor(private $appManagerService: IAppManagerService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
 	execute(args: string[]): IFuture<void> {
-		return this.$appManagerService.upload(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.Android].toLowerCase());
+		return this.$appManagerService.upload(this.$devicePlatformsConstants.Android.toLowerCase());
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -15,10 +14,11 @@ class AppManagerUploadAndroidCommand implements ICommand {
 $injector.registerCommand("appmanager|upload|android", AppManagerUploadAndroidCommand);
 
 class AppManagerUploadIosCommand implements ICommand {
-	constructor(private $appManagerService: IAppManagerService) { }
+	constructor(private $appManagerService: IAppManagerService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
 	execute(args: string[]): IFuture<void> {
-		return this.$appManagerService.upload(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.iOS]);
+		return this.$appManagerService.upload(this.$devicePlatformsConstants.iOS.toLowerCase());
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -26,10 +26,11 @@ class AppManagerUploadIosCommand implements ICommand {
 $injector.registerCommand("appmanager|upload|ios", AppManagerUploadIosCommand);
 
 class AppManagerUploadWP8Command implements ICommand {
-	constructor(private $appManagerService: IAppManagerService) { }
+	constructor(private $appManagerService: IAppManagerService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
 	execute(args: string[]): IFuture<void> {
-		return this.$appManagerService.upload(MobileHelper.DevicePlatforms[MobileHelper.DevicePlatforms.WP8]);
+		return this.$appManagerService.upload(this.$devicePlatformsConstants.WP8.toLowerCase());
 	}
 
 	allowedParameters: ICommandParameter[] = [];

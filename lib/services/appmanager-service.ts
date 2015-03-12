@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import MobileHelper = require("../common/mobile/mobile-helper");
 import constants = require("../common/mobile/constants");
 import util = require("util");
 import options = require("../options");
@@ -15,11 +14,12 @@ class AppManagerService implements IAppManagerService {
 		private $project: Project.IProject,
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
-		private $buildService: Project.IBuildService) { }
+		private $buildService: Project.IBuildService,
+		private $mobileHelper: Mobile.IMobileHelper) { }
 
 	upload(platform: string): IFuture<void> {
 		return (() => {
-			var mobilePlatform = MobileHelper.validatePlatformName(platform, this.$errors);
+			var mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 

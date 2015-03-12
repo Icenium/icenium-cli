@@ -6,7 +6,6 @@ import util = require("util");
 
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
-import MobileHelper = require("../common/mobile/mobile-helper");
 import options = require("../common/options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
@@ -22,7 +21,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
-		$resources: IResourceLoader) {
+		$resources: IResourceLoader,
+		private $mobileHelper: Mobile.IMobileHelper) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
 	}
 
@@ -111,7 +111,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 
 		if(buildProperties.Platform === "WP8") {
-			buildProperties.WP8ProductID = projectData.WP8ProductID || MobileHelper.generateWP8GUID();
+			buildProperties.WP8ProductID = projectData.WP8ProductID || this.generateWP8GUID();
 			buildProperties.WP8PublisherID = projectData.WP8PublisherID;
 			buildProperties.WP8Publisher = projectData.WP8Publisher;
 			buildProperties.WP8TileTitle = projectData.WP8TileTitle;
@@ -127,7 +127,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			var platforms = _.keys(MobileHelper.platformCapabilities);
+			var platforms = this.$mobileHelper.platformNames;
 			_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion).wait());
 
 			var appResourcesDir = this.$resources.appResourcesDir;
@@ -178,7 +178,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
 			if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
-				properties[wp8guid] = MobileHelper.generateWP8GUID();
+				properties[wp8guid] = this.generateWP8GUID();
 				updated = true;
 			}
 		});
@@ -199,6 +199,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 
 		return updated;
+	}
+
+	private generateWP8GUID(): string {
+		return helpers.createGUID();
 	}
 }
 $injector.register("cordovaProject", CordovaProject);

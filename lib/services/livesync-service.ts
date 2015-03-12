@@ -6,7 +6,6 @@ import path = require("path");
 var options: any = require("../common/options");
 var gaze = require("gaze");
 import helpers = require("./../helpers");
-import MobileHelper = require("./../common/mobile/mobile-helper");
 import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
 
@@ -29,7 +28,8 @@ export class LiveSyncService implements ILiveSyncService {
 		private $errors: IErrors,
 		private $project: Project.IProject,
 		private $projectFilesManager: Project.IProjectFilesManager,
-		private $dispatcher: IFutureDispatcher) { }
+		private $dispatcher: IFutureDispatcher,
+		private $mobileHelper: Mobile.IMobileHelper) { }
 
 	public livesync(platform: string): IFuture<void> {
 		return (() => {
@@ -38,7 +38,7 @@ export class LiveSyncService implements ILiveSyncService {
 			this.$devicesServices.initialize({ platform: platform, deviceId: options.device }).wait();
 			var platform = this.$devicesServices.platform;
 
-			if(!MobileHelper.platformCapabilities[platform].companion && options.companion) {
+			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion && options.companion) {
 				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
 			}
 
@@ -81,7 +81,7 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private getProjectFileInfo(fileName: string): IProjectFileInfo {
-		var platforms = _.map(MobileHelper.PlatformNames,(platformName: string) => MobileHelper.normalizePlatformName(platformName));
+		var platforms = this.$mobileHelper.platformNames;
 		var parsed = this.parseFile(fileName, platforms, this.$devicesServices.platform);
 		if(!parsed) {
 			parsed = this.parseFile(fileName, ["debug", "release"], "debug");
@@ -135,11 +135,11 @@ export class LiveSyncService implements ILiveSyncService {
 		}).future<void>()();
 	}
 
-	private getLocalToDevicePaths(localProjectPath: string, projectFiles: IProjectFileInfo[], deviceProjectPath: string): MobileHelper.LocalToDevicePathData[] {
+	private getLocalToDevicePaths(localProjectPath: string, projectFiles: IProjectFileInfo[], deviceProjectPath: string): Mobile.ILocalToDevicePathData[] {
 		var localToDevicePaths = _.map(projectFiles,(projectFileInfo: IProjectFileInfo) => {
 			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFileInfo.onDeviceName);
 			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
-			return new MobileHelper.LocalToDevicePathData(projectFileInfo.fileName, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
+			return this.$mobileHelper.generateLocalToDevicePathData(projectFileInfo.fileName, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
 		});
 
 		return localToDevicePaths;

@@ -3,7 +3,6 @@
 
 import path = require("path");
 import util = require("util");
-import MobileHelper = require("./../common/mobile/mobile-helper");
 
 export class ProjectCommandBase implements ICommand {
 	constructor(protected $project: Project.IProject,
@@ -52,14 +51,15 @@ export class InitProjectCommandBase extends ProjectCommandBase {
 	constructor($project: Project.IProject,
 		$errors: IErrors,
 		protected $fs: IFileSystem,
-		protected $logger: ILogger) {
+		protected $logger: ILogger,
+		protected $mobileHelper: Mobile.IMobileHelper) {
 		super($project, $errors, $logger);
 
 		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
 		this.bootstrapFile = new FileDescriptor(path.join(this.projectDir, "app", "bootstrap.js"), "file");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
-		this.cordovaFiles = _.map(Object.keys(MobileHelper.platformCapabilities), platform => {
+		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => {
 			return new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file");
 		});
 
@@ -196,8 +196,9 @@ export class InitCommand extends InitProjectCommandBase {
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$logger: ILogger,
+		$mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants) {
-		super($project, $errors, $fs, $logger);
+		super($project, $errors, $fs, $logger, $mobileHelper);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -224,8 +225,9 @@ export class InitHybridCommand extends InitProjectCommandBase {
 		$project: Project.IProject,
 		$fs: IFileSystem,
 		$logger: ILogger,
+		$mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants) {
-		super($project, $errors, $fs, $logger);
+		super($project, $errors, $fs, $logger, $mobileHelper);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -239,8 +241,9 @@ export class InitNativeCommand extends InitProjectCommandBase {
 		$project: Project.IProject,
 		$fs: IFileSystem,
 		$logger: ILogger,
+		$mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants) {
-		super($project, $errors, $fs, $logger);
+		super($project, $errors, $fs, $logger, $mobileHelper);
 	}
 
 	public execute(args: string[]): IFuture<void> {
@@ -254,8 +257,9 @@ export class InitWebsiteCommand extends InitProjectCommandBase {
 	$project: Project.IProject,
 	$fs: IFileSystem,
 	$logger: ILogger,
+	$mobileHelper: Mobile.IMobileHelper,
 	private $projectConstants: Project.IProjectConstants) {
-		super($project, $errors, $fs, $logger);
+		super($project, $errors, $fs, $logger, $mobileHelper);
 	}
 
 	public execute(args: string[]): IFuture<void> {

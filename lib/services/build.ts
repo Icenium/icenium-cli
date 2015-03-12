@@ -7,7 +7,6 @@ import path = require("path");
 import os = require("os");
 var options: any = require("../common/options");
 import plist = require("plist");
-import MobileHelper = require("../common/mobile/mobile-helper");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
@@ -34,7 +33,8 @@ export class BuildService implements Project.IBuildService {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $multipartUploadService: IMultipartUploadService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
-		private $projectConstants: Project.IProjectConstants) { }
+		private $projectConstants: Project.IProjectConstants,
+		private $mobileHelper: Mobile.IMobileHelper) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -126,7 +126,7 @@ export class BuildService implements Project.IBuildService {
 
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
-			settings.platform = MobileHelper.normalizePlatformName(settings.platform);
+			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
 			var projectData = this.$project.projectData;
 
 			var buildProperties: any = {
@@ -405,7 +405,7 @@ export class BuildService implements Project.IBuildService {
 
 	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
 		return (() => {
-			platform = MobileHelper.validatePlatformName(platform, this.$errors);
+			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			var result = this.build({
 				platform: platform,
@@ -433,7 +433,7 @@ export class BuildService implements Project.IBuildService {
 
 	private executeBuildCordova(platform: string): IFuture<void> {
 		return (() => {
-			platform = MobileHelper.validatePlatformName(platform, this.$errors);
+			platform = this.$mobileHelper.validatePlatformName(platform);
 
 			if(options["save-to"]) {
 				options.download = true;
@@ -452,7 +452,7 @@ export class BuildService implements Project.IBuildService {
 			if(options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
-				if(!MobileHelper.platformCapabilities[platform].wirelessDeploy && !options.download) {
+				if(!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !options.download) {
 					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
 					options.download = true;
 				}
@@ -477,8 +477,8 @@ export class BuildService implements Project.IBuildService {
 
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
-			platform = MobileHelper.validatePlatformName(platform, this.$errors);
-			if(!MobileHelper.platformCapabilities[platform].companion) {
+			platform = this.$mobileHelper.validatePlatformName(platform);
+			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
 				this.$errors.fail("The companion app is not available on %s.", platform);
 			}
 
