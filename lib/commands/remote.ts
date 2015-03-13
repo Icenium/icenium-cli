@@ -17,13 +17,23 @@ export class PortCommandParameter implements ICommandParameter {
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
+			if(!hostInfo.isDarwin()) {
+				this.$errors.failWithoutHelp("You can use remote command only on MacOS.");
+			}
+
 			if(!validationValue) {
 				this.$errors.fail("You must specify a port number.");
 			}
 
 			var parsedPortNumber = parseInt(validationValue);
-			if(parsedPortNumber === NaN || parsedPortNumber < 0 || parsedPortNumber > 65536) {
-				this.$errors.fail("You must specify a port number between 0 and 65536.");
+
+			if(isNaN(parsedPortNumber) || parsedPortNumber <= 0 || parsedPortNumber >= 65536) {
+				this.$errors.failWithoutHelp("You must specify a valid port number. Valid values are between 1 and 65535.");
+			}
+
+			if(!hostInfo.isWindows() && (parsedPortNumber < 1024)) {
+				this.$errors.failWithoutHelp("Port %s is a system port and cannot be used." + os.EOL +
+					"To use a non-system port, re-run the command with a port number greater than 1023.", parsedPortNumber.toString());
 			}
 			return true;
 		}).future<boolean>()();
@@ -51,15 +61,6 @@ export class RemoteCommand implements ICommand {
 			}
 
 			var parsedPortNumber = parseInt(args[0]);
-			if( isNaN(parsedPortNumber) || parsedPortNumber <= 0 || parsedPortNumber >= 65536) {
-				this.$errors.fail("You must specify a valid port number. Valid values are between 1 and 65535.");
-			}
-
-			if (!hostInfo.isWindows() && (parsedPortNumber < 1024)) {
-				this.$errors.fail("Port %s is a system port and cannot be used." + os.EOL +
-				"To use a non-system port, re-run the command with a port number greater than 1023.", parsedPortNumber.toString());
-			}
-
 			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
 
 			this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
