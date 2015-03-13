@@ -5,13 +5,15 @@ import util = require("util");
 import fiber = require("fibers");
 import helpers = require("./helpers");
 import staticConfigBaseLib = require("./common/static-config-base");
+import configBaseLib = require("./common/config-base");
 
-export class Configuration implements IConfiguration { // User specific config
+export class Configuration extends configBaseLib.ConfigBase implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG :boolean;
-	PROXY_TO_FIDDLER: boolean;
-	FIDDLER_HOSTNAME: string;
+	USE_PROXY: boolean;
+	PROXY_HOSTNAME: string;
+	PROXY_PORT: number;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	DEFAULT_WEBSITE_PROJECT_TEMPLATE: string;
@@ -22,7 +24,9 @@ export class Configuration implements IConfiguration { // User specific config
 	TYPESCRIPT_COMPILER_OPTIONS: ITypeScriptCompilerOptions;
 
 	/*don't require logger and everything that has logger as dependency in config.js due to cyclic dependency*/
-	constructor(private $fs: IFileSystem) {
+	constructor(protected $fs: IFileSystem) {
+		super($fs);
+
 		var configPath = this.getConfigPath("config");
 		if (!this.$fs.exists(configPath).wait()) {
 			var configBase = this.loadConfig("config-base").wait();
@@ -52,17 +56,8 @@ export class Configuration implements IConfiguration { // User specific config
 		}).future<void>()();
 	}
 
-	private getConfigPath(filename: string) : string {
-		return path.join(__dirname, "../config/", filename + ".json");
-	}
-
 	private copyFile(from: string, to: string): IFuture<void> {
 		return this.$fs.copyFile(from, to);
-	}
-
-	private loadConfig(name: string): IFuture<any> {
-		var configFileName = this.getConfigPath(name);
-		return this.$fs.readJson(configFileName);
 	}
 
 	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
