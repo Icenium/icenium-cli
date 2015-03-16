@@ -18,13 +18,11 @@ var knownOpts: any = {
 		"device": String,
 		"file": String,
 		"save-to": String,
-		"saveTo": String,
 		"client": String,
 		"available": Boolean,
 		"release": Boolean,
 		"debug": Boolean,
-		"valid-value": Boolean,
-		"validValue": Boolean
+		"valid-value": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",

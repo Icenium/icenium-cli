@@ -228,6 +228,7 @@ describe("project integration tests", () => {
 
 		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses",() => {
 			prompter.confirmResult = false;
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait()
 			assert.throws(() => project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait());
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");

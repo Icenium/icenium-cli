@@ -10,7 +10,10 @@ var isExecutionStopped = false;
 var knownOpts = {
 	"path": String,
 	"help": Boolean,
-	"verbose": Boolean
+	"verbose": Boolean,
+	"profile-dir": String,
+	"some-dashed-value": String,
+	"a-b-c-d-e-f-g": String
 };
 
 var shorthands = {
@@ -160,6 +163,47 @@ describe("common helpers", () => {
 			errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
 
 			assert.isTrue(isExecutionStopped);
+		});
+
+		// when you pass --option with dash, yargs adds it to yargs.argv in two ways:
+		// for ex. '$ appbuilder login --profile-dir "some dir"' will add profile dir to yargs.argv as: profileDir and profile-dir
+		describe("validates dashed options correctly",() => {
+			it("does not break execution when dashed option with single dash is passed",() => {
+				isExecutionStopped = false;
+				var parsed = {
+					"profile-dir": "some dir",
+					"profileDir": "some dir"
+				};
+
+				errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+				assert.isFalse(isExecutionStopped, "Dashed options should be validated in specific way. Make sure validation allows yargs specific behavior:" +
+					"Dashed options (profile-dir) are added to yargs.argv in two ways: profile-dir and profileDir");
+			});
+
+			it("does not break execution when dashed option with two dashes is passed",() => {
+				isExecutionStopped = false;
+				var parsed = {
+					"some-dashed-value": "some dir",
+					"someDashedValue": "some dir"
+				};
+
+				errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+				assert.isFalse(isExecutionStopped, "Dashed options should be validated in specific way. Make sure validation allows yargs specific behavior:" +
+					"Dashed options (some-dashed-value) are added to yargs.argv in two ways: some-dashed-value and someDashedValue");
+			});
+
+			it("does not break execution when dashed option with a lot of dashes is passed",() => {
+				isExecutionStopped = false;
+				var parsed = {
+					"a-b-c-d-e-f-g": "some dir",
+					"aBCDEFG": "some dir"
+				};
+
+				errors.validateYargsArguments(parsed, knownOpts, shorthands, "mocha");
+
+				assert.isFalse(isExecutionStopped, "Dashed options should be validated in specific way. Make sure validation allows yargs specific behavior:" +
+					"Dashed options (a-b-c-d-e-f-g) are added to yargs.argv in two ways: a-b-c-d-e-f-g and aBCDEFG.");
+			});
 		});
 	});
 });
