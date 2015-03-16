@@ -106,9 +106,9 @@ $injector.requireCommand("deploy|wp8", "./commands/deploy");
 
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 $injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./commands/livesync-cloud");
-$injector.requireCommand(["livesync|android", "live-sync|android"], "./commands/livesync-cloud");
-$injector.requireCommand(["livesync|ios", "live-sync|ios"], "./commands/livesync-cloud");
-$injector.requireCommand(["livesync|wp8", "live-sync|wp8"], "./commands/livesync-cloud");
+$injector.requireCommand(["livesync|android", "live-sync|android"], "./commands/live-sync");
+$injector.requireCommand(["livesync|ios", "live-sync|ios"], "./commands/live-sync");
+$injector.requireCommand(["livesync|wp8", "live-sync|wp8"], "./commands/live-sync");
 
 $injector.require("identityManager", "./commands/cryptographic-identities");
 $injector.requireCommand("provision|*list", "./commands/cryptographic-identities");
