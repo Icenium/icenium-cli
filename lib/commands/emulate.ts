@@ -59,7 +59,6 @@ export class EmulateIosCommand implements ICommand {
 				var tempDir = this.$project.getTempDir("emulatorfiles").wait();
 				var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 					platform: this.$devicePlatformsConstants.iOS,
-					configuration: "Debug",
 					showQrCodes: false,
 					downloadFiles: true,
 					downloadedFilePath: path.join(tempDir, "package.ipa"),
