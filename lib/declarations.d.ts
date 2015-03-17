@@ -235,6 +235,12 @@ interface IStaticConfig extends Config.IStaticConfig {
 	triggerJsonSchemaValidation: boolean;
 }
 
+interface IDependencyConfigService {
+	dependencyConfigFilePath: string;
+	getAppScaffoldingConfig(): IFuture<IAppScaffoldingConfig>;
+	getGeneratorConfig(generatorName: string): IFuture<IGeneratorConfig>;
+}
+
 interface IServerConfiguration {
 	tfisServer: IFuture<string>;
 	assemblyVersion: IFuture<string>;
@@ -295,11 +301,52 @@ interface IUserSettingsService extends UserSettings.IUserSettingsService {
 	saveSettings(data: IDictionary<{}>): IFuture<void>;
 }
 
-interface IServerExtensionsService {
-	prepareExtension(packageName: string, ensureAppIsNotRunning: () => void): IFuture<void>;
+interface IDependencyConfig {
+	name: string;
+	version: string;
+	gitHubRepoUrl: string;
+	downloadUrl?: string;
+	pathToSave?: string;
+}
+
+interface IAppScaffoldingConfig extends IDependencyConfig { }
+
+interface IGeneratorConfig extends IDependencyConfig { }
+
+interface IExtensionsServiceBase {
 	getExtensionVersion(packageName: string): string;
 	getExtensionPath(packageName: string): string;
 	cacheDir: string;
+}
+
+interface IServerExtensionsService extends IExtensionsServiceBase {
+	prepareExtension(packageName: string, beforeDownloadPackageAction: () => void): IFuture<void>;
+}
+
+interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
+	prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig): IFuture<void>;
+}
+
+interface IGeneratorExtensionsService {
+	getGeneratorCachePath(generatorName: string, appScaffoldingPath: string): string;
+	prepareGenerator(generatorName: string, appScaffoldingPath: string): IFuture<void>;
+}
+
+interface IAppScaffoldingExtensionsService {
+	appScaffoldingPath: string;
+	prepareAppScaffolding(): IFuture<void>;
+}
+
+interface IScreenBuilderService {
+	prepareScreenBuilder(generatorName: string): IFuture<void>;
+}
+
+interface IExtensionData {
+	packageName: string;
+	version: string;
+	downloadUri: string;
+	pathToSave?: string;
+	forceDownload?: boolean;
 }
 
 interface IPathFilteringService {

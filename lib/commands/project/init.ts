@@ -8,8 +8,9 @@ export class InitCommand extends InitProjectCommandBaseLib.InitProjectCommandBas
 				$errors: IErrors,
 				$fs: IFileSystem,
 				$logger: ILogger,
+				$mobileHelper: Mobile.IMobileHelper,
 				private $projectConstants: Project.IProjectConstants) {
-		super($project, $errors, $fs, $logger);
+		super($project, $errors, $fs, $logger, $mobileHelper);
 	}
 
 	public execute(args: string[]): IFuture<void> {

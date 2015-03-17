@@ -34,7 +34,7 @@ export class BuildService implements Project.IBuildService {
 		private $multipartUploadService: IMultipartUploadService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $projectConstants: Project.IProjectConstants,
-		private $mobileHelper: Mobile.IMobileHelper) { }
+			private $mobileHelper: Mobile.IMobileHelper) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {

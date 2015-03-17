@@ -1,6 +1,7 @@
 require("./common/bootstrap");
 $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
+$injector.require("dependencyConfigService", "./dependency-config");
 $injector.require("userSettingsService", "./services/user-settings-service");
 require("./options");
 // note: order above is important!
@@ -14,6 +15,9 @@ $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
+$injector.require("appScaffoldingExtensionsService", "./services/app-scaffolding-extensions-service");
+$injector.require("generatorExtensionsService", "./services/generator-extensions-service");
+$injector.require("screenBuilderService", "./services/screen-builder-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
@@ -82,6 +86,7 @@ $injector.require("projectConstants", "./project/project-constants");
 $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
+$injector.requireCommand("create|*default", "./commands/project/create");
 $injector.requireCommand("create|hybrid", "./commands/project/create-hybrid");
 $injector.requireCommand("create|native", "./commands/project/create-native");
 $injector.requireCommand("create|website", "./commands/project/create-website");

@@ -3,7 +3,6 @@
 
 import path = require("path");
 import util = require("util");
-import MobileHelper = require("./../../common/mobile/mobile-helper");
 import ProjectCommandBaseLib = require("./project-command-base");
 
 class FileDescriptor {
@@ -21,14 +20,15 @@ export class InitProjectCommandBase extends ProjectCommandBaseLib.ProjectCommand
 	constructor($project: Project.IProject,
 		$errors: IErrors,
 		protected $fs: IFileSystem,
-		protected $logger: ILogger) {
+		protected $logger: ILogger,
+		protected $mobileHelper: Mobile.IMobileHelper) {
 		super($project, $errors, $logger);
 
 		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
 		this.bootstrapFile = new FileDescriptor(path.join(this.projectDir, "app", "bootstrap.js"), "file");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
-		this.cordovaFiles = _.map(Object.keys(MobileHelper.platformCapabilities), platform => {
+		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => {
 			return new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file");
 		});
 
