@@ -2,7 +2,8 @@
 "use strict";
 
 import path = require("path");
-import util = require("util")
+import temp = require("temp");
+import util = require("util");
 import jsonSchemaResolverPath = require("./json-schema-resolver");
 
 export class JsonSchemaLoader implements IJsonSchemaLoader {
@@ -30,20 +31,19 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 	public downloadSchemas(): IFuture<void> {
 		return (() => {
+			temp.track();
 			this.$fs.deleteDirectory(this.schemasFolderPath).wait();
 			this.$fs.createDirectory(this.schemasFolderPath).wait();
 
-			var zipUrl = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
-
-			var filePath = path.join(this.schemasFolderPath, "schemas.zip");
+			var filePath = temp.path({suffix: ".zip"});
 			var file = this.$fs.createWriteStream(filePath);
 			var fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			this.$httpClient.httpRequest({ url: zipUrl, pipeTo: file}).wait();
+			var schemasEndpoint = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
+			this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file}).wait();
 			fileEnd.wait();
 
 			this.$fs.unzip(filePath, this.schemasFolderPath).wait();
-			this.$fs.deleteFile(filePath).wait();
 		}).future<void>()();
 	}
 
