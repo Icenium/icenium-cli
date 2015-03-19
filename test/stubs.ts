@@ -92,6 +92,10 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
+	appendFile(filename: string, data: any, encoding?: string): IFuture<void> {
+		return undefined;
+	}
+
 	writeJson(filename:string, data:any, space?:string, encoding?:string):IFuture<void> {
 		return undefined;
 	}
@@ -376,6 +380,17 @@ export class StaticConfig implements IStaticConfig {
 	adbFilePath = "adbFilePath";
 	sevenZipFilePath = "7za";
 	triggerJsonSchemaValidation = true;
+	public get MAN_PAGES_DIR(): string {
+		return path.join(__dirname, "../", "docs", "man_pages");
+	}
+
+	public get HTML_PAGES_DIR(): string {
+		return path.join(__dirname, "../", "docs", "html");
+	}
+
+	public get HTML_HELPERS_DIR(): string {
+		return path.join(__dirname, "../", "docs", "helpers");
+	}
 }
 
 export class HooksService implements IHooksService {

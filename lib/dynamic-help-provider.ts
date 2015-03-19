@@ -17,12 +17,14 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		}).future<boolean>()();
 	}
 
-	public getLocalVariables(): IFuture<IDictionary<any>> {
+	public getLocalVariables(options: { isHtml: boolean }): IFuture<IDictionary<any>> {
 		return ((): IDictionary<any> => {
+			var isHtml = options.isHtml;
 			var localVariables:IDictionary<any> = {};
-			localVariables["isMobileWebsite"] = this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite]).wait();
-			localVariables["isCordova"] = this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
-			localVariables["isNativeScript"] = this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();
+			localVariables["isMobileWebsite"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite]).wait();
+			localVariables["isCordova"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
+			localVariables["isNativeScript"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();
+
 			return localVariables;
 		}).future<IDictionary<any>>()();
 	}
