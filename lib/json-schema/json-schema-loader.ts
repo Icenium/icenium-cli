@@ -2,6 +2,8 @@
 "use strict";
 
 import path = require("path");
+import temp = require("temp");
+import util = require("util");
 import jsonSchemaResolverPath = require("./json-schema-resolver");
 
 export class JsonSchemaLoader implements IJsonSchemaLoader {
@@ -11,8 +13,10 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 	private schema: ISchema = null;
 	private loadedSchemas: IDictionary<ISchema> = null;
 
-	public constructor(private $fs: IFileSystem,
+	public constructor(private $config: IConfiguration,
+		private $fs: IFileSystem,
 		private $errors: IErrors,
+		private $httpClient: Server.IHttpClient,
 		private $injector: IInjector,
 		private $resources: IResourceLoader) {
 		this.schemasFolderPath = this.$resources.resolvePath("json-schemas");
@@ -25,20 +29,40 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		this.$injector.register("jsonSchemaResolver", schemaResolver);
 	}
 
+	public downloadSchemas(): IFuture<void> {
+		return (() => {
+			temp.track();
+			this.$fs.deleteDirectory(this.schemasFolderPath).wait();
+			this.$fs.createDirectory(this.schemasFolderPath).wait();
+
+			var filePath = temp.path({suffix: ".zip"});
+			var file = this.$fs.createWriteStream(filePath);
+			var fileEnd = this.$fs.futureFromEvent(file, "finish");
+
+			var schemasEndpoint = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
+			this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file}).wait();
+			fileEnd.wait();
+
+			this.$fs.unzip(filePath, this.schemasFolderPath).wait();
+		}).future<void>()();
+	}
+
 	private loadSchemas(): IFuture<void> {
 		return (() => {
-			var fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
-			_.each(fileNames, (fileName: string) => {
-				if( path.extname(fileName) === ".json") {
-					var fullFilePath = path.join(this.schemasFolderPath, fileName);
-					var schema = this.$fs.readJson(fullFilePath).wait();
-					this.schemas[schema.id] = schema;
-				}
-			});
+			if(this.$fs.exists(this.schemasFolderPath).wait()) {
 
-			var schemas = _.values(this.schemas);
-			_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
+				var fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
+				_.each(fileNames, (fileName: string) => {
+					if( path.extname(fileName) === ".json") {
+						var fullFilePath = path.join(this.schemasFolderPath, fileName);
+						var schema = this.$fs.readJson(fullFilePath).wait();
+						this.schemas[schema.id] = schema;
+					}
+				});
 
+				var schemas = _.values(this.schemas);
+				_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
+			}
 		}).future<void>()();
 	}
 
