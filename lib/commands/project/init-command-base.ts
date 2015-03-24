@@ -28,9 +28,7 @@ export class InitProjectCommandBase extends ProjectCommandBaseLib.ProjectCommand
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
 		this.bootstrapFile = new FileDescriptor(path.join(this.projectDir, "app", "bootstrap.js"), "file");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
-		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => {
-			return new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file");
-		});
+		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file"));
 
 		this.generateMandatoryAndForbiddenFiles();
 	}

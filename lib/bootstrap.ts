@@ -1,7 +1,7 @@
 require("./common/bootstrap");
 $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
-$injector.require("dependencyConfigService", "./dependency-config");
+$injector.require("dependencyConfigService", "./services/dependency-config");
 $injector.require("userSettingsService", "./services/user-settings-service");
 require("./options");
 // note: order above is important!

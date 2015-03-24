@@ -80,18 +80,16 @@ export class ExtensionsServiceBase {
 		return this.$fs.writeJson(this.versionsFile, this.extensionVersions);
 	}
 
-	private downloadPackage(downloadUri: string, zipFileName: string): IFuture<void> {
-		return ((): void => {
-			this.$logger.debug("Downloading package from %s", downloadUri);
+	private downloadPackage(downloadUri: string, zipFileName: string): IFuture<Server.IResponse> {
+		this.$logger.debug("Downloading package from %s", downloadUri);
 
-			var zipFile = this.$fs.createWriteStream(zipFileName);
-			var request = this.$httpClient.httpRequest({
-				url: downloadUri,
-				pipeTo: zipFile,
-				headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
-			});
+		var zipFile = this.$fs.createWriteStream(zipFileName);
+		var request = this.$httpClient.httpRequest({
+			url: downloadUri,
+			pipeTo: zipFile,
+			headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
+		});
 
-			request.wait();
-		}).future<void >()();
+		return request;
 	}
 }

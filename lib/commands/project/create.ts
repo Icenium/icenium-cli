@@ -10,8 +10,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	private static GENERATOR_NAME = "generator-kendo-ui-mobile";
 
 	constructor(public $project: Project.IProject,
-				public $errors: IErrors,
-				public $logger: ILogger,
+		public $errors: IErrors,
+		public $logger: ILogger,
 		private $childProcess: IChildProcess,
 		private $projectConstants: Project.IProjectConstants,
 		private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
@@ -32,7 +32,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 					generatorsCache: path.join(appScaffoldingPath, "cache"),
 					path: projectDirPath,
 					dependencies: ['generator-kendo-ui-mobile@latest'],
-					connect: function _cnnct(done: any) {
+					connect: (done: Function) => {
 						done();
 					},
 					logger: this.$logger.trace.bind(this.$logger)

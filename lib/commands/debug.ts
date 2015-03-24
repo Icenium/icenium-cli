@@ -61,8 +61,8 @@ export class DebugCommand implements ICommand {
 		return (() => {
 			var isRunning = this.$processInfo.isRunning(this.$debuggerPlatformServices.executableName).wait();
 			if (isRunning) {
-				this.$errors.fail({formatStr: "AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
-				"Close it and run $ appbuilder debug again.", suppressCommandHelp: true});
+				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
+				"Close it and run $ appbuilder debug again.");
 			}
 		}).future<void>()();
 	}
