@@ -59,12 +59,7 @@ export class LiveSyncService implements ILiveSyncService {
 				this.$project.projectData.AppIdentifier, options.companion);
 
 			if(options.file) {
-				try {
-					this.sync(appIdentifier, projectDir, [path.resolve(options.file)]).wait();
-				} catch(e) {
-					var message: string = (e.code === "ENOENT") ? util.format("The file %s does not exist.", options.file) : e.message;
-					this.$errors.failWithoutHelp(message);
-				}
+				this.$fs.tryExecuteFileOperation(options.file, () => this.sync(appIdentifier, projectDir, [path.resolve(options.file)]),  util.format("The file %s does not exist.", options.file));
 			} else {
 				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
 

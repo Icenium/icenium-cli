@@ -15,9 +15,11 @@ export class ServerExtensionsService implements IServerExtensionsService {
 		private $config: IConfiguration,
 		private $serverConfiguration: IServerConfiguration,
 		private $server: Server.IServer) {
-			if (this.$fs.exists(this.versionsFile).wait()) {
+		this.$fs.tryExecuteFileOperation(this.versionsFile, () => {
+			return (() => {
 				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
-			}
+			}).future<any>()();
+		});
 	}
 
 	public get cacheDir(): string {
