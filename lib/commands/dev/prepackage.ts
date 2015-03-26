@@ -32,6 +32,7 @@ export class PrePackageCommand implements ICommand {
 			//Cordova files have to be downloaded after cordova migration data so we know which cordova versions we support
 			this.$logger.info("Downloading cordova.js files.");
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
+			this.$logger.info("Preparing screenBuilder...");
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

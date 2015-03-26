@@ -238,6 +238,7 @@ interface IStaticConfig extends Config.IStaticConfig {
 interface IDependencyConfigService {
 	dependencyConfigFilePath: string;
 	getAppScaffoldingConfig(): IFuture<IAppScaffoldingConfig>;
+	getAllGenerators(): IFuture<IGeneratorConfig[]>;
 	getGeneratorConfig(generatorName: string): IFuture<IGeneratorConfig>;
 }
 
@@ -328,8 +329,8 @@ interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
 }
 
 interface IGeneratorExtensionsService {
-	getGeneratorCachePath(generatorName: string, appScaffoldingPath: string): string;
-	prepareGenerator(generatorName: string, appScaffoldingPath: string): IFuture<void>;
+	getGeneratorCachePath(generatorName: string): string;
+	prepareGenerator(generatorName: string): IFuture<void>;
 }
 
 interface IAppScaffoldingExtensionsService {
@@ -338,7 +339,9 @@ interface IAppScaffoldingExtensionsService {
 }
 
 interface IScreenBuilderService {
-	prepareScreenBuilder(generatorName: string): IFuture<void>;
+	prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void>;
+	allSupportedCommands(): IFuture<string[]>;
+	generateAllCommands(generatorName: string): IFuture<void>;
 }
 
 interface IExtensionData {

@@ -4,6 +4,8 @@
 import path = require("path");
 import options = require("../common/options");
 import helpers = require("../helpers");
+import temp = require("temp");
+temp.track();
 
 export class ExtensionsServiceBase {
 	private extensionVersions: IStringDictionary = {};
@@ -30,6 +32,10 @@ export class ExtensionsServiceBase {
 
 	public prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, beforeDownloadAction?: () => IFuture<void>): IFuture<void> {
 		return ((): void => {
+			if (this.$fs.exists(this.versionsFile).wait()) {
+				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
+			}
+
 			var packageName = extensionData.packageName;
 			var extensionVersion = extensionData.version;
 			var extensionPath = extensionData.pathToSave || this.getExtensionPath(extensionData.packageName);
@@ -44,15 +50,13 @@ export class ExtensionsServiceBase {
 
 			if( helpers.versionCompare(cachedVersion, extensionVersion) < 0) {
 				this.$logger.info("Updating %s package...", packageName);
-				var zipFileName = path.join(this.cacheDir, packageName + ".zip");
+				var zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
 				if(beforeDownloadAction) {
 					beforeDownloadAction().wait();
 				}
 
-				if(this.$fs.exists(extensionPath).wait()) {
-					this.$fs.deleteDirectory(extensionPath).wait();
-				}
+				this.$fs.deleteDirectory(extensionPath).wait();
 
 				this.$fs.createDirectory(extensionPath).wait();
 				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
