@@ -12,6 +12,7 @@ export class LoggerStub implements ILogger {
 	}
 
 	setLevel(level: string): void {}
+	getLevel(): string { return undefined; }
 	fatal(formatStr: string, ...args:string[]): void {}
 	error(formatStr: string, ...args:string[]): void {}
 	warn(formatStr: string, ...args:string[]): void {}
@@ -153,9 +154,11 @@ export class FileSystemStub implements IFileSystem {
 	setCurrentUserAsOwner(path: string, owner: string): IFuture<void> {
 		return undefined;
 	}
+
 	enumerateFilesInDirectorySync(directoryPath: string, filterCallback?: (file: string, stat: IFsStats) => boolean): string[] {
 		return [];
 	}
+
 	tryExecuteFileOperation(path: string, operation: () => IFuture<any>, enoentErrorMessage?: string): IFuture<void> {
 		return undefined;
 	}
