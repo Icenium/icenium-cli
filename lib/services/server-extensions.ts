@@ -19,7 +19,7 @@ export class ServerExtensionsService implements IServerExtensionsService {
 			return (() => {
 				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 			}).future<any>()();
-		});
+		}).wait();
 	}
 
 	public get cacheDir(): string {
