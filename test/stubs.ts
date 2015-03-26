@@ -156,6 +156,9 @@ export class FileSystemStub implements IFileSystem {
 	enumerateFilesInDirectorySync(directoryPath: string, filterCallback?: (file: string, stat: IFsStats) => boolean): string[] {
 		return [];
 	}
+	tryExecuteFileOperation(path: string, operation: () => IFuture<any>, enoentErrorMessage?: string): IFuture<void> {
+		return undefined;
+	}
 }
 
 export class ErrorsStub implements IErrors {
