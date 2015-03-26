@@ -12,6 +12,7 @@ var commandParams = require("../lib/common/command-params");
 
 export class LoggerStubWithErrorOnFatal implements ILogger {
 	setLevel(level: string): void { }
+	getLevel(): string { return undefined; }
 	fatal(formatStr: string, ...args: string[]): void { throw new Error();}
 	error(formatStr: string, ...args: string[]): void { }
 	warn(formatStr: string, ...args: string[]): void { }
