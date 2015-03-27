@@ -170,3 +170,4 @@ $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
 $injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilities");
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");
+$injector.require("progressIndicator", "./progress-indicator");

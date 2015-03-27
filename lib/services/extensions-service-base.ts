@@ -71,7 +71,7 @@ export class ExtensionsServiceBase {
 					this.$fs.deleteDirectory(extensionPath).wait();
 					throw err;
 				}
-				this.$logger.info("Finished updating %s package.", packageName);
+				this.$logger.trace("Finished updating %s package.", packageName);
 			}
 		}).future<void>()();
 	}

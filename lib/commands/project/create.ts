@@ -13,7 +13,6 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	constructor(public $project: Project.IProject,
 		public $errors: IErrors,
 		public $logger: ILogger,
-		private $childProcess: IChildProcess,
 		private $projectConstants: Project.IProjectConstants,
 		private $screenBuilderService: IScreenBuilderService) {
 		super($project, $errors, $logger);
@@ -21,11 +20,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var projectDirPath = path.resolve(options.path || ".");
 			this.$screenBuilderService.prepareAndGeneratePrompt(CreateCommand.GENERATOR_NAME).wait();
-
-			this.$logger.trace("Installing project dependencies using bower");
-			this.$childProcess.exec("bower install", { cwd: projectDirPath }).wait();
+			this.$screenBuilderService.installAppDependencies().wait();
 
 			this.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 		}).future<void>()();

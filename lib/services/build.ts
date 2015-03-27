@@ -33,8 +33,8 @@ export class BuildService implements Project.IBuildService {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $multipartUploadService: IMultipartUploadService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
-		private $projectConstants: Project.IProjectConstants,
-		private $mobileHelper: Mobile.IMobileHelper) { }
+		private $mobileHelper: Mobile.IMobileHelper,
+		private $progressIndicator: IProgressIndicator) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -73,7 +73,7 @@ export class BuildService implements Project.IBuildService {
 			buildProperties.LiveSyncToken = liveSyncToken;
 
 			var buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
-			this.showProgressIndicator(buildProjectFuture, 2000).wait();
+			this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000).wait();
 			this.$logger.printInfoMessageOnSameLine(os.EOL);
 
 			var body = buildProjectFuture.get();
@@ -515,25 +515,15 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.printInfoMessageOnSameLine("Uploading...");
 			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
-				this.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
-				this.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
 			} else {
-				this.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
 					this.$fs.createReadStream(projectZipFile)), 2000).wait();
 			}
 
 			this.$logger.printInfoMessageOnSameLine(os.EOL);
 			this.$logger.trace("Project imported");
-		}).future<void>()();
-	}
-
-	private showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void> {
-		return (() => {
-			while(!future.isResolved()) {
-				this.$logger.printMsgWithTimeout(".", timeout).wait();
-			}
-			// Make sure future is not left behind and prevent "There are outstanding futures." error.
-			future.wait();
 		}).future<void>()();
 	}
 }

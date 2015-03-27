@@ -342,6 +342,7 @@ interface IScreenBuilderService {
 	prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void>;
 	allSupportedCommands(): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
+	installAppDependencies(): IFuture<void>;
 }
 
 interface IExtensionData {
@@ -461,4 +462,8 @@ interface ILiveSyncService {
 
 interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
+}
+
+interface IProgressIndicator {
+	showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void>;
 }

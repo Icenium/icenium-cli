@@ -12,11 +12,13 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $fs: IFileSystem,
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
-		private $logger: ILogger) { }
+		private $logger: ILogger,
+		private $progressIndicator: IProgressIndicator) { }
 
 	public prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void> {
 		return (() => {
-			this.prepareScreenBuilder().wait();
+			this.$logger.out("Preparing ScreenBuilder..");
+			this.$progressIndicator.showProgressIndicator(this.prepareScreenBuilder(), 2000).wait();
 			this.promptGenerate(generatorName, type).wait();
 		}).future<void>()();
 	}
@@ -38,6 +40,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			var commands = this.allSupportedCommands().wait();
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
 		}).future<void>()();
+	}
+
+	public installAppDependencies(): IFuture<void> {
+		this.$logger.trace("Installing project dependencies using bower");
+		var projectDirPath = path.resolve(options.path || ".");
+		return this.$childProcess.exec("bower install", { cwd: projectDirPath });
 	}
 
 	private prepareScreenBuilder(): IFuture<void> {
