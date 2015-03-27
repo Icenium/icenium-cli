@@ -285,24 +285,32 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 			}
 
 			var user = this.$userDataStore.getUser().wait();
-			var schema = [
-					{
+			var schema: any = [];
+
+			if(!model.Name) {
+				schema.push({
 						type: "input",
 						name: "Name",
 						message: "Name",
 						default: () => user.name
-					},
-					{
-						type: "input",
-						name: "Email",
-						message: "Email",
-						default: () => user.email,
-						validate: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
-							return validationResult.isSuccessful ? true : validationResult.error;
-						}
-					},
-					{
+				});
+			}
+
+			if(!model.Email) {
+				schema.push({
+					type: "input",
+					name: "Email",
+					message: "Email",
+					default: () => user.email,
+					validate: (value: string) => {
+						var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
+						return validationResult.isSuccessful ? true : validationResult.error;
+					}
+				});
+			}
+
+			if(!model.Country) {
+				schema.push({
 						type: "input",
 						name: "Country",
 						message: "Country",
@@ -313,7 +321,8 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 							message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
 							return validationResult.isSuccessful ? true : message.join("\n");
 						}
-					}];
+				});
+			}
 
 			return this.$prompter.get(schema).wait();
 
@@ -357,37 +366,41 @@ export class CreateSelfSignedIdentity implements ICommand {
 				Email: args[1],
 				Country: args[2]
 			};
+			this.model = identityInfo;
 
 			identityInfo = this.$identityInformationGatherer.gatherIdentityInformation(identityInfo).wait();
 
-			this.model = {
-				ForGooglePlayPublishing: args[3] ? (args[3].toLowerCase() === "googleplay" ? "y" : "n") : undefined,
-				StartDate: args[4],
-				EndDate: args[5]
-			};
+			this.model.ForGooglePlayPublishing = args[3] ? (args[3].toLowerCase() === "googleplay" ? "y" : "n") : undefined;
+			this.model.StartDate = args[4];
+			this.model.EndDate = args[5];
 
 			var promptSchema = this.getPromptSchema(this.model);
 
-			this.model = this.$prompter.get(promptSchema).wait();
-			_.extend(this.model, identityInfo);
+			if(promptSchema.length > 0) {
+				this.model = this.$prompter.get(promptSchema).wait();
+				_.extend(this.model, identityInfo);
+			}
 
-			var endDate = this.$prompter.get([{
-				message: "Valid until (yyyy-mm-dd)",
-				type: "input",
-				name: "EndDate",
-				default: () => this.getDefaultEndDate(this.isForGooglePlay()),
-				validate: (value: string) => {
-					var validationResult = this.$selfSignedIdentityValidator.
-						validateProperty(<ISelfSignedIdentityModel>{
-							ForGooglePlayPublishing: this.isForGooglePlay().toString(),
-							StartDate: this.model["StartDate"] || this.getHistoryValue("StartDate"),
-							EndDate: value
-						}, "EndDate");
+			var endDate = this.model.EndDate;
+			if(!endDate) {
+				endDate = this.$prompter.get([{
+					message: "Valid until (yyyy-mm-dd)",
+					type: "input",
+					name: "EndDate",
+					default: () => this.getDefaultEndDate(this.isForGooglePlay()),
+					validate: (value: string) => {
+						var validationResult = this.$selfSignedIdentityValidator.
+							validateProperty(<ISelfSignedIdentityModel>{
+								ForGooglePlayPublishing: this.isForGooglePlay().toString(),
+								StartDate: this.model["StartDate"] || this.getHistoryValue("StartDate"),
+								EndDate: value
+							}, "EndDate");
 
-					return validationResult.isSuccessful ? true : validationResult.error;
-				}
-			}]).wait();
-			_.extend(this.model, endDate);
+						return validationResult.isSuccessful ? true : validationResult.error;
+					}
+				}]).wait();
+				_.extend(this.model, endDate);
+			}
 
 			var identityGenerationData = IdentityGenerationDataFactory.create(this.model);
 			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
@@ -400,13 +413,18 @@ export class CreateSelfSignedIdentity implements ICommand {
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
 	private getPromptSchema(defaults: any): IPromptSchema[] {
-		var promptSchema = [{
+		var promptSchema: any = [];
+		if(!defaults.ForGooglePlayPublishing) {
+			promptSchema.push({
 					message: "Is for Google Play publishing?",
 					type: "confirm",
 					name: "ForGooglePlayPublishing",
 					default: () => false
-				},
-				{
+				});
+		}
+
+		if(!defaults.StartDate) {
+			promptSchema.push({
 					message: "Valid from (yyyy-mm-dd)",
 					type: "input",
 					name: "StartDate",
@@ -415,7 +433,9 @@ export class CreateSelfSignedIdentity implements ICommand {
 						var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{StartDate: value}, "StartDate");
 						return validationResult.isSuccessful ? true : validationResult.error;
 					}
-				}];
+				});
+		}
+
 		return promptSchema;
 	}
 
