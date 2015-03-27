@@ -87,13 +87,7 @@ $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
 $injector.requireCommand("create|*default", "./commands/project/create");
-$injector.requireCommand("create|hybrid", "./commands/project/create-hybrid");
-$injector.requireCommand("create|native", "./commands/project/create-native");
-$injector.requireCommand("create|website", "./commands/project/create-website");
 $injector.requireCommand("init|*unknown", "./commands/project/init");
-$injector.requireCommand("init|hybrid", "./commands/project/init-hybrid");
-$injector.requireCommand("init|native", "./commands/project/init-native");
-$injector.requireCommand("init|website", "./commands/project/init-website");
 
 $injector.requireCommand("prop|add", "./commands/prop/prop-add");
 $injector.requireCommand("prop|set", "./commands/prop/prop-set");
@@ -171,3 +165,5 @@ $injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilitie
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");
 $injector.require("progressIndicator", "./progress-indicator");
+
+$injector.require("projectCommandsService", "./services/project-commands-service");

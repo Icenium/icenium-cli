@@ -339,6 +339,7 @@ interface IAppScaffoldingExtensionsService {
 }
 
 interface IScreenBuilderService {
+	generatorName: string;
 	prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void>;
 	allSupportedCommands(): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
@@ -466,4 +467,8 @@ interface IAppManagerService {
 
 interface IProgressIndicator {
 	showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void>;
+}
+
+interface IProjectCommandsService {
+	generateAllProjectCommands(): void;
 }

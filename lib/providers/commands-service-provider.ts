@@ -2,14 +2,19 @@
 "use strict";
 
 class CommandsServiceProvider implements ICommandsServiceProvider {
-	constructor(public $screenBuilderService: IScreenBuilderService) { }
+	constructor(private $projectCommandsService: IProjectCommandsService,
+		private $screenBuilderService: IScreenBuilderService) { }
 
-	public allDynamicCommands(): IFuture<string[]> {
+	public getDynamicCommands(): IFuture<string[]> {
 		return this.$screenBuilderService.allSupportedCommands();
 	}
 
 	public generateDynamicCommands(): IFuture<void> {
-		return this.$screenBuilderService.generateAllCommands("generator-kendo-ui-mobile");
+		return this.$screenBuilderService.generateAllCommands(this.$screenBuilderService.generatorName);
+	}
+
+	public registerDynamicSubCommands(): void {
+		this.$projectCommandsService.generateAllProjectCommands();
 	}
 }
 $injector.register("commandsServiceProvider", CommandsServiceProvider);

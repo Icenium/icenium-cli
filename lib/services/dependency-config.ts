@@ -52,11 +52,6 @@ export class DependencyConfigService implements IDependencyConfigService {
 
 			return this.dependencyConfigCache;
 		}).future<any>()();
-
-
-
-
-
 	}
 }
 $injector.register("dependencyConfigService", DependencyConfigService);

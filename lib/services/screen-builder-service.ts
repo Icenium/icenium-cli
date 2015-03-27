@@ -15,6 +15,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $logger: ILogger,
 		private $progressIndicator: IProgressIndicator) { }
 
+	public get generatorName(): string {
+		return "generator-kendo-ui-mobile";
+	}
+
 	public prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void> {
 		return (() => {
 			this.$logger.out("Preparing ScreenBuilder..");
