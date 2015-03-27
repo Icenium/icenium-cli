@@ -277,7 +277,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 		private $logger: ILogger) { }
 
 	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
-		return ((): IIdentityInformation => {
+		return (() => {
 			var myCountry = model.Country;
 			if(!myCountry) {
 				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
@@ -285,54 +285,38 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 			}
 
 			var user = this.$userDataStore.getUser().wait();
-			var schema: IPromptSchema = {
-				properties: {
-					Name: {
-						required: true,
-						type: "string",
+			var schema = [
+					{
+						type: "input",
+						name: "Name",
+						message: "Name",
 						default: () => user.name
 					},
-					Email: {
-						description: "E-mail",
-						required: true,
-						type: "string",
+					{
+						type: "input",
+						name: "Email",
+						message: "Email",
 						default: () => user.email,
-						conform: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.
-								validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
-
-							if(!validationResult.isSuccessful) {
-								schema.properties["Email"].message = validationResult.error;
-								return false;
-							}
-							return true;
+						validate: (value: string) => {
+							var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
+							return validationResult.isSuccessful ? true : validationResult.error;
 						}
 					},
-					Country: {
-						required: true,
-						type: "string",
+					{
+						type: "input",
+						name: "Country",
+						message: "Country",
 						default: () => myCountry,
-						conform: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.
-								validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
-
-							if(!validationResult.isSuccessful) {
-								var message = [validationResult.error, "Valid countries are:"];
-
-								message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
-
-								schema.properties["Country"].message = message.join("\n");
-								return false;
-							}
-							return true;
+						validate: (value: string) => {
+							var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
+							var message = [validationResult.error, "Valid countries are:"];
+							message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
+							return validationResult.isSuccessful ? true : message.join("\n");
 						}
-					}
-				}
-			};
+					}];
 
-			this.$prompter.start();
-			this.$prompter.override(model);
-			return <IIdentityInformation> this.$prompter.get(schema).wait();
+			return this.$prompter.get(schema).wait();
+
 		}).future<IIdentityInformation>()();
 	}
 
@@ -384,10 +368,26 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 			var promptSchema = this.getPromptSchema(this.model);
 
-			this.$prompter.start();
-			this.$prompter.override(this.model);
 			this.model = this.$prompter.get(promptSchema).wait();
 			_.extend(this.model, identityInfo);
+
+			var endDate = this.$prompter.get([{
+				message: "Valid until (yyyy-mm-dd)",
+				type: "input",
+				name: "EndDate",
+				default: () => this.getDefaultEndDate(this.isForGooglePlay()),
+				validate: (value: string) => {
+					var validationResult = this.$selfSignedIdentityValidator.
+						validateProperty(<ISelfSignedIdentityModel>{
+							ForGooglePlayPublishing: this.isForGooglePlay().toString(),
+							StartDate: this.model["StartDate"] || this.getHistoryValue("StartDate"),
+							EndDate: value
+						}, "EndDate");
+
+					return validationResult.isSuccessful ? true : validationResult.error;
+				}
+			}]).wait();
+			_.extend(this.model, endDate);
 
 			var identityGenerationData = IdentityGenerationDataFactory.create(this.model);
 			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
@@ -399,75 +399,32 @@ export class CreateSelfSignedIdentity implements ICommand {
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector),
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
-	private getPromptSchema(defaults: any): IPromptSchema {
-		var promptSchema: IPromptSchema = {
-			properties: {
-				ForGooglePlayPublishing: {
-					description: "Is for Google Play publishing? (y/n)",
-					required: true,
-					type: "string",
-					default: () => "n",
-					conform: (value: string) => {
-						if(!/^[yn]$/i.test(value)) {
-							promptSchema.properties["ForGooglePlayPublishing"].message = "Choose 'y' (yes) or 'n' (no).";
-							return false;
-						}
-						return true;
-					}
+	private getPromptSchema(defaults: any): IPromptSchema[] {
+		var promptSchema = [{
+					message: "Is for Google Play publishing?",
+					type: "confirm",
+					name: "ForGooglePlayPublishing",
+					default: () => false
 				},
-				StartDate: {
-					description: "Valid from (yyyy-mm-dd)",
-					required: true,
-					type: "string",
+				{
+					message: "Valid from (yyyy-mm-dd)",
+					type: "input",
+					name: "StartDate",
 					default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
-					conform: (value: string) => {
-						var validationResult = this.$selfSignedIdentityValidator.
-							validateProperty(<ISelfSignedIdentityModel>{ StartDate: value }, "StartDate");
-
-						if(!validationResult.isSuccessful) {
-							promptSchema.properties["StartDate"].message = validationResult.error;
-							return false;
-						}
-
-						return true;
+					validate: (value:string) => {
+						var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{StartDate: value}, "StartDate");
+						return validationResult.isSuccessful ? true : validationResult.error;
 					}
-				},
-				EndDate: {
-					description: "Valid until (yyyy-mm-dd)",
-					required: true,
-					type: "string",
-					default: () => this.getDefaultEndDate(this.isForGooglePlay()),
-					conform: (value: string) => {
-						var validationResult = this.$selfSignedIdentityValidator.
-							validateProperty(<ISelfSignedIdentityModel>{
-								ForGooglePlayPublishing: this.isForGooglePlay().toString(),
-								StartDate: defaults["StartData"] || this.getHistoryValue("StartDate"),
-								EndDate: value
-							}, "EndDate");
-
-						if(!validationResult.isSuccessful) {
-							promptSchema.properties["EndDate"].message = validationResult.error;
-							return false;
-						}
-						return true;
-					}
-				}
-			}
-		};
+				}];
 		return promptSchema;
 	}
 
 	private isForGooglePlay(): boolean {
-		if(this.model.ForGooglePlayPublishing) {
-			return this.model.ForGooglePlayPublishing === "y";
-		} else {
-			return /^y$/i.test(this.getHistoryValue("ForGooglePlayPublishing"))
-		}
+		return this.getHistoryValue("ForGooglePlayPublishing");
 	}
 
 	private getHistoryValue(name: string): any {
-		var entry = this.$prompter.history(name);
-		return entry && entry.value;
+		return this.model[name];
 	}
 
 	private getDefaultEndDate(forGooglePlayPublishing: boolean): string {
@@ -503,7 +460,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 			var nameOrIndex = args[0];
 			var identity = this.$identityManager.findCertificate(nameOrIndex).wait();
 
-			if(this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias)).wait()) {
+			if(this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
 			}
 		}).future<void>()();
@@ -553,7 +510,7 @@ export class ExportCryptographicIdentity implements ICommand {
 
 			var targetFile = this.$fs.createWriteStream(targetFileName);
 
-			this.$logger.info("Exporting certificate to file %s.", targetFileName);
+			this.$logger.info("Exporting certificate to file '%s'.", targetFileName);
 			this.$server.identityStore.getIdentity(name, password, targetFile).wait();
 		}).future<void>()();
 	}

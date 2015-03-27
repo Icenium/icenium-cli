@@ -22,18 +22,15 @@ export class AppstoreApplicationCommandBase implements ICommand {
 	public getAppleId(): IFuture<string> {
 		return (() => {
 			var appleIdSchema: IPromptSchema = {
-				properties: {
-					appleId: {
-						description: "Apple ID",
-						type: "string",
-						hidden: false,
-						required: true,
-						message: "Apple ID must be non-empty."
-					}
+				message: "Apple ID",
+				type: "input",
+				name: "appleId",
+				validate: (value: string) => {
+					return !value ? "Apple ID must be non-empty." : true;
 				}
 			};
 
-			var result = this.$prompter.get(appleIdSchema).wait();
+			var result = this.$prompter.get([appleIdSchema]).wait();
 			return result["appleId"];
 		}).future<string>()();
 	}
