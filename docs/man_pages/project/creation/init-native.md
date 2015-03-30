@@ -1,7 +1,7 @@
 init native
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder init native [--appid <App ID>]`
 

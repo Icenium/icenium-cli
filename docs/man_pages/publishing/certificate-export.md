@@ -1,7 +1,7 @@
 certificate export
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate export <Certificate ID> [<Password>] [--path <Directory>]`
 

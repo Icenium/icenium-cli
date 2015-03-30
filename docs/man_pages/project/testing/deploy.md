@@ -1,7 +1,7 @@
 deploy
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder deploy <Platform> [--device <Device ID>] [--debug] [--release]`
 Android | `$ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>] [--debug] [--release]`

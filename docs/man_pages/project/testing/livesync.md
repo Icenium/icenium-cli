@@ -1,7 +1,7 @@
 livesync
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync [<Platform>] [--device <Device ID>] [--companion] [--watch]`    `$ appbuilder livesync [<Command>]`
 Andorid | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`

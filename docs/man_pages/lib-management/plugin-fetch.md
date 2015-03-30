@@ -1,7 +1,7 @@
 plugin fetch
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin fetch <Name | ID | Path | URL | [<Keyword> [<Keyword>]*>] >`
     

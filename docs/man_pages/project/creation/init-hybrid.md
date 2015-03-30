@@ -1,7 +1,7 @@
 init hybrid
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder init hybrid [--appid <App ID>]`
 Initializes an existing Apache Cordova project for development in the current directory. 

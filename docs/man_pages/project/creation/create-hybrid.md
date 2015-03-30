@@ -1,7 +1,7 @@
 create hybrid
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder create hybrid <App name> [--template <Template>] [--path <Directory>] [--appid <App ID>]`
 

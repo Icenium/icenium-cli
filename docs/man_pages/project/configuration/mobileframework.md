@@ -1,7 +1,7 @@
 mobileframework
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder mobileframework [<Command>] [--path <Directory>]`
 

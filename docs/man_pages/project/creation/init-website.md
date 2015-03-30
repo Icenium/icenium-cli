@@ -1,7 +1,7 @@
 init website
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder init website`
 Initializes an existing Mobile Website project for development in the current directory. 

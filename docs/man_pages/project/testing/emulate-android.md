@@ -1,7 +1,7 @@
 emulate android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
 Native emulator | `$ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`

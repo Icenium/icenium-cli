@@ -1,7 +1,7 @@
 livesync ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]`
 

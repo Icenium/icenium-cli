@@ -1,7 +1,7 @@
 prop
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop <Command>`
 

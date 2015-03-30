@@ -1,7 +1,7 @@
 prop remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop remove <Property Name> <Value> [Value]*`
 

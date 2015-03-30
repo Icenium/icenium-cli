@@ -1,7 +1,7 @@
 plugin remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin remove <Name or ID> [--debug] [--release]`
 

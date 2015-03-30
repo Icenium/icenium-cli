@@ -1,7 +1,7 @@
 sample clone
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder sample clone <Clone ID> [--path <Directory>]`	
 

@@ -1,7 +1,7 @@
 appstore upload
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appstore upload <Application Name> [<AppleID>] [<Password>] --certificate <Certificate ID> --provision <Provision ID>`
 

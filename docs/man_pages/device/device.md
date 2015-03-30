@@ -1,7 +1,7 @@
 device
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device [<Command>]`
 

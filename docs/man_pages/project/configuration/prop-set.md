@@ -1,7 +1,7 @@
 prop set
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop set <Property Name> <Value> [Value]*`
 

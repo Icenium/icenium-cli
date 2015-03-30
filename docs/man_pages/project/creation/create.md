@@ -1,7 +1,7 @@
 create
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder create [<Command>]`
 Creates a project for hybrid or native development. You must run the create command with a related command.

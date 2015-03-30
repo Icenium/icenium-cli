@@ -1,7 +1,7 @@
 plugin configure
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin configure <Name or ID> [--debug] [--release]`
 

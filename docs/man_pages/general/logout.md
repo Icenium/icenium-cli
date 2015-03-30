@@ -1,7 +1,7 @@
 logout
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder logout`
 Logs you out from the Telerik Platform.

@@ -1,7 +1,7 @@
 plugin find
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin find [<Keyword> [<Keyword>]*>]`
 

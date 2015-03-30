@@ -1,7 +1,7 @@
 plugin add
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 List all plugins | `$ appbuilder plugin add --available [--debug] [--release]`    
 Add plugins | `$ appbuilder plugin add <Name or ID> [--debug] [--release]`

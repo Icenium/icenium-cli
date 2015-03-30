@@ -1,7 +1,7 @@
 simulate
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder simulate [--path <Directory>]`
 

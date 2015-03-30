@@ -1,7 +1,7 @@
 help
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder help [<Command>]`
 Lists the available commands or shows information about the selected command.

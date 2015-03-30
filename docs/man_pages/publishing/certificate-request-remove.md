@@ -1,7 +1,7 @@
 certificate-request remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request remove <Csr ID>`
 

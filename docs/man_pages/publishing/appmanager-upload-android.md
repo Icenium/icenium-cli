@@ -1,7 +1,7 @@
 appmanager upload android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager upload android [--certificate <Certificate ID>] [--download]`   
 

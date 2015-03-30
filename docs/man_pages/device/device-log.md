@@ -1,7 +1,7 @@
 device log
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device log --device <Device ID>`
 Opens the device log stream for a selected connected device. 

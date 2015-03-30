@@ -1,7 +1,7 @@
 provision import
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder provision import <File Path>`
 

@@ -1,7 +1,7 @@
 certificate-request download
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request download <Csr ID> [--save-to <File Path>]`
 

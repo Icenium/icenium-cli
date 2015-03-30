@@ -1,7 +1,7 @@
 appstore
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appstore <Command>`
 

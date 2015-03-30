@@ -1,7 +1,7 @@
 cloud export
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder cloud export <Project ID> [--path <Directory>]`
 

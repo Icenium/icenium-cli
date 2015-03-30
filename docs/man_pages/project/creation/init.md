@@ -1,7 +1,7 @@
 init
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$appbuilder init`    `$appbuilder init [`<Command>`]`
 
