@@ -97,16 +97,20 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		private $identityManager: Server.IIdentityManager,
 		private $stringParameterBuilder: IStringParameterBuilder,
 		private $loginManager: ILoginManager,
-		private $injector: IInjector) {
+		private $injector: IInjector,
+		private $projectConstants: Project.IProjectConstants) {
 		super($server, $logger, $prompter, $errors);
 	}
-    
+
 	allowedParameters = [this.$stringParameterBuilder.createMandatoryParameter("No application specified. Specify an application that is ready for upload in iTunes Connect."),
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
-        
+
 	execute(args:string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureCordovaProject();
+			if(!this.$project.capabilities.uploadToAppstore) {
+				this.$errors.failWithoutHelp("You cannot upload %s projects to AppStore.", this.$project.projectData.Framework);
+			}
+
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var application = args[0];
