@@ -6,12 +6,12 @@ Usage | Synopsis
 General | `$ appbuilder certificate-request`
 Additional functionality | `$ appbuilder certificate-request [<Command>]`
 
-Lists all pending certificate signing requests (.csr).
+Lists all pending certificate signing requests (CSR).
 
 `<Command>` is a related command that extends the certificate-request command. You can run the following related commands:
-* `create` - Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
-* `remove` - Removes a pending certificate signing request (.csr) from the server.
-* `download` - Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center.
+* `create` - Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center.
+* `remove` - Removes a pending certificate signing request (CSR) from the server.
+* `download` - Downloads a pending certificate signing request (CSR) which you can upload in the iOS Dev Center.
 <% if(isHtml) { %> 
 
 #### Related Commands

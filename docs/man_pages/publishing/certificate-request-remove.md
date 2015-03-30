@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request remove <Csr ID>`
 
-Removes a pending certificate signing request (.csr) from the server.
+Removes a pending certificate signing request (CSR) from the server.
 `<Csr ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`.
 <% if(isHtml) { %> 
 
