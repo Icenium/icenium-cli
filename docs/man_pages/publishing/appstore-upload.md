@@ -11,9 +11,6 @@ Builds the project and uploads the application to iTunes Connect.
 `<AppleID>` and `<Password>` are your credentials for logging into iTunes Connect. If you do not provide them when running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-<% if(isNativeScript) { %>
-This command is not applicable to NativeScript projects.
-<% } %>
 
 Options:
 * `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. You must specify a production certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`

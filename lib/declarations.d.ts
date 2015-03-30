@@ -161,6 +161,7 @@ interface IProjectCapabilities {
 	livesyncCompanion: boolean;
 	updateKendo: boolean;
 	emulate: boolean;
+	uploadToAppstore: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {

@@ -33,7 +33,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			livesync: false,
 			livesyncCompanion: true,
 			updateKendo: false,
-			emulate: true
+			emulate: true,
+			uploadToAppstore: true
 		};
 	}
 
