@@ -3,7 +3,7 @@ appstore upload
 
 Usage | Syntax
 ------|-------
-General | `$ appbuilder appstore upload <Application Name> [<AppleID>] [<Password>]` --certificate <Certificate ID> --provision <Provision ID>
+General | `$ appbuilder appstore upload <Application Name> [<AppleID>] [<Password>] --certificate <Certificate ID> --provision <Provision ID>`
 
 Builds the project and uploads the application to iTunes Connect.
 
