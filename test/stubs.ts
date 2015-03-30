@@ -433,13 +433,10 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 export class PrompterStub implements IPrompter {
 	public confirmResult = false;
 
-	start(): void {}
-	get(schema: IPromptSchema): IFuture<any> { return Future.fromResult("");}
+	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult("");}
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
-	confirm(prompt: string, defaultAction?: () => string): IFuture<boolean> {
+	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
 		return Future.fromResult(this.confirmResult);
 	}
-	history(name: string): IPromptHistoryValue { return undefined; }
-	override(object: any): void {}
-	public dispose() {}
+	dispose(): void { }
 }

@@ -41,29 +41,23 @@ class UpdateKendoUICommand implements ICommand {
 				]));
 			this.$logger.out(table.toString());
 
-			var schema: IPromptSchema = {
-				properties: {
-					packageIdx: {
-						required: true,
-						type: "string",
-						message: "Valid values are between 1 and " + packages.length,
-						description: "Enter the index of the package that you want to install",
-						conform: (value: string) => {
-							var num = parseInt(value, 10);
-							return !isNaN(num) && num >= 1 && num <= packages.length;
-						}
-					}
+			var schema : IPromptSchema = {
+				type: "input",
+				name: "packageIdx",
+				message: "Enter the index of the package that you want to install",
+				validate: (value: string) => {
+					var num = parseInt(value, 10);
+					return !isNaN(num) && num >= 1 && num <= packages.length ? true : "Valid values are between 1 and " + packages.length;
 				}
 			};
 
-			this.$prompter.start();
-			var choice = this.$prompter.get(schema).wait();
+			var choice = this.$prompter.get([schema]).wait();
 
 			var confirm = this.$prompter.confirm(
 				"This operation will overwrite existing Kendo UI framework files and " +
 				"any changes will be lost. ".red.bold +
 				"Are you sure you want to continue?",
-				() => "y").wait();
+				() => true).wait();
 			if (!confirm) {
 				return;
 			}

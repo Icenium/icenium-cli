@@ -211,22 +211,18 @@ export class PluginsService implements IPluginsService {
 	private gatherVariableInformation(plugin: Server.CordovaPluginData, variableName: string, configuration: string): IFuture<any> {
 		return (() => {
 			var schema: IPromptSchema = {
-				properties: { }
-			};
-			schema["properties"][variableName] = {
-				required: true,
-				type: "string",
-				description: configuration ? util.format("Set value for variable %s in %s configuration", variableName, configuration) : util.format("Set value for variable %s", variableName)
+				name: variableName,
+				type: "input",
+				message: configuration ? util.format("Set value for variable %s in %s configuration", variableName, configuration) : util.format("Set value for variable %s", variableName)
 			};
 
 			var cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 			var pluginVariables = cordovaPluginVariables[plugin.Identifier];
 			if(pluginVariables && pluginVariables[variableName]) {
-				schema["properties"][variableName]["default"] = () => pluginVariables[variableName];
+				schema["default"] = () => pluginVariables[variableName];
 			}
 
-			this.$prompter.start();
-			return this.$prompter.get(schema).wait();
+			return this.$prompter.get([schema]).wait();
 		}).future<any>()();
 
 	}
