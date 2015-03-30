@@ -23,6 +23,9 @@ export class ExtensionsServiceBase {
 	}
 
 	public getExtensionVersion(packageName: string): string {
+		if(!this.extensionVersions) {
+			return null;
+		}
 		return this.extensionVersions[packageName];
 	}
 
@@ -74,6 +77,10 @@ export class ExtensionsServiceBase {
 				this.$logger.trace("Finished updating %s package.", packageName);
 			}
 		}).future<void>()();
+	}
+
+	public shouldUpdatePackage(cachedVersion: string, extensionVersion: string): boolean {
+		return helpers.versionCompare(cachedVersion, extensionVersion) < 0;
 	}
 
 	private get versionsFile(): string {

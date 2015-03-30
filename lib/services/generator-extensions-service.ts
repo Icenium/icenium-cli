@@ -9,9 +9,11 @@ export class GeneratorExtensionsService extends dependencyExtensionsServiceLib.D
 	constructor($fs: IFileSystem,
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
-		private $dependencyConfigService: IDependencyConfigService,
-		private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService) {
-			super($fs, $httpClient, $logger);
+		$progressIndicator: IProgressIndicator,
+		private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
+		private $childProcess: IChildProcess,
+		private $dependencyConfigService: IDependencyConfigService) {
+			super($fs, $httpClient, $logger, $progressIndicator);
 	}
 
 	public getGeneratorCachePath(generatorName: string): string {
@@ -24,7 +26,8 @@ export class GeneratorExtensionsService extends dependencyExtensionsServiceLib.D
 			generatorConfig.pathToSave = this.getGeneratorCachePath(generatorName);
 			this.$fs.ensureDirectoryExists(generatorConfig.pathToSave).wait();
 
-			this.prepareDependencyExtension(generatorName, generatorConfig).wait();
+			var afterPrepareAction = () => this.$childProcess.exec("npm install", {cwd: this.getGeneratorCachePath(generatorName) });
+			this.prepareDependencyExtension(generatorName, generatorConfig, afterPrepareAction).wait();
 		}).future<void>()();
 	}
 }

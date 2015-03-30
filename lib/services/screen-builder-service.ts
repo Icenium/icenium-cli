@@ -12,8 +12,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $fs: IFileSystem,
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
-		private $logger: ILogger,
-		private $progressIndicator: IProgressIndicator) { }
+		private $logger: ILogger) { }
 
 	public get generatorName(): string {
 		return "generator-kendo-ui-mobile";
@@ -22,7 +21,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void> {
 		return (() => {
 			this.$logger.out("Preparing ScreenBuilder..");
-			this.$progressIndicator.showProgressIndicator(this.prepareScreenBuilder(), 2000).wait();
+			this.prepareScreenBuilder().wait();
 			this.promptGenerate(generatorName, type).wait();
 		}).future<void>()();
 	}
@@ -55,15 +54,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	private prepareScreenBuilder(): IFuture<void> {
 		return (() => {
 			this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
-			var appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
-			this.npmInstall(appScaffoldingPath).wait();
 
 			var generators = this.$dependencyConfigService.getAllGenerators().wait();
-			_.each(generators, (generator: IGeneratorConfig) => {
-				var generatorName = generator.name;
-				this.$generatorExtensionsService.prepareGenerator(generatorName).wait();
-				this.npmInstall(this.$generatorExtensionsService.getGeneratorCachePath(generatorName)).wait();
-			});
+			_.each(generators, (generator: IGeneratorConfig) => this.$generatorExtensionsService.prepareGenerator(generator.name).wait());
 		}).future<void>()();
 	}
 
@@ -96,10 +89,6 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		});
 
 		return future;
-	}
-
-	private npmInstall(currentWorkingDirectory: string): IFuture<void> {
-		return this.$childProcess.exec("npm install", {cwd: currentWorkingDirectory });
 	}
 
 	private registerCommand(command: string, generatorName: string): void {

@@ -9,8 +9,10 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 	constructor($fs: IFileSystem,
 				$httpClient: Server.IHttpClient,
 				$logger: ILogger,
+				$progressIndicator: IProgressIndicator,
+				private $childProcess: IChildProcess,
 		private $dependencyConfigService: IDependencyConfigService) {
-		super($fs, $httpClient, $logger);
+		super($fs, $httpClient, $logger, $progressIndicator);
 	}
 
 	public get appScaffoldingPath(): string {
@@ -20,7 +22,8 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 	public prepareAppScaffolding(): IFuture<void> {
 		return (() => {
 			var appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
-			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig).wait();
+			var afterPrepareAction = () => this.$childProcess.exec("npm install", {cwd: this.appScaffoldingPath });
+			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction).wait();
 		}).future<void>()();
 	}
 }

@@ -325,7 +325,7 @@ interface IServerExtensionsService extends IExtensionsServiceBase {
 }
 
 interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
-	prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig): IFuture<void>;
+	prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction: () => IFuture<void>): IFuture<void>;
 }
 
 interface IGeneratorExtensionsService {
@@ -335,7 +335,7 @@ interface IGeneratorExtensionsService {
 
 interface IAppScaffoldingExtensionsService {
 	appScaffoldingPath: string;
-	prepareAppScaffolding(): IFuture<void>;
+	prepareAppScaffolding(afterPrepareAction?: () => void): IFuture<void>;
 }
 
 interface IScreenBuilderService {

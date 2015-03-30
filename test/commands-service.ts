@@ -44,7 +44,9 @@ testInjector.register("hooksService", stubs.HooksService);
 testInjector.register("commandsService", commandsServiceFile.CommandsService);
 testInjector.register("stringParameter", commandParams.StringCommandParameter);
 testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
-testInjector.register("commandsServiceProvider", {});
+testInjector.register("commandsServiceProvider", {
+	registerDynamicSubCommands: () => {}
+});
 var commandsService = testInjector.resolve("commandsService");
 var isCommandExecuted = false;
 
