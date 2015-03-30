@@ -1,6 +1,6 @@
 #AppBuilder
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder <command> [parameters] [--options <values>]`
 

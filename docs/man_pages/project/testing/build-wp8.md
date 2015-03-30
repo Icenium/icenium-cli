@@ -1,7 +1,7 @@
 build wp8
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder build wp8 [--download] [--companion] [--save-to <File Path>] [--debug] [--release]`
 

@@ -1,7 +1,7 @@
 update-kendoui
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder update-kendoui`
 

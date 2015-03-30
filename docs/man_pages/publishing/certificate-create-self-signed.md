@@ -1,7 +1,7 @@
 certificate create-self-signed
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate create-self-signed [<Purpose> [<Name> [<Email> [<Country> [<StartDate> [<EndDate>]]]]]]`
 

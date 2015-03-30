@@ -1,7 +1,7 @@
 device android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device android [--timeout <Milliseconds>]`
 

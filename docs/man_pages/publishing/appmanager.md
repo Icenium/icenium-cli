@@ -1,7 +1,7 @@
 appmanager
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General |`$ appbuilder appmanager <Command>`
 

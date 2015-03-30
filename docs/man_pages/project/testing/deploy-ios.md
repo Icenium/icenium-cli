@@ -1,7 +1,7 @@
 deploy ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID> [--debug] [--release]`
 

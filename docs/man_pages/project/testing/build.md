@@ -1,7 +1,7 @@
 build
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder build <Platform> [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--debug] [--release]`
 Android | `$ appbuilder build android [--certificate <Certificate ID>] [--companion] [--download] [--save-to <File Path>] [--debug] [--release]`

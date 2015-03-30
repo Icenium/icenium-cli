@@ -1,7 +1,7 @@
 create native
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder create native <App name> [--template <Template>] [--path <path>] [--appid <App ID>]`
 Creates a new project from a NativeScript-based template.

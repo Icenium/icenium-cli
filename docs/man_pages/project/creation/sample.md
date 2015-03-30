@@ -1,7 +1,7 @@
 sample
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder sample`    `$ appbuilder sample [<Command>]`
 

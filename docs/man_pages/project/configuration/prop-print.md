@@ -1,7 +1,7 @@
 prop print
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 Print values of all properties | `$ appbuilder prop print [--validValue]`
 Print value(s) of a property | `$ appbuilder prop print <Property Name> [--validValue]`

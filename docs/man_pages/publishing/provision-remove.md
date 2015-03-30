@@ -1,7 +1,7 @@
 provision remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder provision remove <Provision ID>`
 

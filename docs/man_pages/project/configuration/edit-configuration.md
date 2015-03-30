@@ -1,7 +1,7 @@
 edit-configuration
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder edit-configuration <ConfigurationFile>`
 

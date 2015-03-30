@@ -1,7 +1,7 @@
 certificate import
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate import <File Path> [<Password>]`
 

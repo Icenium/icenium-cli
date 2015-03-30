@@ -1,7 +1,7 @@
 certificate
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate`    
 Additional functionality | `$ appbuilder certificate [<Command>]`

@@ -1,7 +1,7 @@
 device ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device ios [--timeout <Milliseconds>]`
 Lists all recognized connected iOS devices with serial number and index.

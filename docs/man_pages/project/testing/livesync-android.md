@@ -1,7 +1,7 @@
 livesync android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`
 

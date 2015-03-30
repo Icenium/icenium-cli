@@ -1,7 +1,7 @@
 prop add
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop add <Property Name> <Value> [Value]*`
 

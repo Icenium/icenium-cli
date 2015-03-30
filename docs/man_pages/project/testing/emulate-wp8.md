@@ -1,7 +1,7 @@
 emulate wp8
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder emulate wp8 [--path <Directory>] [--debug] [--release]`
 

@@ -1,7 +1,7 @@
 certificate remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate remove <Certificate ID>`
 

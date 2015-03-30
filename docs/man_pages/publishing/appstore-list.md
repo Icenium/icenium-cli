@@ -1,7 +1,7 @@
 appstore list
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General |`$ appbuilder appstore list [<AppleID>] [<Password>]`
 

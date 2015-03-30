@@ -1,7 +1,7 @@
 mobileframework set
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
 

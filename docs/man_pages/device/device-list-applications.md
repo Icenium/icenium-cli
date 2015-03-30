@@ -1,7 +1,7 @@
 device list-applications
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device list-applications [--device <Device ID>]`
 Lists the installed applications on all connected Android and iOS devices. 

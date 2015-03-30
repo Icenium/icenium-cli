@@ -1,7 +1,7 @@
 emulate
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder emulate <Command> [--debug] [--release] [--path]`
 

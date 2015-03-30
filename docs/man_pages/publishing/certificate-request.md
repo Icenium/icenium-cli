@@ -1,7 +1,7 @@
 certificate-request
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request`
 Additional functionality | `$ appbuilder certificate-request [<Command>]`

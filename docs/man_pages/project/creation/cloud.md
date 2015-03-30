@@ -1,7 +1,7 @@
 cloud
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 List projects | `$ appbuilder cloud`    
 With subcommand | `$ appbuilder cloud [<Command>]`

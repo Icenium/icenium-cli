@@ -1,7 +1,7 @@
 livesync cloud
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync cloud`
 

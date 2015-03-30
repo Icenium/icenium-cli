@@ -1,7 +1,7 @@
 login
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder login`
 Opens a new browser window in which you can provide your login credentials for the Telerik Platform.

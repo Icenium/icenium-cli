@@ -1,7 +1,7 @@
 device run
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device run <Application ID> [--device <Device ID>]`
 Runs the selected application on a connected Android or iOS device.

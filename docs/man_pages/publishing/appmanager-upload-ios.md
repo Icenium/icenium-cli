@@ -1,7 +1,7 @@
 appmanager upload ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager upload ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--download]`
 

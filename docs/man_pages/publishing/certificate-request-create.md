@@ -1,7 +1,7 @@
 certificate-request create
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request create [<Name> [<Email> [<Country>]]] [--save-to <File Path>]`
 

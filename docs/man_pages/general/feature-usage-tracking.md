@@ -1,7 +1,7 @@
 feature-usage-tracking
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder feature-usage-tracking [<Command>]`
 Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.

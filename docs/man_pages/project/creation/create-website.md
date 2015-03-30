@@ -1,7 +1,7 @@
 create website
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder create website <Site name> [--template <Template>] [--path <path>]`
 Creates a new project from a Mobile Website-based template.

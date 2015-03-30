@@ -1,7 +1,7 @@
 provision
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder provision [<Provision ID> -v]`
 Additional functionality | `$ appbuilder provision [<Command>] `

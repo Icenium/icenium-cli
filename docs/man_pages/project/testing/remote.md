@@ -1,7 +1,7 @@
 remote
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder remote <Port> [--device <Device Name>] [--timeout]`
 

@@ -1,7 +1,7 @@
 debug
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder debug`
 

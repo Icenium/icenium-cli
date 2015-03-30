@@ -1,7 +1,7 @@
 build android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder build android [--download] [--companion] [--certificate <Certificate ID>][--save-to <File Path>] [--debug] [--release]`
 
