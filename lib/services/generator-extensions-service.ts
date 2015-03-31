@@ -1,32 +1,39 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import dependencyExtensionsServiceLib = require("./dependency-extensions-service-base");
+import appScaffoldingExtensionsServiceLib = require("./app-scaffolding-extensions-service");
 import path = require("path");
 import util = require("util");
 
-export class GeneratorExtensionsService extends dependencyExtensionsServiceLib.DependencyExtensionsServiceBase implements IGeneratorExtensionsService {
+export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceLib.AppScaffoldingExtensionsService implements IGeneratorExtensionsService {
 	constructor($fs: IFileSystem,
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
 		$progressIndicator: IProgressIndicator,
-		private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
-		private $childProcess: IChildProcess,
-		private $dependencyConfigService: IDependencyConfigService) {
-			super($fs, $httpClient, $logger, $progressIndicator);
-	}
-
-	public getGeneratorCachePath(generatorName: string): string {
-		return path.join(this.$appScaffoldingExtensionsService.appScaffoldingPath, "cache", generatorName, "latest", "node_modules", generatorName);
+		$childProcess: IChildProcess,
+		$dependencyConfigService: IDependencyConfigService) {
+			super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService);
 	}
 
 	public prepareGenerator(generatorName: string): IFuture<void> {
 		return (() => {
 			var generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
-			generatorConfig.pathToSave = this.getGeneratorCachePath(generatorName);
+			generatorConfig.pathToSave = path.join(this.appScaffoldingPath, generatorName, "latest", "node_modules");
+
 			this.$fs.ensureDirectoryExists(generatorConfig.pathToSave).wait();
 
-			var afterPrepareAction = () => this.$childProcess.exec("npm install", {cwd: this.getGeneratorCachePath(generatorName) });
+			var afterPrepareAction = () => {
+				return (() => {
+					var generatorCachePath = path.join(generatorConfig.pathToSave, generatorName);
+					var dependencies = this.$fs.readJson(path.join(generatorCachePath, "package.json")).wait().dependencies;
+					_.each(dependencies, (value, key) => {
+						var packageToInstall = util.format("%s@%s", key, value);
+						this.npmInstall(packageToInstall).wait();
+					});
+
+					this.npmDedupe().wait();
+				}).future<void>()();
+			};
 			this.prepareDependencyExtension(generatorName, generatorConfig, afterPrepareAction).wait();
 		}).future<void>()();
 	}

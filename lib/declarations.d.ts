@@ -328,7 +328,6 @@ interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
 }
 
 interface IGeneratorExtensionsService {
-	getGeneratorCachePath(generatorName: string): string;
 	prepareGenerator(generatorName: string): IFuture<void>;
 }
 
@@ -339,10 +338,20 @@ interface IAppScaffoldingExtensionsService {
 
 interface IScreenBuilderService {
 	generatorName: string;
-	prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void>;
-	allSupportedCommands(): IFuture<string[]>;
+	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void>;
+	allSupportedCommands(generatorName: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
 	installAppDependencies(): IFuture<void>;
+}
+
+interface IScreenBuilderOptions {
+	type?: string;
+	answers?: IScreenBuilderAnswer;
+	projectPath?: string;
+}
+
+interface IScreenBuilderAnswer {
+	name?: string;
 }
 
 interface IExtensionData {

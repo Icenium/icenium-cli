@@ -6,10 +6,11 @@ import util = require("util");
 import options = require("../options");
 
 export class ScreenBuilderService implements IScreenBuilderService {
+	public static DEFAULT_SCREENBUILDER_TYPE = "application";
+
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
 		private $childProcess: IChildProcess,
 		private $dependencyConfigService: IDependencyConfigService,
-		private $fs: IFileSystem,
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
 		private $logger: ILogger) { }
@@ -18,29 +19,25 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "generator-kendo-ui-mobile";
 	}
 
-	public prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void> {
+	public prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void> {
 		return (() => {
-			this.$logger.out("Preparing ScreenBuilder..");
-			this.prepareScreenBuilder().wait();
-			this.promptGenerate(generatorName, type).wait();
+			this.$logger.out("Please, wait while Screen Builder and its dependencies are being configured.");
+			this.promptGenerate(generatorName, screenBuilderOptions).wait();
 		}).future<void>()();
 	}
 
-	public allSupportedCommands(): IFuture<string[]> {
+	public allSupportedCommands(generatorName: string): IFuture<string[]> {
 		return (() => {
-			var generators = this.$dependencyConfigService.getAllGenerators().wait();
-			var generator = _.first(generators); // Currently we support only one generator.
-
-			var schemaFilePath = path.join(this.$generatorExtensionsService.getGeneratorCachePath(generator.name), ".schema.json");
-			var schemaContent = this.$fs.readJson(schemaFilePath).wait();
-			var allSupportedCommands = _.keys(schemaContent);
+			var scaffolderData = this.createScaffolder(generatorName).wait();
+			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
+			var allSupportedCommands = scaffolderData.future.wait();
 			return _.map(allSupportedCommands, (command:string) => util.format("add-%s", command));
 		}).future<string[]>()();
 	}
 
 	public generateAllCommands(generatorName: string): IFuture<void> {
 		return (() => {
-			var commands = this.allSupportedCommands().wait();
+			var commands = this.allSupportedCommands(generatorName).wait();
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
 		}).future<void>()();
 	}
@@ -60,35 +57,54 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	private promptGenerate(generatorName: string, type?: string): IFuture<void> {
-		var appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
-		var dependencies = [util.format("%s@latest", generatorName)];
+	private promptGenerate(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void> {
+		var scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
+		var scaffolder = scaffolderData.scaffolder;
+		var type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 
-		var cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
-		var Scaffolder = require(cliServicePath);
-		var connector = {
-			generatorsCache: path.join(appScaffoldingPath, "cache"),
-			path: path.resolve(options.path || "."),
-			dependencies: dependencies,
-			connect: (done: Function) => {
-				done();
-			},
-			logger: this.$logger.trace.bind(this.$logger)
-		};
-		var s = new Scaffolder(connector);
+		if(type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE) {
+			scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
+		} else {
+			scaffolder.promptGenerate(type, scaffolderData.callback);
+		}
 
-		var future = new Future<void>();
+		return scaffolderData.future;
+	}
 
-		s.promptGenerate(type, (err:any) => {
-			if (err) {
-				this.$logger.trace("ScreenBuilder error while prompting: %s", err);
-				future.throw(err);
-			} else {
-				future.return();
-			}
-		});
+	private createScaffolder(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<{ scaffolder: any; future: IFuture<any>; callback: Function }> {
+		return (() => {
+			this.prepareScreenBuilder().wait();
+			screenBuilderOptions = screenBuilderOptions || {};
 
-		return future;
+			var appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
+
+			var cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
+			var Scaffolder = require(cliServicePath);
+			var connector = {
+				generatorsCache: appScaffoldingPath,
+				generatorsAlias: ['H'],
+				path: screenBuilderOptions.projectPath || path.resolve(options.path || "."),
+				dependencies: util.format("%s@latest", generatorName),
+				connect: (done:Function) => {
+					done();
+				},
+				logger: this.$logger.trace.bind(this.$logger)
+			};
+
+			var scaffolder = new Scaffolder(connector);
+			var future = new Future<void>();
+			var callback = (err:any, data:any) => {
+				if (err) {
+					var error = _.map(err.errors, (e:any) => e.message).join("\n");
+					this.$logger.trace("ScreenBuilder error while prompting: %s", err);
+					future.throw(error);
+				} else {
+					future.return(data);
+				}
+			};
+
+			return {scaffolder: scaffolder, future: future, callback: callback};
+		}).future<{ scaffolder: any; future: IFuture<any>; callback: Function }>()();
 	}
 
 	private registerCommand(command: string, generatorName: string): void {
@@ -108,7 +124,10 @@ class ScreenBuilderDynamicCommand implements ICommand {
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, this.command);
+		var screenBuilderOptions = {
+			type: this.command.substr(this.command.indexOf("-") + 1)
+		};
+		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
