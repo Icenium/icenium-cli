@@ -23,3 +23,15 @@ lib/**/*.js.map
 
 scratch/
 test/
+**/docs/html
+**/obj
+**/bin/Microsoft.NodejsTools.WebRole.dll
+**/.vs
+**/.ntvs_analysis.dat
+npm-debug.log
+node_modules
+resources/App_Resources
+resources/Cordova
+resources/ItemTemplates
+resources/ProjectTemplates
+resources/json-schemas
