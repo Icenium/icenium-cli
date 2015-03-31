@@ -1,102 +1,30 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import options = require("../common/options");
 import Future = require("fibers/future");
-import helpers = require("../helpers");
 
-export class ServerExtensionsService implements IServerExtensionsService {
-	private extensionVersions: IStringDictionary = {};
+import serverExtensionsBaseLib = require("./extensions-service-base");
 
-	constructor(private $logger: ILogger,
-		private $httpClient: Server.IHttpClient,
-		private $fs: IFileSystem,
+export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsServiceBase implements IServerExtensionsService {
+	constructor($logger: ILogger,
+		$httpClient: Server.IHttpClient,
+		$fs: IFileSystem,
 		private $config: IConfiguration,
-		private $serverConfiguration: IServerConfiguration,
-		private $server: Server.IServer) {
-		this.$fs.tryExecuteFileOperation(this.versionsFile, () => {
-			return (() => {
-				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
-			}).future<any>()();
-		}).wait();
+		private $serverConfiguration: IServerConfiguration){
+			super($fs, $httpClient, $logger);
 	}
 
-	public get cacheDir(): string {
-		return path.join(options["profile-dir"], "Cache");
-	}
-
-	public getExtensionVersion(packageName: string): string {
-		return this.extensionVersions[packageName];
-	}
-
-	public getExtensionPath(packageName: string): string {
-		return path.join(this.cacheDir, packageName);
-	}
-
-	public prepareExtension(packageName: string, ensureAppIsNotRunning: () => IFuture<void>): IFuture<void> {
-		return ((): void => {
-			var extensionPath = this.getExtensionPath(packageName);
-
+	public prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): IFuture<void> {
+		return (() => {
 			var cachedVersion = "0.0.0.0";
-			var serverVersion = this.$serverConfiguration.assemblyVersion.wait();
-			this.$logger.debug("Server version: %s", serverVersion);
-			
-			if (this.extensionVersions[packageName]) {
-				cachedVersion = this.extensionVersions[packageName];
-				this.$logger.debug("Cached version is: %s", cachedVersion);
-			}
+			var extensionData = {
+				packageName: packageName,
+				version: this.$serverConfiguration.assemblyVersion.wait(),
+				downloadUri: this.getExtensionDownloadUri(packageName).wait()
+			};
 
-			if (helpers.versionCompare(cachedVersion, serverVersion) < 0) {
-				this.$logger.info("Updating %s package...", packageName);
-				var zipFileName = path.join(this.cacheDir, packageName + ".zip");
-
-				ensureAppIsNotRunning();
-
-				if(this.$fs.exists(extensionPath).wait()) {
-					this.$fs.deleteDirectory(extensionPath).wait();
-				}
-
-				this.$fs.createDirectory(extensionPath).wait();
-				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
-
-				try {
-					this.downloadPackage(packageName, zipFileName).wait();
-					this.$fs.unzip(zipFileName, extensionPath).wait();
-					this.$fs.deleteFile(zipFileName).wait();
-					this.extensionVersions[packageName] = serverVersion;
-					this.saveVersionsFile().wait();
-				} catch(err) {
-					this.$fs.deleteDirectory(extensionPath).wait();
-					throw err;
-				}
-				this.$logger.info("Finished updating %s package.", packageName);
-			}
+			this.prepareExtensionBase(extensionData, cachedVersion, beforeDownloadExtensionAction).wait();
 		}).future<void>()();
-	}
-
-	private get versionsFile(): string {
-		return path.join(this.cacheDir, "extension-versions.json");
-	}
-
-	private saveVersionsFile() : IFuture<void> {
-		return this.$fs.writeJson(this.versionsFile, this.extensionVersions);
-	}
-
-	private downloadPackage(packageName:string, zipFileName: string): IFuture<void> {
-		return ((): void => {
-			var downloadUri = this.getExtensionDownloadUri(packageName).wait();
-			this.$logger.debug("Downloading package from %s", downloadUri);
-
-			var zipFile = this.$fs.createWriteStream(zipFileName);
-			var request = this.$httpClient.httpRequest({
-				url: downloadUri,
-				pipeTo: zipFile,
-				headers: { Accept: "application/octet-stream, application/x-silverlight-app" }
-			});
-
-			request.wait();
-		}).future<void >()();
 	}
 
 	private getExtensionDownloadUri(packageName: string): IFuture<string> {

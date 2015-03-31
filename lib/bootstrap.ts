@@ -1,6 +1,7 @@
 require("./common/bootstrap");
 $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
+$injector.require("dependencyConfigService", "./services/dependency-config");
 $injector.require("userSettingsService", "./services/user-settings-service");
 require("./options");
 // note: order above is important!
@@ -14,6 +15,9 @@ $injector.require("resourceDownloader", "./resource-loader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
+$injector.require("appScaffoldingExtensionsService", "./services/app-scaffolding-extensions-service");
+$injector.require("generatorExtensionsService", "./services/generator-extensions-service");
+$injector.require("screenBuilderService", "./services/screen-builder-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
@@ -81,13 +85,9 @@ $injector.require("mobileWebsiteProject", "./project/web-site-project");
 $injector.require("projectConstants", "./project/project-constants");
 $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
-$injector.requireCommand("create|hybrid", "./commands/project");
-$injector.requireCommand("create|native", "./commands/project");
-$injector.requireCommand("create|website", "./commands/project");
-$injector.requireCommand("init|*unknown", "./commands/project");
-$injector.requireCommand("init|hybrid", "./commands/project");
-$injector.requireCommand("init|native", "./commands/project");
-$injector.requireCommand("init|website", "./commands/project");
+$injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
+$injector.requireCommand("create|*default", "./commands/project/create");
+$injector.requireCommand("init|*unknown", "./commands/project/init");
 
 $injector.requireCommand("prop|add", "./commands/prop/prop-add");
 $injector.requireCommand("prop|set", "./commands/prop/prop-set");
@@ -162,3 +162,8 @@ $injector.require("liveSyncService", "./services/livesync-service");
 $injector.require("appManagerService", "./services/appmanager-service");
 $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
 $injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilities");
+
+$injector.require("commandsServiceProvider", "./providers/commands-service-provider");
+$injector.require("progressIndicator", "./progress-indicator");
+
+$injector.require("projectCommandsService", "./services/project-commands-service");

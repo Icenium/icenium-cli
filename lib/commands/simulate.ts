@@ -60,12 +60,14 @@ export class SimulateCommand implements ICommand {
 		return this.$simulatorPlatformServices.canRunApplication();
 	}
 
-	private ensureSimulatorIsNotRunning(): void {
-		var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
-		if (isRunning) {
-			this.$errors.fail({formatStr: "AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
-				"Close it and run $ appbuilder simulate again.", suppressCommandHelp: true});
-		}
+	private ensureSimulatorIsNotRunning(): IFuture<void> {
+		return (() => {
+			var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
+			if (isRunning) {
+				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
+					"Close it and run $ appbuilder simulate again.");
+			}
+		}).future<void>()();
 	}
 
 	private runSimulator(simulatorPackageName: string): IFuture<void> {

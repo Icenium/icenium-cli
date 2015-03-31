@@ -235,6 +235,13 @@ interface IStaticConfig extends Config.IStaticConfig {
 	triggerJsonSchemaValidation: boolean;
 }
 
+interface IDependencyConfigService {
+	dependencyConfigFilePath: string;
+	getAppScaffoldingConfig(): IFuture<IAppScaffoldingConfig>;
+	getAllGenerators(): IFuture<IGeneratorConfig[]>;
+	getGeneratorConfig(generatorName: string): IFuture<IGeneratorConfig>;
+}
+
 interface IServerConfiguration {
 	tfisServer: IFuture<string>;
 	assemblyVersion: IFuture<string>;
@@ -295,11 +302,56 @@ interface IUserSettingsService extends UserSettings.IUserSettingsService {
 	saveSettings(data: IDictionary<{}>): IFuture<void>;
 }
 
-interface IServerExtensionsService {
-	prepareExtension(packageName: string, ensureAppIsNotRunning: () => void): IFuture<void>;
+interface IDependencyConfig {
+	name: string;
+	version: string;
+	gitHubRepoUrl: string;
+	downloadUrl?: string;
+	pathToSave?: string;
+}
+
+interface IAppScaffoldingConfig extends IDependencyConfig { }
+
+interface IGeneratorConfig extends IDependencyConfig { }
+
+interface IExtensionsServiceBase {
 	getExtensionVersion(packageName: string): string;
 	getExtensionPath(packageName: string): string;
 	cacheDir: string;
+}
+
+interface IServerExtensionsService extends IExtensionsServiceBase {
+	prepareExtension(packageName: string, beforeDownloadPackageAction: () => void): IFuture<void>;
+}
+
+interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
+	prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction: () => IFuture<void>): IFuture<void>;
+}
+
+interface IGeneratorExtensionsService {
+	getGeneratorCachePath(generatorName: string): string;
+	prepareGenerator(generatorName: string): IFuture<void>;
+}
+
+interface IAppScaffoldingExtensionsService {
+	appScaffoldingPath: string;
+	prepareAppScaffolding(afterPrepareAction?: () => void): IFuture<void>;
+}
+
+interface IScreenBuilderService {
+	generatorName: string;
+	prepareAndGeneratePrompt(generatorName: string, type?: string): IFuture<void>;
+	allSupportedCommands(): IFuture<string[]>;
+	generateAllCommands(generatorName: string): IFuture<void>;
+	installAppDependencies(): IFuture<void>;
+}
+
+interface IExtensionData {
+	packageName: string;
+	version: string;
+	downloadUri: string;
+	pathToSave?: string;
+	forceDownload?: boolean;
 }
 
 interface IPathFilteringService {
@@ -411,4 +463,12 @@ interface ILiveSyncService {
 
 interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
+}
+
+interface IProgressIndicator {
+	showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void>;
+}
+
+interface IProjectCommandsService {
+	generateAllProjectCommands(): void;
 }
