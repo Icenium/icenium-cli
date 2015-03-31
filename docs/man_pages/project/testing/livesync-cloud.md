@@ -9,7 +9,15 @@ Synchronizes the project with the cloud to enable LiveSync via wireless connecti
 
 To get the latest changes on device, tap and hold with three fingers on the device screen until the download pop-up
 appears. When the download completes, the app refreshes automatically.
+
+<% if(isConsole && isNativeScript) { %>
+WARNING: You can LiveSync changes only to the NativeScript companion app. To LiveSync changes to an application package, re-build and re-deploy your NativeScript app.
+<% } %>
+
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* For NativeScript projects, you can LiveSync changes only to the NativeScript companion app.
 
 #### Related Commands
 
