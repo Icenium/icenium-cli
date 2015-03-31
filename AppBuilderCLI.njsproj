@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{101d1083-f2e6-4127-a565-dba018947516}</ProjectGuid>
+    <ProjectHome />
+    <ProjectView>ProjectFiles</ProjectView>
+    <StartupFile>bin\appbuilder.js</StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <EnableTypeScript>true</EnableTypeScript>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ScriptArguments>
+    </ScriptArguments>
+    <StartWebBrowser>True</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="ab-logo.png" />
+    <Content Include="no-support.png" />
+    <Content Include="support.png" />
+    <Content Include="package.json" />
+    <Content Include="ABIGNORE.md" />
+    <Content Include="CONTRIBUTING.md" />
+    <Content Include="for-developers.md" />
+    <Content Include="README.md" />
+    <Compile Include="Gruntfile.js" />
+    <Compile Include="postinstall.js" />
+    <Compile Include="prepublish.js" />
+    <Compile Include="preuninstall.js" />
+    <Compile Include="bin\appbuilder.js" />
+    <Content Include="config\config-base.json" />
+    <Content Include="config\config-dev.json" />
+    <Content Include="config\config-mac.json" />
+    <Content Include="config\config-release.json" />
+    <Content Include="config\config-sit.json" />
+    <Content Include="config\config-sit1.json" />
+    <Content Include="config\config-sttap.json" />
+    <Content Include="config\config-test.json" />
+    <Content Include="config\config.json" />
+    <TypeScriptCompile Include="lib\appbuilder-cli.ts" />
+    <TypeScriptCompile Include="lib\bootstrap.ts" />
+    <TypeScriptCompile Include="lib\config.ts" />
+    <TypeScriptCompile Include="lib\declarations.d.ts" />
+    <TypeScriptCompile Include="lib\dns.ts" />
+    <TypeScriptCompile Include="lib\dynamic-help-provider.ts" />
+    <TypeScriptCompile Include="lib\express.ts" />
+    <TypeScriptCompile Include="lib\fiber-bootstrap.ts" />
+    <TypeScriptCompile Include="lib\helpers.ts" />
+    <TypeScriptCompile Include="lib\host-info.ts" />
+    <TypeScriptCompile Include="lib\http-server.ts" />
+    <TypeScriptCompile Include="lib\login.ts" />
+    <TypeScriptCompile Include="lib\mobile-platforms-capabilities.ts" />
+    <TypeScriptCompile Include="lib\options.ts" />
+    <TypeScriptCompile Include="lib\plugins-data.ts" />
+    <TypeScriptCompile Include="lib\process-info.ts" />
+    <TypeScriptCompile Include="lib\project.ts" />
+    <TypeScriptCompile Include="lib\qr.ts" />
+    <TypeScriptCompile Include="lib\resource-loader.ts" />
+    <TypeScriptCompile Include="lib\server-api.d.ts" />
+    <TypeScriptCompile Include="lib\server-api.ts" />
+    <TypeScriptCompile Include="lib\server-config.ts" />
+    <TypeScriptCompile Include="lib\service-util.ts" />
+    <TypeScriptCompile Include="lib\templates-service.ts" />
+    <TypeScriptCompile Include="lib\x509.ts" />
+    <Content Include="resources\project-properties-cordova.json" />
+    <Content Include="resources\project-properties-mobilewebsite.json" />
+    <Content Include="resources\project-properties-nativescript.json" />
+    <TypeScriptCompile Include="test\.d.ts" />
+    <TypeScriptCompile Include="test\build-configurations.ts" />
+    <TypeScriptCompile Include="test\commands-service.ts" />
+    <TypeScriptCompile Include="test\common-helpers.ts" />
+    <TypeScriptCompile Include="test\common-options.ts" />
+    <TypeScriptCompile Include="test\cordova-migration-service.ts" />
+    <TypeScriptCompile Include="test\cryptographic-identities.ts" />
+    <TypeScriptCompile Include="test\edit-configuration.ts" />
+    <TypeScriptCompile Include="test\file-system.ts" />
+    <TypeScriptCompile Include="test\framework-versions.ts" />
+    <TypeScriptCompile Include="test\hash-service.ts" />
+    <TypeScriptCompile Include="test\help.ts" />
+    <TypeScriptCompile Include="test\helpers.ts" />
+    <TypeScriptCompile Include="test\multipart-upload.ts" />
+    <TypeScriptCompile Include="test\path-filtering.ts" />
+    <TypeScriptCompile Include="test\plugins-service.ts" />
+    <TypeScriptCompile Include="test\project-name-validator.ts" />
+    <TypeScriptCompile Include="test\project-properties-service.ts" />
+    <TypeScriptCompile Include="test\project.ts" />
+    <TypeScriptCompile Include="test\service-util.ts" />
+    <TypeScriptCompile Include="test\string-param-builder.ts" />
+    <TypeScriptCompile Include="test\stubs.ts" />
+    <TypeScriptCompile Include="test\test-bootstrap.ts" />
+    <TypeScriptCompile Include="test\x509.ts" />
+    <TypeScriptCompile Include="test\yok.ts" />
+    <Content Include="docs\helpers\basic-page.html" />
+    <Content Include="docs\helpers\styles.css" />
+    <Content Include="docs\man_pages\index.md" />
+    <Content Include="docs\man_pages\device\device-android.md" />
+    <Content Include="docs\man_pages\device\device-ios.md" />
+    <Content Include="docs\man_pages\device\device-list-applications.md" />
+    <Content Include="docs\man_pages\device\device-log.md" />
+    <Content Include="docs\man_pages\device\device-run.md" />
+    <Content Include="docs\man_pages\device\device.md" />
+    <Content Include="docs\man_pages\general\autocomplete.md" />
+    <Content Include="docs\man_pages\general\feature-usage-tracking.md" />
+    <Content Include="docs\man_pages\general\help.md" />
+    <Content Include="docs\man_pages\general\login.md" />
+    <Content Include="docs\man_pages\general\logout.md" />
+    <Content Include="docs\man_pages\general\user.md" />
+    <Content Include="docs\man_pages\lib-management\plugin-add.md" />
+    <Content Include="docs\man_pages\lib-management\plugin-configure.md" />
+    <Content Include="docs\man_pages\lib-management\plugin-fetch.md" />
+    <Content Include="docs\man_pages\lib-management\plugin-find.md" />
+    <Content Include="docs\man_pages\lib-management\plugin-remove.md" />
+    <Content Include="docs\man_pages\lib-management\plugin.md" />
+    <Content Include="docs\man_pages\lib-management\update-kendoui.md" />
+    <Content Include="docs\man_pages\publishing\appmanager-upload-android.md" />
+    <Content Include="docs\man_pages\publishing\appmanager-upload-ios.md" />
+    <Content Include="docs\man_pages\publishing\appmanager.md" />
+    <Content Include="docs\man_pages\publishing\appstore-list.md" />
+    <Content Include="docs\man_pages\publishing\appstore-upload.md" />
+    <Content Include="docs\man_pages\publishing\appstore.md" />
+    <Content Include="docs\man_pages\publishing\certificate-create-self-signed.md" />
+    <Content Include="docs\man_pages\publishing\certificate-export.md" />
+    <Content Include="docs\man_pages\publishing\certificate-import.md" />
+    <Content Include="docs\man_pages\publishing\certificate-remove.md" />
+    <Content Include="docs\man_pages\publishing\certificate-request-create.md" />
+    <Content Include="docs\man_pages\publishing\certificate-request-download.md" />
+    <Content Include="docs\man_pages\publishing\certificate-request-remove.md" />
+    <Content Include="docs\man_pages\publishing\certificate-request.md" />
+    <Content Include="docs\man_pages\publishing\certificate.md" />
+    <Content Include="docs\man_pages\publishing\provision-import.md" />
+    <Content Include="docs\man_pages\publishing\provision-remove.md" />
+    <Content Include="docs\man_pages\publishing\provision.md" />
+    <Content Include="docs\man_pages\project\configuration\edit-configuration.md" />
+    <Content Include="docs\man_pages\project\configuration\mobileframework-set.md" />
+    <Content Include="docs\man_pages\project\configuration\mobileframework.md" />
+    <Content Include="docs\man_pages\project\configuration\prop-add.md" />
+    <Content Include="docs\man_pages\project\configuration\prop-print.md" />
+    <Content Include="docs\man_pages\project\configuration\prop-remove.md" />
+    <Content Include="docs\man_pages\project\configuration\prop-set.md" />
+    <Content Include="docs\man_pages\project\configuration\prop.md" />
+    <Content Include="docs\man_pages\project\creation\cloud-export.md" />
+    <Content Include="docs\man_pages\project\creation\cloud.md" />
+    <Content Include="docs\man_pages\project\creation\create-hybrid.md" />
+    <Content Include="docs\man_pages\project\creation\create-native.md" />
+    <Content Include="docs\man_pages\project\creation\create-website.md" />
+    <Content Include="docs\man_pages\project\creation\create.md" />
+    <Content Include="docs\man_pages\project\creation\init-hybrid.md" />
+    <Content Include="docs\man_pages\project\creation\init-native.md" />
+    <Content Include="docs\man_pages\project\creation\init-website.md" />
+    <Content Include="docs\man_pages\project\creation\init.md" />
+    <Content Include="docs\man_pages\project\creation\sample-clone.md" />
+    <Content Include="docs\man_pages\project\creation\sample.md" />
+    <Content Include="docs\man_pages\project\testing\build-android.md" />
+    <Content Include="docs\man_pages\project\testing\build-ios.md" />
+    <Content Include="docs\man_pages\project\testing\build-wp8.md" />
+    <Content Include="docs\man_pages\project\testing\build.md" />
+    <Content Include="docs\man_pages\project\testing\debug.md" />
+    <Content Include="docs\man_pages\project\testing\deploy-android.md" />
+    <Content Include="docs\man_pages\project\testing\deploy-ios.md" />
+    <Content Include="docs\man_pages\project\testing\deploy.md" />
+    <Content Include="docs\man_pages\project\testing\emulate-android.md" />
+    <Content Include="docs\man_pages\project\testing\emulate-ios.md" />
+    <Content Include="docs\man_pages\project\testing\emulate-wp8.md" />
+    <Content Include="docs\man_pages\project\testing\emulate.md" />
+    <Content Include="docs\man_pages\project\testing\livesync-android.md" />
+    <Content Include="docs\man_pages\project\testing\livesync-cloud.md" />
+    <Content Include="docs\man_pages\project\testing\livesync-ios.md" />
+    <Content Include="docs\man_pages\project\testing\livesync.md" />
+    <Content Include="docs\man_pages\project\testing\remote.md" />
+    <Content Include="docs\man_pages\project\testing\simulate.md" />
+    <TypeScriptCompile Include="lib\commands\appmanager.ts" />
+    <TypeScriptCompile Include="lib\commands\authentication.ts" />
+    <TypeScriptCompile Include="lib\commands\build.ts" />
+    <TypeScriptCompile Include="lib\commands\cloud-projects.ts" />
+    <TypeScriptCompile Include="lib\commands\cryptographic-identities.ts" />
+    <TypeScriptCompile Include="lib\commands\debug.ts" />
+    <TypeScriptCompile Include="lib\commands\deploy.ts" />
+    <TypeScriptCompile Include="lib\commands\edit-configuration.ts" />
+    <TypeScriptCompile Include="lib\commands\emulate.ts" />
+    <TypeScriptCompile Include="lib\commands\generate-server-api.ts" />
+    <TypeScriptCompile Include="lib\commands\itunes-connect.ts" />
+    <TypeScriptCompile Include="lib\commands\live-sync.ts" />
+    <TypeScriptCompile Include="lib\commands\livesync-cloud.ts" />
+    <TypeScriptCompile Include="lib\commands\project.ts" />
+    <TypeScriptCompile Include="lib\commands\remote.ts" />
+    <TypeScriptCompile Include="lib\commands\samples.ts" />
+    <TypeScriptCompile Include="lib\commands\simulate.ts" />
+    <TypeScriptCompile Include="lib\commands\update-kendoui.ts" />
+    <TypeScriptCompile Include="lib\commands\user-status.ts" />
+    <Content Include="lib\common\README.md" />
+    <TypeScriptCompile Include="lib\common\bootstrap.ts" />
+    <TypeScriptCompile Include="lib\common\child-process.ts" />
+    <TypeScriptCompile Include="lib\common\command-params.ts" />
+    <TypeScriptCompile Include="lib\common\config-base.ts" />
+    <TypeScriptCompile Include="lib\common\declarations.d.ts" />
+    <TypeScriptCompile Include="lib\common\dispatchers.ts" />
+    <TypeScriptCompile Include="lib\common\errors.ts" />
+    <TypeScriptCompile Include="lib\common\extensions.ts" />
+    <TypeScriptCompile Include="lib\common\file-system.ts" />
+    <TypeScriptCompile Include="lib\common\helpers.ts" />
+    <TypeScriptCompile Include="lib\common\host-info.ts" />
+    <TypeScriptCompile Include="lib\common\http-client.ts" />
+    <TypeScriptCompile Include="lib\common\logger.ts" />
+    <TypeScriptCompile Include="lib\common\opener.ts" />
+    <TypeScriptCompile Include="lib\common\options.ts" />
+    <TypeScriptCompile Include="lib\common\project-helper.ts" />
+    <TypeScriptCompile Include="lib\common\prompter.ts" />
+    <TypeScriptCompile Include="lib\common\properties-parser.ts" />
+    <TypeScriptCompile Include="lib\common\queue.ts" />
+    <TypeScriptCompile Include="lib\common\static-config-base.ts" />
+    <TypeScriptCompile Include="lib\common\sysinfo.ts" />
+    <TypeScriptCompile Include="lib\common\yok.ts" />
+    <TypeScriptCompile Include="lib\definitions\cookie.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\cryptographic-identities.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\express.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\hash-service.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\httpServer.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\ip.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\minimatch.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\moment.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\multipart-upload-service.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\plugman.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\Q.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\sax-js.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\templates-service.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\valid-url.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\validator.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\xml-mapping.d.ts" />
+    <TypeScriptCompile Include="lib\definitions\xml2js.d.ts" />
+    <TypeScriptCompile Include="lib\hooks\before-build.ts" />
+    <TypeScriptCompile Include="lib\hooks\before-deploy.ts" />
+    <TypeScriptCompile Include="lib\hooks\before-livesync.ts" />
+    <TypeScriptCompile Include="lib\hooks\typescript-compilation.ts" />
+    <TypeScriptCompile Include="lib\json-schema\json-schema-constants.ts" />
+    <TypeScriptCompile Include="lib\json-schema\json-schema-loader.ts" />
+    <TypeScriptCompile Include="lib\json-schema\json-schema-resolver.ts" />
+    <TypeScriptCompile Include="lib\json-schema\json-schema-validator.ts" />
+    <TypeScriptCompile Include="lib\json-schema\json-schema.d.ts" />
+    <TypeScriptCompile Include="lib\project\cordova-project.ts" />
+    <TypeScriptCompile Include="lib\project\framework-project-base.ts" />
+    <TypeScriptCompile Include="lib\project\nativescript-project.ts" />
+    <TypeScriptCompile Include="lib\project\project-constants.ts" />
+    <TypeScriptCompile Include="lib\project\project-files-manager.ts" />
+    <TypeScriptCompile Include="lib\project\project.d.ts" />
+    <TypeScriptCompile Include="lib\project\web-site-project.ts" />
+    <TypeScriptCompile Include="lib\services\analytics-settings-service.ts" />
+    <TypeScriptCompile Include="lib\services\appmanager-service.ts" />
+    <TypeScriptCompile Include="lib\services\build.ts" />
+    <TypeScriptCompile Include="lib\services\cordova-migration-service.ts" />
+    <TypeScriptCompile Include="lib\services\cordova-plugins.ts" />
+    <TypeScriptCompile Include="lib\services\emulator-settings-service.ts" />
+    <TypeScriptCompile Include="lib\services\hash-service.ts" />
+    <TypeScriptCompile Include="lib\services\livesync-service.ts" />
+    <TypeScriptCompile Include="lib\services\marketplace-plugins-service.ts" />
+    <TypeScriptCompile Include="lib\services\multipart-upload.ts" />
+    <TypeScriptCompile Include="lib\services\options-service.ts" />
+    <TypeScriptCompile Include="lib\services\path-filtering.ts" />
+    <TypeScriptCompile Include="lib\services\platform-migration.ts" />
+    <TypeScriptCompile Include="lib\services\plugins-service.ts" />
+    <TypeScriptCompile Include="lib\services\project-properties-service.ts" />
+    <TypeScriptCompile Include="lib\services\project-simulator-service.ts" />
+    <TypeScriptCompile Include="lib\services\remote-projects-service.ts" />
+    <TypeScriptCompile Include="lib\services\samples-service.ts" />
+    <TypeScriptCompile Include="lib\services\server-extensions.ts" />
+    <TypeScriptCompile Include="lib\services\user-settings-service.ts" />
+    <TypeScriptCompile Include="lib\swagger\code-entity.ts" />
+    <TypeScriptCompile Include="lib\swagger\code-printer.ts" />
+    <TypeScriptCompile Include="lib\swagger\service-contract-generator.ts" />
+    <TypeScriptCompile Include="lib\swagger\service-contract-provider.ts" />
+    <TypeScriptCompile Include="lib\swagger\swagger.d.ts" />
+    <TypeScriptCompile Include="lib\swagger\ts-type-system-helpers.ts" />
+    <TypeScriptCompile Include="lib\validators\base-validators.ts" />
+    <TypeScriptCompile Include="lib\validators\cryptographic-identity-validators.ts" />
+    <TypeScriptCompile Include="lib\validators\ios-deployment-validator.ts" />
+    <TypeScriptCompile Include="lib\commands\dev\config-apply.ts" />
+    <TypeScriptCompile Include="lib\commands\dev\config-reset.ts" />
+    <TypeScriptCompile Include="lib\commands\dev\config.ts" />
+    <TypeScriptCompile Include="lib\commands\dev\prepackage.ts" />
+    <TypeScriptCompile Include="lib\commands\framework-versions\print-versions.ts" />
+    <TypeScriptCompile Include="lib\commands\framework-versions\set-version.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\add-plugin.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\configure-plugin.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\fetch-plugin.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\find-plugins.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\list-plugin.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\plugin-configure-command-parameter.ts" />
+    <TypeScriptCompile Include="lib\commands\plugin\remove-plugin.ts" />
+    <TypeScriptCompile Include="lib\commands\prop\prop-add.ts" />
+    <TypeScriptCompile Include="lib\commands\prop\prop-command-base.ts" />
+    <TypeScriptCompile Include="lib\commands\prop\prop-print.ts" />
+    <TypeScriptCompile Include="lib\commands\prop\prop-remove.ts" />
+    <TypeScriptCompile Include="lib\commands\prop\prop-set.ts" />
+    <TypeScriptCompile Include="lib\common\commands\analytics.ts" />
+    <TypeScriptCompile Include="lib\common\commands\completion-prompt.ts" />
+    <TypeScriptCompile Include="lib\common\commands\help.ts" />
+    <TypeScriptCompile Include="lib\common\commands\post-install.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\bplist-parser.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\bufferpack.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\byline.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\colors.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\commands-service.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\commands.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\config.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\filesize.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\iconv-lite.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\lodash.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\log4js.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\logger.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\marked.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\mobile.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\node-ffi.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\node-fibers.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\node.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\open.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\options-service.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\osenv.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\plist.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\plistlib.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\progress-stream.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\prompt.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\properties-parser.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\rimraf.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\signals.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\temp.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\unzip.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\user-settings.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\validator.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\watchr.d.ts" />
+    <TypeScriptCompile Include="lib\common\definitions\yok.d.ts" />
+    <TypeScriptCompile Include="lib\common\events\signal.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\app-identifier.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\constants.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\device-platforms-constants.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\mobile-helper.ts" />
+    <TypeScriptCompile Include="lib\common\services\analytics-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\auto-completion-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\cancellation.ts" />
+    <TypeScriptCompile Include="lib\common\services\commands-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\dynamic-help-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\hooks-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\html-help-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\micro-templating-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\typescript-compilation-service.ts" />
+    <TypeScriptCompile Include="lib\common\services\user-settings-service.ts" />
+    <TypeScriptCompile Include="lib\common\validators\iTunes-validator.ts" />
+    <TypeScriptCompile Include="lib\common\validators\project-name-validator.ts" />
+    <TypeScriptCompile Include="lib\common\validators\validation-result.ts" />
+    <TypeScriptCompile Include="lib\common\commands\device\device-log-stream.ts" />
+    <TypeScriptCompile Include="lib\common\commands\device\list-applications.ts" />
+    <TypeScriptCompile Include="lib\common\commands\device\list-devices.ts" />
+    <TypeScriptCompile Include="lib\common\commands\device\run-application.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\android\android-device.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\android\android-emulator-services.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\ios\ios-core.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\ios\ios-device.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\ios\ios-emulator-services.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\ios\ios-proxy-services.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\mobile-core\device-discovery.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\mobile-core\devices-services.ts" />
+    <TypeScriptCompile Include="lib\common\mobile\wp8\wp8-emulator-services.ts" />
+    <Content Include="lib\common\resources\platform-tools\android\darwin\NOTICE.txt" />
+    <Content Include="lib\common\resources\platform-tools\android\linux\NOTICE.txt" />
+    <Content Include="lib\common\resources\platform-tools\android\win32\NOTICE.txt" />
+    <TypeScriptCompile Include="lib\project\resolvers\framework-project-resolver-base.ts" />
+    <TypeScriptCompile Include="lib\project\resolvers\framework-project-resolver.ts" />
+    <TypeScriptCompile Include="lib\project\resolvers\framework-simulator-service-resolver.ts" />
+    <Content Include="resources\login\end.html" />
+    <Content Include="resources\qr\scan.html" />
+    <Content Include="resources\qr\style.css" />
+    <Compile Include="resources\qr\jquery-1.10.2.min.js" />
+    <TypeScriptCompile Include="resources\typescript-definitions-files\android17.d.ts" />
+    <TypeScriptCompile Include="resources\typescript-definitions-files\declarations.d.ts" />
+    <TypeScriptCompile Include="resources\typescript-definitions-files\ios.d.ts" />
+    <TypeScriptCompile Include="test\definitions\chai.d.ts" />
+    <TypeScriptCompile Include="test\definitions\mocha.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin" />
+    <Folder Include="config" />
+    <Folder Include="docs" />
+    <Folder Include="docs\helpers" />
+    <Folder Include="docs\man_pages" />
+    <Folder Include="docs\man_pages\device" />
+    <Folder Include="docs\man_pages\general" />
+    <Folder Include="docs\man_pages\lib-management" />
+    <Folder Include="docs\man_pages\project" />
+    <Folder Include="docs\man_pages\project\configuration" />
+    <Folder Include="docs\man_pages\project\creation" />
+    <Folder Include="docs\man_pages\project\testing" />
+    <Folder Include="docs\man_pages\publishing" />
+    <Folder Include="lib" />
+    <Folder Include="lib\bin" />
+    <Folder Include="lib\commands" />
+    <Folder Include="lib\commands\dev" />
+    <Folder Include="lib\commands\framework-versions" />
+    <Folder Include="lib\commands\plugin" />
+    <Folder Include="lib\commands\prop" />
+    <Folder Include="lib\common" />
+    <Folder Include="lib\common\commands" />
+    <Folder Include="lib\common\commands\device" />
+    <Folder Include="lib\common\definitions" />
+    <Folder Include="lib\common\events" />
+    <Folder Include="lib\common\mobile" />
+    <Folder Include="lib\common\mobile\android" />
+    <Folder Include="lib\common\mobile\ios" />
+    <Folder Include="lib\common\mobile\mobile-core" />
+    <Folder Include="lib\common\mobile\wp8" />
+    <Folder Include="lib\common\resources" />
+    <Folder Include="lib\common\resources\platform-tools" />
+    <Folder Include="lib\common\resources\platform-tools\android" />
+    <Folder Include="lib\common\resources\platform-tools\android\darwin" />
+    <Folder Include="lib\common\resources\platform-tools\android\linux" />
+    <Folder Include="lib\common\resources\platform-tools\android\win32" />
+    <Folder Include="lib\common\resources\platform-tools\unzip" />
+    <Folder Include="lib\common\resources\platform-tools\unzip\darwin" />
+    <Folder Include="lib\common\resources\platform-tools\unzip\linux" />
+    <Folder Include="lib\common\resources\platform-tools\unzip\win32" />
+    <Folder Include="lib\common\services" />
+    <Folder Include="lib\common\validators" />
+    <Folder Include="lib\common\vendor" />
+    <Folder Include="lib\definitions" />
+    <Folder Include="lib\hooks" />
+    <Folder Include="lib\json-schema" />
+    <Folder Include="lib\obj" />
+    <Folder Include="lib\obj\Debug" />
+    <Folder Include="lib\project" />
+    <Folder Include="lib\project\resolvers" />
+    <Folder Include="lib\services" />
+    <Folder Include="lib\swagger" />
+    <Folder Include="lib\validators" />
+    <Folder Include="resources" />
+    <Folder Include="resources\login" />
+    <Folder Include="resources\qr" />
+    <Folder Include="resources\typescript-definitions-files" />
+    <Folder Include="test" />
+    <Folder Include="test\definitions" />
+    <Folder Include="test\resources" />
+    <Folder Include="vendor" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
