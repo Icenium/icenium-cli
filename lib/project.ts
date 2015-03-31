@@ -6,12 +6,14 @@ import path = require("path");
 import util = require("util");
 
 import commonHelpers = require("./common/helpers");
+import Future = require("fibers/future");
 import helpers = require("./helpers");
 import options = require("./common/options");
 import projectPropertiesServiceLib = require("./services/project-properties-service");
 
 export class Project implements Project.IProject {
 	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
+	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
 	private static CONFIGURATION_FILE_SEARCH_PATTERN: RegExp = new RegExp(".*.abproject$", "i");
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
@@ -32,11 +34,15 @@ export class Project implements Project.IProject {
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
+		private $loginManager: ILoginManager,
 		private $logger: ILogger,
+		private $multipartUploadService: IMultipartUploadService,
+		private $progressIndicator: IProgressIndicator,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $resources: IResourceLoader,
+		private $server: Server.IServer,
 		private $staticConfig: IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $prompter: IPrompter,
@@ -641,6 +647,58 @@ export class Project implements Project.IProject {
 				}
 			});
 		}).future<void>()();
+	}
+
+	public zipProject(): IFuture<string> {
+		return (() => {
+			var tempDir = this.getTempDir().wait();
+
+			var projectZipFile = path.join(tempDir, "Build.zip");
+			this.$fs.deleteFile(projectZipFile).wait();
+			var projectDir = this.getProjectDir().wait();
+
+			var files = this.enumerateProjectFiles().wait();
+			var zipOp = this.$fs.zipFiles(projectZipFile, files,
+				p => this.getProjectRelativePath(p, projectDir));
+
+			var result = new Future<string>();
+			zipOp.resolveSuccess(() => result.return(projectZipFile));
+			return result.wait();
+		}).future<string>()();
+	}
+
+	public importProject(): IFuture<void> {
+		return (() => {
+			this.ensureProject();
+
+			this.$loginManager.ensureLoggedIn().wait();
+			var projectZipFile = this.zipProject().wait();
+			var fileSize = this.$fs.getFileSize(projectZipFile).wait();
+			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
+			var projectName = this.projectData.ProjectName;
+			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
+			this.$logger.printInfoMessageOnSameLine("Uploading...");
+			if(fileSize > Project.CHUNK_UPLOAD_MIN_FILE_SIZE) {
+				this.$logger.trace("Start uploading file by chunks.");
+				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
+			} else {
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
+					this.$fs.createReadStream(projectZipFile)), 2000).wait();
+			}
+
+			this.$logger.printInfoMessageOnSameLine(os.EOL);
+			this.$logger.trace("Project imported");
+		}).future<void>()();
+	}
+
+	private getProjectRelativePath(fullPath: string, projectDir: string): string {
+		projectDir = path.join(projectDir, path.sep);
+		if (!_.startsWith(fullPath, projectDir)) {
+			throw new Error("File is not part of the project.");
+		}
+
+		return fullPath.substring(projectDir.length);
 	}
 
 	private get projectInformation(): Project.IProjectInformation {

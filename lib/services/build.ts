@@ -7,7 +7,6 @@ import path = require("path");
 import os = require("os");
 var options: any = require("../common/options");
 import plist = require("plist");
-import Future = require("fibers/future");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
@@ -15,7 +14,6 @@ import AppIdentifier = require("../common/mobile/app-identifier");
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
-	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
 	private static APPIDENTIFIER_PLACE_HOLDER = "$AppIdentifier$";
 
 	constructor(private $config: IConfiguration,
@@ -31,7 +29,6 @@ export class BuildService implements Project.IBuildService {
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
 		private $platformMigrator: Project.IPlatformMigrator,
-		private $multipartUploadService: IMultipartUploadService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $progressIndicator: IProgressIndicator) { }
@@ -95,33 +92,6 @@ export class BuildService implements Project.IBuildService {
 				errors: body.Errors.map(error => error.Message)
 			};
 		}).future<Server.IBuildResult>()();
-	}
-
-	private getProjectRelativePath(fullPath: string, projectDir: string): string {
-		projectDir = path.join(projectDir, path.sep);
-		if(!_.startsWith(fullPath, projectDir)) {
-			throw new Error("File is not part of the project.");
-		}
-
-		return fullPath.substring(projectDir.length);
-	}
-
-	private zipProject(): IFuture<string> {
-		return (() => {
-			var tempDir = this.$project.getTempDir().wait();
-
-			var projectZipFile = path.join(tempDir, "Build.zip");
-			this.$fs.deleteFile(projectZipFile).wait();
-			var projectDir = this.$project.getProjectDir().wait();
-
-			var files = this.$project.enumerateProjectFiles().wait();
-			var zipOp = this.$fs.zipFiles(projectZipFile, files,
-				p => this.getProjectRelativePath(p, projectDir));
-
-			var result = new Future<string>();
-			zipOp.resolveSuccess(() => result.return(projectZipFile));
-			return result.wait();
-		}).future<string>()();
 	}
 
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
@@ -333,7 +303,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);
 
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
-			this.importProject().wait();
+			this.$project.importProject().wait();
 
 			var buildResult = this.requestCloudBuild(settings).wait();
 			var packageDefs = buildResult.packageDefs;
@@ -484,7 +454,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.info("Deploying to AppBuilder companion app.");
 
-			this.importProject().wait();
+			this.$project.importProject().wait();
 
 			var appIdentifier = AppIdentifier.createAppIdentifier(platform, this.$project.projectData.AppIdentifier, true);
 
@@ -499,31 +469,6 @@ export class BuildService implements Project.IBuildService {
 				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
 				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
 			}]).wait();
-		}).future<void>()();
-	}
-
-	public importProject(): IFuture<void> {
-		return (() => {
-			this.$project.ensureProject();
-
-			this.$loginManager.ensureLoggedIn().wait();
-			var projectZipFile = this.zipProject().wait();
-			var fileSize = this.$fs.getFileSize(projectZipFile).wait();
-			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
-			var projectName = this.$project.projectData.ProjectName;
-			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
-			this.$logger.printInfoMessageOnSameLine("Uploading...");
-			if(fileSize > BuildService.CHUNK_UPLOAD_MIN_FILE_SIZE) {
-				this.$logger.trace("Start uploading file by chunks.");
-				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
-				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
-			} else {
-				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
-					this.$fs.createReadStream(projectZipFile)), 2000).wait();
-			}
-
-			this.$logger.printInfoMessageOnSameLine(os.EOL);
-			this.$logger.trace("Project imported");
 		}).future<void>()();
 	}
 }
