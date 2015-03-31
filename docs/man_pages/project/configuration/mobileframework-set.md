@@ -7,15 +7,27 @@ General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
 
 Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.
 
-`<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
+<% if(isConsole)  { %>
 <% if(isNativeScript)  { %>
-This command is not applicable to NativeScript projects.
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
 <% } %>
+<% if(isMobileWebsite)  { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
+<% } %>
+<% } %>
+
+<% if(isCordova)  { %>
+`<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
 
 Options:
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
+<% } %>
 
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 

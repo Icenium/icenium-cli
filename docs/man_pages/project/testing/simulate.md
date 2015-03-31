@@ -7,11 +7,25 @@ General | `$ appbuilder simulate [--path <Directory>]`
 
 Runs the current project in the device simulator.
 
-In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux systems.
+<% if(isConsole)  { %>
+<% if(isLinux) { %>
+WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help simulate`
+<% } %>
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help simulate`
+<% } %>
+<% } %>
 
+<% if((isWindows || isMacOS) && (isCordova || isMobileWebsite)) { %>
 Options:
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
+<% } %>
+
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on Linux systems.
+* You cannot run this command on NativeScript projects.
 
 #### Related Commands
 
