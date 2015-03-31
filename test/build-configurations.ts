@@ -98,6 +98,8 @@ function createTestInjector() {
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("prompter", {});
+	testInjector.register("multipartUploadService", {});
+	testInjector.register("progressIndicator", {});
 
 	testInjector.register("fs", fslib.FileSystem);
 	testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);

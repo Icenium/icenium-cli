@@ -115,6 +115,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() } });
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("httpClient", {});
+	testInjector.register("multipartUploadService", {});
+	testInjector.register("progressIndicator", {});
 
 	return testInjector;
 }

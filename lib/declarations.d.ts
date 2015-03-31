@@ -120,7 +120,6 @@ declare module Project {
 
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
-		importProject(): IFuture<void>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]>;

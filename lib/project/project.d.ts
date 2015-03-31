@@ -30,6 +30,8 @@ declare module Project {
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		adjustBuildProperties(buildProperties: any): any;
 		saveProject(projectDir?: string): IFuture<void>;
+		zipProject(): IFuture<string>;
+		importProject(): IFuture<void>;
 
 		ensureCordovaProject(): void;
 		ensureProject(): void;

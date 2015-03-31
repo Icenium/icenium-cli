@@ -2,12 +2,12 @@
 "use strict";
 
 export class ImportProjectCommand implements ICommand {
-	constructor(private $buildService: Project.IBuildService) { }
+	constructor(private $project: Project.IProject) { }
 
 	allowedParameters: ICommandParameter[] = [];
 
 	execute(args: string[]): IFuture<void> {
-		return	this.$buildService.importProject();
+		return	this.$project.importProject();
 	}
 }
 $injector.registerCommand("livesync|cloud", ImportProjectCommand);
