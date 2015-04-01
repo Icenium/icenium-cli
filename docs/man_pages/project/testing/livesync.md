@@ -4,7 +4,7 @@ livesync
 Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync [<Platform>] [--device <Device ID>] [--companion] [--watch]`    `$ appbuilder livesync [<Command>]`
-Andorid | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`
+Android | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`
 iOS | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]`
 
 Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
