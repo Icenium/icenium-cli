@@ -5,13 +5,13 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appstore <Command>`
 
-You must run the appstore command with a related command.
+Connects to your iTunes Connect account. You must run the appstore command with a related command.
 
 `<Command>` is a related command that extends the appstore command. You can run the following related commands:
 * `list` - Lists all application records in iTunes Connect.
 * `upload` - Builds the project and uploads the binary to iTunes Connect.
-<% if(isHtml) { %> 
 
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description
