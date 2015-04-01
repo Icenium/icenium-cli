@@ -46,6 +46,7 @@
     <Content Include="config\config.json" />
     <TypeScriptCompile Include="lib\appbuilder-cli.ts" />
     <TypeScriptCompile Include="lib\bootstrap.ts" />
+    <TypeScriptCompile Include="lib\common\commands\preuninstall.ts" />
     <TypeScriptCompile Include="lib\config.ts" />
     <TypeScriptCompile Include="lib\declarations.d.ts" />
     <TypeScriptCompile Include="lib\dns.ts" />
@@ -188,7 +189,6 @@
     <TypeScriptCompile Include="lib\commands\itunes-connect.ts" />
     <TypeScriptCompile Include="lib\commands\live-sync.ts" />
     <TypeScriptCompile Include="lib\commands\livesync-cloud.ts" />
-    <TypeScriptCompile Include="lib\commands\project.ts" />
     <TypeScriptCompile Include="lib\commands\remote.ts" />
     <TypeScriptCompile Include="lib\commands\samples.ts" />
     <TypeScriptCompile Include="lib\commands\simulate.ts" />
