@@ -7,17 +7,23 @@ General | `$ appbuilder livesync cloud`
 
 Synchronizes the project with the cloud to enable LiveSync via wireless connection (using the three finger tap and hold gesture). 
 
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 To get the latest changes on device, tap and hold with three fingers on the device screen until the download pop-up
 appears. When the download completes, the app refreshes automatically.
-
-<% if(isConsole && isNativeScript) { %>
+<% } %>
+<% if(isConsole) { %>
+<% if(isNativeScript) { %>
 WARNING: You can LiveSync changes only to the NativeScript companion app. To LiveSync changes to an application package, re-build and re-deploy your NativeScript app.
 <% } %>
-
+<% if(isMobileWebsite)  { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync cloud`
+<% } %>
+<% } %>
 <% if(isHtml) { %> 
 #### Command Limitations
 
 * For NativeScript projects, you can LiveSync changes only to the NativeScript companion app.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 

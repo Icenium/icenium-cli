@@ -3,21 +3,25 @@ livesync
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder livesync [<Platform>] [--device <Device ID>] [--companion] [--watch]`    `$ appbuilder livesync [<Command>]`
-Android | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`
-iOS | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]`
+General | `$ appbuilder livesync <Command>`
 
-Synchronizes the latest changes in your project to connected devices. In this version of the Telerik AppBuilder CLI,
-you cannot synchronize changes to Windows Phone connected devices.
-`<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
-Options:
-* `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
-* `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`
-* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the Telerik AppBuilder companion app.
+Synchronizes the latest changes in your project to devices. 
 
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync`
+<% } %>
+
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 `<Command>` is a related command that extends the livesync command. You can run the following related commands:
 * `cloud` - Synchronizes the project with the cloud to enable LiveSync for remote devices (using the three finger tap and hold gesture).
+* `android` - Synchronizes the latest changes in your project to connected Android devices.
+* `ios` - Synchronizes the latest changes in your project to connected iOS devices.
+<% } %>
+
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot LiveSync changes to connected Windows Phone devices.
 
 #### Related Commands
 

@@ -6,10 +6,11 @@ Usage | Synopsis
 General |`$ appbuilder appstore list [<AppleID>] [<Password>]`
 
 Lists all application records in iTunes Connect. The list contains name, version, and bundle ID for each application record.
+
+<% if(isHtml) { %> 
 `<Apple ID>` and `<Password>` are your credentials for logging in iTunes Connect. If you do not provide them when running the command, the Telerik AppBuilder CLI will prompt you to provide them.
 
-When running $ appbuilder appstore upload, you need to provide the name for the application record.
-<% if(isHtml) { %> 
+When you run `$ appbuilder appstore upload`, you need to provide the name for the application record as listed by `$ appbuilder appstore list`
 
 #### Related Commands
 
