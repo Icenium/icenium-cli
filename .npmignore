@@ -10,11 +10,11 @@ for-developers.md
 prepublish.js
 Gruntfile.js
 *.cmd
-tscommand.tmp.txt
+tscommand*.tmp.txt
 .tscache/
-
 bin/appbuilder
 bin/*.cmd
+**/bin/Microsoft.NodejsTools.WebRole.dll
 
 config/config-*
 
@@ -25,13 +25,10 @@ scratch/
 test/
 **/docs/html
 **/obj
-**/bin/Microsoft.NodejsTools.WebRole.dll
 **/.vs
 **/.ntvs_analysis.dat
+**/*.njsproj
+**/*.sln
+**/*.suo
 npm-debug.log
 node_modules
-resources/App_Resources
-resources/Cordova
-resources/ItemTemplates
-resources/ProjectTemplates
-resources/json-schemas
