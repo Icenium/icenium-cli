@@ -14,7 +14,13 @@ interface Console {
 
 declare var console: Console;
 declare var global;
-declare var require;
+declare var require: {
+    (id: string): any;
+    resolve(id:string): string;
+    cache: any;
+    extensions: any;
+    main: any;
+};
 
 // Global functions
 declare function Log(data: any): void;
@@ -30,21 +36,23 @@ declare var __filename: string;
  * Calls a function after a specified delay.
  * @param callback The function to be called.
  * @param milliseconds The time to wait before the function is called. Defaults to 0.
+ * @return timeoutObject id that can be used to cancel the operation. 
  */
-declare function setTimeout(callback: Function, milliseconds?: number): number;
+declare function setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): any;
 
 /**
  * Clears the delay set by a call to the setTimeout function.
  * @param id The identifier returned by the previously called setTimeout() method.
  */
-declare function clearTimeout(id: number): void;
+declare function clearTimeout(timeoutId: any): void;
 
 /**
  * Calls a function repeatedly with a delay between each call.
  * @param callback The function to be called.
  * @param milliseconds The delay between each function call.
+ * @return intervalObject id that can be used to cancel the operation.
  */
-declare function setInterval(callback: Function, milliseconds?: number): number;
+declare function setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): any;
 
 /**
  * Clears repeated function which was set up by calling setInterval().
@@ -52,17 +60,35 @@ declare function setInterval(callback: Function, milliseconds?: number): number;
  */
 declare function clearInterval(id: number): void;
 
+/**
+ * Calls a function immediately after I/O events callbacks and before setTimeout and setInterval.
+ * @param callback The function to be called.
+ * @param milliseconds The delay between each function call.
+ * @return immediateObject id that can be used to cancel the operation.
+ */
+declare function setImmediate(callback: (...args: any[]) => void, ...args: any[]): any;
+
+/**
+ * Clears repeated function which was set up by calling setInterval().
+ * @param id The identifier returned by the setImmediate() method.
+ */
+declare function clearImmediate(immediateId: any): void;
+
 declare class WeakRef<T> {
     constructor(obj: T);
     get(): T;
     clear(): void;
 }
 
-declare module module {
-    var id: string;
-    var filename: string;
-    var exports: any;
-}
+declare var module: {
+    exports: any;
+    require(id: string): any;
+    id: string;
+    filename: string;
+    loaded: boolean;
+    parent: any;
+    children: any[];
+};
 
 // Type definitions for es6-promise
 // Project: https://github.com/jakearchibald/ES6-Promise
