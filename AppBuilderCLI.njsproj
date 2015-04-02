@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{101d1083-f2e6-4127-a565-dba018947516}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <StartupFile>bin\appbuilder.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -23,6 +23,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <Content Include="ab-logo.png" />
+    <Content Include="lib\common\LICENSE" />
     <Content Include="no-support.png" />
     <Content Include="support.png" />
     <Content Include="package.json" />
@@ -68,6 +69,13 @@
     <TypeScriptCompile Include="lib\server-api.ts" />
     <TypeScriptCompile Include="lib\server-config.ts" />
     <TypeScriptCompile Include="lib\service-util.ts" />
+    <TypeScriptCompile Include="lib\services\app-scaffolding-extensions-service.ts" />
+    <TypeScriptCompile Include="lib\services\dependency-config.ts" />
+    <TypeScriptCompile Include="lib\services\dependency-extensions-service-base.ts" />
+    <TypeScriptCompile Include="lib\services\extensions-service-base.ts" />
+    <TypeScriptCompile Include="lib\services\generator-extensions-service.ts" />
+    <TypeScriptCompile Include="lib\services\project-commands-service.ts" />
+    <TypeScriptCompile Include="lib\services\screen-builder-service.ts" />
     <TypeScriptCompile Include="lib\templates-service.ts" />
     <TypeScriptCompile Include="lib\x509.ts" />
     <Content Include="resources\project-properties-cordova.json" />
