@@ -101,5 +101,9 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public get helpTextPath() {
 		return path.join(__dirname, "../resources/help.txt");
 	}
+
+	public get HTML_CLI_HELPERS_DIR(): string {
+		return path.join(__dirname, "../docs/helpers");
+	}
 }
 $injector.register("staticConfig", StaticConfig);
