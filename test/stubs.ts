@@ -394,8 +394,13 @@ export class StaticConfig implements IStaticConfig {
 		return path.join(__dirname, "../", "docs", "html");
 	}
 
-	public get HTML_HELPERS_DIR(): string {
-		return path.join(__dirname, "../", "docs", "helpers");
+	public get HTML_COMMON_HELPERS_DIR(): string {
+		return path.join(__dirname, "../lib/common", "docs", "helpers");
+	}
+
+	public get HTML_CLI_HELPERS_DIR(): string {
+		return path.join(__dirname, "..", "docs", "helpers");
+		
 	}
 }
 
