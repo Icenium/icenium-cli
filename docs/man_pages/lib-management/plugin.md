@@ -3,8 +3,8 @@ plugin
 
 Usage | Synopsis
 ------|-------
-List plugins | `$ appbuilder plugin [--available] [--debug] [--release]`    
-Manage plugins | `$ appbuilder plugin <Command>`
+List | `$ appbuilder plugin [--available] [--debug] [--release]`    
+Manage | `$ appbuilder plugin <Command>`
 
 Lists all core, integrated and verified plugins that are currently enabled for your project. With the `--available` switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
 
@@ -18,20 +18,26 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 
 <% if((isConsole && isCordova) || isHtml) { %>
+#### Options
+* `--available` - Lists all plugins that are currently enabled in your project and all plugins that you can enable in your project.
+* `--debug` - Lists all plugins enabled for the Debug build configuration. If `--available` is set, also lists all plugins that you can enable for the Debug build configuration.
+* `--release` - Lists all plugins enabled for the Release build configuration. If `--available` is set, also lists all plugins that you can enable for the Release build configuration.
+
+#### Attributes  
 `<Command>` is a related command that extends the plugin command. You can run the following related commands:
 * `add` - Enables a core, integrated or verified plugin for your project.
 * `configure` - Configures plugin variables for the selected core, integrated or verified plugin.
 * `remove` - Disables a core, integrated or verified plugin for your project.
 * `find` - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 * `fetch` - Imports the selected Apache Cordova plugin into your project. <% if(isHtml) { %>You can specify a plugin by local path, URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. The plugin must be Plugman-compatible.<% } %>
-
-Options:
-* `--available` - Lists all plugins that are currently enabled in your project and all plugins that you can enable in your project.
-* `--debug` - Lists all plugins enabled for the Debug build configuration. If `--available` is set, also lists all plugins that you can enable for the Debug build configuration.
-* `--release` - Lists all plugins enabled for the Release build configuration. If `--available` is set, also lists all plugins that you can enable for the Release build configuration.
 <% } %>
 
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
+
 #### Related Commands
 
 Command | Description

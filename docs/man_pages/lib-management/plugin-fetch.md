@@ -3,17 +3,28 @@ plugin fetch
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder plugin fetch <Name | ID | Path | URL | [<Keyword> [<Keyword>]*>] >`
+By name | `$ appbuilder plugin fetch <Name>`
+By ID | `$ appbuilder plugin fetch <ID>`
+By path | `$ appbuilder plugin fetch <Path>`
+By URL | `$ appbuilder plugin fetch <URL>`
+By keyword(s) | `$ appbuilder plugin fetch [<Keyword> [<Keyword>]*>]`
     
-Imports the selected Apache Cordova plugin into your project. You can specify a plugin by local path,
-URL to a plugin repository, name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry. 
-The plugin must be Plugman-compatible.
-
-<% if(isNativeScript)  { %>
-This command is not applicable to NativeScript projects.
+Imports the selected Plugman-compatible Apache Cordova plugin into your project. <% if(isHtml) { %>You can specify a plugin by local path,
+URL to a plugin repository, name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry.<% } %>
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin fetch`
 <% } %>
-
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help plugin fetch`
+<% } %>
+<% } %>
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
+* You can fetch only Plugman-compatible plugins.
 
 #### Related Commands
 
