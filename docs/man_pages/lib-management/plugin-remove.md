@@ -6,16 +6,27 @@ Usage | Synopsis
 General | `$ appbuilder plugin remove <Name or ID> [--debug] [--release]`
 
 Disables a core, integrated or verified plugin from your project.
-
-`<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
-<% if(isNativeScript)  { %>
-This command is not applicable to NativeScript projects.
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin remove`
 <% } %>
-
-Options:
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help plugin remove`
+<% } %>
+<% } %>
+<% if((isConsole && isCordova) || isHtml) { %>
+#### Options
 * `--debug` - Disables the specified plugin for the Debug build configuration only. 
 * `--release` - Disables the specified plugin for the Release build configuration only.
+
+#### Attributes
+`<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
+<% } %>
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 

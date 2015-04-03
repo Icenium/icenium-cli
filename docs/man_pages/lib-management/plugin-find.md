@@ -6,12 +6,19 @@ Usage | Synopsis
 General | `$ appbuilder plugin find [<Keyword> [<Keyword>]*>]`
 
 Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-
-<% if(isNativeScript)  { %>
-This command is not applicable to NativeScript projects.
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin find`
 <% } %>
-
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help plugin find`
+<% } %>
+<% } %>
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 
