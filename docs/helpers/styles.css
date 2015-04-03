@@ -134,6 +134,8 @@ body {
 	font-family: "open_sansregular",sans-serif;
 	line-height: 1.2;
 	padding: 15px 3em;
+	margin: 0 auto;
+	max-width: 75%;
 }
 
 body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video {
@@ -172,8 +174,15 @@ em {
 	font-style: italic;
 }
 
+/* lists */
 ol, ul, dl {
 	padding: 0;
+}
+
+ul {
+	margin: 10px 10px 10px 20px;
+	list-style: disc;
+	list-style-position: outside;
 }
 
 ol {
@@ -183,7 +192,6 @@ ol {
 code {
 	font-family: "Courier New","TexGyreCursor-Regular", monospace;
 	font-size: 13px;
-	font-weight: bold;
 }
 
 code + em {
@@ -272,7 +280,6 @@ h4 {
 	font-size: 13px;
 	font-size: 1.3rem;
 	font-weight: 500;
-	text-decoration: underline;
 }
 h4 + p {
 	margin-top: 0;
@@ -298,16 +305,6 @@ p {
 	margin-bottom: 12px;
 	margin-top: 12px;
 	line-height: 22px;
-}
-
-/* lists */
-ol, ul, dl {
-  padding: 0;
-}
-ul {
-  margin: 10px 10px 10px 20px;
-  list-style: disc;
-  list-style-position: outside;
 }
 
 /* tables */
@@ -350,7 +347,18 @@ table td {
 	border-left-width: 0;
 	border-right-width: 0;
 }
+
+table td:first-of-type {
+	width: 25%;
+}
+
 table td h2, table td h3, table td h4, table td h5 {
 	font-weight: 500;
 	margin: 0;
+}
+
+/* logo */
+.logo {
+	margin: 20px auto;
+	display: block;
 }
