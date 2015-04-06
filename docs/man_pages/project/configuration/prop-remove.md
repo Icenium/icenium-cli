@@ -6,10 +6,25 @@ Usage | Synopsis
 General | `$ appbuilder prop remove <Property Name> <Value> [Value]*`
 
 Disables options for the selected project property, if the property accepts multiple values.
-`<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
-> WARNING: Do not modify the CorePlugins property with this command. Instead, use the `$ appbuilder plugin commands`.
 
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop remove`
+<% } %> 
+<% if(isCordova) { %>
+WARNING: Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
+<% } %> 
+<% } %>
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+#### Attributes
+* `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
+* `<Value>` is a current value of the property as listed by `$ appbuilder prop print <Property Name>`. You can separate multiple values with a space.
+<% } %> 
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 
