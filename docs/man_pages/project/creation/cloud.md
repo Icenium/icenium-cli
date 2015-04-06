@@ -3,15 +3,16 @@ cloud
 
 Usage | Synopsis
 ------|-------
-List projects | `$ appbuilder cloud`    
-With subcommand | `$ appbuilder cloud [<Command>]`
+General | `$ appbuilder cloud [<Command>]`    
 
 Lists all projects associated with your Telerik Platform account.
 
-`<Command>` is a related command that extends the cloud command. You can run the following related commands:
-* `export` - Exports a selected project from the cloud and initializes it for development in the Telerik AppBuilder CLI.
-<% if(isHtml) { %> 
+#### Attributes
 
+`<Command>` is a related command that extends the `cloud` command. You can run the following related commands:
+* `export` - Exports a selected project from the cloud and initializes it for development in the Telerik AppBuilder CLI. You must run this command in a directory that does not contain a project.
+
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description

@@ -5,11 +5,19 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder cloud export <Project ID> [--path <Directory>]`
 
-Exports one of your projects from the cloud and initializes it for development in the current directory.
-`<Project ID>` is the index or name of the project as listed by `$ appbuilder cloud`
-Options:
-* `--path` - Specifies the directory where to export the selected project on your file system. If not set, exports the project in the current directory.
+Exports one of your projects from the cloud and initializes it for development in the current directory. The current directory must be empty.
+<% if(isConsole) { %>
+WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.
+<% } %> 
+#### Options
+* `--path` - Specifies the directory where to export the selected project on your file system. The directory must be empty. If not set, exports the project in the current directory.
+
+#### Attributes
+* `<Project ID>` is the index or name of the project as listed by `$ appbuilder cloud`
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You must run this command in an empty directory or specify `--path` to an empty directory.
 
 #### Related Commands
 

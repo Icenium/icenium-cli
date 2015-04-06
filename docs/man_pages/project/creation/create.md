@@ -3,15 +3,17 @@ create
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder create [<Command>]`
-Creates a project for hybrid or native development. You must run the create command with a related command.
+General | `$ appbuilder create [<Type>]`
 
-`<Command>` is a related command that extends the create command. You can run the following related commands:
-    hybrid - Creates a new project from an Apache Cordova-based template.
-    native - Creates a new project from a NativeScript-based template.
-    website - Creates a new project from a Mobile Website template.
+Creates a project for hybrid, native or mobile website development. You must run the `create` command with a related command that specifies the project type.
+
+#### Attributes
+`<Type>` is a related command that extends the `create` command. You can run the following related commands:
+* `hybrid` - Creates a new project from an **Apache Cordova** template.
+* `native` - Creates a new project from a **NativeScript** template.
+* `website` - Creates a new project from a **Mobile Website** template.
+
 <% if(isHtml) { %> 
-
 #### Related Commands
 
 Command | Description
