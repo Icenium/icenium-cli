@@ -3,17 +3,27 @@ prop print
 
 Usage | Synopsis
 ------|-------
-Print values of all properties | `$ appbuilder prop print [--validValue]`
-Print value(s) of a property | `$ appbuilder prop print <Property Name> [--validValue]`
+Print all properties | `$ appbuilder prop print [--validValue]`
+Print a selected property | `$ appbuilder prop print <Property Name> [--validValue]`
 
-Prints information about the configuration of the project or the selected property.
-If `--validValue` is set, prints the valid configuration values. 
+Prints information about the configuration of the project or the selected property.  
+If `--validValue` is set, prints the valid configuration values.  
 If not set, prints the current configuration. 
 
-`<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
-Options:
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop print`
+<% } %>
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+#### Options
 * `--validValue` - When set, prints the valid values for all valid project properties or for the selected property.
+
+#### Attributes
+* `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
+<% } %>
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 

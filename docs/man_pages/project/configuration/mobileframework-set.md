@@ -15,15 +15,13 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
 <% } %>
 <% } %>
-
-<% if(isCordova)  { %>
-Attributes:
+<% if((isConsole && isCordova) || isHtml) { %>
+#### Attributes
 * `<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
 
-Options:
+#### Options
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 <% } %>
-
 <% if(isHtml) { %> 
 #### Command Limitations
 

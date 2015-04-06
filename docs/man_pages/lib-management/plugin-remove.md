@@ -20,7 +20,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `--release` - Disables the specified plugin for the Release build configuration only.
 
 #### Attributes
-`<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
+* `<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
 <% } %>
 <% if(isHtml) { %> 
 #### Command Limitations

@@ -6,10 +6,25 @@ Usage | Synopsis
 General | `$ appbuilder prop set <Property Name> <Value> [Value]*`
 
 Sets the selected project property and overwrites its current value.
-Run `$ appbuilder prop print <Property Name> --validValue` to print the valid values for the property.
-`<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
-> WARNING: Do not modify the CorePlugins property with this command. Instead, use the `$ appbuilder plugin commands`.
+
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop set`
+<% } %> 
+<% if(isCordova) { %>
+WARNING: Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
+<% } %> 
+<% } %>
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+#### Attributes
+* `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
+* `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --validValue`. You can separate multiple values with a space.
+<% } %> 
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 
