@@ -77,6 +77,7 @@ Command | Description
 [appstore&nbsp;list](publishing/appstore-list.html) | Lists all applications in iTunes Connect.
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
 [appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager.html) | Builds the project and uploads the binary to Telerik AppManager.
+[appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
 
 ## Global Options
 Option | Description

@@ -465,6 +465,8 @@ interface ILiveSyncService {
 
 interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
+	openAppManagerStore(): void;
+	publishLivePatch(platforms: string[]): IFuture<void>;
 }
 
 interface IProgressIndicator {

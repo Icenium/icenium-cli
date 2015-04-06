@@ -5,6 +5,7 @@ import os = require("os");
 import util = require("util");
 import options = require("../common/options");
 import pluginsDataLib = require("../plugins-data");
+import Future = require("fibers/future");
 
 export class PluginsService implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
@@ -23,11 +24,9 @@ export class PluginsService implements IPluginsService {
 		// Cordova plugin commands are only applicable to Cordova projects
 		this.$project.ensureCordovaProject();
 
-		this.$logger.info("Gathering information for plugins...");
-
 		this.identifierToPlugin = Object.create(null);
-		this.createPluginsData($cordovaPluginsService).wait();
-		this.createPluginsData($marketplacePluginsService).wait();
+		Future.wait([this.createPluginsData($cordovaPluginsService),
+			this.createPluginsData($marketplacePluginsService)]);
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
