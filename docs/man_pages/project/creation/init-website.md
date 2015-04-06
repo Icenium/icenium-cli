@@ -4,14 +4,12 @@ init website
 Usage | Synopsis
 ------|-------
 General | `$ appbuilder init website`
-Initializes an existing Mobile Website project for development in the current directory. 
 
-The operation creates one or more of the following AppBuilder-specific files, if missing:
+Initializes an existing Mobile Website project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project synchronized from GitHub, the project retains any existing project configuration.
+
+This operation creates one or more of the following AppBuilder-specific files, if missing:
 * .abproject
 * .abignore
-
-If the directory contains an existing AppBuilder project synchronized from GitHub, the project retains any existing project configuration.
-<% if(isHtml) { %> 
 
 #### Related Commands
 

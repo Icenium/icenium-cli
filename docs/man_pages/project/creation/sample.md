@@ -3,20 +3,20 @@ sample
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder sample`    `$ appbuilder sample [<Command>]`
+General | `$ appbuilder sample [<Command>]`
 
-Lists all available sample apps with name, description, GitHub repository, and clone command. To clone a selected sample app,
-run its clone command as listed by `$ appbuilder sample`
+Lists all available sample apps with name, description, GitHub repository and clone command.
+
+#### Attributes
 `<Command>` is any related command that extends the sample command. You can run the following related commands:
-* `clone` - Clones a selected sample app.
-<% if(isHtml) { %> 
+* `clone` - Clones the selected sample app.
 
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description
 ----------|----------
-[cloud export](cloud-export.html) | Exports one of your projects from the cloud and initializes it for development
-in the current directory.
+[cloud export](cloud-export.html) | Exports one of your projects from the cloud and initializes it for development in the current directory.
 [cloud](cloud.html) | Lists all projects associated with your Telerik Platform account.
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
