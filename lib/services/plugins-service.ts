@@ -4,6 +4,7 @@
 import os = require("os");
 import util = require("util");
 import options = require("../common/options");
+import pluginsDataLib = require("../plugins-data");
 
 export class PluginsService implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
@@ -48,11 +49,54 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
-			if(this.isPluginInstalled(pluginName)) {
-				this.$errors.fail("Plugin %s is already installed", pluginName);
+			var installedPlugin = this.getInstalledPluginByName(pluginName);
+
+			if(installedPlugin) {
+				if(installedPlugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
+					this.$logger.info("Plugin '%s' is already installed", pluginName);
+					var message = util.format("Would you like to update the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
+					if (this.$prompter.confirm(message, () => true).wait()) {
+						var versions = this.getPluginVersions(pluginName);
+						var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
+						versions.splice(currentVersionIndex, 1);
+
+						var version = this.promptForVersion(pluginName, versions).wait();
+						this.$logger.info("Updating plugin '%s' to version %s..", pluginName, version);
+
+						var updatePlugin = (pluginName:string, configuration?:string) => {
+							var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), installedPlugin.toProjectDataRecord());
+							newCorePlugins.push(util.format("%s@%s", installedPlugin.data.Identifier, version));
+							this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+							this.$project.saveProject().wait();
+						};
+						if (this.$project.hasBuildConfigurations()) {
+							var configurations = this.$project.configurations;
+							_.each(configurations, (configuration:string) => {
+								updatePlugin(pluginName, configuration);
+							});
+						} else {
+							updatePlugin(pluginName);
+						}
+
+						this.$logger.info("Successfully updated plugin '%s' to version %s.", pluginName, version);
+					}
+					return;
+				} else {
+					this.$errors.fail("Plugin '%s' is already installed", pluginName);
+				}
 			}
 
-			this.configurePlugin(pluginName).wait();
+			var parts = pluginName.split("@");
+			pluginName = parts[0];
+			var version = parts[1] || "";
+
+			if(!version) {
+				var versions = this.getPluginVersions(pluginName);
+				version = this.promptForVersion(pluginName, versions).wait();
+			}
+
+
+			this.configurePlugin(pluginName, version).wait();
 
 		}).future<void>()();
 	}
@@ -63,11 +107,13 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified.");
 			}
 
-			if (!this.isPluginInstalled(pluginName)) {
+			var installedPlugin = this.getInstalledPluginByName(pluginName);
+			if (installedPlugin === null || installedPlugin === undefined) {
 				this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}
 
-			var plugin = this.getPluginByName(pluginName);
+
+			var plugin = this.getPluginByName(pluginName, installedPlugin.data.Version);
 
 			if(this.$project.hasBuildConfigurations()) {
 				_.each(plugin.configurations, (configuration:string) => {
@@ -96,24 +142,30 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
-		pluginName = pluginName.toLowerCase();
-		return _.any(this.getInstalledPlugins(), (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
+		var installedPlugin = this.getInstalledPluginByName(pluginName);
+		return installedPlugin !== null && installedPlugin !== undefined;
 	}
 
-	public configurePlugin(pluginName: string): IFuture<void> {
+	public configurePlugin(pluginName: string, version: string): IFuture<void> {
 		return (() => {
 			if(this.$project.hasBuildConfigurations()) {
 				var configurations = this.$project.configurations;
 				_.each(configurations, (configuration:string) => {
-					this.configurePluginCore(pluginName, configuration).wait();
+					this.configurePluginCore(pluginName, configuration, version).wait();
 				});
 			} else {
-				this.configurePluginCore(pluginName).wait();
+				this.configurePluginCore(pluginName, version).wait();
 			}
 		}).future<void>()();
 	}
 
-	private configurePluginCore(pluginName: string, configuration?: string): IFuture<void> {
+	private getInstalledPluginByName(pluginName: string): IPlugin {
+		pluginName = pluginName.toLowerCase();
+		var installedPlugins = this.getInstalledPlugins();
+		return _.find(installedPlugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
+	}
+
+	private configurePluginCore(pluginName: string, configuration?: string, version?: string): IFuture<void> {
 		return (() => {
 			var plugin = this.getPluginByName(pluginName);
 			var pluginData = plugin.data;
@@ -136,7 +188,7 @@ export class PluginsService implements IPluginsService {
 			if(!newCorePlugins) {
 				newCorePlugins = [];
 			}
-			newCorePlugins.push(plugin.toProjectDataRecord());
+			newCorePlugins.push(plugin.toProjectDataRecord(version));
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 			this.$project.saveProject().wait();
 
@@ -178,32 +230,32 @@ export class PluginsService implements IPluginsService {
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
 		return (() => {
 			var plugins = pluginsService.getAvailablePlugins().wait();
-
 			_.each(plugins, (plugin: Server.CordovaPluginData) => {
-
 				try {
-					var pluginData = pluginsService.createPluginData(plugin).wait();
-				} catch(e) {
+					var data = pluginsService.createPluginData(plugin);
+				} catch (e) {
 					this.$logger.warn("Unable to fetch data for %s plugin. Please, try again in a few minutes.", (<any>plugin).title);
 					this.$logger.trace(e);
 				}
+				_.each(data, pluginData => {
+					if (pluginData && pluginData.data) {
+						var projectDataRecord = pluginData.toProjectDataRecord();
+						var configurations = this.$project.configurationSpecificData;
 
-				if(pluginData) {
-					var projectDataRecord = pluginData.toProjectDataRecord();
-					var configurations = _.keys(this.$project.configurationSpecificData);
-
-					_.each(configurations, (configuration:string) => {
-						var configData = this.$project.configurationSpecificData[configuration];
-						if (configData) {
-							var corePlugins = configData[PluginsService.CORE_PLUGINS_PROPERTY_NAME];
-							if (corePlugins && _.contains(corePlugins, projectDataRecord)) {
-								pluginData.configurations.push(configuration);
+						_.each(configurations, (configData: IDictionary<any>, configuration:string) => {
+							if (configData) {
+								var corePlugins = configData[PluginsService.CORE_PLUGINS_PROPERTY_NAME];
+								if (corePlugins && _.contains(corePlugins, projectDataRecord)) {
+									pluginData.configurations.push(configuration);
+								}
 							}
-						}
-					});
+						});
 
-					this.identifierToPlugin[projectDataRecord] = pluginData;
-				}
+						this.identifierToPlugin[projectDataRecord] = pluginData;
+					} else {
+						this.$logger.warn("Unable to fetch data for plugin %s.", plugin.Identifier);
+					}
+				});
 			});
 		}).future<void>()();
 	}
@@ -224,14 +276,20 @@ export class PluginsService implements IPluginsService {
 
 			return this.$prompter.get([schema]).wait();
 		}).future<any>()();
-
 	}
 
-	private getPluginByName(pluginName: string): IPlugin {
+	private getPluginByName(pluginName: string, version?: string): IPlugin {
 		var plugins = this.getAvailablePlugins();
 		var toLowerCasePluginName = pluginName.toLowerCase();
 
-		var plugin = _.find(plugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName);
+		var plugin = _.find(plugins, (plugin: IPlugin) => {
+			var condition = plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName;
+			if(version) {
+				condition = condition && plugin.data.Version === version;
+			}
+
+			return condition;
+		});
 		if(!plugin) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}
@@ -250,6 +308,43 @@ export class PluginsService implements IPluginsService {
 		}
 
 		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+	}
+
+	private getPluginVersions(pluginName: string): any[] {
+		var toLowerCasePluginName = pluginName.toLowerCase();
+
+		var versions:any[] = [];
+		_.each(this.getAvailablePlugins(), (plugin:IPlugin) => {
+			if (plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName) {
+				var pluginVersionsData = (<IMarketplacePlugin>plugin).pluginVersionsData;
+				versions = _.map(pluginVersionsData.Versions, p => {
+					return {name: p.Version, value: p.Version};
+				});
+				return false;
+			}
+		});
+
+		return versions;
+	}
+
+	private promptForVersion(pluginName: string, versions: any[]): IFuture<string> {
+		return (() => {
+			return versions.length > 1 ? this.promptForVersionCore(pluginName, versions).wait(): versions[0].value;
+		}).future<string>()();
+	}
+
+	private promptForVersionCore(pluginName: string, versions: any[]): IFuture<string> {
+		return (() => {
+			var promptData = [{
+				type: "list",
+				name: "version",
+				message: "Which plugin version would you like to use?",
+				choices: versions
+			}];
+			var answer = this.$prompter.get(promptData).wait();
+			var version = answer.version;
+			return version;
+		}).future<string>()();
 	}
 }
 $injector.register("pluginsService", PluginsService);

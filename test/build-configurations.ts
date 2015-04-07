@@ -120,6 +120,9 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 			},
 			getMarketplacePluginData: (pluginIdentifier: string, pluginVersion: string) => {
 				return Future.fromResult(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
+			},
+			getMarketplacePluginsData: () => {
+				return Future.fromResult(cordovaPlugins);
 			}
 		}
 	});

@@ -107,10 +107,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion);
 	}
 
-	public createPluginData(plugin: Server.CordovaPluginData): IFuture<IPlugin> {
-		return (() => {
-			return new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants);
-		}).future<IPlugin>()();
+	public createPluginData(plugin: Server.CordovaPluginData): IPlugin[] {
+		return [new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants)];
 	}
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {

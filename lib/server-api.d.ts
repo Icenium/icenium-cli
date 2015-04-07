@@ -77,6 +77,28 @@ declare module Server{
 		SupportedFrameworkVersions: Server.FrameworkVersion[];
 		IntegratedPlugins: any;
 	}
+	interface MarketplacePluginPublisher{
+		Name: string;
+		Url: string;
+	}
+	interface MarketplacePluginData{
+		Publisher: Server.MarketplacePluginPublisher;
+		Authors: string[];
+		DownloadsCount: number;
+		SupportedVersion: string;
+		Name: string;
+		Identifier: string;
+		Version: string;
+		Description: string;
+		Url: string;
+		Assets: string[];
+		Platforms: Server.DevicePlatform[];
+		AndroidRequiredPermissions: string[];
+		Variables: string[];
+	}
+	interface MarketplacePluginVersionsData{
+		Versions: Server.MarketplacePluginData[];
+	}
 	interface PropertyMigration{
 		BaseValue: string;
 		Type: string;
@@ -105,6 +127,7 @@ declare module Server{
 		getCordovaVersions(): IFuture<string[]>;
 		getCordovaFrameworkVersions(): IFuture<Server.FrameworkVersion[]>;
 		getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>;
+		getMarketplacePluginsData(): IFuture<Server.MarketplacePluginVersionsData[]>;
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>;
 		addPlatform(platform: Server.DevicePlatform, solutionName: string, projectName: string): IFuture<Server.MigrationResult>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
@@ -429,6 +452,16 @@ declare module Server{
 		id: string;
 		name: string;
 	}
+	interface TapNotificationData{
+		Message: string;
+		Date: Date;
+		Url: string;
+		Unread: boolean;
+	}
+	interface TapNotificationSummaryData{
+		FirstUnreadNotification: Server.TapNotificationData;
+		UnreadNotificationsCount: number;
+	}
 	interface ITapServiceContract{
 		getFeatures(accountId: string, serviceType: string): IFuture<string[]>;
 		getExistingClientSolutions(): IFuture<Server.TapSolutionData[]>;
@@ -440,6 +473,9 @@ declare module Server{
 		getServiceApplications(serviceType: string, accountId: string): IFuture<Server.TapSolutionData[]>;
 		getServiceApplicationProjectKey(serviceType: string, id: string): IFuture<string>;
 		createServiceApplication(serviceType: string, workspaceId: string, applicationName: string, description: string): IFuture<string>;
+		getNotificationSummary(accountId: string): IFuture<Server.TapNotificationSummaryData>;
+		getUnreadNotifications(accountId: string): IFuture<Server.TapNotificationData[]>;
+		getReadNotifications(accountId: string, fromDate: Date): IFuture<Server.TapNotificationData[]>;
 	}
 	interface BranchItemData{
 		BranchName: string;
