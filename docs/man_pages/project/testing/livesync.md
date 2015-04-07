@@ -5,23 +5,24 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync <Command>`
 
-Synchronizes the latest changes in your project to devices. 
+Synchronizes the latest changes in your project to devices. You must run the `livesync` command with a related command.
 
-<% if(isConsole && isMobileWebsite) { %>
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync`
+<% } %> 
 <% } %>
-
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 `<Command>` is a related command that extends the livesync command. You can run the following related commands:
 * `cloud` - Synchronizes the project with the cloud to enable LiveSync for remote devices (using the three finger tap and hold gesture).
-* `android` - Synchronizes the latest changes in your project to connected Android devices.
-* `ios` - Synchronizes the latest changes in your project to connected iOS devices.
+<% if(isCordova) { %>* `android` - Synchronizes the latest changes in your project to connected Android devices. 
+* `ios` - Synchronizes the latest changes in your project to connected iOS devices.<% } %>
 <% } %>
-
 <% if(isHtml) { %> 
 #### Command Limitations
 
 * You cannot LiveSync changes to connected Windows Phone devices.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 
