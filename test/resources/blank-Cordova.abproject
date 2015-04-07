@@ -14,10 +14,14 @@
     ,"iOSBackgroundMode": []
     ,"WP8TileTitle": ""
     ,"WP8Publisher": ""
-    ,"WP8Capabilities": []
+    ,"WP8Capabilities": [
+        "ID_CAP_NETWORKING",
+        "ID_CAP_WEBBROWSERCOMPONENT"
+     ]
     ,"WP8Requirements": []
     ,"FrameworkVersion": "3.7.0"
     ,"AndroidPermissions": [
+        "android.permission.INTERNET"
     ]
     ,"DeviceOrientations": [
       "Portrait",
