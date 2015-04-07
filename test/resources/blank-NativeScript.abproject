@@ -13,7 +13,9 @@
     ]
     ,"iOSBackgroundMode": []
     ,"FrameworkVersion": "0.9.0"
-    ,"AndroidPermissions": [ ]
+    ,"AndroidPermissions": [
+        "android.permission.INTERNET"
+     ]
     ,"DeviceOrientations": [
       "Portrait",
       "Landscape"
