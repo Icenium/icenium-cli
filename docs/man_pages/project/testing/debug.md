@@ -5,11 +5,29 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder debug`
 
-Shows the debug tools to let you debug applications on connected devices.
-<% if(isLinux) { %>
-In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux systems.
+Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %>For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
+
+<% } %> 
+<% if(isConsole) { %>
+WARNING: You can work only with connected iOS and Android devices.
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
-<% if(isHtml) { %> 
+<% if(isLinux) { %>
+WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
+<% } %> 
+<% } %> 
+<% if(isHtml) { %>
+#### Prerequisites
+
+* [Requirements for debugging on Android devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#android-requirements)
+* [Requirements for debugging on iOS devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#ios-requirements)
+
+#### Command Limitations
+
+* You cannot run this command on mobile website projects.
+* You cannot run this command on Linux systems.
+* You cannot run this command on Windows Phone devices.
 
 #### Related Commands
 

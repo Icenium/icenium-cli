@@ -5,31 +5,46 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--availableDevices] [--debug] [--release] [--timeout]`
 
-Builds the specified project in the cloud and runs it in the native iOS Simulator.
-
-`<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
-`<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-`<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --availableDevices`
-
-Prerequisites:
+Builds the specified project in the cloud and runs it in the native iOS Simulator. <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate ios`
+<% } %> 
+<% if(isWindows) { %>
+WARNING: You cannot run this command on Windows systems. To view the complete help for this command, run `$ appbuilder help emulate ios`
+<% } %> 
+<% if(isLinux) { %>
+WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help emulate ios`
+<% } %> 
+<% } %>
+<% if(isHtml) { %>
+#### Prerequisites
 Before running the iOS Simulator, verify that you have met the following requirements.
 * You are running the Telerik AppBuilder CLI on OS X.
-* You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the  Telerik AppBuilder CLI depends. <% if(isHtml) { %> For more information, visit  [ios-sim-portable](https://www.npmjs.org/package/ios-sim-portable) <% } %>
-
-You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
-<% if(isHtml) { %>
-For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
+* You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the  Telerik AppBuilder CLI depends.  For more information, see [ios-sim-portable](https://www.npmjs.org/package/ios-sim-portable).
 <% } %>
-
-Options:
+<% if((isConsole && isMacOS && (isNativeScript || isCordova)) || isHtml) { %>
+#### Options
 * `--availableDevices` - Lists all available device type identifiers for the current XCode.
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
-* `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. You must specify a certificate. The certificate must match the provisioning profile.To list available certificates, run `$ appbuilder certificate`* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. You must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`    
-* `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. To list the available iOS Simulator devices, run `$ appbuilder emulate ios --availableDevices`    
+* `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. <% if(isHtml) { %>You must specify a certificate. The certificate must match the provisioning profile.<% } %>
+* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name.<% if(isHtml) { %> You must specify a provisioning profile. The provisioning profile must match the certificate. <% } %>    
+* `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. 
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start before quitting the operation and releasing the console. The value must be a positive integer. If not set, the default timeout is 90 seconds.
+
+#### Attributes
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+* `<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --availableDevices`
+<% } %>
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on Windows systems.
+* You cannot run this command on Linux systems.
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 
