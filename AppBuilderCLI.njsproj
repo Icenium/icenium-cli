@@ -306,7 +306,7 @@
     <TypeScriptCompile Include="lib\commands\prop\prop-remove.ts" />
     <TypeScriptCompile Include="lib\commands\prop\prop-set.ts" />
     <TypeScriptCompile Include="lib\common\commands\analytics.ts" />
-    <TypeScriptCompile Include="lib\common\commands\completion-prompt.ts" />
+    <TypeScriptCompile Include="lib\common\commands\autocompletion.ts" />
     <TypeScriptCompile Include="lib\common\commands\help.ts" />
     <TypeScriptCompile Include="lib\common\commands\post-install.ts" />
     <TypeScriptCompile Include="lib\common\definitions\bplist-parser.d.ts" />
