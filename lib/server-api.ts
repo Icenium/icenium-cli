@@ -58,8 +58,8 @@ export class CordovaService implements Server.ICordovaServiceContract{
 	public getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>{
 		return this.$serviceProxy.call<Server.CordovaPluginData>('GetMarketplacePluginData', 'GET', ['api','cordova','marketplace',encodeURI(pluginId.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
-	public getMarketplacePluginsData(): IFuture<Server.MarketplacePluginVersionsData[]>{
-		return this.$serviceProxy.call<Server.MarketplacePluginVersionsData[]>('GetMarketplacePluginsData', 'GET', ['api','cordova','marketplace-directory'].join('/'), 'application/json', null, null);
+	public getMarketplacePluginsData(framework: string): IFuture<Server.MarketplacePluginVersionsData[]>{
+		return this.$serviceProxy.call<Server.MarketplacePluginVersionsData[]>('GetMarketplacePluginsData', 'GET', ['api','cordova','marketplace-directory',encodeURI(framework.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 	public getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>{
 		return this.$serviceProxy.call<Server.DevicePlatform[]>('GetCurrentPlatforms', 'GET', ['api','cordova','platforms',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
@@ -306,6 +306,10 @@ export class PackagesService implements Server.IPackagesServiceContract{
 		return this.$serviceProxy.call<Server.BowerPackagesFilters>('GetFilters', 'GET', ['api','packages','filters'].join('/'), 'application/json', null, null);
 	}
 }
+export class PublishService implements Server.IPublishServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+}
 export class RawSettingsService implements Server.IRawSettingsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -455,8 +459,8 @@ export class VersioncontrolService implements Server.IVersioncontrolServiceContr
 	public getRemote(solutionName: string): IFuture<string>{
 		return this.$serviceProxy.call<string>('GetRemote', 'GET', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'remote'].join('/'), 'application/json', null, null);
 	}
-	public setRemote(solutionName: string, remoteUrl: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('SetRemote', 'PUT', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'remote'].join('/'), null, [{name: 'remoteUrl', value: JSON.stringify(remoteUrl), contentType: 'application/json'}], null);
+	public setRemote(solutionName: string, remoteData: Server.GitRemoteData): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetRemote', 'POST', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'remote'].join('/'), null, [{name: 'remoteData', value: JSON.stringify(remoteData), contentType: 'application/json'}], null);
 	}
 	public getInfo(solutionName: string): IFuture<Server.VersionControlData>{
 		return this.$serviceProxy.call<Server.VersionControlData>('GetInfo', 'GET', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'info'].join('/'), 'application/json', null, null);
@@ -506,6 +510,7 @@ export class ServiceContainer implements Server.IServer{
 	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
 	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
 	public packages: Server.IPackagesServiceContract = this.$injector.resolve(PackagesService);
+	public publish: Server.IPublishServiceContract = this.$injector.resolve(PublishService);
 	public rawSettings: Server.IRawSettingsServiceContract = this.$injector.resolve(RawSettingsService);
 	public settings: Server.ISettingsServiceContract = this.$injector.resolve(SettingsService);
 	public status: Server.IStatusServiceContract = this.$injector.resolve(StatusService);

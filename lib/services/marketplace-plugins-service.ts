@@ -11,7 +11,7 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 		private $projectConstants: Project.IProjectConstants) { }
 
 	public getAvailablePlugins(): IFuture<any> {
-		return this.$server.cordova.getMarketplacePluginsData();
+		return this.$server.cordova.getMarketplacePluginsData(this.$project.projectData.Framework);
 	}
 
 	public createPluginData(plugin: Server.MarketplacePluginVersionsData): IMarketplacePlugin[] { // DefaultVersion, Identifier, Versions

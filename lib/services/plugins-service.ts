@@ -49,6 +49,11 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
+			var pluginNameToLowerCase = pluginName.toLowerCase();
+			if(!_.any(this.getAvailablePlugins(), (pl) => pl.data.Name.toLowerCase() ===  pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
+				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
+			}
+
 			var installedPlugin = this.getInstalledPluginByName(pluginName);
 
 			if(installedPlugin) {
@@ -90,7 +95,7 @@ export class PluginsService implements IPluginsService {
 			pluginName = parts[0];
 			var version = parts[1] || "";
 
-			if(!version) {
+			if(this.getPluginByName(pluginName).type === pluginsDataLib.PluginType.MarketplacePlugin && !version) {
 				var versions = this.getPluginVersions(pluginName);
 				version = this.promptForVersion(pluginName, versions).wait();
 			}
