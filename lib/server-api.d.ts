@@ -127,7 +127,7 @@ declare module Server{
 		getCordovaVersions(): IFuture<string[]>;
 		getCordovaFrameworkVersions(): IFuture<Server.FrameworkVersion[]>;
 		getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>;
-		getMarketplacePluginsData(): IFuture<Server.MarketplacePluginVersionsData[]>;
+		getMarketplacePluginsData(framework: string): IFuture<Server.MarketplacePluginVersionsData[]>;
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>;
 		addPlatform(platform: Server.DevicePlatform, solutionName: string, projectName: string): IFuture<Server.MigrationResult>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
@@ -382,6 +382,8 @@ declare module Server{
 		getInstalledPackages(solutionName: string, projectName: string): IFuture<Server.PackageData[]>;
 		getFilters(): IFuture<Server.BowerPackagesFilters>;
 	}
+	interface IPublishServiceContract{
+	}
 	interface IRawSettingsServiceContract{
 		getUserSettings($resultStream: any): IFuture<void>;
 		saveUserSettings(content: any): IFuture<void>;
@@ -493,6 +495,10 @@ declare module Server{
 		CommitterName: string;
 		CommitterEmail: string;
 	}
+	interface GitRemoteData{
+		RemoteUrl: string;
+		RemoteName: string;
+	}
 	interface VersionControlData{
 		CanCommit: boolean;
 		CanCheckout: boolean;
@@ -568,7 +574,7 @@ declare module Server{
 		createBranch(solutionName: string, branchName: string, versionName: string): IFuture<Server.BranchItemData>;
 		deleteBranch(solutionName: string, branchName: string, forceDelete: boolean): IFuture<void>;
 		getRemote(solutionName: string): IFuture<string>;
-		setRemote(solutionName: string, remoteUrl: string): IFuture<void>;
+		setRemote(solutionName: string, remoteData: Server.GitRemoteData): IFuture<void>;
 		getInfo(solutionName: string): IFuture<Server.VersionControlData>;
 		track(solutionName: string): IFuture<Server.ChangeItemData[]>;
 		getStatus(solutionName: string, filePaths: string[]): IFuture<Server.ChangeItemData[]>;
@@ -596,6 +602,7 @@ declare module Server{
 		build: Server.IBuildServiceContract;
 		projects: Server.IProjectsServiceContract;
 		packages: Server.IPackagesServiceContract;
+		publish: Server.IPublishServiceContract;
 		rawSettings: Server.IRawSettingsServiceContract;
 		settings: Server.ISettingsServiceContract;
 		status: Server.IStatusServiceContract;
