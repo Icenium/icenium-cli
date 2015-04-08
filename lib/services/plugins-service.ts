@@ -95,7 +95,7 @@ export class PluginsService implements IPluginsService {
 			pluginName = parts[0];
 			var version = parts[1] || "";
 
-			if(!version) {
+			if(this.getPluginByName(pluginName).type === pluginsDataLib.PluginType.MarketplacePlugin && !version) {
 				var versions = this.getPluginVersions(pluginName);
 				version = this.promptForVersion(pluginName, versions).wait();
 			}
