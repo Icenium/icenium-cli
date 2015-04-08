@@ -775,7 +775,7 @@ export class Project implements Project.IProject {
 						formatStr: "The project file %s is corrupted." + os.EOL +
 						"Consider restoring an earlier version from your source control or backup." + os.EOL +
 						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
-						"Additional technical info: %s",
+						"Additional technical information: %s",
 						suppressCommandHelp: true
 					},
 						projectFilePath, err.toString());

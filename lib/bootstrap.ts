@@ -104,6 +104,12 @@ $injector.requireCommand("deploy|android", "./commands/deploy");
 $injector.requireCommand("deploy|ios", "./commands/deploy");
 $injector.requireCommand("deploy|wp8", "./commands/deploy");
 
+$injector.require("publishService", "./services/publish-service");
+
+$injector.requireCommand("publish|*list", "./commands/publish");
+$injector.requireCommand("publish|add", "./commands/publish");
+$injector.requireCommand("publish|remove", "./commands/publish");
+
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 $injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./commands/livesync-cloud");
 $injector.requireCommand(["livesync|android", "live-sync|android"], "./commands/live-sync");

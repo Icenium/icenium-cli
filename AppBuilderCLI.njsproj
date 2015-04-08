@@ -49,6 +49,7 @@
     <TypeScriptCompile Include="lib\appbuilder-cli.ts" />
     <TypeScriptCompile Include="lib\bootstrap.ts" />
     <TypeScriptCompile Include="lib\commands\livepatch.ts" />
+    <TypeScriptCompile Include="lib\commands\publish.ts" />
     <TypeScriptCompile Include="lib\common\commands\preuninstall.ts" />
     <TypeScriptCompile Include="lib\config.ts" />
     <TypeScriptCompile Include="lib\declarations.d.ts" />
@@ -78,6 +79,7 @@
     <TypeScriptCompile Include="lib\services\generator-extensions-service.ts" />
     <TypeScriptCompile Include="lib\services\livepatch-service.ts" />
     <TypeScriptCompile Include="lib\services\project-commands-service.ts" />
+    <TypeScriptCompile Include="lib\services\publish-service.ts" />
     <TypeScriptCompile Include="lib\services\screen-builder-service.ts" />
     <TypeScriptCompile Include="lib\templates-service.ts" />
     <TypeScriptCompile Include="lib\x509.ts" />

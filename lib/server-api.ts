@@ -309,6 +309,9 @@ export class PackagesService implements Server.IPackagesServiceContract{
 export class PublishService implements Server.IPublishServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
+	public publishFtp(solutionName: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('PublishFtp', 'POST', ['api','publish','ftp',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'ftpConnectionData', value: JSON.stringify(ftpConnectionData), contentType: 'application/json'}], null);
+	}
 }
 export class RawSettingsService implements Server.IRawSettingsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
