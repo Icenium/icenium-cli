@@ -49,6 +49,11 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
+			var pluginNameToLowerCase = pluginName.toLowerCase();
+			if(!_.any(this.getAvailablePlugins(), (pl) => pl.data.Name.toLowerCase() ===  pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
+				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
+			}
+
 			var installedPlugin = this.getInstalledPluginByName(pluginName);
 
 			if(installedPlugin) {
