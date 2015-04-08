@@ -1,7 +1,7 @@
 add-signup
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-signup`
 Generates a Sign Up form with several common user profile fields. You can add it to any view.

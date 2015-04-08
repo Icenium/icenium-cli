@@ -170,3 +170,4 @@ $injector.require("progressIndicator", "./progress-indicator");
 
 $injector.require("projectCommandsService", "./services/project-commands-service");
 
+$injector.requireCommand("screenbuilder", "./commands/screenbuilder");

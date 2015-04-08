@@ -1,7 +1,7 @@
 add-list
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-list`
 Generates a list and inserts it in the selected view.

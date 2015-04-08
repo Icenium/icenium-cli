@@ -1,7 +1,7 @@
 add-form
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-form`
 Generates а generic input form that you can later fill in with any input field you like. You can customize the form submit buttons - Submit and Cancel. To omit a button, enter a white space for its content.

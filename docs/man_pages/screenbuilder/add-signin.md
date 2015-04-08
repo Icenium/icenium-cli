@@ -1,7 +1,7 @@
 add-signin
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-signin`
 Generates Sign In form with username and password boxes and a Sign in button. You can add it to any view.
