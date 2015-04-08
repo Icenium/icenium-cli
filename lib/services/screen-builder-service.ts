@@ -84,7 +84,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				generatorsCache: appScaffoldingPath,
 				generatorsAlias: ['H'],
 				path: screenBuilderOptions.projectPath || path.resolve(options.path || "."),
-				dependencies: util.format("%s@latest", generatorName),
+				dependencies: [generatorName + "@0.0.1"],
 				connect: (done:Function) => {
 					done();
 				},

@@ -5,6 +5,7 @@ import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");
 import helpers = require("./helpers");
+import hostInfo = require("./common/host-info");
 
 declare var exports: any;
 
@@ -22,7 +23,8 @@ var knownOpts: any = {
 		"available": Boolean,
 		"release": Boolean,
 		"debug": Boolean,
-		"valid-value": Boolean
+		"valid-value": Boolean,
+		"screenBuilderCacheDir": String
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",
@@ -41,6 +43,8 @@ _(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.short
 	key = shorthands[key] || key;
 	commonOptions[key] = val;
 }).value();
+
+commonOptions["screenBuilderCacheDir"] = (hostInfo.isWindows() && commonOptions.defaultProfileDir === commonOptions.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): commonOptions.profileDir;
 
 exports.knownOpts = knownOpts;
 exports.shorthands = shorthands;

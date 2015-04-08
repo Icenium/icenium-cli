@@ -34,7 +34,7 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 					pathToSave: dependencyConfig.pathToSave
 				};
 
-				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion), 5000).wait();
 				this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100).wait();
 			}
 		}).future<void>()();

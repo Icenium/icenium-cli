@@ -12,13 +12,13 @@ export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceL
 		$progressIndicator: IProgressIndicator,
 		$childProcess: IChildProcess,
 		$dependencyConfigService: IDependencyConfigService) {
-			super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService);
+		super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService);
 	}
 
 	public prepareGenerator(generatorName: string): IFuture<void> {
 		return (() => {
 			var generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
-			generatorConfig.pathToSave = path.join(this.appScaffoldingPath, generatorName, "latest", "node_modules");
+			generatorConfig.pathToSave = path.join(this.appScaffoldingPath, "H", generatorConfig.version , "node_modules");
 
 			this.$fs.ensureDirectoryExists(generatorConfig.pathToSave).wait();
 
