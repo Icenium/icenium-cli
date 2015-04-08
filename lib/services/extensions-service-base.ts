@@ -10,16 +10,13 @@ temp.track();
 export class ExtensionsServiceBase {
 	private extensionVersions: IStringDictionary = {};
 
-	constructor(public $fs: IFileSystem,
-				public $httpClient: Server.IHttpClient,
-				public $logger: ILogger) {
+	constructor(public cacheDir: string,
+		protected $fs: IFileSystem,
+		protected $httpClient: Server.IHttpClient,
+		protected $logger: ILogger) {
 		if (this.$fs.exists(this.versionsFile).wait()) {
 			this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 		}
-	}
-
-	public get cacheDir(): string {
-		return path.join(options.profileDir, "Cache");
 	}
 
 	public getExtensionVersion(packageName: string): string {
@@ -84,7 +81,7 @@ export class ExtensionsServiceBase {
 	}
 
 	private get versionsFile(): string {
-		return path.join(this.cacheDir, "extension-versions.json");
+		return path.join(options.profileDir, "Cache", "extension-versions.json");
 	}
 
 	private saveVersionsFile() : IFuture<void> {

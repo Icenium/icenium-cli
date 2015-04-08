@@ -4,6 +4,7 @@
 import path = require("path");
 import osenv = require("osenv");
 import commonOptions = require("./common/options");
+import helpers = require("./helpers");
 import hostInfo = require("./common/host-info");
 
 declare var exports: any;
@@ -22,7 +23,8 @@ var knownOpts: any = {
 		"available": Boolean,
 		"release": Boolean,
 		"debug": Boolean,
-		"valid-value": Boolean
+		"valid-value": Boolean,
+		"screenBuilderCacheDir": String
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",
@@ -33,21 +35,16 @@ var knownOpts: any = {
 _.extend(commonOptions.knownOpts, knownOpts);
 _.extend(commonOptions.shorthands, shorthands);
 
-var defaultProfileDir = "";
-var blackDragonCacheFolder = "Telerik/BlackDragon";
-var appBuilderCacheFolder = ".appbuilder-cli";
-if(hostInfo.isWindows()) {
-	defaultProfileDir = path.join(process.env.LocalAppData, blackDragonCacheFolder, appBuilderCacheFolder);
-} else {
-	defaultProfileDir = path.join(osenv.home(), ".local/share", blackDragonCacheFolder, appBuilderCacheFolder);
-}
-
+var defaultProfileDir = helpers.defaultProfileDir();
 commonOptions.setProfileDir(defaultProfileDir);
+
 var errors: IErrors = $injector.resolve("errors");
 _(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.shorthands)).each((val,key) => {
 	key = shorthands[key] || key;
 	commonOptions[key] = val;
 }).value();
+
+commonOptions["screenBuilderCacheDir"] = (hostInfo.isWindows() && commonOptions.defaultProfileDir === commonOptions.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): commonOptions.profileDir;
 
 exports.knownOpts = knownOpts;
 exports.shorthands = shorthands;

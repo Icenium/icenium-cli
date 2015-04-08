@@ -8,11 +8,12 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 	private static SCREEN_BUILDER_BUCKET_NAME = "http://s3.amazonaws.com/screenbuilder-cli";
 	private static DEFAULT_CACHED_VERSION = "0.0.0";
 
-	constructor($fs: IFileSystem,
-				$httpClient: Server.IHttpClient,
-				$logger: ILogger,
-				private $progressIndicator: IProgressIndicator) {
-		super($fs, $httpClient, $logger);
+	constructor(public cacheDir: string,
+		$fs: IFileSystem,
+		$httpClient: Server.IHttpClient,
+		$logger: ILogger,
+		private $progressIndicator: IProgressIndicator) {
+		super(cacheDir, $fs, $httpClient, $logger);
 	}
 
 	public prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): IFuture<void> {
@@ -33,7 +34,7 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 					pathToSave: dependencyConfig.pathToSave
 				};
 
-				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion), 1000).wait();
+				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion), 5000).wait();
 				this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100).wait();
 			}
 		}).future<void>()();

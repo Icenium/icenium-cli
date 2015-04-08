@@ -6,7 +6,7 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public getDynamicCommands(): IFuture<string[]> {
-		return this.$screenBuilderService.allSupportedCommands();
+		return this.$screenBuilderService.allSupportedCommands(this.$screenBuilderService.generatorName);
 	}
 
 	public generateDynamicCommands(): IFuture<void> {
