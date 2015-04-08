@@ -3,8 +3,10 @@ create
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder create <Type>`
 
+General | `$ appbuilder create [<Type>] [<App name>]`
+
+If `<App name>` is specified, new Screen Builder project will be created.
 Creates a project for hybrid, native or mobile website development. You must run the `create` command with a command extension that specifies the project type.
 
 ### Attributes
@@ -12,6 +14,7 @@ Creates a project for hybrid, native or mobile website development. You must run
 * `hybrid` - Creates a new project from an **Apache Cordova** template.
 * `native` - Creates a new project from a **NativeScript** template.
 * `website` - Creates a new project from a **Mobile Website** template.
+`<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ). 
 
 <% if(isHtml) { %> 
 ### Related Commands

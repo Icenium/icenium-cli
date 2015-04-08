@@ -31,7 +31,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			var scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
 			var allSupportedCommands = scaffolderData.future.wait();
-			return _.map(allSupportedCommands, (command:string) => util.format("add-%s", command));
+			return _.map(allSupportedCommands, (command:string) => util.format("add-%s", command.toLowerCase()));
 		}).future<string[]>()();
 	}
 
