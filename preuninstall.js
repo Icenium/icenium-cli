@@ -8,3 +8,5 @@ var child = child_process.exec("node bin/appbuilder.js dev-preuninstall", functi
 });
 
 child.stdout.pipe(process.stdout);
+
+setTimeout(function(){}, 3000);
