@@ -23,7 +23,6 @@ WARNING: This command and its related commands are not applicable to mobile webs
 
 `<Command>` is a related command that extends the `mobileframework` command. You can run the following related commands:
 * `set` - Sets the selected framework version for the project and updates the plugins according to the new version.
-
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
