@@ -3,10 +3,10 @@ plugin
 
 Usage | Synopsis
 ------|-------
-List | `$ appbuilder plugin [--available] [--debug] [--release]`    
-Manage | `$ appbuilder plugin <Command>`
+List plugins | `$ appbuilder plugin [--available] [--debug] [--release]`    
+Manage plugins | `$ appbuilder plugin <Command>`
 
-Lists all core, integrated and verified plugins that are currently enabled for your project. With the `--available` switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.
+Lists all core, integrated and verified plugins that are currently enabled for your project. <% if(isHtml) { %>With the `--available` switch, lists all core, integrated and verified plugins that are enabled in your project and that you can enable in your project.<% } %> 
 
 <% if(isConsole) { %>
 <% if(isMobileWebsite) { %>
@@ -31,7 +31,6 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `find` - Searches by keyword for plugins in the Apache Cordova Plugin Registry.
 * `fetch` - Imports the selected Apache Cordova plugin into your project. <% if(isHtml) { %>You can specify a plugin by local path, URL to a plugin repository, or a name of a plugin published in the Apache Cordova Plugin Registry. The plugin must be Plugman-compatible.<% } %>
 <% } %>
-
 <% if(isHtml) { %> 
 #### Command Limitations
 
@@ -44,9 +43,7 @@ Command | Description
 ----------|----------
 [plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
 [plugin configure](plugin-configure.html) | Configures plugin variables for selected core, integrated or verified plugin.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
 [plugin remove](plugin-remove.html) | Disables a core, integrated or verified plugin from your project.
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[update-kendoui](update-kendoui.html) | Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory.
+[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
+[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
 <% } %>
