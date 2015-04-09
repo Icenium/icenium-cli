@@ -13,7 +13,7 @@ WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS an
 <% } %>
 
 #### Attributes
-`<Command>` is a related command that extends the device command. You can run the following related commands.
+`<Command>` is a related command that extends the `device` command. You can run the following related commands.
 * `android` - Lists all recognized connected Android physical and running Android virtual devices.
 <% if(isWindows || isMacOS) { %>* `ios` - Lists all recognized connected iOS devices. <% } %> 
 * `log` - Opens the device log stream for a selected connected device.
