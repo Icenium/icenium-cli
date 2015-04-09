@@ -5,20 +5,24 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager upload ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--download]`
 
-Builds the project and uploads the application to Telerik AppManager.
-After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.
-<% if (isMobileWebsite) { %>
-This command is not applicable to Mobile Website projects.
+Builds the project for iOS and uploads the application to Telerik AppManager. <% if(isHtml) { %>After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.<% } %> 
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload ios`
 <% } %>
-
-`<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
-`<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-Options:
-* `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name.       To list available certificates, run `$ appbuilder certificate`
-* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. To list available provisioning profiles, run `$ appbuilder provision`
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+#### Options
+* `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
+* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name.<% if(isHtml) { %>To list available provisioning profiles, run `$ appbuilder provision`<% } %>  
 * `--download` - If set, downloads the application package to the root of the project.
 
+#### Attributes
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+<% } %> 
 <% if(isHtml) { %> 
+#### Command Limitations
+
+* You cannot run this command on mobile website projects.
 
 #### Related Commands
 

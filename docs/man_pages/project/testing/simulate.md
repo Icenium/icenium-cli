@@ -16,8 +16,8 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% } %>
 
-<% if((isWindows || isMacOS) && (isCordova || isMobileWebsite)) { %>
-Options:
+<% if((isConsole && (isWindows || isMacOS) && (isCordova || isMobileWebsite)) || isHtml) { %>
+#### Options
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 <% } %>
 

@@ -15,19 +15,17 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appstore upload`
 <% } %>
 <% } %>
-
 <% if((isConsole && isCordova) || isHtml) { %>
-Options:
+#### Options
 * `--certificate` - Sets the **production** certificate that you want to use for code signing your iOS app.
 * `--provision` - Sets the **distribution** provisioning profile that you want to use for code signing your iOS app.
 
-Attributes: 
+#### Attributes 
 * `<Application Name>` is the name for the application record that you want to upload for publishing as listed by `$ appbuilder appstore list`
 * `<AppleID>` and `<Password>` are your credentials for logging into iTunes Connect.
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
 <% } %>
-
 <% if(isHtml) { %>
 #### Command Limitations
 
