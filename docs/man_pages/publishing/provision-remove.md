@@ -7,9 +7,10 @@ General | `$ appbuilder provision remove <Provision ID>`
 
 Removes the selected provisioning profile.
 
-`<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`.
-<% if(isHtml) { %> 
+#### Attributes
+* `<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`
 
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description

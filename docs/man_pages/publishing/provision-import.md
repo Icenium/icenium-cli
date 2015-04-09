@@ -6,8 +6,11 @@ Usage | Synopsis
 General | `$ appbuilder provision import <File Path>`
 
 Imports the provisioning profile stored in the selected file.
-<% if(isHtml) { %> 
 
+#### Attributes
+* `<File Path>` must be complete with file name and extension.
+
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description

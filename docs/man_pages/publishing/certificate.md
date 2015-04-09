@@ -3,19 +3,19 @@ certificate
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate`    
-Additional functionality | `$ appbuilder certificate [<Command>]`
+List certificates | `$ appbuilder certificate`    
+Manage certificates | `$ appbuilder certificate [<Command>]`
 
-Lists all configured certificates for code signing iOS and Android applications with index and name. When building an app, you can
-set the certificate by index or name in the --certificate option.
+Lists or lets you manage certificates for code signing iOS and Android applications. <% if(isHtml) { %>When building an app, you can set the certificate by index or name in the `--certificate` option.<% } %>  
 
-`<Command>` is a related command that extends the certificate command. You can run the following related commands:
+#### Attributes
+`<Command>` is a related command that extends the `certificate` command. You can run the following related commands:
 * `create-self-signed` - Creates a self-signed certificate for code signing Android applications.
 * `remove` - Removes the selected certificate from the server.
 * `export` - Exports the selected certificate from the server on your file system.
 * `import` - Imports a certificate from your file system to the server.
-<% if(isHtml) { %> 
 
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description

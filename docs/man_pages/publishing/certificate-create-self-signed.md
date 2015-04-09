@@ -5,21 +5,18 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate create-self-signed [<Purpose> [<Name> [<Email> [<Country> [<StartDate> [<EndDate>]]]]]]`
 
-Creates a self-signed certificate for code signing Android applications.
+Creates a self-signed certificate for code signing Android applications. <% if(isHtml) { %>If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set
+the remaining certificate details. 
 
 Depending on the certificate type, you can install your app for testing or you can publish it in Google Play.
-If you want to publish your app in Google Play, verify that the certificate expires after October 22, 2033.
+If you want to publish your app in Google Play, verify that the certificate expires after October 22, 2033.<% } %>
 
-`<Purpose>` is the type of the certificate that you want to create. You can set the following purposes: Generic or GooglePlay.
-`<StartDate>` and `<EndDate>` set the validity of the certificate. You must set the start and end date in the following format: yyyy-mm-dd. 
+#### Attributes
+* `<Purpose>` is the type of the certificate that you want to create. You can set the following purposes: `Generic` or `GooglePlay`.
+* `<StartDate>` and `<EndDate>` set the validity of the certificate. You must set the start and end date in the following format: yyyy-mm-dd. 
 
-> NOTE: If you want to publish your app in Google Play, verify that the end date is greater than 2033-10-22.
-
-If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set
-the remaining certificate details.
-
+<% if(isConsole) { %>NOTE: If you want to publish your app in Google Play, verify that the value for `<End Date>` is greater than 2033-10-22.<% } %>
 <% if(isHtml) { %> 
-
 #### Related Commands
 
 Command | Description
