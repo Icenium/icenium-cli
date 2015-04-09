@@ -10,7 +10,7 @@ Opens a configuration file for editing.
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help edit-configuration`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Attributes
+### Attributes
 * `<ConfigurationFile>` is the configuration file that you want to open. The following values are valid for this attribute.
 <% if(isConsole && (isNativeScript || isCordova)) { %><%=#{project.configurationFilesString}%><% } %><% } %>	<% if(isHtml) { %>* `android-manifest` - Opens AndroidManifest.xml for editing and creates it, if needed.
     * `android-config` - Opens config.xml for Android for editing and creates it, if needed.
@@ -19,11 +19,11 @@ WARNING: This command is not applicable to mobile website projects. To view the 
     * `wp8-manifest` - Opens WMAppManifest.xml for editing and creates it, if needed.
     * `wp8-config` - Opens config.xml for Windows Phone 8 for editing and creates it, if needed.
 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

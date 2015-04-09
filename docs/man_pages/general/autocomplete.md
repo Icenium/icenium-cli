@@ -10,7 +10,7 @@ Enables command-line completion for bash and zsh shells.
 <% if(isHtml) { %>> <% } %>NOTE: This operation modifies the `.bash_profile`, `.bashrc` and `.zshrc` files.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

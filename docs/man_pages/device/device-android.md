@@ -7,10 +7,10 @@ General | `$ appbuilder device android [--timeout <Milliseconds>]`
 
 Lists all recognized connected physical and running virtual devices with serial number and index. <% if(isHtml) { %>If a connected Android device is not shown in the list, make sure that you have installed the required Android USB drivers on your system and that USB debugging is enabled on the device.<% } %> 
 
-#### Options
+### Options
 * `--timeout` - Sets the time in milliseconds for the operation to search for connected devices before completing. If not set, the default value is 4000. <% if(isHtml) { %>The operation will continue to wait and listen for newly connected devices and will list them after the specified time expires. 
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

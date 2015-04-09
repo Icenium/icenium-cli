@@ -9,17 +9,17 @@ Exports one of your projects from the cloud and initializes it for development i
 
 <% if(isConsole) { %>WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.<% } %> 
 
-#### Options
+### Options
 * `--path` - Specifies the directory where to export the selected project on your file system. The directory must be empty. If not set, exports the project in the current directory.
 
-#### Attributes
+### Attributes
 * `<Project ID>` is the index or name of the project as listed by `$ appbuilder cloud`
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You must run this command in an empty directory or specify `--path` to an empty directory.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

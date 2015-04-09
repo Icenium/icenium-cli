@@ -18,7 +18,7 @@ You can choose which files from your project to exclude or include in your appli
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate android`
 <% } %>
 <% if(isHtml) { %>
-#### Prerequisites
+### Prerequisites
 Before running your app in the **native Android emulator** from the Android SDK, verify that your system meets the following requirements.
 * Verify that you have installed the Android SDK and its dependencies.
 * Verify that you have added the following Android SDK directories to the PATH environment variable:
@@ -32,7 +32,7 @@ Before running your app in the **Genymotion emulator**, verify that your system 
     * `/Applications/Genymotion.app/Contents/MacOS/`
     * `/Applications/Genymotion Shell.app/Contents/MacOS/`<% } %> 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
@@ -41,17 +41,17 @@ Before running your app in the **Genymotion emulator**, verify that your system 
 * `--geny` - Sets the Genymotion virtual device on which you want to run your app. You can set only one device at a time. <% if(isHtml) { %>To list the available Genymotion virtual devices, run `$ genyshell -c "devices list"`. You cannot use `--avd` and `--geny` simultaneously.<% } %>       
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot before quitting the operation and releasing the console. If not set, the default timeout is 120 seconds. To wait indefinitely, set 0.
 
-#### Attributes
+### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<AvdName>` is the name of the Android virtual device that you want to use as listed by `$ android list avd`. You can specify only one name at a time.
 * `<GenyName>` is the name of the Genymotion virtual device that you want to use as listed by `$ genyshell -c "devices list"`. You can specify only one name at a time.
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

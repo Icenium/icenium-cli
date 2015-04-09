@@ -8,7 +8,7 @@ Manage certificates | `$ appbuilder certificate [<Command>]`
 
 Lists or lets you manage certificates for code signing iOS and Android applications. <% if(isHtml) { %>When building an app, you can set the certificate by index or name in the `--certificate` option.<% } %>  
 
-#### Attributes
+### Attributes
 `<Command>` is a related command that extends the `certificate` command. You can run the following related commands:
 * `create-self-signed` - Creates a self-signed certificate for code signing Android applications.
 * `remove` - Removes the selected certificate from the server.
@@ -16,7 +16,7 @@ Lists or lets you manage certificates for code signing iOS and Android applicati
 * `import` - Imports a certificate from your file system to the server.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

@@ -18,18 +18,18 @@ WARNING: This command is not applicable to Linux systems. To view the complete h
 <% } %> 
 <% } %> 
 <% if(isHtml) { %>
-#### Prerequisites
+### Prerequisites
 
 * [Requirements for debugging on Android devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#android-requirements)
 * [Requirements for debugging on iOS devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#ios-requirements)
 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 * You cannot run this command on Linux systems.
 * You cannot run this command on Windows Phone devices.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

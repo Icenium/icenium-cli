@@ -16,19 +16,19 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
-#### Options
+### Options
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 
-#### Attributes
+### Attributes
 * `<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

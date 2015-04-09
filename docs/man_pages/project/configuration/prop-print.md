@@ -14,18 +14,18 @@ If not set, prints the current configuration.
 WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop print`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Options
+### Options
 * `--validValue` - When set, prints the valid values for all valid project properties or for the selected property.
 
-#### Attributes
+### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

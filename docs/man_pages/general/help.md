@@ -7,11 +7,11 @@ General | `$ appbuilder help [<Command>]`
 
 Lists the available commands or shows information about the selected command.
 
-#### Attributes
+### Attributes
 * `<Command>` is any of the available commands as listed by `$ appbuilder help`.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

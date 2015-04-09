@@ -13,32 +13,32 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 
-#### Attributes
+### Attributes
 `<Command>` is a related command that sets a target platform for the emulate command. You can run the following related commands:
 * `android` - Builds the specified project in the cloud and runs it in the native Android emulator or Genymotion.
 <% if(isMacOS) { %>* `ios` - Builds the specified project in the cloud and runs it in the native iOS Simulator.<% } %> 
 <% if(isWindows) { %>* `wp8` - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.<% } %> 
 <% } %>
 <% if(isHtml) { %> 
-#### Prerequisites
+### Prerequisites
 
 * [Prerequisites for running in the native Android emulator or Genymotion](http://docs.telerik.com/platform/appbuilder/testing-your-app/running-in-emulators/android-emulator#prerequisites)
 * [Prerequisites for running in the native iOS Simulator](http://docs.telerik.com/platform/appbuilder/testing-your-app/running-in-emulators/ios-emulator)
 * [Prerequisites for running in the native Windows Phone emulator](http://docs.telerik.com/platform/appbuilder/testing-your-app/running-in-emulators/wp8-emulator)
 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 * On Windows systems, you can run this command for Android and Windows Phone.
 * On OS X systems, you can run this command for Android and iOS.
 * On Linux systems, you can run this command for Android.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

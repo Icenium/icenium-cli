@@ -14,17 +14,17 @@ see [appbuilder prop](../configuration/prop.html)<% } %>
 <% if(isConsole) { %>
 WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.
 <% } %> 
-#### Options
+### Options
 * `--path` - Specifies the directory where you want to clone the sample app, if different from the current directory. The directory must be empty. 
 
-#### Attributes
+### Attributes
 * `<Clone ID>` is the title of the sample app as listed by `$ appbuilder sample`<% if(isHtml) { %>. If the title consists of two or more strings,    separated by a space, you must replace the spaces with hyphens. For example, to clone the Pinch and zoom sample app, run `$ appbuilder sample clone pinch-and-zoom`.
 
-#### Command Limitations
+### Command Limitations
  
 * You must run this command in an empty directory or specify `--path` to an empty directory. 
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

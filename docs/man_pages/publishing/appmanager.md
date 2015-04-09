@@ -10,7 +10,7 @@ Builds and uploads your application to AppManager. You must run the `appmanager 
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Attributes
+### Attributes
 
 `<Platform>` is a related command that extends the appmanager command. You can run the following related commands:
 * `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
@@ -18,11 +18,11 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.
 <% } %> 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

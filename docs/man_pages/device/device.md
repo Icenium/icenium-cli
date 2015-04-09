@@ -12,7 +12,7 @@ WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS an
 <% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device` <% } %> 
 <% } %>
 
-#### Attributes
+### Attributes
 `<Command>` is a related command that extends the `device` command. You can run the following related commands.
 * `android` - Lists all recognized connected Android physical and running Android virtual devices.
 <% if(isWindows || isMacOS) { %>* `ios` - Lists all recognized connected iOS devices. <% } %> 
@@ -21,12 +21,12 @@ WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS an
 * `run` - Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <%}%>device.
 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot work with connected Windows Phone devices.
 * You cannot work with connected iOS devices on Linux systems.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

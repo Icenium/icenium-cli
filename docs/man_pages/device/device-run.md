@@ -13,15 +13,15 @@ WARNING: You can work only with connected <% if(isMacOS) { %>iOS and <% } %>Andr
 <% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device run`<% } %>  
 <% } %>
 
-#### Options
+### Options
 * `--device` - If multiple devices are connected, sets the device on which you want to run the app.
 
-#### Attributes
+### Attributes
 * `<Application ID>` is the application identifier as listed by `$ appbuilder device list-applications` 
 * `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
 
 <% if(isHtml) { %>
-#### Prerequisites
+### Prerequisites
 Before running your app on an iOS device, verify that your system and app meet the following requirements.
 
 * You are running the Telerik AppBuilder CLI on an OS X system.
@@ -32,13 +32,13 @@ Before running your app on an Android device, verify that your app meets the fol
 
 * You have built your app with the debug build configuration.
 
-#### Command Limitations
+### Command Limitations
 
 * You cannot work with connected Windows Phone devices.
 * You can run this command on one connected device at a time.
 * You cannot run this command for iOS devices on Windows and Linux systems.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

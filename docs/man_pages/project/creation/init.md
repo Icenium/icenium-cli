@@ -9,14 +9,14 @@ Initializes an existing project for development. The command attempts to determi
 
 You can run the `init` command with a related command that specifies the project type.
 
-#### Attributes
+### Attributes
 `<Type>` is a related command that extends the `init` command. You can run the following related commands:
 * `hybrid` - Initializes an existing Apache Cordova project for development in the current directory.
 * `native` - Initializes an existing NativeScript project for development in the current directory.
 * `website` - Initializes an existing Mobile Website project for development in the current directory.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

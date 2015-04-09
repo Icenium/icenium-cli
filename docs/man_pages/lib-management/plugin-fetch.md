@@ -20,13 +20,13 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 * You can fetch only Plugman-compatible plugins.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

@@ -11,7 +11,7 @@ Options:
 * `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as certificate_requestCSR.
 <% if(isHtml) { %> 
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
