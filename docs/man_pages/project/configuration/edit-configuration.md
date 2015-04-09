@@ -12,7 +12,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 #### Attributes
 * `<ConfigurationFile>` is the configuration file that you want to open. The following values are valid for this attribute.
-<% if(isConsole && !isMobileWebsite) { %><%=#{project.configurationFilesString}%><% } %><% } %>	<% if(isHtml) { %>* `android-manifest` - Opens AndroidManifest.xml for editing and creates it, if needed.
+<% if(isConsole && (isNativeScript || isCordova)) { %><%=#{project.configurationFilesString}%><% } %><% } %>	<% if(isHtml) { %>* `android-manifest` - Opens AndroidManifest.xml for editing and creates it, if needed.
     * `android-config` - Opens config.xml for Android for editing and creates it, if needed.
     * `ios-info` - Opens Info.plist for editing and creates it, if needed.
     * `ios-config` - Opens config.xml for iOS for editing and creates it, if needed.
