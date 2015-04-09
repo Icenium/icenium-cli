@@ -1,32 +1,33 @@
-appmanager upload
+appmanager upload wp8
 ==========
 
 Usage | Synopsis
 ------|-------
-General |`$ appbuilder appmanager upload <Platform>`
+General | `$ appbuilder appmanager upload wp8 [--download]`   
 
-Builds and uploads your application to AppManager. You must run the `appmanager upload` command with a related command that specifies the target mobile platform.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
-<% } %>
-<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Attributes
-
-`<Platform>` is a related command that extends the appmanager command. You can run the following related commands:
-* `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
-* `ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
-* `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.
+Builds the project for Windows Phone and uploads the application to Telerik AppManager. <% if(isHtml) { %>After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.<% } %> 
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload wp8`
 <% } %> 
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager upload wp8`
+<% } %> 
+<% } %>
+<% if((isConsole && isCordova) || isHtml) { %>
+#### Options
+* `--download` - If set, downloads the application package to the root of the project.
+<% } %>
 <% if(isHtml) { %> 
 #### Command Limitations
 
 * You cannot run this command on mobile website projects.
-
+* You cannot run this command on NativeScript projects.
 #### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
+[appmanager](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
