@@ -11,7 +11,7 @@ Connects to your iTunes Connect account. You must run the `appstore` command wit
 
 `<Command>` is a related command that extends the `appstore` command. You can run the following related commands:
 * `list` - Lists all application records in iTunes Connect.
-<% if(isCordova) { %>* `upload` - Builds the project and uploads the binary to iTunes Connect.<% } %> 
+<% if(isCordova || isNativeScript) { %>* `upload` - Builds the project and uploads the binary to iTunes Connect.<% } %> 
 <% if(isHtml) { %> 
 #### Related Commands
 

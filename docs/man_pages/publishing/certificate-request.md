@@ -3,17 +3,18 @@ certificate-request
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate-request`
-Additional functionality | `$ appbuilder certificate-request [<Command>]`
+List certificate requests | `$ appbuilder certificate-request`
+Manage certificate requests | `$ appbuilder certificate-request [<Command>]`
 
-Lists all pending certificate signing requests (CSR).
+Lists or lets you manage certificate signing requests (CSR).
 
-`<Command>` is a related command that extends the certificate-request command. You can run the following related commands:
+#### Attributes
+`<Command>` is a related command that extends the `certificate-request` command. You can run the following related commands:
 * `create` - Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center.
 * `remove` - Removes a pending certificate signing request (CSR) from the server.
 * `download` - Downloads a pending certificate signing request (CSR) which you can upload in the iOS Dev Center.
-<% if(isHtml) { %> 
 
+<% if(isHtml) { %> 
 #### Related Commands
 
 Command | Description

@@ -5,10 +5,13 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate import <File Path> [<Password>]`
 
-Imports an existing certificate from a P12 or a CER file stored on your local file system. If you do not provide the certificate
-password when running the command, the Telerik AppBuilder CLI prompts you to provide it.
-<% if(isHtml) { %> 
+Imports an existing certificate from a P12 or a CER file stored on your local file system. <% if(isHtml) { %>If you do not provide the certificate password when running the command, the Telerik AppBuilder CLI prompts you to provide it.<% } %>
 
+#### Attributes
+* `<File Path>` must be complete with file name and extension.
+* `<Password>` is the password for the certificate.
+
+<% if(isHtml) { %>
 #### Related Commands
 
 Command | Description

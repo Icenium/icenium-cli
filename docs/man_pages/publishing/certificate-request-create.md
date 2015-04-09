@@ -5,12 +5,13 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request create [<Name> [<Email> [<Country>]]] [--save-to <File Path>]`
 
-Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center.
-If you do not provide values for `<Name>`, `<Email>` and `<Country>`, the Telerik AppBuilder CLI prompts you to complete the missing details.
+Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center. <% if(isHtml) { %>If you do not provide values for `<Name>`, `<Email>` and `<Country>`, the Telerik AppBuilder CLI prompts you to complete the missing details.<% } %> 
 
-Options:
-* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as certificate_requestCSR.
-<% if(isHtml) { %> 
+#### Options
+* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. 
+
+#### Attributes
+* `<File Path>` must be complete with file name and extension. <% if(isHtml) { %>If not specified, the certificate signing request is saved as `certificate_request.csr` in the root of the project.
 
 #### Related Commands
 
