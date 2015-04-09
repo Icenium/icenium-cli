@@ -24,6 +24,10 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `<File Path>` is the complete file path to which you want to save your application package. The file path must be complete with file name and extension.
 <% } %>
 <% if(isHtml) { %> 
+### Command Limitations
+
+* You cannot run this command on mobile website projects.
+
 ### Related Commands
 
 Command | Description

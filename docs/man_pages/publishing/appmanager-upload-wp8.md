@@ -23,6 +23,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 * You cannot run this command on mobile website projects.
 * You cannot run this command on NativeScript projects.
+
 ### Related Commands
 
 Command | Description

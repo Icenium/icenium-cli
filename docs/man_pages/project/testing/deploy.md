@@ -33,6 +33,7 @@ You can choose which files from your project to exclude or include in your appli
 
 * You cannot run this command on mobile website projects.
 * You cannot run this command on Windows Phone devices.
+* On Linux systems, you cannot run this command on iOS devices.
 
 ### Related Commands
 
