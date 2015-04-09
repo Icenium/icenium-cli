@@ -37,8 +37,8 @@ Command | Description
 [prop&nbsp;add](project/configuration/prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop&nbsp;set](project/configuration/prop-set.html) | Sets the selected project property and overwrites its current value.
 [prop&nbsp;remove](project/configuration/prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
-[mobileframework](project/configuration/mobileframework.html) | Lists all supported versions of the mobile framework for your project.
-[mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected framework version for the project and updates the plugins according to the new version.
+[mobileframework](project/configuration/mobileframework.html) | Lists all supported Apache Cordova versions.
+[mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the plugins according to the new version.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
 
 ## Plugin Management Commands
