@@ -10,7 +10,7 @@ This set of commands manages the properties for your project. You must run the `
 WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Attributes
+### Attributes
 `<Command>` is a related command that extends the prop command. You can run the following related commands:
 * `print` - Prints the current project configuration or the value for the selected project property.
 * `add` - Enables more options for the selected project property, if the property accepts multiple values.
@@ -18,11 +18,11 @@ WARNING: This command and its related commands are not applicable to mobile webs
 * `remove` - Disables options for the selected project property, if the property accepts multiple values.
 <% } %>
 <% if(isHtml) { %>
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

@@ -15,20 +15,20 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - Disables the specified plugin for the Debug build configuration only. 
 * `--release` - Disables the specified plugin for the Release build configuration only.
 
-#### Attributes
+### Attributes
 * `<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

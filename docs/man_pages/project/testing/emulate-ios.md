@@ -18,13 +18,13 @@ WARNING: You cannot run this command on Linux systems. To view the complete help
 <% } %> 
 <% } %>
 <% if(isHtml) { %>
-#### Prerequisites
+### Prerequisites
 Before running the iOS Simulator, verify that you have met the following requirements.
 * You are running the Telerik AppBuilder CLI on OS X.
 * You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the  Telerik AppBuilder CLI depends.  For more information, see [ios-sim-portable](https://www.npmjs.org/package/ios-sim-portable).
 <% } %>
 <% if((isConsole && isMacOS && (isNativeScript || isCordova)) || isHtml) { %>
-#### Options
+### Options
 * `--availableDevices` - Lists all available device type identifiers for the current XCode.
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
@@ -34,19 +34,19 @@ Before running the iOS Simulator, verify that you have met the following require
 * `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. 
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start before quitting the operation and releasing the console. The value must be a positive integer. If not set, the default timeout is 90 seconds.
 
-#### Attributes
+### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
 * `<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --availableDevices`
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on Windows systems.
 * You cannot run this command on Linux systems.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

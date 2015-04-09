@@ -10,7 +10,7 @@ Opens a new browser window in which you can provide your login credentials for t
 After you have authenticated with the Telerik Platform, you can close the browser window and continue your work from the command line.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

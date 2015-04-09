@@ -12,7 +12,7 @@ Lists all application records in iTunes Connect. The list contains name, version
 
 When you run `$ appbuilder appstore upload`, you need to provide the name for the application record as listed by `$ appbuilder appstore list`
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

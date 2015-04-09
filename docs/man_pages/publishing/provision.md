@@ -8,17 +8,17 @@ Manage provisioning profiles | `$ appbuilder provision [<Command>] `
 
 Lists or lets you manage provisioning profiles for code signing iOS applications. <% if(isHtml) { %>When building an app, you can set the provisioning profile by index or name in the `--provision` option.<% } %> 
 
-#### Options
+### Options
 * `-v`, `--verbose` - Lists the devices included in the selected provisioning profile.
 
-#### Attributes
+### Attributes
 * `<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`
 * `<Command>` is a related command that extends the provision command. You can run the following related commands:
 	* `import` - Imports a provisioning profile from file.
 	* `remove` - Removes a registered provisioning profile.
 
 <% if(isHtml) { %>
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

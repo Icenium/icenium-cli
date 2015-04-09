@@ -7,10 +7,10 @@ General | `$ appbuilder init native [--appid <App ID>]`
 
 Initializes an existing NativeScript project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains any existing project configuration.<% } %> 
 
-#### Options
+### Options
 * `--appid` - Sets the application identifier for your app. 
 
-#### Attributes
+### Attributes
 * `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
 
 <% if(isHtml) { %>
@@ -18,7 +18,7 @@ This operation creates one or more of the following AppBuilder-specific files, i
 * .abproject
 * .abignore
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

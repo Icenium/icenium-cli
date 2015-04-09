@@ -12,19 +12,19 @@ WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS an
 <% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device log`<% } %> 
 <% } %>
 
-#### Options
+### Options
 * `--device` - If multiple devices are connected, sets the device for which you want to stream the log in the console.
 
-#### Attributes
+### Attributes
 * `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot work with connected Windows Phone devices.
 * You cannot work with connected iOS devices on Linux systems.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

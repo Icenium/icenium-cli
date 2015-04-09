@@ -23,12 +23,12 @@ Options:
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

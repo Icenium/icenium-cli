@@ -16,17 +16,17 @@ WARNING: Do not modify the `CorePlugins` property with this command. Instead, us
 <% } %> 
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-#### Attributes
+### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 * `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --validValue`. You can separate multiple values with a space.
 <% } %> 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

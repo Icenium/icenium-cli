@@ -18,25 +18,25 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 <% } %>
 <% if((isConsole && (isWindows || isMacOS) && (isNativeScript || isCordova)) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--device` - Specifies the serial number or the index of the connected device on which you want to deploy the app. <% if(isHtml) { %>To list all connected devices, grouped by platform, run `$ appbuilder device`<% } %>  
 * `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. <% if(isHtml) { %>You must specify a certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`<% } %> 
 * `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. <% if(isHtml) { %>You must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`<% } %> 
 
-#### Attributes
+### Attributes
 * `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
 <% } %> 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on mobile website projects.
 * You cannot run this command on Linux systems.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

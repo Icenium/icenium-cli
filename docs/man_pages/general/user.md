@@ -8,7 +8,7 @@ General | `$ appbuilder user`
 Prints information about the currently logged in user, including name, email address, subscription plan and license expiration date.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

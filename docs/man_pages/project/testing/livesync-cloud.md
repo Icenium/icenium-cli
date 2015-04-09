@@ -20,12 +20,12 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %>
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * For NativeScript projects, you can LiveSync changes only to the NativeScript companion app.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

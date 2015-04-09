@@ -11,7 +11,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %>
 <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--download` - If set, downloads the application package to the root of the project, instead of producing a QR code.<% if(isHtml) { %>Set this option if you want to manually deploy the app package later. You cannot set both the `--companion` and `--download` switches. If you want to download the application package to a specified file path, use the `--save-to` option instead.<% } %>  
@@ -19,12 +19,12 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %>
 * `--save-to` - If set, downloads the application package and saves it to the specified file path, instead of the project root. You do not need to set the `--download` switch.
 
-#### Attributes
+### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<File Path>` is the complete file path to which you want to save your application package. The file path must be complete with file name and extension.
 <% } %>
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

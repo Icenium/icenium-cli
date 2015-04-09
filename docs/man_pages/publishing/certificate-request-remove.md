@@ -7,11 +7,11 @@ General | `$ appbuilder certificate-request remove <CSR ID>`
 
 Removes a pending certificate signing request (CSR) from the server.
 
-#### Attributes
+### Attributes
 * `<CSR ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

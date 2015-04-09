@@ -9,7 +9,7 @@ Logs you out from the Telerik Platform.
 
 <% if(isConsole) { %>IMPORTANT: To build, deploy, or synchronize your projects with the cloud, you need to be logged in.<% } %>
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

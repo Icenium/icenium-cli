@@ -9,11 +9,11 @@ Removes a selected certificate from the server.
 
 <% if(isHtml) { %>> <% } %>WARNING: Deleting a certificate cannot be undone. If you have not backed up the certificate, you will not be able to restore it. You will not be able to update any apps that you have signed and published with the certificate. To store a copy of the certificate on your local file system, run `$ appbuilder certificate export` 
 
-#### Attributes
+### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

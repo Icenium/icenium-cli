@@ -11,7 +11,7 @@ This operation creates one or more of the following AppBuilder-specific files, i
 * .abproject
 * .abignore
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

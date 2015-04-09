@@ -19,12 +19,12 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `ios` - Synchronizes the latest changes in your project to connected iOS devices.<% } %>
 <% } %>
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot LiveSync changes to connected Windows Phone devices.
 * You cannot run this command on mobile website projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

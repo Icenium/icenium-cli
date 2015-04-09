@@ -9,21 +9,21 @@ Creates a new project for hybrid development from an Apache Cordova template in 
 <% if(isConsole) { %>
 WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.
 <% } %>
-#### Options
+### Options
 * `--template` - Sets the source template for the project.
 * `--path` - Specifies the directory where you want to create the project, if different from the current directory. The directory must be empty.
 * `--appid` - Sets the application identifier for your app. If not specified, the application identifier is set to `com.telerik.<App name>`. 
 
-#### Attributes
+### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 * `<Template>` is the source template that you want to use. The default value is `KendoUI.TabStrip`. You can use the following templates: <%=#{cordovaProject.projectTemplatesString}%>.
 * `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
 <% if(isHtml) { %>
-#### Command Limitations
+### Command Limitations
 
 * You must run this command in an empty directory or specify `--path` to an empty directory.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

@@ -13,26 +13,26 @@ Builds the specified project in the cloud and runs it in the native emulator fro
 <% if(isMacOS) { %>WARNING: You cannot run this command on OS X systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
 <% } %> 
 <% if(isHtml) { %>
-#### Prerequisites
+### Prerequisites
 Before running the Windows Phone 8.0 or the Windows Phone 8.1 emulator, verify that your system meets the following requirements.
 * You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
 * You have installed the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
 <% } %> 
 <% if((isConsole && isWindows && isCordova) || isHtml) { %>
-#### Options
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 <% } %> 
 <% if(isHtml) { %> 
-#### Command Limitations
+### Command Limitations
 
 * You cannot run this command on OS X systems.
 * You cannot run this command on Linux systems.
 * You cannot run this command on mobile website projects.
 * You cannot run this command on NativeScript projects.
 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
