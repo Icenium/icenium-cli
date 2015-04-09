@@ -10,10 +10,9 @@ Disable | `$ appbuilder autocomplete disable`
 
 
 Asks for confirmation if command line autocompletion should be enabled for bash and zsh.
+<% if(isHtml) { %>> <% } %>NOTE: This operation modifies the `.bash_profile`, `.bashrc` and `.zshrc` files.
 
-> NOTE: This will modify your .bash_profile, .bashrc and .zshrc files.
 <% if(isHtml) { %> 
-
 #### Related Commands
 
 Command | Description
@@ -22,5 +21,4 @@ Command | Description
 [autocomplete-enable](autocomplete-enable.html) | Enables autocompletion for bash and zsh.
 [autocomplete-disable](autocomplete-disable.html) | Disables autocompletion for bash and zsh.
 [feature-usage-tracking](feature-usage-tracking.html) | Configures anonymous usage statistics tracking for the NativeScript command-line interface.
-[help](help.html) | Lists the available commands or shows information about the selected command.
 <% } %>
