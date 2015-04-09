@@ -6,11 +6,14 @@ Usage | Synopsis
 General | `$ appbuilder certificate-request download <Csr ID> [--save-to <File Path>]`
 
 Downloads a pending certificate signing request (CSR) which you can upload in the iOS Dev Center. 
-`<Csr ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
-Options:
-* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as certificate_requestCSR.
-<% if(isHtml) { %> 
 
+### Options
+* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as `certificate_request.csr`.
+
+### Attributes
+* `<CSR ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
+
+<% if(isHtml) { %> 
 ### Related Commands
 
 Command | Description
