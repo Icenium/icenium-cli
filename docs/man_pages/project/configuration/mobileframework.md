@@ -16,11 +16,14 @@ WARNING: This command and its related commands are not applicable to mobile webs
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
+### Options
+* `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
+
+### Attributes
+
 `<Command>` is a related command that extends the `mobileframework` command. You can run the following related commands:
 * `set` - Sets the selected framework version for the project and updates the plugins according to the new version.
 
-Options:
-* `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
