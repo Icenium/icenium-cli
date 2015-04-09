@@ -8,12 +8,14 @@ General | `$ appbuilder device [<Command>]`
 Lists all recognized connected devices with serial number and index, grouped by platform. 
 
 <% if(isConsole) { %>
-WARNING: You can work only with connected iOS and Android devices.
+WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS and <% } %>Android devices.  
+<% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device` <% } %> 
 <% } %>
 
+#### Attributes
 `<Command>` is a related command that extends the device command. You can run the following related commands.
 * `android` - Lists all recognized connected Android physical and running Android virtual devices.
-* `ios` - Lists all recognized connected iOS devices.
+<% if(isWindows || isMacOS) { %>* `ios` - Lists all recognized connected iOS devices. <% } %> 
 * `log` - Opens the device log stream for a selected connected device.
 * `list-applications` - Lists the installed applications on all connected Android <% if(isWindows || isMacOS) { %>or iOS <%}%>devices.
 * `run` - Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <%}%>device.
@@ -22,6 +24,7 @@ WARNING: You can work only with connected iOS and Android devices.
 #### Command Limitations
 
 * You cannot work with connected Windows Phone devices.
+* You cannot work with connected iOS devices on Linux systems.
 
 #### Related Commands
 
