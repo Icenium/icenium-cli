@@ -27,7 +27,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
