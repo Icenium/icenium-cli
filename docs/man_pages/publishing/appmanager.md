@@ -12,7 +12,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 
-`<Platform>` is a related command that extends the appmanager command. You can run the following related commands:
+`<Platform>` is a related command that extends the appmanager command. You can run the following related commands.
 * `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
 * `ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
 * `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.

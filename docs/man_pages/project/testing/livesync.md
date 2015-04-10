@@ -13,7 +13,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %> 
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-`<Command>` is a related command that extends the livesync command. You can run the following related commands:
+`<Command>` is a related command that extends the livesync command. You can run the following related commands.
 * `cloud` - Synchronizes the project with the cloud to enable LiveSync for remote devices (using the three finger tap and hold gesture).
 <% if(isCordova) { %>* `android` - Synchronizes the latest changes in your project to connected Android devices. 
 * `ios` - Synchronizes the latest changes in your project to connected iOS devices.<% } %>

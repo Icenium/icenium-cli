@@ -19,7 +19,7 @@ You can choose which files from your project to exclude or include in your appli
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 
 ### Attributes
-`<Command>` is a related command that sets a target platform for the `emulate` command. You can run the following related commands:
+`<Command>` is a related command that sets a target platform for the `emulate` command. You can run the following related commands.
 * `android` - Builds the specified project in the cloud and runs it in the native Android emulator or Genymotion.
 <% if(isMacOS) { %>* `ios` - Builds the specified project in the cloud and runs it in the native iOS Simulator.<% } %> 
 <% if(isWindows) { %>* `wp8` - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.<% } %> 

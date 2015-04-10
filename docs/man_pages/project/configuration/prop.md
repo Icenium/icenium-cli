@@ -11,7 +11,7 @@ WARNING: This command and its related commands are not applicable to mobile webs
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
-`<Command>` is a related command that extends the prop command. You can run the following related commands:
+`<Command>` is a related command that extends the prop command. You can run the following related commands.
 * `print` - Prints the current project configuration or the value for the selected project property.
 * `add` - Enables more options for the selected project property, if the property accepts multiple values.
 * `set` - Sets the selected project property and overwrites its current value.
