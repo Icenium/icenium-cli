@@ -13,7 +13,7 @@ Command | Description
 [logout](general/logout.html) | Logs you out from the Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
 [feature-usage-tracking](general/feature-usage-tracking.html) | Configures anonymous feature usage tracking.
-[autocomplete](general/autocomplete.html) | Enables command-line completion.
+[autocomplete](general/autocomplete.html) | Manages your command-line completion settings.
 
 ## Project Development Commands
 Command | Description
