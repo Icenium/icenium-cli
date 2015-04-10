@@ -24,7 +24,7 @@ You can choose which files from your project to exclude or include in your appli
 * `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-* `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms:
+* `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms.
     * `android` - Deploys your project on Android. <% if(isHtml) { %>If `--device` is not specified, deploys on all running physical and virtual Android devices.<% } %> 
 	<% if(isWindows || isMacOS) { %>* `ios` - Deploys your project on iOS.<% } %> 
 <% } %> 

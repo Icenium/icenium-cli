@@ -24,7 +24,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<File Path>` is the complete file path to which you want to save your application package. The file path must be complete with file name and extension.
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-* `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms:
+* `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms.
     * `android` - Builds your project for Android.
 	* `ios` - Builds your project for iOS.
 	<% if(isCordova) { %>* `wp8`- Builds your project for Windows Phone.<% } %>
