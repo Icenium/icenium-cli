@@ -1,7 +1,7 @@
 autocomplete disable
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder autocomplete disable`
 

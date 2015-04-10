@@ -1,7 +1,7 @@
 autocomplete status
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder autocomplete status`
 
