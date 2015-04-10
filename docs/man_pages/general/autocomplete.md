@@ -11,6 +11,7 @@ Disable | `$ appbuilder autocomplete disable`
 
 Asks for confirmation if command line autocompletion should be enabled for bash and zsh.
 <% if(isHtml) { %>> <% } %>NOTE: This operation modifies the `.bash_profile`, `.bashrc` and `.zshrc` files.
+<% if(isHtml) { %>> <% } %>NOTE: This operation modifies the `.bash_profile`, `.bashrc` and `.zshrc` files.
 
 <% if(isHtml) { %> 
 ### Related Commands
