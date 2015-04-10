@@ -5,14 +5,14 @@ Usage | Synopsis
 ------|-------
 General |`$ appbuilder appmanager upload <Platform>`
 
-Builds and uploads your application to AppManager. You must run the `appmanager upload` command with a related command that specifies the target mobile platform.
+Builds and uploads your application to AppManager. You must run the `appmanager upload` command with a command extension that specifies the target mobile platform.
 <% if(isConsole && isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 
-`<Platform>` is a related command that extends the appmanager command. You can run the following related commands.
+`<Platform>` extends the appmanager command. You can set the following values for this attribute.
 * `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
 * `ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
 * `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.

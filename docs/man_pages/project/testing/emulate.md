@@ -3,9 +3,9 @@ emulate
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder emulate <Command> [--debug] [--release] [--path]`
+General | `$ appbuilder emulate <Platform> [--debug] [--release] [--path]`
 
-Builds the specified project in the cloud and runs it in a native emulator. You must run the `emulate` command with a related command.
+Builds the specified project in the cloud and runs it in a native emulator. You must run the `emulate` command with a command extension.
 <% if(isConsole && isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate`
 <% } %>
@@ -19,7 +19,7 @@ You can choose which files from your project to exclude or include in your appli
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 
 ### Attributes
-`<Command>` is a related command that sets a target platform for the `emulate` command. You can run the following related commands.
+`<Platform>` sets a target platform for the `emulate` command. You can set the following target platforms.
 * `android` - Builds the specified project in the cloud and runs it in the native Android emulator or Genymotion.
 <% if(isMacOS) { %>* `ios` - Builds the specified project in the cloud and runs it in the native iOS Simulator.<% } %> 
 <% if(isWindows) { %>* `wp8` - Builds the specified project in the cloud and runs it in the native emulator from the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.<% } %> 

@@ -9,10 +9,10 @@ Lists all supported versions of Apache Cordova.
 
 <% if(isConsole) { %>
 <% if(isNativeScript)  { %>
-WARNING: This command and its related commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
+WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
 <% } %>
 <% if(isMobileWebsite)  { %>
-WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
@@ -21,7 +21,7 @@ WARNING: This command and its related commands are not applicable to mobile webs
 
 ### Attributes
 
-`<Command>` is a related command that extends the `mobileframework` command. You can run the following related commands.
+`<Command>` extends the `mobileframework` command. You can set the following values for this attribute.
 * `set` - Sets the selected framework version for the project and updates the plugins according to the new version.
 <% } %>
 <% if(isHtml) { %> 

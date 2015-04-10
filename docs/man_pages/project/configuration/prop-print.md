@@ -11,7 +11,7 @@ If `--validValue` is set, prints the valid configuration values.
 If not set, prints the current configuration. 
 
 <% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop print`
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop print`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options

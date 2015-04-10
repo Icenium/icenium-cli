@@ -8,7 +8,7 @@ General | `$ appbuilder sample [<Command>]`
 Lists all available sample apps with name, description, GitHub repository and clone command.
 
 ### Attributes
-`<Command>` is any related command that extends the `sample` command. You can run the following related commands.
+`<Command>` extends the `sample` command. You can set the following values for this attribute.
 * `clone` - Clones the selected sample app.
 
 <% if(isHtml) { %> 
