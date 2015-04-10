@@ -24,7 +24,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `--release` - Lists all plugins enabled for the Release build configuration. If `--available` is set, also lists all plugins that you can enable for the Release build configuration.
 
 ### Attributes  
-`<Command>` extends the plugin command. You can set the following values for this attribute.
+`<Command>` extends the `plugin` command. You can set the following values for this attribute.
 * `add` - Enables a core, integrated or verified plugin for your project.
 * `configure` - Configures plugin variables for the selected core, integrated or verified plugin.
 * `remove` - Disables a core, integrated or verified plugin for your project.
