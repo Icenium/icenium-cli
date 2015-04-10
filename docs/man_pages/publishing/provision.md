@@ -13,7 +13,7 @@ Lists or lets you manage provisioning profiles for code signing iOS applications
 
 ### Attributes
 * `<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`
-* `<Command>` extends the provision command. You can set the following values for this attribute.
+* `<Command>` extends the `provision` command. You can set the following values for this attribute.
 	* `import` - Imports a provisioning profile from file.
 	* `remove` - Removes a registered provisioning profile.
 

@@ -11,7 +11,7 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
-`<Command>` extends the prop command. You can set the following values for this attribute.
+`<Command>` extends the `prop` command. You can set the following values for this attribute.
 * `print` - Prints the current project configuration or the value for the selected project property.
 * `add` - Enables more options for the selected project property, if the property accepts multiple values.
 * `set` - Sets the selected project property and overwrites its current value.
