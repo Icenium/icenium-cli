@@ -7,10 +7,10 @@ General | `$appbuilder init [<Type>]`
 
 Initializes an existing project for development. The command attempts to determine the project type and retain any existing configuration based on the files in the working directory.  
 
-You can run the `init` command with a related command that specifies the project type.
+You can run the `init` command with a command extension that specifies the project type.
 
 ### Attributes
-`<Type>` is a related command that extends the `init` command. You can run the following related commands.
+`<Type>` extends the `init` command. You can set the following values for this attribute.
 * `hybrid` - Initializes an existing Apache Cordova project for development in the current directory.
 * `native` - Initializes an existing NativeScript project for development in the current directory.
 * `website` - Initializes an existing Mobile Website project for development in the current directory.

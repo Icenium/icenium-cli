@@ -8,7 +8,7 @@ Add property | `$ appbuilder prop add <Property Name> <Value> [Value]*`
 Enables more options for the selected project property, if the property accepts multiple values. 
 <% if(isConsole) { %>
 <% if(isMobileWebsite) { %>
-WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop add`
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop add`
 <% } %>
 <% if(isCordova) { %>
 WARNING: Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`

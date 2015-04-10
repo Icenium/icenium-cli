@@ -9,7 +9,7 @@ Disables options for the selected project property, if the property accepts mult
 
 <% if(isConsole) { %>
 <% if(isMobileWebsite) { %>
-WARNING: This command and its related commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop remove`
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop remove`
 <% } %> 
 <% if(isCordova) { %>
 WARNING: Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`

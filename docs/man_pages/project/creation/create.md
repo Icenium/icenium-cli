@@ -5,10 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder create <Type>`
 
-Creates a project for hybrid, native or mobile website development. You must run the `create` command with a related command that specifies the project type.
+Creates a project for hybrid, native or mobile website development. You must run the `create` command with a command extension that specifies the project type.
 
 ### Attributes
-`<Type>` is a related command that extends the `create` command. You can run the following related commands.
+`<Type>` extends the `create` command. You can set the following values for this attribute.
 * `hybrid` - Creates a new project from an **Apache Cordova** template.
 * `native` - Creates a new project from a **NativeScript** template.
 * `website` - Creates a new project from a **Mobile Website** template.
