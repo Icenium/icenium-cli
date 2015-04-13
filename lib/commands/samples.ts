@@ -4,26 +4,26 @@
 import path = require("path");
 var options: any = require("../common/options");
 
-export class PrintSamplesInformationCommand implements ICommand {
-	constructor(private $samplesService: ISamplesService) { }
+export class PrintSamplesCommand implements ICommand {
+	constructor(private $samplesService: ISamplesService,
+		private frameworkIdentifier: string) { }
+
 	execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$samplesService.printSamplesInformation().wait();
-		}).future<void>()();
+		return this.$samplesService.printSamplesInformation(this.frameworkIdentifier);
 	}
+
 	allowedParameters: ICommandParameter[] = []
 }
-$injector.registerCommand("sample|*list", PrintSamplesInformationCommand);
+$injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, {frameworkIdentifier: "" }));
 
 export class CloneSampleCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
 		private $fs: IFileSystem,
 		private $errors: IErrors) { }
 	execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$samplesService.cloneSample(args[0]).wait();
-		}).future<void>()();
+		return this.$samplesService.cloneSample(args[0]);
 	}
+
 	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$samplesService, this.$fs, this.$errors)]
 }
 $injector.registerCommand("sample|clone", CloneSampleCommand);
