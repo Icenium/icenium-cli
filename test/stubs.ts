@@ -440,6 +440,8 @@ export class PrompterStub implements IPrompter {
 
 	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult("");}
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
+	getString(prompt: string): IFuture<string>{ return Future.fromResult("");}
+	promptForChoice(promptMessage: string, choices: any[]): IFuture<string>{ return Future.fromResult("");}
 	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
 		return Future.fromResult(this.confirmResult);
 	}
