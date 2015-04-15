@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder debug`
 
-Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %>For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
+Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %> For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
 
 <% } %> 
 <% if(isConsole) { %>
