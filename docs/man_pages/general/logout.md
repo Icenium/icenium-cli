@@ -7,7 +7,7 @@ General | `$ appbuilder logout`
 
 Logs you out from the Telerik Platform.
 
-<% if(isConsole) { %>IMPORTANT: To build, deploy, or synchronize your projects with the cloud, you need to be logged in.<% } %>
+<% if(isConsole) { %>IMPORTANT: To run any operations that require access to the cloud services such as build, deploy or synchronize with cloud, you need to be logged in.<% } %>
 <% if(isHtml) { %> 
 ### Related Commands
 
