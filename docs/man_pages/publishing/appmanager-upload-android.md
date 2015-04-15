@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager upload android [--certificate <Certificate ID>] [--download]`   
 
-Builds the project for Android and uploads the application to Telerik AppManager. <% if(isHtml) { %>After the upload completes, you need to go to your app in Telerik AppManager, manually configure it for distribution and publish it.<% } %> 
+Builds the project for Android and uploads the application to Telerik AppManager. <% if(isHtml) { %>After the upload completes, you need to go to your app in [Telerik AppManager](https://platform.telerik.com/appmanager), manually configure it for distribution and publish it.<% } %> 
 <% if(isConsole && isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload android`
 <% } %>
