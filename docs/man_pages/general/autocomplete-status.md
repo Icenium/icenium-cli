@@ -8,7 +8,7 @@ General | `$ appbuilder autocomplete status`
 Prints your current command-line completion settings.
 
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------

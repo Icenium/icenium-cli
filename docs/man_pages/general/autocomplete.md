@@ -12,7 +12,7 @@ Prints your current command-line completion settings. If disabled, prompts you t
 
 <% if(isHtml) { %>> <% } %>NOTE: This operation might modify the `.bash_profile`, `.bashrc` and `.zshrc` files.
 
-#### Attributes
+### Attributes
 `<Command>` extends the `autocomplete` command. You can set the following values for this attribute.
 * `status` - Prints your current command-line completion settings.
 * `enable` - Enables command-line completion. You need to restart the shell to complete the operation.

@@ -9,7 +9,7 @@ Enables command-line completion for bash and zsh shells. You need to restart the
 
 <% if(isHtml) { %>> <% } %>NOTE: This operation might modify the `.bash_profile`, `.bashrc` and `.zshrc` files.
 <% if(isHtml) { %> 
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
