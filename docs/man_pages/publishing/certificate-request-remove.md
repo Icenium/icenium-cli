@@ -1,19 +1,21 @@
 certificate-request remove
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate-request remove <Csr ID>`
+General | `$ appbuilder certificate-request remove <CSR ID>`
 
-Removes a pending certificate signing request (.csr) from the server.
-`<Csr ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`.
+Removes a pending certificate signing request (CSR) from the server.
+
+### Attributes
+* `<CSR ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
+
 <% if(isHtml) { %> 
-
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

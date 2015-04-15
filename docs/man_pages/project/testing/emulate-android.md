@@ -1,55 +1,57 @@
 emulate android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder emulate android [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
-Native emulator | `$ appbuilder emulate android [--avd <Name>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
-Genymotion emulator | `$ appbuilder emulate android [--geny <GenyName>] [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
+Native emulator | `$ appbuilder emulate android --avd <AvdName> [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
+Genymotion emulator | `$ appbuilder emulate android --geny <GenyName> [--path <Directory>] [--certificate <Certificate ID>] [--timeout <Seconds>] [--debug] [--release]`
 
-Builds the specified project in the cloud and runs it in a native Android emulator.
-If you do not select an Android virtual device (AVD) with the `--avd` option or a Genymotion
-virtual device with the `--geny` option, your app runs in the default AVD or a currently running emulator, if any. 
-To list the available AVDs, run `$ android list avd` To list the available Genymotion devices, run `$ genyshell -c "devices list"`
-To test your app on multiple Android virtual devices, run `$ appbuilder emulate android --avd <Name>` or `$ appbuilder emulate android --geny <GenyName>`for each virtual device.
+Builds the specified project in the cloud and runs it in a native Android emulator or Genymotion. <% if(isHtml) { %>If you do not select an Android virtual device (AVD) with the `--avd` option or a Genymotion virtual device with the `--geny` option, your app runs in the default AVD or a currently running emulator, if any.  
+To list the available AVDs, run `$ android list avd`  
+To list the available Genymotion devices, run `$ genyshell -c "devices list"`  
+To test your app on multiple Android virtual devices, run `$ appbuilder emulate android --avd <Name>` or `$ appbuilder emulate android --geny <GenyName>` for each virtual device.
 
-`<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
-`<Name>` is the name of the Android virtual device that you want to use as listed by `$ android list avd`. You can specify only one name at a time.
-`<GenyName>` is the name of the Genymotion virtual device that you want to use as listed by `$ genyshell -c "devices list"`. You can specify only one name at a time.
-
-Prerequisites:
-Before running your app in the Android emulator from the Android SDK, verify that your system meets the following requirements.
-* Verify that you are running the Telerik AppBuilder CLI on a Windows, OS X or Linux system.
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
+<% } %> 
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate android`
+<% } %>
+<% if(isHtml) { %>
+### Prerequisites
+Before running your app in the **native Android emulator** from the Android SDK, verify that your system meets the following requirements.
 * Verify that you have installed the Android SDK and its dependencies.
 * Verify that you have added the following Android SDK directories to the PATH environment variable:
-    * platform-tools
-    * tools
+    * `platform-tools`
+    * `tools`
 
-Before running your app in the Genymotion emulator, verify that your system meets the following requirements.
+Before running your app in the **Genymotion emulator**, verify that your system meets the following requirements.
 * Verify that you have installed Genymotion and its dependencies.
-<% if(isWindows || isLinux) { %>* On Windows and Linux systems, verify that you have added the Genymotion installation directory to the PATH environment variable.<% } %>
-<% if(isMacOS) {%>* On OS X systems, verify that you have added the following paths to the PATH environment variable.
-    * /Applications/Genymotion.app/Contents/MacOS/
-    * /Applications/Genymotion Shell.app/Contents/MacOS/
-<% } %> 
-
-You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
-<% if(isHtml) { %>
-For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
-<% } %>
-
-Options:
+* On Windows and Linux systems, verify that you have added the Genymotion installation directory to the `PATH` environment variable.
+* On OS X systems, verify that you have added the following paths to the `PATH` environment variable.
+    * `/Applications/Genymotion.app/Contents/MacOS/`
+    * `/Applications/Genymotion Shell.app/Contents/MacOS/`<% } %> 
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
-* `--certificate` - Sets the certificate that you want to use for code signing your iOS or Android app. You can set a certificate by index or name. To list available certificates, run `$ appbuilder certificate`
-* `--avd` - Sets the Android virtual device on which you want to run your app. You can set only one device at a time. To list the available Android virtual devices, run `$ android list avd`. You cannot use `--avd` and `--geny` simultaneously.
-* `--geny` - Sets the Genymotion virtual device on which you want to run your app. You can set only one device at a time. To list the available Genymotion virtual devices, run `$ genyshell -c "devices list"`. You cannot use `--avd` and `--geny` simultaneously.      
+* `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
+* `--avd` - Sets the Android virtual device on which you want to run your app. You can set only one device at a time. <% if(isHtml) { %>To list the available Android virtual devices, run `$ android list avd`. You cannot use `--avd` and `--geny` simultaneously.<% } %> 
+* `--geny` - Sets the Genymotion virtual device on which you want to run your app. You can set only one device at a time. <% if(isHtml) { %>To list the available Genymotion virtual devices, run `$ genyshell -c "devices list"`. You cannot use `--avd` and `--geny` simultaneously.<% } %>       
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the virtual device to boot before quitting the operation and releasing the console. If not set, the default timeout is 120 seconds. To wait indefinitely, set 0.
 
+### Attributes
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<AvdName>` is the name of the Android virtual device that you want to use as listed by `$ android list avd`. You can specify only one name at a time.
+* `<GenyName>` is the name of the Genymotion virtual device that you want to use as listed by `$ genyshell -c "devices list"`. You can specify only one name at a time.
+<% } %>
 <% if(isHtml) { %> 
+### Command Limitations
 
-#### Related Commands
+* You cannot run this command on mobile website projects.
+
+### Related Commands
 
 Command | Description
 ----------|----------

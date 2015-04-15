@@ -1,20 +1,38 @@
 livesync ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]`
 
 Synchronizes the latest changes in your project to connected iOS devices.
 
-`<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
-Options:
-* `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
-* `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`
-* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the Telerik AppBuilder companion app.
-<% if(isHtml) { %> 
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync ios`
+<% } %>
+<% if(isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help livesync ios`
+<% } %>
+<% if(isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help livesync ios`<% } %>
+<% } %>
 
-#### Related Commands
+<% if((isConsole && (isWindows || isMacOS) && isCordova) || isHtml) { %>
+`<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+
+### Options
+* `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
+* `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`    
+>* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the companion app.
+<% } %>
+<% if(isHtml) { %> 
+### Command Limitations
+
+* You cannot run this command on NativeScript projects.
+* You cannot run this command on mobile website projects.
+* You cannot run this command on Linux systems.
+
+### Related Commands
 
 Command | Description
 ----------|----------

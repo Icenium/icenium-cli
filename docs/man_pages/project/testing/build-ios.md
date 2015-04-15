@@ -1,28 +1,36 @@
 build ios
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder build ios [--download] [--companion] [--certificate <Certificate ID>] [--provision <Provision ID>] [--save-to <File Path>] [--debug] [--release]`
 
-Builds the project for the target platform and produces an application package or a QR code for deployment.
-`<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`<Provision ID> is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
-<% if(isHtml) { %>
-For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
+Builds the project for iOS and produces an application package or a QR code for deployment.
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help build ios`
 <% } %>
+<% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
+<% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
+### Options
+* `--debug` - If set, applies the Debug build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - If set, applies the Release build configuration.<% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--download` - If set, downloads the application package to the root of the project, instead of producing a QR code.<% if(isHtml) { %>Set this option if you want to manually deploy the app package later. You cannot set both the `--companion` and `--download` switches. If you want to download the application package to a specified file path, use the `--save-to` option instead.<% } %>  
+* `--companion` - Produces a QR code for deployment in the companion app. <% if(isHtml) { %>When deploying to the companion app, you do not need to set a certificate or provision.<% } %> 
+* `--certificate` - Sets the certificate that you want to use for code signing your iOS or Android app. You can set a certificate by index or name. <% if(isHtml) { %>Unless the `--companion` switch is set, you must specify a certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`<% } %>     
+* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. <% if(isHtml) { %>Unless the `--companion` switch is set, you must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`<% } %>     
+* `--save-to` - If set, downloads the application package and saves it to the specified file path, instead of the project root. You do not need to set the `--download` switch.
 
-Options:
-* `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--download` - If set, downloads the application package to the root of the project, instead of producing a QR code. Set this option if you want to manually deploy the app package later. You cannot set both the `--companion` and `--download` switches. If you want to download the application package to a specified file path, use the `--save-to` option instead.
-* `--companion` - Produces a QR code for deployment in the Telerik AppBuilder companion app. When deploying to the companion app, you do not need to set a certificate or provision.
-* `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name.To list available certificates, run `$ appbuilder certificate`        
-* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. Unless the `--companion` switch is set, you must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`    
-* `--save-to` - If set, downloads the application package and saves it to the specified file path, instead of the project root. The file path must be complete with file name and extension. You do not need to set the `--download` switch.
+### Attributes
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<File Path>` is the complete file path to which you want to save your application package. The file path must be complete with file name and extension.
+* `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+<% } %> 
 <% if(isHtml) { %> 
+### Command Limitations
 
-#### Related Commands
+* You cannot run this command on mobile website projects.
+
+### Related Commands
 
 Command | Description
 ----------|----------

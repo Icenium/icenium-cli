@@ -1,24 +1,25 @@
 certificate-request
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate-request`
-Additional functionality | `$ appbuilder certificate-request [<Command>]`
+List certificate requests | `$ appbuilder certificate-request`
+Manage certificate requests | `$ appbuilder certificate-request [<Command>]`
 
-Lists all pending certificate signing requests (.csr).
+Lists or lets you manage certificate signing requests (CSR).
 
-`<Command>` is a related command that extends the certificate-request command. You can run the following related commands:
-* `create` - Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
-* `remove` - Removes a pending certificate signing request (.csr) from the server.
-* `download` - Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center.
+### Attributes
+`<Command>` extends the `certificate-request` command. You can set the following values for this attribute.
+* `create` - Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center.
+* `remove` - Removes a pending certificate signing request (CSR) from the server.
+* `download` - Downloads a pending certificate signing request (CSR) which you can upload in the iOS Dev Center.
+
 <% if(isHtml) { %> 
-
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

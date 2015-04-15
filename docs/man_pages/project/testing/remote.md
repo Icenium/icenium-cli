@@ -1,22 +1,31 @@
 remote
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder remote <Port> [--device <Device Name>] [--timeout]`
 
-Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. 
-
-This operation is applicable only to OS X systems.
-
-`<Port>` is an integer greater than 1023 that specifies a port on your OS X system. Make sure that the port is open and that your firewall allows traffic on it, if configured. Make sure that your Windows system can reach and send traffic to the OS X system on the specified port. 
-`<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --availableDevices`
-Options:
-* `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices from the other Telerik AppBuilder clients.  To list the available iOS Simulator devices, run `$ appbuilder emulate ios --availableDevices`
+Starts a remote server to let you run your app in the iOS Simulator from a Windows system. On the specified port, the Telerik AppBuilder CLI listens for requests from other Telerik AppBuilder clients and launches the iOS Simulator. <% if(isHtml) { %>For more information about launching the iOS simulator from the other Telerik AppBuilder clients, see [Run app in the native iOS Simulator from the AppBuilder Windows client](http://docs.telerik.com/platform/appbuilder/testing-your-app/running-in-emulators/ios-emulator#run-app-in-the-native-ios-simulator-from-the-appbuilder-windows-client) and [Run app in the native iOS Simulator from the AppBuilder extension for Visual Studio](http://docs.telerik.com/platform/appbuilder/testing-your-app/running-in-emulators/ios-emulator#run-app-in-the-native-ios-simulator-from-the-appbuilder-extension-for-visual-studio).<% } %>  
+<% if(isConsole) { %>
+<% if(isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help remote`<% } %>
+<% if(isWindows) { %>WARNING: You cannot run this command on Windows systems. To view the complete help for this command, run `$ appbuilder help remote`<% } %> 
+<% } %> 
+<% if((isConsole && isMacOS) || isHtml) { %>
+### Options
+* `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. <% if(isHtml) { %>When this option is set, the Telerik AppBuilder CLI always launches the selected device and disregards any device choices from the other Telerik AppBuilder clients.  To list the available iOS Simulator devices, run `$ appbuilder emulate ios --availableDevices`<% } %> 
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start before quitting the operation and releasing the console. The value must be a positive integer. If not set, the default timeout is 90 seconds.
-<% if(isHtml) { %> 
 
-#### Related Commands
+### Attributes
+* `<Port>` is an integer greater than 1023 that specifies a port on your OS X system. <% if(isHtml) { %>Make sure that the port is open and that your firewall allows traffic on it, if configured. Make sure that your Windows system can reach and send traffic to the OS X system on the specified port.<% } %>   
+* `<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --availableDevices`
+<% } %> 
+<% if(isHtml) { %> 
+### Command Limitations
+
+* You cannot run this command on Linux systems.
+* You cannot run this command on Windows systems.
+
+### Related Commands
 
 Command | Description
 ----------|----------

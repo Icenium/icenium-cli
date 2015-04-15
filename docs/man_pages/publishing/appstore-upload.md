@@ -1,27 +1,36 @@
 appstore upload
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appstore upload <Application Name> [<AppleID>] [<Password>] --certificate <Certificate ID> --provision <Provision ID>`
 
 Builds the project and uploads the application to iTunes Connect.
 
-`<Application Name>` is the name for the application record that you want to upload for publishing. To retrieve the names of your        application records available in iTunes Connect, run `$ appbuilder appstore list`
-`<AppleID>` and `<Password>` are your credentials for logging into iTunes Connect. If you do not provide them when running the command, the Telerik AppBuilder CLI will prompt you to provide them.
-`<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
-`<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appstore upload`
+<% } %>
+<% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
+### Options
+* `--certificate` - Sets the **production** certificate that you want to use for code signing your iOS app.
+* `--provision` - Sets the **distribution** provisioning profile that you want to use for code signing your iOS app.
 
-Options:
-* `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. You must specify a production certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`
-* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. You must specify a provisioning profile for App Store distribution. The provisioning profile must match the certificate.       To list available provisioning profiles, run $ appbuilder provision.
-<% if(isHtml) { %> 
+### Attributes 
+* `<Application Name>` is the name for the application record that you want to upload for publishing as listed by `$ appbuilder appstore list`
+* `<AppleID>` and `<Password>` are your credentials for logging into iTunes Connect.
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+<% } %>
+<% if(isHtml) { %>
+### Command Limitations
 
-#### Related Commands
+* You cannot run this command on mobile website projects.
+
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

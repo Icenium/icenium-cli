@@ -1,21 +1,36 @@
 livesync android
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync android [--device <Device ID>] [--companion] [--watch]`
 
 Synchronizes the latest changes in your project to connected Android devices.
 
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync android`
+<% } %>
+<% if(isNativeScript) { %>
+WARNING: This command is applicable only to the NativeScript companion app. Make sure to run this command with the `--companion` switch.
+<% } %>
+<% } %>
+
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
 
-Options:
+### Options
 * `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
 * `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`    
-* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the Telerik AppBuilder companion app.
-<% if(isHtml) { %> 
+* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the companion app. <% if(isNativeScript) { %>This switch is mandatory for NativeScript projects.<% } %>
+<% } %>
+<% if(isHtml) { %>
+### Command Limitations
 
-#### Related Commands
+* For NativeScript projects, you can LiveSync changes only to the companion app.
+* You cannot run this command on mobile website projects.
+
+### Related Commands
 
 Command | Description
 ----------|----------

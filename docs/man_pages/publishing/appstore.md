@@ -1,22 +1,23 @@
 appstore
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder appstore <Command>`
 
-You must run the appstore command with a related command.
+Connects to your iTunes Connect account. You must run the `appstore` command with a command extension.
 
-`<Command>` is a related command that extends the appstore command. You can run the following related commands:
+### Attributes
+
+`<Command>` extends the `appstore` command. You can set the following values for this attribute.
 * `list` - Lists all application records in iTunes Connect.
-* `upload` - Builds the project and uploads the binary to iTunes Connect.
+<% if(isCordova || isNativeScript) { %>* `upload` - Builds the project and uploads the binary to iTunes Connect.<% } %> 
 <% if(isHtml) { %> 
-
-#### Related Commands
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.

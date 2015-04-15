@@ -1,22 +1,27 @@
 device
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder device [<Command>]`
 
-Lists all recognized connected devices with serial number and index, grouped by platform. In this version of the Telerik AppBuilder CLI,
-you can connect only iOS and Android devices.
+Lists all recognized <% if(isWindows || isMacOS) { %>iOS and <% } %>Android connected devices with serial number and index<% if(isWindows || isMacOS) { %>, grouped by platform<% } %>. 
 
-`<Command>` is a related command that extends the device command. You can run the following related commands:
-* android - Lists all recognized connected Android physical and running Android virtual devices.
-* ios - Lists all recognized connected iOS devices.
-* log - Opens the device log stream for a selected connected device.
-* list-applications - Lists the installed applications on all connected Android <% if(isWindows || isMacOS) { %>or iOS <%}%>devices.
-* run - Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <%}%>device.
+### Attributes
+`<Command>` extends the `device` command. You can set the following values for this attribute.
+* `android` - Lists all recognized connected Android physical and running Android virtual devices.
+<% if(isWindows || isMacOS) { %>* `ios` - Lists all recognized connected iOS devices. <% } %> 
+* `log` - Opens the device log stream for a selected connected device.
+* `list-applications` - Lists the installed applications on all connected Android <% if(isWindows || isMacOS) { %>or iOS <%}%>devices.
+* `run` - Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <%}%>device.
+
 <% if(isHtml) { %> 
+### Command Limitations
 
-#### Related Commands
+* You cannot work with connected Windows Phone devices.
+* You cannot work with connected iOS devices on Linux systems.
+
+### Related Commands
 
 Command | Description
 ----------|----------
@@ -25,5 +30,4 @@ Command | Description
 [device list-applications](device-list-applications.html) | Lists the installed applications on all connected Android and iOS devices.
 [device log](device-log.html) | Opens the device log stream for a selected connected device.
 [device run](device-run.html) | Runs the selected application on a connected Android or iOS device.
-[device](device.html) | Lists all recognized connected devices with serial number and index, grouped by platform.
 <% } %>

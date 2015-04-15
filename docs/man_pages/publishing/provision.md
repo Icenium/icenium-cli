@@ -1,27 +1,28 @@
 provision
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
-General | `$ appbuilder provision [<Provision ID> -v]`
-Additional functionality | `$ appbuilder provision [<Command>] `
+List provisioning profiles | `$ appbuilder provision [<Provision ID> -v]`
+Manage provisioning profiles | `$ appbuilder provision [<Command>] `
 
-Lists all configured provisioning profiles for code signing iOS applications with index and name. When building an app, 
-you can set the provisioning profile by index or name in the --provision option.
-`<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`
-Options:
+Lists or lets you manage provisioning profiles for code signing iOS applications. <% if(isHtml) { %>When building an app, you can set the provisioning profile by index or name in the `--provision` option.<% } %> 
+
+### Options
 * `-v`, `--verbose` - Lists the devices included in the selected provisioning profile.
 
-`<Command>` is a related command that extends the provision command. You can run the following related commands:
-* `import` - Imports a provisioning profile from file.
-* `remove` - Removes a registered provisioning profile.
-<% if(isHtml) { %> 
+### Attributes
+* `<Provision ID>` is the index or identifier of the provisioning profile as listed by `$ appbuilder provision`
+* `<Command>` extends the `provision` command. You can set the following values for this attribute.
+	* `import` - Imports a provisioning profile from file.
+	* `remove` - Removes a registered provisioning profile.
 
-#### Related Commands
+<% if(isHtml) { %>
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

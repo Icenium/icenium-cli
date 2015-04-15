@@ -1,21 +1,24 @@
 certificate-request download
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request download <Csr ID> [--save-to <File Path>]`
 
-Downloads a pending certificate signing request (.csr) which you can upload in the iOS Dev Center. 
-`<Csr ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
-Options:
-* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as certificate_request.csr.
-<% if(isHtml) { %> 
+Downloads a pending certificate signing request (CSR) which you can upload in the iOS Dev Center. 
 
-#### Related Commands
+### Options
+* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as `certificate_request.csr`.
+
+### Attributes
+* `<CSR ID>` is the index of the certificate signing request as listed by `$ appbuilder certificate-request`
+
+<% if(isHtml) { %> 
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

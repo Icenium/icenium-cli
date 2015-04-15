@@ -1,37 +1,41 @@
 deploy
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
-General | `$ appbuilder deploy <Platform> [--device <Device ID>] [--debug] [--release]`
-Android | `$ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>] [--debug] [--release]`
-iOS | `$ appbuilder deploy ios [--device <Device ID>] --certificate <Certificate ID> --provision <Provision ID> [--debug] [--release]`
+General | `$ appbuilder deploy <Platform> [--device <Device ID>] [--certificate <Certificate ID>] [--provision <Provision ID>] [--debug] [--release]`
 
-Builds the project for the selected platform and deploys it to connected physical devices. When you build for Android,
-deploys the project on all connected physical devices and running Android virtual devices. 
-
-In this version of the Telerik AppBuilder CLI, you cannot build and deploy to Windows Phone connected devices.
-<% if(isLinux) { %>
-In this version of the Telerik AppBuilder CLI, you cannot build and deploy to iOS connected devices on Linux systems.
-<% } %>
-
-`<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`<Certificate ID> is the index or name of the certificate as listed by `$ appbuilder certificate`
-`<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
-
-You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file.
+Builds the project for iOS or Android and deploys it to connected physical devices. 
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help deploy`
+<% } %> 
 <% if(isHtml) { %>
-For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
-<% } %>
-
-Options:
+You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
+<% } %> 
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--device` - Specifies the serial number or the index of the connected device on which you want to deploy the app. To list all connected devices, grouped by platform, run `$ appbuilder device`
-* `--certificate` - Sets the certificate that you want to use for code signing your iOS or Android app. You can set a certificate by index or name. If you build for iOS, you must specify a certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`
-* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`.
-<% if(isHtml) { %> 
+* `--device` - Specifies the serial number or the index of the connected device on which you want to deploy the app. <% if(isHtml) { %>To list all connected devices, grouped by platform, run `$ appbuilder device`<% } %>  
+* `--certificate` - Sets the certificate that you want to use for code signing your iOS or Android app. You can set a certificate by index or name. <% if(isHtml) { %>If you build for iOS, you must specify a certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`<% } %> 
+* `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. <% if(isHtml) { %>If you build for iOS, you must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`<% } %> 
 
-#### Related Commands
+### Attributes
+* `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+* `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
+* `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
+* `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms.
+    * `android` - Deploys your project on Android. <% if(isHtml) { %>If `--device` is not specified, deploys on all running physical and virtual Android devices.<% } %> 
+	<% if(isWindows || isMacOS) { %>* `ios` - Deploys your project on iOS.<% } %> 
+<% } %> 
+<% if(isHtml) { %> 
+### Command Limitations
+
+* You cannot run this command on mobile website projects.
+* You cannot run this command on Windows Phone devices.
+* On Linux systems, you cannot run this command on iOS devices.
+
+### Related Commands
 
 Command | Description
 ----------|----------

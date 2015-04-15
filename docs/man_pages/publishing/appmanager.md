@@ -1,24 +1,28 @@
-appmanager
+appmanager upload
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
-General |`$ appbuilder appmanager <Command>`
+General |`$ appbuilder appmanager upload <Platform>`
 
-You must run the appmanager command with a related command.
-
-<% if(isMobileWebsite) { %>
-This command is not applicable to Mobile Website projects.
+Builds and uploads your application to AppManager. You must run the `appmanager upload` command with a command extension that specifies the target mobile platform.
+<% if(isConsole && isMobileWebsite) { %>
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
 <% } %>
+<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+### Attributes
 
-`<Command>` is a related command that extends the appmanager command. You can run the following related commands:
-* `upload` - Builds the project and uploads the binary to Telerik AppManager.
-* `android` - `$ appbuilder appmanager upload android --certificate <Certificate ID>`
-* `ios` - `$ appbuilder appmanager upload ios --certificate <Certificate ID> --provision <Provision ID>`
-* `wp8` - `$ appbuilder appmanager upload wp8`
+`<Platform>` extends the `appmanager` command. You can set the following values for this attribute.
+* `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
+* `ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
+* `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.
+<% } %> 
 <% if(isHtml) { %> 
+### Command Limitations
 
-#### Related Commands
+* You cannot run this command on mobile website projects.
+
+### Related Commands
 
 Command | Description
 ----------|----------

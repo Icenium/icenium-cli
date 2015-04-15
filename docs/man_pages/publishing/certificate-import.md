@@ -1,19 +1,22 @@
 certificate import
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate import <File Path> [<Password>]`
 
-Imports an existing certificate from a P12 or a CER file stored on your local file system. If you do not provide the certificate
-password when running the command, the Telerik AppBuilder CLI prompts you to provide it.
-<% if(isHtml) { %> 
+Imports an existing certificate from a P12 or a CER file stored on your local file system. <% if(isHtml) { %>If you do not provide the certificate password when running the command, the Telerik AppBuilder CLI prompts you to provide it.<% } %>
 
-#### Related Commands
+### Attributes
+* `<File Path>` must be complete with file name and extension.
+* `<Password>` is the password for the certificate.
+
+<% if(isHtml) { %>
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

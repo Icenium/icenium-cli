@@ -1,18 +1,21 @@
 provision import
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder provision import <File Path>`
 
 Imports the provisioning profile stored in the selected file.
-<% if(isHtml) { %> 
 
-#### Related Commands
+### Attributes
+* `<File Path>` must be complete with file name and extension.
+
+<% if(isHtml) { %> 
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.

@@ -1,22 +1,23 @@
 certificate-request create
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate-request create [<Name> [<Email> [<Country>]]] [--save-to <File Path>]`
 
-Creates a certificate signing request (.csr) which you can upload in the iOS Dev Center.
-If you do not provide values for `<Name>`, `<Email>` and `<Country>`, the Telerik AppBuilder CLI prompts you to complete the missing details.
+Creates a certificate signing request (CSR) which you can upload in the iOS Dev Center. <% if(isHtml) { %>If you do not provide values for `<Name>`, `<Email>` and `<Country>`, the Telerik AppBuilder CLI prompts you to complete the missing details.<% } %> 
 
-Options:
-* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. The file path must be complete with file name and extension. If not specified, the certificate signing request is saved as certificate_request.csr.
-<% if(isHtml) { %> 
+### Options
+* `--save-to` - If set, downloads the certificate request and saves it to the specified file path. 
 
-#### Related Commands
+### Attributes
+* `<File Path>` must be complete with file name and extension. <% if(isHtml) { %>If not specified, the certificate signing request is saved as `certificate_request.csr` in the root of the project.
+
+### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager](appmanager.html) | Allows interaction with appmanager.
+[appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
