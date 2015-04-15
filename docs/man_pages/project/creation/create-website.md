@@ -13,7 +13,7 @@ Creates a new project from a Mobile Website template in the current directory.
 * `--path` - Specifies the directory where you want to create the project, if different from the current directory. The directory must be empty.
 
 ### Attributes
-* `<Site name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
+* `<Site name>` is the name of the website. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 * `<Template>` is the source template that you want to use. The default value is `KendoUI.TabStrip`. You can use the following templates: <%=#{mobileWebsiteProject.projectTemplatesString}%>.
 <% if(isHtml) { %>
 ### Command Limitations
