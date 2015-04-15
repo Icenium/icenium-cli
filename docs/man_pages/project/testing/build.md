@@ -13,7 +13,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 * `--debug` - If set, applies the Debug build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--release` - If set, applies the Release build configuration.<% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - If set, applies the Release build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--download` - If set, downloads the application package to the root of the project, instead of producing a QR code.<% if(isHtml) { %>Set this option if you want to manually deploy the app package later. You cannot set both the `--companion` and `--download` switches. If you want to download the application package to a specified file path, use the `--save-to` option instead.<% } %>  
 * `--companion` - Produces a QR code for deployment in the companion app. <% if(isHtml) { %>When deploying to the companion app, you do not need to set a certificate or provision.<% } %> 
 * `--certificate` - Sets the certificate that you want to use for code signing your iOS or Android app. You can set a certificate by index or name. <% if(isHtml) { %>If you build for iOS, unless the `--companion` switch is set, you must specify a certificate. The certificate must match the provisioning profile. To list available certificates, run `$ appbuilder certificate`<% } %>     
@@ -27,7 +27,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `<Platform>` is the target mobile platform for which you want to build your project. You can set the following target platforms.
     * `android` - Builds your project for Android.
 	* `ios` - Builds your project for iOS.
-	<% if(isCordova) { %>* `wp8`- Builds your project for Windows Phone.<% } %>
+	<% if(isCordova) { %>* `wp8` - Builds your project for Windows Phone.<% } %>
 <% } %> 
 <% if(isHtml) { %> 
 ### Command Limitations
