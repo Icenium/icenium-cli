@@ -5,12 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder device [<Command>]`
 
-Lists all recognized connected devices with serial number and index, grouped by platform. 
-
-<% if(isConsole) { %>
-WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS and <% } %>Android devices.  
-<% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device` <% } %> 
-<% } %>
+Lists all recognized <% if(isWindows || isMacOS) { %>iOS and <% } %>Android connected devices with serial number and index<% if(isWindows || isMacOS) { %>, grouped by platform<% } %>. 
 
 ### Attributes
 `<Command>` extends the `device` command. You can set the following values for this attribute.

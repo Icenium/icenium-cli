@@ -7,11 +7,6 @@ General | `$ appbuilder device list-applications [--device <Device ID>]`
 
 Lists the installed applications on all connected Android <% if(isWindows || isMacOS) { %>and iOS <% } %>devices. 
 
-<% if(isConsole) { %>
-WARNING: You can work only with connected <% if(isWindows || isMacOS) { %>iOS and <% } %>Android devices.  
-<% if(isLinux) { %>WARNING: You cannot work with connected iOS devices on Linux systems. To view the complete help for this command, run `$ appbuilder help device list-applications`<% } %> 
-<% } %>
-
 ### Options
 * `--device` - If multiple devices are connected, sets the device for which you want to list all currently installed applications.
 
