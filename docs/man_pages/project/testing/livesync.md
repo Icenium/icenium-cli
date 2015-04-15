@@ -16,7 +16,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 `<Command>` extends the `livesync` command. You can set the following values for this attribute.
 * `cloud` - Synchronizes the project with the cloud to enable LiveSync for remote devices (using the three finger tap and hold gesture).
 * `android` - Synchronizes the latest changes in your project to connected Android devices. 
-* `ios` - Synchronizes the latest changes in your project to connected iOS devices.<% } %>
+* `ios` - Synchronizes the latest changes in your project to connected iOS devices.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
