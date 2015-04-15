@@ -16,13 +16,13 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 
-When you build without the `--download` switch, the Telerik AppBuilder CLI lets you download and installthe Telerik Application Enrollment Token (AET) on your device via QR code. Always make sure that you have installed the Telerik AET on the device before attempting to scan the QR code for your Windows Phone app package. If the Telerik AET is not installed on the device, the following error message will appear when you attempt to install your app: "Before you install this app, you need to add Telerik AD company account".
+When you build without the `--download` switch, the Telerik AppBuilder CLI lets you download and install the Telerik Application Enrollment Token (AET) on your device via QR code. Always make sure that you have installed the Telerik AET on the device before attempting to scan the QR code for your Windows Phone app package. If the Telerik AET is not installed on the device, the following error message will appear when you attempt to install your app: "Before you install this app, you need to add Telerik AD company account".
 
 When you build without the `--download` switch, you can deploy the app package on device only via QR code or by opening the link in the device browser. You cannot install the app package manually via cable connection.<% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Options
 * `--debug` - If set, applies the Debug build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--release` - If set, applies the Release build configuration.<% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - If set, applies the Release build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--download` - If set, downloads the application package to the root of the project, instead of producing a QR code.<% if(isHtml) { %>Set this option if you want to manually deploy the app package later. You cannot set both the `--companion` and `--download` switches. If you want to download the application package to a specified file path, use the `--save-to` option instead.<% } %>  
 * `--companion` - Produces a QR code for deployment in the companion app.
 * `--save-to` - If set, downloads the application package and saves it to the specified file path, instead of the project root. You do not need to set the `--download` switch.
