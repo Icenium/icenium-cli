@@ -44,7 +44,12 @@ var createTestInjector = (options?: { isProjectTypeResult: boolean; isPlatformRe
 	injector.register("opener", {
 		open(target: string, appname?: string): void {}
 	});
-	
+	injector.register("commandsServiceProvider", {
+		getDynamicCommands: (): IFuture<string[]> => {
+			return Future.fromResult(<string[]>[]);
+		}
+	});
+
 	injector.register("staticConfig", {
 		helpTextPath: path.join(__dirname, "../resources/help.txt")
 	});
