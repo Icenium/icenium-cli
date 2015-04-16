@@ -45,7 +45,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public installAppDependencies(): IFuture<void> {
 		this.$logger.trace("Installing project dependencies using bower");
 		var projectDirPath = path.resolve(options.path || ".");
-		return this.$childProcess.exec("bower install", { cwd: projectDirPath });
+		var bowerModuleFilePath = require.resolve("bower");
+		var bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
+		var command = util.format("%s %s install", "node", bowerPath);
+		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
 
 	private prepareScreenBuilder(): IFuture<void> {
