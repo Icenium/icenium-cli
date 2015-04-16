@@ -20,13 +20,14 @@ class Sample {
 
 export class SamplesService implements ISamplesService {
 	private static GITHUB_ICENIUM_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
-	private static GITHUB_TELERIK_LOCATION_ENDPOINT = "https://api.github.com/orgs/telerik/repos?per_page=100";
 	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/(?!deprecated-)(sample-|.*?-sample-)[\w\W]+[.]git$/i;
 	private static NAME_FORMAT_REGEX = /(sample-|-)/gi;
 	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i;
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
-	private static NATIVESCRIPT_SAMPLE_CUTENESS_NAME = "nativescript-sample-cuteness";
+	private static GITHUB_CORDOVA_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/sample-[\\w\\W]+[.]git$", "i");
+	private static GITHUB_MOBILE_WEBSITE_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/mobilewebsite-sample-[\\w\\W]+[.]git$", "i");
+	private static GITHUB_NS_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/nativescript-sample-[\\w\\W]+[.]git$", "i");
 	private sampleCategories = [
 		{ id: "demo-app", regEx: /(^|\s)demo($|\s)/i, name: "Demo Applications", order: 1, matchOrder: 2 },
 		{ id: "core-api", regEx: /(^|\s)core($|\s)/i, name: "Core APIs", order: 2, matchOrder: 3 },
@@ -38,23 +39,26 @@ export class SamplesService implements ISamplesService {
 		private $errors: IErrors,
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
-		private $staticConfig: IStaticConfig) {
+		private $staticConfig: IStaticConfig,
+		private $projectConstants: Project.IProjectConstants) {
 	}
 
-	private get samples(): IFuture<Sample[]> {
+	public printSamplesInformation(framework?: string): IFuture<void> {
 		return (() => {
-			if (!this._samples) {
-				this._samples = this.getAllSamples().wait();
+			this.$logger.info("You can choose a sample from the following: %s", os.EOL);
+			if(framework) {
+				this.printSamplesInformationForFramework(framework).wait();
+			} else {
+				_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS).forEach(framework => this.printSamplesInformationForFramework(framework).wait());
 			}
-
-			return this._samples;
-		}).future<Sample[]>()();
+		}).future<void>()();
 	}
 
-	public printSamplesInformation(): IFuture<string> {
+	private printSamplesInformationForFramework(framework: string): IFuture<void> {
 		return (() => {
-			this.$logger.info(this.getSamplesInformation().wait());
-		}).future<string>()();
+			this.$logger.info("%s samples:%s=========================%s", framework, os.EOL, os.EOL);
+			this.$logger.info(this.getSamplesInformation(framework).wait() + os.EOL + os.EOL);
+		}).future<void>()();
 	}
 
 	public cloneSample(sampleName: string): IFuture<void> {
@@ -65,7 +69,7 @@ export class SamplesService implements ISamplesService {
 			}
 
 			var sampleNameLower = sampleName.toLowerCase();
-			var sample = _.find(this.samples.wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
+			var sample = _.find(this.getSamples().wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
 			if (!sample) {
 				this.$errors.fail("There is no sample named '%s'.", sampleName);
 			}
@@ -100,10 +104,10 @@ export class SamplesService implements ISamplesService {
 		}).future<void>()();
 	}
 
-	private getSamplesInformation(): IFuture<string> {
+	private getSamplesInformation(framework: string): IFuture<string> {
 		return (() => {
 			try {
-				var availableSamples = this.samples.wait();
+				var availableSamples = this.getSamples(framework).wait();
 			} catch (error) {
 				return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
 			}
@@ -122,28 +126,39 @@ export class SamplesService implements ISamplesService {
 					return;
 				}
 
-				outputLines.push(util.format("%s:%s======================", category.name, os.EOL));
+				outputLines.push(util.format("   %s:%s   ======================", category.name, os.EOL));
 
 				_.each(category.samples, (sample: Sample) => {
-					var nameRow = util.format("    Sample: %s", sample.displayName);
-					var descriptionRow = util.format("    Description: %s", sample.description);
-					var gitClone = util.format("    Github repository page: %s", sample.githubUrl);
-					var cloneCommand = util.format("    Clone command: $ appbuilder sample clone %s", sample.name);
+					var nameRow = util.format("      Sample: %s", sample.displayName);
+					var descriptionRow = util.format("      Description: %s", sample.description);
+					var gitClone = util.format("      Github repository page: %s", sample.githubUrl);
+					var cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
 					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL));
 				});
 			});
 
-			outputLines.unshift("You can choose a sample from the following:");
 			return outputLines.join(os.EOL + os.EOL);
 		}).future<string>()();
 	}
 
-	private getAllSamples(): IFuture<Sample[]> {
-		return (() => {
-			var iceniumOrganizationSamples = this.getRepositories(SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT, (repo: any) => SamplesService.GITHUB_REGEX.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]).wait();
-			var telerikOrganizationSamples = this.getRepositories(SamplesService.GITHUB_TELERIK_LOCATION_ENDPOINT, (repo: any) => repo.name === SamplesService.NATIVESCRIPT_SAMPLE_CUTENESS_NAME).wait();
-			var repos = _.union(iceniumOrganizationSamples, telerikOrganizationSamples);
+	private getRegExpForFramework(framework?: string): RegExp {
+		framework = framework || "";
+		switch(framework.toLowerCase()) {
+			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase():
+				return SamplesService.GITHUB_NS_SAMPLES_REGEX;
+			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase():
+				return SamplesService.GITHUB_CORDOVA_SAMPLES_REGEX;
+			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite.toLowerCase():
+				return SamplesService.GITHUB_MOBILE_WEBSITE_SAMPLES_REGEX;
+			default:
+				return SamplesService.GITHUB_REGEX;
+		}
+	}
 
+	private getSamples(framework?: string): IFuture<Sample[]> {
+		return (() => {
+			var regex = this.getRegExpForFramework(framework);
+			var repos = _.select(this.getIceniumRepositories().wait(),(repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
 			var samples = _.map(repos, (repo: any) => {
 				return new Sample(
 					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
@@ -174,21 +189,24 @@ export class SamplesService implements ISamplesService {
 		}).future<string[]>()();
 	}
 
-	private getRepositories(gitHubEndpointUrl: string, filter: (repo: any) => boolean): IFuture<string[]> {
-		return (() => {
-			var repos: string[] = [];
+	private _repos: string[];
 
-			for (var page = 1; ; ++page) {
-				var pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
-				if(_.isEmpty(pagedResult)) {
-					break;
+	private getIceniumRepositories(): IFuture<string[]> {
+		return ((): string[] => {
+			if(!this._repos) {
+				var gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
+				this._repos = [];
+
+				for(var page = 1; ; ++page) {
+					var pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
+					if(_.isEmpty(pagedResult)) {
+						break;
+					}
+					Array.prototype.push.apply(this._repos, pagedResult);
 				}
-				Array.prototype.push.apply(repos, pagedResult);
 			}
 
-			repos = _.select(repos, (repo:any) => filter(repo));
-
-			return repos;
+			return this._repos;
 		}).future<string[]>()();
 	}
 

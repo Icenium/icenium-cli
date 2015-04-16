@@ -379,7 +379,7 @@ interface ICordovaMigrationService {
 
 interface ISamplesService {
 	cloneSample(sampleName: string): IFuture<void>;
-	printSamplesInformation(): IFuture<string>;
+	printSamplesInformation(framework?: string): IFuture<void>;
 }
 
 interface IExpress {
@@ -473,6 +473,8 @@ interface IProgressIndicator {
 	showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void>;
 }
 
-interface IProjectCommandsService {
-	generateAllProjectCommands(): void;
+interface IDynamicSubCommandInfo {
+	baseCommandName: string;
+	filePath: string;
+	commandConstructor: Function;
 }

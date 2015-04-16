@@ -43,7 +43,7 @@ class PrompterStub implements IPrompter {
 		this.confirmCalled = true;
 		return Future.fromResult(this.confirmResult);
 	}
-	public dispose() {}
+	public dispose() { }
 }
 
 var mockProjectNameValidator = {

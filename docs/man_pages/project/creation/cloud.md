@@ -27,5 +27,8 @@ Command | Description
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.
 [init website](init-website.html) | Initializes an existing Mobile Website project for development in the current directory.
 [sample](sample.html) | Lists all available sample apps with name, description, GitHub repository, and clone command.
+[sample native](sample-native.html) | Lists all available NativeScript sample apps.
+[sample hybrid](sample-hybrid.html) | Lists all available Apache Cordova sample apps.
+[sample website](sample-website.html) | Lists all available mobile website sample apps.
 [sample clone](sample-clone.html) | Clones the selected sample app from GitHub to your local file system.
 <% } %>
