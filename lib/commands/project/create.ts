@@ -6,12 +6,17 @@ import path = require("path");
 import options = require("./../../options");
 import util = require("util");
 
-export class CreateCommand implements ICommand {
-	constructor(private $fs: IFileSystem,
+import ProjectCommandBaseLib = require("./project-command-base");
+
+export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
+	constructor($errors: IErrors,
+		private $fs: IFileSystem,
 		private $nameCommandParameter: ICommandParameter,
-		private $project: Project.IProject,
+		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-		private $screenBuilderService: IScreenBuilderService) { }
+		private $screenBuilderService: IScreenBuilderService) {
+		super($errors, $project);
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -30,6 +35,10 @@ export class CreateCommand implements ICommand {
 
 			this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 		}).future<void>()();
+	}
+
+	public canExecute(args: string[]): IFuture<boolean> {
+		return this.canExecuteCore();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];
