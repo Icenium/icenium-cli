@@ -428,6 +428,9 @@ declare module Server{
 		getLinuxBuildMachineStatus(): IFuture<string>;
 		getMacBuildMachineStatus(): IFuture<string>;
 	}
+	interface PatchData{
+		Platforms: Server.DevicePlatform[];
+	}
 	interface FeatureStatus{
 		IsAvailable: boolean;
 		IsAccountUpgradeRequired: boolean;
@@ -436,6 +439,7 @@ declare module Server{
 	interface ITamServiceContract{
 		verifyStoreCreated(): IFuture<void>;
 		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void>;
+		uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
 	}
 	interface TapSolutionData{
