@@ -48,6 +48,10 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
+			var parts = pluginName.split("@");
+			pluginName = parts[0];
+			var version = parts[1] || "";
+
 			var pluginNameToLowerCase = pluginName.toLowerCase();
 			if(!_.any(this.getAvailablePlugins(), (pl) => pl.data.Name.toLowerCase() ===  pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
@@ -58,7 +62,7 @@ export class PluginsService implements IPluginsService {
 			if(installedPlugin) {
 				if(installedPlugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
 					this.$logger.info("Plugin '%s' is already installed", pluginName);
-					var message = util.format("Would you like to update the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
+					var message = util.format("Would you like to change the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
 					if (this.$prompter.confirm(message, () => true).wait()) {
 						var versions = this.getPluginVersions(pluginName);
 						var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
@@ -89,10 +93,6 @@ export class PluginsService implements IPluginsService {
 					this.$errors.fail("Plugin '%s' is already installed", pluginName);
 				}
 			}
-
-			var parts = pluginName.split("@");
-			pluginName = parts[0];
-			var version = parts[1] || "";
 
 			if(this.getPluginByName(pluginName).type === pluginsDataLib.PluginType.MarketplacePlugin && !version) {
 				var versions = this.getPluginVersions(pluginName);
