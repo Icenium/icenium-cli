@@ -1,13 +1,22 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-export class CreateProjectCommand implements ICommand {
-	constructor(private frameworkIdentifier: string,
+import ProjectCommandBaseLib = require("./project-command-base");
+
+export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBase {
+	constructor($errors: IErrors,
+		private frameworkIdentifier: string,
 		private $nameCommandParameter: ICommandParameter,
-		private $project: Project.IProject) { }
+		$project: Project.IProject) {
+		super($errors, $project);
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return this.$project.createNewProject(args[0], this.frameworkIdentifier);
+	}
+
+	public canExecute(args: string[]): IFuture<boolean> {
+		return this.canExecuteCore();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];
