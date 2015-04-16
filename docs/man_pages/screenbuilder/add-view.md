@@ -1,7 +1,7 @@
 add-view
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-view`
 Generates a new folder with the name of the view and scaffolds two files in it - view.html and index.js. You can also choose whether you want to include the view in the main navigation

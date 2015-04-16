@@ -1,7 +1,7 @@
 add-field
 ==========
 
-Usage | Syntax
+Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-field`
 Generates an input field pair (Label and Input field) that you can add to any of your available forms. You can add as many fields as you want to your forms.

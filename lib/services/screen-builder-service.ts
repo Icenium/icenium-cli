@@ -28,6 +28,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public allSupportedCommands(generatorName: string): IFuture<string[]> {
 		return (() => {
+			generatorName = generatorName || this.generatorName;
 			var scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
 			var allSupportedCommands = scaffolderData.future.wait();

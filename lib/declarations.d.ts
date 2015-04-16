@@ -339,7 +339,7 @@ interface IAppScaffoldingExtensionsService {
 interface IScreenBuilderService {
 	generatorName: string;
 	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void>;
-	allSupportedCommands(generatorName: string): IFuture<string[]>;
+	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
 	installAppDependencies(): IFuture<void>;
 }

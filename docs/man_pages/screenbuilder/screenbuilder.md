@@ -1,17 +1,10 @@
-create
+screenbuilder
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder add-dataProvider`
-Preserves information for your custom DataProvider. After you generate a DataProvider you can reuse it in as many places as you wish.
-
-The following Data Providers are available:
-    * Telerik Backend Services
-    * JSON
-    * OData
-    * Object
-    * XML
+General | `$ appbuilder screenbuilder`
+Shows all supported Screen Builder commands.
 <% if(isHtml) { %> 
 
 #### Related Commands
