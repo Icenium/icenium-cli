@@ -298,6 +298,7 @@ export class BuildService implements Project.IBuildService {
 			this.$project.ensureProject();
 
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
+			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
 			settings.configuration = settings.configuration || (options.release ? "Release" : "Debug");
 			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);

@@ -92,7 +92,9 @@ function createTestInjector() {
 	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
-		validate: (data: IProjectData) => { }
+		validate: (data: IProjectData) => { },
+		validateWithBuildSchema: (data: IProjectData, platformName: string): void => { },
+		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => { }
 	});
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
