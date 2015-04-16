@@ -2,6 +2,7 @@
 "use strict";
 
 import options = require("../../common/options");
+import pluginsDataLib = require("./../../plugins-data");
 
 export class AddPluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
@@ -11,7 +12,28 @@ export class AddPluginCommand implements ICommand {
 		return (() => {
 			if(options.available){
 				var installedPlugins = this.$pluginsService.getInstalledPlugins();
-				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => _.any(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name));
+				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
+					if(plugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
+						var marketPlacePlugin = <IMarketplacePlugin>plugin;
+						var installedPlugin = _.find(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name && installedPlugin.data.Version === plugin.data.Version);
+						if(installedPlugin) {
+							if(marketPlacePlugin.pluginVersionsData.Versions.length > 1) {
+								// reject installed version
+								marketPlacePlugin.pluginVersionsData.Versions = <any>_.reject(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === installedPlugin.data.Version);
+								var defaultVersion = (<any>marketPlacePlugin.pluginVersionsData).DefaultVersion;
+
+								if(defaultVersion !== installedPlugin.data.Version) { // The default version is installed, we need to change DefaultVersion property
+									marketPlacePlugin.data = _.find(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === defaultVersion);
+									(<any>marketPlacePlugin.pluginVersionsData).DefaultVersion = marketPlacePlugin.data.Version;
+								}
+								return false;
+							}
+							return true;
+						}
+					}
+
+					return _.any(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name)
+				});
 				this.$pluginsService.printPlugins(plugins);
 			} else {
 				this.$pluginsService.addPlugin(args[0]).wait();

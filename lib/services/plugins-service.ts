@@ -50,7 +50,7 @@ export class PluginsService implements IPluginsService {
 
 			var parts = pluginName.split("@");
 			pluginName = parts[0];
-			var version = parts[1] || "";
+			var version = parts[1];
 
 			var pluginNameToLowerCase = pluginName.toLowerCase();
 			if(!_.any(this.getAvailablePlugins(), (pl) => pl.data.Name.toLowerCase() ===  pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
@@ -61,15 +61,25 @@ export class PluginsService implements IPluginsService {
 
 			if(installedPlugin) {
 				if(installedPlugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
-					this.$logger.info("Plugin '%s' is already installed", pluginName);
+					this.$logger.info("Plugin '%s' with version '%s' is already installed.", pluginName, version);
 					var message = util.format("Would you like to change the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
-					if (this.$prompter.confirm(message, () => true).wait()) {
+					var confirm = version ? true : this.$prompter.confirm(message, () => true).wait();
+					if (confirm) {
 						var versions = this.getPluginVersions(pluginName);
-						var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
-						versions.splice(currentVersionIndex, 1);
 
-						var version = this.promptForVersion(pluginName, versions).wait();
-						this.$logger.info("Updating plugin '%s' to version %s..", pluginName, version);
+						if(version) {
+							if(!_.any(versions, v => v.value === version)) {
+								this.$errors.fail("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
+							} else if(installedPlugin.data.Version === version) {
+								return;
+							}
+						} else {
+							var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
+							versions.splice(currentVersionIndex, 1);
+							version = this.promptForVersion(pluginName, versions).wait();
+						}
+
+						this.$logger.info("Updating plugin '%s' to version %s.", pluginName, version);
 
 						var updatePlugin = (pluginName:string, configuration?:string) => {
 							var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), installedPlugin.toProjectDataRecord());
@@ -94,11 +104,15 @@ export class PluginsService implements IPluginsService {
 				}
 			}
 
-			if(this.getPluginByName(pluginName).type === pluginsDataLib.PluginType.MarketplacePlugin && !version) {
+			var pluginToAdd = this.getPluginByName(pluginName);
+			if(pluginToAdd.type === pluginsDataLib.PluginType.MarketplacePlugin) {
 				var versions = this.getPluginVersions(pluginName);
-				version = this.promptForVersion(pluginName, versions).wait();
+				if(version && !_.any(versions, v => v.value === version)) {
+					this.$errors.fail("Invalid version %s. The valid versions are: %s", version, versions.map(v => v.value).join(", "));
+				} else if(!version) {
+					version = this.promptForVersion(pluginName, versions).wait();
+				}
 			}
-
 
 			this.configurePlugin(pluginName, version).wait();
 
@@ -130,19 +144,26 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public printPlugins(plugins: IPlugin[]): void {
-		var groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
-		var outputLines:string[] = [];
+		if(options.available) {
+			// Group marketplace plugins
+			var marketplacePlugins = _.filter(plugins, (pl) => pl.type === pluginsDataLib.PluginType.MarketplacePlugin);
+			var output = _.filter(plugins, pl => pl.type === pluginsDataLib.PluginType.CorePlugin || pl.type === pluginsDataLib.PluginType.AdvancedPlugin);
 
-		_.each(Object.keys(groups), (group: string) => {
-			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
-
-			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
-			_.each(sortedPlugins, (plugin: IPlugin) => {
-				outputLines.push(plugin.pluginInformation.join(os.EOL));
+			var groups = _.groupBy(marketplacePlugins, (plugin:IPlugin) => plugin.data.Identifier);
+			_.each(groups, (group:any) => {
+				var defaultData = _.find(group, (gr:IPlugin) => {
+					var pvd = (<any>gr).pluginVersionsData;
+					return pvd && gr.data.Version === pvd.DefaultVersion;
+				});
+				if (defaultData) {
+					output.push(defaultData);
+				}
 			});
-		});
 
-		this.$logger.out(outputLines.join(os.EOL + os.EOL));
+			this.printPluginsCore(output);
+		} else {
+			this.printPluginsCore(plugins);
+		}
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
@@ -349,6 +370,22 @@ export class PluginsService implements IPluginsService {
 			var version = answer.version;
 			return version;
 		}).future<string>()();
+	}
+
+	private printPluginsCore(plugins: IPlugin[]): void {
+		var groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
+		var outputLines:string[] = [];
+
+		_.each(Object.keys(groups), (group: string) => {
+			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
+
+			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
+			_.each(sortedPlugins, (plugin: IPlugin) => {
+				outputLines.push(plugin.pluginInformation.join(os.EOL));
+			});
+		});
+
+		this.$logger.out(outputLines.join(os.EOL + os.EOL));
 	}
 }
 $injector.register("pluginsService", PluginsService);
