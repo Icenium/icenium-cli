@@ -1,20 +1,15 @@
-create
+create screenbuilder
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder create [<Type>] [<App name>]`
+General | `$ appbuilder create screenbuilder <App name>`
 
-If only `<App name>` is specified, new Screen Builder project will be created.
-Creates a project for hybrid, native or mobile website development. You must run the `create` command with a command extension that specifies the project type.
+Creates a new Screen Builder project.
 
 ### Attributes
-`<Type>` extends the `create` command. You can set the following values for this attribute.
-* `hybrid` - Creates a new project from an **Apache Cordova** template.
-* `native` - Creates a new project from a **NativeScript** template.
-* `website` - Creates a new project from a **Mobile Website** template.
-* `screenbuilder` - Creates a new **Screen Builder** project.
-`<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ). 
+* `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
+* `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
 
 <% if(isHtml) { %> 
 ### Related Commands
@@ -26,7 +21,6 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create website](create-website.html) | Creates a new project from a Mobile Website-based template.
-[create screenbuilder](create-screenbuilder.html) | Creates a new Screen Builder project.
 [init](init.html) | Initializes an existing project for development.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.
