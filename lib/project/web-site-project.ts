@@ -33,6 +33,7 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 			livesyncCompanion: false,
 			updateKendo: false,
 			emulate: false,
+			publish: true,
 			uploadToAppstore: false
 		};
 	}

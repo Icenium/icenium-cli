@@ -369,6 +369,10 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
 		return undefined;
 	}
+
+	public excludeFile(projectDir: string, excludeFilePath: string) : void {
+		return undefined;
+	}
 }
 
 export class StaticConfig implements IStaticConfig {

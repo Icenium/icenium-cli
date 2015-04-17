@@ -94,6 +94,15 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 		return this.isFileExcluded(relativeToProjectPath, excludedProjectDirsAndFiles, projectDir);
 	}
 
+	public excludeFile(projectDir: string, excludeFilePath: string) : void {
+		if (!this.isProjectFileExcluded(projectDir, excludeFilePath)) {
+			var relativeToProjectPath = path.relative(projectDir, excludeFilePath);
+			var appendData = '\n' + relativeToProjectPath + '\n';
+			var ignoreFilePath = path.join(projectDir, ProjectFilesManager.IGNORE_FILE);
+			this.$fs.appendFile(ignoreFilePath, appendData).wait();
+		}
+	}
+
 	private get ignoreFilesConfigurations(): string[] {
 		var configurations: string[] = [ ProjectFilesManager.IGNORE_FILE ];
 		// unless release is explicitly set, we use debug config

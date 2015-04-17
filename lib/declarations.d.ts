@@ -160,6 +160,7 @@ interface IProjectCapabilities {
 	livesyncCompanion: boolean;
 	updateKendo: boolean;
 	emulate: boolean;
+	publish: boolean;
 	uploadToAppstore: boolean;
 }
 
@@ -478,4 +479,18 @@ interface IDynamicSubCommandInfo {
 	baseCommandName: string;
 	filePath: string;
 	commandConstructor: Function;
+}
+
+interface IPublishService {
+	publish(idOrUrl: string, username: string, password: string): IFuture<void>;
+	listAllConnections(): void;
+	addConnection(name: string, publishUrl: string): IFuture<void>;
+	removeConnection(idOrName: string): IFuture<void>;
+}
+
+interface IPublishConnection extends IStringDictionary {
+	type: string;
+	publicUrl: string;
+	publishUrl: string;
+	name: string;
 }

@@ -24,12 +24,14 @@ var knownOpts: any = {
 		"release": Boolean,
 		"debug": Boolean,
 		"valid-value": Boolean,
-		"screenBuilderCacheDir": String
+		"screenBuilderCacheDir": String,
+		"force": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",
 		"r": "release",
-		"d": "debug"
+		"d": "debug",
+		"f": "force"
 	};
 
 _.extend(commonOptions.knownOpts, knownOpts);

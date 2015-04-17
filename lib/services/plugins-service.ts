@@ -339,14 +339,7 @@ export class PluginsService implements IPluginsService {
 
 	private promptForVersionCore(pluginName: string, versions: any[]): IFuture<string> {
 		return (() => {
-			var promptData = [{
-				type: "list",
-				name: "version",
-				message: "Which plugin version would you like to use?",
-				choices: versions
-			}];
-			var answer = this.$prompter.get(promptData).wait();
-			var version = answer.version;
+			var version = this.$prompter.promptForChoice("Which plugin version do you want to use?", versions).wait();
 			return version;
 		}).future<string>()();
 	}

@@ -88,6 +88,7 @@ declare module Project {
 		availableConfigFiles: IDictionary<Project.IConfigurationFile>;
 		enumerateProjectFiles(projectDir: string, additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
 		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
+		excludeFile(projectDir: string, excludeFilePath: string) : void;
 	}
 
 	interface IProjectConstants {

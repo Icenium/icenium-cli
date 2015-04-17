@@ -382,7 +382,14 @@ declare module Server{
 		getInstalledPackages(solutionName: string, projectName: string): IFuture<Server.PackageData[]>;
 		getFilters(): IFuture<Server.BowerPackagesFilters>;
 	}
+	interface FtpConnectionData{
+		RemoteUrl: string;
+		ShouldPurge: boolean;
+		Username: string;
+		Password: string;
+	}
 	interface IPublishServiceContract{
+		publishFtp(solutionName: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
 	}
 	interface IRawSettingsServiceContract{
 		getUserSettings($resultStream: any): IFuture<void>;
