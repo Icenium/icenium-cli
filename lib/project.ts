@@ -796,7 +796,7 @@ export class Project implements Project.IProject {
 
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if(this.$fs.exists(templateFileName).wait()) {
-				projectDir = path.join(projectDir, appname);
+				projectDir = (options.path) ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
 				try {
