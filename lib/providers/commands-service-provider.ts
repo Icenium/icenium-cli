@@ -39,6 +39,10 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		];
 	}
 
+	public get dynamicCommandsPrefix(): string {
+		return this.$screenBuilderService.commandsPrefix;
+	}
+
 	public getDynamicCommands(): IFuture<string[]> {
 		return this.$screenBuilderService.allSupportedCommands(this.$screenBuilderService.generatorName);
 	}
