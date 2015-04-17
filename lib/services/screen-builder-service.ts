@@ -19,6 +19,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "generator-kendo-ui-mobile";
 	}
 
+	public get commandsPrefix(): string {
+		return "add";
+	}
+
 	public prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void> {
 		return (() => {
 			this.$logger.out("Please, wait while Screen Builder and its dependencies are being configured.");
@@ -32,7 +36,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			var scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
 			var allSupportedCommands = scaffolderData.future.wait();
-			return _.map(allSupportedCommands, (command:string) => util.format("add-%s", command.toLowerCase()));
+			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command));
 		}).future<string[]>()();
 	}
 

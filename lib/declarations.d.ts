@@ -338,6 +338,7 @@ interface IAppScaffoldingExtensionsService {
 
 interface IScreenBuilderService {
 	generatorName: string;
+	commandsPrefix: string;
 	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void>;
 	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
