@@ -31,7 +31,7 @@ export class PublishService implements IPublishService {
 		this.$project.ensureProject();
 
 		if (!this.$project.capabilities.publish) {
-			this.$errors.failWithoutHelp("The publish command is only applicable to projects of type %s", this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
+			this.$errors.failWithoutHelp("This command is only applicable to %s projects ", this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite);
 		}
 
 		this.readConnections().wait();
