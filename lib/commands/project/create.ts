@@ -22,7 +22,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		return (() => {
 			var projectName = args[0];
 			var projectPath = path.join(this.$project.getNewProjectDir(), projectName);
-			this.$fs.createDirectory(projectPath).wait();
+			this.$project.createTemplateFolder(projectPath).wait();
 
 			var screenBuilderOptions = {
 				projectPath: projectPath,
