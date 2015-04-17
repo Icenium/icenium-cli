@@ -6,11 +6,7 @@ export class NameParameter implements ICommandParameter {
 	mandatory = true;
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			if(validationValue) {
-				return this.$projectNameValidator.validate(validationValue);
-			}
-
-			return false;
+			return this.$projectNameValidator.validate(validationValue);
 		}).future<boolean>()();
 	}
 }

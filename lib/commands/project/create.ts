@@ -19,6 +19,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.validateProjectData();
+
 			var projectName = args[0];
 			var projectPath = path.join(this.$project.getNewProjectDir(), projectName);
 			this.$project.createTemplateFolder(projectPath).wait();
@@ -34,10 +36,6 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 			this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 		}).future<void>()();
-	}
-
-	public canExecute(args: string[]): IFuture<boolean> {
-		return this.canExecuteCore();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];

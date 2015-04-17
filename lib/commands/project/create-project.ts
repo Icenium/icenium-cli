@@ -12,11 +12,8 @@ export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBa
 	}
 
 	public execute(args: string[]): IFuture<void> {
+		this.validateProjectData();
 		return this.$project.createNewProject(args[0], this.frameworkIdentifier);
-	}
-
-	public canExecute(args: string[]): IFuture<boolean> {
-		return this.canExecuteCore();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];
