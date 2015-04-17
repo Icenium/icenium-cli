@@ -187,7 +187,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	var projectFilePath = path.join(tempFolder, projectName, getProjectFileName(configuration));
+	var projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
 	var abProjectContent = fs.readJson(projectFilePath).wait();
 
 	updateTestInjector(testInjector, getCordovaPluginsData(abProjectContent["CorePlugins"]), availableMarketplacePlugins);
