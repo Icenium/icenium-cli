@@ -250,6 +250,7 @@ export class Project implements Project.IProject {
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
 
 			this.createProjectFileFromExistingProject(projectDir, framework).wait();
+			this.$logger.info("Successfully initialized %s project.", framework); 
 		}).future<void>()();
 	}
 

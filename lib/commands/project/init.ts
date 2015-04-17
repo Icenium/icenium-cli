@@ -12,7 +12,6 @@ export class InitProjectCommand implements ICommand {
 	private cordovaFiles: FileDescriptor[];
 	public projectDir: string;
 	public tnsModulesDir: FileDescriptor;
-	public bootstrapFile: FileDescriptor;
 	public indexHtml: FileDescriptor;
 	public projectFilesDescriptors: any;
 
@@ -25,7 +24,6 @@ export class InitProjectCommand implements ICommand {
 
 		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
-		this.bootstrapFile = new FileDescriptor(path.join(this.projectDir, "app", "bootstrap.js"), "file");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
 		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file"));
 
@@ -81,9 +79,9 @@ export class InitProjectCommand implements ICommand {
 	private generateMandatoryAndForbiddenFiles() {
 		this.projectFilesDescriptors = Object.create(null);
 
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova,  this.cordovaFiles, [this.bootstrapFile, this.tnsModulesDir]);
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.bootstrapFile, this.tnsModulesDir], this.cordovaFiles.concat([this.indexHtml]));
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite, [this.indexHtml],  this.cordovaFiles.concat([this.bootstrapFile, this.tnsModulesDir]));
+		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.cordovaFiles, [this.tnsModulesDir]);
+		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.tnsModulesDir], this.cordovaFiles.concat([this.indexHtml]));
+		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite, [this.indexHtml], this.cordovaFiles.concat([this.tnsModulesDir]));
 	}
 
 	private generateMandatoryAndForbiddenFilesCore(frameworkIdentifer: string, manddatorFiles: FileDescriptor[], forbiddenFiles: FileDescriptor[]): void {
