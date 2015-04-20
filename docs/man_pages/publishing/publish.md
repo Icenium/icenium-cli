@@ -39,4 +39,5 @@ Command | Description
 ----------|----------
 [publish](publish.html) | Lists all saved connections or publishes to the selected connection.
 [publish add](publish-add.html) | Saves a new server connection.
+[publish remove](publish-remove.html) | Removes a saved connection.
 <% } %>
