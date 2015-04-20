@@ -32,15 +32,6 @@ export class SimulateCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureProject();
-
-			if (!this.$project.capabilities.simulate) {
-				this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.Framework);
-			}
-
-			if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
-				this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on Linux. The device simulator for Linux will become available in a future release of the Telerik AppBuilder CLI.");
-			}
 
 			this.$loginManager.ensureLoggedIn().wait();
 
@@ -57,6 +48,16 @@ export class SimulateCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 
 	public canExecute(args: string[]): IFuture<boolean> {
+		if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on %s. The device simulator for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
+		}
+
+		this.$project.ensureProject();
+
+		if(!this.$project.capabilities.simulate) {
+			this.$errors.fail("You cannot run %s based projects in the device simulator.", this.$project.projectData.Framework);
+		}
+
 		return this.$simulatorPlatformServices.canRunApplication();
 	}
 
