@@ -105,9 +105,11 @@ export class Project implements Project.IProject {
 			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
 				var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 				var configFiles = frameworkProject.configFiles;
-				var title = util.format("Configuration files for %s projects:", framework);
-				result.push(title);
-				result.push(this.configurationFilesStringCore(configFiles));
+				if(configFiles && configFiles.length > 0) {
+					var title = util.format("Configuration files for %s projects:", framework);
+					result.push(title);
+					result.push(this.configurationFilesStringCore(configFiles));
+				}
 			});
 
 			return result.join("\n")
