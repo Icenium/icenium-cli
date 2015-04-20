@@ -8,7 +8,7 @@ General | `$ appbuilder <Command> [Parameters] [--options <Values>]`
 ## General Commands
 Command | Description
 -------|----------
-[help <Command>](general/help.html) | Shows additional information about the commands in this list.
+[help `<Command>`](general/help.html) | Shows additional information about the commands in this list.
 [login](general/login.html) | Logs you in the Telerik Platform.
 [logout](general/logout.html) | Logs you out from the Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
