@@ -430,6 +430,10 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
+			if(propertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
+				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(propertyName, propertyValues[0]);
+			}
+
 			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
@@ -633,6 +637,7 @@ export class Project implements Project.IProject {
 
 	private validateProjectData(properties: any): void {
 		this.$jsonSchemaValidator.validate(properties);
+		this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME, properties.AppIdentifier);
 	}
 
 	public saveProject(projectDir: string): IFuture<void> {
@@ -796,7 +801,7 @@ export class Project implements Project.IProject {
 
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if(this.$fs.exists(templateFileName).wait()) {
-				projectDir = path.join(projectDir, appname);
+				projectDir = (options.path) ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
 				try {

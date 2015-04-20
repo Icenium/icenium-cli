@@ -10,7 +10,6 @@ import ProjectCommandBaseLib = require("./project-command-base");
 
 export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	constructor($errors: IErrors,
-		private $fs: IFileSystem,
 		private $nameCommandParameter: ICommandParameter,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
@@ -44,3 +43,4 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	allowedParameters = [this.$nameCommandParameter];
 }
 $injector.registerCommand("create|*default", CreateCommand);
+$injector.registerCommand("create|screenbuilder", CreateCommand);

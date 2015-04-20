@@ -87,6 +87,7 @@ $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
 $injector.requireCommand("create|*default", "./commands/project/create");
+$injector.requireCommand("create|screenbuilder", "./commands/project/create");
 $injector.requireCommand("init|*unknown", "./commands/project/init");
 
 $injector.requireCommand("prop|add", "./commands/prop/prop-add");
