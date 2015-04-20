@@ -13,8 +13,7 @@ describe("project-name-validator smoke tests", () => {
 	before(() => {
 		var testInjector = new yok.Yok();
 		testInjector.register("errors", stubs.ErrorsStub);
-		testInjector.register("projectNameValidator", "../lib/common/validators/project-name-validator");
-		validator = testInjector.resolve("projectNameValidator");
+		validator = testInjector.resolve(pnv.ProjectNameValidator);
 	});
 
 	it("invalid chars in the middle", () => {
@@ -30,7 +29,11 @@ describe("project-name-validator smoke tests", () => {
 	});
 
 	it("only numbers", () => {
-		assert.ok(() => validator.validate("123"));
+		assert.strictEqual(true, validator.validate("123"));
+	});
+
+	it("invalid length", () => {
+		assert.throws(() => validator.validate("Thirtyone character long string"));
 	});
 });
 

@@ -193,6 +193,13 @@ describe("project integration tests", () => {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
+
+		it("with long name should throw ", () => {
+			project = testInjector.resolve(projectlib.Project);
+			var projectName = "Thirtyone character long string";
+
+			assert.throws(() => project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait());
+		});
 	});
 
 	describe("updateProjectPropertiesAndSave",() => {
