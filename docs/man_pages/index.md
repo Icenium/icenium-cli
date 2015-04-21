@@ -4,11 +4,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder <Command> [Parameters] [--options <Values>]`
 
-
 ## General Commands
 Command | Description
 -------|----------
-[help `<Command>`](general/help.html) | Shows additional information about the commands in this list.
+[help `<Command>`](general/help.html) | Shows additional information about the commands in this list in the browser.
 [login](general/login.html) | Logs you in the Telerik Platform.
 [logout](general/logout.html) | Logs you out from the Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
@@ -82,7 +81,7 @@ Command | Description
 ## Global Options
 Option | Description
 -------|---------
---help,&nbsp;-h,&nbsp;/? | Prints help about the selected command.
+--help,&nbsp;-h,&nbsp;/? | Prints help about the selected command in the console.
 --path `<Directory>` | Specifies the directory that contains the project. If not set, the project is searched for in the current directory and all directories above it.
 --version | Prints the client version.
 --log&nbsp;trace | Prints a detailed diagnostic log for the execution of the current command.
