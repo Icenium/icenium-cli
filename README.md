@@ -91,7 +91,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 * Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 
-   > **IMPORTANT:** If you are using `sudo apt-get install` to install Node.js, make sure to install the `nodejs-legacy` package instead of `node`.
+   > **TIP:** You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
 
 * An Internet browser (latest official release)
 * (64-bit systems) The runtime libraries for the ia32/i386 architecture
