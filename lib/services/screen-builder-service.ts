@@ -7,6 +7,9 @@ import options = require("../options");
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
+	private static PREDEFINED_SCREENBUILDER_TYPES: IStringDictionary = {
+		dataprovider: "dataProvider"
+	}
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
 		private $childProcess: IChildProcess,
@@ -36,7 +39,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			var scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
 			var allSupportedCommands = scaffolderData.future.wait();
-			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command));
+			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 		}).future<string[]>()();
 	}
 
@@ -69,6 +72,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		var scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
 		var scaffolder = scaffolderData.scaffolder;
 		var type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
+		type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
 
 		if(type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE) {
 			scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);

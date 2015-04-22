@@ -12,7 +12,7 @@ Generates an input field pair (Label and Input field) that you can add to any of
 
 Command | Description
 ----------|----------
-[add-dataProvider](add-dataProvider.html) | Preserves information for your custom DataProvider.
+[add-dataprovider](add-dataprovider.html) | Preserves information for your custom DataProvider.
 [add-field](add-field.html) | Generates an input field pair (Label and Input field) that you can add to any of your available forms.
 [add-form](add-form.html) | Generates а generic input form that you can later fill in with any input field you like.
 [add-list](add-list.html) | Generates a list and inserts it in the selected view.
