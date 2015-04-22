@@ -131,15 +131,33 @@ export class ScreenBuilderService implements IScreenBuilderService {
 $injector.register("screenBuilderService", ScreenBuilderService);
 
 class ScreenBuilderDynamicCommand implements ICommand {
+	private static SCREEN_BUILDER_SPECIFIC_FILES = [".yo-rc.json", ".app.json", "app.js"];
+
 	constructor(public generatorName: string,
 		public command: string,
+		private $errors: IErrors,
+		private $fs: IFileSystem,
+		private $project: Project.IProject,
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public execute(args: string[]): IFuture<void> {
+		this.ensureScreenBuilderProject().wait();
+
 		var screenBuilderOptions = {
 			type: this.command.substr(this.command.indexOf("-") + 1)
 		};
 		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
+	}
+
+	private ensureScreenBuilderProject(): IFuture<void> {
+		return (() => {
+			this.$project.ensureProject();
+
+			var projectDir = this.$project.getProjectDir().wait();
+			if(!_.every(ScreenBuilderDynamicCommand.SCREEN_BUILDER_SPECIFIC_FILES, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
+				this.$errors.fail("This command is applicable only to Screen Builder projects.");
+			}
+		}).future<void>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
