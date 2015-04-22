@@ -61,7 +61,6 @@ export class PluginsService implements IPluginsService {
 
 			if(installedPlugin) {
 				if(installedPlugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
-					this.$logger.info("Plugin '%s' with version '%s' is already installed.", pluginName, version);
 					var message = util.format("Would you like to change the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
 					var confirm = version ? true : this.$prompter.confirm(message, () => true).wait();
 					if (confirm) {
@@ -71,6 +70,7 @@ export class PluginsService implements IPluginsService {
 							if(!_.any(versions, v => v.value === version)) {
 								this.$errors.fail("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
 							} else if(installedPlugin.data.Version === version) {
+								this.$logger.info("Plugin '%s' with version '%s' is already installed.", pluginName, version);
 								return;
 							}
 						} else {
