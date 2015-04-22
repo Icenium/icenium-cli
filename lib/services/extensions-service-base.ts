@@ -5,6 +5,7 @@ import path = require("path");
 import options = require("../common/options");
 import helpers = require("../helpers");
 import temp = require("temp");
+import util = require("util");
 temp.track();
 
 export class ExtensionsServiceBase {
