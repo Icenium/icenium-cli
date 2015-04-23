@@ -19,11 +19,12 @@ export class PluginsService implements IPluginsService {
 		private $errors: IErrors,
 		private $logger: ILogger,
 		private $project: Project.IProject,
-		private $prompter: IPrompter) {
+		private $prompter: IPrompter,
+		private $loginManager: ILoginManager) {
 
 		// Cordova plugin commands are only applicable to Cordova projects
 		this.$project.ensureCordovaProject();
-
+		this.$loginManager.ensureLoggedIn().wait();
 		this.identifierToPlugin = Object.create(null);
 		Future.wait([this.createPluginsData($cordovaPluginsService),
 			this.createPluginsData($marketplacePluginsService)]);

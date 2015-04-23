@@ -109,7 +109,11 @@ function createTestInjector() {
 	testInjector.register("mobileHelper", mobileHelperLib.MobileHelper);
 	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
-
+	testInjector.register("loginManager", {
+		ensureLoggedIn: (): IFuture<void> => {
+			return Future.fromResult();
+		}
+	});
 	return testInjector;
 }
 
