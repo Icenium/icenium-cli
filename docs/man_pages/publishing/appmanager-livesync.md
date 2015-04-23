@@ -5,31 +5,35 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager livesync [<Platforms>]`
 
-Publish a new update of your application in AppManager. <% if(isHtml) { %>If you have not enabled the AppManager LiveSync plugin for your project, it will be automatically enabled for the release build configuration.<% } %>
-In case you do not specify a platform, the patch will be published for all platforms (in case you confirm the prompt dialog).
+Publishes a new Telerik AppManager LiveSync update of your published application. <% if(isHtml) { %>If you have not enabled the AppManager LiveSync plugin for your project, it will be automatically enabled for the release build configuration. If you do not specify a platform, the AppBuilder CLI will prompt you to choose your target mobile platforms.
 
-<% if(isConsole && isMobileWebsite) { %>WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync`<% } %>
+For more information about AppManager LiveSync, see [Update Your Published App with AppManager LiveSync](http://docs.telerik.com/platform/appbuilder/publishing-your-app/update-appmanager-livesync#cli).<% } %>
 
-<% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync`<% } %>
+<% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync` <% } %> 
+<% } %>
+
+<% if((isConsole && isCordova) || isHtml) { %>
 ### Attributes
-`<Platforms>` is one or more target platforms, separated by a space, for which you want to publish an update in AppManager. You can set the following target platforms.
+`<Platforms>` is one or more target platforms, separated by a space, for which you want to create a Telerik AppManager LiveSync update. You can set the following target platforms.
 * `android` - Publishes an update for your Android application.
 * `ios` - Publishes an update for your iOS application.
-<% if(isCordova) { %>* `wp8` - Publishes an update for your Windows Phone application.<% } %>
-
-If you do not set a target platform, the AppBuilder CLI publishes an update for all platforms. 
+* `wp8` - Publishes an update for your Windows Phone application.
 <% } %>
 
 <% if(isHtml) { %> 
-
 ### Prerequisites
 
-* You must have published a major version of your app, enabled for AppManager LiveSync. To create a new major version enabled for AppManager LiveSync, run `$ appbuilder appmanager upload <Platform>`
+* You must have a published version of your app, enabled for AppManager LiveSync, in Telerik AppManager, Google Play, Apple App Store or Windows Phone Store. To create a new version enabled for AppManager LiveSync, complete the following steps.
+	1. Enable your project for AppManager LiveSync by running `$ appbuilder plugin add com.telerik.LivePatch --release`
+	1. Publish your app to [Telerik AppManager](http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#cli), [Google Play](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-android#cli), [Apple App Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-ios#cli) or [Windows Phone Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#cli).
+* Your project must target Apache Cordova 3.0.0 or later.
 
 ### Command Limitations
 
 * You cannot run this command on mobile website projects.
-* You cannot publish an update for Windows Phone for NativeScript projects.
+* You cannot run this command on NativeScript projects.
 
 ### Related Commands
 
