@@ -23,6 +23,6 @@ Command | Description
 [add-form](add-form.html) | Generates а generic input form that you can later fill in with any input field you like.
 [add-list](add-list.html) | Generates a list and inserts it in the selected view.
 [add-signin](add-signin.html) | Creates a new project from a Mobile Website-based template.
-[add-signup](add-singup.html) | Generates a Sign Up form with several common user profile fields.
+[add-signup](add-signup.html) | Generates a Sign Up form with several common user profile fields.
 [add-view](add-view.html) | Generates a new folder with the name of the view and scaffolds two files in it - view.html and index.js.
 <% } %>
