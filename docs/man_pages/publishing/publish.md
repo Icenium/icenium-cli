@@ -17,11 +17,11 @@ Lists saved server connections or lets you publish your website to a selected se
 
 <% if((isConsole && isMobileWebsite) || isHtml) { %>
 ### Options
-* `--force | -f` - If set, purges the project directory on the remote server before uploading the mobile website.
+* `--force | -f` - If set, purges the project directory on the remote server before uploading the mobile website. This switch is required, if you have published your website to the same URL before.
 
 ### Attributes
 * `<Connection Index>` is the index of the connection as listed by `$ appbuilder publish`
-* `<URL>` is the URL of a remote server.
+* `<URL>` is the URL of a remote server in an `ftp://<address>` format.
 * `<Username>` and `<Password>` are your credentials for the remote server.
 * `<Command>` extends the `publish` command. You can set the following values for this attribute.
 	* `add` - Saves a new server connection.

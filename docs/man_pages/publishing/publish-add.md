@@ -11,7 +11,11 @@ Saves a new server connection. <% if(isHtml) { %>If you do not provide one or mo
 <% if(isCordova) { %>WARNING: This command is not applicable to Apache Cordova projects. To view the complete help for this command, run `$ appbuilder help publish add`<% } %>
 <% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help publish add` <% } %>
 <% } %>
+<% if((isConsole && isMobileWebsite) || isHtml) { %>
+### Attributes
 
+* `<PublishUrl>` is the URL of a remote server in an `ftp://<address>` format.
+<% } %>
 <% if(isHtml) { %>
 ### Command Limitations
 

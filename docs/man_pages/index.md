@@ -77,6 +77,7 @@ Command | Description
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
 [appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
 [appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
+[publish](publishing/publish.html) | Lets you manage your server connections or publishes your mobile website to a remote server.
 
 ## Global Options
 Option | Description
