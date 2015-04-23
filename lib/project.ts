@@ -639,7 +639,9 @@ export class Project implements Project.IProject {
 
 	private validateProjectData(properties: any): void {
 		this.$jsonSchemaValidator.validate(properties);
-		this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME, properties.AppIdentifier);
+		if (this.capabilities.build) {
+			this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME, properties.AppIdentifier);
+		}
 	}
 
 	public saveProject(projectDir: string): IFuture<void> {
