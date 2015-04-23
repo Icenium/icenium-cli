@@ -135,7 +135,8 @@ export class PluginsService implements IPluginsService {
 			var plugin = this.getPluginByName(pluginName, installedPlugin.data.Version);
 
 			if(this.$project.hasBuildConfigurations()) {
-				_.each(plugin.configurations, (configuration:string) => {
+				var configurations = this.$project.configurations;
+				_.each(configurations, (configuration:string) => {
 					this.removePluginCore(pluginName, plugin, configuration).wait();
 				});
 			} else {
