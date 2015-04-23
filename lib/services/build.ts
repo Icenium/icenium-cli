@@ -394,8 +394,8 @@ export class BuildService implements Project.IBuildService {
 		return (() => {
 			this.$project.ensureProject();
 
-			if(!this.$project.capabilities.build && !options.companion) {
-				this.$errors.fail("Use $ appbuilder build <Platform> --companion to deploy your application to Telerik Nativescript Companion App. You will be able to build %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+			if(!this.$project.capabilities.build) {
+				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 			}
 
 			this.executeBuildCordova(platform).wait();
