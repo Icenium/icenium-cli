@@ -295,7 +295,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "tns_modules");
+				var tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
@@ -303,7 +303,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "tns_modules");
+				var tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
