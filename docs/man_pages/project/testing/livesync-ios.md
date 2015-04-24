@@ -22,8 +22,8 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 ### Options
 * `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
-* `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`    
->* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the companion app.
+* `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`
+* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the companion app.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
