@@ -194,8 +194,6 @@ To list the available sample apps, run `appbuilder sample`.
 
 The Telerik AppBuilder CLI creates a new subdirectory in the current directory, clones the sample inside it and preserves the existing project configuration of the sample app.
 
-If you want to develop for Windows Phone, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. For more information about how to configure your project properties, run `appbuilder prop --help`.
-
 <a name="simulator"><b>3. Run in simulator</b></a>
 
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.

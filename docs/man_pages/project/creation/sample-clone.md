@@ -5,11 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder sample clone <Clone ID> [--path <Directory>]`	
 
-Clones the selected sample app from GitHub to your local file system and preserves its existing project configuration. <% if(isHtml) { %>You can examine and modify the sample code, run it in the simulator, and build and deploy it on your devices. To list all available sample apps with their clone commands, run `$ appbuilder sample` 
-
-If you want to develop for Windows Phone, make sure to manually set new unique values for the WP8ProductID and WP8PublisherID properties
-to avoid issues when running your app on device. For more information about how to configure your project properties,
-see [appbuilder prop](../configuration/prop.html)<% } %>
+Clones the selected sample app from GitHub to your local file system and preserves its existing project configuration. <% if(isHtml) { %>You can examine and modify the sample code, run it in the simulator, and build and deploy it on your devices. To list all available sample apps with their clone commands, run `$ appbuilder sample`<% } %>
 
 <% if(isConsole) { %>
 WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.
