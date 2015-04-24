@@ -28,7 +28,7 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 * You must have a published version of your app, enabled for AppManager LiveSync, in Telerik AppManager, Google Play, Apple App Store or Windows Phone Store. To create a new version enabled for AppManager LiveSync, complete the following steps.
 	1. Enable your project for AppManager LiveSync by running `$ appbuilder plugin add com.telerik.LivePatch --release`
 	1. Publish your app to [Telerik AppManager](http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#cli), [Google Play](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-android#cli), [Apple App Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-ios#cli) or [Windows Phone Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#cli).
-* Your project must target Apache Cordova 3.0.0 or later.
+* Your project must target Apache Cordova 3.5.0 or later. To check the target Apache Cordova version of your project, run `$ appbuilder mobileframework`
 
 ### Command Limitations
 
