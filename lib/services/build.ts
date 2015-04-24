@@ -416,7 +416,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$loginManager.ensureLoggedIn().wait();
 
-			if(this.$project.projectData.WPSdk && this.$project.projectData.WPSdk === "8.0" && helpers.versionCompare(this.$project.projectData.FrameworkVersion,"3.7.0") >= 0) {
+			if(this.$mobileHelper.isWP8Platform(platform) && this.$project.projectData.WPSdk && this.$project.projectData.WPSdk === "8.0" && helpers.versionCompare(this.$project.projectData.FrameworkVersion,"3.7.0") >= 0) {
 				this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", this.$project.projectData.FrameworkVersion);
 			}
 
