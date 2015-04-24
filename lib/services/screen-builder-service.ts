@@ -3,7 +3,7 @@
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import options = require("../options");
+import options = require("../common/options");
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
