@@ -204,7 +204,7 @@ export class Project implements Project.IProject {
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
 
 			if(projectDirFiles.length !== 0) {
-				this.$errors.fail("The specified directory must be empty to create a new project.");
+				this.$errors.fail("The specified '%s' directory must be empty to create a new project.", projectDir);
 			}
 		}).future<void>()();
 	}
