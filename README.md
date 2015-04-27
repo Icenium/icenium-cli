@@ -10,6 +10,9 @@ Command-Line Interface for Telerik AppBuilder
 The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybrid and native mobile apps for iOS, Android and Windows Phone, and mobile websites from your favorite IDE or code editor. You can develop your projects locally from the convenience of your preferred code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
 
 * [Installation](#installation "How to install the Telerik AppBuilder CLI")
+	* [System Requirements](#system-requirements)
+	* [Install the Telerik AppBuilder CLI](#install-the-telerik-appbuilder-cli)
+	* [Configure Proxy Usage](#configure-proxy-usage)
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
 * [How to Contribute](#contribution "How to contribute to the Telerik AppBuilder CLI")
@@ -132,6 +135,20 @@ OS | Node.js installed from http://nodejs.org/ | Node.js installed via package m
 Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
 OS X | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
 Linux | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
+
+[Back to Top][1]
+
+### Configure Proxy Usage
+
+If you are working with the Telerik AppBuilder CLI behind a web proxy, you might need to configure your proxy settings.
+
+1. On your file system, locate the directory where the **appbuilder** npm package is installed.
+1. In a text editor, open `config` &#8594; `config.json`.
+1. Set `USE_PROXY` to `true`.
+1. Set `PROXY_PORT`.
+1. Set `PROXY_HOSTNAME`.
+
+> Make sure to preserve the quotation marks and commas as in the initial `config.json` file.
 
 [Back to Top][1]
 
@@ -402,7 +419,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 &nbsp;   | Create projects with Screen Builder | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-&nbsp;   | Develop with NativeScript 0.5.0 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Develop with NativeScript 0.10.0 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Migrate between supported NativeScript versions | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Customize the Debug and Release build configurations | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
