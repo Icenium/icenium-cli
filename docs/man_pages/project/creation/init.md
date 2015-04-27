@@ -26,7 +26,7 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create website](create-website.html) | Creates a new project from a Mobile Website-based template.
-[create screenbuilder](create-screenbuilder.html) | Creates a new Screen Builder project.
+[create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.
 [init website](init-website.html) | Initializes an existing Mobile Website project for development in the current directory.
