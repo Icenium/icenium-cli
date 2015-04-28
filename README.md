@@ -1,15 +1,18 @@
 Command-Line Interface for Telerik AppBuilder
 ===========
 
-*Build and publish iOS, Android and Windows Phone hybrid apps using a single pure HTML5, CSS, and JavaScript code base*
+*Build and publish cross-platform hybrid or native apps and mobile websites using a single pure HTML5, CSS, and JavaScript code base*
 
 [![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
-The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
+The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybrid and native mobile apps for iOS, Android and Windows Phone, and mobile websites from your favorite IDE or code editor. You can develop your projects locally from the convenience of your preferred code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
 
 * [Installation](#installation "How to install the Telerik AppBuilder CLI")
+	* [System Requirements](#system-requirements)
+	* [Install the Telerik AppBuilder CLI](#install-the-telerik-appbuilder-cli)
+	* [Configure Proxy Usage](#configure-proxy-usage)
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
 * [How to Contribute](#contribution "How to contribute to the Telerik AppBuilder CLI")
@@ -130,8 +133,22 @@ In the command prompt, run the following command.
 OS | Node.js installed from http://nodejs.org/ | Node.js installed via package manager
 ---|---------------------|----
 Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
-OS X | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
-Linux | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
+OS X | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
+Linux | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
+
+[Back to Top][1]
+
+### Configure Proxy Usage
+
+If you are working with the Telerik AppBuilder CLI behind a web proxy, you might need to configure your proxy settings.
+
+1. On your file system, locate the directory where the **appbuilder** npm package is installed.
+1. In a text editor, open `config` &#8594; `config.json`.
+1. Set `USE_PROXY` to `true`.
+1. Set `PROXY_PORT`.
+1. Set `PROXY_HOSTNAME`.
+
+> Make sure to preserve the quotation marks and commas as in the initial `config.json` file.
 
 [Back to Top][1]
 
@@ -161,13 +178,15 @@ A new tab opens in your default browser. Provide your login credentials, confirm
 
 **Create new project from template**
 
-To create a new hybrid project from the default template, navigate to an empty directory and run the following command. 
+To create a new project from the default template, navigate to an empty directory and run the following command. 
 
 ```bash
-$ appbuilder create hybrid MyApp
+$ appbuilder create <Type> MyApp
 ```
 
-The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. The project is based on the Kendo UI TabStrip template.
+You can set hybrid, native or website for `<Type>`.
+
+The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. 
 
 **Create new project from existing project**
 
@@ -194,7 +213,19 @@ To list the available sample apps, run `appbuilder sample`.
 
 The Telerik AppBuilder CLI creates a new subdirectory in the current directory, clones the sample inside it and preserves the existing project configuration of the sample app.
 
+**Create new project with Screen Builder**
+
+Screen Builder lets you quickly create a new project for hybrid mobile development customized with navigation, home view and user interface skin.
+
+```Shell
+appbuilder create screenbuilder <My App>
+```
+
+The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. After you navigate to your Screen Builder-based project, you can run the Screen Builder commands to further customize your project by adding application views, connecting to data sources, creating user registration and sign-in and adding forms, lists and fields. For more information, run `$ appbuilder screenbuilder -h`
+
 <a name="simulator"><b>3. Run in simulator</b></a>
+
+> This operation is applicable to hybrid and mobile website projects.
 
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
@@ -210,7 +241,9 @@ For more information about the Telerik AppBuilder device simulator, see <a href=
 
 <a name="device"><b>4. Run on device</b></a>
 
-To run your app on an Android device, install a QR code reader on the device, install the Telerik AppBuilder companion app, navigate to the folder containing your project files and run the following command in the command line. 
+> This operation is applicable to hybrid and native projects.
+
+To run your app on an Android device, install a QR code reader on the device, install the Telerik AppBuilder companion app for hybrid apps or the Telerik NativeScript companion app for native projects, navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
 $ appbuilder build android --companion
@@ -218,9 +251,9 @@ $ appbuilder build android --companion
 
 After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
-With the Telerik AppBuilder companion app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik AppBuilder companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>.
+With the companion app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik AppBuilder companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>. You can get the Telerik NativeScript companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.NativeScript" target="_blank">Google Play</a>.
 
-To run your app on an iOS device, install the Telerik AppBuilder companion app on the device, run it, and navigate to the folder containing your project files and run the following command in the command line. 
+To run your app on an iOS device, install the Telerik AppBuilder companion app for hybrid apps or the Telerik NativeScript companion app for native projects, run it, and navigate to the folder containing your project files and run the following command in the command line. 
 
 ```bash
 $ appbuilder build ios --companion
@@ -228,7 +261,9 @@ $ appbuilder build ios --companion
 
 After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
-With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. 
+With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. You can get the Telerik NativeScript companion app from <a href="https://itunes.apple.com/bg/app/nativescript/id882561588?mt=8" target="_blank">App Store</a>.
+
+> For Windows Phone, you can develop only hybrid apps. 
 
 To run your app on a Windows Phone device, install a QR code reader on the device, navigate to the folder containing your project files and run the following command in the command line. 
 
@@ -247,6 +282,8 @@ Edit your code in your preferred IDE or code editor. Save your changes.
 > In Sublime Text 2 and Sublime Text 3, you can install the Telerik AppBuilder package which provides integration with the Telerik AppBuilder CLI. For more information, click <a href="https://sublime.wbond.net/packages/Telerik%20AppBuilder" target="_blank">here</a>. 
 
 <a name="livesync"><b>6. Get code changes in the simulator and on device</b></a>
+
+> This operation is applicable only to hybrid and native projects.
 
 In the running device simulator, your app refreshes automatically on save.
 
@@ -305,6 +342,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 &nbsp;   | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Switch Telerik AppBuilder accounts | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Create projects from the project templates | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Create projects with Screen Builder | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Clone the sample apps | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
@@ -378,9 +416,10 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 &nbsp;   | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Switch Telerik AppBuilder accounts | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Create projects from the project templates | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-&nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Create projects with Screen Builder | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
+&nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-&nbsp;   | Develop with NativeScript 0.5.0 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Develop with NativeScript 0.10.0 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Migrate between supported NativeScript versions | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Customize the Debug and Release build configurations | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
@@ -435,6 +474,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 &nbsp;   | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Switch Telerik AppBuilder accounts | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Create projects from the project templates | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Create projects with Screen Builder | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Clone the sample apps | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">

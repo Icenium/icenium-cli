@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder create screenbuilder <App name> [--path <Directory>] [--appid <App ID>]`
 
-Creates a new Screen Builder project.
+Creates a new project for hybrid development with Screen Builder. <% if(isHtml) { %>Screen Builder lets you create a new project customized with navigation, home view and user interface skin. Later you can run the Screen Builder commands on this project to further customize it by adding application views, connecting to data sources, creating user registration and sign-in and adding forms, lists and fields.<% } %> 
 
 ### Options
 * `--path` - Specifies the directory where you want to create the project, if different from the current directory. The directory must be empty.
@@ -34,4 +34,12 @@ Command | Description
 [sample hybrid](sample-hybrid.html) | Lists all available Apache Cordova sample apps.
 [sample website](sample-website.html) | Lists all available mobile website sample apps.
 [sample clone](sample-clone.html) | Clones the selected sample app from GitHub to your local file system.
+[screenbuilder](../../screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
+[add-field](add-field.html) | Inserts an input field in an existing form.
+[add-form](add-form.html) | Inserts a generic input form in an existing application view.
+[add-list](add-list.html) | Inserts a list in an existing application view.
+[add-signin](add-signin.html) | Inserts a sign-in form in an existing application view.
+[add-signup](add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-view](add-view.html) | Adds a new application view to your project.
 <% } %>

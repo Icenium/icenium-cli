@@ -40,6 +40,19 @@ Command | Description
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the plugins according to the new version.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
 
+## Screen Builder Development Commands
+Command | Description
+-------|----------
+[create screenbuilder](project/creation/create.html) | Creates a new project for hybrid development with Screen Builder.
+[screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
+[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
+[add-signin](screenbuilder/add-signing.html) | Inserts a sign-in form in an existing application view.
+[add-signup](screenbuilder/add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
+[add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
+[add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.
+
 ## Plugin Management Commands
 Command | Description
 -------|----------
