@@ -177,7 +177,7 @@ export class ErrorsStub implements IErrors {
 	}
 
 	failWithoutHelp(message: string, ...args: any[]): void {
-		throw new Error();
+		throw new Error(message);	
 	}
 
 	beginCommand(action:() => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {

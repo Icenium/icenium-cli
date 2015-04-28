@@ -647,12 +647,13 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	public saveProject(projectDir: string): IFuture<void> {
+	public saveProject(projectDir: string, configurations?: string[]): IFuture<void> {
 		return (() => {
+			let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
 			projectDir = projectDir || this.getProjectDir().wait();
 			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
 
-			_.each(this.configurations, (configuration: string) => {
+			_.each(configs, (configuration: string) => {
 				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
 				if(this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
