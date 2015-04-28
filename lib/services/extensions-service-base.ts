@@ -31,8 +31,10 @@ export class ExtensionsServiceBase {
 		return path.join(this.cacheDir, packageName);
 	}
 
-	public prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, beforeDownloadAction?: () => IFuture<void>): IFuture<void> {
+	public prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, actions?: { beforeDownloadAction?: () => IFuture<void>; afterDownloadAction?: () => IFuture<void>}): IFuture<void> {
 		return ((): void => {
+			actions = actions || {};
+
 			if (this.$fs.exists(this.versionsFile).wait()) {
 				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 			}
@@ -53,8 +55,8 @@ export class ExtensionsServiceBase {
 				this.$logger.printInfoMessageOnSameLine(util.format("Updating %s package...", packageName));
 				var zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
-				if(beforeDownloadAction) {
-					beforeDownloadAction().wait();
+				if(actions.beforeDownloadAction) {
+					actions.beforeDownloadAction().wait();
 				}
 
 				this.$fs.deleteDirectory(extensionPath).wait();
@@ -67,6 +69,9 @@ export class ExtensionsServiceBase {
 					this.$fs.unzip(zipFileName, extensionPath).wait();
 					this.$fs.deleteFile(zipFileName).wait();
 					this.extensionVersions[packageName] = extensionVersion;
+					if(actions.afterDownloadAction) {
+						actions.afterDownloadAction().wait();
+					}
 					this.saveVersionsFile().wait();
 				} catch(err) {
 					this.$fs.deleteDirectory(extensionPath).wait();
