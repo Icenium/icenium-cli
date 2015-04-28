@@ -20,7 +20,8 @@ export class PluginsService implements IPluginsService {
 		private $logger: ILogger,
 		private $project: Project.IProject,
 		private $prompter: IPrompter,
-		private $loginManager: ILoginManager) {
+		private $loginManager: ILoginManager,
+		private $projectConstants: Project.IProjectConstants) {
 
 		// Cordova plugin commands are only applicable to Cordova projects
 		this.$project.ensureCordovaProject();
@@ -31,12 +32,20 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		return this.getAllInstalledPlugins({operation: _.intersection});
-	}
+		var corePlugins: string[] = [];
+		if(options.debug) {
+			corePlugins = corePlugins.concat(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME));
+		}
 
-	// return plugins that are enabled in one or more configurations
-	public getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[] {
-		return this.getAllInstalledPlugins({operation: _.union});
+		if(options.release) {
+			corePlugins = corePlugins.concat(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+		}
+
+		if(!options.debug && !options.release) {
+			corePlugins = <string[]>_.union(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+		}
+
+		return _.map(corePlugins,(pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
@@ -240,17 +249,19 @@ export class PluginsService implements IPluginsService {
 			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
 				delete cordovaPluginVariables[pluginData.Identifier];
 			}
+			var oldCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+			var newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
 
-			var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
-			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
-			this.$project.saveProject().wait();
+			if(newCorePlugins.length !== oldCorePlugins.length) {
+				this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+				this.$project.saveProject().wait();
 
-			if(configuration) {
-				this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
-			} else {
-				this.$logger.out("Plugin %s was successfully removed.", pluginName);
+				if(configuration) {
+					this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+				} else {
+					this.$logger.out("Plugin %s was successfully removed.", pluginName);
+				}
 			}
-
 		}).future<void>()();
 	}
 
@@ -322,19 +333,6 @@ export class PluginsService implements IPluginsService {
 		}
 
 		return plugin;
-	}
-
-	private getAllInstalledPlugins(configuration: {operation: (...args: any[]) => any[]}): IPlugin[] {
-		var corePlugins: any = null;
-		if(options.debug || options.d) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
-		} else if(options.release || options.r) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
-		} else {
-			corePlugins = configuration.operation(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
-		}
-
-		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 
 	private getPluginVersions(pluginName: string): any[] {
