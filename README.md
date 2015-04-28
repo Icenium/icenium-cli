@@ -133,8 +133,8 @@ In the command prompt, run the following command.
 OS | Node.js installed from http://nodejs.org/ | Node.js installed via package manager
 ---|---------------------|----
 Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
-OS X | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
-Linux | `sudo npm install appbuilder -g` | `npm install appbuilder -g`
+OS X | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
+Linux | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
 
 [Back to Top][1]
 

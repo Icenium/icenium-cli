@@ -10,6 +10,7 @@ Inserts a list in an existing application view. You can connect the list to a da
 ### Prerequisites
 
 * The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
+* You must have at least one data provider configured with `$ appbuilder add-dataprovider`
 
 ### Command Limitations 
 
