@@ -18,6 +18,10 @@ Command | Description
 [add-view](add-view.html) | Adds a new application view to your project.
 
 <% if(isHtml) { %> 
+### Prerequisites
+
+* Verify that you have installed git on your system.
+
 ### Related Commands
 Command | Description
 ----------|----------

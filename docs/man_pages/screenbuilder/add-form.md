@@ -10,6 +10,7 @@ Inserts a generic input form in an existing application view. You can later inse
 ### Prerequisites
 
 * The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
+* Verify that you have installed git on your system.
 
 ### Command Limitations 
 
