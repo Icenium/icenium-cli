@@ -15,7 +15,7 @@ Creates a new project for native development from a NativeScript template in the
 ### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 * `<Template>` is the source template that you want to use. The default value is `Blank`. You can use the following templates: <%=#{nativeScriptProject.projectTemplatesString}%>.
-* `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
+* `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
 <% if(isHtml) { %>
 ### Command Limitations
 

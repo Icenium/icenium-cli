@@ -12,7 +12,7 @@ For more information about how to configure your project properties, see [appbui
 * `--appid` - Sets the application identifier for your app. 
 
 ### Attributes
-* `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
+* `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
 <% if(isHtml) { %>
 This operation creates one or more of the following AppBuilder-specific files, if missing:
 * .abproject
