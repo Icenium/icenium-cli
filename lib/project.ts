@@ -235,9 +235,10 @@ export class Project implements Project.IProject {
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
-	public initializeProjectFromExistingFiles(framework: string): IFuture<void> {
+	public initializeProjectFromExistingFiles(framework: string, projectDir?: string): IFuture<void> {
 		return ((): void => {
-			var projectDir = this.getNewProjectDir();
+			projectDir = projectDir || this.getNewProjectDir();
+
 			if(!this.$fs.exists(projectDir).wait()) {
 				this.$errors.fail({ formatStr: util.format("The specified folder '%s' does not exist!", projectDir), suppressCommandHelp: true });
 			}

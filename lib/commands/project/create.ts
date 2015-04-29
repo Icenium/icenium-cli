@@ -3,7 +3,7 @@
 
 import Future = require("fibers/future");
 import path = require("path");
-import options = require("./../../options");
+import options = require("./../../common/options");
 import util = require("util");
 
 import ProjectCommandBaseLib = require("./project-command-base");
@@ -23,7 +23,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			this.validateProjectData();
 
 			var projectName = args[0];
-			var projectPath = path.join(this.$project.getNewProjectDir(), projectName);
+			var projectPath = path.resolve(options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
+
 			this.$project.createTemplateFolder(projectPath).wait();
 
 			var screenBuilderOptions = {
@@ -35,9 +36,9 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 			try {
 				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
-				this.$screenBuilderService.installAppDependencies().wait();
+				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
 
-				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath).wait();
 			} catch(err) {
 				this.$fs.deleteDirectory(projectPath).wait();
 				throw err;
