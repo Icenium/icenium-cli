@@ -2,13 +2,15 @@
 "use strict";
 
 import yok = require("../lib/common/yok");
-var testInjector = new yok.Yok();
+import future = require("fibers/future");
 import stubs = require("./stubs");
 var commandsServiceFile = require("../lib/common/services/commands-service");
 var configFile = require("../lib/config");
 import util = require("util");
 var assert = require("chai").assert;
 var commandParams = require("../lib/common/command-params");
+
+var isCommandExecuted: boolean;
 
 export class LoggerStubWithErrorOnFatal implements ILogger {
 	setLevel(level: string): void { }
@@ -34,21 +36,6 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 	printInfoMessageOnSameLine(message: string): void { }
 	printMsgWithTimeout(message: string, timeout: number): IFuture <void> { return null;}
 }
-
-testInjector.register("config", configFile.Configuration);
-testInjector.register("logger", LoggerStubWithErrorOnFatal);
-testInjector.register("fs", stubs.FileSystemStub);
-testInjector.register("errors", stubs.ErrorsNoFailStub);
-testInjector.register("staticConfig", stubs.StaticConfig);
-testInjector.register("hooksService", stubs.HooksService);
-testInjector.register("commandsService", commandsServiceFile.CommandsService);
-testInjector.register("stringParameter", commandParams.StringCommandParameter);
-testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
-testInjector.register("commandsServiceProvider", {
-	registerDynamicSubCommands: () => {}
-});
-var commandsService = testInjector.resolve("commandsService");
-var isCommandExecuted = false;
 
 class MockCommandParameter implements ICommandParameter {
 	constructor(mandatory: boolean) {
@@ -80,7 +67,6 @@ class MockCommandWithOneMandatoryParameter implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [new MockCommandParameter(true)];
 }
-testInjector.registerCommand("commandWithOneMandatArg", MockCommandWithOneMandatoryParameter);
 
 class MockCommandWithOneNonMandatoryParameter implements ICommand {
 	execute(args: string[]): IFuture<void> {
@@ -90,7 +76,6 @@ class MockCommandWithOneNonMandatoryParameter implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [new MockCommandParameter(false)];
 }
-testInjector.registerCommand("commandWithOneNonMandatArg", MockCommandWithOneNonMandatoryParameter);
 
 class MockCommandWithSomeMandatoryParameteres implements ICommand {
 	execute(args: string[]): IFuture<void> {
@@ -100,7 +85,6 @@ class MockCommandWithSomeMandatoryParameteres implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [new MockCommandParameter(true), new MockCommandParameter(true)];
 }
-testInjector.registerCommand("commandWithSomeMandatArgs", MockCommandWithSomeMandatoryParameteres);
 
 class MockCommandWithoutParameters implements ICommand {
 	execute(args: string[]): IFuture<void> {
@@ -110,7 +94,6 @@ class MockCommandWithoutParameters implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [];
 }
-testInjector.registerCommand("commandWithoutArgs", MockCommandWithoutParameters);
 
 class MockCommandWithInvalidParameters implements ICommand {
 	execute(args: string[]): IFuture<void> {
@@ -120,7 +103,6 @@ class MockCommandWithInvalidParameters implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [new MockInvalidCommandParameter(true)];
 }
-testInjector.registerCommand("commandWithInvalidArgs", MockCommandWithInvalidParameters);
 
 class MockCommandWithCanExecuteImplemented implements ICommand {
 	execute(args: string[]): IFuture<void> {
@@ -128,19 +110,12 @@ class MockCommandWithCanExecuteImplemented implements ICommand {
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
-			if(args[0] === "true") {
-				return true;
-			}
-
-			return false;
-		}).future<boolean>()();
+		return future.fromResult(args[0] === "true");
 	}
 
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [new MockInvalidCommandParameter(true)];
 }
-testInjector.registerCommand("commandWithCanExecute", MockCommandWithCanExecuteImplemented);
 
 class MockCommandWithStringCommandParameter implements ICommand {
 	// Make sure stringParameter can be resolved
@@ -152,7 +127,6 @@ class MockCommandWithStringCommandParameter implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [this.$stringParameter];
 }
-testInjector.registerCommand("commandWithStringParam", MockCommandWithStringCommandParameter);
 
 class MockCommandWithStringParamBuilder implements ICommand {
 	// Make sure stringParameter can be resolved
@@ -165,10 +139,50 @@ class MockCommandWithStringParamBuilder implements ICommand {
 	disableAnalytics = true;
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Missing mandatory Parameter")];
 }
-testInjector.registerCommand("commandWithStringParamBuilder", MockCommandWithStringParamBuilder);
+
+class MockCommandWithIsEnabledToFalse implements ICommand {
+	execute(args: string[]): IFuture<void> {
+		return (() => isCommandExecuted = true).future<void>()();
+	}
+
+	isDisabled = true;
+	disableAnalytics = true;
+	allowedParameters: ICommandParameter[] = [];
+}
 
 describe("commands service", () => {
 	describe("tryExecuteCommand", () => {
+		var commandsService: any;
+
+		beforeEach(() => {
+			var testInjector = new yok.Yok();
+			testInjector.register("config", configFile.Configuration);
+			testInjector.register("logger", LoggerStubWithErrorOnFatal);
+			testInjector.register("fs", stubs.FileSystemStub);
+			testInjector.register("errors", stubs.ErrorsNoFailStub);
+			testInjector.register("staticConfig", stubs.StaticConfig);
+			testInjector.register("hooksService", stubs.HooksService);
+			testInjector.register("commandsService", commandsServiceFile.CommandsService);
+			testInjector.register("stringParameter", commandParams.StringCommandParameter);
+			testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
+			testInjector.register("commandsServiceProvider", {
+				registerDynamicSubCommands: () => {}
+			});
+
+			commandsService = testInjector.resolve("commandsService");
+			isCommandExecuted = false;
+
+			testInjector.registerCommand("commandWithOneMandatArg", MockCommandWithOneMandatoryParameter);
+			testInjector.registerCommand("commandWithOneNonMandatArg", MockCommandWithOneNonMandatoryParameter);
+			testInjector.registerCommand("commandWithSomeMandatArgs", MockCommandWithSomeMandatoryParameteres);
+			testInjector.registerCommand("commandWithoutArgs", MockCommandWithoutParameters);
+			testInjector.registerCommand("commandWithInvalidArgs", MockCommandWithInvalidParameters);
+			testInjector.registerCommand("commandWithCanExecute", MockCommandWithCanExecuteImplemented);
+			testInjector.registerCommand("commandWithStringParam", MockCommandWithStringCommandParameter);
+			testInjector.registerCommand("commandWithStringParamBuilder", MockCommandWithStringParamBuilder);
+			testInjector.registerCommand("commandWithIsEnabledSetToFalse", MockCommandWithIsEnabledToFalse);
+		});
+
 		it("executes command which has only StringCommandParameter when param is NOT passed", () => {
 			isCommandExecuted = false;
 
@@ -336,6 +350,12 @@ describe("commands service", () => {
 		it("does not execute command when it implements canExecute and it returns false", () => {
 			isCommandExecuted = false;
 			commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]).wait();
+			assert.isFalse(isCommandExecuted);
+		});
+
+		it("does not execute command when it has isEnabled set to false", () => {
+			isCommandExecuted = false;
+			commandsService.tryExecuteCommand("commandWithIsEnabledSetToFalse", []).wait();
 			assert.isFalse(isCommandExecuted);
 		});
 	});
