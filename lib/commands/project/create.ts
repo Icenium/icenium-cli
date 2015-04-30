@@ -20,6 +20,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.validateProjectData();
+
 			var projectName = args[0];
 			var projectPath = path.join(this.$project.getNewProjectDir(), projectName);
 			this.$project.createTemplateFolder(projectPath).wait();
@@ -30,17 +32,20 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 					name: projectName
 				}
 			};
-			this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
-			this.$screenBuilderService.installAppDependencies().wait();
 
-			this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			try {
+				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
+				this.$screenBuilderService.installAppDependencies().wait();
+
+				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			} catch(err) {
+				this.$fs.deleteDirectory(projectPath).wait();
+				throw err;
+			}
 		}).future<void>()();
-	}
-
-	public canExecute(args: string[]): IFuture<boolean> {
-		return this.canExecuteCore();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];
 }
 $injector.registerCommand("create|*default", CreateCommand);
+$injector.registerCommand("create|screenbuilder", CreateCommand);

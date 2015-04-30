@@ -4,11 +4,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder <Command> [Parameters] [--options <Values>]`
 
-
 ## General Commands
 Command | Description
 -------|----------
-[help <Command>](general/help.html) | Shows additional information about the commands in this list.
+[help `<Command>`](general/help.html) | Shows additional information about the commands in this list in the browser.
 [login](general/login.html) | Logs you in the Telerik Platform.
 [logout](general/logout.html) | Logs you out from the Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
@@ -40,6 +39,19 @@ Command | Description
 [mobileframework](project/configuration/mobileframework.html) | Lists all supported Apache Cordova versions.
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the plugins according to the new version.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
+
+## Screen Builder Development Commands
+Command | Description
+-------|----------
+[create screenbuilder](project/creation/create.html) | Creates a new project for hybrid development with Screen Builder.
+[screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
+[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
+[add-signin](screenbuilder/add-signing.html) | Inserts a sign-in form in an existing application view.
+[add-signup](screenbuilder/add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
+[add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
+[add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.
 
 ## Plugin Management Commands
 Command | Description
@@ -76,13 +88,14 @@ Command | Description
 [provision&nbsp;remove](publishing/provision-remove.html) | Removes a registered provisioning profile.
 [appstore&nbsp;list](publishing/appstore-list.html) | Lists all applications in iTunes Connect.
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
-[appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager.html) | Builds the project and uploads the binary to Telerik AppManager.
-[appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
+[appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
+[publish](publishing/publish.html) | Lets you manage your server connections or publishes your mobile website to a remote server.
 
 ## Global Options
 Option | Description
 -------|---------
---help,&nbsp;-h,&nbsp;/? | Prints help about the selected command.
+--help,&nbsp;-h,&nbsp;/? | Prints help about the selected command in the console.
 --path `<Directory>` | Specifies the directory that contains the project. If not set, the project is searched for in the current directory and all directories above it.
 --version | Prints the client version.
 --log&nbsp;trace | Prints a detailed diagnostic log for the execution of the current command.

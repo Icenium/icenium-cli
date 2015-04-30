@@ -105,9 +105,11 @@ export class Project implements Project.IProject {
 			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
 				var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 				var configFiles = frameworkProject.configFiles;
-				var title = util.format("Configuration files for %s projects:", framework);
-				result.push(title);
-				result.push(this.configurationFilesStringCore(configFiles));
+				if(configFiles && configFiles.length > 0) {
+					var title = util.format("Configuration files for %s projects:", framework);
+					result.push(title);
+					result.push(this.configurationFilesStringCore(configFiles));
+				}
 			});
 
 			return result.join("\n")
@@ -202,7 +204,7 @@ export class Project implements Project.IProject {
 			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
 
 			if(projectDirFiles.length !== 0) {
-				this.$errors.fail("The specified directory must be empty to create a new project.");
+				this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
 			}
 		}).future<void>()();
 	}
@@ -430,6 +432,10 @@ export class Project implements Project.IProject {
 		return (() => {
 			this.ensureProject();
 
+			if(propertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
+				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(propertyName, propertyValues[0]);
+			}
+
 			this.$projectPropertiesService.updateProjectProperty(this.projectData, mode, propertyName, propertyValues).wait();
 			this.printProjectProperty(propertyName).wait();
 			this.saveProject(this.getProjectDir().wait()).wait();
@@ -633,6 +639,9 @@ export class Project implements Project.IProject {
 
 	private validateProjectData(properties: any): void {
 		this.$jsonSchemaValidator.validate(properties);
+		if (this.capabilities.build) {
+			this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME, properties.AppIdentifier);
+		}
 	}
 
 	public saveProject(projectDir: string): IFuture<void> {
@@ -796,7 +805,7 @@ export class Project implements Project.IProject {
 
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if(this.$fs.exists(templateFileName).wait()) {
-				projectDir = path.join(projectDir, appname);
+				projectDir = (options.path) ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
 				try {

@@ -3,10 +3,13 @@
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import options = require("../options");
+import options = require("../common/options");
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
+	private static PREDEFINED_SCREENBUILDER_TYPES: IStringDictionary = {
+		dataprovider: "dataProvider"
+	}
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
 		private $childProcess: IChildProcess,
@@ -36,7 +39,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			var scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
 			var allSupportedCommands = scaffolderData.future.wait();
-			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command));
+			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 		}).future<string[]>()();
 	}
 
@@ -69,6 +72,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		var scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
 		var scaffolder = scaffolderData.scaffolder;
 		var type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
+		type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
 
 		if(type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE) {
 			scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
@@ -92,7 +96,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				generatorsCache: appScaffoldingPath,
 				generatorsAlias: ['H'],
 				path: screenBuilderOptions.projectPath || path.resolve(options.path || "."),
-				dependencies: [generatorName + "@0.0.1"],
+				dependencies: [util.format("%s@%s", generatorName, this.$dependencyConfigService.getGeneratorConfig(generatorName).wait().version)],
 				connect: (done:Function) => {
 					done();
 				},
@@ -127,15 +131,33 @@ export class ScreenBuilderService implements IScreenBuilderService {
 $injector.register("screenBuilderService", ScreenBuilderService);
 
 class ScreenBuilderDynamicCommand implements ICommand {
+	private static SCREEN_BUILDER_SPECIFIC_FILES = [".yo-rc.json", ".app.json", "app.js"];
+
 	constructor(public generatorName: string,
 		public command: string,
+		private $errors: IErrors,
+		private $fs: IFileSystem,
+		private $project: Project.IProject,
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public execute(args: string[]): IFuture<void> {
+		this.ensureScreenBuilderProject().wait();
+
 		var screenBuilderOptions = {
 			type: this.command.substr(this.command.indexOf("-") + 1)
 		};
 		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
+	}
+
+	private ensureScreenBuilderProject(): IFuture<void> {
+		return (() => {
+			this.$project.ensureProject();
+
+			var projectDir = this.$project.getProjectDir().wait();
+			if(!_.every(ScreenBuilderDynamicCommand.SCREEN_BUILDER_SPECIFIC_FILES, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
+				this.$errors.fail("This command is applicable only to Screen Builder projects.");
+			}
+		}).future<void>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

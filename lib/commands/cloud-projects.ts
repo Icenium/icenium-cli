@@ -72,6 +72,9 @@ export class CloudExportProjectsCommand implements ICommand {
 			if(this.$fs.exists(projectDir).wait()) {
 				this.$errors.fail("The folder %s already exists!", projectDir);
 			}
+			if (this.$project.projectData) {
+				this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
+			}
 
 			temp.track();
 			var projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});

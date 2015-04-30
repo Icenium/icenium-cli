@@ -78,6 +78,12 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		}
 	});
 
+	testInjector.register("loginManager", {
+		ensureLoggedIn: (): IFuture<void> => {
+			return Future.fromResult();
+		}
+	});
+
 	return testInjector;
 }
 

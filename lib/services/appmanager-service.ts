@@ -67,13 +67,16 @@ class AppManagerService implements IAppManagerService {
 
 	public publishLivePatch(platforms: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureCordovaProject();
+			this.$loginManager.ensureLoggedIn().wait();
+
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
 			var cachedOptionsRelease = commonOptions.release;
 			commonOptions.release = true;
 			this.configureLivePatchPlugin().wait();
 
-			this.$logger.warn("If you have not published an AppManager LiveSync-enabled major version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
-			this.$logger.info("To create a new major version enabled for AppManager LiveSync, run `$ appbuilder appmanager upload <Platform>`");
+			this.$logger.warn("If you have not published an AppManager LiveSync-enabled version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
+			this.$logger.info("To learn how to create a new version enabled for AppManager LiveSync, run `$ appbuilder help appmanager livesync`");
 
 			this.$project.importProject().wait();
 			this.$logger.printInfoMessageOnSameLine("Publishing patch for " + platforms.join(", ") + "...");

@@ -71,9 +71,9 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	}
 
 	private generateDefaultAppId(appName: string): string {
-		var sanitizedName = _.filter(appName.split(""), (c) => /[a-zA-Z0-9]/.test(c)).join("");
+		var sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
 		if(sanitizedName) {
-			if(/^\d+$/.test(sanitizedName)) {
+			if(/^\d.*$/.test(sanitizedName)) {
 				sanitizedName = "the" + sanitizedName;
 			}
 			return "com.telerik." + sanitizedName;

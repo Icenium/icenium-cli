@@ -1,5 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
+import os = require("os");
 import path = require("path");
 import serverExtensionsBaseLib = require("./extensions-service-base");
 import util = require("util");
@@ -36,6 +37,7 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 
 				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion), 5000).wait();
 				this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100).wait();
+				this.$logger.printInfoMessageOnSameLine(os.EOL);
 			}
 		}).future<void>()();
 	}

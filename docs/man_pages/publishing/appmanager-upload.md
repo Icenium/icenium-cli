@@ -3,20 +3,19 @@ appmanager upload
 
 Usage | Synopsis
 ------|-------
-General |`$ appbuilder appmanager <Command>`
+General |`$ appbuilder appmanager upload <Platform>`
 
-Builds and uploads your application to Telerik AppManager<% if(isCordova) { %> or creates a Telerik AppManager LiveSync update for your published app<% } %>. You must run the `appmanager` command with a command extension.
+Builds and uploads your application to AppManager. You must run the `appmanager upload` command with a command extension that specifies the target mobile platform.
 <% if(isConsole && isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
 <% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 
-`<Command>` extends the `appmanager` command. You can set the following values for this attribute.
-* `upload android` - Builds the project for Android and uploads the binary to Telerik AppManager.
-* `upload ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
-<% if(isCordova) { %>* `upload wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.
-* `livesync` - Publishes a new Telerik AppManager LiveSync update of your application.<% } %> 
+`<Platform>` extends the `appmanager` command. You can set the following values for this attribute.
+* `android` - Builds the project for Android and uploads the binary to Telerik AppManager.
+* `ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
+<% if(isCordova) { %>* `wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.<% } %> 
 <% } %> 
 <% if(isHtml) { %> 
 ### Command Limitations

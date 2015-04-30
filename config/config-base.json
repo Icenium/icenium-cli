@@ -3,6 +3,7 @@
 	"AB_SERVER": "localhost",
 	"DEBUG": true,
 	"USE_PROXY": false,
+	"ON_PREM": false,
 	"PROXY_HOSTNAME": "127.0.0.1",
 	"PROXY_PORT": 8888,
 	"DEFAULT_CORDOVA_PROJECT_TEMPLATE": "KendoUI.TabStrip",

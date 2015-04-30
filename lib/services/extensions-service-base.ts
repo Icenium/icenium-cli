@@ -5,6 +5,7 @@ import path = require("path");
 import options = require("../common/options");
 import helpers = require("../helpers");
 import temp = require("temp");
+import util = require("util");
 temp.track();
 
 export class ExtensionsServiceBase {
@@ -49,7 +50,7 @@ export class ExtensionsServiceBase {
 			}
 
 			if( helpers.versionCompare(cachedVersion, extensionVersion) < 0) {
-				this.$logger.info("Updating %s package...", packageName);
+				this.$logger.printInfoMessageOnSameLine(util.format("Updating %s package...", packageName));
 				var zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
 				if(beforeDownloadAction) {
