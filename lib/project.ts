@@ -235,7 +235,7 @@ export class Project implements Project.IProject {
 		return this.createFromTemplate(projectName, projectDir);
 	}
 
-	public initializeProjectFromExistingFiles(framework: string, projectDir?: string): IFuture<void> {
+	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
 		return ((): void => {
 			projectDir = projectDir || this.getNewProjectDir();
 
@@ -252,17 +252,17 @@ export class Project implements Project.IProject {
 			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
 
-			this.createProjectFileFromExistingProject(projectDir, framework).wait();
+			this.createProjectFileFromExistingProject(projectDir, appName).wait();
 			this.$logger.info("Successfully initialized %s project.", framework); 
 		}).future<void>()();
 	}
 
-	private createProjectFileFromExistingProject(projectDir: string, framework: string): IFuture<void> {
+	private createProjectFileFromExistingProject(projectDir: string, appName?: string): IFuture<void> {
 		return ((): void => {
-			var appname = path.basename(projectDir);
+			appName = appName || path.basename(projectDir);
 
-			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appname).wait();
-			this.projectData = this.alterPropertiesForNewProject(properties, appname);
+			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appName).wait();
+			this.projectData = this.alterPropertiesForNewProject(properties, appName);
 
 			try {
 				this.validateProjectData(this.projectData);

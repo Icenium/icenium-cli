@@ -9,7 +9,7 @@ declare module Project {
 		startPackageActivity: string;
 
 		createNewProject(projectName: string, framework: string): IFuture<void>;
-		initializeProjectFromExistingFiles(framework: string, projectDir?: string): IFuture<void>;
+		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<void>;
 		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
