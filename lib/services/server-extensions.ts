@@ -2,7 +2,6 @@
 "use strict";
 
 import Future = require("fibers/future");
-import options = require("./../common/options");
 import serverExtensionsBaseLib = require("./extensions-service-base");
 import path = require("path");
 
@@ -11,8 +10,9 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 		$httpClient: Server.IHttpClient,
 		$fs: IFileSystem,
 		private $config: IConfiguration,
-		private $serverConfiguration: IServerConfiguration){
-			super(path.join(options.profileDir, "Cache"), $fs, $httpClient, $logger);
+		private $serverConfiguration: IServerConfiguration,
+		$options: IOptions){
+			super(path.join($options.profileDir, "Cache"), $fs, $httpClient, $logger, $options);
 	}
 
 	public prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): IFuture<void> {

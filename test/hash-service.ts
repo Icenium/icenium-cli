@@ -5,6 +5,7 @@ import yok = require("../lib/common/yok");
 
 import Future = require("fibers/future");
 import stubs = require("./stubs");
+import hostInfoLib = require("../lib/common/host-info");
 import temp = require("temp");
 temp.track();
 import util = require("util");
@@ -23,6 +24,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("hashService", hashServiceFile.HashService);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("errors", stubs.ErrorsNoFailStub);
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 
 	let errors = testInjector.resolve("errors");
 	errors.fail = (...args: any[]) => {

@@ -4,7 +4,6 @@ import http = require("http");
 import util = require("util");
 import path = require("path");
 import url = require("url");
-import options = require("./common/options");
 import Future = require("fibers/future");
 import helpers = require("./helpers");
 import querystring = require("querystring");
@@ -17,7 +16,8 @@ export class UserDataStore implements IUserDataStore {
 
 	constructor(private $fs: IFileSystem,
 		private $config: Config.IConfig,
-		private $logger: ILogger) { }
+		private $logger: ILogger,
+		private $options: IOptions) { }
 
 	public hasCookie(): IFuture<boolean> {
 		return (() => {
@@ -109,11 +109,11 @@ export class UserDataStore implements IUserDataStore {
 	}
 
 	private getCookieFilePath(): string {
-		return path.join(options["profile-dir"], this.$config.AB_SERVER + ".cookie");
+		return path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".cookie");
 	}
 
 	private getUserStateFilePath(): string {
-		return path.join(options["profile-dir"], this.$config.AB_SERVER + ".user");
+		return path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".user");
 	}
 }
 $injector.register("userDataStore", UserDataStore);
@@ -130,7 +130,8 @@ export class LoginManager implements ILoginManager {
 		private $commandsService: ICommandsService,
 		private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $httpServer: IHttpServer,
-		private $httpClient: Server.IHttpClient) { }
+		private $httpClient: Server.IHttpClient,
+		private $options: IOptions) { }
 
 	public logout(): IFuture<void> {
 		return (() => {
@@ -174,7 +175,7 @@ export class LoginManager implements ILoginManager {
 
 	private doLogin(): IFuture<void> {
 		return (() => {
-			this.$fs.createDirectory(options["profile-dir"]).wait();
+			this.$fs.createDirectory(this.$options["profile-dir"]).wait();
 
 			this.loginInBrowser().wait();
 
@@ -225,8 +226,9 @@ export class LoginManager implements ILoginManager {
 			let timeoutID: NodeJS.Timer = undefined;
 
 			if(!helpers.isInteractive()) {
-				let timeout = options.hasOwnProperty("timeout")
-					? +options.timeout
+
+				let timeout = this.$options.hasOwnProperty("timeout")
+					? + this.$options.timeout
 					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
 
 				if(timeout > 0) {

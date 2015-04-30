@@ -103,9 +103,13 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 
 	private getRegexPattern(appIdentifier: string): string {
 		let starPlaceholder = "<!StarPlaceholder!>";
-		let escapedIdentifier = (<any>RegExp).escape(helpers.stringReplaceAll(appIdentifier, "*", starPlaceholder));
+		let escapedIdentifier = this.escape(helpers.stringReplaceAll(appIdentifier, "*", starPlaceholder));
 		let replacedIdentifier = helpers.stringReplaceAll(escapedIdentifier, starPlaceholder, ".*");
 		return "^" + replacedIdentifier + "$";
+	}
+
+	private escape(s: string): string {
+		return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 	}
 }
 $injector.register("iOSDeploymentValidator", IOSDeploymentValidator);

@@ -18,6 +18,8 @@ import yok = require("../lib/common/yok");
 import mobileHelperLib = require("../lib/common/mobile/mobile-helper");
 import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
 import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
+import hostInfoLib = require("../lib/common/host-info");
+import optionsLib = require("../lib/options");
 
 import assert = require("assert");
 import Future = require("fibers/future");
@@ -114,6 +116,8 @@ function createTestInjector() {
 			return Future.fromResult();
 		}
 	});
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+	testInjector.register("options", optionsLib.Options);
 	return testInjector;
 }
 
@@ -160,17 +164,25 @@ function getProjectFileName(configuration: string) {
 function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
 	let projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
+	let options = testInjector.resolve(optionsLib.Options);
 	let project = testInjector.resolve("project");
 	let fs = testInjector.resolve("fs");
 
 	// Create new project
-	let options:any = require("./../lib/common/options");
 	let tempFolder = temp.mkdirSync("template");
 
 	let projectName = "Test";
 	options.path = tempFolder;
 	options.template = "Blank";
 	options.appid = "com.telerik.Test";
+	if (configuration === "debug") {
+		options.release = false;
+		options.debug = true;
+	} else if(configuration === "release") {
+		options.debug = false;
+		options.release = true;
+	}
+
 	project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 	let availableMarketplacePlugins = [
@@ -186,12 +198,7 @@ function assertCorePluginsCount(configuration?: string) {
 		}
 	];
 
-	if (configuration === "debug") {
-		options.debug = true;
-	} else if(configuration === "release") {
-		delete options.debug;
-		options.release = true;
-	}
+
 
 	let projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
 	let abProjectContent = fs.readJson(projectFilePath).wait();

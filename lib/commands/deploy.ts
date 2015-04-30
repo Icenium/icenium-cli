@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import options = require("../common/options");
 import util = require("util");
 import Future = require("fibers/future");
 import commandParams = require("../common/command-params");
@@ -14,7 +13,9 @@ export class DeployHelper implements IDeployHelper {
 		protected $buildService: Project.IBuildService,
 		protected $liveSyncService: ILiveSyncService,
 		protected $errors: IErrors,
-		private $mobileHelper: Mobile.IMobileHelper) { }
+		private $mobileHelper: Mobile.IMobileHelper,
+		private $options: IOptions) { }
+
 
 	public deploy(platform?: string): IFuture<void> {
 		this.$project.ensureProject();
@@ -31,12 +32,12 @@ export class DeployHelper implements IDeployHelper {
 
 	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
-			if (options.companion) {
+			if (this.$options.companion) {
 				this.$liveSyncService.livesync(platform).wait();
 				return;
 			}
 
-			this.$devicesServices.initialize({ platform: platform, deviceId: options.device}).wait();
+			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device}).wait();
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
 

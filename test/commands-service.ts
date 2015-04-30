@@ -168,6 +168,9 @@ describe("commands service", () => {
 			testInjector.register("commandsServiceProvider", {
 				registerDynamicSubCommands: () => {}
 			});
+			testInjector.register("options", {
+				validateOptions: () => {}
+			});			
 
 			commandsService = testInjector.resolve("commandsService");
 			isCommandExecuted = false;

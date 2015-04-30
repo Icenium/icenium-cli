@@ -1,16 +1,16 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import options = require("../../common/options");
 import pluginsDataLib = require("./../../plugins-data");
 
 export class AddPluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
-				private $injector: IInjector) { }
+				private $injector: IInjector,
+				private $options: IOptions) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			if(options.available){
+			if(this.$options.available){
 				let installedPlugins = this.$pluginsService.getInstalledPlugins();
 				let plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
 					if(plugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
@@ -45,7 +45,7 @@ export class AddPluginCommand implements ICommand {
 
 	public canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			if(options.available) {
+			if(this.$options.available) {
 				return true;
 			}
 

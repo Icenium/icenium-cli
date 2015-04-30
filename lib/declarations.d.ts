@@ -572,3 +572,36 @@ interface IPublishConnection extends IStringDictionary {
 	publishUrl: string;
 	name: string;
 }
+
+interface IOptions extends ICommonOptions {
+	validateOptions(): void;	
+	
+	companion: boolean;
+	download: boolean;
+	certificate: string;
+	provision: string;
+	template: string;
+	deploy: string;
+	device: string;
+	file: string;
+	"save-to": string;
+	client: string;
+	available: boolean;
+	release: boolean;
+	debug: boolean;
+	"valid-value": boolean;
+	screenBuilderCacheDir: string;
+	force: boolean;
+	validValue: boolean;
+	deviceType: string;
+	core: boolean;
+	professional: boolean;
+	verified: boolean;
+	latest: boolean;
+	publish: boolean;
+	"send-push": boolean;
+	sendPush: boolean;
+	"send-email": boolean;
+	sendEmail: boolean;
+	group: string[];
+}

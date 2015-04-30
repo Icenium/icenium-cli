@@ -2,7 +2,6 @@
 "use strict";
 
 import commonHelpers = require("./../common/helpers");
-import options = require("../common/options");
 
 import path = require("path");
 import util = require("util");
@@ -15,12 +14,13 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		protected $fs: IFileSystem,
 		protected $resources: IResourceLoader,
 		protected $errors: IErrors,
-		protected $jsonSchemaValidator: IJsonSchemaValidator) { }
+		protected $jsonSchemaValidator: IJsonSchemaValidator,
+		protected $options: IOptions) { }
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void {
 		properties.DisplayName = projectName;
-		let appid = options.appid;
-		if(!options.appid) {
+		let appid = this.$options.appid;
+		if(!this.$options.appid) {
 			appid = this.generateDefaultAppId(projectName);
 			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
 		}

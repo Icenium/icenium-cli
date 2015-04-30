@@ -8,7 +8,6 @@ import minimatch = require("minimatch");
 import iconv = require("iconv-lite");
 import osenv = require("osenv");
 import helpers = require("../helpers");
-import options = require("../common/options");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
@@ -43,7 +42,8 @@ export class EmulateIosCommand implements ICommand {
 				private $project: Project.IProject,
 				private $buildService: Project.IBuildService,
 				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
+				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+				private $options: IOptions) {
 		this.$project.ensureProject();
 	}
 
@@ -55,7 +55,7 @@ export class EmulateIosCommand implements ICommand {
 			this.$iOSEmulatorServices.checkAvailability().wait();
 			let app = "";
 
-			if(!options.availableDevices) {
+			if(!this.$options.availableDevices) {
 				let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 				let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 					platform: this.$devicePlatformsConstants.iOS,

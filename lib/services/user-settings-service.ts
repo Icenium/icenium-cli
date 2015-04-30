@@ -5,15 +5,15 @@ import xmlMapping = require("xml-mapping");
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import options = require("../common/options");
 import helpers = require("../helpers");
 import userSettingsServiceBaseLib = require("./../common/services/user-settings-service");
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
 
-	constructor(private $fs: IFileSystem) {
-		this.userSettingsFile = path.join(options["profile-dir"], "local-user-settings.json");
+	constructor(private $fs: IFileSystem,
+		$options: IOptions) {
+		this.userSettingsFile = path.join($options["profile-dir"], "local-user-settings.json");
 	}
 
 	public get userSettingsFilePath(): string {
@@ -38,8 +38,9 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
 
 	constructor(private $fs: IFileSystem,
-				private $config: Config.IConfig) {
-		this.userSettingsFile = path.join(options["profile-dir"], this.$config.AB_SERVER + ".user-settings.xml");
+				private $config: Config.IConfig,
+				private $options: IOptions) {
+		this.userSettingsFile = path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".user-settings.xml");
 	}
 
 	public get userSettingsFilePath(): string {
@@ -60,12 +61,13 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	constructor(private $fs: IFileSystem,
 		private $server: Server.IServer,
 		private $sharedUserSettingsFileService: IUserSettingsFileService,
-		private $loginManager: ILoginManager) { }
+		private $loginManager: ILoginManager,
+		private $options: IOptions) { }
 
 	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
 			if(!this.userSettingsData) {
-				this.$fs.createDirectory(options["profile-dir"]).wait();
+				this.$fs.createDirectory(this.$options["profile-dir"]).wait();
 
 				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath).wait()) {
 					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();

@@ -13,8 +13,9 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 		$fs: IFileSystem,
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
+		$options: IOptions,
 		private $progressIndicator: IProgressIndicator) {
-		super(cacheDir, $fs, $httpClient, $logger);
+		super(cacheDir, $fs, $httpClient, $logger, $options);
 	}
 
 	public prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): IFuture<void> {

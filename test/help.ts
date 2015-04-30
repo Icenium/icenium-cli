@@ -10,31 +10,40 @@ import microTemplateServiceLib = require("../lib/common/services/micro-templatin
 import dynamicHelpServiceLib = require("../lib/common/services/dynamic-help-service");
 import dynamicHelpProviderLib = require("../lib/dynamic-help-provider");
 import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
-let opts = require("../lib/common/options");
+
+import optionsLib = require("../lib/options");
+import hostInfoLib = require("../lib/common/host-info");
 
 let assert = require("chai").assert;
 
-let createTestInjector = (options?: { isProjectTypeResult: boolean; isPlatformResult: boolean }): IInjector => {
-	opts.help = true;
+let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResult: boolean }): IInjector => {
 	let injector = new yok.Yok();
 	let logger = new stubs.LoggerStub();
-	injector.register("logger", logger);
+	injector.register("hostInfo", hostInfoLib.HostInfo);
+	injector.register("staticConfig", {
+		helpTextPath: path.join(__dirname, "../resources/help.txt")
+	});
 	injector.register("errors", stubs.ErrorsStub);
-	options = options || { isPlatformResult: true, isProjectTypeResult: true };
+	injector.register("options", optionsLib.Options);
+	let options = injector.resolve("options");
+	options.help = true;
+	injector.register("logger", logger);
+
+	opts = opts || { isPlatformResult: true, isProjectTypeResult: true };
 	
 	injector.register("dynamicHelpProvider", dynamicHelpProviderLib.DynamicHelpProvider);
 	injector.register("dynamicHelpService", {
-		isProjectType: (...args: string[]): IFuture<boolean> => { return Future.fromResult(options.isProjectTypeResult); },
-		isPlatform: (...args: string[]): boolean => { return options.isPlatformResult; },
+		isProjectType: (...args: string[]): IFuture<boolean> => { return Future.fromResult(opts.isProjectTypeResult); },
+		isPlatform: (...args: string[]): boolean => { return opts.isPlatformResult; },
 		getLocalVariables: (): IFuture<IDictionary<any>> => {
 			return (() => {
 				let localVariables: IDictionary<any> = {};
-				localVariables["isMobileWebsite"] = options.isProjectTypeResult;
-				localVariables["isCordova"] = options.isProjectTypeResult;
-				localVariables["isNativeScript"] = options.isProjectTypeResult;
-				localVariables["isLinux"] = options.isPlatformResult;
-				localVariables["isWindows"] = options.isPlatformResult;
-				localVariables["isMacOS"] = options.isPlatformResult;
+				localVariables["isMobileWebsite"] = opts.isProjectTypeResult;
+				localVariables["isCordova"] = opts.isProjectTypeResult;
+				localVariables["isNativeScript"] = opts.isProjectTypeResult;
+				localVariables["isLinux"] = opts.isPlatformResult;
+				localVariables["isWindows"] = opts.isPlatformResult;
+				localVariables["isMacOS"] = opts.isPlatformResult;
 				return localVariables;
 			}).future<IDictionary<any>>()();
 		}
@@ -50,9 +59,7 @@ let createTestInjector = (options?: { isProjectTypeResult: boolean; isPlatformRe
 		}
 	});
 
-	injector.register("staticConfig", {
-		helpTextPath: path.join(__dirname, "../resources/help.txt")
-	});
+
 
 	injector.registerCommand("foo", {});
 

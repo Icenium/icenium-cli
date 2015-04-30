@@ -4,7 +4,6 @@
 import constants = require("../common/mobile/constants");
 import util = require("util");
 import os = require("os");
-import options = require("../common/options");
 import helpers = require("../helpers");
 let Table = require("cli-table");
 
@@ -23,6 +22,7 @@ class AppManagerService implements IAppManagerService {
 		private $progressIndicator: IProgressIndicator,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $options: IOptions,
 		private $injector: IInjector) { }
 
 	public upload(platform: string): IFuture<void> {
@@ -41,7 +41,7 @@ class AppManagerService implements IAppManagerService {
 				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
 				showWp8SigningMessage: false,
 				buildForTAM: true,
-				downloadFiles: options.download
+				downloadFiles: this.$options.download
 			}).wait();
 
 			if(!buildResult[0] || !buildResult[0].solutionPath) {
@@ -54,26 +54,21 @@ class AppManagerService implements IAppManagerService {
 			let projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
 
 			let publishSettings: Server.PublishSettings = {
-				IsPublished: options.publish,
-				NotifyByPush: options.sendPush,
-				NotifyByEmail: options.sendEmail,
+				IsPublished: this.$options.publish,
+				NotifyByPush: this.$options.sendPush,
+				NotifyByEmail: this.$options.sendEmail,
 				Groups: []
 			};
 
-			if (options.group) {
-
-				if(!_.isArray(options.group)) {
-                    options.group = [options.group];
-				}
-
-				publishSettings.Groups = this.findGroups(options.group).wait();
+			if (this.$options.group) {
+				publishSettings.Groups = this.findGroups(this.$options.group).wait();
 			}
 
-			if(!options.publish && options.sendEmail) {
+			if(!this.$options.publish && this.$options.sendEmail) {
 				this.$logger.warn("You have not set the --publish switch. Your users will not receive an email.");
 			}
 
-			if(!options.publish && options.sendPush) {
+			if(!this.$options.publish && this.$options.sendPush) {
 				this.$logger.warn("You have not set the --publish switch. Your users will not receive a push notification.");
 			}
 
@@ -122,8 +117,10 @@ class AppManagerService implements IAppManagerService {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
-			let cachedOptionsRelease = options.release;
-			options.release = true;
+
+			let cachedOptionsRelease = this.$options.release;
+			this.$options.release = true;
+			
 			this.configureLivePatchPlugin().wait();
 
 			this.$logger.warn("If you have not published an AppManager LiveSync-enabled version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
@@ -133,7 +130,8 @@ class AppManagerService implements IAppManagerService {
 			this.$logger.printInfoMessageOnSameLine("Publishing patch for " + platforms.join(", ") + "...");
 			this.$progressIndicator.showProgressIndicator(this.$server.tam.uploadPatch(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, <any>{ Platforms: platforms }), 2000).wait();
 			this.$logger.printInfoMessageOnSameLine(os.EOL);
-			options.release = cachedOptionsRelease;
+
+			this.$options.release = cachedOptionsRelease;
 
 			this.openAppManagerStore();
 		}).future<void>()();

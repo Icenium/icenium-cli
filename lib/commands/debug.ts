@@ -5,8 +5,6 @@ import child_process = require("child_process");
 import path = require("path");
 import Future = require("fibers/future");
 import helpers = require("../helpers");
-import hostInfo = require("../host-info");
-import commonHostInfo = require("../common/host-info");
 let gaze = require("gaze");
 
 export class DebugCommand implements ICommand {
@@ -14,6 +12,8 @@ export class DebugCommand implements ICommand {
 
 	constructor(private $logger: ILogger,
 		private $errors: IErrors,
+		private $hostCapabilities: IHostCapabilities,
+		private $hostInfo: IHostInfo,
 		private $loginManager: ILoginManager,
 		private $debuggerPlatformServices: IExtensionPlatformServices,
 		private $serverExtensionsService: IServerExtensionsService,
@@ -37,7 +37,7 @@ export class DebugCommand implements ICommand {
 	}
 
 	public canExecute(args: string[]): IFuture<boolean> {
-		if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+		if(!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on %s. The debug tools for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}
 
@@ -105,6 +105,7 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 
 	constructor(private $childProcess: IChildProcess,
 		$errors: IErrors,
+		private $hostInfo: IHostInfo,
 		$logger: ILogger,
 		$sharedUserSettingsFileService: IUserSettingsFileService,
 		$sharedUserSettingsService: IUserSettingsService,
@@ -129,7 +130,7 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 	}
 
 	public canRunApplication(): IFuture<boolean> {
-		return hostInfo.isDotNet40Installed("Unable to start the debug tool. Verify that you have installed .NET 4.0 or later and try again.");
+		return this.$hostInfo.isDotNet40Installed("Unable to start the debug tool. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 }
 
@@ -169,9 +170,10 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	}
 }
 
-if(commonHostInfo.isWindows()) {
+let hostInfo = this.$injector.resolve("hostInfo");
+if(hostInfo.isWindows()) {
 	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
-} else if(commonHostInfo.isDarwin()) {
+} else if(hostInfo.isDarwin()) {
 	$injector.register("debuggerPlatformServices", DarwinDebuggerPlatformServices);
 } else {
 	$injector.register("debuggerPlatformServices", {}); // for unsupported OSes

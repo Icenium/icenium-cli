@@ -3,7 +3,7 @@ $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
 $injector.require("dependencyConfigService", "./services/dependency-config");
 $injector.require("userSettingsService", "./services/user-settings-service");
-require("./options");
+$injector.require("options", "./options");
 // note: order above is important!
 
 $injector.require("serverConfiguration", "./server-config");
@@ -171,6 +171,7 @@ $injector.requireCommand("appmanager|livesync", "./commands/appmanager-livesync"
 
 $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
 $injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilities");
+$injector.require("hostCapabilities", "./host-capabilities");
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");
 $injector.require("logcatPrinter", "./providers/logcat-printer");

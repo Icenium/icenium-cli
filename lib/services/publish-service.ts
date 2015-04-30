@@ -1,7 +1,6 @@
 ﻿///<reference path="../.d.ts"/>
 "use strict";
 
-import options = require("../common/options");
 import os = require("os");
 import helpers = require("../common/helpers");
 import path = require("path");
@@ -26,7 +25,8 @@ export class PublishService implements IPublishService {
 				private $projectFilesManager: Project.IProjectFilesManager,
 				private $project: Project.IProject,
 				private $prompter: IPrompter,
-				private $server: Server.IServer) {
+				private $server: Server.IServer,
+				private $options: IOptions) {
 
 		this.$project.ensureProject();
 
@@ -158,7 +158,7 @@ export class PublishService implements IPublishService {
 		return (() => {
 			let ftpConnectionData: Server.FtpConnectionData = {
 				RemoteUrl: idOrUrl,
-				ShouldPurge: options.force,
+				ShouldPurge: this.$options.force,
 				Username: username,
 				Password: password
 			};

@@ -6,6 +6,7 @@ import yok = require("../lib/common/yok");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import temp = require("temp");
+import hostInfoLib = require("../lib/common/host-info");
 temp.track();
 import util = require("util");
 let assert = require("chai").assert;
@@ -28,6 +29,7 @@ class ServiceProxy implements Server.IServiceProxy {
 function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();
 
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("fs", fileSystemFile.FileSystem);
 	testInjector.register("hashService", hashServiceFile.HashService);
 	testInjector.register("errors", stubs.ErrorsStub);

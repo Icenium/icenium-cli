@@ -6,6 +6,8 @@ import errorsLib = require("./../lib/common/errors");
 import stubs = require("./stubs");
 import Future = require("fibers/future");
 import yok = require("../lib/common/yok");
+import optionsLib = require("../lib/options");
+import hostInfoLib = require("../lib/common/host-info");
 
 import assert = require("assert");
 
@@ -21,6 +23,8 @@ function createTestInjector(publishConnections: IPublishConnection[]): IInjector
 	testInjector.register("projectConstants", {});
 	testInjector.register("project", {});
 	testInjector.register("projectConstants", {});
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+	testInjector.register("options", optionsLib.Options);
 
 	// Register mocked dependencies
 	testInjector.register("progressIndicator", {

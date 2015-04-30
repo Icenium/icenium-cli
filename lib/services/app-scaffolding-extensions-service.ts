@@ -3,7 +3,6 @@
 
 import dependencyExtensionsServiceLib = require("./dependency-extensions-service-base");
 import hostInfo = require("./../common/host-info");
-import options = require("../common/options");
 import path = require("path");
 import util = require("util");
 
@@ -15,8 +14,9 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 		$logger: ILogger,
 		$progressIndicator: IProgressIndicator,
 		protected $childProcess: IChildProcess,
-		protected $dependencyConfigService: IDependencyConfigService) {
-		super(options.screenBuilderCacheDir, $fs, $httpClient, $logger, $progressIndicator); // We should pass here the correct profileDir
+		protected $dependencyConfigService: IDependencyConfigService,
+		$options: IOptions) {
+		super($options.screenBuilderCacheDir, $fs, $httpClient, $logger, $options, $progressIndicator); // We should pass here the correct profileDir
 	}
 
 	public get appScaffoldingPath(): string {
@@ -26,7 +26,7 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 	public prepareAppScaffolding(): IFuture<void> {
 		return (() => {
 			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
-			appScaffoldingConfig.pathToSave = options.screenBuilderCacheDir;
+			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
 				return (() => {
 					this.npmInstall("glob-watcher@0.0.8").wait(); // HACK: With this we are able to make paths shorter with 20 symbols.

@@ -5,11 +5,9 @@
 import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
-import hostInfo = require("../common/host-info");
 
 export class EditConfigurationCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors,
-		private $templatesService: ITemplatesService,
 		private $project: Project.IProject) { }
 
 	mandatory = true;
@@ -35,12 +33,13 @@ export class EditConfigurationCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
+		private $hostInfo: IHostInfo,
 		private $opener: IOpener,
 		private $project: Project.IProject,
 		private $templatesService: ITemplatesService) {
 	}
 
-	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$templatesService, this.$project)];
+	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$project)];
 
 	execute(args: string[]): IFuture<void> {
 		let file = args[0];
@@ -61,7 +60,7 @@ export class EditConfigurationCommand implements ICommand {
 
 				//delete extra file in template zip
 				this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();
-				if (hostInfo.isWindows()) {
+				if (this.$hostInfo.isWindows) {
 					let contents = this.$fs.readText(filepath).wait();
 					contents = helpers.stringReplaceAll(contents, "\n", "\r\n");
 					this.$fs.writeFile(filepath, contents).wait();

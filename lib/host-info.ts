@@ -17,15 +17,3 @@ export function isDotNet40Installed(message: string) : IFuture<boolean> {
 	});
 	return result;
 }
-
-export let hostCapabilities: { [key: string]: IHostCapabilities } = {
-	"win32": {
-		debugToolsSupported: true
-	},
-	"darwin": {
-		debugToolsSupported: true
-	},
-	"linux": {
-		debugToolsSupported: false
-	}
-}

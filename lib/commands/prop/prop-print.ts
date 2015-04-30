@@ -2,13 +2,13 @@
 "use strict";
 import helpers = require("./../../helpers");
 import projectPropertyCommandBaseLib = require("./prop-command-base");
-import options = require("../../common/options");
 
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
 	constructor($staticConfig: IStaticConfig,
-		$injector: IInjector) {
+		$injector: IInjector,
+		private $options: IOptions) {
 		super($staticConfig, $injector);
-		if(!options.validValue) {
+		if(!this.$options.validValue) {
 			this.$project.ensureProject();
 		}
 	}
