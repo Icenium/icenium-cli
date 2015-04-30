@@ -92,7 +92,9 @@ function createTestInjector() {
 	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
-		validate: (data: IProjectData) => { }
+		validate: (data: IProjectData) => { },
+		validateWithBuildSchema: (data: IProjectData, platformName: string): void => { },
+		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => { }
 	});
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
@@ -107,7 +109,11 @@ function createTestInjector() {
 	testInjector.register("mobileHelper", mobileHelperLib.MobileHelper);
 	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
-
+	testInjector.register("loginManager", {
+		ensureLoggedIn: (): IFuture<void> => {
+			return Future.fromResult();
+		}
+	});
 	return testInjector;
 }
 
@@ -187,7 +193,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	var projectFilePath = path.join(tempFolder, projectName, getProjectFileName(configuration));
+	var projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
 	var abProjectContent = fs.readJson(projectFilePath).wait();
 
 	updateTestInjector(testInjector, getCordovaPluginsData(abProjectContent["CorePlugins"]), availableMarketplacePlugins);

@@ -145,7 +145,7 @@ describe("project integration tests", () => {
 
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
-			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
+			var abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
@@ -177,7 +177,7 @@ describe("project integration tests", () => {
 			options.appid = "com.telerik.Test";
 
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-			var abProject = fs.readFileSync(path.join(tempFolder, projectName, ".abproject"));
+			var abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			var testProperties = JSON.parse(abProject.toString());
 			var correctProperties = JSON.parse(correctABProject.toString());
@@ -192,6 +192,13 @@ describe("project integration tests", () => {
 			for(var key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
+		});
+
+		it("with long name should throw ", () => {
+			project = testInjector.resolve(projectlib.Project);
+			var projectName = "Thirtyone character long string";
+
+			assert.throws(() => project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait());
 		});
 	});
 
@@ -230,7 +237,7 @@ describe("project integration tests", () => {
 
 		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses",() => {
 			prompter.confirmResult = false;
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait()
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
 			assert.throws(() => project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait());
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
@@ -239,7 +246,7 @@ describe("project integration tests", () => {
 		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses",() => {
 			// First set WPSdk to 8.1 and FrameworkVersion to 3.7.0
 			prompter.confirmResult = true;
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait()
+			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
 
 			prompter.confirmResult = false;
@@ -288,7 +295,7 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "tns_modules");
+				var tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
@@ -296,7 +303,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "tns_modules");
+				var tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 

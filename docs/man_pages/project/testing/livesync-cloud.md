@@ -5,11 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder livesync cloud`
 
-Synchronizes the project with the cloud to enable LiveSync via wireless connection (using the three finger tap and hold gesture). 
+Synchronizes the project with the cloud to enable LiveSync via wireless connection (using the three-finger tap and hold gesture). <% if(isHtml) { %>You can also control LiveSync with the three-finger tap and hold gesture programmatically. For more information, see [Enable or Disable LiveSync Programmatically](http://docs.telerik.com/platform/appbuilder/testing-your-app/livesync/configuring-livesync/configure-livesync-programmatically) and [LiveSync Changes Programmatically](http://docs.telerik.com/platform/appbuilder/testing-your-app/livesync/livesync-programmatically).<% } %> 
 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
-To get the latest changes on device, tap and hold with three fingers on the device screen until the download pop-up
-appears. When the download completes, the app refreshes automatically.
+To get the latest changes on device, tap and hold with three fingers on the device screen until the download pop-up appears. When the download completes, the app refreshes automatically.
 <% } %>
 <% if(isConsole) { %>
 <% if(isNativeScript) { %>

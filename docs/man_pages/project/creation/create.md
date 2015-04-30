@@ -3,18 +3,21 @@ create
 
 Usage | Synopsis
 ------|-------
+Create hybrid | `$ appbuilder create hybrid <App name>`
+Create native | `$ appbuilder create native <App name>`
+Create website | `$ appbuilder create website <Site name>`
+Create with Screen Builder | `$ appbuilder create screenbuilder <App Name>` OR `$ appbuilder create <App Name>`
 
-General | `$ appbuilder create [<Type>] [<App name>]`
-
-If `<App name>` is specified, new Screen Builder project will be created.
-Creates a project for hybrid, native or mobile website development. You must run the `create` command with a command extension that specifies the project type.
+Creates a project for hybrid, native or mobile website development. If `screenbuilder` and `<Type>` are not specified, creates a new project for hybrid development with Screen Builder.
 
 ### Attributes
-`<Type>` extends the `create` command. You can set the following values for this attribute.
-* `hybrid` - Creates a new project from an **Apache Cordova** template.
-* `native` - Creates a new project from a **NativeScript** template.
-* `website` - Creates a new project from a **Mobile Website** template.
-`<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ). 
+* `screenbuilder` - Creates a new project for hybrid development with Screen Builder. You can later run the Screen Builder commands for project development on this project.
+* `<Type>` extends the `create` command. You can set the following values for this attribute. 
+	* `hybrid` - Creates a new project from an **Apache Cordova** template.
+	* `native` - Creates a new project from a **NativeScript** template.
+	* `website` - Creates a new project from a **Mobile Website** template.
+* `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
+* `<Site name>` is the name of the mobile website. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 
 <% if(isHtml) { %> 
 ### Related Commands
@@ -26,6 +29,7 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create website](create-website.html) | Creates a new project from a Mobile Website-based template.
+[create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [init](init.html) | Initializes an existing project for development.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.

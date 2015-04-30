@@ -87,6 +87,7 @@ $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
 $injector.requireCommand("create|*default", "./commands/project/create");
+$injector.requireCommand("create|screenbuilder", "./commands/project/create");
 $injector.requireCommand("init|*unknown", "./commands/project/init");
 
 $injector.requireCommand("prop|add", "./commands/prop/prop-add");
@@ -154,7 +155,6 @@ $injector.require("emulatorSettingsService", "./services/emulator-settings-servi
 $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
 $injector.require("remoteProjectService", "./services/remote-projects-service");
-$injector.require("optionsService", "./services/options-service");
 $injector.require("processInfo", "./process-info");
 $injector.requireCommand("mobileframework|*print", "./commands/framework-versions/print-versions");
 $injector.requireCommand("mobileframework|set", "./commands/framework-versions/set-version");

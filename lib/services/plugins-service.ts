@@ -19,23 +19,33 @@ export class PluginsService implements IPluginsService {
 		private $errors: IErrors,
 		private $logger: ILogger,
 		private $project: Project.IProject,
-		private $prompter: IPrompter) {
+		private $prompter: IPrompter,
+		private $loginManager: ILoginManager,
+		private $projectConstants: Project.IProjectConstants) {
 
 		// Cordova plugin commands are only applicable to Cordova projects
 		this.$project.ensureCordovaProject();
-
+		this.$loginManager.ensureLoggedIn().wait();
 		this.identifierToPlugin = Object.create(null);
 		Future.wait([this.createPluginsData($cordovaPluginsService),
 			this.createPluginsData($marketplacePluginsService)]);
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		return this.getAllInstalledPlugins({operation: _.intersection});
-	}
+		var corePlugins: string[] = [];
+		if(options.debug) {
+			corePlugins = corePlugins.concat(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME));
+		}
 
-	// return plugins that are enabled in one or more configurations
-	public getInstalledPluginsEnabledAtLeastInOneConfiguration(): IPlugin[] {
-		return this.getAllInstalledPlugins({operation: _.union});
+		if(options.release) {
+			corePlugins = corePlugins.concat(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+		}
+
+		if(!options.debug && !options.release) {
+			corePlugins = <string[]>_.union(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+		}
+
+		return _.map(corePlugins,(pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
@@ -48,6 +58,10 @@ export class PluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
+			var parts = pluginName.split("@");
+			pluginName = parts[0];
+			var version = parts[1];
+
 			var pluginNameToLowerCase = pluginName.toLowerCase();
 			if(!_.any(this.getAvailablePlugins(), (pl) => pl.data.Name.toLowerCase() ===  pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
@@ -57,15 +71,25 @@ export class PluginsService implements IPluginsService {
 
 			if(installedPlugin) {
 				if(installedPlugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
-					this.$logger.info("Plugin '%s' is already installed", pluginName);
-					var message = util.format("Would you like to update the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
-					if (this.$prompter.confirm(message, () => true).wait()) {
+					var message = util.format("Would you like to change the version of '%s' plugin. The current installed version is %s. ", pluginName, installedPlugin.data.Version);
+					var confirm = version ? true : this.$prompter.confirm(message, () => true).wait();
+					if (confirm) {
 						var versions = this.getPluginVersions(pluginName);
-						var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
-						versions.splice(currentVersionIndex, 1);
 
-						var version = this.promptForVersion(pluginName, versions).wait();
-						this.$logger.info("Updating plugin '%s' to version %s..", pluginName, version);
+						if(version) {
+							if(!_.any(versions, v => v.value === version)) {
+								this.$errors.fail("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
+							} else if(installedPlugin.data.Version === version) {
+								this.$logger.info("Plugin '%s' with version '%s' is already installed.", pluginName, version);
+								return;
+							}
+						} else {
+							var currentVersionIndex = _.findIndex(versions, (v) => v.value === installedPlugin.data.Version);
+							versions.splice(currentVersionIndex, 1);
+							version = this.promptForVersion(pluginName, versions).wait();
+						}
+
+						this.$logger.info("Updating plugin '%s' to version %s.", pluginName, version);
 
 						var updatePlugin = (pluginName:string, configuration?:string) => {
 							var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), installedPlugin.toProjectDataRecord());
@@ -90,15 +114,15 @@ export class PluginsService implements IPluginsService {
 				}
 			}
 
-			var parts = pluginName.split("@");
-			pluginName = parts[0];
-			var version = parts[1] || "";
-
-			if(this.getPluginByName(pluginName).type === pluginsDataLib.PluginType.MarketplacePlugin && !version) {
+			var pluginToAdd = this.getPluginByName(pluginName);
+			if(pluginToAdd.type === pluginsDataLib.PluginType.MarketplacePlugin) {
 				var versions = this.getPluginVersions(pluginName);
-				version = this.promptForVersion(pluginName, versions).wait();
+				if(version && !_.any(versions, v => v.value === version)) {
+					this.$errors.fail("Invalid version %s. The valid versions are: %s", version, versions.map(v => v.value).join(", "));
+				} else if(!version) {
+					version = this.promptForVersion(pluginName, versions).wait();
+				}
 			}
-
 
 			this.configurePlugin(pluginName, version).wait();
 
@@ -120,7 +144,8 @@ export class PluginsService implements IPluginsService {
 			var plugin = this.getPluginByName(pluginName, installedPlugin.data.Version);
 
 			if(this.$project.hasBuildConfigurations()) {
-				_.each(plugin.configurations, (configuration:string) => {
+				var configurations = this.$project.configurations;
+				_.each(configurations, (configuration:string) => {
 					this.removePluginCore(pluginName, plugin, configuration).wait();
 				});
 			} else {
@@ -130,19 +155,26 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public printPlugins(plugins: IPlugin[]): void {
-		var groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
-		var outputLines:string[] = [];
+		if(options.available) {
+			// Group marketplace plugins
+			var marketplacePlugins = _.filter(plugins, (pl) => pl.type === pluginsDataLib.PluginType.MarketplacePlugin);
+			var output = _.filter(plugins, pl => pl.type === pluginsDataLib.PluginType.CorePlugin || pl.type === pluginsDataLib.PluginType.AdvancedPlugin);
 
-		_.each(Object.keys(groups), (group: string) => {
-			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
-
-			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
-			_.each(sortedPlugins, (plugin: IPlugin) => {
-				outputLines.push(plugin.pluginInformation.join(os.EOL));
+			var groups = _.groupBy(marketplacePlugins, (plugin:IPlugin) => plugin.data.Identifier);
+			_.each(groups, (group:any) => {
+				var defaultData = _.find(group, (gr:IPlugin) => {
+					var pvd = (<any>gr).pluginVersionsData;
+					return pvd && gr.data.Version === pvd.DefaultVersion;
+				});
+				if (defaultData) {
+					output.push(defaultData);
+				}
 			});
-		});
 
-		this.$logger.out(outputLines.join(os.EOL + os.EOL));
+			this.printPluginsCore(output);
+		} else {
+			this.printPluginsCore(plugins);
+		}
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
@@ -217,17 +249,19 @@ export class PluginsService implements IPluginsService {
 			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
 				delete cordovaPluginVariables[pluginData.Identifier];
 			}
+			var oldCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+			var newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
 
-			var newCorePlugins = _.without(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration), plugin.toProjectDataRecord());
-			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
-			this.$project.saveProject().wait();
+			if(newCorePlugins.length !== oldCorePlugins.length) {
+				this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+				this.$project.saveProject().wait();
 
-			if(configuration) {
-				this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
-			} else {
-				this.$logger.out("Plugin %s was successfully removed.", pluginName);
+				if(configuration) {
+					this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+				} else {
+					this.$logger.out("Plugin %s was successfully removed.", pluginName);
+				}
 			}
-
 		}).future<void>()();
 	}
 
@@ -301,19 +335,6 @@ export class PluginsService implements IPluginsService {
 		return plugin;
 	}
 
-	private getAllInstalledPlugins(configuration: {operation: (...args: any[]) => any[]}): IPlugin[] {
-		var corePlugins: any = null;
-		if(options.debug || options.d) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug");
-		} else if(options.release || options.r) {
-			corePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release");
-		} else {
-			corePlugins = configuration.operation(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "debug"), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, "release"));
-		}
-
-		return _.map(corePlugins, (pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
-	}
-
 	private getPluginVersions(pluginName: string): any[] {
 		var toLowerCasePluginName = pluginName.toLowerCase();
 
@@ -342,6 +363,22 @@ export class PluginsService implements IPluginsService {
 			var version = this.$prompter.promptForChoice("Which plugin version do you want to use?", versions).wait();
 			return version;
 		}).future<string>()();
+	}
+
+	private printPluginsCore(plugins: IPlugin[]): void {
+		var groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
+		var outputLines:string[] = [];
+
+		_.each(Object.keys(groups), (group: string) => {
+			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
+
+			var sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
+			_.each(sortedPlugins, (plugin: IPlugin) => {
+				outputLines.push(plugin.pluginInformation.join(os.EOL));
+			});
+		});
+
+		this.$logger.out(outputLines.join(os.EOL + os.EOL));
 	}
 }
 $injector.register("pluginsService", PluginsService);

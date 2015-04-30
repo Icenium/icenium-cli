@@ -5,10 +5,13 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder help [<Command>]`
 
-Lists the available commands or shows information about the selected command.
+Opens the command reference for all commands in your browser or shows information about the selected command in the browser.
+
+To list all commands in the console, run `$ appbuilder -h`  
+To print information about a selected command in the console, run `$ appbuilder <Command> -h` 
 
 ### Attributes
-* `<Command>` is any of the available commands as listed by `$ appbuilder help`.
+* `<Command>` is any of the available commands as listed by `$ appbuilder help` or `$ appbuilder -h`
 
 <% if(isHtml) { %> 
 ### Related Commands

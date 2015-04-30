@@ -11,7 +11,7 @@ Initializes an existing NativeScript project for development in the current dire
 * `--appid` - Sets the application identifier for your app. 
 
 ### Attributes
-* `<App ID>` must consist of at least three alphanumeric strings, separated by a dot (.). Each string must start with a letter. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
+* `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
 
 <% if(isHtml) { %>
 This operation creates one or more of the following AppBuilder-specific files, if missing:
@@ -28,6 +28,7 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create website](create-website.html) | Creates a new project from a Mobile Website-based template.
+[create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [init](init.html) | Initializes an existing project for development.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init website](init-website.html) | Initializes an existing Mobile Website project for development in the current directory.

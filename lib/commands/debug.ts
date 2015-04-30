@@ -26,10 +26,6 @@ export class DebugCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
-				this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on Linux. The debug tools for Linux will become available in a future release of the Telerik AppBuilder CLI.");
-			}
-
 			this.$loginManager.ensureLoggedIn().wait();
 
 			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
@@ -41,6 +37,10 @@ export class DebugCommand implements ICommand {
 	}
 
 	public canExecute(args: string[]): IFuture<boolean> {
+		if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on %s. The debug tools for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
+		}
+
 		return this.$debuggerPlatformServices.canRunApplication();
 	}
 

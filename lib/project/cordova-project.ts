@@ -95,7 +95,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	private getCorrectWP8PackageIdentityName(appIdentifier: string) {
-		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, appIdentifier).substr(0, 50);
+		var sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""),(c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
+		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
 	public projectTemplatesString(): IFuture<string> {

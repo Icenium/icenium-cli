@@ -437,6 +437,10 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	getPropertyType(framework: string, propertyName: string): string {
 		return "";
 	}
+
+	validateWithBuildSchema(data: IProjectData, platformName: string): void { }
+
+	validatePropertyUsingBuildSchema(propertyName: string, propertyValue: string): void { }
 }
 
 export class PrompterStub implements IPrompter {

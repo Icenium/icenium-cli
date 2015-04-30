@@ -10,17 +10,9 @@ export class SetProjectPropertyCommand extends projectPropertyCommandBaseLib.Pro
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
 			var property = args[0];
 			var propertyValues = _.rest(args, 1);
-			if(this.$project.validateProjectProperty(property, propertyValues, "set").wait()) {
-				if(propertyValues.length === 1 && propertyValues[0]) {
-					return true;
-				}
-			}
-
-			return false;
-		}).future<boolean>()();
+			return this.$project.validateProjectProperty(property, propertyValues, "set");
 	}
 
 	execute(args: string[]): IFuture<void> {
