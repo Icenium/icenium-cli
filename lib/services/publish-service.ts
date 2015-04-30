@@ -11,7 +11,7 @@ var Table = require("cli-table");
 export class PublishService implements IPublishService {
 	private static JSON_PUBLISH_FILE_NAME = ".abpublish";
 	private static ALLOWED_CONNECTION_TYPE = "ftp";
-	private static ERROR_MESSAGE_WHEN_PROJECT_EXISTS_ON_REMOTE = "User cancelled operation";
+	private static ERROR_MESSAGE_WHEN_PROJECT_EXISTS_ON_REMOTE = "Project already exists on the remote server";
 	private static PUBLIC_URL_DEFAULT_VALUE = "";
 	private static REMOVE_ALL_CONNECTIONS_MESSAGE = "All of them";
 
