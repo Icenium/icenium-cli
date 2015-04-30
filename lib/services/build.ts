@@ -137,6 +137,10 @@ export class BuildService implements Project.IBuildService {
 				}
 
 				if(certificateData) {
+					if (certificateData.isiOS) {
+						this.$errors.failWithoutHelp("The certificate you have chosen is ineligible for the Android platform.");
+					}
+
 					buildProperties.AndroidCodesigningIdentity = certificateData.Alias;
 					this.$logger.info("Using certificate '%s'", certificateData.Alias);
 				} else {
