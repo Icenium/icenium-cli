@@ -63,6 +63,7 @@ export class SimulateCommand implements ICommand {
 
 	private ensureSimulatorIsNotRunning(): IFuture<void> {
 		return (() => {
+			this.$logger.info(); // HACK - display simulator downloading indicator correctly
 			var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
