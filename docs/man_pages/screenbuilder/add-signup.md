@@ -11,6 +11,7 @@ Inserts a sign-up form in an existing application view. You can connect the form
 
 * The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
 * You must have at least one data provider configured with `$ appbuilder add-dataprovider`
+* Verify that you have installed git on your system.
 
 ### Command Limitations 
 
