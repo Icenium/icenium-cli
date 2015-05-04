@@ -17,6 +17,7 @@ class CryptographicIdentityConstants {
 	public static X509_EXTENSION = "cer";
 	public static PKCS12CERTIFICATE = "Pkcs12";
 	public static X509CERTIFICATE = "X509Certificate";
+	public static APPLE_INC = "Apple Inc.";
 	public static MAX_ALLOWED_PASSWORD_ATTEMPTS = 3;
 }
 
@@ -26,7 +27,8 @@ interface IFailedProvision {
 }
 
 export class CryptographicIdentityStoreService implements ICryptographicIdentityStoreService {
-	constructor(private $server: Server.IServer) { }
+	constructor(private $server: Server.IServer,
+		private $x509: IX509CertificateLoader) { }
 
 	public getAllProvisions(): IFuture<IProvision[]> {
 		return (() => {
@@ -40,8 +42,8 @@ export class CryptographicIdentityStoreService implements ICryptographicIdentity
 			var data = this.$server.identityStore.getIdentities().wait();
 			return _.map(data, (identityData) => {
 				var identity: any = identityData;
-				identity.Type = identity.$type;
-				delete identity.$type;
+				var certificateOrganization = this.$x509.load(identity.Certificate).issuerData['O'];
+				identity.isiOS = certificateOrganization === CryptographicIdentityConstants.APPLE_INC;
 				return <ICryptographicIdentity>identity;
 			});
 		}).future<ICryptographicIdentity[]>()();
@@ -116,7 +118,6 @@ export class IdentityManager implements Server.IIdentityManager {
 		return ((): any => {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
-
 			var result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if(!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
@@ -210,7 +211,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			if(identity) {
 				return identity;
 			} else {
-				this.$errors.fail("No certificate found compatible with provision '%s' found.", provisionData.Name);
+				this.$errors.fail("No certificate compatible with provision '%s' found.", provisionData.Name);
 				return null;
 			}
 		}).future<ICryptographicIdentity>()();

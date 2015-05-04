@@ -17,7 +17,7 @@ interface IProvision {
 interface ICryptographicIdentity {
 	Alias: string;
 	Attributes: string[];
-	Type: string;
+	isiOS: boolean;
 	Certificate: string;
 }
 
