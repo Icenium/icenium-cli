@@ -24,7 +24,7 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 				downloadUri: this.getExtensionDownloadUri(packageName).wait()
 			};
 
-			this.prepareExtensionBase(extensionData, cachedVersion, beforeDownloadExtensionAction).wait();
+			this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction }).wait();
 		}).future<void>()();
 	}
 

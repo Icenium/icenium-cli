@@ -7,6 +7,10 @@ General | `$ appbuilder add-dataProvider`
 
 Connects your project to a Telerik Backend Services, JSON or OData data provider. <% if(isHtml) { %>After you configure the data provider, you can use it in your code or use it with the `add-list`, `add-signin` and `add-signup` commands to generate lists, sign-in and sign-up forms connected to the data provider. An interactive prompt guides you through the setup process.  
 
+### Prerequisites
+
+* Verify that you have installed git on your system.
+
 ### Command Limitations
 
 * You can run this command only on projects created with Screen Builder.

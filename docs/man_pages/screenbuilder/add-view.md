@@ -10,6 +10,7 @@ Adds a new application view to your project. You can later add lists and forms t
 ### Command Limitations 
 
 * You can run this command only on projects created with Screen Builder.
+* Verify that you have installed git on your system.
 
 ### Related Commands
 
