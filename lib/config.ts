@@ -10,10 +10,11 @@ import configBaseLib = require("./common/config-base");
 export class Configuration extends configBaseLib.ConfigBase implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
-	DEBUG :boolean;
+	DEBUG: boolean;
 	USE_PROXY: boolean;
 	PROXY_HOSTNAME: string;
 	PROXY_PORT: number;
+	ON_PREM: boolean;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
 	DEFAULT_WEBSITE_PROJECT_TEMPLATE: string;
@@ -75,6 +76,7 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 	private mergeConfig(config: IConfiguration, mergeFrom: IConfiguration): void {
 		_.extend(config, mergeFrom);
 	}
+
 }
 $injector.register("config", Configuration);
 

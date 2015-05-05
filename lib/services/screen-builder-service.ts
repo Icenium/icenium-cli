@@ -9,7 +9,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
 	private static PREDEFINED_SCREENBUILDER_TYPES: IStringDictionary = {
 		dataprovider: "dataProvider"
-	}
+	};
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
 		private $childProcess: IChildProcess,
@@ -50,13 +50,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	public installAppDependencies(): IFuture<void> {
+	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void> {
 		this.$logger.trace("Installing project dependencies using bower");
-		var projectDirPath = path.resolve(options.path || ".");
 		var bowerModuleFilePath = require.resolve("bower");
 		var bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
 		var command = util.format("%s %s install", "node", bowerPath);
-		return this.$childProcess.exec(command, { cwd: projectDirPath });
+		return this.$childProcess.exec(command, { cwd: screenBuilderOptions.projectPath });
 	}
 
 	private prepareScreenBuilder(): IFuture<void> {

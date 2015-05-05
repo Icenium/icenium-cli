@@ -23,7 +23,7 @@ export class InitProjectCommand implements ICommand {
 		private $projectConstants: Project.IProjectConstants) {
 
 		this.projectDir = $project.getNewProjectDir();
-		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "tns_modules"), "directory");
+		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "app", "tns_modules"), "directory");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
 		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file"));
 

@@ -6,22 +6,33 @@ var options: any = require("../common/options");
 
 export class PrintSamplesCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
-		private frameworkIdentifier: string) { }
+		private frameworkIdentifier: string,
+		private $config: IConfiguration) { }
 
 	execute(args: string[]): IFuture<void> {
 		return this.$samplesService.printSamplesInformation(this.frameworkIdentifier);
 	}
 
+	get isDisabled() {
+		return this.$config.ON_PREM;
+	}
+
 	allowedParameters: ICommandParameter[] = []
 }
-$injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, {frameworkIdentifier: "" }));
+$injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, {frameworkIdentifier: ""}));
 
 export class CloneSampleCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
 		private $fs: IFileSystem,
-		private $errors: IErrors) { }
+		private $errors: IErrors,
+		private $config: IConfiguration) { }
+
 	execute(args: string[]): IFuture<void> {
 		return this.$samplesService.cloneSample(args[0]);
+	}
+
+	get isDisabled() {
+		return this.$config.ON_PREM;
 	}
 
 	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$samplesService, this.$fs, this.$errors)]

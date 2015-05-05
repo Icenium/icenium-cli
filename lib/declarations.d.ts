@@ -343,7 +343,7 @@ interface IScreenBuilderService {
 	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void>;
 	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
-	installAppDependencies(): IFuture<void>;
+	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void>;
 }
 
 interface IScreenBuilderOptions {

@@ -9,7 +9,8 @@ Inserts an input field of a selected type with a label and placeholder text in a
 
 ### Prerequisites
 
-* The existing form must be added with `$ appbuilder add-form` 
+* The existing form must be added with `$ appbuilder add-form`
+* Verify that you have installed git on your system. 
 
 ### Command Limitations 
 
