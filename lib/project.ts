@@ -342,6 +342,8 @@ export class Project implements Project.IProject {
 				return;
 			}
 
+			this.ensureAllPlatformAssets().wait();
+
 			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
 				var shouldUpdateWPSdk = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?", this.projectData.WPSdk)).wait();
 				if(shouldUpdateWPSdk) {

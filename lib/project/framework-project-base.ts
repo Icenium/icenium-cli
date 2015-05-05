@@ -9,6 +9,7 @@ import util = require("util");
 
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	private projectSchema: any;
+	private assetUpdateMessagePrinted = false;
 
 	constructor(protected $logger: ILogger,
 		protected $fs: IFileSystem,
@@ -49,11 +50,10 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		}).future<string[]>()();
 	}
 
-	_assetUpdateMessagePrinted = false;
 	public printAssetUpdateMessage(): void {
-		if (!this._assetUpdateMessagePrinted) {
+		if (!this.assetUpdateMessagePrinted) {
 			this.$logger.info("Setting up missing asset files. Commit these assets into your source control repository.");
-			this._assetUpdateMessagePrinted = true;
+			this.assetUpdateMessagePrinted = true;
 		}
 	}
 
