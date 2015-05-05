@@ -600,6 +600,7 @@ export class ImportCryptographicIdentity implements ICommand {
 					result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
 				} catch(err) {
 					noErrorOccurred = false;
+					isPasswordRequired = true;
 					this.$logger.error(err.message + os.EOL + "Verify that you have provided the correct file and password and try again.");
 				}
 
