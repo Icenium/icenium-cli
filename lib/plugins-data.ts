@@ -85,6 +85,7 @@ export class MarketplacePluginData extends CordovaPluginData {
 		$project: Project.IProject,
 		$projectConstants: Project.IProjectConstants) {
 		super(data, PluginType.MarketplacePlugin, $project, $projectConstants);
+		this.data.Identifier = (<any>this.pluginVersionsData).Identifier;
 	}
 
 	public get pluginInformation(): string[] {
