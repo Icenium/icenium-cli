@@ -365,7 +365,7 @@ export class Project implements Project.IProject {
 				this.setProperty("CorePlugins", newPluginsList, configuration);
 			});
 
-			var successfullyChanged: string[] = [],
+			var backedUpFiles: string[] = [],
 				backupSuffix = ".backup";
 			try {
 				_.each(this.$mobileHelper.platformNames, (platform) => {
@@ -373,18 +373,18 @@ export class Project implements Project.IProject {
 					var cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
 					var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
 					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
+					backedUpFiles.push(cordovaJsFileName);
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
-					successfullyChanged.push(cordovaJsFileName);
 				});
 			} catch(error) {
-				_.each(successfullyChanged, file => {
+				_.each(backedUpFiles, file => {
 					this.$logger.trace("Reverting %s", file);
 					this.$fs.copyFile(file + backupSuffix, file).wait();
 				});
-				throw error;
+				this.$errors.failWithoutHelp(error.message);
 			}
 			finally {
-				_.each(successfullyChanged, file => {
+				_.each(backedUpFiles, file => {
 					this.$fs.deleteFile(file + backupSuffix).wait();
 				});
 			}
