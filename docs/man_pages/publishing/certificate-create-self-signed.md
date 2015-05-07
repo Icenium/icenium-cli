@@ -3,7 +3,7 @@ certificate create-self-signed
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate create-self-signed [<Purpose> [<Name> [<Email> [<Country> [<StartDate> [<EndDate>]]]]]]`
+General | `$ appbuilder certificate create-self-signed [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]`
 
 Creates a self-signed certificate for code signing Android applications. <% if(isHtml) { %>If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set
 the remaining certificate details. 
