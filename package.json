@@ -69,7 +69,7 @@
     "string-to-json": "0.1.0",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
     "temp": "0.8.1",
-    "typescript": "1.4.1",
+    "typescript": "1.5.0-beta",
     "unzip": "0.1.11",
     "valid-url": "1.0.9",
     "validator": "3.2.1",
