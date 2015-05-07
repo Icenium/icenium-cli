@@ -143,10 +143,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 				error.details = util.format("Expected %s but got %s", error.details, data[propertyName]);
 			}
 
-			var errorMessage =  util.format("Property %s: %s. %s", propertyName, error.message, error.details);
+			var errorMessage = util.format("Property %s: %s. %s", propertyName, error.message, error.details);
 			this.$logger.trace("JSV error: %s", errorMessage);
 
-			result[propertyName] = (opts.usePredefinedErrors === false ? undefined : JsonSchemaValidator.PREDEFINED_ERRORS[propertyName]) || this.tryResolveValidationSchemaCore(undefined, opts.validationSchemaName).properties[propertyName].errorMessage || errorMessage;
+			var property = this.tryResolveValidationSchemaCore(undefined, opts.validationSchemaName).properties[propertyName];
+			result[propertyName] = (opts.usePredefinedErrors === false ? undefined :
+				JsonSchemaValidator.PREDEFINED_ERRORS[propertyName]) || (property ? property.errorMessage : errorMessage);
 		});
 
 		return result;
