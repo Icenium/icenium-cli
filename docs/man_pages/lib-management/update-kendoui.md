@@ -3,7 +3,7 @@ update-kendoui
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder update-kendoui`
+General | `$ appbuilder update-kendoui [--verified] [--core] [--professional] [--latest]`
 
 Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory.<% if(isHtml || isCordova) { %> The verified tag marks stable Kendo UI Service Pack releases.<% } %> 
 <% if(isConsole) { %>
@@ -14,6 +14,13 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help update-kendoui`
 <% } %>
 <% } %>
+### Options
+* `--verified` - Lists version marked with verified tag.
+* `--core` - Lists Kendo UI Core versions. When combined with `--verified` option, lists only Kendo UI Core verified versions.
+* `--professional` - Lists Kendo UI Professional versions. When combined with `--verified` option, lists only Kendo UI Professional verified versions.
+* `--latest` - Installs the latest available version without prompt for selection. This option can be combined with all other options. For example `$ appbuilder update-kendoui --latest --verified --core` will install latest available verified version of Kendo UI Core.
+
+> NOTE: `--core` and `--professional` options cannot be used simultaneously.
 <% if(isHtml) { %> 
 ### Command Limitations
 

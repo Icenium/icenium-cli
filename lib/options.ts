@@ -25,7 +25,11 @@ var knownOpts: any = {
 		"debug": Boolean,
 		"valid-value": Boolean,
 		"screenBuilderCacheDir": String,
-		"force": Boolean
+		"force": Boolean,
+		"verified": Boolean,
+		"core": Boolean,
+		"professional": Boolean,
+		"latest": Boolean
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",
