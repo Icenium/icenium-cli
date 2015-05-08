@@ -19,7 +19,7 @@ export class JsonSchemaResolver implements IJsonSchemaResolver {
 				this.$errors.fail("Unable to find schema with id %s.", schemaId);
 			}
 
-			var extendsProperty = this.schemasCache[schemaId].extends;
+			let extendsProperty = this.schemasCache[schemaId].extends;
 			if(extendsProperty) {
 				this.schemasCache[schemaId].extends = {};
 				this.schemasCache[schemaId].extends.properties = Object.create(null);
@@ -33,7 +33,7 @@ export class JsonSchemaResolver implements IJsonSchemaResolver {
 
 	private buildValidationSchema(extendsProperty: ISchemaExtends[], schemaId: string) {
 		_.each(extendsProperty, (ext: ISchemaExtends) => {
-			var refSchema = this.findSchema(ext.$ref);
+			let refSchema = this.findSchema(ext.$ref);
 			if(refSchema && refSchema.properties) {
 				_.each(_.keys(refSchema.properties), (propertyName: string) => {
 					if(!this.schemasCache[schemaId].extends.properties[propertyName]) {

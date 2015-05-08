@@ -3,8 +3,8 @@
 
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
-var options: any = require("../common/options");
-var Table = require("cli-table");
+let options: any = require("../common/options");
+let Table = require("cli-table");
 
 export class AppstoreApplicationCommandBase implements ICommand {
 	constructor(public $server: Server.IServer,
@@ -21,7 +21,7 @@ export class AppstoreApplicationCommandBase implements ICommand {
 
 	public getAppleId(): IFuture<string> {
 		return (() => {
-			var appleIdSchema: IPromptSchema = {
+			let appleIdSchema: IPromptSchema = {
 				message: "Apple ID",
 				type: "input",
 				name: "appleId",
@@ -30,7 +30,7 @@ export class AppstoreApplicationCommandBase implements ICommand {
 				}
 			};
 
-			var result = this.$prompter.get([appleIdSchema]).wait();
+			let result = this.$prompter.get([appleIdSchema]).wait();
 			return result["appleId"];
 		}).future<string>()();
 	}
@@ -52,8 +52,8 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 
-			var userName = args[0];
-			var password = args[1];
+			let userName = args[0];
+			let password = args[1];
 
 			if(!userName) {
 				userName = this.getAppleId().wait();
@@ -63,14 +63,14 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 				password = this.$prompter.getPassword("Apple ID password").wait();
 			}
 
-			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			apps = _.sortBy(apps, (app: Server.Application) => app.Application);
 			if(!apps.length) {
 				this.$logger.out("No applications are ready for upload.");
 				return;
 			}
 
-			var table = new Table({
+			let table = new Table({
 				head: ["Application", "Version", "Bundle ID"],
 				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
@@ -110,9 +110,9 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 
 			this.$loginManager.ensureLoggedIn().wait();
 
-			var application = args[0];
-			var userName = args[1];
-			var password = args[2];
+			let application = args[0];
+			let userName = args[1];
+			let password = args[2];
 			if(!application) {
 				this.$errors.fail("No application specified. Specify an application that is ready for upload in iTunes Connect.");
 			}
@@ -123,7 +123,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 
 			if(options.provision) {
 				this.$logger.info("Checking provision.");
-				var provision = this.$identityManager.findProvision(options.provision).wait();
+				let provision = this.$identityManager.findProvision(options.provision).wait();
 
 				if(provision.ProvisionType !== constants.ProvisionType.AppStore) {
 					this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
@@ -136,14 +136,14 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 			}
 
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
-			var apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
-			var theApp = _.find(apps, (app: Server.Application) => app.Application === application);
+			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			let theApp = _.find(apps, (app: Server.Application) => app.Application === application);
 			if(!theApp) {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
 			}
 
 			this.$logger.info("Building release package.");
-			var buildResult = this.$buildService.build({
+			let buildResult = this.$buildService.build({
 				platform: "iOS",
 				configuration: "Release",
 				provisionTypes: [constants.ProvisionType.AppStore]
@@ -153,10 +153,10 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 			}
 
 			this.$logger.info("Uploading package to iTunes Connect. This may take several minutes.");
-			var solutionPath = buildResult[0].solutionPath;
-			var projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
+			let solutionPath = buildResult[0].solutionPath;
+			let projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
 
-			var projectData = this.$project.projectData;
+			let projectData = this.$project.projectData;
 			this.$server.itmstransporter.uploadApplication(projectData.ProjectName, projectData.ProjectName,
 				projectPath, theApp.AppleID, userName, password).wait();
 

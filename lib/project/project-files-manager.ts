@@ -72,12 +72,12 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 
 	public enumerateProjectFiles(projectDir: string, additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
-			var excludedProjectDirsAndFiles = ProjectFilesManager.INTERNAL_NONPROJECT_FILES.
+			let excludedProjectDirsAndFiles = ProjectFilesManager.INTERNAL_NONPROJECT_FILES.
 				concat(additionalExcludedProjectDirsAndFiles || []);
 
-			var projectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
-				var isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles, projectDir);
-				var isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
+			let projectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (filePath, stat) => {
+				let isExcluded = this.isFileExcluded(path.relative(projectDir, filePath), excludedProjectDirsAndFiles, projectDir);
+				let isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
 				return !isExcluded && !isSubprojectDir;
 			});
 
@@ -87,26 +87,26 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 	}
 
 	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
-		var excludedProjectDirsAndFiles = ProjectFilesManager.INTERNAL_NONPROJECT_FILES.
+		let excludedProjectDirsAndFiles = ProjectFilesManager.INTERNAL_NONPROJECT_FILES.
 			concat(additionalExcludedDirsAndFiles || []);
 
-		var relativeToProjectPath = path.relative(projectDir, filePath);
+		let relativeToProjectPath = path.relative(projectDir, filePath);
 		return this.isFileExcluded(relativeToProjectPath, excludedProjectDirsAndFiles, projectDir);
 	}
 
 	public excludeFile(projectDir: string, excludeFilePath: string) : void {
 		if (!this.isProjectFileExcluded(projectDir, excludeFilePath)) {
-			var relativeToProjectPath = path.relative(projectDir, excludeFilePath);
-			var appendData = '\n' + relativeToProjectPath + '\n';
-			var ignoreFilePath = path.join(projectDir, ProjectFilesManager.IGNORE_FILE);
+			let relativeToProjectPath = path.relative(projectDir, excludeFilePath);
+			let appendData = '\n' + relativeToProjectPath + '\n';
+			let ignoreFilePath = path.join(projectDir, ProjectFilesManager.IGNORE_FILE);
 			this.$fs.appendFile(ignoreFilePath, appendData).wait();
 		}
 	}
 
 	private get ignoreFilesConfigurations(): string[] {
-		var configurations: string[] = [ ProjectFilesManager.IGNORE_FILE ];
+		let configurations: string[] = [ ProjectFilesManager.IGNORE_FILE ];
 		// unless release is explicitly set, we use debug config
-		var configFileName = "." +
+		let configFileName = "." +
 			((options.release || options.r) ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME) +
 			ProjectFilesManager.IGNORE_FILE;
 		configurations.push(configFileName);

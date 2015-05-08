@@ -9,12 +9,12 @@ import util = require("util");
 import helpers = require("./../lib/helpers");
 import validatorsModule = require("./../lib/validators/cryptographic-identity-validators");
 import commandsModule = require("./../lib/commands/cryptographic-identities");
-var assert = require("chai").assert;
+let assert = require("chai").assert;
 
 function createTestInjector(): IInjector {
 	require("../lib/common/logger");
 
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("x509", {});
@@ -23,7 +23,7 @@ function createTestInjector(): IInjector {
 }
 
 describe("Create self signed identity unit tests", () => {
-	var selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>, testInjector: IInjector;
+	let selfSignedIdentityValidator: IValidator<ISelfSignedIdentityModel>, testInjector: IInjector;
 	before(() => {
 		testInjector = createTestInjector();
 		testInjector.register("selfSignedIdentityValidator", validatorsModule.SelfSignedIdentityValidator);
@@ -34,7 +34,7 @@ describe("Create self signed identity unit tests", () => {
 
 	describe("SelfSignedIdentityValidator unit tests", () => {
 		it("validates that Name, Email, Country, StartDate and EndDate are set and valid", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: "Dummyland",
@@ -43,12 +43,12 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isTrue(validationResult.isSuccessful);
 		});
 
 		it("validates that Name is missing", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: undefined,
 				Email: "dummy@foo.com",
 				Country: "Dummyland",
@@ -57,14 +57,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Name"));
 		});
 
 		it("validates that Email is missing", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: undefined,
 				Country: "Dummyland",
@@ -73,14 +73,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Email"));
 		});
 
 		it("validates that Country is missing", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: undefined,
@@ -89,14 +89,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		});
 
 		it("validates that Country is invalid", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: "TheLand",
@@ -105,14 +105,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				INVALID_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		});
 
 		it("validates that StartDate is missing", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: "Dummyland",
@@ -121,14 +121,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-02-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "StartDate"));
 		});
 
 		it("validates that EndDate is missing", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: "Dummyland",
@@ -137,14 +137,14 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: undefined
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, util.format(validatorsModule.SelfSignedIdentityValidator.
 				EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "EndDate"));
 		});
 
 		it("validates that Expiration time is negative", () => {
-			var model = <ISelfSignedIdentityModel>{
+			let model = <ISelfSignedIdentityModel>{
 				Name: "Dummy",
 				Email: "dummy@foo.com",
 				Country: "Dummyland",
@@ -153,7 +153,7 @@ describe("Create self signed identity unit tests", () => {
 				EndDate: "2010-01-02"
 			};
 
-			var validationResult = selfSignedIdentityValidator.validate(model);
+			let validationResult = selfSignedIdentityValidator.validate(model);
 			assert.isFalse(validationResult.isSuccessful);
 			assert.equal(validationResult.error, validatorsModule.SelfSignedIdentityValidator.NEGATIVE_EXPIRATION_ERROR_MESSAGE);
 		});

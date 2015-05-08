@@ -13,13 +13,13 @@ import Future = require("fibers/future");
 import util = require("util");
 
 function createMarketplacePluginsData(marketplacePlugins: any[]) {
-	var json = '[';
-	var index = 0;
+	let json = '[';
+	let index = 0;
 	_.each(marketplacePlugins, plugin => {
-		var uniqueId = plugin.Identifier;
-		var version = plugin.Version;
-		var title = _.last(uniqueId.split("."));
-		var obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
+		let uniqueId = plugin.Identifier;
+		let version = plugin.Version;
+		let title = _.last(uniqueId.split("."));
+		let obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
 			title, uniqueId, version);
 		if(++index !== marketplacePlugins.length) {
 			json += obj + ",";
@@ -33,7 +33,7 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 }
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("cordovaPluginsService", cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("errors", stubs.ErrorsStub);
@@ -89,7 +89,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 
 describe("plugins-service", () => {
 	it("return count of installed plugins", () => {
-		var cordovaPlugins = [
+		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
 				Name: "BatteryStatus"
@@ -99,12 +99,12 @@ describe("plugins-service", () => {
 				Name: "PushPlugin"
 			}
 		];
-		var installedMarketplacePlugins = [{
+		let installedMarketplacePlugins = [{
 			Identifier: "com.telerik.stripe",
 			Name: "Stripe",
 			Version: "1.0.4"
 		}];
-		var availableMarketplacePlugins = [{
+		let availableMarketplacePlugins = [{
 			Identifier: "com.telerik.stripe",
 			DefaultVersion: "1.0.4",
 			Versions: [{
@@ -114,15 +114,15 @@ describe("plugins-service", () => {
 			}]
 		}];
 
-		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-		var installedPlugins = service.getInstalledPlugins();
+		let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+		let installedPlugins = service.getInstalledPlugins();
 
 		assert.equal(3, installedPlugins.length);
 	});
 	it("increment installed plugins count after add plugin", () => {
-		var cordovaPlugins = [
+		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
 				Name: "BatteryStatus"
@@ -132,11 +132,11 @@ describe("plugins-service", () => {
 				Name: "PushPlugin"
 			}
 		];
-		var installedMarketplacePlugins = [{
+		let installedMarketplacePlugins = [{
 			Identifier: "com.telerik.stripe",
 			Name: "Stripe",
 			Version: "1.0.4" }];
-		var availableMarketplacePlugins = [
+		let availableMarketplacePlugins = [
 			{
 				Identifier: "nl.x-services.plugins.toast",
 				DefaultVersion: "2.0.1",
@@ -160,16 +160,16 @@ describe("plugins-service", () => {
 				]
 			}];
 
-			var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+			let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-			var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
 			service.addPlugin("Toast").wait();
-			var installedPlugins = service.getInstalledPlugins();
+			let installedPlugins = service.getInstalledPlugins();
 
 			assert.equal(4, installedPlugins.length);
 		});
 	it("decrement installed plugins count after remove plugin", () => {
-		var cordovaPlugins = [
+		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
 				Name: "BatteryStatus"
@@ -179,7 +179,7 @@ describe("plugins-service", () => {
 				Name: "PushPlugin"
 			}
 		];
-		var installedMarketplacePlugins = [{
+		let installedMarketplacePlugins = [{
 				Identifier: "com.telerik.stripe",
 				Name: "Stripe",
 				Version: "1.0.4"
@@ -190,7 +190,7 @@ describe("plugins-service", () => {
 				Version: "2.0.1"
 			}
 		];
-		var availableMarketplacePlugins = [
+		let availableMarketplacePlugins = [
 			{
 				Identifier: "com.telerik.stripe",
 				DefaultVersion: "1.0.4",
@@ -211,15 +211,15 @@ describe("plugins-service", () => {
 			}
 		];
 
-		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+		let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
 		service.removePlugin("Stripe").wait();
 
 		assert.equal(3, service.getInstalledPlugins().length);
 	});
 	it("does not fail if data for one of the plugins cannot be fetched", () => {
-		var cordovaPlugins = [
+		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
 				Name: "BatteryStatus"
@@ -230,13 +230,13 @@ describe("plugins-service", () => {
 			}
 		];
 
-		var installedMarketplacePlugins = [{
+		let installedMarketplacePlugins = [{
 			Identifier: "com.telerik.stripe",
 			Name: "Stripe",
 			Version: "1.0.4"
 		}];
 
-		var availableMarketplacePlugins = [
+		let availableMarketplacePlugins = [
 			{
 				Identifier: "nl.x-services.plugins.toast",
 				DefaultVersion: "2.0.1",
@@ -257,14 +257,14 @@ describe("plugins-service", () => {
 			}
 		];
 
-		var testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
-		var marketPlaceService: ICordovaPluginsService = testInjector.resolve("marketplacePluginsService");
+		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+		let marketPlaceService: ICordovaPluginsService = testInjector.resolve("marketplacePluginsService");
 		marketPlaceService.createPluginData = (plugin: any): IMarketplacePlugin[] => {
 			throw new Error("MockMarketPlace throws error when creating plugin data.");
 		};
 
-		var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-		var availablePlugins = service.getAvailablePlugins();
+		let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+		let availablePlugins = service.getAvailablePlugins();
 
 		// Only cordovaPlugins are counted, availableMarketplacePlugins cannot fetched, but we still receive correct data for other plugins
 		assert.equal(2, availablePlugins.length);

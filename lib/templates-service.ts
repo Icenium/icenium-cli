@@ -31,9 +31,9 @@ export class TemplatesService implements ITemplatesService {
 
 	public getTemplatesString(regexp: RegExp): IFuture<string> {
 		return (() => {
-			var templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
+			let templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
 				.map((file) => {
-					var match = file.match(regexp);
+					let match = file.match(regexp);
 					return match && match[1];
 				})
 				.filter((file: string) => file !== null)
@@ -44,8 +44,8 @@ export class TemplatesService implements ITemplatesService {
 
 	public downloadProjectTemplates(): IFuture<void> {
 		return (() => {
-			var templates = this.$server.projects.getProjectTemplates().wait();
-			var templatesDir = this.projectTemplatesDir;
+			let templates = this.$server.projects.getProjectTemplates().wait();
+			let templatesDir = this.projectTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir).wait();
 			this.$fs.createDirectory(templatesDir).wait();
 			
@@ -55,8 +55,8 @@ export class TemplatesService implements ITemplatesService {
 
 	public downloadItemTemplates(): IFuture<void> {
 		return (() => {
-			var templates = this.$server.projects.getItemTemplates().wait();
-			var templatesDir = this.itemTemplatesDir;
+			let templates = this.$server.projects.getItemTemplates().wait();
+			let templatesDir = this.itemTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir).wait();
 			this.$fs.createDirectory(templatesDir).wait();
 
@@ -70,28 +70,28 @@ export class TemplatesService implements ITemplatesService {
 
 	public unpackAppResources(): IFuture<void> {
 		return (() => {
-			var appResourcesDir = this.$resources.appResourcesDir;
+			let appResourcesDir = this.$resources.appResourcesDir;
 			this.$fs.deleteDirectory(appResourcesDir).wait();
 
-			var assetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
-			var unzipOps:IFuture<any>[] = [];
-			var unzipStream = this.$fs.createReadStream(assetsZipFileName)
+			let assetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
+			let unzipOps:IFuture<any>[] = [];
+			let unzipStream = this.$fs.createReadStream(assetsZipFileName)
 				.pipe(unzip.Parse())
 				.on("entry", (entry: ZipEntry) => {
 					if (entry.type !== "File" || !_.startsWith(entry.path.toLowerCase(), "app_resources/")) {
 						entry.autodrain();
 						return;
 					}
-					var assetTargetFileName = path.join(appResourcesDir, entry.path);
-					var mkdirFuture = this.$fs.createDirectory(path.dirname(assetTargetFileName));
+					let assetTargetFileName = path.join(appResourcesDir, entry.path);
+					let mkdirFuture = this.$fs.createDirectory(path.dirname(assetTargetFileName));
 					mkdirFuture.resolve((err) => {
 						if (err) {
-							var errFuture = new Future();
+							let errFuture = new Future();
 							errFuture.throw(err);
 							unzipOps.push(errFuture);
 							entry.autodrain();
 						} else {
-							var assetTargetFile = this.$fs.createWriteStream(assetTargetFileName);
+							let assetTargetFile = this.$fs.createWriteStream(assetTargetFileName);
 							unzipOps.push(this.$fs.futureFromEvent(assetTargetFile, "finish"));
 							entry.pipe(assetTargetFile);
 						}
@@ -104,13 +104,13 @@ export class TemplatesService implements ITemplatesService {
 
 	private downloadTemplate(template: any, templatesDir: string): IFuture<void> {
 		return (() => {
-			var downloadUri = template.DownloadUri;
-			var name = path.basename(downloadUri);
-			var filepath = path.join(templatesDir, name);
-			var file = this.$fs.createWriteStream(filepath);
-			var fileEnd = this.$fs.futureFromEvent(file, "finish");
+			let downloadUri = template.DownloadUri;
+			let name = path.basename(downloadUri);
+			let filepath = path.join(templatesDir, name);
+			let file = this.$fs.createWriteStream(filepath);
+			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			var response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
+			let response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 		}).future<void>()();
 	}

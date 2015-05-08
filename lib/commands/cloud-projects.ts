@@ -5,7 +5,7 @@ import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
-var options: any = require("../common/options");
+let options: any = require("../common/options");
 import temp = require("temp");
 
 class ProjectIdCommandParameter implements ICommandParameter {
@@ -15,7 +15,7 @@ class ProjectIdCommandParameter implements ICommandParameter {
 	validate(validationValue?: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				var realProjectName = this.$remoteProjectService.getProjectName(validationValue.toString()).wait();
+				let realProjectName = this.$remoteProjectService.getProjectName(validationValue.toString()).wait();
 				if(realProjectName) {
 					return true;
 				}
@@ -41,7 +41,7 @@ export class CloudListProjectsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var data = this.$remoteProjectService.getProjects().wait();
+			let data = this.$remoteProjectService.getProjects().wait();
 			this.printProjects(data);
 		}).future<void>()();
 	}
@@ -61,14 +61,14 @@ export class CloudExportProjectsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var name = this.$remoteProjectService.getProjectName(args[0]).wait();
+			let name = this.$remoteProjectService.getProjectName(args[0]).wait();
 			this.doExportRemoteProject(name).wait();
 		}).future<void>()();
 	}
 
 	private doExportRemoteProject(remoteProjectName: string): IFuture<void> {
 		return (() => {
-			var projectDir = path.join(this.$project.getNewProjectDir(), remoteProjectName);
+			let projectDir = path.join(this.$project.getNewProjectDir(), remoteProjectName);
 			if(this.$fs.exists(projectDir).wait()) {
 				this.$errors.fail("The folder %s already exists!", projectDir);
 			}
@@ -77,16 +77,16 @@ export class CloudExportProjectsCommand implements ICommand {
 			}
 
 			temp.track();
-			var projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
-			var unzipStream = this.$fs.createWriteStream(projectZipFilePath);
+			let projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
+			let unzipStream = this.$fs.createWriteStream(projectZipFilePath);
 			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, unzipStream)).wait();
 			this.$fs.unzip(projectZipFilePath, projectDir).wait();
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
-				var projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
+				let projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile).wait()) {
-					var properties = this.$remoteProjectService.getProjectProperties(remoteProjectName).wait();
+					let properties = this.$remoteProjectService.getProjectProperties(remoteProjectName).wait();
 					this.$project.createProjectFile(projectDir, properties).wait();
 				}
 			}

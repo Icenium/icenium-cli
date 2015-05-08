@@ -7,7 +7,7 @@ import Future = require("fibers/future");
 import helpers = require("../helpers");
 import hostInfo = require("../host-info");
 import commonHostInfo = require("../common/host-info");
-var gaze = require("gaze");
+let gaze = require("gaze");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
@@ -28,7 +28,7 @@ export class DebugCommand implements ICommand {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 
-			var debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
+			let debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
 			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
 			this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this)).wait();
 
@@ -49,7 +49,7 @@ export class DebugCommand implements ICommand {
 			this.$logger.info("Starting debugger...");
 			this.$sharedUserSettingsService.loadUserSettingsFile().wait();
 
-			var debuggerParams = [
+			let debuggerParams = [
 				"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
 				];
 
@@ -59,7 +59,7 @@ export class DebugCommand implements ICommand {
 
 	private ensureDebuggerIsNotRunning(): IFuture<void> {
 		return (() => {
-			var isRunning = this.$processInfo.isRunning(this.$debuggerPlatformServices.executableName).wait();
+			let isRunning = this.$processInfo.isRunning(this.$debuggerPlatformServices.executableName).wait();
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
 				"Close it and run $ appbuilder debug again.");
@@ -78,7 +78,7 @@ class BaseDebuggerPlatformServices {
 		private $dispatcher: IFutureDispatcher) { }
 
 	public startWatchingUserSettingsFile(): void {
-		var _this = this;
+		let _this = this;
 		gaze(this.$sharedUserSettingsFileService.userSettingsFilePath, function(err: Error, watchr: any) {
 			if(err) {
 				this.$errors.fail(err.toString());
@@ -123,8 +123,8 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 	public runApplication(applicationPath: string, applicationParams: string[]): void {
 		this.startWatchingUserSettingsFile();
 
-		var debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
-		var childProcess: child_process.ChildProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
+		let debuggerBinary = path.join(applicationPath, WinDebuggerPlatformServices.EXECUTABLE_NAME_WIN);
+		let childProcess: child_process.ChildProcess = this.$childProcess.spawn(debuggerBinary, applicationParams);
 		this.waitDebuggerExit(childProcess);
 	}
 
@@ -158,8 +158,8 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	public runApplication(applicationPath: string, applicationParams: string[]): void {
 		this.startWatchingUserSettingsFile();
 
-		var debuggerBinary = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX);
-		var commandLine = [debuggerBinary, '--args'].concat(applicationParams);
+		let debuggerBinary = path.join(applicationPath, DarwinDebuggerPlatformServices.EXECUTABLE_NAME_OSX);
+		let commandLine = [debuggerBinary, '--args'].concat(applicationParams);
 		this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}

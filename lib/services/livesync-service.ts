@@ -3,8 +3,8 @@
 
 import util = require("util");
 import path = require("path");
-var options: any = require("../common/options");
-var gaze = require("gaze");
+let options: any = require("../common/options");
+let gaze = require("gaze");
 import helpers = require("./../helpers");
 import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
@@ -53,15 +53,15 @@ export class LiveSyncService implements ILiveSyncService {
 				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
-			var projectDir = this.$project.getProjectDir().wait();
+			let projectDir = this.$project.getProjectDir().wait();
 
-			var appIdentifier = AppIdentifier.createAppIdentifier(platform,
+			let appIdentifier = AppIdentifier.createAppIdentifier(platform,
 				this.$project.projectData.AppIdentifier, options.companion);
 
 			if(options.file) {
 				this.$fs.tryExecuteFileOperation(options.file, () => this.sync(appIdentifier, projectDir, [path.resolve(options.file)]),  util.format("The file %s does not exist.", options.file));
 			} else {
-				var projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
+				let projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
 
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
 
@@ -75,8 +75,8 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private getProjectFileInfo(fileName: string): IProjectFileInfo {
-		var platforms = this.$mobileHelper.platformNames;
-		var parsed = this.parseFile(fileName, platforms, this.$devicesServices.platform);
+		let platforms = this.$mobileHelper.platformNames;
+		let parsed = this.parseFile(fileName, platforms, this.$devicesServices.platform);
 		if(!parsed) {
 			parsed = this.parseFile(fileName, ["debug", "release"], "debug");
 		}
@@ -89,8 +89,8 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private parseFile(fileName: string, validValues: string[], value: string): any {
-		var regex = util.format("^(.+?)[.](%s)([.].+?)$", validValues.join("|"));
-		var parsed = fileName.match(new RegExp(regex, "i"));
+		let regex = util.format("^(.+?)[.](%s)([.].+?)$", validValues.join("|"));
+		let parsed = fileName.match(new RegExp(regex, "i"));
 		if(parsed) {
 			return {
 				fileName: fileName,
@@ -103,10 +103,10 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
-		var projectFilesInfo: IProjectFileInfo[] = [];
+		let projectFilesInfo: IProjectFileInfo[] = [];
 
 		_.each(projectFiles,(projectFile: string) => {
-			var projectFileInfo = this.getProjectFileInfo(projectFile);
+			let projectFileInfo = this.getProjectFileInfo(projectFile);
 			if(projectFileInfo.shouldIncludeFile) {
 				projectFilesInfo.push(projectFileInfo);
 			}
@@ -117,10 +117,10 @@ export class LiveSyncService implements ILiveSyncService {
 
 	private syncCore(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: IProjectFileInfo[]): IFuture<void> {
 		return (() => {
-			var action = (device: Mobile.IDevice): IFuture<void> => {
+			let action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
-					var platformSpecificProjectPath = appIdentifier.deviceProjectPath;
-					var localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
+					let platformSpecificProjectPath = appIdentifier.deviceProjectPath;
+					let localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
 					device.sync(localDevicePaths, appIdentifier, this.$project.getLiveSyncUrl()).wait();
 				}).future<void>()();
 			};
@@ -130,9 +130,9 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private getLocalToDevicePaths(localProjectPath: string, projectFiles: IProjectFileInfo[], deviceProjectPath: string): Mobile.ILocalToDevicePathData[] {
-		var localToDevicePaths = _.map(projectFiles,(projectFileInfo: IProjectFileInfo) => {
-			var relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFileInfo.onDeviceName);
-			var devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
+		let localToDevicePaths = _.map(projectFiles,(projectFileInfo: IProjectFileInfo) => {
+			let relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFileInfo.onDeviceName);
+			let devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
 			return this.$mobileHelper.generateLocalToDevicePathData(projectFileInfo.fileName, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
 		});
 
@@ -140,7 +140,7 @@ export class LiveSyncService implements ILiveSyncService {
 	}
 
 	private liveSyncDevices(platform: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
-		var _this = this;
+		let _this = this;
 
 		gaze(projectDir + "/**/*", function(err: any, watcher: any) {
 			this.on('changed',(filePath: string) => {
@@ -156,7 +156,7 @@ export class LiveSyncService implements ILiveSyncService {
 	private batchLiveSync(filePath: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
 		if(!this.timer) {
 			this.timer = setInterval(() => {
-				var filesToSync = this.syncQueue;
+				let filesToSync = this.syncQueue;
 				if(filesToSync.length > 0) {
 					this.syncQueue = [];
 					this.$logger.trace("Syncing %s", filesToSync.join(", "));

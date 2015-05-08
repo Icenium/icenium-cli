@@ -7,7 +7,7 @@ import ip = require("ip");
 
 export class DomainNameSystem implements IDomainNameSystem {
 	private reverse(ipAddress: string): IFuture<string[]> {
-		var future = new Future<string[]>();
+		let future = new Future<string[]>();
 		dns.reverse(ipAddress, (err: Error, domains: string[]) => {
 			if(err) {
 				future.return([]);
@@ -21,8 +21,8 @@ export class DomainNameSystem implements IDomainNameSystem {
 
 	public getDomains(): IFuture<string[]> {
 		return (() => {
-			var ipAddress = ip.address();
-			var domains = this.reverse(ipAddress).wait();
+			let ipAddress = ip.address();
+			let domains = this.reverse(ipAddress).wait();
 			return domains;
 		}).future<string[]>()();
 	}

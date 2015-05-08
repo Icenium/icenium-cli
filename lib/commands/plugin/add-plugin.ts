@@ -11,16 +11,16 @@ export class AddPluginCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			if(options.available){
-				var installedPlugins = this.$pluginsService.getInstalledPlugins();
-				var plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
+				let installedPlugins = this.$pluginsService.getInstalledPlugins();
+				let plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
 					if(plugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
-						var marketPlacePlugin = <IMarketplacePlugin>plugin;
-						var installedPlugin = _.find(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name && installedPlugin.data.Version === plugin.data.Version);
+						let marketPlacePlugin = <IMarketplacePlugin>plugin;
+						let installedPlugin = _.find(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name && installedPlugin.data.Version === plugin.data.Version);
 						if(installedPlugin) {
 							if(marketPlacePlugin.pluginVersionsData.Versions.length > 1) {
 								// reject installed version
 								marketPlacePlugin.pluginVersionsData.Versions = <any>_.reject(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === installedPlugin.data.Version);
-								var defaultVersion = (<any>marketPlacePlugin.pluginVersionsData).DefaultVersion;
+								let defaultVersion = (<any>marketPlacePlugin.pluginVersionsData).DefaultVersion;
 
 								if(defaultVersion !== installedPlugin.data.Version) { // The default version is installed, we need to change DefaultVersion property
 									marketPlacePlugin.data = _.find(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === defaultVersion);
@@ -49,9 +49,9 @@ export class AddPluginCommand implements ICommand {
 				return true;
 			}
 
-			var pluginName = args[0];
+			let pluginName = args[0];
 			// Use pluginCommandParameter's validate method for verification.
-			var pluginCommandParameter = this.$injector.resolve(PluginCommandParameter);
+			let pluginCommandParameter = this.$injector.resolve(PluginCommandParameter);
 			pluginCommandParameter.validate(pluginName).wait();
 
 			return true;

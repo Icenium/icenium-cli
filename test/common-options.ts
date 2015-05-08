@@ -4,16 +4,16 @@
 import options = require("../lib/common/options");
 import osenv = require("osenv");
 import path = require("path");
-var assert = require("chai").assert;
-var yargs: any = require("yargs");
-var hostInfo = require("../lib/common/host-info");
+let assert = require("chai").assert;
+let yargs: any = require("yargs");
+let hostInfo = require("../lib/common/host-info");
 
 describe("common options", () => {
 	describe("setProfileDir", () => {
 		it("uses profile-dir from yargs when it exists", () => {
 			yargs.argv["profile-dir"] = undefined;
 			yargs.argv["profileDir"] = undefined;
-			var expectedProfileDir = "TestDir";
+			let expectedProfileDir = "TestDir";
 			yargs.argv["profile-dir"] = expectedProfileDir;
 			options.setProfileDir("");
 			assert.equal(options["profile-dir"], expectedProfileDir);
@@ -23,7 +23,7 @@ describe("common options", () => {
 		it("sets default profile-dir when it is not passed on command line", () => {
 			yargs.argv["profile-dir"] = undefined;
 			yargs.argv["profileDir"] = undefined;
-			var profileDir = "TestDir";
+			let profileDir = "TestDir";
 			options.setProfileDir("TestDir");
 			assert.equal(options["profile-dir"], profileDir);
 			assert.equal(options["profileDir"], profileDir);
@@ -32,7 +32,7 @@ describe("common options", () => {
 		it("uses profileDir from yargs when it exists", () => {
 			yargs.argv["profile-dir"] = undefined;
 			yargs.argv["profileDir"] = undefined;
-			var expectedProfileDir = "TestDir";
+			let expectedProfileDir = "TestDir";
 			yargs.argv["profileDir"] = expectedProfileDir;
 			options.setProfileDir("");
 			assert.equal(options["profileDir"], expectedProfileDir);

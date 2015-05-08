@@ -12,7 +12,7 @@ export class GenerateServerApiCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var result = this.$serviceContractGenerator.generate().wait();
+			let result = this.$serviceContractGenerator.generate().wait();
 			this.$fs.writeFile(path.join(__dirname, "../server-api.d.ts"), result.interfaceFile).wait();
 			this.$fs.writeFile(path.join(__dirname, "../server-api.ts"), result.implementationFile).wait();
 		}).future<void>()();

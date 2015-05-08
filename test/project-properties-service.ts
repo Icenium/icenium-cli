@@ -8,14 +8,14 @@ import path = require("path");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
-var assert: chai.Assert = chai.assert;
+let assert: chai.Assert = chai.assert;
 
-var projectPropertiesServiceFile = require("../lib/services/project-properties-service");
-var resourceLoaderFile = require("../lib/resource-loader");
+let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
+let resourceLoaderFile = require("../lib/resource-loader");
 import projectConstantsLib = require("../lib/project/project-constants");
 
 function createTestInjector(): IInjector {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("injector", yok.Yok);
 	testInjector.register("frameworkProjectResolver", stubs.FrameworkProjectResolver);
 	testInjector.register("jsonSchemaValidator", stubs.JsonSchemaValidator);
@@ -68,40 +68,40 @@ class SampleProject implements Project.IFrameworkProject {
 describe("projectPropertiesService", () => {
 	describe("completeProjectProperties", () => {
 		it("sets projectVersion to number 1 when it is not part of properties", () => {
-			var properties: any = {};
-			var testInjector = createTestInjector();
-			var service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
+			let properties: any = {};
+			let testInjector = createTestInjector();
+			let service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
 			service.completeProjectProperties(properties, new SampleProject());
 			assert.strictEqual(properties["projectVersion"], 1, "projectVersion must be set to 1 when it is not part of the project properties.");
 		});
 
 		it("returns true when projectVersion is changed", () => {
-			var properties: any = {};
-			var testInjector = createTestInjector();
-			var service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
-			var result = service.completeProjectProperties(properties, new SampleProject());
+			let properties: any = {};
+			let testInjector = createTestInjector();
+			let service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
+			let result = service.completeProjectProperties(properties, new SampleProject());
 			assert.isTrue(result, "completeProjectProperties must return true, when it changes projectPropertiesService");
 		});
 
 		it("returns false when nothing is changed", () => {
-			var properties: any = {
+			let properties: any = {
 				"projectVersion": 1
 			};
-			var testInjector = createTestInjector();
-			var service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
-			var result = service.completeProjectProperties(properties, new SampleProject());
+			let testInjector = createTestInjector();
+			let service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
+			let result = service.completeProjectProperties(properties, new SampleProject());
 			assert.isFalse(result, "completeProjectProperties must return false, when there's no changes");
 		});
 
 		it("returns true when frameworkProject completeProjectProperties returns true", () => {
-			var properties: any = {
+			let properties: any = {
 				"projectVersion": 1
 			};
-			var testInjector = createTestInjector();
-			var service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
-			var sampleProject = new SampleProject();
+			let testInjector = createTestInjector();
+			let service: IProjectPropertiesService = testInjector.resolve("projectPropertiesService");
+			let sampleProject = new SampleProject();
 			sampleProject.completeProjectePropertiesResult = true;
-			var result = service.completeProjectProperties(properties, sampleProject);
+			let result = service.completeProjectProperties(properties, sampleProject);
 			assert.isTrue(result, "completeProjectProperties must return true, when frameworkProject's completeProjectProperties returns true.");
 		});
 	});

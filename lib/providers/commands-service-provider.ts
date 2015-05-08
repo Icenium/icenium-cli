@@ -58,10 +58,10 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 	}
 
 	private registerDynamicSubCommand(command: IDynamicSubCommandInfo): void {
-		var subCommands = _.keys(this.mapCommandNameToFramework);
+		let subCommands = _.keys(this.mapCommandNameToFramework);
 		_.each(subCommands, subCommand => {
-			var resolver = this.$injector.resolve(command.commandConstructor, { frameworkIdentifier: this.mapCommandNameToFramework[subCommand] });
-			var name = util.format("%s|%s", command.baseCommandName, subCommand);
+			let resolver = this.$injector.resolve(command.commandConstructor, { frameworkIdentifier: this.mapCommandNameToFramework[subCommand] });
+			let name = util.format("%s|%s", command.baseCommandName, subCommand);
 			this.$injector.requireCommand(name, command.filePath);
 			this.$injector.registerCommand(name, resolver);
 		});

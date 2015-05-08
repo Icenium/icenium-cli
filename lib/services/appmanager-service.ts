@@ -26,7 +26,7 @@ class AppManagerService implements IAppManagerService {
 
 	upload(platform: string): IFuture<void> {
 		return (() => {
-			var mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
+			let mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
@@ -34,7 +34,7 @@ class AppManagerService implements IAppManagerService {
 			this.$server.tam.verifyStoreCreated().wait();
 
 			this.$logger.info("Building release package.");
-			var buildResult = this.$buildService.build({
+			let buildResult = this.$buildService.build({
 				platform: mobilePlatform,
 				configuration: "Release",
 				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
@@ -48,9 +48,9 @@ class AppManagerService implements IAppManagerService {
 			}
 
 			this.$logger.info("Uploading package to Telerik AppManager.");
-			var projectName = this.$project.projectData.ProjectName;
-			var solutionPath = buildResult[0].solutionPath;
-			var projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
+			let projectName = this.$project.projectData.ProjectName;
+			let solutionPath = buildResult[0].solutionPath;
+			let projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
 			this.$server.tam.uploadApplication(projectName, projectName, projectPath).wait();
 
 			this.$logger.info("Successfully uploaded package.");
@@ -60,7 +60,7 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	public openAppManagerStore(): void {
-		var tamUrl = util.format("%s://%s/appbuilder/Services/tam", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+		let tamUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Services/tam`;
 		this.$logger.info("Go to %s to manage your apps.", tamUrl);
 		this.$opener.open(tamUrl);
 	}
@@ -71,7 +71,7 @@ class AppManagerService implements IAppManagerService {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
-			var cachedOptionsRelease = commonOptions.release;
+			let cachedOptionsRelease = commonOptions.release;
 			commonOptions.release = true;
 			this.configureLivePatchPlugin().wait();
 
@@ -90,7 +90,7 @@ class AppManagerService implements IAppManagerService {
 
 	private configureLivePatchPlugin(): IFuture<void> {
 		return (() => {
-			var plugins = this.$pluginsService.getInstalledPlugins();
+			let plugins = this.$pluginsService.getInstalledPlugins();
 			if(!_.any(plugins, plugin => plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
 				this.$logger.warn("The AppManager LiveSync plugin is not enabled for your project. Enabling it now for the release build configuration...");
 				this.$pluginsService.addPlugin(AppManagerService.LIVEPATCH_PLUGIN_ID).wait();

@@ -3,7 +3,7 @@
 import temp = require("temp");
 import path = require("path");
 import options = require("../common/options");
-var Table = require("cli-table");
+let Table = require("cli-table");
 
 class UpdateKendoUICommand implements ICommand {
 	private static VERIFIED_TAG = "verified";
@@ -45,7 +45,7 @@ class UpdateKendoUICommand implements ICommand {
 				this.$errors.fail("This operation is applicable only to hybrid projects.");
 			}
 
-			var packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
+			let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 			if(options.verified) {
 				packages = _.filter(packages, pack => _.any(pack.VersionTags, tag => tag.toLowerCase() === UpdateKendoUICommand.VERIFIED_TAG));
 			}
@@ -58,10 +58,10 @@ class UpdateKendoUICommand implements ICommand {
 				packages = _.filter(packages, pack => pack.Name === UpdateKendoUICommand.KENDO_PROFESSIONAL);
 			}
 
-			var downloadUri: string;
+			let downloadUri: string;
 			if(options.latest) {
-				var latestPackage = _.first(packages);
-				var sameDateItems = _.filter(packages, pack => pack.Version === latestPackage.Version);
+				let latestPackage = _.first(packages);
+				let sameDateItems = _.filter(packages, pack => pack.Version === latestPackage.Version);
 				if(sameDateItems.length > 1) {
 					downloadUri = this.selectKendoVersion(sameDateItems).wait();
 				} else {
@@ -71,7 +71,7 @@ class UpdateKendoUICommand implements ICommand {
 				downloadUri = this.selectKendoVersion(packages).wait();
 			}
 
-			var confirm = this.$prompter.confirm(
+			let confirm = this.$prompter.confirm(
 				"This operation will overwrite existing Kendo UI framework files and " +
 				"any changes will be lost. ".red.bold +
 				"Are you sure you want to continue?",
@@ -88,19 +88,19 @@ class UpdateKendoUICommand implements ICommand {
 	private selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): IFuture<string> {
 		return ((): string => {
 			this.showAvailableVersions(packages);
-			var schema: IPromptSchema = {
+			let schema: IPromptSchema = {
 				type: "input",
 				name: "packageIdx",
 				message: "Enter the index of the package that you want to install",
 				validate: (value: string) => {
-					var num = parseInt(value, 10);
+					let num = parseInt(value, 10);
 					return !isNaN(num) && num >= 1 && num <= packages.length ? true : "Valid values are between 1 and " + packages.length;
 				}
 			};
 
-			var choice = this.$prompter.get([schema]).wait();
-			var packageIdx = parseInt(choice.packageIdx, 10) - 1;
-			var selectedPackage = packages[packageIdx];
+			let choice = this.$prompter.get([schema]).wait();
+			let packageIdx = parseInt(choice.packageIdx, 10) - 1;
+			let selectedPackage = packages[packageIdx];
 			this.$logger.trace("Selected package is:");
 			this.$logger.trace(selectedPackage);
 			return selectedPackage.DownloadUrl;
@@ -109,7 +109,7 @@ class UpdateKendoUICommand implements ICommand {
 
 	private showAvailableVersions(packages: Server.IKendoDownloadablePackageData[]): void {
 		this.$logger.out("You can download and install the following Kendo UI packages.");
-		var table = new Table({
+		let table = new Table({
 			head: ["#", "KendoUI", "Version", "Tags"],
 			chars: { 'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' }
 		});
@@ -128,13 +128,13 @@ class UpdateKendoUICommand implements ICommand {
 		return (() => {
 			temp.track();
 
-			var filepath = temp.path({suffix: ".zip", prefix: "abkendoupdate-"});
-			var file = this.$fs.createWriteStream(filepath);
-			var fileEnd = this.$fs.futureFromEvent(file, "finish");
-			var response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
+			let filepath = temp.path({suffix: ".zip", prefix: "abkendoupdate-"});
+			let file = this.$fs.createWriteStream(filepath);
+			let fileEnd = this.$fs.futureFromEvent(file, "finish");
+			let response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 
-			var outDir = path.join(this.$project.getProjectDir().wait(), "kendo");
+			let outDir = path.join(this.$project.getProjectDir().wait(), "kendo");
 			this.$fs.unzip(filepath, outDir).wait();
 			this.$logger.info("Successfully updated Kendo package.");
 		}).future<void>()();

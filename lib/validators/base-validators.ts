@@ -7,7 +7,7 @@ export class BaseValidator<Input> implements IValidator<Input> {
 	constructor(private $injector: IInjector) { }
 
 	public throwIfInvalid(data: Input): void {
-		var validationResult: IValidationResult = this.validate(data);
+		let validationResult: IValidationResult = this.validate(data);
 		if (!validationResult.isSuccessful) {
 			this.$injector.resolve("$errors").fail(validationResult.error);
 		}
@@ -27,7 +27,7 @@ export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 
 	public throwIfInvalid(data: Input): IFuture<void> {
 		return (() => {
-			var validationResult: IValidationResult = this.validate(data).wait();
+			let validationResult: IValidationResult = this.validate(data).wait();
 			if (!validationResult.isSuccessful) {
 				this.$injector.resolve("$errors").fail(validationResult.error);
 			}
@@ -45,8 +45,8 @@ export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 
 export class Helpers {
 	public static validate(validators: Function[]): IValidationResult {
-		var validationResults = <IValidationResult[]>_.map(validators, (validator) => validator());
-		var firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
+		let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator());
+		let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 		if (firstFailedValidationResult) {
 			return firstFailedValidationResult;
 		}
@@ -55,8 +55,8 @@ export class Helpers {
 
 	public static validateAsync(validators: Function[]): IFuture<IValidationResult> {
 		return (() => {
-			var validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
-			var firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
+			let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
+			let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 			if (firstFailedValidationResult) {
 				return firstFailedValidationResult
 			}

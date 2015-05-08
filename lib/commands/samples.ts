@@ -2,7 +2,7 @@
 "use strict";
 
 import path = require("path");
-var options: any = require("../common/options");
+let options: any = require("../common/options");
 
 export class PrintSamplesCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
@@ -47,8 +47,8 @@ class CloneCommandParameter implements ICommandParameter {
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				var sampleName = <string>validationValue;
-				var cloneTo = options.path || sampleName;
+				let sampleName = <string>validationValue;
+				let cloneTo = options.path || sampleName;
 				if(this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
 					this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 				}

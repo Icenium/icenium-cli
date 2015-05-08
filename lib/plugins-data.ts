@@ -21,7 +21,7 @@ export class CordovaPluginData implements IPlugin {
 	}
 
 	public get pluginInformation(): string[] {
-		var additionalPluginData = [this.buildRow("Platforms", this.data.Platforms.join(", "))];
+		let additionalPluginData = [this.buildRow("Platforms", this.data.Platforms.join(", "))];
 		return this.composePluginInformation(additionalPluginData);
 	}
 
@@ -34,17 +34,17 @@ export class CordovaPluginData implements IPlugin {
 	}
 
 	protected composePluginInformation(additionalPluginData: string[]): string[] {
-		var result = <string[]>(_.flatten([this.getBasicPluginInformation(), additionalPluginData, this.getPluginVariablesInfo()]));
+		let result = <string[]>(_.flatten([this.getBasicPluginInformation(), additionalPluginData, this.getPluginVariablesInfo()]));
 		return result;
 	}
 
 	private getBasicPluginInformation(): string[] {
-		var nameRow = this.buildRow("Plugin", this.data.Name);
-		var identifierRow = this.buildRow("Identifier", this.data.Identifier);
-		var versionRow = this.buildRow("Version", this.data.Version);
-		var urlRow = this.buildRow("Url", this.data.Url);
+		let nameRow = this.buildRow("Plugin", this.data.Name);
+		let identifierRow = this.buildRow("Identifier", this.data.Identifier);
+		let versionRow = this.buildRow("Version", this.data.Version);
+		let urlRow = this.buildRow("Url", this.data.Url);
 
-		var result = [nameRow, identifierRow, versionRow, urlRow];
+		let result = [nameRow, identifierRow, versionRow, urlRow];
 
 		if(this.configurations && this.configurations.length > 0) {
 			result.push(util.format("    Configuration: %s", this.configurations.join(", ")));
@@ -54,14 +54,14 @@ export class CordovaPluginData implements IPlugin {
 	}
 
 	private getPluginVariablesInfo(): string[] {
-		var result: string[] = [];
+		let result: string[] = [];
 		_.each(this.configurations, (configuration: string) => {
-			var pluginVariablesData = this.$project.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+			let pluginVariablesData = this.$project.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
 			if(pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
-				var variables = pluginVariablesData[this.data.Identifier];
-				var variableNames = _.keys(variables);
+				let variables = pluginVariablesData[this.data.Identifier];
+				let variableNames = _.keys(variables);
 				if(variableNames.length > 0) {
-					var output:string[] = [];
+					let output:string[] = [];
 					output.push(util.format("    Variables for %s configuration:", configuration));
 					_.each(variableNames, (variableName:string) => {
 						output.push(util.format("        %s: %s", variableName, variables[variableName]));
@@ -88,12 +88,12 @@ export class MarketplacePluginData extends CordovaPluginData {
 	}
 
 	public get pluginInformation(): string[] {
-		var additionalPluginData = [
+		let additionalPluginData = [
 			this.buildRow("Downloads count", this.data.DownloadsCount.toString()),
 			this.buildRow("Available versions",  _.map(this.pluginVersionsData.Versions, pl => pl.Version).join(", "))
 		];
 
-		var publisherName = this.getPublisherName(this.data.Publisher);
+		let publisherName = this.getPublisherName(this.data.Publisher);
 		if(publisherName) {
 			additionalPluginData.push(this.buildRow("Publisher", publisherName));
 		}

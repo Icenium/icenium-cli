@@ -22,12 +22,12 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		return (() => {
 			this.validateProjectData();
 
-			var projectName = args[0];
-			var projectPath = path.resolve(options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
+			let projectName = args[0];
+			let projectPath = path.resolve(options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
 
 			this.$project.createTemplateFolder(projectPath).wait();
 
-			var screenBuilderOptions = {
+			let screenBuilderOptions = {
 				projectPath: projectPath,
 				answers: {
 					name: projectName

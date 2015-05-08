@@ -9,12 +9,12 @@ import yok = require("../lib/common/yok");
 
 import assert = require("assert");
 
-var writeJsonData: any;
-var timesPrompterHasAskedForString: number;
-var serverFtpConnectionData: Server.FtpConnectionData;
+let writeJsonData: any;
+let timesPrompterHasAskedForString: number;
+let serverFtpConnectionData: Server.FtpConnectionData;
 
 function createTestInjector(publishConnections: IPublishConnection[]): IInjector {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("errors", errorsLib.Errors);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("staticConfig", stubs.StaticConfig);
@@ -95,7 +95,7 @@ function createTestInjector(publishConnections: IPublishConnection[]): IInjector
 }
 
 describe("publish-service", () => {
-	var service: IPublishService;
+	let service: IPublishService;
 	beforeEach(() => {
 		writeJsonData = null;
 		timesPrompterHasAskedForString = 0;
@@ -103,18 +103,18 @@ describe("publish-service", () => {
 
 	describe("publish", () => {
 		it("when publish by id should call server with correct data", () => {
-			var remotePublishUrl = 'firstUrl';
-			var initialPublishConnections: IPublishConnection[] = [{
+			let remotePublishUrl = 'firstUrl';
+			let initialPublishConnections: IPublishConnection[] = [{
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: remotePublishUrl,
 				name: 'firstName'
 			}];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			
-			var expected: Server.FtpConnectionData = { 
+			let expected: Server.FtpConnectionData = {
 				RemoteUrl: remotePublishUrl,
 				ShouldPurge: undefined,
 				Username: 'username',
@@ -127,26 +127,26 @@ describe("publish-service", () => {
 		});
 
 		it("when publish by id with invalid id should throw", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
+			let initialPublishConnections: IPublishConnection[] = [];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 
 			assert.throws(() => service.publish('1', '', '').wait(), 'Connection with invalid id successfully published to remote');
 		});
 
 		it("when publish by url should call server with correct data", () => {
-			var initialPublishConnections: IPublishConnection[] = [{
+			let initialPublishConnections: IPublishConnection[] = [{
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: 'firstUrl',
 				name: 'firstName'
 			}];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			
-			var expected: Server.FtpConnectionData = { 
+			let expected: Server.FtpConnectionData = {
 				RemoteUrl: '127.0.0.1',
 				ShouldPurge: undefined,
 				Username: 'username',
@@ -159,9 +159,9 @@ describe("publish-service", () => {
 		});
 
 		it("when publishing without password should prompt for password", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
+			let initialPublishConnections: IPublishConnection[] = [];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 
 			service.publish('127.0.0.1', 'username', '').wait();
@@ -170,9 +170,9 @@ describe("publish-service", () => {
 		});
 
 		it("when publishing without username and password should prompt for both", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
+			let initialPublishConnections: IPublishConnection[] = [];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 
 			service.publish('127.0.0.1', '', '').wait();
@@ -183,13 +183,13 @@ describe("publish-service", () => {
 
 	describe("publish-add", () => {
 		it("when adding first connection should call $fs.writeJson with correct data", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
-			var testInjector = createTestInjector(initialPublishConnections);
+			let initialPublishConnections: IPublishConnection[] = [];
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			var name = 'name';
-			var url = 'url';
+			let name = 'name';
+			let url = 'url';
 			service.addConnection(name, url).wait();
-			var ftpPublishConnection: IPublishConnection = {
+			let ftpPublishConnection: IPublishConnection = {
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: url,
@@ -200,18 +200,18 @@ describe("publish-service", () => {
 		});
 
 		it("when adding multiple connections should call $fs.writeJson with correct data", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
-			var testInjector = createTestInjector(initialPublishConnections);
+			let initialPublishConnections: IPublishConnection[] = [];
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			var name1 = 'name';
-			var url1 = 'url';
+			let name1 = 'name';
+			let url1 = 'url';
 
-			var name2 = 'name';
-			var url2 = 'url';
+			let name2 = 'name';
+			let url2 = 'url';
 
 			service.addConnection(name1, url1).wait();
 			service.addConnection(name2, url2).wait();
-			var ftpPublishConnections: IPublishConnection[] = [{
+			let ftpPublishConnections: IPublishConnection[] = [{
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: url1,
@@ -228,37 +228,37 @@ describe("publish-service", () => {
 		});
 
 		it("when adding duplicate connections should throw", () => {
-			var name = 'name';
-			var url = 'url';
+			let name = 'name';
+			let url = 'url';
 
-			var initialPublishConnections: IPublishConnection[] = [{
+			let initialPublishConnections: IPublishConnection[] = [{
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: url,
 				name: name
 			}];
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			assert.throws(() => service.addConnection(name, url).wait(), 'Duplicate connections added without error');
 		});
 
 		it("when adding connection without url should prompt for url", () => {
-			var name = 'name';
-			var url = '';
+			let name = 'name';
+			let url = '';
 
-			var initialPublishConnections: IPublishConnection[] = [];
-			var testInjector = createTestInjector(initialPublishConnections);
+			let initialPublishConnections: IPublishConnection[] = [];
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			service.addConnection(name, url).wait();
 			assert.strictEqual(timesPrompterHasAskedForString, 1, 'User is not prompted to provide mandatory parameter URL');
 		});
 
 		it("when adding connection without name and url should prompt for both", () => {
-			var name = '';
-			var url = '';
+			let name = '';
+			let url = '';
 
-			var initialPublishConnections: IPublishConnection[] = [];
-			var testInjector = createTestInjector(initialPublishConnections);
+			let initialPublishConnections: IPublishConnection[] = [];
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			service.addConnection(name, url).wait();
 			assert.strictEqual(timesPrompterHasAskedForString, 2, 'User is not prompted to provide mandatory parameters name and URL');
@@ -267,14 +267,14 @@ describe("publish-service", () => {
 
 	describe("publish-remove", () => {
 		it("when removing new connection by id should call $fs.writeJson with correct data", () => {
-			var ftpPublishConnection: IPublishConnection = {
+			let ftpPublishConnection: IPublishConnection = {
 				type: 'ftp',
 				publicUrl: '',
 				publishUrl: 'secondUrl',
 				name: 'secondName'
 			};
 
-			var initialPublishConnections: IPublishConnection[] = [{
+			let initialPublishConnections: IPublishConnection[] = [{
 				// id = 1
 				type: 'ftp',
 				publicUrl: '',
@@ -283,7 +283,7 @@ describe("publish-service", () => {
 			},
 			ftpPublishConnection];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			
 			service.removeConnection('1').wait();
@@ -292,9 +292,9 @@ describe("publish-service", () => {
 		});
 
 		it("when removing connection with invalid connection id should throw", () => {
-			var initialPublishConnections: IPublishConnection[] = [];
+			let initialPublishConnections: IPublishConnection[] = [];
 
-			var testInjector = createTestInjector(initialPublishConnections);
+			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
 			
 			assert.throws(() => service.removeConnection('1').wait(), 'Connection with invalid id successfully deleted');

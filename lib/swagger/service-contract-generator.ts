@@ -23,9 +23,9 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 	public generate(): IFuture<Server.IServiceContractClientCode> {
 		return ((): Server.IServiceContractClientCode => {
-			var swagger = this.$serviceContractProvider.getApi().wait();
-			var interfacesFile= new codeEntityLib.Block();
-			var implementationsFile = new codeEntityLib.Block();
+			let swagger = this.$serviceContractProvider.getApi().wait();
+			let interfacesFile= new codeEntityLib.Block();
+			let implementationsFile = new codeEntityLib.Block();
 
 			implementationsFile.writeLine("///<reference path=\".d.ts\"/>");
 			implementationsFile.writeLine("//");
@@ -41,26 +41,26 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			interfacesFile.writeLine("//");
 			interfacesFile.writeLine("///<reference path=\".d.ts\"/>");
 
-			var serverModuleName = "Server";
-			var serverModuleDeclaration = new codeEntityLib.Block("declare module " + serverModuleName);
+			let serverModuleName = "Server";
+			let serverModuleDeclaration = new codeEntityLib.Block("declare module " + serverModuleName);
 			serverModuleDeclaration.toString();
 
-			var serverClass = new codeEntityLib.Block("export class ServiceContainer implements Server.IServer");
-			var serverInterface = new codeEntityLib.Block("interface IServer");
+			let serverClass = new codeEntityLib.Block("export class ServiceContainer implements Server.IServer");
+			let serverInterface = new codeEntityLib.Block("interface IServer");
 
 			serverClass.writeLine("constructor(private $injector: IInjector){ }");
 
 			_.each(swagger.apis, (apiPath: Swagger.ISwaggerApi) => {
 				this.pendingModels = {};
-				var swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
+				let swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
 
-				var models: Swagger.IBlock[] = this.generateModels(swaggerService.models);
+				let models: Swagger.IBlock[] = this.generateModels(swaggerService.models);
 				serverModuleDeclaration.addBlocks(models);
 
-				var service = this.generateService(swaggerService, serverModuleName);
+				let service = this.generateService(swaggerService, serverModuleName);
 
 				_.each(_.keys(this.pendingModels), (modelName: string) => {
-					var model = this.pendingModels[modelName];
+					let model = this.pendingModels[modelName];
 					if(model) {
 						serverModuleDeclaration.addBlock(model);
 					}
@@ -69,9 +69,9 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 				serverModuleDeclaration.addBlock(service.serviceInterface);
 				implementationsFile.addBlock(service.serviceImplementation);
 
-				var serviceName = swaggerService.resourcePath.substr(1);
+				let serviceName = swaggerService.resourcePath.substr(1);
 
-				var name = this.getNameWithoutSlash(serviceName);
+				let name = this.getNameWithoutSlash(serviceName);
 				serverInterface.writeLine(util.format("%s: Server.I%sServiceContract;", name, this.toPascalCase(name)));
 				serverClass.writeLine(util.format("public %s: Server.I%sServiceContract = this.$injector.resolve(%sService);",
 					name, this.toPascalCase(name), this.toPascalCase(name)));
@@ -83,7 +83,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			implementationsFile.addBlock(serverClass);
 			implementationsFile.writeLine("$injector.register('server', ServiceContainer);");
 
-			var codePrinter = new swaggerCodePrinterLib.SwaggerCodePrinter();
+			let codePrinter = new swaggerCodePrinterLib.SwaggerCodePrinter();
 			return {
 				interfaceFile: codePrinter.composeBlock(interfacesFile),
 				implementationFile: codePrinter.composeBlock(implementationsFile)
@@ -93,10 +93,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private generateModels(models: IDictionary<Swagger.IModel>): Swagger.IBlock[] {
-		var modelsBlocks: Swagger.IBlock[] = [];
+		let modelsBlocks: Swagger.IBlock[] = [];
 		_.each(models, (model: Swagger.IModel) => {
 			if(model.id.indexOf("`") < 0) {
-				var typeName = this.tsTypeSystemHelpers.translate(model.id);
+				let typeName = this.tsTypeSystemHelpers.translate(model.id);
 				if (!this.tsTypeSystemHelpers.isModel(typeName)) {
 					this.visitModel(model);
 					if (this.tsTypeSystemHelpers.isModel(typeName)) {
@@ -110,8 +110,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private getNameWithoutSlash(name: string) {
-		var result = name;
-		var index = name.indexOf("/");
+		let result = name;
+		let index = name.indexOf("/");
 		if(index !== -1) {
 			result = name.substring(0, index) + name[index + 1].toUpperCase() + name.substr(index + 2);
 		}
@@ -120,11 +120,11 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private generateModel(model: Swagger.IModel): Swagger.IBlock {
-		var name = this.getNameWithoutSlash(model.id);
-		var modelBlock: Swagger.IBlock = new codeEntityLib.Block(util.format("interface %s", name));
-		var properties = _.keys(model.properties);
+		let name = this.getNameWithoutSlash(model.id);
+		let modelBlock: Swagger.IBlock = new codeEntityLib.Block(util.format("interface %s", name));
+		let properties = _.keys(model.properties);
 		_.each(properties, (propertyName: string) => {
-			var typeName = this.getModelPropertyTypeName(model.properties[propertyName]);
+			let typeName = this.getModelPropertyTypeName(model.properties[propertyName]);
 			if(!this.tsTypeSystemHelpers.isBuiltIn(typeName)) {
 				typeName = util.format("Server.%s", typeName);
 			}
@@ -136,7 +136,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 	private visitModel(model: Swagger.IModel): void {
 		if (!this.tsTypeSystemHelpers.isGeneric(model.id)) {
-			var modelName = this.tsTypeSystemHelpers.translate(model.id);
+			let modelName = this.tsTypeSystemHelpers.translate(model.id);
 			this.tsTypeSystemHelpers.addModel(modelName);
 		}
 
@@ -151,7 +151,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private getModelPropertyTypeName(property: Swagger.IModelProperty): string {
-		var typeName: string;
+		let typeName: string;
 		if (property.items) {
 			typeName = property.items.$ref + "[]";
 		} else {
@@ -161,9 +161,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private ensureEnumAdded(allowableValues: Swagger.IModelPropertyValue) {
-		var typeName = this.tsTypeSystemHelpers.translate(allowableValues.valueType);
+		let enumBlock: Swagger.IBlock;
+		let typeName = this.tsTypeSystemHelpers.translate(allowableValues.valueType);
 		if (!this.pendingModels[typeName]) {
-			var enumBlock = new codeEntityLib.Block(util.format("enum %s", typeName));
+			enumBlock = new codeEntityLib.Block(util.format("enum %s", typeName));
 			_.each(allowableValues.values, (value: string) => enumBlock.writeLine(util.format("%s,", value)));
 		}
 		this.pendingModels[typeName] = enumBlock;
@@ -171,12 +172,12 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 
 	private generateService(swaggerService: Swagger.ISwaggerServiceContract, serverModuleName: string): Swagger.IService {
-		var swaggerServiceContractName = this.getSwaggerServiceContractName(swaggerService);
-		var serviceInterface = new codeEntityLib.Block(util.format("interface %s", swaggerServiceContractName));
-		var serviceImplementation = new codeEntityLib.Block(util.format("export class %s implements %s.%s", this.getSwaggerServiceName(swaggerService), serverModuleName, swaggerServiceContractName));
+		let swaggerServiceContractName = this.getSwaggerServiceContractName(swaggerService);
+		let serviceInterface = new codeEntityLib.Block(util.format("interface %s", swaggerServiceContractName));
+		let serviceImplementation = new codeEntityLib.Block(util.format("export class %s implements %s.%s", this.getSwaggerServiceName(swaggerService), serverModuleName, swaggerServiceContractName));
 		serviceImplementation.addBlock(new codeEntityLib.Block(util.format("constructor(private $serviceProxy: %s.IServiceProxy)", serverModuleName)));
 
-		var map: IDictionary<Swagger.IServiceEndpoint[]> = Object.create(null);
+		let map: IDictionary<Swagger.IServiceEndpoint[]> = Object.create(null);
 
 		_.each(swaggerService.apis, (api: Swagger.ISwaggerApi) => {
 			_.each(api.operations, (operation: Swagger.IOperation) => {
@@ -184,16 +185,16 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 					if(!map[operation.nickname]) {
 						map[operation.nickname] = [];
 					}
-					var generatedOperation = this.generateOperation(operation, swaggerService.basePath, api.path);
+					let generatedOperation = this.generateOperation(operation, swaggerService.basePath, api.path);
 					map[operation.nickname].push(generatedOperation);
 				}
 			});
 		});
 
-		var values = _.values(map);
+		let values = _.values(map);
 
 		_.each(values, (endpoints: Swagger.IServiceEndpoint[]) => {
-			var index = 0;
+			let index = 0;
 			_.each(endpoints, (endpoint: Swagger.IServiceEndpoint) => {
 				if(index === 0) {
 
@@ -201,10 +202,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 					serviceImplementation.addBlock(endpoint.endpointImplementation);
 				} else {
-					var implementationOpener = util.format("public %s(%s): IFuture<%s>", endpoint.operationContractName + index, endpoint.parameters.join(", "), endpoint.callResultType);
-					var interfaceOpener = util.format("%s(%s): IFuture<%s>;", endpoint.operationContractName + index, endpoint.parameters.join(", "), endpoint.callResultType);
+					let implementationOpener = util.format("public %s(%s): IFuture<%s>", endpoint.operationContractName + index, endpoint.parameters.join(", "), endpoint.callResultType);
+					let interfaceOpener = util.format("%s(%s): IFuture<%s>;", endpoint.operationContractName + index, endpoint.parameters.join(", "), endpoint.callResultType);
 
-					var implementationBlock = new codeEntityLib.Block(implementationOpener);
+					let implementationBlock = new codeEntityLib.Block(implementationOpener);
 					implementationBlock.writeLine("\t" + _.map(endpoint.endpointImplementation.codeEntities, (codeEntity: Swagger.ILine) => codeEntity.content).join("\n"));
 
 					serviceInterface.addLine( codeEntityLib.Line.create(interfaceOpener));
@@ -218,19 +219,19 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private getSwaggerServiceContractName(swaggerService: Swagger.ISwaggerServiceContract): string {
-		var swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
-		var name = this.getNameWithoutSlash(swaggerServiceName);
+		let swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
+		let name = this.getNameWithoutSlash(swaggerServiceName);
 		return util.format("I%sServiceContract", name);
 	}
 
 	private getSwaggerServiceName(swaggerService: Swagger.ISwaggerServiceContract): string {
-		var swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
-		var name = this.getNameWithoutSlash(swaggerServiceName);
+		let swaggerServiceName = this.getSwaggerServiceClassName(swaggerService);
+		let name = this.getNameWithoutSlash(swaggerServiceName);
 		return util.format("%sService", name);
 	}
 
 	private getSwaggerServiceClassName(swaggerService: Swagger.ISwaggerServiceContract): string {
-		var swaggerServiceName = swaggerService.resourcePath.substr(1);
+		let swaggerServiceName = swaggerService.resourcePath.substr(1);
 		return this.toPascalCase(swaggerServiceName);
 	}
 
@@ -267,13 +268,13 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private generateOperation(operation: Swagger.IOperation, basePath: string, path: string): Swagger.IServiceEndpoint {
-		var operationContractName = this.getOperationContractName(operation);
-		var parameters: string[] = [];
+		let operationContractName = this.getOperationContractName(operation);
+		let parameters: string[] = [];
 
-		var enumPathParameters: IStringDictionary = {};
+		let enumPathParameters: IStringDictionary = {};
 		operation.parameters.sort((parameter: Swagger.IParameter, otherParameter: Swagger.IParameter) => {
-			var parameterType = this.getParameterType(parameter);
-			var otherParameterType = this.getParameterType(otherParameter);
+			let parameterType = this.getParameterType(parameter);
+			let otherParameterType = this.getParameterType(otherParameter);
 
 			if (parameterType < otherParameterType) {
 				return -1;
@@ -286,7 +287,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			}
 		});
 
-		var pathParams = this.getSwaggerParamsByType(operation, ParamTypes.Path);
+		let pathParams = this.getSwaggerParamsByType(operation, ParamTypes.Path);
 		_.each(pathParams, (parameter: Swagger.IParameter) => {
 			if (parameter.allowableValues !== undefined && parameter.dataType === "string") {
 				this.tsTypeSystemHelpers.addModel(parameter.allowableValues.valueType);
@@ -295,10 +296,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			}
 		});
 
-		var paramsMap: IDictionary<string> = Object.create(null);
+		let paramsMap: IDictionary<string> = Object.create(null);
 
 		_.each(operation.parameters, (parameter: Swagger.IParameter) => {
-			var tsTypeName = this.tsTypeSystemHelpers.translate(parameter.dataType);
+			let tsTypeName = this.tsTypeSystemHelpers.translate(parameter.dataType);
 			if (this.tsTypeSystemHelpers.isStream(tsTypeName)) {
 				tsTypeName = this.tsTypeSystemHelpers.getReadableStreamTypeName();
 			} else if (parameter.allowableValues) {
@@ -317,20 +318,20 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			paramsMap[parameter.name] = tsTypeName;
 		});
 
-		var responseType = this.tsTypeSystemHelpers.translate(operation.responseClass);
+		let responseType = this.tsTypeSystemHelpers.translate(operation.responseClass);
 		if (!this.tsTypeSystemHelpers.isBuiltIn(responseType)) {
 			responseType = "Server." + responseType;
 		}
 
-		var httpCallParameters = [this.quote(operation.nickname), this.quote(operation.httpMethod)];
+		let httpCallParameters = [this.quote(operation.nickname), this.quote(operation.httpMethod)];
 
-		var httpCallPath = this.generateHttpCallPath(operation, basePath, path, enumPathParameters);
+		let httpCallPath = this.generateHttpCallPath(operation, basePath, path, enumPathParameters);
 		httpCallParameters.push(httpCallPath);
 
-		var accepts = this.getAccepts(operation);
+		let accepts = this.getAccepts(operation);
 		httpCallParameters.push(accepts ? this.quote(accepts) : "null");
 
-		var bodyParams = this.generateBodyParams(operation);
+		let bodyParams = this.generateBodyParams(operation);
 		httpCallParameters.push(bodyParams);
 
 		if (this.tsTypeSystemHelpers.isStream(responseType)) {
@@ -340,9 +341,9 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			httpCallParameters.push("null");
 		}
 
-		var callResultType = this.tsTypeSystemHelpers.isStream(responseType) ? "void" : responseType;
-		var generatedContract = codeEntityLib.Line.create(util.format("%s(%s): IFuture<%s>;", operationContractName, parameters.join(", "), callResultType));
-		var generatedOperation = new codeEntityLib.Block(util.format("public %s(%s): IFuture<%s>", operationContractName, parameters.join(", "), callResultType));
+		let callResultType = this.tsTypeSystemHelpers.isStream(responseType) ? "void" : responseType;
+		let generatedContract = codeEntityLib.Line.create(util.format("%s(%s): IFuture<%s>;", operationContractName, parameters.join(", "), callResultType));
+		let generatedOperation = new codeEntityLib.Block(util.format("public %s(%s): IFuture<%s>", operationContractName, parameters.join(", "), callResultType));
 		generatedOperation.writeLine(util.format("return this.$serviceProxy.call<%s>(%s);", callResultType, httpCallParameters.join(", ")));
 
 		return {
@@ -393,11 +394,11 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private generateHttpCallPath(operation: Swagger.IOperation, basePath: string, path: string, enumPathParameters: any): string {
-		var components = _.filter(path.split("/"), (component) => !!component && !!component.trim());
-		var pathComponents = _.map(components, (pathComponent: string) => {
-			var matchParam = /{(.+)}/.exec(pathComponent);
+		let components = _.filter(path.split("/"), (component) => !!component && !!component.trim());
+		let pathComponents = _.map(components, (pathComponent: string) => {
+			let matchParam = /{(.+)}/.exec(pathComponent);
 			if (matchParam) {
-				var param = matchParam[1];
+				let param = matchParam[1];
 				if (enumPathParameters[param]) {
 					param = "(" + enumPathParameters[param] + param + ")";
 				}
@@ -406,7 +407,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			return this.quote(pathComponent);
 		});
 
-		var fullPath: string[] = [];
+		let fullPath: string[] = [];
 		_.each(basePath.split("/"), (part) => {
 			if (part) {
 				fullPath.push(this.quote(part));
@@ -414,14 +415,14 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		});
 		fullPath = fullPath.concat(pathComponents);
 
-		var path = util.format("[%s].join('/')", fullPath.toString());
+		let callPath = util.format("[%s].join('/')", fullPath.toString());
 
-		var queryParams = this.getSwaggerParamsByType(operation, ParamTypes.Query);
+		let queryParams = this.getSwaggerParamsByType(operation, ParamTypes.Query);
 		if (queryParams.length > 0) {
-			path += util.format(" + '?' + querystring.stringify({ %s })",
+			callPath += util.format(" + '?' + querystring.stringify({ %s })",
 				_.map(queryParams, (param) => util.format("'%s': %s", param.name, param.name)).join(", "));
 		}
-		return path;
+		return callPath;
 	}
 
 	private getAccepts(operation: Swagger.IOperation): string {
@@ -434,11 +435,11 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private generateBodyParams(operation: Swagger.IOperation): string {
-		var bodyParams = this.getSwaggerParamsByType(operation, ParamTypes.Body);
-		var result: string[] = [];
+		let bodyParams = this.getSwaggerParamsByType(operation, ParamTypes.Body);
+		let result: string[] = [];
 		_.each(bodyParams, (bodyParam: Swagger.IParameter) => {
-			var contentType = this.getContentType(bodyParam.dataType);
-			var paramValue = bodyParam.name;
+			let contentType = this.getContentType(bodyParam.dataType);
+			let paramValue = bodyParam.name;
 			if(contentType === "application/json") {
 				paramValue = util.format("JSON.stringify(%s)", bodyParam.name);
 			}

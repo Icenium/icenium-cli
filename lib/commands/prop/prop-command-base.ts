@@ -16,11 +16,11 @@ export class ProjectPropertyCommandBase {
 	}
 
 	public get completionData(): string[] {
-		var parseResult = /prop[ ]+([^ ]+) ([^ ]*)/.exec(process.argv.join(" "));
+		let parseResult = /prop[ ]+([^ ]+) ([^ ]*)/.exec(process.argv.join(" "));
 		if (parseResult) {
-			var propName = parseResult[2];
+			let propName = parseResult[2];
 			if (this.projectSchema[propName]) {
-				var range = this.projectSchema[propName].range;
+				let range = this.projectSchema[propName].range;
 				if (range) {
 					if (!_.isArray(range)) {
 						range = _.map(range, (value:{ input: string }, key:string) => {

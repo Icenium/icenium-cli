@@ -28,9 +28,9 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 	constructor(protected $fs: IFileSystem) {
 		super($fs);
 
-		var configPath = this.getConfigPath("config");
+		let configPath = this.getConfigPath("config");
 		if (!this.$fs.exists(configPath).wait()) {
-			var configBase = this.loadConfig("config-base").wait();
+			let configBase = this.loadConfig("config-base").wait();
 			this.$fs.writeJson(configPath, configBase).wait();
 		} else {
 			this.mergeConfig(this, this.loadConfig("config").wait());
@@ -43,8 +43,8 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 
 	public apply(configName: string): IFuture<void> {
 		return ((): any => {
-			var baseConfig = this.loadConfig("config-base").wait();
-			var newConfig = this.loadConfig("config-" + configName).wait();
+			let baseConfig = this.loadConfig("config-base").wait();
+			let newConfig = this.loadConfig("config-" + configName).wait();
 			this.mergeConfig(baseConfig, newConfig);
 			this.saveConfig(baseConfig, "config").wait();
 		}).future<void>()();
@@ -52,7 +52,7 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 
 	public printConfigData(): IFuture<void> {
 		return (() => {
-			var config = this.loadConfig("config").wait();
+			let config = this.loadConfig("config").wait();
 			console.log(config);
 		}).future<void>()();
 	}
@@ -62,14 +62,14 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 	}
 
 	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
-		var configNoFunctions = Object.create(null);
+		let configNoFunctions = Object.create(null);
 		_.each(<any>config, (entry, key) => {
 			if (typeof entry !== "function") {
 				configNoFunctions[key] = entry;
 			}
 		});
 
-		var configFileName = this.getConfigPath(name);
+		let configFileName = this.getConfigPath(name);
 		return this.$fs.writeJson(configFileName, configNoFunctions);
 	}
 
@@ -88,7 +88,7 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 
 	public get START_PACKAGE_ACTIVITY_NAME(): string {
-		var project: Project.IProject = $injector.resolve("project");
+		let project: Project.IProject = $injector.resolve("project");
 		return project.startPackageActivity;
 	}
 

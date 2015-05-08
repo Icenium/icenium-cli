@@ -13,8 +13,8 @@ export class AppManagerLiveSyncCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
 			if(!args || args.length === 0) {
-				var options = this.$mobileHelper.platformNames.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
-				var selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", options).wait();
+				let options = this.$mobileHelper.platformNames.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
+				let selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", options).wait();
 				if(selectedPlatform === AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION) {
 					this.$appManagerService.publishLivePatch(this.$mobileHelper.platformNames).wait();
 				} else {
@@ -22,7 +22,7 @@ export class AppManagerLiveSyncCommand implements ICommand {
 				}
 			} else {
 				// make sure each platform is specified only once
-				var platforms = _.keys(_.groupBy(args, arg => this.$mobileHelper.normalizePlatformName(arg)));
+				let platforms = _.keys(_.groupBy(args, arg => this.$mobileHelper.normalizePlatformName(arg)));
 				this.$appManagerService.publishLivePatch(platforms).wait();
 			}
 		}).future<void>()();

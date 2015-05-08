@@ -16,8 +16,8 @@ export class DependencyConfigService implements IDependencyConfigService {
 
 	public getGeneratorConfig(generatorName: string): IFuture<IGeneratorConfig> {
 		return (() => {
-			var generators = this.getAllGenerators().wait();
-			var generatorConfig = _.find(generators, (generator: IGeneratorConfig) => generator.name === generatorName);
+			let generators = this.getAllGenerators().wait();
+			let generatorConfig = _.find(generators, (generator: IGeneratorConfig) => generator.name === generatorName);
 			if(!generatorConfig) {
 				this.$errors.fail("Unable to find config data for %s. Check if config/generator-config.json exists and try again.", generatorName);
 			}
@@ -28,14 +28,14 @@ export class DependencyConfigService implements IDependencyConfigService {
 
 	public getAppScaffoldingConfig(): IFuture<IAppScaffoldingConfig> {
 		return (() => {
-			var dependencyConfig = this.getDependencyConfigContent().wait();
+			let dependencyConfig = this.getDependencyConfigContent().wait();
 			return dependencyConfig.appScaffolding;
 		}).future<IAppScaffoldingConfig>()();
 	}
 
 	public getAllGenerators(): IFuture<IGeneratorConfig[]> {
 		return (() => {
-			var dependencyConfigContent = this.getDependencyConfigContent().wait();
+			let dependencyConfigContent = this.getDependencyConfigContent().wait();
 			return dependencyConfigContent.generators;
 		}).future<IGeneratorConfig[]>()();
 	}

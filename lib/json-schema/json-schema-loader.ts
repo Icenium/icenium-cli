@@ -25,7 +25,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 		this.loadSchemas().wait();
 
-		var schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
+		let schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
 		this.$injector.register("jsonSchemaResolver", schemaResolver);
 	}
 
@@ -35,11 +35,11 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			this.$fs.deleteDirectory(this.schemasFolderPath).wait();
 			this.$fs.createDirectory(this.schemasFolderPath).wait();
 
-			var filePath = temp.path({suffix: ".zip"});
-			var file = this.$fs.createWriteStream(filePath);
-			var fileEnd = this.$fs.futureFromEvent(file, "finish");
+			let filePath = temp.path({suffix: ".zip"});
+			let file = this.$fs.createWriteStream(filePath);
+			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			var schemasEndpoint = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
+			let schemasEndpoint = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
 			this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file}).wait();
 			fileEnd.wait();
 
@@ -51,36 +51,36 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		return (() => {
 			if(this.$fs.exists(this.schemasFolderPath).wait()) {
 
-				var fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
+				let fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
 				_.each(fileNames, (fileName: string) => {
 					if( path.extname(fileName) === ".json") {
-						var fullFilePath = path.join(this.schemasFolderPath, fileName);
-						var schema = this.$fs.readJson(fullFilePath).wait();
+						let fullFilePath = path.join(this.schemasFolderPath, fileName);
+						let schema = this.$fs.readJson(fullFilePath).wait();
 						this.schemas[schema.id] = schema;
 					}
 				});
 
-				var schemas = _.values(this.schemas);
+				let schemas = _.values(this.schemas);
 				_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
 			}
 		}).future<void>()();
 	}
 
 	private isSchemaLoaded(schemaId: string): boolean {
-		var schemaIds = _.keys(this.loadedSchemas);
+		let schemaIds = _.keys(this.loadedSchemas);
 		return _.contains(schemaIds, schemaId);
 	}
 
 	private loadSchema(schema: ISchema): IFuture<void> {
 		return (() => {
-			var id = schema.id;
-			var extendsProperty = schema.extends;
+			let id = schema.id;
+			let extendsProperty = schema.extends;
 
 			if(!this.isSchemaLoaded(id)) {
 				if(extendsProperty && extendsProperty.length > 0) {
 					_.each(extendsProperty, (ext: ISchemaExtends) => {
-						var schemaRef = ext.$ref;
-						var extSchema = this.findSchema(schemaRef);
+						let schemaRef = ext.$ref;
+						let extSchema = this.findSchema(schemaRef);
 
 						if(!extSchema) {
 							this.$errors.fail("Schema %s not found.", schemaRef);

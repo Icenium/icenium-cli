@@ -4,14 +4,14 @@
 import chai = require("chai");
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
-var assert:chai.Assert = chai.assert;
+let assert:chai.Assert = chai.assert;
 import pnv = require("../lib/common/validators/project-name-validator");
 
 describe("project-name-validator smoke tests", () => {
 
-	var validator: IProjectNameValidator;
+	let validator: IProjectNameValidator;
 	before(() => {
-		var testInjector = new yok.Yok();
+		let testInjector = new yok.Yok();
 		testInjector.register("errors", stubs.ErrorsStub);
 		validator = testInjector.resolve(pnv.ProjectNameValidator);
 	});

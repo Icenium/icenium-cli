@@ -9,7 +9,7 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 	public isProjectType(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
 			if(this.$project.getProjectDir().wait()) {
-				var framework = this.$project.projectData.Framework.toLowerCase();
+				let framework = this.$project.projectData.Framework.toLowerCase();
 				return _.any(args, arg => arg.toLowerCase() === framework);
 			}
 
@@ -19,8 +19,8 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 
 	public getLocalVariables(options: { isHtml: boolean }): IFuture<IDictionary<any>> {
 		return ((): IDictionary<any> => {
-			var isHtml = options.isHtml;
-			var localVariables:IDictionary<any> = {};
+			let isHtml = options.isHtml;
+			let localVariables:IDictionary<any> = {};
 			localVariables["isMobileWebsite"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite]).wait();
 			localVariables["isCordova"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
 			localVariables["isNativeScript"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();

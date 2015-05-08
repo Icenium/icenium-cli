@@ -26,7 +26,7 @@ import temp = require("temp");
 import util = require("util");
 temp.track();
 
-var mockProjectNameValidator = {
+let mockProjectNameValidator = {
 	validateCalled: false,
 	validate: () => {
 		mockProjectNameValidator.validateCalled = true;
@@ -35,7 +35,7 @@ var mockProjectNameValidator = {
 };
 
 function getCordovaPluginsData(cordovaPlugins: string[]): any[] {
-	var cordovaPluginsData: any[] = [];
+	let cordovaPluginsData: any[] = [];
 	_.each(cordovaPlugins, (cordovaPlugin: string) => {
 		cordovaPluginsData.push({
 			Name: _.last(cordovaPlugin.split(".")),
@@ -47,13 +47,13 @@ function getCordovaPluginsData(cordovaPlugins: string[]): any[] {
 }
 
 function createMarketplacePluginsData(marketplacePlugins: any[]) {
-	var json = '[';
-	var index = 0;
+	let json = '[';
+	let index = 0;
 	_.each(marketplacePlugins, plugin => {
-		var uniqueId = plugin.Identifier;
-		var version = plugin.Version;
-		var title = _.last(uniqueId.split("."));
-		var obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
+		let uniqueId = plugin.Identifier;
+		let version = plugin.Version;
+		let title = _.last(uniqueId.split("."));
+		let obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
 			title, uniqueId, version);
 		if(++index !== marketplacePlugins.length) {
 			json += obj + ",";
@@ -67,7 +67,7 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 }
 
 function createTestInjector() {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("childProcess", childProcess.ChildProcess);
 	testInjector.register("project", projectLib.Project);
 	testInjector.register("errors", stubs.ErrorsStub);
@@ -144,7 +144,7 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 }
 
 function getProjectFileName(configuration: string) {
-	var projectFileName = ".abproject";
+	let projectFileName = ".abproject";
 	if (configuration) {
 		if (configuration === "debug") {
 			projectFileName = ".debug.abproject";
@@ -158,22 +158,22 @@ function getProjectFileName(configuration: string) {
 }
 
 function assertCorePluginsCount(configuration?: string) {
-	var testInjector = createTestInjector();
-	var projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
-	var project = testInjector.resolve("project");
-	var fs = testInjector.resolve("fs");
+	let testInjector = createTestInjector();
+	let projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
+	let project = testInjector.resolve("project");
+	let fs = testInjector.resolve("fs");
 
 	// Create new project
-	var options:any = require("./../lib/common/options");
-	var tempFolder = temp.mkdirSync("template");
+	let options:any = require("./../lib/common/options");
+	let tempFolder = temp.mkdirSync("template");
 
-	var projectName = "Test";
+	let projectName = "Test";
 	options.path = tempFolder;
 	options.template = "Blank";
 	options.appid = "com.telerik.Test";
 	project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
-	var availableMarketplacePlugins = [
+	let availableMarketplacePlugins = [
 		{
 			Identifier: "nl.x-services.plugins.toast",
 			Name: "Toast",
@@ -193,11 +193,11 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	var projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
-	var abProjectContent = fs.readJson(projectFilePath).wait();
+	let projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
+	let abProjectContent = fs.readJson(projectFilePath).wait();
 
 	updateTestInjector(testInjector, getCordovaPluginsData(abProjectContent["CorePlugins"]), availableMarketplacePlugins);
-	var service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+	let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
 	project.getProperty = (propertyName: string, configuration: string) => {
 		return abProjectContent[propertyName];
 	};

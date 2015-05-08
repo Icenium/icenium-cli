@@ -6,15 +6,15 @@ import yok = require("../lib/common/yok");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import util = require("util");
-var assert = require("chai").assert;
+let assert = require("chai").assert;
 
-var fileSystemFile = require("../lib/common/file-system");
-var hashServiceFile = require("../lib/services/hash-service");
-var printVersionsFile = require("../lib/commands/framework-versions/print-versions");
-var setVersionFile = require("../lib/commands/framework-versions/set-version");
+let fileSystemFile = require("../lib/common/file-system");
+let hashServiceFile = require("../lib/services/hash-service");
+let printVersionsFile = require("../lib/commands/framework-versions/print-versions");
+let setVersionFile = require("../lib/commands/framework-versions/set-version");
 
 function createTestInjector(): IInjector {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 
 	testInjector.register("fs", fileSystemFile.FileSystem);
 	testInjector.register("errors", {
@@ -59,9 +59,9 @@ function createTestInjector(): IInjector {
 describe("mobileframework", () => {
 	describe("MobileFrameworkCommandParameter", () => {
 		it("fails when version is not in correct format", () => {
-			var testInjector = createTestInjector();
-			var message: string;
-			var mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
+			let testInjector = createTestInjector();
+			let message: string;
+			let mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 				testInjector.resolve("project"), testInjector.resolve("errors"));
 			try {
 				mobileFwCP.validate("1").wait();
@@ -73,9 +73,9 @@ describe("mobileframework", () => {
 		});
 
 		it("fails when version is not supported", () => {
-			var testInjector = createTestInjector();
-			var message: string;
-			var mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
+			let testInjector = createTestInjector();
+			let message: string;
+			let mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 				testInjector.resolve("project"), testInjector.resolve("errors"));
 			try {
 				mobileFwCP.validate("1.0.5").wait();
@@ -87,8 +87,8 @@ describe("mobileframework", () => {
 		});
 
 		it("returns true when version is correct", () => {
-			var testInjector = createTestInjector();
-			var mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
+			let testInjector = createTestInjector();
+			let mobileFwCP: ICommandParameter = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 				testInjector.resolve("project"), testInjector.resolve("errors"));
 
 			assert.isTrue(mobileFwCP.validate("1.0.0").wait());
@@ -97,15 +97,15 @@ describe("mobileframework", () => {
 
 	describe("print", () => {
 		it("prints display names of supported versions", () => {
-			var expectedOutput = ["version_1_0_0", "version_1_0_1"];
-			var testInjector = createTestInjector();
-			var message: string;
+			let expectedOutput = ["version_1_0_0", "version_1_0_1"];
+			let testInjector = createTestInjector();
+			let message: string;
 			testInjector.register("logger", {
 				info: (formatStr: string, ...args: string[]) => {
 					message += formatStr;
 				}
 			});
-			var mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
+			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
 			mbFrm.execute([]).wait();
 			_.each(expectedOutput, version => {
 				assert.isTrue(message.indexOf(version) > -1);

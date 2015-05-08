@@ -17,17 +17,17 @@ export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceL
 
 	public prepareGenerator(generatorName: string): IFuture<void> {
 		return (() => {
-			var generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
+			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
 			generatorConfig.pathToSave = path.join(this.appScaffoldingPath, "H", generatorConfig.version , "node_modules");
 
 			this.$fs.ensureDirectoryExists(generatorConfig.pathToSave).wait();
 
-			var afterPrepareAction = () => {
+			let afterPrepareAction = () => {
 				return (() => {
-					var generatorCachePath = path.join(generatorConfig.pathToSave, generatorName);
-					var dependencies = this.$fs.readJson(path.join(generatorCachePath, "package.json")).wait().dependencies;
+					let generatorCachePath = path.join(generatorConfig.pathToSave, generatorName);
+					let dependencies = this.$fs.readJson(path.join(generatorCachePath, "package.json")).wait().dependencies;
 					_.each(dependencies, (value, key) => {
-						var packageToInstall = util.format("%s@%s", key, value);
+						let packageToInstall = util.format("%s@%s", key, value);
 						this.npmInstall(packageToInstall).wait();
 					});
 

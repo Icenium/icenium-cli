@@ -68,9 +68,9 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 				this.$fs.createDirectory(options["profile-dir"]).wait();
 
 				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath).wait()) {
-					var fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();
-					var timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
-					var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();
+					let timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
+					let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 					if(diffDays > 1) {
 						this.downloadUserSettings().wait();
 					} else {
@@ -107,7 +107,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 				return null;
 			}
 
-			var data = this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG];
+			let data = this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG];
 			try {
 				settingName.split(".").forEach(property => { data = data[property]; });
 			} catch(e) {
@@ -126,7 +126,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	}
 
 	public saveSetting<T>(key: string, value: T): IFuture<void> {
-		var settingObject: any = {};
+		let settingObject: any = {};
 		settingObject[key] = value;
 
 		return this.saveSettings(settingObject);
@@ -149,15 +149,15 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 			}
 
 			Object.keys(data).forEach(property => {
-				var newPropertyName = property + ".$t";
+				let newPropertyName = property + ".$t";
 				data[newPropertyName] = data[property];
 				delete data[property];
 			});
 
-			var convertedData = require("string-to-json").convert(data);
+			let convertedData = require("string-to-json").convert(data);
 			helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
 
-			var xml = xmlMapping.toxml(this.userSettingsData);
+			let xml = xmlMapping.toxml(this.userSettingsData);
 			this.$server.rawSettings.saveUserSettings(xml).wait();
 
 			if (Object.keys(data).length !== 0) {

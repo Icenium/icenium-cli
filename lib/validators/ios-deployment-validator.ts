@@ -35,15 +35,15 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_CERTIFICATE_ERROR_MESSAGE);
 			}
 
-			var provision = this.$identityManager.findProvision(model.provisionOption).wait();
-			var provisionValidationResult = this.validateProvision(provision);
+			let provision = this.$identityManager.findProvision(model.provisionOption).wait();
+			let provisionValidationResult = this.validateProvision(provision);
 
 			if(!provisionValidationResult.isSuccessful) {
 				return provisionValidationResult;
 			}
 
-			var certificate = this.$identityManager.findCertificate(model.certificateOption).wait();
-			var certificateValidationResult = this.validateCertificate(certificate, provision).wait();
+			let certificate = this.$identityManager.findCertificate(model.certificateOption).wait();
+			let certificateValidationResult = this.validateCertificate(certificate, provision).wait();
 
 			if(!certificateValidationResult.isSuccessful) {
 				return certificateValidationResult;
@@ -62,14 +62,14 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 			return new ValidationResult.ValidationResult(IOSDeploymentValidator.EXPIRED_PROVISON_ERROR_MESSAGE);
 		}
 		if(provision.ApplicationIdentifier !== "*") {
-			var provisionIdentifierPattern = new RegExp(this.getRegexPattern(provision.ApplicationIdentifier));
+			let provisionIdentifierPattern = new RegExp(this.getRegexPattern(provision.ApplicationIdentifier));
 			if(!provisionIdentifierPattern.test(this.appIdentifier)) {
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.APPLICATION_IDENTIFIER_MISMATCH);
 			}
 		}
 
 		if(this.deviceIdentifier) {
-			var isInProvisionedDevices = provision.ProvisionedDevices && _.contains(provision.ProvisionedDevices, this.deviceIdentifier);
+			let isInProvisionedDevices = provision.ProvisionedDevices && _.contains(provision.ProvisionedDevices, this.deviceIdentifier);
 			if(!isInProvisionedDevices) {
 				return new ValidationResult.ValidationResult(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Use `$ appbuilder provision -v` to list all devices included in provision", this.deviceIdentifier));
 			}
@@ -97,14 +97,14 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	}
 
 	private isCertificateExpired(certificate: string): boolean {
-		var cert = this.$x509.load(certificate);
+		let cert = this.$x509.load(certificate);
 		return cert.expiresOn <= new Date();
 	}
 
 	private getRegexPattern(appIdentifier: string): string {
-		var starPlaceholder = "<!StarPlaceholder!>";
-		var escapedIdentifier = (<any>RegExp).escape(helpers.stringReplaceAll(appIdentifier, "*", starPlaceholder));
-		var replacedIdentifier = helpers.stringReplaceAll(escapedIdentifier, starPlaceholder, ".*");
+		let starPlaceholder = "<!StarPlaceholder!>";
+		let escapedIdentifier = (<any>RegExp).escape(helpers.stringReplaceAll(appIdentifier, "*", starPlaceholder));
+		let replacedIdentifier = helpers.stringReplaceAll(escapedIdentifier, starPlaceholder, ".*");
 		return "^" + replacedIdentifier + "$";
 	}
 }

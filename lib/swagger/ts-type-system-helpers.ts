@@ -36,7 +36,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 			return this.translateMap(typeName);
 		}
 
-		var match = /List\[(.+)\]/.exec(typeName);
+		let match = /List\[(.+)\]/.exec(typeName);
 		if(match) {
 			return this.translate(match[1]) + "[]";
 		}
@@ -58,7 +58,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	public isStream(typeName: string): boolean {
-		var tsTypeName = this.translate(typeName);
+		let tsTypeName = this.translate(typeName);
 		return _.endsWith(tsTypeName, "Stream") || _.endsWith(tsTypeName, "file");
 	}
 
@@ -75,13 +75,13 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	private translateMap(typeName: string): string {
-		var keyStartIndex = typeName.indexOf(TSTypeSystemHelpers.ARRAY_START_CHAR) + 1;
-		var keyValueSeparatorIndex = typeName.indexOf(TSTypeSystemHelpers.COMMA_CHAR);
-		var key = typeName.substr(keyStartIndex, keyValueSeparatorIndex - keyStartIndex);
+		let keyStartIndex = typeName.indexOf(TSTypeSystemHelpers.ARRAY_START_CHAR) + 1;
+		let keyValueSeparatorIndex = typeName.indexOf(TSTypeSystemHelpers.COMMA_CHAR);
+		let key = typeName.substr(keyStartIndex, keyValueSeparatorIndex - keyStartIndex);
 		if(key !== TSTypeSystemHelpers.STRING_TYPE_NAME) {
 			return TSTypeSystemHelpers.ANY_TYPE_NAME;
 		} else {
-			var value = typeName.substr(keyValueSeparatorIndex + 1, typeName.indexOf(TSTypeSystemHelpers.ARRAY_END_CHAR) - keyValueSeparatorIndex - 1);
+			let value = typeName.substr(keyValueSeparatorIndex + 1, typeName.indexOf(TSTypeSystemHelpers.ARRAY_END_CHAR) - keyValueSeparatorIndex - 1);
 			return util.format("IDictionary<%s>", this.translate(value));
 		}
 	}

@@ -7,7 +7,7 @@ export class LogcatPrinter implements Mobile.ILogcatPrinter {
 	constructor(private $logger: ILogger) { }
 
 	public print(lineText: string): void {
-		var log = this.getConsoleLogFromLine(lineText);
+		let log = this.getConsoleLogFromLine(lineText);
 		if(log) {
 			if(log.tag) {
 				this.$logger.out("%s: %s", log.tag, log.message);
@@ -18,9 +18,9 @@ export class LogcatPrinter implements Mobile.ILogcatPrinter {
 	}
 
 	private getConsoleLogFromLine(lineText: String): any {
-		var acceptedTags = ["chromium", "Web Console", "JS"];
+		let acceptedTags = ["chromium", "Web Console", "JS"];
 		//sample line is "I/Web Console(    4438): Received Event: deviceready at file:///storage/emulated/0/Icenium/com.telerik.TestApp/js/index.js:48"
-		var match = lineText.match(LogcatPrinter.LINE_REGEX);
+		let match = lineText.match(LogcatPrinter.LINE_REGEX);
 		if(match) {
 			if(acceptedTags.indexOf(match[1]) !== -1) {
 				return {tag: match[1], message: match[3]};

@@ -7,9 +7,9 @@ import path = require("path");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
-var assert: chai.Assert = chai.assert;
+let assert: chai.Assert = chai.assert;
 
-var testInjector = new yok.Yok();
+let testInjector = new yok.Yok();
 testInjector.register("server", {});
 testInjector.register("errors", {});
 testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() }});
@@ -35,7 +35,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
             assert.deepEqual(service.migratePlugins(["plugin"], "3.0.0", "3.2.0").wait(), ["plugin"]);
         });
 
@@ -53,7 +53,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0").wait(), ["org.apache.cordova.AudioHandler"]);
 		});
 
@@ -66,7 +66,7 @@ describe("cordova-migration-service", () => {
 				}
 			});
 
-			var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.camera", "org.apache.cordova.statusbar"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.camera"]);
 		});
 
@@ -82,7 +82,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0").wait(), ["org.apache.cordova.media"]);
         });
 
@@ -98,7 +98,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.media"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.AudioHandler"]);
         });
 
@@ -119,7 +119,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.4.0").wait(), ["org.apache.cordova.NewMedia"]);
         });
 
@@ -140,7 +140,7 @@ describe("cordova-migration-service", () => {
 				}
             });
 
-            var service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+            let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.NewMedia"], "3.4.0", "3.0.0").wait(), ["org.apache.cordova.AudioHandler"]);
         });
     });

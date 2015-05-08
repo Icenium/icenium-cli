@@ -58,7 +58,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public get configFiles(): Project.IConfigurationFile[] {
-		var allConfigFiles = this.$projectFilesManager.availableConfigFiles;
+		let allConfigFiles = this.$projectFilesManager.availableConfigFiles;
 		return [
 			allConfigFiles["cordova-android-manifest"],
 			allConfigFiles["android-config"],
@@ -78,7 +78,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
-		var fileMask = /^cordova\.(\w*)\.js$/i;
+		let fileMask = /^cordova\.(\w*)\.js$/i;
 		return this.getProjectTargetsBase(projectDir, fileMask);
 	}
 
@@ -95,7 +95,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	private getCorrectWP8PackageIdentityName(appIdentifier: string) {
-		var sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""),(c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
+		let sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""),(c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
 		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
@@ -108,8 +108,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
-		var projectData = projectInformation.projectData;
-		var configurationName = options.release ? "release" : "debug";
+		let projectData = projectInformation.projectData;
+		let configurationName = options.release ? "release" : "debug";
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 
 		if(buildProperties.Platform === "WP8") {
@@ -129,14 +129,14 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			var platforms = this.$mobileHelper.platformNames;
+			let platforms = this.$mobileHelper.platformNames;
 			_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion).wait());
 
-			var appResourcesDir = this.$resources.appResourcesDir;
-			var appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+			let appResourcesDir = this.$resources.appResourcesDir;
+			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
-				var relativePath = path.relative(appResourcesDir, appResourceFile);
-				var targetFilePath = path.join(projectDir, relativePath);
+				let relativePath = path.relative(appResourcesDir, appResourceFile);
+				let targetFilePath = path.join(projectDir, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
@@ -150,17 +150,17 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			var cordovaJsFileName = path.join(projectDir, util.format("cordova.%s.js", platform).toLowerCase());
+			let cordovaJsFileName = path.join(projectDir, util.format("cordova.%s.js", platform).toLowerCase());
 			if (!this.$fs.exists(cordovaJsFileName).wait()) {
 				this.printAssetUpdateMessage();
-				var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(frameworkVersion, platform);
+				let cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(frameworkVersion, platform);
 				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
 			}
 		}).future<void>()();
 	}
 
 	public completeProjectProperties(properties: any): boolean {
-		var updated = false;
+		let updated = false;
 
 		if (_.has(properties, "name")) {
 			properties.ProjectName = properties.name;
@@ -186,14 +186,14 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		});
 
 		if(!_.has(properties, "WP8PackageIdentityName")) {
-			var wp8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
+			let wp8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
 			this.$logger.warn("Missing 'WP8PackageIdentityName' property in .abproject. Default value '%s' will be used.", wp8PackageIdentityName);
 			properties.WP8PackageIdentityName = wp8PackageIdentityName;
 			updated = true;
 		}
 
 		if(!_.has(properties, "WP8WindowsPublisherName")) {
-			var wp8WindowsPublisherName = CordovaProject.WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME;
+			let wp8WindowsPublisherName = CordovaProject.WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME;
 			this.$logger.warn("Missing 'WP8WindowsPublisherName' property in .abproject. Default value '%s' will be used.", wp8WindowsPublisherName);
 			properties.WP8WindowsPublisherName = wp8WindowsPublisherName;
 			updated = true;

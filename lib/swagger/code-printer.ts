@@ -11,7 +11,7 @@ export class SwaggerCodePrinter {
 	private static END_BLOCK_CHAR = "}";
 
 	public composeBlock(block: Swagger.IBlock, indentSize: number = 0): string {
-		var content = this.getIndentation(indentSize);
+		let content = this.getIndentation(indentSize);
 
 		if(block.opener) {
 			content += block.opener;
@@ -42,7 +42,7 @@ export class SwaggerCodePrinter {
 	}
 
 	private composeLine(line: Swagger.ILine, indentSize: number): string {
-		var content = this.getIndentation(indentSize);
+		let content = this.getIndentation(indentSize);
 		content += line.content;
 		content += SwaggerCodePrinter.NEW_LINE_CHAR;
 

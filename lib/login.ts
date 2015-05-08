@@ -54,7 +54,7 @@ export class UserDataStore implements IUserDataStore {
 	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void> {
 		cookies = cookies || {};
 		_.each(setCookieHeader, (cookieStr: string) => {
-			var parsed = cookielib.parse(cookieStr);
+			let parsed = cookielib.parse(cookieStr);
 			_.each(Object.keys(parsed), (key: string) => {
 				this.$logger.debug("Stored cookie %s=%s", key, parsed[key]);
 				cookies[key] = parsed[key];
@@ -93,7 +93,7 @@ export class UserDataStore implements IUserDataStore {
 					throw new Error("Not logged in.");
 				}
 
-				var contents = this.$fs.readText(sourceFile).wait();
+				let contents = this.$fs.readText(sourceFile).wait();
 				try {
 					setter(contents);
 				} catch(err) {
@@ -138,7 +138,7 @@ export class LoginManager implements ILoginManager {
 
 			this.localLogout().wait();
 
-			var logoutUrl = util.format("%s://%s/appbuilder/Mist/Logout", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			let logoutUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/Logout`;
 			this.$logger.debug("Logout URL is '%s'", logoutUrl);
 			this.$opener.open(logoutUrl);
 
@@ -189,16 +189,17 @@ export class LoginManager implements ILoginManager {
 
 	private loginInBrowser(): IFuture<any> {
 		return (() => {
-			var authComplete = new Future<string>();
+			let authComplete = new Future<string>();
 
 			this.$logger.info("Launching login page in browser.");
 
-			var localhostServer = this.$httpServer.createServer({
+			let loginUrl: string;
+			let localhostServer = this.$httpServer.createServer({
 				routes: {
 					"/": (request: http.ServerRequest, response: http.ServerResponse) => {
 						this.$logger.debug("Login complete: " + request.url);
-						var parsedUrl = url.parse(request.url, true);
-						var cookieData = parsedUrl.query.cookies;
+						let parsedUrl = url.parse(request.url, true);
+						let cookieData = parsedUrl.query.cookies;
 						if(cookieData) {
 							this.serveLoginFile("end.html")(request, response);
 
@@ -215,16 +216,16 @@ export class LoginManager implements ILoginManager {
 			localhostServer.listen(0);
 			this.$fs.futureFromEvent(localhostServer, "listening").wait();
 
-			var port = localhostServer.address().port;
-			var loginUrl = util.format("%s://%s/appbuilder/Mist/ClientLogin?port=%s&client_name=AppBuilderCLI", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, port);
+			let port = localhostServer.address().port;
+			loginUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/ClientLogin?port=${port}&client_name=AppBuilderCLI`;
 
 			this.$logger.debug("Login URL is '%s'", loginUrl);
 			this.$opener.open(loginUrl);
 
-			var timeoutID: NodeJS.Timer = undefined;
+			let timeoutID: NodeJS.Timer = undefined;
 
 			if(!helpers.isInteractive()) {
-				var timeout = options.hasOwnProperty("timeout")
+				let timeout = options.hasOwnProperty("timeout")
 					? +options.timeout
 					: LoginManager.DEFAULT_NONINTERACTIVE_LOGIN_TIMEOUT_MS;
 
@@ -238,15 +239,15 @@ export class LoginManager implements ILoginManager {
 				}
 			}
 
-			var cookieData = authComplete.wait();
+			let cookieData = authComplete.wait();
 			if(timeoutID !== undefined) {
 				clearTimeout(timeoutID);
 			}
 
-			var cookies = JSON.parse(cookieData);
+			let cookies = JSON.parse(cookieData);
 			this.$userDataStore.setCookies(cookies).wait();
 
-			var userData = this.$server.authentication.getLoggedInUser().wait();
+			let userData = this.$server.authentication.getLoggedInUser().wait();
 			this.$userDataStore.setUser(userData).wait();
 
 			return userData;
@@ -255,7 +256,7 @@ export class LoginManager implements ILoginManager {
 
 	public telerikLogin(user: string, password: string): IFuture<void> {
 		return (() => {
-			var response = this.$httpClient.httpRequest({
+			let response = this.$httpClient.httpRequest({
 				method: "POST",
 				url: util.format("%s://%s/appbuilder/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
 				headers: {
@@ -264,11 +265,11 @@ export class LoginManager implements ILoginManager {
 				body: querystring.stringify({ userName: user, password: password })
 			}).wait();
 
-			var cookies = response.headers["set-cookie"];
+			let cookies = response.headers["set-cookie"];
 			if(cookies) {
 				this.$userDataStore.parseAndSetCookies(cookies).wait();
 
-				var userData = this.$server.authentication.getLoggedInUser().wait();
+				let userData = this.$server.authentication.getLoggedInUser().wait();
 				this.$userDataStore.setUser(userData).wait();
 			}
 		}).future<void>()();

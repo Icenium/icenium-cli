@@ -49,7 +49,7 @@ export class Block implements Swagger.IBlock {
 	}
 
 	public writeLine(content: string): void {
-		var line = Line.create(content);
+		let line = Line.create(content);
 		this.codeEntities.push(line);
 	}
 }
