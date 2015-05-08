@@ -147,8 +147,9 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 			this.$logger.trace("JSV error: %s", errorMessage);
 
 			let property = this.tryResolveValidationSchemaCore(undefined, opts.validationSchemaName).properties[propertyName];
+			let errMsg = (property && property.errorMessage) ? property.errorMessage : errorMessage;
 			result[propertyName] = (opts.usePredefinedErrors === false ? undefined :
-				JsonSchemaValidator.PREDEFINED_ERRORS[propertyName]) || (property ? property.errorMessage : errorMessage);
+				JsonSchemaValidator.PREDEFINED_ERRORS[propertyName]) || errMsg;
 		});
 
 		return result;
