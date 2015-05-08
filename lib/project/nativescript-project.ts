@@ -52,7 +52,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public get configFiles():  Project.IConfigurationFile[] {
-		var allConfigFiles = this.$projectFilesManager.availableConfigFiles;
+		let allConfigFiles = this.$projectFilesManager.availableConfigFiles;
 		return [
 			allConfigFiles["ios-info"],
 			allConfigFiles["nativescript-android-manifest"]
@@ -77,7 +77,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {
-			var templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();
+			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();
 			return templateStrings.replace(/TS[.]/g, "TypeScript.");
 		}).future<string>()()
 	}
@@ -100,11 +100,11 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			var appResourcesDir = this.$resources.appResourcesDir;
-			var appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+			let appResourcesDir = this.$resources.appResourcesDir;
+			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
-				var relativePath = path.relative(appResourcesDir, appResourceFile);
-				var targetFilePath = path.join(projectDir, relativePath);
+				let relativePath = path.relative(appResourcesDir, appResourceFile);
+				let targetFilePath = path.join(projectDir, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
@@ -116,7 +116,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public completeProjectProperties(properties: any): boolean {
-		var updated = false;
+		let updated = false;
 
 		if (_.has(properties, "name")) {
 			properties.ProjectName = properties.name;

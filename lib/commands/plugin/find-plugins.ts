@@ -20,20 +20,20 @@ export class FindPluginsCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var plugins = this.$cordovaPluginsService.getPlugins(args);
+			let plugins = this.$cordovaPluginsService.getPlugins(args);
 			this.printPlugins(plugins);
 		}).future<void>()();
 	}
 
 	private printPlugins(plugins: IBasicPluginInformation[]) {
 		_.each(plugins, (plugin) => {
-			var pluginDescription = this.composePluginDescription(plugin);
+			let pluginDescription = this.composePluginDescription(plugin);
 			this.$logger.info(pluginDescription);
 		});
 	}
 
 	private composePluginDescription(plugin: IBasicPluginInformation) {
-		var description = util.format("Name: %s%s", plugin.name, os.EOL);
+		let description = util.format("Name: %s%s", plugin.name, os.EOL);
 		description += util.format("Description: %s%s", this.trim(plugin.description), os.EOL);
 		description += util.format("Version: %s%s", plugin.version, os.EOL);
 		return description;

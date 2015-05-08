@@ -26,8 +26,8 @@ import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constant
 import childProcessLib = require("../lib/common/child-process");
 import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
 import Future = require("fibers/future");
-var projectConstants = new projectConstantsLib.ProjectConstants();
-var assert = require("chai").assert;
+let projectConstants = new projectConstantsLib.ProjectConstants();
+let assert = require("chai").assert;
 temp.track();
 
 
@@ -46,7 +46,7 @@ class PrompterStub implements IPrompter {
 	public dispose() { }
 }
 
-var mockProjectNameValidator = {
+let mockProjectNameValidator = {
 	validateCalled: false,
 	validate: () => {
 		mockProjectNameValidator.validateCalled = true;
@@ -57,7 +57,7 @@ var mockProjectNameValidator = {
 function createTestInjector(): IInjector {
 	require("../lib/common/logger");
 
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("project", projectlib.Project);
 
 	testInjector.register("errors", stubs.ErrorsStub);
@@ -124,7 +124,7 @@ function createTestInjector(): IInjector {
 }
 
 describe("project integration tests", () => {
-	var project: Project.IProject, testInjector: IInjector;
+	let project: Project.IProject, testInjector: IInjector;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
@@ -135,9 +135,9 @@ describe("project integration tests", () => {
 	describe("createNewProject", () => {
 		it("creates a valid project folder (Cordova project)", () => {
 			project = testInjector.resolve(projectlib.Project);
-			var options: any = require("./../lib/common/options");
-			var tempFolder = temp.mkdirSync("template");
-			var projectName = "Test";
+			let options: any = require("./../lib/common/options");
+			let tempFolder = temp.mkdirSync("template");
+			let projectName = "Test";
 
 			options.path = tempFolder;
 			options.template = "Blank";
@@ -145,13 +145,13 @@ describe("project integration tests", () => {
 
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
-			var abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
-			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
-			var testProperties = JSON.parse(abProject.toString());
-			var correctProperties = JSON.parse(correctABProject.toString());
+			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
+			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
+			let testProperties = JSON.parse(abProject.toString());
+			let correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = project.getProjectSchema().wait();
-			var guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
+			let projectSchema = project.getProjectSchema().wait();
+			let guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
 			delete testProperties.ProjectGuid;
@@ -161,59 +161,59 @@ describe("project integration tests", () => {
 			delete testProperties.WP8PublisherID;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for(var key in testProperties) {
+			for(let key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
 
 		it("creates a valid project folder (NativeScript project)", () => {
 			project = testInjector.resolve(projectlib.Project);
-			var options: any = require("./../lib/common/options");
-			var tempFolder = temp.mkdirSync("template");
-			var projectName = "Test";
+			let options: any = require("./../lib/common/options");
+			let tempFolder = temp.mkdirSync("template");
+			let projectName = "Test";
 
 			options.path = tempFolder;
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-			var abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
-			var correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
-			var testProperties = JSON.parse(abProject.toString());
-			var correctProperties = JSON.parse(correctABProject.toString());
+			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
+			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
+			let testProperties = JSON.parse(abProject.toString());
+			let correctProperties = JSON.parse(correctABProject.toString());
 
-			var projectSchema = project.getProjectSchema().wait();
-			var guidRegex = new RegExp(projectSchema.ProjectGuid.regex);
+			let projectSchema = project.getProjectSchema().wait();
+			let guidRegex = new RegExp(projectSchema.ProjectGuid.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
 			delete testProperties.ProjectGuid;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for(var key in testProperties) {
+			for(let key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
 
 		it("with long name should throw ", () => {
 			project = testInjector.resolve(projectlib.Project);
-			var projectName = "Thirtyone character long string";
+			let projectName = "Thirtyone character long string";
 
 			assert.throws(() => project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait());
 		});
 	});
 
 	describe("updateProjectPropertiesAndSave",() => {
-		var prompter: PrompterStub;
+		let prompter: PrompterStub;
 		beforeEach(() => {
 			prompter = testInjector.resolve("prompter");
 			prompter.confirmResult = true;
-			var options: any = require("../lib/common/options");
-			var tempFolder = temp.mkdirSync("template");
+			let options: any = require("../lib/common/options");
+			let tempFolder = temp.mkdirSync("template");
 
 			options.path = tempFolder;
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
-			var projectName = "Test";
+			let projectName = "Test";
 			project = testInjector.resolve("project");
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 		});
@@ -278,10 +278,10 @@ describe("project integration tests", () => {
 	});
 
 	describe("Init command tests",() => {
-		var options: any;
-		var tempFolder: string;
-		var projectName = "Test";
-		var mobileHelper: Mobile.IMobileHelper;
+		let options: any;
+		let tempFolder: string;
+		let projectName = "Test";
+		let mobileHelper: Mobile.IMobileHelper;
 		beforeEach(() => {
 			options = require("../lib/common/options");
 			tempFolder = temp.mkdirSync("template");
@@ -294,26 +294,26 @@ describe("project integration tests", () => {
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "app", "tns_modules");
+				let projectDir = project.getProjectDir().wait();
+				let tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				var projectDir = project.getProjectDir().wait();
-				var tnsDir = path.join(projectDir, "app", "tns_modules");
+				let projectDir = project.getProjectDir().wait();
+				let tnsDir = path.join(projectDir, "app", "tns_modules");
 				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
 			it("existing TypeScript.Blank project has project files after init",() => {
 				options.template = "TypeScript.Blank";
-				var project: Project.IProject = testInjector.resolve("project");
+				let project: Project.IProject = testInjector.resolve("project");
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				var projectDir = project.getProjectDir().wait();
-				var projectFile = path.join(projectDir, ".abproject");
-				var abignoreFile = path.join(projectDir, ".abignore");
+				let projectDir = project.getProjectDir().wait();
+				let projectFile = path.join(projectDir, ".abproject");
+				let abignoreFile = path.join(projectDir, ".abignore");
 				fs.unlinkSync(projectFile);
 				fs.unlinkSync(abignoreFile);
 				options.path = projectDir;
@@ -325,9 +325,9 @@ describe("project integration tests", () => {
 			it("existing project has .abproject and .abignore files after init",() => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				var projectDir = project.getProjectDir().wait();
-				var projectFile = path.join(projectDir, ".abproject");
-				var abignoreFile = path.join(projectDir, ".abignore");
+				let projectDir = project.getProjectDir().wait();
+				let projectFile = path.join(projectDir, ".abproject");
+				let abignoreFile = path.join(projectDir, ".abignore");
 				fs.unlinkSync(projectFile);
 				fs.unlinkSync(abignoreFile);
 				options.path = projectDir;
@@ -341,11 +341,11 @@ describe("project integration tests", () => {
 			it("existing project has configuration specific files and .abignore files after init",() => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
-				var projectFile = path.join(projectDir, projectConstants.PROJECT_FILE);
-				var releaseProjectFile = path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME);
-				var debugProjectFile = path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME);
-				var abignoreFile = path.join(projectDir, ".abignore");
+				let projectDir = project.getProjectDir().wait();
+				let projectFile = path.join(projectDir, projectConstants.PROJECT_FILE);
+				let releaseProjectFile = path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME);
+				let debugProjectFile = path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME);
+				let abignoreFile = path.join(projectDir, ".abignore");
 				fs.unlinkSync(projectFile);
 				fs.unlinkSync(releaseProjectFile);
 				fs.unlinkSync(debugProjectFile);
@@ -361,10 +361,10 @@ describe("project integration tests", () => {
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
 			});
@@ -372,10 +372,10 @@ describe("project integration tests", () => {
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova TypeScript.Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
 			});
@@ -383,10 +383,10 @@ describe("project integration tests", () => {
 			it("KendoUI.Drawer template has mandatory files", () => {
 				options.template = "KendoUI.Drawer";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Drawer template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
 			});
@@ -394,10 +394,10 @@ describe("project integration tests", () => {
 			it("KendoUI.Empty template has mandatory files", () => {
 				options.template = "KendoUI.Empty";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Empty template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
 			});
@@ -405,10 +405,10 @@ describe("project integration tests", () => {
 			it("KendoUI.TabStrip template has mandatory files", () => {
 				options.template = "KendoUI.TabStrip";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				var projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir().wait();
 
-				var cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
-					var cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
+				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.TabStrip template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
 			});
@@ -417,18 +417,18 @@ describe("project integration tests", () => {
 
 	describe("createTemplateFolder", () => {
 		it("creates project folder when folder with that name doesn't exists", () => {
-			var tempFolder = temp.mkdirSync("template");
-			var projectName = "Test";
-			var projectFolder = path.join(tempFolder, projectName);
+			let tempFolder = temp.mkdirSync("template");
+			let projectName = "Test";
+			let projectFolder = path.join(tempFolder, projectName);
 
 			project.createTemplateFolder(projectFolder).wait();
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
 		it("doesn't fail when folder with that name exists and it's empty", () => {
-			var tempFolder = temp.mkdirSync("template");
-			var projectName = "Test";
-			var projectFolder = path.join(tempFolder, projectName);
+			let tempFolder = temp.mkdirSync("template");
+			let projectName = "Test";
+			let projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
 			project.createTemplateFolder(projectFolder).wait();
@@ -436,9 +436,9 @@ describe("project integration tests", () => {
 		});
 
 		it("fails when project folder is not empty", () => {
-			var tempFolder = temp.mkdirSync("template");
-			var projectName = "Test";
-			var projectFolder = path.join(tempFolder, projectName);
+			let tempFolder = temp.mkdirSync("template");
+			let projectName = "Test";
+			let projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
 			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", "0666"));
@@ -485,7 +485,7 @@ function getProjectData(): IProjectData {
 }
 
 describe("project unit tests", () => {
-	var projectProperties: IProjectPropertiesService, testInjector: IInjector;
+	let projectProperties: IProjectPropertiesService, testInjector: IInjector;
 
 	beforeEach(() => {
 		testInjector = createTestInjector();
@@ -493,8 +493,8 @@ describe("project unit tests", () => {
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
-		var config = testInjector.resolve("config");
-		var staticConfig = testInjector.resolve("staticConfig");
+		let config = testInjector.resolve("config");
+		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
@@ -502,59 +502,59 @@ describe("project unit tests", () => {
 
 	describe("updateProjectProperty", () => {
 		it("sets unconstrained string property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DisplayName = "wrong";
 			projectProperties.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
 			projectProperties.updateProjectProperty(projectData, "set", "ProjectName", ["fine"]).wait();
 			assert.equal("fine", projectData.ProjectName);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "ProjectName", ["fine"]).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "del", "ProjectName", ["fine"]).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
 			projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait());
 		});
 
 		it("sets enumerated property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
 			projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
@@ -563,7 +563,7 @@ describe("project unit tests", () => {
 		});
 
 		it("appends to enumerated collection property with shorthand", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["1"]).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
@@ -572,14 +572,14 @@ describe("project unit tests", () => {
 		});
 
 		it("appends multiple values to enumerated collection property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
 			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["1", "2"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DeviceOrientations = ["Landscape", "Portrait"];
 			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
@@ -588,20 +588,20 @@ describe("project unit tests", () => {
 		});
 
 		it("disallows unrecognized values for enumerated collection property", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
 			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
 			projectProperties.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", () => {
-			var projectData = getProjectData();
+			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
 			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
@@ -610,7 +610,7 @@ describe("project unit tests", () => {
 });
 
 describe("project unit tests (canonical paths)", () => {
-	var project: any, testInjector: IInjector, oldPath: string;
+	let project: any, testInjector: IInjector, oldPath: string;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
@@ -618,7 +618,7 @@ describe("project unit tests (canonical paths)", () => {
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.resolve("staticConfig").PROJECT_FILE_NAME = "";
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
-		var staticConfig = testInjector.resolve("staticConfig");
+		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.triggerJsonSchemaValidation = false;
 		project = testInjector.resolve("project");
 
@@ -630,31 +630,31 @@ describe("project unit tests (canonical paths)", () => {
 
 	it("no ending path separator", () => {
 		options.path = "test";
-		var project = testInjector.resolve(projectlib.Project);
+		let project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("one ending path separator", () => {
 		options.path = "test" + path.sep;
-		var project = testInjector.resolve(projectlib.Project);
+		let project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("multiple ending path separator", () => {
 		options.path = "test" + path.sep + path.sep;
-		var project = testInjector.resolve(projectlib.Project);
+		let project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("do not remove separators which are not at the end", () => {
 		options.path = "test" + path.sep + "test" + path.sep;
-		var project = testInjector.resolve(projectlib.Project);
+		let project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test" + path.sep + "test"));
 	});
 });
 
 describe("cordovaProject unit tests",() => {
-	var projectProperties: IProjectPropertiesService, testInjector: IInjector;
+	let projectProperties: IProjectPropertiesService, testInjector: IInjector;
 
 	beforeEach(() => {
 		testInjector = createTestInjector();
@@ -662,8 +662,8 @@ describe("cordovaProject unit tests",() => {
 
 		testInjector.register("config", require("../lib/config").Configuration);
 		testInjector.register("staticConfig", require("../lib/config").StaticConfig);
-		var config = testInjector.resolve("config");
-		var staticConfig = testInjector.resolve("staticConfig");
+		let config = testInjector.resolve("config");
+		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 
@@ -672,18 +672,18 @@ describe("cordovaProject unit tests",() => {
 
 	describe("alterPropertiesForNewProject",() => {
 		it("sets correct WP8PackageIdentityName when appid is short",() => {
-			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
-			var props: any = {};
+			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			let props: any = {};
 			options.appid = "appId";
 			cordovaProject.alterPropertiesForNewProject(props, "name");
 			assert.equal(props["WP8PackageIdentityName"], "1234Telerik.appId");
 		});
 
 		it("sets correct WP8PackageIdentityName when appid combined with default prefix has 50 symbols length",() => {
-			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
-			var props: any = {};
-			var defaultPrefix = "1234Telerik.";
-			var value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
+			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			let props: any = {};
+			let defaultPrefix = "1234Telerik.";
+			let value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
 			options.appid = value;
 
 			cordovaProject.alterPropertiesForNewProject(props, "name");
@@ -691,10 +691,10 @@ describe("cordovaProject unit tests",() => {
 		});
 
 		it("sets correct WP8PackageIdentityName when appid combined with default prefix has more than 50 symbols length",() => {
-			var cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
-			var props: any = {};
-			var defaultPrefix = "1234Telerik.";
-			var value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
+			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
+			let props: any = {};
+			let defaultPrefix = "1234Telerik.";
+			let value = _.range(0, 50 - defaultPrefix.length).map(num => "a").join("");
 			options.appid = value + "another long value that should be omitted at the end";
 
 			cordovaProject.alterPropertiesForNewProject(props, "name");

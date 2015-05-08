@@ -26,7 +26,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	public search(keywords: string[]): IBasicPluginInformation[] {
-		var future = new Future<IBasicPluginInformation[]>();
+		let future = new Future<IBasicPluginInformation[]>();
 		plugman.search(keywords, (result) => {
 			if (this.isError(result)) {
 				future.throw(result);
@@ -40,8 +40,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	public fetch(pluginId: string): IFuture<string> {
 		return(() => {
 			this.$project.ensureProject();
-			var future = new Future<string>();
-			var pluginDir = this.getPluginsDir().wait();
+			let future = new Future<string>();
+			let pluginDir = this.getPluginsDir().wait();
 
 			try {
 				if (this.$fs.exists(pluginId).wait() && this.$fs.getFsStats(pluginId).wait().isFile()) {
@@ -65,15 +65,15 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	private resolveLocalPluginDir(pluginId: string): IFuture<string> {
 		return (() => {
 			temp.track();
-			var destDir = temp.mkdirSync("ab-");
+			let destDir = temp.mkdirSync("ab-");
 			this.$fs.unzip(pluginId, destDir).wait();
 
-			var pluginXml = path.join(destDir, "plugin.xml");
+			let pluginXml = path.join(destDir, "plugin.xml");
 			if (this.$fs.exists(pluginXml).wait()) {
 				return destDir;
 			}
 
-			var dirs = _.filter(
+			let dirs = _.filter(
 				this.$fs.readDirectory(destDir).wait(),
 				(item) => this.$fs.getFsStats(path.join(destDir, item)).wait().isDirectory());
 
@@ -91,8 +91,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	public configure(): void {
-		var future = new Future();
-		var params = ["set", "registry", this.$config.CORDOVA_PLUGINS_REGISTRY];
+		let future = new Future();
+		let params = ["set", "registry", this.$config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (result) => {
 			if (this.isError(result)) {
 				future.throw(result);
@@ -112,7 +112,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
-		var pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
+		let pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
 		if (_.startsWith(pluginIdentifier, "org.apache.cordova")) {
 			pluginType = PluginsDataLib.PluginType.CorePlugin;
 		}

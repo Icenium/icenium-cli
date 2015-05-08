@@ -63,7 +63,7 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
-		var result: string[] = [];
+		let result: string[] = [];
 		return (() => { return result; }).future<string[]>()();
 	}
 

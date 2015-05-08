@@ -209,12 +209,11 @@ export class ErrorsNoFailStub implements IErrors {
 	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
 		return (() => {
 			try {
-				var result = action().wait();
+				let result = action().wait();
+				return result;
 			} catch(ex) {
 				return false;
 			}
-
-			return result;
 		}).future<boolean>()();
 	}
 

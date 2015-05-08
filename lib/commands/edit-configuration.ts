@@ -16,7 +16,7 @@ export class EditConfigurationCommandParameter implements ICommandParameter {
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			var template = _.findWhere(this.$project.projectConfigFiles, { template: validationValue });
+			let template = _.findWhere(this.$project.projectConfigFiles, { template: validationValue });
 			if(!template) {
 				if(validationValue) {
 					this.$errors.fail("There is no matching configuration file for: %s", validationValue);
@@ -43,26 +43,26 @@ export class EditConfigurationCommand implements ICommand {
 	allowedParameters = [new EditConfigurationCommandParameter(this.$errors, this.$templatesService, this.$project)];
 
 	execute(args: string[]): IFuture<void> {
-		var file = args[0];
-		var template = _.findWhere(this.$project.projectConfigFiles, { template: file });
+		let file = args[0];
+		let template = _.findWhere(this.$project.projectConfigFiles, { template: file });
 		return this.executeImplementation(template);
 	}
 
 	private executeImplementation(template: Project.IConfigurationFile): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			var projectPath = this.$project.getProjectDir().wait();
-			var filepath = path.join(projectPath, template.filepath);
-			var directory = path.dirname(filepath);
+			let projectPath = this.$project.getProjectDir().wait();
+			let filepath = path.join(projectPath, template.filepath);
+			let directory = path.dirname(filepath);
 			if (!this.$fs.exists(filepath).wait()) {
 				this.$logger.info("Creating configuration file: " + filepath);
-				var templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
+				let templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
 				this.$fs.unzip(templateFilePath, directory).wait();
 
 				//delete extra file in template zip
 				this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();
 				if (hostInfo.isWindows()) {
-					var contents = this.$fs.readText(filepath).wait();
+					let contents = this.$fs.readText(filepath).wait();
 					contents = helpers.stringReplaceAll(contents, "\n", "\r\n");
 					this.$fs.writeFile(filepath, contents).wait();
 				}

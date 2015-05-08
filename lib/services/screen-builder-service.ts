@@ -36,25 +36,25 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public allSupportedCommands(generatorName: string): IFuture<string[]> {
 		return (() => {
 			generatorName = generatorName || this.generatorName;
-			var scaffolderData = this.createScaffolder(generatorName).wait();
+			let scaffolderData = this.createScaffolder(generatorName).wait();
 			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
-			var allSupportedCommands = scaffolderData.future.wait();
+			let allSupportedCommands = scaffolderData.future.wait();
 			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 		}).future<string[]>()();
 	}
 
 	public generateAllCommands(generatorName: string): IFuture<void> {
 		return (() => {
-			var commands = this.allSupportedCommands(generatorName).wait();
+			let commands = this.allSupportedCommands(generatorName).wait();
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
 		}).future<void>()();
 	}
 
 	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void> {
 		this.$logger.trace("Installing project dependencies using bower");
-		var bowerModuleFilePath = require.resolve("bower");
-		var bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
-		var command = util.format("%s %s install", "node", bowerPath);
+		let bowerModuleFilePath = require.resolve("bower");
+		let bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
+		let command = util.format("%s %s install", "node", bowerPath);
 		return this.$childProcess.exec(command, { cwd: screenBuilderOptions.projectPath });
 	}
 
@@ -62,15 +62,15 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return (() => {
 			this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
 
-			var generators = this.$dependencyConfigService.getAllGenerators().wait();
+			let generators = this.$dependencyConfigService.getAllGenerators().wait();
 			_.each(generators, (generator: IGeneratorConfig) => this.$generatorExtensionsService.prepareGenerator(generator.name).wait());
 		}).future<void>()();
 	}
 
 	private promptGenerate(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void> {
-		var scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
-		var scaffolder = scaffolderData.scaffolder;
-		var type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
+		let scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
+		let scaffolder = scaffolderData.scaffolder;
+		let type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 		type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
 
 		if(type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE) {
@@ -87,11 +87,11 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			this.prepareScreenBuilder().wait();
 			screenBuilderOptions = screenBuilderOptions || {};
 
-			var appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
+			let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
 
-			var cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
-			var Scaffolder = require(cliServicePath);
-			var connector = {
+			let cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
+			let Scaffolder = require(cliServicePath);
+			let connector = {
 				generatorsCache: appScaffoldingPath,
 				generatorsAlias: ['H'],
 				path: screenBuilderOptions.projectPath || path.resolve(options.path || "."),
@@ -102,11 +102,11 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				logger: this.$logger.trace.bind(this.$logger)
 			};
 
-			var scaffolder = new Scaffolder(connector);
-			var future = new Future<void>();
-			var callback = (err:any, data:any) => {
+			let scaffolder = new Scaffolder(connector);
+			let future = new Future<void>();
+			let callback = (err:any, data:any) => {
 				if (err) {
-					var error = _.map(err.errors, (e:any) => e.message).join("\n");
+					let error = _.map(err.errors, (e:any) => e.message).join("\n");
 					this.$logger.trace("ScreenBuilder error while prompting: %s", err);
 					future.throw(error);
 				} else {
@@ -142,7 +142,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		this.ensureScreenBuilderProject().wait();
 
-		var screenBuilderOptions = {
+		let screenBuilderOptions = {
 			type: this.command.substr(this.command.indexOf("-") + 1)
 		};
 		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
@@ -152,7 +152,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 		return (() => {
 			this.$project.ensureProject();
 
-			var projectDir = this.$project.getProjectDir().wait();
+			let projectDir = this.$project.getProjectDir().wait();
 			if(!_.every(ScreenBuilderDynamicCommand.SCREEN_BUILDER_SPECIFIC_FILES, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
 				this.$errors.fail("This command is applicable only to Screen Builder projects.");
 			}

@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-var options: any = require("../common/options");
+let options: any = require("../common/options");
 import Future = require("fibers/future");
 import util = require("util");
 import helpers = require("../helpers");
@@ -32,17 +32,17 @@ export class CryptographicIdentityStoreService implements ICryptographicIdentity
 
 	public getAllProvisions(): IFuture<IProvision[]> {
 		return (() => {
-			var data = this.$server.mobileprovisions.getProvisions().wait();
+			let data = this.$server.mobileprovisions.getProvisions().wait();
 			return _.map(data, (identityData) => <IProvision>identityData);
 		}).future<IProvision[]>()();
 	}
 
 	public getAllIdentities(): IFuture<ICryptographicIdentity[]> {
 		return (() => {
-			var data = this.$server.identityStore.getIdentities().wait();
+			let data = this.$server.identityStore.getIdentities().wait();
 			return _.map(data, (identityData) => {
-				var identity: any = identityData;
-				var certificateOrganization = this.$x509.load(identity.Certificate).issuerData['O'];
+				let identity: any = identityData;
+				let certificateOrganization = this.$x509.load(identity.Certificate).issuerData['O'];
 				identity.isiOS = certificateOrganization === CryptographicIdentityConstants.APPLE_INC;
 				return <ICryptographicIdentity>identity;
 			});
@@ -62,10 +62,10 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public listCertificates(): IFuture<void> {
 		return ((): any => {
-			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
-				var cert = this.$x509.load(identity.Certificate);
+				let cert = this.$x509.load(identity.Certificate);
 				this.$logger.out("%s: '%s', expires on %s, issued by %s", (index + 1).toString(), identity.Alias,
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
@@ -80,7 +80,7 @@ export class IdentityManager implements Server.IIdentityManager {
 		this.$logger.out("%s: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
 			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 		if (options.verbose || options.v) {
-			var devices = provision.ProvisionedDevices;
+			let devices = provision.ProvisionedDevices;
 			if(devices && devices.length) {
 				this.$logger.out("  Provisioned device identifiers:");
 				devices.sort();
@@ -96,12 +96,12 @@ export class IdentityManager implements Server.IIdentityManager {
 	public listProvisions(provisionStr?: string): IFuture<void> {
 		return (() => {
 			if(provisionStr) {
-				var provision = this.findProvision(provisionStr).wait();
+				let provision = this.findProvision(provisionStr).wait();
 				this.printProvisionData(provision, 0);
 				return;
 			}
 
-			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 			provisions = _.sortBy(provisions, (provision) => provision.Name);
 
 			_.forEach(provisions, (provision, provisionIndex) => {
@@ -117,8 +117,8 @@ export class IdentityManager implements Server.IIdentityManager {
 	public findCertificate(identityStr: string): IFuture<ICryptographicIdentity> {
 		return ((): any => {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
-			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
-			var result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
+			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if(!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
 					"a valid index. List registered certificates with 'certificate' command.", identityStr);
@@ -131,8 +131,8 @@ export class IdentityManager implements Server.IIdentityManager {
 	public findProvision(provisionStr: string): IFuture<IProvision> {
 		return ((): any => {
 			this.$logger.debug("Looking for provision '%s'", provisionStr);
-			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
-			var result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
+			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			let result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
 			if(!result) {
 				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'provision' command.", provisionStr);
@@ -145,24 +145,24 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision> {
 		return ((): IProvision => {
-			var provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
-			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 
 			provisions = _.filter(provisions, (prov) => _.contains(provisionTypes, prov.ProvisionType));
 			if(provisions.length === 0) {
 				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
 			}
 
-			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
+			let validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{ deviceIdentifier: deviceIdentifier, appIdentifier: appIdentifier });
 
-			var passedProvisions: IProvision[] = [];
-			var failedProvisions: IFailedProvision[] = [];
+			let passedProvisions: IProvision[] = [];
+			let failedProvisions: IFailedProvision[] = [];
 
 			_.each(provisions, (prov: IProvision) => {
-				var validationResult = validator.validateProvision(prov);
-				var hasCompatibleCertificate = false;
-				var error = validationResult.error;
+				let validationResult = validator.validateProvision(prov);
+				let hasCompatibleCertificate = false;
+				let error = validationResult.error;
 				if(validationResult.isSuccessful) {
 					hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().isSuccessful);
 					if(!hasCompatibleCertificate) {
@@ -177,17 +177,17 @@ export class IdentityManager implements Server.IIdentityManager {
 				}
 			});
 
-			var provision = _(provisionTypes)
+			let provision = _(provisionTypes)
 				.map((type) => _.find(passedProvisions, (prov) => prov.ProvisionType === type))
 				.find((prov) => Boolean(prov));
 
 			if(provision) {
 				return provision;
 			} else {
-				var composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
+				let composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
 
-				var iterator = (result: string, data: IFailedProvision) => {
-					var currentError = util.format('Cannot use provision "%s" because the following error occurred: %s %s',
+				let iterator = (result: string, data: IFailedProvision) => {
+					let currentError = util.format('Cannot use provision "%s" because the following error occurred: %s %s',
 						data.provision.Name, data.error, os.EOL);
 					return result + currentError;
 				};
@@ -201,12 +201,12 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public autoselectCertificate(provisionData: IProvision): IFuture<ICryptographicIdentity> {
 		return ((): ICryptographicIdentity => {
-			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 
-			var validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
+			let validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{ deviceIdentifier: null, appIdentifier: null });
 
-			var identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().isSuccessful);
+			let identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().isSuccessful);
 
 			if(identity) {
 				return identity;
@@ -218,14 +218,14 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	public isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean {
-		var formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
+		let formattedCertificate = helpers.stringReplaceAll(certificate.Certificate, /[\r\n]/, "");
 
 		return _.some(provision.Certificates, (c: string) => formattedCertificate.indexOf(c) >= 0);
 	}
 
 	public findReleaseCertificate(): IFuture<ICryptographicIdentity> {
 		return (() => {
-			var identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			return _.find(identities, (identity: ICryptographicIdentity) => this.$selfSignedIdentityValidator.validateCertificate(true, identity.Certificate));
 		}).future<ICryptographicIdentity>()();
 	}
@@ -240,7 +240,7 @@ class IdentityGenerationDataFactory {
 	};
 
 	public static create(identityModel: ISelfSignedIdentityModel): Server.IdentityGenerationData {
-		var identityGenerationData = <Server.IdentityGenerationData> {
+		let identityGenerationData = <Server.IdentityGenerationData> {
 			StartDate: new Date(identityModel.StartDate),
 			Attributes: {},
 			EndDate: new Date(identityModel.EndDate),
@@ -251,7 +251,7 @@ class IdentityGenerationDataFactory {
 	}
 
 	public static getDistinguishedNameValues(name: string, email: string, countryCode: string): any {
-		var distinguishedNameValues: IStringDictionary = Object.create(null);
+		let distinguishedNameValues: IStringDictionary = Object.create(null);
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.CN] = name;
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.EmailAddress] = email;
 		distinguishedNameValues[IdentityGenerationDataFactory.derObjectIdentifierNames.C] = countryCode;
@@ -279,14 +279,14 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 
 	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
 		return (() => {
-			var myCountry = model.Country;
+			let myCountry = model.Country;
 			if(!myCountry) {
 				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
 				myCountry = this.getDefaultCountry().wait();
 			}
 
-			var user = this.$userDataStore.getUser().wait();
-			var schema: any = [];
+			let user = this.$userDataStore.getUser().wait();
+			let schema: any = [];
 
 			if(!model.Name) {
 				schema.push({
@@ -304,7 +304,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 					message: "Email",
 					default: () => user.email,
 					validate: (value: string) => {
-						var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
+						let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Email: value }, "Email");
 						return validationResult.isSuccessful ? true : validationResult.error;
 					}
 				});
@@ -317,8 +317,8 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 						message: "Country",
 						default: () => myCountry,
 						validate: (value: string) => {
-							var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
-							var message = [validationResult.error, "Valid countries are:"];
+							let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
+							let message = [validationResult.error, "Valid countries are:"];
 							message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
 							return validationResult.isSuccessful ? true : message.join("\n");
 						}
@@ -333,8 +333,8 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 	private getDefaultCountry(): IFuture<string> {
 		return (() => {
 			try {
-				var locationResponse:Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
-				var location:any = JSON.parse(locationResponse.body);
+				let locationResponse:Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
+				let location:any = JSON.parse(locationResponse.body);
 				return location.country_name;
 			} catch(err) {
 				return "";
@@ -357,12 +357,12 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var type = args[3];
+			let type = args[3];
 			if(type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
 				this.$errors.fail("Certificate type must be either 'Generic' or 'GooglePlay'");
 			}
 
-			var identityInfo: IIdentityInformation = {
+			let identityInfo: IIdentityInformation = {
 				Name: args[0],
 				Email: args[1],
 				Country: args[2]
@@ -375,14 +375,14 @@ export class CreateSelfSignedIdentity implements ICommand {
 			this.model.StartDate = args[4];
 			this.model.EndDate = args[5];
 
-			var promptSchema = this.getPromptSchema(this.model);
+			let promptSchema = this.getPromptSchema(this.model);
 
 			if(promptSchema.length > 0) {
 				this.model = this.$prompter.get(promptSchema).wait();
 				_.extend(this.model, identityInfo);
 			}
 
-			var endDate = this.model.EndDate;
+			let endDate = this.model.EndDate;
 			if(!endDate) {
 				endDate = this.$prompter.get([{
 					message: "Valid until (yyyy-mm-dd)",
@@ -390,7 +390,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 					name: "EndDate",
 					default: () => this.getDefaultEndDate(this.isForGooglePlay()),
 					validate: (value: string) => {
-						var validationResult = this.$selfSignedIdentityValidator.
+						let validationResult = this.$selfSignedIdentityValidator.
 							validateProperty(<ISelfSignedIdentityModel>{
 								ForGooglePlayPublishing: this.isForGooglePlay().toString(),
 								StartDate: this.model["StartDate"] || this.getHistoryValue("StartDate"),
@@ -403,8 +403,8 @@ export class CreateSelfSignedIdentity implements ICommand {
 				_.extend(this.model, endDate);
 			}
 
-			var identityGenerationData = IdentityGenerationDataFactory.create(this.model);
-			var result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
+			let identityGenerationData = IdentityGenerationDataFactory.create(this.model);
+			let result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
 			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
 		}).future<void>()();
 	}
@@ -414,7 +414,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
 	private getPromptSchema(defaults: any): IPromptSchema[] {
-		var promptSchema: any = [];
+		let promptSchema: any = [];
 		if(!defaults.ForGooglePlayPublishing) {
 			promptSchema.push({
 					message: "Is for Google Play publishing?",
@@ -431,7 +431,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 					name: "StartDate",
 					default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
 					validate: (value:string) => {
-						var validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{StartDate: value}, "StartDate");
+						let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{StartDate: value}, "StartDate");
 						return validationResult.isSuccessful ? true : validationResult.error;
 					}
 				});
@@ -478,8 +478,8 @@ export class RemoveCryptographicIdentity implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var nameOrIndex = args[0];
-			var identity = this.$identityManager.findCertificate(nameOrIndex).wait();
+			let nameOrIndex = args[0];
+			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
 
 			if(this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
@@ -504,12 +504,12 @@ export class ExportCryptographicIdentity implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var nameOrIndex = args[0];
-			var password = args[1];
+			let nameOrIndex = args[0];
+			let password = args[1];
 
-			var identity = this.$identityManager.findCertificate(nameOrIndex).wait();
-			var name = identity.Alias;
-			var sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
+			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
+			let name = identity.Alias;
+			let sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
 
 			if(sanitizedName.length == 0) {
 				sanitizedName = "exported_certificate";
@@ -518,7 +518,7 @@ export class ExportCryptographicIdentity implements ICommand {
 				sanitizedName = (sanitizedName + "_certificate").trim();
 			}
 
-			var targetFileName = path.join(this.getPath(), util.format("%s.%s", sanitizedName,
+			let targetFileName = path.join(this.getPath(), util.format("%s.%s", sanitizedName,
 				CryptographicIdentityConstants.PKCS12_EXTENSION));
 
 			if(this.$fs.exists(targetFileName).wait()) {
@@ -529,7 +529,7 @@ export class ExportCryptographicIdentity implements ICommand {
 				password = this.$prompter.getPassword("Exported file password").wait();
 			}
 
-			var targetFile = this.$fs.createWriteStream(targetFileName);
+			let targetFile = this.$fs.createWriteStream(targetFileName);
 
 			this.$logger.info("Exporting certificate to file '%s'.", targetFileName);
 			this.$server.identityStore.getIdentity(name, password, targetFile).wait();
@@ -537,7 +537,7 @@ export class ExportCryptographicIdentity implements ICommand {
 	}
 
 	private getPath(): string {
-		var path: string = options.path;
+		let path: string = options.path;
 		delete options.path;
 
 		if(!path) {
@@ -565,17 +565,17 @@ export class ImportCryptographicIdentity implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var certificateFile = args[0];
-			var password = args[1];
-			var isPasswordRequired = false;
+			let certificateFile = args[0];
+			let password = args[1];
+			let isPasswordRequired = false;
 
-			var extension = path.extname(certificateFile).toLowerCase();
+			let extension = path.extname(certificateFile).toLowerCase();
 			if(extension !== ".p12" && extension !== ".cer") {
 				this.$errors.fail("To add a cryptographic identity to the list, import a P12 file " +
 					"that contains an existing cryptographic identity or a CER file that contains the " +
 					"certificate generated from a certificate signing request.")
 			}
-			var importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
+			let importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
 
 			if(!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
@@ -585,11 +585,11 @@ export class ImportCryptographicIdentity implements ICommand {
 				isPasswordRequired = true;
 			}
 
-			var targetFile : any;
-			var result : Server.CryptographicIdentityData[];
-			var noErrorOccurred : boolean;
+			let targetFile : any;
+			let result : Server.CryptographicIdentityData[];
+			let noErrorOccurred : boolean;
 
-			for (var i = 0; i < CryptographicIdentityConstants.MAX_ALLOWED_PASSWORD_ATTEMPTS; ++i) {
+			for (let i = 0; i < CryptographicIdentityConstants.MAX_ALLOWED_PASSWORD_ATTEMPTS; ++i) {
 				noErrorOccurred = true;
 				targetFile = this.$fs.createReadStream(certificateFile);
 				if (isPasswordRequired) {
@@ -632,7 +632,7 @@ class CreateCertificateSigningRequest implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var model: IIdentityInformation = {
+			let model: IIdentityInformation = {
 				Name: args[0],
 				Email: args[1],
 				Country: args[2]
@@ -640,11 +640,11 @@ class CreateCertificateSigningRequest implements ICommand {
 
 			model = this.$identityInformationGatherer.gatherIdentityInformation(model).wait();
 
-			var subjectNameValues = IdentityGenerationDataFactory.getDistinguishedNameValues(
+			let subjectNameValues = IdentityGenerationDataFactory.getDistinguishedNameValues(
 				model.Name, model.Email, model.Country);
-			var certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
+			let certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
 
-			var downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
+			let downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
 			downloader.downloadCertificate(certificateData.UniqueName).wait();
 		}).future<void>()();
 	}
@@ -659,7 +659,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
+			let requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
 				this.$logger.out("%s: %s", (i + 1).toString(), req.Subject);
@@ -679,14 +679,14 @@ interface ICertificateSigningRequest {
 
 function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): IFuture<ICertificateSigningRequest> {
 	return ((): ICertificateSigningRequest => {
-		var requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
+		let requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
 		requests = _.sortBy(requests, (req) => req.UniqueName);
 
-		var index = parseInt(indexStr, 10) - 1;
+		let index = parseInt(indexStr, 10) - 1;
 		if(index < 0 || index >= requests.length) {
 			$errors.fail("No certificate with number '%s' exists", indexStr);
 		}
-		var req = requests[index];
+		let req = requests[index];
 		return req;
 	}).future<ICertificateSigningRequest>()();
 }
@@ -703,9 +703,9 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var indexStr = args[0];
+			let indexStr = args[0];
 
-			var req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
+			let req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
 
 			if(this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
 				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
@@ -732,19 +732,19 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var indexStr = args[0];
+			let indexStr = args[0];
 			if(!indexStr) {
 				this.$errors.fail("Specify certificate signing request index to download.");
 			}
 
-			var req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
+			let req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
 			this.downloadCertificate(req.UniqueName).wait();
 		}).future<void>()();
 	}
 
 	public downloadCertificate(uniqueName: string): IFuture<void> {
 		return ((): void => {
-			var targetFileName = options["save-to"];
+			let targetFileName = options["save-to"];
 			if(targetFileName) {
 				if(this.$fs.exists(targetFileName).wait()) {
 					this.$errors.fail("The output file already exists.");
@@ -753,7 +753,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 				targetFileName = this.$fs.getUniqueFileName("certificate_request.csr").wait();
 			}
 
-			var targetFile = this.$fs.createWriteStream(targetFileName);
+			let targetFile = this.$fs.createWriteStream(targetFileName);
 			this.$logger.info("Writing certificate signing request to %s", path.resolve(targetFileName));
 			this.$server.identityStore.getCertificateRequest(uniqueName, targetFile).wait();
 		}).future<void>()();
@@ -769,7 +769,7 @@ class FileNameCommandParameter implements ICommandParameter {
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			var fileName = validationValue;
+			let fileName = validationValue;
 			if(!fileName) {
 				this.$errors.fail("No file specified.");
 			}
@@ -807,7 +807,7 @@ class ImportProvisionCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var fileName = args[0];
+			let fileName = args[0];
 			if(!fileName) {
 				this.$errors.fail("No file specified.");
 			}
@@ -816,8 +816,8 @@ class ImportProvisionCommand implements ICommand {
 				this.$errors.fail({ formatStr: "File '%s' does not exist.", suppressCommandHelp: true }, fileName);
 			}
 
-			var provisionFile = this.$fs.createReadStream(fileName);
-			var provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
+			let provisionFile = this.$fs.createReadStream(fileName);
+			let provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
 			this.$commandsService.tryExecuteCommand("provision", []).wait();
@@ -849,7 +849,7 @@ class RemoveProvisionCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			var provisionData = this.$identityManager.findProvision(args[0]).wait();
+			let provisionData = this.$identityManager.findProvision(args[0]).wait();
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 

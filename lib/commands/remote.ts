@@ -25,7 +25,7 @@ export class PortCommandParameter implements ICommandParameter {
 				this.$errors.fail("You must specify a port number.");
 			}
 
-			var parsedPortNumber = parseInt(validationValue);
+			let parsedPortNumber = parseInt(validationValue);
 
 			if(isNaN(parsedPortNumber) || parsedPortNumber <= 0 || parsedPortNumber >= 65536) {
 				this.$errors.failWithoutHelp("You must specify a valid port number. Valid values are between 1 and 65535.");
@@ -60,14 +60,14 @@ export class RemoteCommand implements ICommand {
 				this.$errors.fail("You must specify a valid port number. Valid values are between 1 and 65535.");
 			}
 
-			var parsedPortNumber = parseInt(args[0]);
+			let parsedPortNumber = parseInt(args[0]);
 			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
 
 			this.$express.post("/launch", (req: express.Request, res: express.Response) => this.onLaunchRequest(req, res));
-			var domain = this.$domainNameSystem.getDomains().wait()[0];
+			let domain = this.$domainNameSystem.getDomains().wait()[0];
 
 			this.$express.listen(parsedPortNumber, () => {
-				var ipAddress = ip.address();
+				let ipAddress = ip.address();
 				this.$logger.info("Listening on port " + parsedPortNumber);
 				if(domain) {
 					this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in one of the following formats:\n" +
@@ -91,8 +91,8 @@ export class RemoteCommand implements ICommand {
 			this.$fs.deleteDirectory(this.appBuilderDir).wait();
 			this.$fs.createDirectory(this.appBuilderDir).wait();
 
-			var deviceFamily = req.query.deviceFamily.toLowerCase();
-			var archive = this.$fs.createWriteStream(this.packageLocation);
+			let deviceFamily = req.query.deviceFamily.toLowerCase();
+			let archive = this.$fs.createWriteStream(this.packageLocation);
 			archive.on('error', (err: Error) => {
 				this.$logger.error('Could not save the uploaded file. ' + err);
 				res.status(500).send('Could not save the uploaded file. ' + err).end();
@@ -103,7 +103,7 @@ export class RemoteCommand implements ICommand {
 
 			this.$fs.unzip(this.packageLocation, this.appBuilderDir).wait();
 
-			var appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
+			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
 
 			options.deviceType = deviceFamily;
 			this.$iOSEmulatorServices.checkAvailability(false).wait();

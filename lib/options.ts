@@ -7,9 +7,9 @@ import commonOptions = require("./common/options");
 import helpers = require("./helpers");
 import hostInfo = require("./common/host-info");
 
-declare var exports: any;
+declare let exports: any;
 
-var knownOpts: any = {
+let knownOpts: any = {
 		"companion": Boolean,
 		"download": Boolean,
 		"certificate": String,
@@ -41,10 +41,10 @@ var knownOpts: any = {
 _.extend(commonOptions.knownOpts, knownOpts);
 _.extend(commonOptions.shorthands, shorthands);
 
-var defaultProfileDir = helpers.defaultProfileDir();
+let defaultProfileDir = helpers.defaultProfileDir();
 commonOptions.setProfileDir(defaultProfileDir);
 
-var errors: IErrors = $injector.resolve("errors");
+let errors: IErrors = $injector.resolve("errors");
 _(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.shorthands)).each((val,key) => {
 	key = shorthands[key] || key;
 	commonOptions[key] = val;

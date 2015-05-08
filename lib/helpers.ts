@@ -14,14 +14,14 @@ export function fromWindowsRelativePathToUnix(windowsRelativePath: string): stri
 }
 
 export function getRelativeToRootPath(rootPath: string, filePath: string): string {
-	var relativeToRootPath = filePath.substr(rootPath.length);
+	let relativeToRootPath = filePath.substr(rootPath.length);
 	return relativeToRootPath;
 }
 
 export function toHash(collection: any, keySelector: (value: any, positionOrKey: any, collection: any) => string, valueSelector: (value: any, positionOrKey: any, collection: any) => any): any {
-	var result:any = {};
+	let result:any = {};
 	if (_.isArray(collection)) {
-		for (var i = 0; i < collection.length; ++i) {
+		for (let i = 0; i < collection.length; ++i) {
 			result[keySelector(collection[i], i, collection)] =
 				valueSelector(collection[i], i, collection);
 		}
@@ -87,25 +87,25 @@ interface IFormatting {
 }
 
 function formatListInMultipleColumns(list: string[], columns: number): IFormatting {
-	var rows = Math.ceil(list.length / columns);
-	var columnList = new Array<Array<string>>();
-	for (var i = 0; i < columns; ++i) {
+	let rows = Math.ceil(list.length / columns);
+	let columnList = new Array<Array<string>>();
+	for (let i = 0; i < columns; ++i) {
 		columnList.push(_.take(list, rows));
 		list = _.rest(list, rows);
 	}
 
-	var extents = _.map(columnList, (sublist) => _.max(sublist, (element: string) => element.length).length);
+	let extents = _.map(columnList, (sublist) => _.max(sublist, (element: string) => element.length).length);
 
-	var formattedRows: string[] = [];
-	var width: number;
-	for (var r = 0; r < rows; ++r) {
-		var rowItems:string[] = [];
-		for (var c = 0; c < columns; ++c) {
-			var item = columnList[c][r] || "";
-			var padding = _.map(_.range(extents[c] - item.length), (x) => " ").join("");
+	let formattedRows: string[] = [];
+	let width: number;
+	for (let r = 0; r < rows; ++r) {
+		let rowItems:string[] = [];
+		for (let c = 0; c < columns; ++c) {
+			let item = columnList[c][r] || "";
+			let padding = _.map(_.range(extents[c] - item.length), (x) => " ").join("");
 			rowItems.push(item + padding);
 		}
-		var formattedRow = rowItems.join(" ");
+		let formattedRow = rowItems.join(" ");
 		formattedRows.push(formattedRow);
 		width = formattedRow.length;
 	}
@@ -116,10 +116,10 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 }
 
 export function formatListForDisplayInMultipleColumns(list: string[]): string {
-	var consoleWidth = process.stdout.columns;
-	var bestFormatting: IFormatting;
-	for (var i = 1; i <= 8; ++i) {
-		var formatting = formatListInMultipleColumns(list, i);
+	let consoleWidth = process.stdout.columns;
+	let bestFormatting: IFormatting;
+	for (let i = 1; i <= 8; ++i) {
+		let formatting = formatListInMultipleColumns(list, i);
 		if (formatting.width <= consoleWidth || !bestFormatting) {
 			bestFormatting = formatting;
 		}
@@ -134,7 +134,7 @@ export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (
 
 	data = _.sortBy(data, selector);
 
-	var identityData = _.find(data, (item) => selector(item).indexOf(identityStr) === 0);
+	let identityData = _.find(data, (item) => selector(item).indexOf(identityStr) === 0);
 	if (identityData) {
 		return identityData;
 	}
@@ -143,7 +143,7 @@ export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (
 		identityStr = identityStr.substr(1);
 	}
 
-	var index = parseInt(identityStr, 10) - 1;
+	let index = parseInt(identityStr, 10) - 1;
 	if (index >= 0 && index < data.length) {
 		return data[index];
 	}
@@ -159,14 +159,14 @@ export function exitOnStdinEnd(): void {
 export function versionCompare(version1: string, version2: string): number {
 	version1 = version1.split("-")[0];
 	version2 = version2.split("-")[0];
-	var v1array = _.map(version1.split("."), (x) => parseInt(x, 10)),
+	let v1array = _.map(version1.split("."), (x) => parseInt(x, 10)),
 		v2array = _.map(version2.split("."), (x) => parseInt(x, 10));
 
 	if (v1array.length !== v2array.length) {
 		throw new Error("Version strings are not in the same format");
 	}
 
-	for (var i = 0; i < v1array.length; ++i) {
+	for (let i = 0; i < v1array.length; ++i) {
 		if (v1array[i] !== v2array[i]) {
 			return v1array[i] > v2array[i] ? 1 : -1;
 		}
@@ -184,7 +184,7 @@ export function toBoolean(str: string): boolean {
 }
 
 export function mergeRecursive(obj1: Object, obj2: Object): Object {
-	for (var p in obj2) {
+	for (let p in obj2) {
 		if(!obj1.hasOwnProperty(p)) {
 			obj1[p] = obj2[p];
 			continue;
@@ -212,8 +212,8 @@ export function block(operation: () => void): void {
 
 // Remove when node incorporates ES6 array.fill
 export function fill(value: string, times: number): string[]{
-	var repeatedValues: string[] = [];
-	for(var repeat = 0; repeat < times; repeat++) {
+	let repeatedValues: string[] = [];
+	for(let repeat = 0; repeat < times; repeat++) {
 		repeatedValues.push(value);
 	}
 
@@ -221,6 +221,6 @@ export function fill(value: string, times: number): string[]{
 }
 
 export function defaultProfileDir(): string {
-	var cacheRootDirectoryPath = hostInfo.isWindows() ? process.env.LocalAppData : path.join(osenv.home(), ".local/share");
+	let cacheRootDirectoryPath = hostInfo.isWindows() ? process.env.LocalAppData : path.join(osenv.home(), ".local/share");
 	return path.join(cacheRootDirectoryPath, "Telerik", "BlackDragon", ".appbuilder-cli");
 }

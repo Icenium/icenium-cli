@@ -47,7 +47,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public getDisplayNameForVersion(version: string): IFuture<string> {
 		return ((): string => {
-			var framework = _.find(this.getSupportedFrameworks().wait(), (fw: Server.FrameworkVersion) => fw.Version === version);
+			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: Server.FrameworkVersion) => fw.Version === version);
 			if(framework) {
 				return framework.DisplayName;
 			}
@@ -60,9 +60,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 
-			var cliSupportedVersions: Server.FrameworkVersion[] = [];
+			let cliSupportedVersions: Server.FrameworkVersion[] = [];
 			_.each(this.$server.cordova.getCordovaFrameworkVersions().wait(), (fw: Server.FrameworkVersion) => {
-				var version = this.parseMscorlibVersion(fw.Version);
+				let version = this.parseMscorlibVersion(fw.Version);
 				if(helpers.versionCompare(version, this.minSupportedVersion) >= 0) {
 					cliSupportedVersions.push(new FrameworkVersion(fw.DisplayName, version));
 				}
@@ -86,15 +86,15 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]> {
 		return (() => {
-			var isUpgrade = helpers.versionCompare(fromVersion, toVersion) < 0;
-			var smallerVersion = isUpgrade ? fromVersion : toVersion;
-			var biggerVersion = isUpgrade ? toVersion : fromVersion;
+			let isUpgrade = helpers.versionCompare(fromVersion, toVersion) < 0;
+			let smallerVersion = isUpgrade ? fromVersion : toVersion;
+			let biggerVersion = isUpgrade ? toVersion : fromVersion;
 
-			var renames = _.select(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
+			let renames = _.select(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
 				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
-			var transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
+			let transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
 
 			plugins = _.map(plugins, plugin => {
 				_.each(transitions, transition => {
@@ -106,7 +106,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				return plugin;
 			});
 
-			var supportedPlugins = this.pluginsForVersion(toVersion).wait();
+			let supportedPlugins = this.pluginsForVersion(toVersion).wait();
 			plugins = _.filter(plugins, plugin => _.contains(supportedPlugins, plugin));
 
 			return plugins;
@@ -115,16 +115,16 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public downloadCordovaMigrationData(): IFuture<void> {
 		return (() => {
-			var json = this.$server.cordova.getMigrationData().wait();
-			var renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(
+			let json = this.$server.cordova.getMigrationData().wait();
+			let renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(
 				this.parseMscorlibVersion(plugin.Version),
 				plugin.OldName,
 				plugin.NewName));
 
-			var supportedVersions = _.map(json.SupportedVersions, plugin => this.parseMscorlibVersion(plugin));
-			var cliSupportedVersions = _.select(supportedVersions, (version: string) => helpers.versionCompare(version, this.minSupportedVersion) >= 0);
+			let supportedVersions = _.map(json.SupportedVersions, plugin => this.parseMscorlibVersion(plugin));
+			let cliSupportedVersions = _.select(supportedVersions, (version: string) => helpers.versionCompare(version, this.minSupportedVersion) >= 0);
 
-			var integratedPlugins: { [version: string]: string[] } = {};
+			let integratedPlugins: { [version: string]: string[] } = {};
 			_.each(cliSupportedVersions, version => {
 				integratedPlugins[version] = json.IntegratedPlugins[version];
 			});

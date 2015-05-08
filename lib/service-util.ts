@@ -30,10 +30,11 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 			headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 
+			let cookies: IStringDictionary;
 			if (this.shouldAuthenticate) {
-				var cookies = this.$userDataStore.getCookies().wait();
+				cookies = this.$userDataStore.getCookies().wait();
 				if (cookies) {
-					var cookieValues = _.map(_.pairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
+					let cookieValues = _.map(_.pairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
 					headers.Cookie = cookieValues.join("; ");
 				}
 			}
@@ -42,7 +43,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 				headers.Accept = accept;
 			}
 
-			var requestOpts: any = {
+			let requestOpts: any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
 				path: "/appbuilder/" + path,
@@ -56,13 +57,14 @@ export class ServiceProxy implements Server.IServiceProxy {
 					throw new Error("TODO: CustomFormData not implemented");
 				}
 
-				var theBody = bodyValues[0];
+				let theBody = bodyValues[0];
 				requestOpts.body = theBody.value;
 				requestOpts.headers["Content-Type"] = theBody.contentType;
 			}
 
+			let response: Server.IResponse;
 			try {
-				var response = this.$httpClient.httpRequest(requestOpts).wait();
+				response = this.$httpClient.httpRequest(requestOpts).wait();
 			} catch(err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
@@ -73,13 +75,13 @@ export class ServiceProxy implements Server.IServiceProxy {
 			}
 
 			this.$logger.debug("%s (%s %s) returned %d", name, method, path, response.response.statusCode);
-			var newCookies = response.headers["set-cookie"];
+			let newCookies = response.headers["set-cookie"];
 
 			if (newCookies) {
 				this.$userDataStore.parseAndSetCookies(newCookies, cookies).wait();
 			}
 
-			var resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
+			let resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
 			return resultValue;
 		}).future<any>()();
 	}

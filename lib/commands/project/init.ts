@@ -49,8 +49,8 @@ export class InitProjectCommand implements ICommand {
 
 	private isProjectType(projectType: string): IFuture<boolean> {
 		return (() => {
-			var result = true;
-			var projectData = this.projectFilesDescriptors[projectType];
+			let result = true;
+			let projectData = this.projectFilesDescriptors[projectType];
 
 			_.each(projectData.mandatoryFiles, (file: FileDescriptor) => {
 				if(!this.$fs.exists(file.path).wait()) {

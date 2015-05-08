@@ -9,7 +9,7 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			var supportedVersions: Server.FrameworkVersion[] = this.$cordovaMigrationService.getSupportedFrameworks().wait();
+			let supportedVersions: Server.FrameworkVersion[] = this.$cordovaMigrationService.getSupportedFrameworks().wait();
 
 			if(this.$project.projectData) {
 				this.$logger.info("Your project is using version " + this.$cordovaMigrationService.getDisplayNameForVersion(this.$project.projectData["FrameworkVersion"]).wait());

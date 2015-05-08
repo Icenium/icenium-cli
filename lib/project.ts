@@ -76,18 +76,18 @@ export class Project implements Project.IProject {
 
 	public getProjectTargets(): IFuture<string[]> {
 		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			var projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
+			let projectDir = this.getProjectDir().wait();
+			let projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
 			return projectTargets;
 		}).future<string[]>()();
 	}
 
 	public getConfigFileContent(template: string): IFuture<any> {
 		return (() => {
-			var configFile = _.find(this.projectConfigFiles, configFile => configFile.template === template);
+			let configFile = _.find(this.projectConfigFiles, configFile => configFile.template === template);
 			if(configFile) {
 				try {
-					var configFileContent = this.$fs.readText(configFile.filepath).wait();
+					let configFileContent = this.$fs.readText(configFile.filepath).wait();
 					return configFileContent;
 				} catch(e) {
 					return null;
@@ -100,13 +100,13 @@ export class Project implements Project.IProject {
 
 	public configurationFilesString(): string {
 		if(!this.frameworkProject) {
-			var result: string[] = [];
+			let result: string[] = [];
 
 			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
-				var frameworkProject = this.$frameworkProjectResolver.resolve(framework);
-				var configFiles = frameworkProject.configFiles;
+				let frameworkProject = this.$frameworkProjectResolver.resolve(framework);
+				let configFiles = frameworkProject.configFiles;
 				if(configFiles && configFiles.length > 0) {
-					var title = util.format("Configuration files for %s projects:", framework);
+					let title = util.format("Configuration files for %s projects:", framework);
 					result.push(title);
 					result.push(this.configurationFilesStringCore(configFiles));
 				}
@@ -125,7 +125,7 @@ export class Project implements Project.IProject {
 	}
 
 	public get configurations(): string[] {
-		var configurations: string[] = [];
+		let configurations: string[] = [];
 		if(options.debug || options.d) {
 			configurations.push(this.$projectConstants.DEBUG_CONFIGURATION_NAME);
 		}
@@ -147,7 +147,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getBuildConfiguration(): string {
-		var configuration = options.release || options.r ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
+		let configuration = options.release || options.r ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
 		return configuration.charAt(0).toUpperCase() + configuration.slice(1);
 	}
 
@@ -157,7 +157,7 @@ export class Project implements Project.IProject {
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
 		if(this._hasBuildConfigurations) {
-			var configData = this.configurationSpecificData[configuration];
+			let configData = this.configurationSpecificData[configuration];
 			if (!configData) {
 				configData = Object.create(null);
 				this.configurationSpecificData[configuration] = configData;
@@ -176,7 +176,7 @@ export class Project implements Project.IProject {
 			}
 			this.cachedProjectDir = null;
 
-			var projectDir = path.resolve(options.path || ".");
+			let projectDir = path.resolve(options.path || ".");
 			while(true) {
 				this.$logger.trace("Looking for project in '%s'", projectDir);
 
@@ -186,7 +186,7 @@ export class Project implements Project.IProject {
 					break;
 				}
 
-				var dir = path.dirname(projectDir);
+				let dir = path.dirname(projectDir);
 				if(dir === projectDir) {
 					this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
 					break;
@@ -201,7 +201,7 @@ export class Project implements Project.IProject {
 	public createTemplateFolder(projectDir: string): IFuture<void> {
 		return (() => {
 			this.$fs.createDirectory(projectDir).wait();
-			var projectDirFiles = this.$fs.readDirectory(projectDir).wait();
+			let projectDirFiles = this.$fs.readDirectory(projectDir).wait();
 
 			if(projectDirFiles.length !== 0) {
 				this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
@@ -230,7 +230,7 @@ export class Project implements Project.IProject {
 			this.$errors.fail("No project name specified.")
 		}
 
-		var projectDir = this.getNewProjectDir();
+		let projectDir = this.getNewProjectDir();
 		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 		return this.createFromTemplate(projectName, projectDir);
 	}
@@ -243,13 +243,13 @@ export class Project implements Project.IProject {
 				this.$errors.fail({ formatStr: util.format("The specified folder '%s' does not exist!", projectDir), suppressCommandHelp: true });
 			}
 
-			var projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+			let projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 			if(this.$fs.exists(projectFile).wait()) {
 				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
 			}
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
-			var blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
+			let blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
 
 			this.createProjectFileFromExistingProject(projectDir, appName).wait();
@@ -261,7 +261,7 @@ export class Project implements Project.IProject {
 		return ((): void => {
 			appName = appName || path.basename(projectDir);
 
-			var properties = this.getProjectPropertiesFromExistingProject(projectDir, appName).wait();
+			let properties = this.getProjectPropertiesFromExistingProject(projectDir, appName).wait();
 			this.projectData = this.alterPropertiesForNewProject(properties, appName);
 
 			try {
@@ -294,8 +294,8 @@ export class Project implements Project.IProject {
 
 	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			var projectFiles = this.$projectFilesManager.enumerateProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles).wait();
+			let projectDir = this.getProjectDir().wait();
+			let projectFiles = this.$projectFilesManager.enumerateProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles).wait();
 			return projectFiles;
 		}).future<string[]>()();
 	}
@@ -306,7 +306,7 @@ export class Project implements Project.IProject {
 				return;
 			}
 
-			var validWPSdks = this.getSupportedWPFrameworks().wait();
+			let validWPSdks = this.getSupportedWPFrameworks().wait();
 			if(!_.contains(validWPSdks, newVersion)) {
 				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
 			}
@@ -315,16 +315,16 @@ export class Project implements Project.IProject {
 			if(helpers.versionCompare(newVersion, "8.0") > 0) {
 				// at least Cordova 3.7 is required
 				if(helpers.versionCompare(this.projectData.FrameworkVersion, "3.7.0") < 0) {
-					var cordovaVersions = this.$cordovaMigrationService.getSupportedFrameworks().wait();
+					let cordovaVersions = this.$cordovaMigrationService.getSupportedFrameworks().wait();
 
 					// Find last framework which is not experimental.
-					var selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1);
+					let selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1);
 					if(helpers.versionCompare(selectedFramework.Version, "3.7.0") < 0) {
 						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
 						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
 					}
 
-					var shouldUpdateFramework = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to %s?", newVersion, selectedFramework.DisplayName)).wait()
+					let shouldUpdateFramework = this.$prompter.confirm(`You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.DisplayName}?`).wait()
 					if(shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
 						this.projectData.FrameworkVersion = selectedFramework.Version;
@@ -345,7 +345,7 @@ export class Project implements Project.IProject {
 			this.ensureAllPlatformAssets().wait();
 
 			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
-				var shouldUpdateWPSdk = this.$prompter.confirm(util.format("You cannot build with the Windows Phone %s SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?", this.projectData.WPSdk)).wait();
+				let shouldUpdateWPSdk = this.$prompter.confirm(`You cannot build with the Windows Phone ${this.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`).wait();
 				if(shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
 					this.projectData.WPSdk = "8.0";
@@ -354,24 +354,24 @@ export class Project implements Project.IProject {
 				}
 			}
 
-			var versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
+			let versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
 			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
-			var oldVersion = this.projectData.FrameworkVersion;
+			let oldVersion = this.projectData.FrameworkVersion;
 
 			_.each(this.configurations, (configuration: string) => {
-				var oldPluginsList = this.getProperty("CorePlugins", configuration);
-				var newPluginsList = this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
+				let oldPluginsList = this.getProperty("CorePlugins", configuration);
+				let newPluginsList = this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
 				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 				this.setProperty("CorePlugins", newPluginsList, configuration);
 			});
 
-			var backedUpFiles: string[] = [],
+			let backedUpFiles: string[] = [],
 				backupSuffix = ".backup";
 			try {
 				_.each(this.$mobileHelper.platformNames, (platform) => {
 					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
-					var cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
-					var cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
+					let cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
+					let cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
 					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
 					backedUpFiles.push(cordovaJsFileName);
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
@@ -395,11 +395,11 @@ export class Project implements Project.IProject {
 
 	public getSupportedPlugins(): IFuture<string[]> {
 		return (() => {
-			var version: string;
+			let version: string;
 			if(this.projectData) {
 				version = this.projectData.FrameworkVersion;
 			} else {
-				var selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1));
+				let selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1));
 				version = selectedFramework.Version;
 			}
 
@@ -409,8 +409,8 @@ export class Project implements Project.IProject {
 
 	public getSupportedWPFrameworks(): IFuture<string[]>{
 		return ((): string[]=> {
-			var validValues: string[] = [];
-			var projectSchema = this.getProjectSchema().wait();
+			let validValues: string[] = [];
+			let projectSchema = this.getProjectSchema().wait();
 			if(projectSchema) {
 				validValues = this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]).wait();
 			}
@@ -421,7 +421,7 @@ export class Project implements Project.IProject {
 
 	public getTempDir(extraSubdir?: string): IFuture<string> {
 		return (() => {
-			var dir = path.join(this.getProjectDir().wait(), ".ab");
+			let dir = path.join(this.getProjectDir().wait(), ".ab");
 			this.$fs.createDirectory(dir).wait();
 			if(extraSubdir) {
 				dir = path.join(dir, extraSubdir);
@@ -448,14 +448,14 @@ export class Project implements Project.IProject {
 	public printProjectProperty(property: string): IFuture<void> {
 		return (() => {
 			if(this.projectData) {
-				var schema: any = this.getProjectSchema().wait();
+				let schema: any = this.getProjectSchema().wait();
 
 				if(property) {
-					var normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
+					let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
 
 					if(options.validValue) {
 						// '$ appbuilder prop print <PropName> --validValue' called inside project dir
-						var prop: any = schema[normalizedPropertyName];
+						let prop: any = schema[normalizedPropertyName];
 						this.printValidValuesOfProperty(prop).wait();
 					} else {
 						// '$ appbuilder prop print <PropName>' called inside project dir
@@ -470,17 +470,17 @@ export class Project implements Project.IProject {
 				} else {
 					if(options.validValue) {
 						// 'appbuilder prop print --validValue' called inside project dir
-						var propKeys: any = _.keys(schema);
-						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
+						let propKeys: any = _.keys(schema);
+						let sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
 						_.each(sortedProperties, propKey => {
-							var prop = schema[propKey];
+							let prop = schema[propKey];
 							this.$logger.info("  " + propKey);
 							this.printValidValuesOfProperty(prop).wait();
 						});
 					} else {
 						// 'appbuilder prop print' called inside project dir
-						var propKeys: any = _.keys(this.projectData);
-						var sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
+						let propKeys: any = _.keys(this.projectData);
+						let sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
 						_.each(sortedProperties, (propertyName: string) => this.$logger.out(propertyName + ": " + this.projectData[propertyName]));
 						this.printConfigurationSpecificData();
 					}
@@ -488,10 +488,10 @@ export class Project implements Project.IProject {
 			} else {
 				// We'll get here only when command is called outside of project directory and --validValue is specified
 				if(property) {
-					var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+					let targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
 					_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
-						var projectSchema: IDictionary<any> = this.$jsonSchemaValidator.tryResolveValidationSchema(targetFrameworkIdentifier);
-						var currentProp = _.find(_.keys(projectSchema), key => key === property);
+						let projectSchema: IDictionary<any> = this.$jsonSchemaValidator.tryResolveValidationSchema(targetFrameworkIdentifier);
+						let currentProp = _.find(_.keys(projectSchema), key => key === property);
 						if(currentProp) {
 							this.$logger.out("  Project type %s:", targetFrameworkIdentifier);
 							this.printValidValuesOfProperty(projectSchema[currentProp]).wait();
@@ -514,7 +514,7 @@ export class Project implements Project.IProject {
 				this.$logger.trace("%sDesired pattern is: %s", Project.INDENTATION, property.pattern);
 			}
 
-			var validValues: string[] = this.$projectPropertiesService.getValidValuesForProperty(property).wait();
+			let validValues: string[] = this.$projectPropertiesService.getValidValuesForProperty(property).wait();
 			if(validValues) {
 				this.$logger.out("%sValid values:", Project.INDENTATION);
 				_.forEach(validValues, value => {
@@ -525,7 +525,7 @@ export class Project implements Project.IProject {
 	}
 
 	private hasConfigurationSpecificDataForProperty(normalizedPropertyName: string): boolean {
-		var properties = _(this.configurationSpecificData)
+		let properties = _(this.configurationSpecificData)
 			.values()
 			.map(val => _.keys(val))
 			.flatten()
@@ -540,23 +540,23 @@ export class Project implements Project.IProject {
 
 		return _.map(property,  (value, key) => {
 			// use '\n' not os.EOL as cli-table does not handle \r\n very well
-			var delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
+			let delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
 			return util.format('%s%s:%s%s', indentation, key, delimiter, this.getPropertyValueAsArray(value, indentation + '   ').join('\n'));
 		});
 	}
 
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string): any[] {
-		var numberOfConfigs = _.keys(this.configurationSpecificData).length;
-		var configsDataForProperty: any[] = _(this.configurationSpecificData)
+		let numberOfConfigs = _.keys(this.configurationSpecificData).length;
+		let configsDataForProperty: any[] = _(this.configurationSpecificData)
 			.values()
 			.map(config => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
 			.value();
 
-		var sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
-		var valuesInAllConfigs = _.map(sharedValues, value => helpers.fill(value, numberOfConfigs));
-		var configSpecificValues = _.map(configsDataForProperty, config => _.difference(config, sharedValues));
+		let sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
+		let valuesInAllConfigs = _.map(sharedValues, value => helpers.fill(value, numberOfConfigs));
+		let configSpecificValues = _.map(configsDataForProperty, config => _.difference(config, sharedValues));
 
-		var maxLength = _(configSpecificValues)
+		let maxLength = _(configSpecificValues)
 			.values()
 			.map(value => value.length)
 			.max();
@@ -569,7 +569,7 @@ export class Project implements Project.IProject {
 	}
 
 	private printConfigurationSpecificData(): void {
-		var properties = <string[]>_(this.configurationSpecificData)
+		let properties = <string[]>_(this.configurationSpecificData)
 			.values()
 			.map(properties => _.keys(properties))
 			.flatten()
@@ -583,18 +583,18 @@ export class Project implements Project.IProject {
 	}
 
 	private printConfigurationSpecificDataForProperty(property: string): void {
-		var data = this.getConfigurationSpecificDataForProperty(property);
-		var headers = _.keys(this.configurationSpecificData);
-		var table = commonHelpers.createTable(headers, data);
+		let data = this.getConfigurationSpecificDataForProperty(property);
+		let headers = _.keys(this.configurationSpecificData);
+		let table = commonHelpers.createTable(headers, data);
 		this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
 		return (() => {
-			var validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
+			let validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
 			if(_.contains(validProperties, property)) {
-				var normalizedPropertyName =  this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
-				var isArray = this.$jsonSchemaValidator.getPropertyType(this.projectData.Framework, normalizedPropertyName) === "array";
+				let normalizedPropertyName =  this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
+				let isArray = this.$jsonSchemaValidator.getPropertyType(this.projectData.Framework, normalizedPropertyName) === "array";
 				if(!isArray) {
 					if(!args || args.length === 0 ) {
 						this.$errors.fail("Property %s requires a single value.", property);
@@ -635,7 +635,7 @@ export class Project implements Project.IProject {
 
 	public ensureAllPlatformAssets(): IFuture<void> {
 		return (() => {
-			var projectDir = this.getProjectDir().wait();
+			let projectDir = this.getProjectDir().wait();
 			this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion).wait();
 		}).future<void>()();
 	}
@@ -653,7 +653,7 @@ export class Project implements Project.IProject {
 			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
 
 			_.each(this.configurations, (configuration: string) => {
-				var configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
+				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
 				if(this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
 					this.$fs.writeJson(configFilePath, this.configurationSpecificData[configuration]).wait();
@@ -664,17 +664,17 @@ export class Project implements Project.IProject {
 
 	public zipProject(): IFuture<string> {
 		return (() => {
-			var tempDir = this.getTempDir().wait();
+			let tempDir = this.getTempDir().wait();
 
-			var projectZipFile = path.join(tempDir, "Build.zip");
+			let projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile).wait();
-			var projectDir = this.getProjectDir().wait();
+			let projectDir = this.getProjectDir().wait();
 
-			var files = this.enumerateProjectFiles().wait();
-			var zipOp = this.$fs.zipFiles(projectZipFile, files,
+			let files = this.enumerateProjectFiles().wait();
+			let zipOp = this.$fs.zipFiles(projectZipFile, files,
 				p => this.getProjectRelativePath(p, projectDir));
 
-			var result = new Future<string>();
+			let result = new Future<string>();
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
 			return result.wait();
 		}).future<string>()();
@@ -685,11 +685,11 @@ export class Project implements Project.IProject {
 			this.ensureProject();
 
 			this.$loginManager.ensureLoggedIn().wait();
-			var projectZipFile = this.zipProject().wait();
-			var fileSize = this.$fs.getFileSize(projectZipFile).wait();
+			let projectZipFile = this.zipProject().wait();
+			let fileSize = this.$fs.getFileSize(projectZipFile).wait();
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
-			var projectName = this.projectData.ProjectName;
-			var bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
+			let projectName = this.projectData.ProjectName;
+			let bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
 			this.$logger.printInfoMessageOnSameLine("Uploading...");
 			if(fileSize > Project.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
@@ -724,12 +724,12 @@ export class Project implements Project.IProject {
 
 	private readProjectData(): IFuture<void> {
 		return (() => {
-			var projectDir = this.getProjectDir().wait();
-			var shouldSaveProject = false;
+			let projectDir = this.getProjectDir().wait();
+			let shouldSaveProject = false;
 			if(projectDir) {
-				var projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
+				let projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 				try {
-					var data = this.$fs.readJson(projectFilePath).wait();
+					let data = this.$fs.readJson(projectFilePath).wait();
 					if(data.projectVersion && data.projectVersion.toString() !== "1") {
 						this.$errors.fail("FUTURE_PROJECT_VER");
 					}
@@ -753,25 +753,25 @@ export class Project implements Project.IProject {
 						this.$jsonSchemaValidator.validate(this.projectData);
 					}
 
-					var debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
+					let debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
 					if(options.debug && !this.$fs.exists(debugProjectFile).wait()) {
 						this.$fs.writeJson(debugProjectFile, {}).wait();
 					}
 
-					var releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
+					let releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
 					if(options.release && !this.$fs.exists(releaseProjectFile).wait()) {
 						this.$fs.writeJson(releaseProjectFile, {}).wait();
 					}
 
-					var allProjectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
+					let allProjectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
 						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
 					});
 
 					_.each(allProjectFiles, (configProjectFile: string) => {
-						var configMatch = path.basename(configProjectFile).match(Project.CONFIGURATION_FROM_FILE_NAME_REGEX);
+						let configMatch = path.basename(configProjectFile).match(Project.CONFIGURATION_FROM_FILE_NAME_REGEX);
 						if(configMatch && configMatch.length > 1) {
-							var configurationName = configMatch[1];
-							var configProjectContent = this.$fs.readJson(configProjectFile).wait();
+							let configurationName = configMatch[1];
+							let configProjectContent = this.$fs.readJson(configProjectFile).wait();
 							this.configurationSpecificData[configurationName.toLowerCase()] = configProjectContent;
 							this._hasBuildConfigurations = true;
 						}
@@ -802,9 +802,9 @@ export class Project implements Project.IProject {
 
 	private createFromTemplate(appname: string, projectDir: string): IFuture<void> {
 		return (() => {
-			var templatesDir = this.$templatesService.projectTemplatesDir;
-			var template = options.template || this.frameworkProject.defaultProjectTemplate;
-			var templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
+			let templatesDir = this.$templatesService.projectTemplatesDir;
+			let template = options.template || this.frameworkProject.defaultProjectTemplate;
+			let templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
 
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if(this.$fs.exists(templateFileName).wait()) {
@@ -816,7 +816,7 @@ export class Project implements Project.IProject {
 					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
 					this.$logger.trace("Reading template project properties.");
 
-					var properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
+					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
@@ -831,9 +831,9 @@ export class Project implements Project.IProject {
 					throw ex;
 				}
 			} else {
-				var templates = this.frameworkProject.projectTemplatesString().wait();
+				let templates = this.frameworkProject.projectTemplatesString().wait();
 
-				var message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
+				let message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
 					options.template,
 					os.EOL,
 					templates);
@@ -860,13 +860,13 @@ export class Project implements Project.IProject {
 
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<IProjectData> {
 		return ((): any => {
-			var projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
-				var extension = path.extname(file);
+			let projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
+				let extension = path.extname(file);
 				return extension == ".proj" || extension == ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
 			});
 
 			if(projectFile) {
-				var isJsonProjectFile = projectFile === this.$projectConstants.PROJECT_FILE;
+				let isJsonProjectFile = projectFile === this.$projectConstants.PROJECT_FILE;
 				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject).wait();
 			}
 

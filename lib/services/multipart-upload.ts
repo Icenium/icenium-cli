@@ -22,13 +22,13 @@ export class MultipartUploadService implements IMultipartUploadService {
 
 	public uploadFileByChunks(filePath: string, bucketKey: string): IFuture<void> {
 		return (() => {
-			var fileSize: number = this.$fs.getFileSize(filePath).wait();
-			var chunkStartByte = 0,
+			let fileSize: number = this.$fs.getFileSize(filePath).wait();
+			let chunkStartByte = 0,
 				endByte: number;
 
 			this.$server.upload.initUpload(bucketKey).wait();
 
-			var chunks: IFuture<void>[] = [];
+			let chunks: IFuture<void>[] = [];
 			while(chunkStartByte < fileSize) {
 				// exclusive endByte
 				endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;
@@ -40,8 +40,8 @@ export class MultipartUploadService implements IMultipartUploadService {
 					endByte = fileSize;
 				}
 
-				var chunkStream = this.$fs.createReadStream(filePath, { start: chunkStartByte, end: endByte });
-				var future = this.uploadChunk(bucketKey, chunkStartByte, endByte, chunkStream, fileSize);
+				let chunkStream = this.$fs.createReadStream(filePath, { start: chunkStartByte, end: endByte });
+				let future = this.uploadChunk(bucketKey, chunkStartByte, endByte, chunkStream, fileSize);
 				chunks.push(future);
 				chunkStartByte = endByte;
 				if(chunks.length === MultipartUploadService.MAX_CONCURRENT_UPLOADS) {
@@ -54,14 +54,14 @@ export class MultipartUploadService implements IMultipartUploadService {
 				Future.wait(chunks);
 			}
 
-			var fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
+			let fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
 
 			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
 		}).future<void>()();
 	}
 
 	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {
-		var headers = {
+		let headers = {
 			"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize),
 			"Content-Length": endIndex - startingIndex
 		};

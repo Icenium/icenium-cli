@@ -25,9 +25,9 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 
 	public prepareAppScaffolding(): IFuture<void> {
 		return (() => {
-			var appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
+			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
 			appScaffoldingConfig.pathToSave = options.screenBuilderCacheDir;
-			var afterPrepareAction = () => {
+			let afterPrepareAction = () => {
 				return (() => {
 					this.npmInstall("glob-watcher@0.0.8").wait(); // HACK: With this we are able to make paths shorter with 20 symbols.
 					this.npmInstall().wait();
@@ -40,7 +40,7 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 
 	protected npmInstall(packageToInstall?: string): IFuture<void> {
 		packageToInstall = packageToInstall || "";
-		var command = util.format("npm install %s --production", packageToInstall);
+		let command = util.format("npm install %s --production", packageToInstall);
 		return this.$childProcess.exec(command, {cwd: this.appScaffoldingPath });
 	}
 

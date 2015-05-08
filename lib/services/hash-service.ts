@@ -2,7 +2,7 @@
 "use strict";
 
 import Future = require("fibers/future");
-var crypto = require("crypto");
+let crypto = require("crypto");
 import util = require("util");
 
 export class HashService implements IHashService {
@@ -17,9 +17,9 @@ export class HashService implements IHashService {
 		return ((): string => {
 			this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding).wait();
 
-			var cryptoHash = crypto.createHash(hashAlgorithm);
-			var future = new Future<void>();
-			var fileStr = this.$fs.createReadStream(filePath);
+			let cryptoHash = crypto.createHash(hashAlgorithm);
+			let future = new Future<void>();
+			let fileStr = this.$fs.createReadStream(filePath);
 			fileStr.on("data", (chunk: NodeBuffer) => {
 				cryptoHash.update(chunk, inputEncoding);
 			});
@@ -60,7 +60,7 @@ export class HashService implements IHashService {
 	}
 
 	private validateHashAlgorithm(hashAlgorithm: string): void {
-		var hashes = crypto.getHashes();
+		let hashes = crypto.getHashes();
 		if(!_.contains(hashes, hashAlgorithm)) {
 			this.$errors.fail(util.format("Specified hash algorithm %s is not valid. Valid algorithms are %s", hashAlgorithm, hashes));
 		}

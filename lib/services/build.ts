@@ -5,7 +5,7 @@ import util = require("util");
 import querystring = require("querystring");
 import path = require("path");
 import os = require("os");
-var options: any = require("../common/options");
+let options: any = require("../common/options");
 import plist = require("plist");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
@@ -41,14 +41,14 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			// escape URLs twice to work around a bug in bit.ly
-			var fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+			let fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
 				this.$config.AB_SERVER_PROTO,
 				this.$config.AB_SERVER, urlKind,
 				querystring.escape(querystring.escape(filesystemPath)),
 				querystring.escape(querystring.escape(liveSyncToken)));
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
-			var url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
+			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
 			if(urlKind === "manifest") {
 				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
 			}
@@ -66,17 +66,17 @@ export class BuildService implements Project.IBuildService {
 
 			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration,{ AppIdentifier: buildProperties.AppIdentifier }).wait();
 
-			var liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
+			let liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
 			buildProperties.LiveSyncToken = liveSyncToken;
 
-			var buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
+			let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
 			this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000).wait();
 			this.$logger.printInfoMessageOnSameLine(os.EOL);
 
-			var body = buildProjectFuture.get();
-			var buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
-				var fullPath = buildResult.FullPath.replace(/\\/g, "/");
-				var solutionPath = util.format("%s/%s", projectName, fullPath);
+			let body = buildProjectFuture.get();
+			let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
+				let fullPath = buildResult.FullPath.replace(/\\/g, "/");
+				let solutionPath = util.format("%s/%s", projectName, fullPath);
 
 				return {
 					platform: buildResult.Platform,
@@ -97,9 +97,9 @@ export class BuildService implements Project.IBuildService {
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
 			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
-			var projectData = this.$project.projectData;
+			let projectData = this.$project.projectData;
 
-			var buildProperties: any = {
+			let buildProperties: any = {
 				Configuration: settings.configuration,
 				Platform: settings.platform,
 				AppIdentifier: projectData.AppIdentifier,
@@ -119,7 +119,7 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
 				buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
 
-				var certificateData: ICryptographicIdentity;
+				let certificateData: ICryptographicIdentity;
 				if(options.certificate) {
 					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
 				} else if(settings.buildForTAM) {
@@ -147,15 +147,15 @@ export class BuildService implements Project.IBuildService {
 					buildProperties.AndroidCodesigningIdentity = "";
 				}
 
-				var result = this.beginBuild(buildProperties).wait();
+				let result = this.beginBuild(buildProperties).wait();
 				return result;
 			} else if(settings.platform === "iOS") {
-				var appIdentifier = projectData.AppIdentifier;
+				let appIdentifier = projectData.AppIdentifier;
 
-				var configFileContent = this.$project.getConfigFileContent("ios-info").wait();
+				let configFileContent = this.$project.getConfigFileContent("ios-info").wait();
 				if(configFileContent) {
-					var parsed = plist.parse(configFileContent);
-					var cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
+					let parsed = plist.parse(configFileContent);
+					let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
 					if(cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
 						appIdentifier = cfBundleIdentifier;
 					}
@@ -166,9 +166,9 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
 
-				var completeAutoselect = (!options.provision && !options.certificate);
+				let completeAutoselect = (!options.provision && !options.certificate);
 
-				var provisionData: IProvision;
+				let provisionData: IProvision;
 				if(options.provision) {
 					provisionData = this.$identityManager.findProvision(options.provision).wait();
 					if(settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
@@ -176,13 +176,13 @@ export class BuildService implements Project.IBuildService {
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
 					}
 				} else if(!settings.buildForiOSSimulator) {
-					var deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
+					let deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
 					provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes, deviceIdentifier).wait();
 					options.provision = provisionData.Name;
 				}
 				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
 
-				var certificateData: ICryptographicIdentity;
+				let certificateData: ICryptographicIdentity;
 				if(options.certificate) {
 					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
 				} else if(!settings.buildForiOSSimulator) {
@@ -192,7 +192,7 @@ export class BuildService implements Project.IBuildService {
 				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
 
 				if(!completeAutoselect) {
-					var iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
+					let iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
 						appIdentifier: appIdentifier,
 						deviceIdentifier: settings.device ? settings.device.getIdentifier() : null
 					});
@@ -207,13 +207,13 @@ export class BuildService implements Project.IBuildService {
 					buildProperties.iOSCodesigningIdentity = certificateData.Alias;
 				}
 
-				var buildResult = this.beginBuild(buildProperties).wait();
+				let buildResult = this.beginBuild(buildProperties).wait();
 				if(provisionData) {
 					buildResult.provisionType = provisionData.ProvisionType;
 				}
 				return buildResult;
 			} else if(settings.platform === "WP8") {
-				var buildCompanyHubApp = !settings.downloadFiles;
+				let buildCompanyHubApp = !settings.downloadFiles;
 				if(this.$project.projectData.WPSdk === "8.1" && ((options.release && settings.downloadFiles) || settings.buildForTAM)) {
 					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
 						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
@@ -249,10 +249,10 @@ export class BuildService implements Project.IBuildService {
 				}
 			});
 
-			var result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
+			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if(result.output) {
-				var buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
+				let buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
 				this.$fs.writeFile(buildLogFilePath, result.output).wait();
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
@@ -276,18 +276,18 @@ export class BuildService implements Project.IBuildService {
 				return;
 			}
 
-			var templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			var targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
+			let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
+			let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each(zipped => {
-				var srcFile = zipped[0];
-				var targetFile = zipped[1];
+				let srcFile = zipped[0];
+				let targetFile = zipped[1];
 				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
 				this.$fs.copyFile(srcFile, targetFile).wait();
 			}).value();
 
-			var scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
-			var htmlTemplateContents = this.$fs.readText(scanFile).wait();
+			let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
+			let htmlTemplateContents = this.$fs.readText(scanFile).wait();
 			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
 				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
 			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
@@ -310,8 +310,8 @@ export class BuildService implements Project.IBuildService {
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
 			this.$project.importProject().wait();
 
-			var buildResult = this.requestCloudBuild(settings).wait();
-			var packageDefs = buildResult.packageDefs;
+			let buildResult = this.requestCloudBuild(settings).wait();
+			let packageDefs = buildResult.packageDefs;
 
 			if((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
 				this.$logger.info("Package built with '%s' provision type. Downloading package, instead of generating QR code.", buildResult.provisionType);
@@ -325,13 +325,13 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			if(settings.showQrCodes) {
-				var urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
-				var liveSyncToken = buildResult.buildProperties.LiveSyncToken;
+				let urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
+				let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
 
-				var packageDownloadViewModels = _.map(packageDefs, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					var liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
+				let packageDownloadViewModels = _.map(packageDefs, (def: Server.IPackageDef): IPackageDownloadViewModel => {
+					let liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
 
-					var packageUrl = (urlKind !== "package")
+					let packageUrl = (urlKind !== "package")
 						? this.getLiveSyncUrl("package", def.relativePath, liveSyncToken).wait()
 						: liveSyncUrl;
 					this.$logger.debug("Download URL is '%s'", packageUrl);
@@ -348,8 +348,8 @@ export class BuildService implements Project.IBuildService {
 				});
 
 				if(settings.platform === "WP8") {
-					var aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
-					var aetDef: IPackageDownloadViewModel = {
+					let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
+					let aetDef: IPackageDownloadViewModel = {
 						qrUrl: aetUrl,
 						qrImageData: this.$qr.generateDataUri(aetUrl),
 						packageUrls: [{ packageUrl: aetUrl, downloadText: "Download application enrollment token" }],
@@ -363,11 +363,11 @@ export class BuildService implements Project.IBuildService {
 
 			if(settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					var targetFileName = settings.downloadedFilePath
+					let targetFileName = settings.downloadedFilePath
 						|| path.join(this.$project.getProjectDir().wait(), path.basename(pkg.solutionPath));
 
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
-					var targetFile = this.$fs.createWriteStream(targetFileName);
+					let targetFile = this.$fs.createWriteStream(targetFileName);
 					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
 					this.$logger.info("Download completed: %s", targetFileName);
 					pkg.localFile = targetFileName;
@@ -382,7 +382,7 @@ export class BuildService implements Project.IBuildService {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
-			var result = this.build({
+			let result = this.build({
 				platform: platform,
 				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
@@ -432,8 +432,8 @@ export class BuildService implements Project.IBuildService {
 					options.download = true;
 				}
 
-				var willDownload = options.download;
-				var provisionTypes = [constants.ProvisionType.AdHoc];
+				let willDownload = options.download;
+				let provisionTypes = [constants.ProvisionType.AdHoc];
 				if(willDownload) {
 					provisionTypes.push(constants.ProvisionType.Development);
 				}
@@ -461,12 +461,12 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.importProject().wait();
 
-			var appIdentifier = AppIdentifier.createAppIdentifier(platform, this.$project.projectData.AppIdentifier, true);
+			let appIdentifier = AppIdentifier.createAppIdentifier(platform, this.$project.projectData.AppIdentifier, true);
 
-			var liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
+			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
-			var hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			var fullDownloadPath = util.format(appIdentifier.liveSyncFormat, appIdentifier.encodeLiveSyncHostUri(hostPart), querystring.escape(liveSyncToken));
+			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat, appIdentifier.encodeLiveSyncHostUri(hostPart), querystring.escape(liveSyncToken));
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 

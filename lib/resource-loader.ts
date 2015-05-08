@@ -39,13 +39,13 @@ class ResourceDownloader implements IResourceDownloader {
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
-			var cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
-			var platforms = this.$mobileHelper.platformNames;
+			let cordovaVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
+			let platforms = this.$mobileHelper.platformNames;
 			cordovaVersions.forEach((version) => {
 				platforms.forEach((platform) => {
-					var targetFilePath = this.$resources.buildCordovaJsFilePath(version, platform);
+					let targetFilePath = this.$resources.buildCordovaJsFilePath(version, platform);
 					this.$fs.createDirectory(path.dirname(targetFilePath)).wait();
-					var targetFile = this.$fs.createWriteStream(targetFilePath);
+					let targetFile = this.$fs.createWriteStream(targetFilePath);
 					this.$server.cordova.getJs(version, <any>platform, targetFile).wait();
 				});
 			});

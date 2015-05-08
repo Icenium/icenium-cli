@@ -25,7 +25,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	public validate(identityModel: ISelfSignedIdentityModel): IValidationResult {
-		var validationResult = BaseValidators.Helpers.validate([
+		let validationResult = BaseValidators.Helpers.validate([
 				() => this.validateName(identityModel.Name),
 				() => this.validateEmail(identityModel.Email),
 				() => this.validateCountry(identityModel.Country),
@@ -38,7 +38,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	public validateCertificate(forGooglePlayPublishing: boolean, certificatePem: string): boolean {
-		var cert = this.$x509.load(certificatePem);
+		let cert = this.$x509.load(certificatePem);
 		return this.validateStartDate(cert.issuedOn.toString()).isSuccessful
 			&& this.validateEndDate(forGooglePlayPublishing.toString(), cert.issuedOn.toString(), cert.expiresOn.toString()).isSuccessful;
 	}
@@ -101,15 +101,15 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateStartDate(startDate: string): IValidationResult {
-		var validationResult: IValidationResult = this.validateDate(startDate, "StartDate");
+		let validationResult: IValidationResult = this.validateDate(startDate, "StartDate");
 		return validationResult;
 	}
 
 	private validateEndDate(forGooglePlayPublishing: string, startDate: string, endDate: string): IValidationResult {
-		var parsedStartDate: Date = new Date(startDate);
-		var parsedEndDate: Date;
+		let parsedStartDate: Date = new Date(startDate);
+		let parsedEndDate: Date;
 
-		var validationResult: IValidationResult = this.validateDate(endDate, "EndDate");
+		let validationResult: IValidationResult = this.validateDate(endDate, "EndDate");
 		if (!validationResult.isSuccessful) {
 			return validationResult;
 		}

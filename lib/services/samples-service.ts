@@ -6,7 +6,7 @@ import util = require("util");
 import os = require("os");
 import temp = require("temp");
 import helpers = require("../helpers");
-var options: any = require("../common/options");
+let options: any = require("../common/options");
 
 class Sample {
 	constructor(public name: string,
@@ -63,34 +63,35 @@ export class SamplesService implements ISamplesService {
 
 	public cloneSample(sampleName: string): IFuture<void> {
 		return (() => {
-			var cloneTo = options.path || sampleName;
+			let cloneTo = options.path || sampleName;
 			if (this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 
-			var sampleNameLower = sampleName.toLowerCase();
-			var sample = _.find(this.getSamples().wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
+			let sampleNameLower = sampleName.toLowerCase();
+			let sample = _.find(this.getSamples().wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
 			if (!sample) {
 				this.$errors.fail("There is no sample named '%s'.", sampleName);
 			}
 
 			this.$logger.info("Cloning sample from GitHub...");
+			let tempDir: string;
 			try {
 				temp.track();
-				var tempDir = temp.mkdirSync("appbuilderSamples");
-				var filepath = path.join(tempDir, sampleName);
-				var file = this.$fs.createWriteStream(filepath);
-				var fileEnd = this.$fs.futureFromEvent(file, "finish");
+				tempDir = temp.mkdirSync("appbuilderSamples");
+				let filepath = path.join(tempDir, sampleName);
+				let file = this.$fs.createWriteStream(filepath);
+				let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-				var response = this.$httpClient.httpRequest({ url: sample.zipUrl, pipeTo: file }).wait();
+				let response = this.$httpClient.httpRequest({ url: sample.zipUrl, pipeTo: file }).wait();
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
-				var projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
-				var projectDir = path.dirname(projectFile);
-				var files = this.$fs.enumerateFilesInDirectorySync(projectDir);
+				let projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
+				let projectDir = path.dirname(projectFile);
+				let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {
-					var targetDir = path.join(cloneTo, file.replace(projectDir, ""));
+					let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
 					this.$fs.copyFile(file, targetDir).wait();
 				})
 			} finally {
@@ -106,21 +107,22 @@ export class SamplesService implements ISamplesService {
 
 	private getSamplesInformation(framework: string): IFuture<string> {
 		return (() => {
+			let availableSamples: Sample[];
 			try {
-				var availableSamples = this.getSamples(framework).wait();
+				availableSamples = this.getSamples(framework).wait();
 			} catch (error) {
 				return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
 			}
 
-			var sortedCategories = _.sortBy(this.sampleCategories, category => category.order);
-			var categories = _.map(sortedCategories, category => {
+			let sortedCategories = _.sortBy(this.sampleCategories, category => category.order);
+			let categories = _.map(sortedCategories, category => {
 				return {
 					name: category.name,
 					samples: _.filter(availableSamples, sample => sample.type === category.id)
 				}
 			});
 
-			var outputLines: string[] = [];
+			let outputLines: string[] = [];
 			_.each(categories, category => {
 				if (category.samples.length == 0) {
 					return;
@@ -129,10 +131,10 @@ export class SamplesService implements ISamplesService {
 				outputLines.push(util.format("   %s:%s   ======================", category.name, os.EOL));
 
 				_.each(category.samples, (sample: Sample) => {
-					var nameRow = util.format("      Sample: %s", sample.displayName);
-					var descriptionRow = util.format("      Description: %s", sample.description);
-					var gitClone = util.format("      Github repository page: %s", sample.githubUrl);
-					var cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
+					let nameRow = util.format("      Sample: %s", sample.displayName);
+					let descriptionRow = util.format("      Description: %s", sample.description);
+					let gitClone = util.format("      Github repository page: %s", sample.githubUrl);
+					let cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
 					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL));
 				});
 			});
@@ -157,9 +159,9 @@ export class SamplesService implements ISamplesService {
 
 	private getSamples(framework?: string): IFuture<Sample[]> {
 		return (() => {
-			var regex = this.getRegExpForFramework(framework);
-			var repos = _.select(this.getIceniumRepositories().wait(),(repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
-			var samples = _.map(repos, (repo: any) => {
+			let regex = this.getRegExpForFramework(framework);
+			let repos = _.select(this.getIceniumRepositories().wait(),(repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
+			let samples = _.map(repos, (repo: any) => {
 				return new Sample(
 					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
 					helpers.capitalizeFirstLetter(repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim()),
@@ -169,7 +171,7 @@ export class SamplesService implements ISamplesService {
 					this.getTypeFromDescription(repo.description));
 			});
 
-			var sortedSamples = _.sortBy(samples, sample => sample.displayName);
+			let sortedSamples = _.sortBy(samples, sample => sample.displayName);
 
 			return sortedSamples;
 		}).future<Sample[]>()();
@@ -178,8 +180,8 @@ export class SamplesService implements ISamplesService {
 	private getPagedResult(gitHubEndpointUrl: string, page: number): IFuture<string[]> {
 		return (() => {
 			try {
-				var requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
-				var result = JSON.parse(this.$httpClient.httpRequest(requestUrl).wait().body);
+				let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
+				let result = JSON.parse(this.$httpClient.httpRequest(requestUrl).wait().body);
 				return result;
 			} catch (error) {
 				this.$logger.debug(error);
@@ -194,11 +196,11 @@ export class SamplesService implements ISamplesService {
 	private getIceniumRepositories(): IFuture<string[]> {
 		return ((): string[] => {
 			if(!this._repos) {
-				var gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
+				let gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
 				this._repos = [];
 
-				for(var page = 1; ; ++page) {
-					var pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
+				for(let page = 1; ; ++page) {
+					let pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
 					if(_.isEmpty(pagedResult)) {
 						break;
 					}
@@ -211,9 +213,9 @@ export class SamplesService implements ISamplesService {
 	}
 
 	private getTypeFromDescription(description: string): string {
-		var sortedCategories = _.sortBy(this.sampleCategories, category => category.matchOrder);
+		let sortedCategories = _.sortBy(this.sampleCategories, category => category.matchOrder);
 
-		var matchedCategory = _.find(sortedCategories, category => category.regEx.test(description));
+		let matchedCategory = _.find(sortedCategories, category => category.regEx.test(description));
 		return matchedCategory ? matchedCategory.id : null;
 	}
 }

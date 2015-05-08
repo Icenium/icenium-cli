@@ -31,9 +31,9 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
 		return (() => {
-			var pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
-			var projectData = this.$project.projectData;
-			var corePlugins = this.$project.getProperty("CorePlugins", "debug");
+			let pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
+			let projectData = this.$project.projectData;
+			let corePlugins = this.$project.getProperty("CorePlugins", "debug");
 
 			return [
 				"--statusbarstyle", projectData.iOSStatusBarStyle,
@@ -48,20 +48,21 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<string> {
 		return (() => {
-			var packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
-			var pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
+			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
+			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
 
-			var pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + CordovaSimulatorService.PLUGINS_API_CONTRACT;
+			let pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + CordovaSimulatorService.PLUGINS_API_CONTRACT;
 
 			if (!this.$fs.exists(pluginsPath).wait()) {
+				let zipFile: any;
 				try {
 					this.$logger.info("Downloading core Cordova plugins...");
 
 					this.$fs.createDirectory(pluginsPath).wait();
-					var zipPath = path.join(pluginsPath, "plugins.zip");
+					let zipPath = path.join(pluginsPath, "plugins.zip");
 
 					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
-					var zipFile = this.$fs.createWriteStream(zipPath);
+					zipFile = this.$fs.createWriteStream(zipPath);
 					this.$server.cordova.getPluginsPackage(zipFile).wait();
 
 					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
@@ -80,7 +81,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 	}
 
 	private getPluginsDirName(serverVersion: string) {
-		var result: string;
+		let result: string;
 		if (this.$config.DEBUG) {
 			result = CordovaSimulatorService.PLUGINS_PACKAGE_IDENTIFIER;
 		} else {

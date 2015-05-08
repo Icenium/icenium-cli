@@ -23,9 +23,9 @@ export class EmulateAndroidCommand implements ICommand {
 			this.$androidEmulatorServices.checkDependencies().wait();
 			this.$androidEmulatorServices.checkAvailability().wait();
 
-			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
-			var packageFilePath = path.join(tempDir, "package.apk");
-			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+			let packageFilePath = path.join(tempDir, "package.apk");
+			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 				platform: this.$devicePlatformsConstants.Android,
 				showQrCodes: false,
 				downloadFiles: true,
@@ -53,11 +53,11 @@ export class EmulateIosCommand implements ICommand {
 		return (() => {
 			this.$iOSEmulatorServices.checkDependencies().wait();
 			this.$iOSEmulatorServices.checkAvailability().wait();
-			var app = "";
+			let app = "";
 
 			if(!options.availableDevices) {
-				var tempDir = this.$project.getTempDir("emulatorfiles").wait();
-				var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+				let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+				let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 					platform: this.$devicePlatformsConstants.iOS,
 					showQrCodes: false,
 					downloadFiles: true,
@@ -90,9 +90,9 @@ export class EmulateWp8Command implements ICommand {
 			this.$wp8EmulatorServices.checkDependencies().wait();
 			this.$wp8EmulatorServices.checkAvailability().wait();
 
-			var tempDir = this.$project.getTempDir("emulatorfiles").wait();
-			var packageFilePath = path.join(tempDir, "package.xap");
-			var packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+			let packageFilePath = path.join(tempDir, "package.xap");
+			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
 				platform: this.$devicePlatformsConstants.WP8,
 				configuration: "Debug",
 				showQrCodes: false,

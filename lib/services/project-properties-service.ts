@@ -21,7 +21,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData> {
 		return ((): any => {
-			var properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
+			let properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
 				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject).wait();
 
 			if (properties) {
@@ -33,7 +33,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {
-		var updated = false;
+		let updated = false;
 
 		if(!_.has(properties, "projectVersion")) {
 			this.$logger.warn("Missing 'projectVersion' property in .abproject. Default value '1' will be used.");
@@ -51,15 +51,15 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
 		return (() => {
 
-			var normalizedProperty = this.normalizePropertyName(property, projectData);
-			var isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
+			let normalizedProperty = this.normalizePropertyName(property, projectData);
+			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
 			if(isString) {
 				if (newValue.length > 1) {
 					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 				}
 			}
 
-			var propertyValue = projectData[normalizedProperty];
+			let propertyValue = projectData[normalizedProperty];
 
 			if (mode === "set") {
 				propertyValue = isString ? newValue[0] : newValue;
@@ -77,7 +77,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			var projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
+			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
 
 			// HACK - yargs parses double values (8.0) as integers (8)
 			if(normalizedProperty === "WPSdk") {
@@ -86,7 +86,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			}
 
-			var propData = projectSchema[normalizedProperty];
+			let propData = projectSchema[normalizedProperty];
 			if(propData && propData.onChanging) {
 				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
@@ -97,11 +97,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	public normalizePropertyName(propertyName: string, projectData: IProjectData): string {
-		var validProperties = this.getValidProperties(projectData);
-		var normalizedPropertyName = validProperties[propertyName.toLowerCase()];
+		let validProperties = this.getValidProperties(projectData);
+		let normalizedPropertyName = validProperties[propertyName.toLowerCase()];
 
 		if(!normalizedPropertyName) {
-			var message = util.format("Unrecognized project property '%s'. Use 'appbuilder prop print' command to lists all available property names.", propertyName);
+			let message = util.format("Unrecognized project property '%s'. Use 'appbuilder prop print' command to lists all available property names.", propertyName);
 			this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 		}
 
@@ -110,33 +110,33 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	public getPropertiesForAllSupportedProjects(): IFuture<string> {
 		return (() => {
-			var result: string[] = [];
-			var schemas: IDictionary<IDictionary<any>> = Object.create(null);
+			let result: string[] = [];
+			let schemas: IDictionary<IDictionary<any>> = Object.create(null);
 
-			var targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+			let targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
 			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
-				var projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
+				let projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
 				schemas[targetFrameworkIdentifier] = projectSchema;
 			});
 
 			// Get common properties
-			var schemaValues = _.values(schemas);
-			var firstArray = _.first(schemaValues);
-			var commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
+			let schemaValues = _.values(schemas);
+			let firstArray = _.first(schemaValues);
+			let commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
 				return _.all(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
 			});
 
 			_.each(_.keys(schemas), (targetFrameworkIdentifier: string) => {
-				var specificFrameworkPropertyNames = _.difference(_.keys(schemas[targetFrameworkIdentifier]), commonPropertyNames);
-				var specificFrameworkProperties: IDictionary<any> = Object.create(null);
+				let specificFrameworkPropertyNames = _.difference(_.keys(schemas[targetFrameworkIdentifier]), commonPropertyNames);
+				let specificFrameworkProperties: IDictionary<any> = Object.create(null);
 				_.each(specificFrameworkPropertyNames, (propertyName: string) => {
 					specificFrameworkProperties[propertyName] = schemas[targetFrameworkIdentifier][propertyName];
 				});
-				var title = util.format("Project properties for %s projects:", targetFrameworkIdentifier);
+				let title = util.format("Project properties for %s projects:", targetFrameworkIdentifier);
 				result.push(this.getProjectSchemaPartHelp(specificFrameworkProperties, title));
 			});
 
-			var commonProperties: IDictionary<string> = Object.create(null);
+			let commonProperties: IDictionary<string> = Object.create(null);
 			_.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
 			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
@@ -167,7 +167,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	public getValidValuesForProperty(propData: any): IFuture<string[]> {
 		return ((): string[] => {
-			var range = this.getPropRange(propData).wait();
+			let range = this.getPropRange(propData).wait();
 			if(range) {
 				return _.sortBy(_.values(range), (val: string) => {
 					return val.toUpperCase();
@@ -179,15 +179,15 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	private getProjectSchemaPartHelp(schema: any, title: string): string {
-		var help = [title];
+		let help = [title];
 		_.each(_.keys(schema), (propertyName: string) => {
-			var value = schema[propertyName];
+			let value = schema[propertyName];
 			help.push(util.format("  %s - %s", propertyName, value.description));
-			var range = this.getPropRange(value).wait();
+			let range = this.getPropRange(value).wait();
 			if (range) {
 				help.push("    Valid values:");
 				_.each(range, (rangeDesc:any, rangeKey:any) => {
-					var desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
+					let desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
 					if (rangeDesc.description) {
 						desc += " - " + rangeDesc.description;
 					}
@@ -207,11 +207,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): IFuture<any> {
 		return ((): any => {
-			var properties: any = {};
-			var result: any = xmlMapping.tojson(this.$fs.readText(projectFile).wait());
-			var propertyGroup: any = result.Project.PropertyGroup[0];
+			let properties: any = {};
+			let result: any = xmlMapping.tojson(this.$fs.readText(projectFile).wait());
+			let propertyGroup: any = result.Project.PropertyGroup[0];
 
-			var projectSchema = frameworkProject.getProjectFileSchema();
+			let projectSchema = frameworkProject.getProjectFileSchema();
 			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
 				if (propertyGroup.hasOwnProperty(propertyName)) {
 					properties[propertyName] = propertyGroup[propertyName][0];

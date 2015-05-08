@@ -6,7 +6,7 @@ import os = require("os");
 import helpers = require("../common/helpers");
 import path = require("path");
 import util = require("util");
-var Table = require("cli-table");
+let Table = require("cli-table");
 
 export class PublishService implements IPublishService {
 	private static JSON_PUBLISH_FILE_NAME = ".abpublish";
@@ -39,7 +39,7 @@ export class PublishService implements IPublishService {
 	}
 
 	public publish(idOrUrl: string, username: string, password: string): IFuture<void> {
-		var ftpConnectionData = this.getFtpConnectionData(idOrUrl, username, password).wait();
+		let ftpConnectionData = this.getFtpConnectionData(idOrUrl, username, password).wait();
 		return this.publishToRemote(ftpConnectionData);
 	}
 
@@ -49,7 +49,7 @@ export class PublishService implements IPublishService {
 			return;
 		}
 
-		var table = new Table({
+		let table = new Table({
 			head: ["Index", "Name", "Publish URL"],
 			chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 		});
@@ -64,7 +64,7 @@ export class PublishService implements IPublishService {
 
 	public addConnection(name: string, publishUrl: string): IFuture<void> {
 		return (() => {
-			var ftpPublishConnection: IPublishConnection = {
+			let ftpPublishConnection: IPublishConnection = {
 				type: PublishService.ALLOWED_CONNECTION_TYPE,
 				publicUrl: PublishService.PUBLIC_URL_DEFAULT_VALUE,
 				publishUrl: publishUrl,
@@ -91,13 +91,13 @@ export class PublishService implements IPublishService {
 
 	public removeConnection(idOrName: string): IFuture<void> {
 		return (() => {
-			var id = parseInt(idOrName) - 1;
-			var message : string;
+			let id = parseInt(idOrName) - 1;
+			let message : string;
 			if (!isNaN(id)) {
-				var removedConnection = this.removeConnectionById(id);
+				let removedConnection = this.removeConnectionById(id);
 				message = util.format("Connection '%s' successfully removed.", removedConnection.name);
 			} else {
-				var removedConnections = this.removeConnectionByName(idOrName).wait();
+				let removedConnections = this.removeConnectionByName(idOrName).wait();
 				message = removedConnections.length > 1 ? util.format("All connections named '%s' successfully removed.", idOrName) : util.format("Connection '%s' successfully removed.", removedConnections[0].name);
 			}
 
@@ -115,13 +115,13 @@ export class PublishService implements IPublishService {
 	private removeConnectionByName(name: string): IFuture<IPublishConnection[]> {
 		return (():IPublishConnection[] => {
 			name = name.toLowerCase();
-			var connectionsToBeRemoved = _.filter(this.ftpPublishConnections, c => c.name.toLowerCase() === name);
+			let connectionsToBeRemoved = _.filter(this.ftpPublishConnections, c => c.name.toLowerCase() === name);
 
 			if (connectionsToBeRemoved.length > 1) {
-				var connectionNameUrls = _.map(connectionsToBeRemoved, c => c.name + '(' + c.publishUrl + ')');
+				let connectionNameUrls = _.map(connectionsToBeRemoved, c => c.name + '(' + c.publishUrl + ')');
 				connectionNameUrls.push(PublishService.REMOVE_ALL_CONNECTIONS_MESSAGE);
 
-				var chosenConnectionNameUrl = this.$prompter.promptForChoice("Which connection do you want to remove?", connectionNameUrls).wait();
+				let chosenConnectionNameUrl = this.$prompter.promptForChoice("Which connection do you want to remove?", connectionNameUrls).wait();
 				if (chosenConnectionNameUrl === PublishService.REMOVE_ALL_CONNECTIONS_MESSAGE) {
 					return <IPublishConnection[]>_.remove(this.allPublishConnections, c => c.name.toLowerCase() === name && c.type === PublishService.ALLOWED_CONNECTION_TYPE);
 				} else {
@@ -137,8 +137,8 @@ export class PublishService implements IPublishService {
 
 	private readConnections(): IFuture<void> {
 		return (() => {
-			var projectDir = this.$project.getProjectDir().wait();
-			var publishFilePath = path.join(projectDir, PublishService.JSON_PUBLISH_FILE_NAME);
+			let projectDir = this.$project.getProjectDir().wait();
+			let publishFilePath = path.join(projectDir, PublishService.JSON_PUBLISH_FILE_NAME);
 			if (!this.$fs.exists(publishFilePath).wait()) {
 				this.allPublishConnections = [];
 				return;
@@ -156,7 +156,7 @@ export class PublishService implements IPublishService {
 
 	private getFtpConnectionData(idOrUrl: string, username: string, password: string): IFuture<Server.FtpConnectionData> {
 		return (() => {
-			var ftpConnectionData: Server.FtpConnectionData = {
+			let ftpConnectionData: Server.FtpConnectionData = {
 				RemoteUrl: idOrUrl,
 				ShouldPurge: options.force,
 				Username: username,
@@ -171,7 +171,7 @@ export class PublishService implements IPublishService {
 				ftpConnectionData.Password = this.$prompter.getPassword("Password:", {allowEmpty: true}).wait();
 			}
 
-			var id = parseInt(idOrUrl) - 1;
+			let id = parseInt(idOrUrl) - 1;
 
 			// the check whether it contains a dot is performed
 			// in case the user tries to publish to an IP address
@@ -187,8 +187,8 @@ export class PublishService implements IPublishService {
 
 	private publishToRemote(ftpConnectionData: Server.FtpConnectionData): IFuture<void> {
 		return (() => {
-			var projectName = this.$project.projectData.ProjectName;
-			var projectDir = this.$project.getProjectDir().wait();
+			let projectName = this.$project.projectData.ProjectName;
+			let projectDir = this.$project.getProjectDir().wait();
 			this.$projectFilesManager.excludeFile(projectDir, PublishService.JSON_PUBLISH_FILE_NAME);
 			this.$project.importProject().wait();
 			this.$logger.printInfoMessageOnSameLine("Publishing");
@@ -212,7 +212,7 @@ export class PublishService implements IPublishService {
 
 	private savePublishJsonFile(): IFuture<void> {
 		return (() => { 
-			var projectDir = this.$project.getProjectDir().wait();
+			let projectDir = this.$project.getProjectDir().wait();
 			this.$fs.writeJson(path.join(projectDir, PublishService.JSON_PUBLISH_FILE_NAME), this.allPublishConnections).wait();
 		}).future<void>()()
 	}

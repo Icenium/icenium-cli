@@ -17,10 +17,10 @@ import helpers = require("../lib/helpers");
 import os = require("os");
 import temp = require("temp");
 temp.track();
-var assert: chai.Assert = chai.assert;
+let assert: chai.Assert = chai.assert;
 
 function createTestInjector() {
-	var testInjector = new yok.Yok();
+	let testInjector = new yok.Yok();
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("childProcess", childProcess.ChildProcess);
 	testInjector.register("fs", fileSystem.FileSystem);
@@ -43,7 +43,7 @@ function createTestInjector() {
 }
 
 function setTempDir(): string {
-	var tempDir = temp.mkdirSync("edit-configuration");
+	let tempDir = temp.mkdirSync("edit-configuration");
 	options.path = tempDir;
 	return tempDir;
 }
@@ -52,31 +52,31 @@ describe("edit-configuration", () => {
 
 	it("throws error when no parameter is given", () => {
 		setTempDir();
-		var testInjector = createTestInjector();
-	 	var command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		let testInjector = createTestInjector();
+	 	let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		assert.throws(() => command.execute([]).wait());
 	});
 
 	it("throws error when wrong configuration file is given", () => {
 		setTempDir();
-		var testInjector = createTestInjector();
-		var command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		let testInjector = createTestInjector();
+		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		assert.throws(() => command.execute(["wrong"]).wait());
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
-		var testInjector = createTestInjector();
-		var tempDir = setTempDir();
-		var template = testInjector.resolve("project").projectConfigFiles[0];
-		var openArgument: string;
-		var opener: IOpener = testInjector.resolve("opener");
+		let testInjector = createTestInjector();
+		let tempDir = setTempDir();
+		let template = testInjector.resolve("project").projectConfigFiles[0];
+		let openArgument: string;
+		let opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
 			openArgument = filepath;
 		};
-		var templateFilepath = path.join(tempDir, template.filepath);
+		let templateFilepath = path.join(tempDir, template.filepath);
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath)).wait();
 
-		var command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		command.execute([template.template]).wait();
 
 		assert.equal(openArgument, templateFilepath);
@@ -84,28 +84,28 @@ describe("edit-configuration", () => {
 	});
 
 	it("doesn't modify file if correct configuration file is given and it exists", () => {
-		var testInjector = createTestInjector();
-		var tempDir = setTempDir();
-		var template = testInjector.resolve("project").projectConfigFiles[0];
-		var openArgument: string;
-		var opener: IOpener = testInjector.resolve("opener");
+		let testInjector = createTestInjector();
+		let tempDir = setTempDir();
+		let template = testInjector.resolve("project").projectConfigFiles[0];
+		let openArgument: string;
+		let opener: IOpener = testInjector.resolve("opener");
 		opener.open = (filepath: string): void => {
 			openArgument = filepath;
 		};
 
-		var templateFilePath = path.join(tempDir, template.filepath);
+		let templateFilePath = path.join(tempDir, template.filepath);
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath)).wait();
 
-		var command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		command.execute([template.template]).wait();
 
-		var templatesService = testInjector.resolve("templatesService");
+		let templatesService = testInjector.resolve("templatesService");
 		testInjector.resolve("fs").unzip( path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir).wait();
 
-		var expectedContent = fs.readFileSync(path.join(tempDir, "AndroidManifest.xml")).toString();
+		let expectedContent = fs.readFileSync(path.join(tempDir, "AndroidManifest.xml")).toString();
 		expectedContent = helpers.stringReplaceAll(expectedContent, "\n", "");
 
-		var actualContent = fs.readFileSync(templateFilePath).toString();
+		let actualContent = fs.readFileSync(templateFilePath).toString();
 		actualContent = helpers.stringReplaceAll(actualContent, os.EOL, "");
 
 		assert.equal(openArgument, templateFilePath);

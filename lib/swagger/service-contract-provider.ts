@@ -8,7 +8,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 
 	getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract> {
 		return (() => {
-			var request:any = {
+			let request:any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
 				path: "/appbuilder/api/swagger",
@@ -19,7 +19,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 				request.path += path;
 			}
 
-			var result = this.$httpClient.httpRequest(request).wait();
+			let result = this.$httpClient.httpRequest(request).wait();
 			if (result.error) {
 				throw result.error;
 			} else {

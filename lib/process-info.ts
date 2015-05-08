@@ -12,7 +12,7 @@ export class ProcessInfo implements IProcessInfo {
 
 	public isRunning(name: string): IFuture<boolean> {
 		return (() => {
-			var result: boolean;
+			let result: boolean;
 
 			if (hostInfo.isWindows()) {
 				if (!_.endsWith(name.toLowerCase(), ".exe")) {

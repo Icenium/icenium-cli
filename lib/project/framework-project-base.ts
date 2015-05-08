@@ -19,7 +19,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void {
 		properties.DisplayName = projectName;
-		var appid = options.appid;
+		let appid = options.appid;
 		if(!options.appid) {
 			appid = this.generateDefaultAppId(projectName);
 			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
@@ -34,12 +34,12 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 
 	public getProjectTargetsBase(dir: string, fileMask: RegExp): IFuture<string[]> {
 		return (() => {
-			var result: string[] = [];
+			let result: string[] = [];
 
 			if (dir) {
-				var files = this.$fs.readDirectory(dir).wait();
-				var platformFiles = _.each(files, (file) => {
-					var matches = file.match(fileMask);
+				let files = this.$fs.readDirectory(dir).wait();
+				let platformFiles = _.each(files, (file) => {
+					let matches = file.match(fileMask);
 					if(matches) {
 						result.push(matches[1].toLowerCase());
 					}
@@ -58,9 +58,9 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	}
 
 	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
-		var propertyValue: any = null;
+		let propertyValue: any = null;
 
-		var configData = projectInformation.configurationSpecificData[configuration];
+		let configData = projectInformation.configurationSpecificData[configuration];
 		if(configData && configData[propertyName]) {
 			propertyValue = configData[propertyName];
 		} else {
@@ -71,7 +71,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	}
 
 	private generateDefaultAppId(appName: string): string {
-		var sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
+		let sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
 		if(sanitizedName) {
 			if(/^\d.*$/.test(sanitizedName)) {
 				sanitizedName = "the" + sanitizedName;

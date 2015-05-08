@@ -2,13 +2,13 @@
 "use strict";
 
 import helpers = require("../lib/helpers");
-var assert = require("chai").assert;
+let assert = require("chai").assert;
 
 describe("helpers", () => {
 	describe("toHash", () => {
 		it("converts array to hash", () => {
-			var source = ["one", "two"];
-			var result:any = helpers.toHash(source, (value) => value, (value, key, source) => {
+			let source = ["one", "two"];
+			let result:any = helpers.toHash(source, (value) => value, (value, key, source) => {
 					return {key: key, value: value, source: source};
 				});
 
@@ -24,8 +24,8 @@ describe("helpers", () => {
 		});
 
 		it("converts hash to another hash", () => {
-			var source = {one:1, two:2};
-			var result:any = helpers.toHash(source, (value, key) => key,
+			let source = {one:1, two:2};
+			let result:any = helpers.toHash(source, (value, key) => key,
 				(value, key, source) => {
 					return {key: key, value: value, source: source};
 				});
@@ -44,32 +44,32 @@ describe("helpers", () => {
 
 	describe("findByNameOrIndex", () => {
 		it("should find exact name match", () => {
-			var source = [{name: "Foo 1"}, {name: "Foo"}];
-			var result = helpers.findByNameOrIndex("Foo", source, (e) => e.name);
+			let source = [{name: "Foo 1"}, {name: "Foo"}];
+			let result = helpers.findByNameOrIndex("Foo", source, (e) => e.name);
 			assert.equal(result.name, "Foo");
 		});
 
 		it("should find name by prefix", () => {
-			var source = [{name: "AaBb"}, {name: "Bb"}];
-			var result = helpers.findByNameOrIndex("Bb", source, (e) => e.name);
+			let source = [{name: "AaBb"}, {name: "Bb"}];
+			let result = helpers.findByNameOrIndex("Bb", source, (e) => e.name);
 			assert.equal(result.name, "Bb");
 		});
 
 		it("should not find name by substring", () => {
-			var source = [{name: "Foo 10"}];
-			var result = helpers.findByNameOrIndex("10", source, (e) => e.name);
+			let source = [{name: "Foo 10"}];
+			let result = helpers.findByNameOrIndex("10", source, (e) => e.name);
 			assert.notOk(result);
 		});
 
 		it("should find element by index", () => {
-			var source = [{name: "Foo 2"}, {name: "Foo 3"}, {name: "Foo 4"}];
-			var result = helpers.findByNameOrIndex("2", source, (e) => e.name);
+			let source = [{name: "Foo 2"}, {name: "Foo 3"}, {name: "Foo 4"}];
+			let result = helpers.findByNameOrIndex("2", source, (e) => e.name);
 			assert.equal(result.name, "Foo 3");
 		});
 
 		it("should find element by index with pound sign", () => {
-			var source = [{name: "2"}, {name: "3"}];
-			var result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
+			let source = [{name: "2"}, {name: "3"}];
+			let result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
 			assert.equal(result.name, "3");
 		})
 	});
@@ -123,7 +123,7 @@ describe("helpers", () => {
 		});
 
 		it("should return zero if versions are equal", () => {
-			var version = "123.456.789";
+			let version = "123.456.789";
 			assert.equal(0, helpers.versionCompare(version, version));
 		});
 

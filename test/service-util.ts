@@ -5,9 +5,9 @@ import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-var assert:chai.Assert = chai.assert;
+let assert:chai.Assert = chai.assert;
 
-var testInjector = new yok.Yok();
+let testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
@@ -52,7 +52,7 @@ class MockHttpClient implements Server.IHttpClient {
 
 	httpRequest(options: any): IFuture<Server.IResponse> {
 		this.options = options;
-		var future = new Future<Server.IResponse>();
+		let future = new Future<Server.IResponse>();
 		if (this.mockError) {
 			future.throw(this.mockError);
 		} else {
@@ -72,7 +72,7 @@ class MockHttpClient implements Server.IHttpClient {
 	}
 }
 
-var httpClient = new MockHttpClient();
+let httpClient = new MockHttpClient();
 
 testInjector.register("httpClient", httpClient);
 
@@ -89,11 +89,11 @@ describe("ServiceProxy", () => {
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});
 	it("calls api without arguments and expected return", () => {
-		var proxy = makeProxy();
+		let proxy = makeProxy();
 
 		httpClient.setResponse({});
 
-		var result = proxy.call("test1", "GET", "authenticate", null, null, null).wait();
+		let result = proxy.call("test1", "GET", "authenticate", null, null, null).wait();
 
 		assert.equal("GET", httpClient.options.method);
 		assert.equal("/appbuilder/authenticate", httpClient.options.path);
@@ -104,22 +104,22 @@ describe("ServiceProxy", () => {
 	});
 
 	it("calls api and returns JSON", () => {
-		var expected = {a: "b", c: 4};
+		let expected = {a: "b", c: 4};
 
-		var proxy = makeProxy();
+		let proxy = makeProxy();
 		httpClient.setResponse({}, JSON.stringify(expected));
 
-		var result = proxy.call("test2", "POST", "/json", "application/json", null, null).wait();
+		let result = proxy.call("test2", "POST", "/json", "application/json", null, null).wait();
 
 		assert.isObject(result);
 		assert.deepEqual(result, expected);
 	});
 
 	it("calls api and pipes result to stream", () => {
-		var proxy = makeProxy();
+		let proxy = makeProxy();
 		httpClient.setResponse({}, null);
 
-		var result = new (require("stream").PassThrough)();
+		let result = new (require("stream").PassThrough)();
 
 		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result).wait();
 
@@ -127,7 +127,7 @@ describe("ServiceProxy", () => {
 	});
 
 	it("throws error returned by HTTP client", () => {
-		var proxy = makeProxy();
+		let proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
 		assert.throws(() => {

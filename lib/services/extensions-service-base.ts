@@ -39,11 +39,11 @@ export class ExtensionsServiceBase {
 				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 			}
 
-			var packageName = extensionData.packageName;
-			var extensionVersion = extensionData.version;
-			var extensionPath = extensionData.pathToSave || this.getExtensionPath(extensionData.packageName);
+			let packageName = extensionData.packageName;
+			let extensionVersion = extensionData.version;
+			let extensionPath = extensionData.pathToSave || this.getExtensionPath(extensionData.packageName);
 
-			var cachedVersion = initialCachedVersion;
+			let cachedVersion = initialCachedVersion;
 			this.$logger.debug("Server version: %s", extensionVersion);
 
 			if (this.extensionVersions[packageName]) {
@@ -53,7 +53,7 @@ export class ExtensionsServiceBase {
 
 			if( helpers.versionCompare(cachedVersion, extensionVersion) < 0) {
 				this.$logger.printInfoMessageOnSameLine(util.format("Updating %s package...", packageName));
-				var zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
+				let zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
 				if(actions.beforeDownloadAction) {
 					actions.beforeDownloadAction().wait();
@@ -97,8 +97,8 @@ export class ExtensionsServiceBase {
 	private downloadPackage(downloadUri: string, zipFileName: string): IFuture<Server.IResponse> {
 		this.$logger.debug("Downloading package from %s", downloadUri);
 
-		var zipFile = this.$fs.createWriteStream(zipFileName);
-		var request = this.$httpClient.httpRequest({
+		let zipFile = this.$fs.createWriteStream(zipFileName);
+		let request = this.$httpClient.httpRequest({
 			url: downloadUri,
 			pipeTo: zipFile,
 			headers: { Accept: "application/octet-stream, application/x-silverlight-app" }

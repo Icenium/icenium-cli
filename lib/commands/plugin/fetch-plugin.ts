@@ -18,12 +18,12 @@ export class FetchPluginCommand implements ICommand {
 			if (args.length === 0) {
 				this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
 			} else if (args.length === 1 && (this.isLocalPath(args[0]).wait() || this.isUrlToRepository(args[0]))) {
-				var result = this.$cordovaPluginsService.fetch(args[0]).wait();
+				let result = this.$cordovaPluginsService.fetch(args[0]).wait();
 				this.$logger.out(result);
 			} else {
-				var plugins = this.$cordovaPluginsService.getPlugins(args);
-				var pluginKeys = Object.keys(plugins);
-				var pluginsCount = pluginKeys.length;
+				let plugins = this.$cordovaPluginsService.getPlugins(args);
+				let pluginKeys = Object.keys(plugins);
+				let pluginsCount = pluginKeys.length;
 				if (pluginsCount === 0) {
 					this.$logger.out("There are 0 matching plugins.");
 				} else if (pluginsCount > 1 && pluginKeys[0] !== args[0]) {

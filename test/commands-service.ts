@@ -4,13 +4,13 @@
 import yok = require("../lib/common/yok");
 import future = require("fibers/future");
 import stubs = require("./stubs");
-var commandsServiceFile = require("../lib/common/services/commands-service");
-var configFile = require("../lib/config");
+let commandsServiceFile = require("../lib/common/services/commands-service");
+let configFile = require("../lib/config");
 import util = require("util");
-var assert = require("chai").assert;
-var commandParams = require("../lib/common/command-params");
+let assert = require("chai").assert;
+let commandParams = require("../lib/common/command-params");
 
-var isCommandExecuted: boolean;
+let isCommandExecuted: boolean;
 
 export class LoggerStubWithErrorOnFatal implements ILogger {
 	setLevel(level: string): void { }
@@ -152,10 +152,10 @@ class MockCommandWithIsEnabledToFalse implements ICommand {
 
 describe("commands service", () => {
 	describe("tryExecuteCommand", () => {
-		var commandsService: any;
+		let commandsService: any;
 
 		beforeEach(() => {
-			var testInjector = new yok.Yok();
+			let testInjector = new yok.Yok();
 			testInjector.register("config", configFile.Configuration);
 			testInjector.register("logger", LoggerStubWithErrorOnFatal);
 			testInjector.register("fs", stubs.FileSystemStub);
@@ -327,7 +327,7 @@ describe("commands service", () => {
 
 		it("does not call validateMandatoryParams when command implements canExecute method.", () => {
 			isCommandExecuted = false;
-			var isValidateCommandArgumentsCalled = false;
+			let isValidateCommandArgumentsCalled = false;
 			commandsService.validateCommandArguments = () => {
 				isValidateCommandArgumentsCalled = true;
 			};

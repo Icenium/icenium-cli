@@ -35,7 +35,7 @@ export class SimulateCommand implements ICommand {
 
 			this.$loginManager.ensureLoggedIn().wait();
 
-			var simulatorPackageName = this.$simulatorPlatformServices.getPackageName();
+			let simulatorPackageName = this.$simulatorPlatformServices.getPackageName();
 			this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 			this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 
@@ -64,7 +64,7 @@ export class SimulateCommand implements ICommand {
 	private ensureSimulatorIsNotRunning(): IFuture<void> {
 		return (() => {
 			this.$logger.info(); // HACK - display simulator downloading indicator correctly
-			var isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
+			let isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
 					"Close it and run $ appbuilder simulate again.");
@@ -76,7 +76,7 @@ export class SimulateCommand implements ICommand {
 		return (() => {
 			this.$logger.info("Starting simulator...");
 
-			var simulatorParams = [
+			let simulatorParams = [
 				"--path", this.$project.getProjectDir().wait(),
 				"--assemblypaths", this.simulatorPath,
 				"--isfeaturetrackingenabled", this.$analyticsService.isEnabled().wait().toString(),
@@ -107,7 +107,7 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
-		var simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
+		let simulatorBinary = path.join(applicationPath, WinSimulatorPlatformServices.EXECUTABLE_NAME_WIN);
 		this.$childProcess.spawn(simulatorBinary, applicationParams,
 			{ stdio: "ignore", detached: true }).unref();
 	}
@@ -133,8 +133,8 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 
 	public runApplication(applicationPath: string, applicationParams: string[]) {
-		var simulatorBinary = path.join(applicationPath, MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC_APP);
-		var commandLine = [simulatorBinary, '--args'].concat(applicationParams);
+		let simulatorBinary = path.join(applicationPath, MacSimulatorPlatformServices.EXECUTABLE_NAME_MAC_APP);
+		let commandLine = [simulatorBinary, '--args'].concat(applicationParams);
 		this.$childProcess.spawn('open', commandLine,
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}
