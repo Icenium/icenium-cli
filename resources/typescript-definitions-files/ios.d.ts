@@ -4018,7 +4018,7 @@ declare class NSCache extends NSObject {
 declare class NSPredicate extends NSObject implements NSSecureCoding, NSCopying {
 	predicateFormat: string;
 	constructor();
-	static predicateWithFormatArgumentArray(predicateFormat: string, arguments: NSArray): NSPredicate;
+	static predicateWithFormatArgumentArray(predicateFormat: string, args: NSArray): NSPredicate;
 	static predicateWithValue(value: boolean): NSPredicate;
 	static predicateWithBlock(block: (arg1: any, arg2: NSDictionary) => boolean): NSPredicate;
 	predicateWithSubstitutionVariables(variables: NSDictionary): NSPredicate;
@@ -4109,7 +4109,7 @@ declare class NSExpression extends NSObject implements NSSecureCoding, NSCopying
 	expressionBlock: (arg1: any, arg2: NSArray, arg3: NSMutableDictionary) => any;
 	constructor(type: number);
 	constructor();
-	static expressionWithFormatArgumentArray(expressionFormat: string, arguments: NSArray): NSExpression;
+	static expressionWithFormatArgumentArray(expressionFormat: string, args: NSArray): NSExpression;
 	static expressionForConstantValue(obj: any): NSExpression;
 	static expressionForEvaluatedObject(): NSExpression;
 	static expressionForVariable(string: string): NSExpression;
@@ -4122,7 +4122,7 @@ declare class NSExpression extends NSObject implements NSSecureCoding, NSCopying
 	static expressionForSubqueryUsingIteratorVariablePredicate(expression: NSExpression, variable: string, predicate: any): NSExpression;
 	static expressionForFunctionSelectorNameArguments(target: NSExpression, name: string, parameters: NSArray): NSExpression;
 	static expressionForAnyKey(): NSExpression;
-	static expressionForBlockArguments(block: (arg1: any, arg2: NSArray, arg3: NSMutableDictionary) => any, arguments: NSArray): NSExpression;
+	static expressionForBlockArguments(block: (arg1: any, arg2: NSArray, arg3: NSMutableDictionary) => any, args: NSArray): NSExpression;
 	initWithExpressionType(type: number): NSExpression;
 	expressionValueWithObjectContext(object: any, context: NSMutableDictionary): any;
 	allowEvaluation(): void;
@@ -15008,7 +15008,7 @@ declare class GKTurnBasedMatch extends NSObject {
 	exchangeDataMaximumSize: number;
 	exchangeMaxInitiatedExchangesPerPlayer: number;
 	constructor();
-	setLocalizableMessageWithKeyArguments(key: string, arguments: NSArray): void;
+	setLocalizableMessageWithKeyArguments(key: string, args: NSArray): void;
 	static findMatchForRequestWithCompletionHandler(request: GKMatchRequest, completionHandler: (arg1: GKTurnBasedMatch, arg2: NSError) => void): void;
 	static loadMatchesWithCompletionHandler(completionHandler: (arg1: NSArray, arg2: NSError) => void): void;
 	static loadMatchWithIDWithCompletionHandler(matchID: string, completionHandler: (arg1: GKTurnBasedMatch, arg2: NSError) => void): void;
@@ -15024,8 +15024,8 @@ declare class GKTurnBasedMatch extends NSObject {
 	endMatchInTurnWithMatchDataScoresAchievementsCompletionHandler(matchData: NSData, scores: NSArray, achievements: NSArray, completionHandler: (arg1: NSError) => void): void;
 	saveCurrentTurnWithMatchDataCompletionHandler(matchData: NSData, completionHandler: (arg1: NSError) => void): void;
 	saveMergedMatchDataWithResolvedExchangesCompletionHandler(matchData: NSData, exchanges: NSArray, completionHandler: (arg1: NSError) => void): void;
-	sendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandler(participants: NSArray, data: NSData, key: string, arguments: NSArray, timeout: number, completionHandler: (arg1: GKTurnBasedExchange, arg2: NSError) => void): void;
-	sendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandler(participants: NSArray, key: string, arguments: NSArray, completionHandler: (arg1: NSError) => void): void;
+	sendExchangeToParticipantsDataLocalizableMessageKeyArgumentsTimeoutCompletionHandler(participants: NSArray, data: NSData, key: string, args: NSArray, timeout: number, completionHandler: (arg1: GKTurnBasedExchange, arg2: NSError) => void): void;
+	sendReminderToParticipantsLocalizableMessageKeyArgumentsCompletionHandler(participants: NSArray, key: string, args: NSArray, completionHandler: (arg1: NSError) => void): void;
 	endTurnWithNextParticipantMatchDataCompletionHandler(nextParticipant: GKTurnBasedParticipant, matchData: NSData, completionHandler: (arg1: NSError) => void): void;
 	participantQuitInTurnWithOutcomeNextParticipantMatchDataCompletionHandler(matchOutcome: number, nextParticipant: GKTurnBasedParticipant, matchData: NSData, completionHandler: (arg1: NSError) => void): void;
 	init(): GKTurnBasedMatch;
@@ -15046,8 +15046,8 @@ declare class GKTurnBasedExchange extends NSObject {
 	completionDate: NSDate;
 	replies: NSArray;
 	constructor();
-	cancelWithLocalizableMessageKeyArgumentsCompletionHandler(key: string, arguments: NSArray, completionHandler: (arg1: NSError) => void): void;
-	replyWithLocalizableMessageKeyArgumentsDataCompletionHandler(key: string, arguments: NSArray, data: NSData, completionHandler: (arg1: NSError) => void): void;
+	cancelWithLocalizableMessageKeyArgumentsCompletionHandler(key: string, args: NSArray, completionHandler: (arg1: NSError) => void): void;
+	replyWithLocalizableMessageKeyArgumentsDataCompletionHandler(key: string, args: NSArray, data: NSData, completionHandler: (arg1: NSError) => void): void;
 	init(): GKTurnBasedExchange;
 	static new(): GKTurnBasedExchange;
 	static allocWithZone(zone: any): GKTurnBasedExchange;
@@ -16901,9 +16901,9 @@ declare class JSValue extends NSObject {
 	isEqualToObject(value: any): boolean;
 	isEqualWithTypeCoercionToObject(value: any): boolean;
 	isInstanceOf(value: any): boolean;
-	callWithArguments(arguments: NSArray): JSValue;
-	constructWithArguments(arguments: NSArray): JSValue;
-	invokeMethodWithArguments(method: string, arguments: NSArray): JSValue;
+	callWithArguments(args: NSArray): JSValue;
+	constructWithArguments(args: NSArray): JSValue;
+	invokeMethodWithArguments(method: string, args: NSArray): JSValue;
 	static valueWithPointInContext(point: CGPoint, context: JSContext): JSValue;
 	static valueWithRangeInContext(range: NSRange, context: JSContext): JSValue;
 	static valueWithRectInContext(rect: CGRect, context: JSContext): JSValue;
@@ -38151,7 +38151,7 @@ declare function CFStringCreateWithBytesNoCopy(alloc: any, bytes: string, numByt
 declare function CFStringCreateWithCharactersNoCopy(alloc: any, chars: any, numChars: number, contentsDeallocator: any): string;
 declare function CFStringCreateWithSubstring(alloc: any, str: string, range: CFRange): string;
 declare function CFStringCreateCopy(alloc: any, theString: string): string;
-declare function CFStringCreateWithFormatAndArguments(alloc: any, formatOptions: NSDictionary, format: string, arguments: number): string;
+declare function CFStringCreateWithFormatAndArguments(alloc: any, formatOptions: NSDictionary, format: string, args: number): string;
 declare function CFStringCreateMutable(alloc: any, maxLength: number): NSMutableString;
 declare function CFStringCreateMutableCopy(alloc: any, maxLength: number, theString: string): NSMutableString;
 declare function CFStringCreateMutableWithExternalCharactersNoCopy(alloc: any, chars: any, numChars: number, capacity: number, externalCharactersAllocator: any): NSMutableString;
@@ -38196,7 +38196,7 @@ declare function CFStringAppend(theString: NSMutableString, appendedString: stri
 declare function CFStringAppendCharacters(theString: NSMutableString, chars: any, numChars: number): void;
 declare function CFStringAppendPascalString(theString: NSMutableString, pStr: string, encoding: number): void;
 declare function CFStringAppendCString(theString: NSMutableString, cStr: string, encoding: number): void;
-declare function CFStringAppendFormatAndArguments(theString: NSMutableString, formatOptions: NSDictionary, format: string, arguments: number): void;
+declare function CFStringAppendFormatAndArguments(theString: NSMutableString, formatOptions: NSDictionary, format: string, args: number): void;
 declare function CFStringInsert(str: NSMutableString, idx: number, insertedStr: string): void;
 declare function CFStringDelete(theString: NSMutableString, range: CFRange): void;
 declare function CFStringReplace(theString: NSMutableString, range: CFRange, replacement: string): void;
@@ -40304,10 +40304,10 @@ declare function JSClassRelease(jsClass: any): void;
 declare function JSObjectMake(ctx: any, jsClass: any, data: any): any;
 declare function JSObjectMakeFunctionWithCallback(ctx: any, name: any, callAsFunction: (arg1: any, arg2: any, arg3: any, arg4: number, arg5: any, arg6: any) => any): any;
 declare function JSObjectMakeConstructor(ctx: any, jsClass: any, callAsConstructor: (arg1: any, arg2: any, arg3: number, arg4: any, arg5: any) => any): any;
-declare function JSObjectMakeArray(ctx: any, argumentCount: number, arguments: any, exception: any): any;
-declare function JSObjectMakeDate(ctx: any, argumentCount: number, arguments: any, exception: any): any;
-declare function JSObjectMakeError(ctx: any, argumentCount: number, arguments: any, exception: any): any;
-declare function JSObjectMakeRegExp(ctx: any, argumentCount: number, arguments: any, exception: any): any;
+declare function JSObjectMakeArray(ctx: any, argumentCount: number, args: any, exception: any): any;
+declare function JSObjectMakeDate(ctx: any, argumentCount: number, args: any, exception: any): any;
+declare function JSObjectMakeError(ctx: any, argumentCount: number, args: any, exception: any): any;
+declare function JSObjectMakeRegExp(ctx: any, argumentCount: number, args: any, exception: any): any;
 declare function JSObjectMakeFunction(ctx: any, name: any, parameterCount: number, parameterNames: any, body: any, sourceURL: any, startingLineNumber: number, exception: any): any;
 declare function JSObjectGetPrototype(ctx: any, object: any): any;
 declare function JSObjectSetPrototype(ctx: any, object: any, value: any): void;
@@ -40320,9 +40320,9 @@ declare function JSObjectSetPropertyAtIndex(ctx: any, object: any, propertyIndex
 declare function JSObjectGetPrivate(object: any): any;
 declare function JSObjectSetPrivate(object: any, data: any): boolean;
 declare function JSObjectIsFunction(ctx: any, object: any): boolean;
-declare function JSObjectCallAsFunction(ctx: any, object: any, thisObject: any, argumentCount: number, arguments: any, exception: any): any;
+declare function JSObjectCallAsFunction(ctx: any, object: any, thisObject: any, argumentCount: number, args: any, exception: any): any;
 declare function JSObjectIsConstructor(ctx: any, object: any): boolean;
-declare function JSObjectCallAsConstructor(ctx: any, object: any, argumentCount: number, arguments: any, exception: any): any;
+declare function JSObjectCallAsConstructor(ctx: any, object: any, argumentCount: number, args: any, exception: any): any;
 declare function JSObjectCopyPropertyNames(ctx: any, object: any): any;
 declare function JSPropertyNameArrayRetain(array: any): any;
 declare function JSPropertyNameArrayRelease(array: any): void;
