@@ -9,13 +9,12 @@
 @if not defined major goto error
 
 git fetch
-git tag -a v%2 -m "Telerik AppBuilder %2" remotes/origin/master
+git tag -a v%2 -m "Telerik AppBuilder %2" remotes/origin/release
 git push origin v%2
 
+npm publish "%1" --ignore-scripts
 @goto :EOF
 
 :error
 @echo Sample usage: publish appbuilder.tgz 1.2.3
 @echo Version string must be in Major.Minor.Revision format
-
-npm publish "%1" --ignore-scripts
