@@ -71,7 +71,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * OS X Mavericks
 * Node.js 0.10.26 or a later stable official release except 0.10.34<br/>A [known issue](http://docs.telerik.com/platform/appbuilder/troubleshooting/known-issues/known-issues-cli-and-sp#the-appbuilder-command-line-interface-and-appbuilder-package-for-sublime-text-27-have-introduced-the-following-known-issues) prevents the AppBuilder CLI from working properly with Node.js 0.10.34.
 * An Internet browser (latest official release)
-* Mono 3.10 or later
+* Mono 3.12 or later
 * (Optional) git<br/>git is required for development with Screen Builder.
 
 **Additional Software Requirements for iOS On-Device Deployment**
