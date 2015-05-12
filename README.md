@@ -22,10 +22,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.9  
-Release date: 2015, April 29
+Latest version: Telerik AppBuilder 2.9.1  
+Release date: 2015, May 11
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 2.9, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9" target="_blank">Telerik AppBuilder 2.9 Release Notes</a>.
+> Telerik AppBuilder 2.9.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.9.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9-1" target="_blank">Telerik AppBuilder 2.9.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.9, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9" target="_blank">Telerik AppBuilder 2.9 Release Notes</a>.
 
 ### System Requirements
 
@@ -326,10 +326,10 @@ $ appbuilder create --help
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.9  
-Release date: 2015, April 29
+Latest version: Telerik AppBuilder 2.9.1  
+Release date: 2015, May 11
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 2.9, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9" target="_blank">Telerik AppBuilder 2.9 Release Notes</a>.
+> Telerik AppBuilder 2.9.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.9.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9-1" target="_blank">Telerik AppBuilder 2.9.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.9, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-9" target="_blank">Telerik AppBuilder 2.9 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
