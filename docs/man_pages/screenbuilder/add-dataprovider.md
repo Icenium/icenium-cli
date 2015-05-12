@@ -23,6 +23,7 @@ Command | Description
 [screenbuilder](screenbuilder.html) | Shows all commands for project development with Screen Builder.
 [add-field](add-field.html) | Inserts an input field in an existing form.
 [add-form](add-form.html) | Generates a generic input form that you can later fill in with any input field you like.
+[add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
 [add-signin](add-signin.html) | Inserts a sign-in form in an existing application view.
 [add-signup](add-signup.html) | Inserts a sign-up form in an existing application view.

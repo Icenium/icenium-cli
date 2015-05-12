@@ -1,11 +1,11 @@
-add-form
+add-about
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder add-form`
+General | `$ appbuilder add-about`
 
-Inserts a generic input form in an existing application view. You can later insert input fields with `$ appbuilder add-field` <% if(isHtml) { %>An interactive prompt guides you through the setup process.
+Inserts an about input form in an existing application view. <% if(isHtml) { %> An interactive prompt guides you through the setup process.
 
 ### Prerequisites
 
@@ -27,6 +27,5 @@ Command | Description
 [add-list](add-list.html) | Inserts a list in an existing application view.
 [add-signin](add-signin.html) | Inserts a sign-in form in an existing application view.
 [add-signup](add-signup.html) | Inserts a sign-up form in an existing application view.
-[add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 <% } %>
