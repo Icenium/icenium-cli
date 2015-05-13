@@ -360,7 +360,7 @@ export class Project implements Project.IProject {
 
 			_.each(this.configurations, (configuration: string) => {
 				let oldPluginsList = this.getProperty("CorePlugins", configuration);
-				let newPluginsList = this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
+				let newPluginsList = _.union(this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait(), oldPluginsList);
 				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 				this.setProperty("CorePlugins", newPluginsList, configuration);
 			});
