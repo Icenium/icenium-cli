@@ -48,9 +48,40 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return updated;
 	}
 
-	public updateProjectProperty(projectData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
-		return (() => {
+	public removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData {
+		let normalizedProperty = this.normalizePropertyName(property, projectData);
+		if(dataToBeUpdated) {
+			delete dataToBeUpdated[normalizedProperty];
+			if(projectData) {
+				this.validateProjectData(projectData, dataToBeUpdated);
+			} else {
+				this.validateProjectData(dataToBeUpdated);
+			}
+		}
+		return dataToBeUpdated;
+	}
 
+	private validateProjectData(projectData: IProjectData, configurationSpecificData?: IProjectData): void {
+		let dataToValidate = Object.create(null);
+		_.extend(dataToValidate, projectData);
+		if(configurationSpecificData) {
+			_.extend(dataToValidate, configurationSpecificData);
+		}
+		this.$jsonSchemaValidator.validate(dataToValidate);
+	}
+
+	private notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): IFuture<void> {
+		return ((): void => {
+			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
+			let propData = projectSchema[propertyName];
+			if(propData && propData.onChanging) {
+				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+			}
+		}).future<void>()();
+	}
+
+	public updateProjectProperty(projectData: IProjectData, configurationSpecificData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
+		return ((): void => {
 			let normalizedProperty = this.normalizePropertyName(property, projectData);
 			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
 			if(isString) {
@@ -59,7 +90,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			}
 
-			let propertyValue = projectData[normalizedProperty];
+			let propertyValue = configurationSpecificData ? configurationSpecificData[normalizedProperty] : projectData[normalizedProperty];
 
 			if (mode === "set") {
 				propertyValue = isString ? newValue[0] : newValue;
@@ -77,8 +108,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(projectData.Framework);
-
 			// HACK - yargs parses double values (8.0) as integers (8)
 			if(normalizedProperty === "WPSdk") {
 				if(propertyValue.indexOf(".") === -1) {
@@ -86,13 +115,15 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			}
 
-			let propData = projectSchema[normalizedProperty];
-			if(propData && propData.onChanging) {
-				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+			this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue).wait();
+
+			if(configurationSpecificData) {
+				configurationSpecificData[normalizedProperty] = propertyValue;
+			} else {
+				projectData[normalizedProperty] =  propertyValue;
 			}
 
-			projectData[normalizedProperty] = propertyValue;
-			this.$jsonSchemaValidator.validate(projectData);
+			this.validateProjectData(projectData, configurationSpecificData);
 		}).future<void>()();
 	}
 

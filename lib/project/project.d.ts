@@ -24,7 +24,7 @@ declare module Project {
 		getProjectTargets(): IFuture<string[]>;
 		getConfigFileContent(template: string): IFuture<any>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
-		printProjectProperty(property: string): IFuture<void>;
+		printProjectProperty(property: string, configuration?: string): IFuture<void>;
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		adjustBuildProperties(buildProperties: any): any;
@@ -36,6 +36,8 @@ declare module Project {
 		ensureProject(): void;
 		ensureAllPlatformAssets(): IFuture<void>;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
+		
+		getConfigurationsSpecifiedByUser(): string[];
 	}
 
 	interface IFrameworkProject {

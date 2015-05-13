@@ -199,10 +199,20 @@ interface IProjectData extends IDictionary<any> {
 interface IProjectPropertiesService {
 	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData>;
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
-	updateProjectProperty(projectData: any, mode: string, property: string, newValue: any): IFuture<void>;
+	updateProjectProperty(projectData: any, configurationSpecificData: IProjectData, mode: string, property: string, newValue: any): IFuture<void>;
 	normalizePropertyName(property: string, projectData: IProjectData): string;
 	getValidValuesForProperty(propData: any): IFuture<string[]>;
 	getPropertiesForAllSupportedProjects(): IFuture<string>;
+	/**
+	 * Removes property from the project and validates the result data.  If it is configuration specific (commonly written in .debug.abproject or .release.abproject) 
+	 * you have to pass the projectData as last parameter of the method.
+	 * @param {IProjectData} dataToBeUpdated The data from which to remove the property.
+	 * @param {string} propertyName The name of the property that should be removed from the data. 
+	 * @param {IProjectData} projectData Optional parameter. The project data, commonly written in .abproject. Set this property whenever you want to remove property from configuration specific data.
+	 * @return {IProjectData} Modified data. In case configurationSpecificData exists, returns it, else returns projectData.
+	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file. 
+	 */
+	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
 }
 
 interface IServerConfigurationData {
