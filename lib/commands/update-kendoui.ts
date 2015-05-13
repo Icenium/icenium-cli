@@ -58,6 +58,14 @@ class UpdateKendoUICommand implements ICommand {
 				packages = _.filter(packages, pack => pack.Name === UpdateKendoUICommand.KENDO_PROFESSIONAL);
 			}
 
+			if(packages.length === 0) {
+				let message = "Cannot find Kendo UI packages that match the provided parameters.";
+				if(options.professional) {
+					message += " Verify that your subscription plan provides 'Kendo UI Professional'.";
+				}
+				this.$errors.failWithoutHelp(message);
+			}
+
 			let downloadUri: string;
 			if(options.latest) {
 				let latestPackage = _.first(packages);
