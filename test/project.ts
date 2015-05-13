@@ -25,6 +25,8 @@ import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validato
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import childProcessLib = require("../lib/common/child-process");
 import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
+import projectPropertiesService = require("../lib/services/project-properties-service");
+import cordovaMigrationService = require("../lib/services/cordova-migration-service");
 import Future = require("fibers/future");
 let projectConstants = new projectConstantsLib.ProjectConstants();
 let assert = require("chai").assert;
@@ -54,6 +56,10 @@ let mockProjectNameValidator = {
 	}
 };
 
+function createFrameworkVersion(version: string) {
+	return { Version: version, DisplayName: version };
+}
+
 function createTestInjector(): IInjector {
 	require("../lib/common/logger");
 
@@ -65,7 +71,16 @@ function createTestInjector(): IInjector {
 	testInjector.register("opener", stubs.OpenerStub);
 	testInjector.register("config", require("../lib/config").Configuration);
 	testInjector.register("staticConfig", require("../lib/config").StaticConfig);
-	testInjector.register("server", {});
+	testInjector.register("server", {
+		cordova: {
+			getCordovaFrameworkVersions: () => {
+				return Future.fromResult([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
+				{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
+				{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
+			}
+		}
+
+	});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
 	testInjector.register("projectNameValidator", mockProjectNameValidator);
@@ -73,23 +88,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
-	testInjector.register("cordovaMigrationService", {
-		getSupportedVersions: (): IFuture<string[]> => {
-				return Future.fromResult(["3.2.0", "3.5.0", "3.7.0"]);
-		},
-
-		getSupportedFrameworks: (): IFuture<Server.FrameworkVersion[]> => {
-			return Future.fromResult([{ DisplayName: "version_3_2_0", Version: "3.2.0" },
-				{ DisplayName: "version_3_5_0", Version: "3.5.0" },
-				{ DisplayName: "version_3_7_0", Version: "3.7.0" }]);
-		},
-
-		getDisplayNameForVersion: (version: string): IFuture<string> => {
-			return Future.fromResult("version_3_5_0");
-		},
-
-		migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]> { return Future.fromResult([""]) }
-	});
+	testInjector.register("cordovaMigrationService", cordovaMigrationService.CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
 	testInjector.register("prompter", PrompterStub);
@@ -119,6 +118,24 @@ function createTestInjector(): IInjector {
 	testInjector.register("httpClient", {});
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
+
+
+	testInjector.register("pluginsService", {
+		getPluginBasicInformation: (pluginName: string) => { 
+			return {
+				name: 'Name',
+				version: '1.0.0'
+			}
+		},
+		getPluginVersions: (pluginName: string) => {
+			return [{
+				name: '1.0.0',
+				value: '1.0.0',
+				minCordova: '3.0.0'
+			}]
+		}
+	});
+	testInjector.register("projectPropertiesService", projectPropertiesService.ProjectPropertiesService);
 
 	return testInjector;
 }

@@ -1,12 +1,12 @@
 {
 	"FrameworkVersion": {
 		"dynamicRange": "#{cordovaMigrationService.getSupportedVersions}",
-		"onChanging": "#{project.onFrameworkVersionChanging}"
+		"onChanging": "#{cordovaMigrationService.onFrameworkVersionChanging}"
 	},
 	"CorePlugins": {
-		"dynamicRange": "#{project.getSupportedPlugins}"
+		"dynamicRange": "#{cordovaMigrationService.getSupportedPlugins}"
 	},
 	"WPSdk": {
-		"onChanging": "#{project.onWPSdkVersionChanging}"
+		"onChanging": "#{cordovaMigrationService.onWPSdkVersionChanging}"
 	}
 }

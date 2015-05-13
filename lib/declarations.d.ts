@@ -381,6 +381,18 @@ interface ICordovaMigrationService {
 	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 	getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]>;
 	getDisplayNameForVersion(version: string): IFuture<string>;
+	/**
+	 * Hook which is dynamically called when a project's framework version is changing
+	 * @param  {string} newVersion The version to upgrade/downgrade to
+	 * @return {IFuture<void>}
+	 */
+	onFrameworkVersionChanging(newVersion: string): IFuture<void>;
+	/**
+	 * Hook which is dynamically called when a project's windows phone sdk version is changing
+	 * @param  {string} newVersion The version to upgrade/downgrade to
+	 * @return {IFuture<void>}
+	 */
+	onWPSdkVersionChanging(newVersion: string): IFuture<void>;
 }
 
 interface ISamplesService {
@@ -389,9 +401,9 @@ interface ISamplesService {
 }
 
 interface IExpress {
-    run(): void;
-    listen(port: number, callback?: Function): any;
-    post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
+	run(): void;
+	listen(port: number, callback?: Function): any;
+	post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
 }
 
 interface IDomainNameSystem {
@@ -409,8 +421,29 @@ interface IPluginsService {
 	printPlugins(plugins: IPlugin[]): void;
 	addPlugin(pluginName: string): IFuture<void>;
 	removePlugin(pluginName: string): IFuture<void>;
-	configurePlugin(pluginName: string, configuration?: string): IFuture<void>;
+	/**
+	 * Used to configure a plugin.
+	 * @param  {string}        pluginName     The name of the plugin.
+	 * @param  {string}        version        The version of the plugin.
+	 * @param  {string[]}      configurations Configurations in which the plugin should be configured. Example: ['debug'], ['debug', 'release']
+	 * @return {IFuture<void>}                
+	 */
+	configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;
+	/**
+	 * Returns basic information about the plugin - it's name, version and cordova version range
+	 * @param  {string}                  pluginName The name of the plugin
+	 * @return {IBasicPluginInformation}            Basic information about the plugin
+	 */
+	getPluginBasicInformation(pluginName: string): IBasicPluginInformation;
+	/**
+	 * Checks wether a plugin is supported for a specific framework version
+	 * @param  {string}  plugin           The name of the plugin
+	 * @param  {string}  version          The plugin's version
+	 * @param  {string}  frameworkVersion The framework's version
+	 * @return {boolean}                  true if the plugin is supported, false otherwise
+	 */
+	isPluginSupported(plugin: string, version: string, frameworkVersion: string): boolean;
 }
 
 interface IPlugin {
@@ -421,9 +454,40 @@ interface IPlugin {
 	toProjectDataRecord(version?: string): string;
 }
 
-interface IBasicPluginInformation {
+interface IPluginVersion {
+	/**
+	 * The name of the plugin
+	 * @type {string}
+	 */
 	name: string;
-	description: string;
+	/**
+	 * The plugin's version
+	 * @type {string}
+	 */
+	value: string;
+	/**
+	 * The cordova version range this plugin supports
+	 * Example: >=3.5.0, <3.7.0, 4.0.0, >=3.0.0 && <4.0.0
+	 * @type {string}
+	 */
+	cordovaVersionRange: string;
+}
+
+interface IBasicPluginInformation {
+	/**
+	 * The plugin's name
+	 * @type {string}
+	 */
+	name: string;
+	/**
+	 * The plugin's description
+	 * @type {[type]}
+	 */
+	description?: string;
+	/**
+	 * The plugin's version in the form of Major.Minor.Patch
+	 * @type {string}
+	 */
 	version: string;
 }
 

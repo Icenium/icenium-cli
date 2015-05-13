@@ -12,7 +12,6 @@ declare module Project {
 		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<void>;
-		onFrameworkVersionChanging(newVersion: string): IFuture<void>;
 		hasBuildConfigurations(): boolean;
 
 		getNewProjectDir(): string;
@@ -101,6 +100,7 @@ declare module Project {
 		CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME: string;
 		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
 		APPIDENTIFIER_PROPERTY_NAME: string;
+		EXPERIMENTAL_TAG: string;
 	}
 
 	interface ITargetFrameworkIdentifiers {
