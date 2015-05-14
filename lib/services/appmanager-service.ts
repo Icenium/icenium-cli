@@ -3,9 +3,8 @@
 
 import constants = require("../common/mobile/constants");
 import util = require("util");
-import options = require("../options");
 import os = require("os");
-import commonOptions = require("../common/options");
+import options = require("../common/options");
 
 class AppManagerService implements IAppManagerService {
 	private static LIVEPATCH_PLUGIN_ID = "com.telerik.LivePatch";
@@ -71,8 +70,8 @@ class AppManagerService implements IAppManagerService {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
-			var cachedOptionsRelease = commonOptions.release;
-			commonOptions.release = true;
+			var cachedOptionsRelease = options.release;
+			options.release = true;
 			this.configureLivePatchPlugin().wait();
 
 			this.$logger.warn("If you have not published an AppManager LiveSync-enabled version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
@@ -82,7 +81,7 @@ class AppManagerService implements IAppManagerService {
 			this.$logger.printInfoMessageOnSameLine("Publishing patch for " + platforms.join(", ") + "...");
 			this.$progressIndicator.showProgressIndicator(this.$server.tam.uploadPatch(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, <any>{ Platforms: platforms }), 2000).wait();
 			this.$logger.printInfoMessageOnSameLine(os.EOL);
-			commonOptions.release = cachedOptionsRelease;
+			options.release = cachedOptionsRelease;
 
 			this.openAppManagerStore();
 		}).future<void>()();
@@ -90,6 +89,7 @@ class AppManagerService implements IAppManagerService {
 
 	private configureLivePatchPlugin(): IFuture<void> {
 		return (() => {
+			// Resolve pluginsService here as in its constructor it fails when project is not Cordova.
 			var $pluginsService: IPluginsService = this.$injector.resolve("pluginsService");
 			var plugins = $pluginsService.getInstalledPlugins();
 			if(!_.any(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
