@@ -99,7 +99,7 @@ $injector.requireCommand("prop|print", "./commands/prop/prop-print");
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
 
-$injector.requireCommand("deployHelper", "./commands/deploy");
+$injector.require("deployHelper", "./commands/deploy");
 $injector.requireCommand("deploy|*devices", "./commands/deploy");
 $injector.requireCommand("deploy|android", "./commands/deploy");
 $injector.requireCommand("deploy|ios", "./commands/deploy");

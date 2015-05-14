@@ -29,7 +29,7 @@ declare module Project {
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		adjustBuildProperties(buildProperties: any): any;
-		saveProject(projectDir?: string): IFuture<void>;
+		saveProject(projectDir?: string, configurations?: string[]): IFuture<void>;
 		zipProject(): IFuture<string>;
 		importProject(): IFuture<void>;
 
