@@ -375,6 +375,19 @@ describe("plugins-service", () => {
 
 		assert.equal(3, service.getInstalledPlugins().length);
 	});
+	it("throw if installed plugin is not available", () => {
+		let installedMarketplacePlugins = [{
+				Identifier: "com.telerik.Invalid",
+				Name: "Stripe",
+				Version: "1.0.4"
+			}
+		];
+
+		let testInjector = createTestInjector([], installedMarketplacePlugins, []);
+
+		let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+		assert.throws(() => service.getInstalledPlugins());
+	});
 	it("does not fail if data for one of the plugins cannot be fetched", () => {
 		let cordovaPlugins = [
 			{
