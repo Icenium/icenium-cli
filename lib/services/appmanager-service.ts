@@ -31,7 +31,7 @@ class AppManagerService implements IAppManagerService {
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
-			this.$logger.info("Accessing Telerik AppManager store.");
+			this.$logger.info("Accessing Telerik AppManager.");
 			this.$server.tam.verifyStoreCreated().wait();
 
 			this.$logger.info("Building release package.");
@@ -60,8 +60,21 @@ class AppManagerService implements IAppManagerService {
 				Groups: []
 			};
 
-			if (options.group.length) {
+			if (options.group) {
+
+				if(!_.isArray(options.group)) {
+                    options.group = [options.group];
+				}
+
 				publishSettings.Groups = this.findGroups(options.group).wait();
+			}
+
+			if(!options.publish && options.sendEmail) {
+				this.$logger.warn("You have not set the --publish switch. Your users will not receive an email.");
+			}
+
+			if(!options.publish && options.sendPush) {
+				this.$logger.warn("You have not set the --publish switch. Your users will not receive a push notification.");
 			}
 
 			this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait();
@@ -71,21 +84,21 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	public getGroups(): IFuture<void> {
-		return ((): any  => {
+		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 
-			this.$logger.info("Accessing Telerik AppManager store.");
-			this.$logger.info("Retrieving available groups from Telerik AppManager store.");
+			this.$logger.info("Accessing Telerik AppManager.");
+			this.$logger.info("Retrieving distribution groups from Telerik AppManager.");
 			let groups = this.$server.tam.getGroups().wait();
 
 			if (!groups.length) {
-				this.$logger.info("No available groups found.");
+				this.$logger.info("Cannot find distribution groups.");
 				return;
 			}
 
 			let table = new Table({
-			head: ["Index", "Name"],
-			chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+				head: ["Index", "Name"],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
 			});
 
 			_.forEach(groups, (group, index) => {
@@ -140,28 +153,24 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	private findGroups(identityStrings:string[]): IFuture<string[]> {
-		return ((): any => {
+		return ((): string[] => {
 			let availableGroups = this.$server.tam.getGroups().wait();
-			let groupIds: string[] = [];
 
 			if (!availableGroups.length) {
-				this.$errors.failWithoutHelp("No available groups found.");
+				this.$errors.failWithoutHelp("Cannot find distribution groups.");
 			}
 
-			_.forEach(identityStrings, (identityStr, index) => {
+			return _.map(identityStrings, identityStr => {
 				let group = helpers.findByNameOrIndex(identityStr, availableGroups, (group) => group.Name);
 
 				if (!group) {
-					this.$errors.failWithoutHelp ("Could not find group named '%s' or was not given a valid index.%sTo see available groups run $ appbuilder appmanager groups",
+					this.$errors.failWithoutHelp ("Cannot find group that matches the provided <Group ID>: '%s'.To list the available groups, run $ appbuilder appmanager groups",
 						identityStr,
 						os.EOL);
 				}
 
-				groupIds.push(group.Id);
+				return group.Id;
 			});
-
-			return groupIds;
-			
 		}).future<string[]>()();
 	}
 }
