@@ -364,8 +364,11 @@ export class TamService implements Server.ITamServiceContract{
 	public verifyStoreCreated(): IFuture<void>{
 		return this.$serviceProxy.call<void>('VerifyStoreCreated', 'GET', ['api','tam','store'].join('/'), null, null, null);
 	}
-	public uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), null, null, null);
+	public getGroups(): IFuture<Server.TamGroupData[]>{
+		return this.$serviceProxy.call<Server.TamGroupData[]>('GetGroups', 'GET', ['api','tam','groups'].join('/'), 'application/json', null, null);
+	}
+	public uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), null, [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
 	}
 	public uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>{
 		return this.$serviceProxy.call<void>('UploadPatch', 'POST', ['api','tam',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),'patches'].join('/'), null, [{name: 'patchData', value: JSON.stringify(patchData), contentType: 'application/json'}], null);

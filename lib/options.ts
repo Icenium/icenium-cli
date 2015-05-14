@@ -29,7 +29,11 @@ let knownOpts: any = {
 		"verified": Boolean,
 		"core": Boolean,
 		"professional": Boolean,
-		"latest": Boolean
+		"latest": Boolean,
+		"publish": Boolean,
+		"send-push": Boolean,
+		"send-email": Boolean,
+		"group": Array
 	},
 	shorthands: IStringDictionary = {
 		"t": "template",

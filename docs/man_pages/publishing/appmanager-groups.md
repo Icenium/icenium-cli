@@ -1,22 +1,25 @@
-certificate create-self-signed
+appmanager groups
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder certificate create-self-signed [<Name> [<Email> [<Country> [<Purpose> [<StartDate> [<EndDate>]]]]]]`
+General | `$ appbuilder appmanager groups`
 
-Creates a self-signed certificate for code signing Android applications. <% if(isHtml) { %>If you do not provide one or more command parameters, the Telerik AppBuilder CLI shows an interactive prompt to let you set
-the remaining certificate details. 
+Lists all available user groups from Telerik AppManager. <% if(isHtml) { %>If you have not managed distribution groups from [Telerik AppManager](https://platform.telerik.com/appmanager), a single 'Default Group' should be provided.
 
-Depending on the certificate type, you can install your app for testing or you can publish it in Google Play.
-If you want to publish your app in Google Play, verify that the certificate expires after October 22, 2033.<% } %>
+For more information about AppManager distribution groups, see [Adding AppManager Distribution Groups](http://docs.telerik.com/platform/appmanager/appmanager-portal/managing-groups/adding-distribution-group).<% } %>
 
-### Attributes
-* `<Purpose>` is the type of the certificate that you want to create. You can set the following purposes: `Generic` or `GooglePlay`.
-* `<StartDate>` and `<EndDate>` set the validity of the certificate. You must set the start and end date in the following format: yyyy-mm-dd. 
-
-<% if(isConsole) { %>NOTE: If you want to publish your app in Google Play, verify that the value for `<End Date>` is greater than 2033-10-22.<% } %>
+<% if(isConsole) { %>
+<% if(isMobileWebsite) { %>WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager groups`<% } %>
+<% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager groups` <% } %> 
+<% } %>
 <% if(isHtml) { %> 
+
+### Command Limitations
+
+* You cannot run this command on mobile website projects.
+* You cannot run this command on NativeScript projects.
+
 ### Related Commands
 
 Command | Description
@@ -25,11 +28,11 @@ Command | Description
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
-[appmanager groups](appmanager-groups.html) | Lists all available user groups from Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
 [appstore upload](appstore-upload.html) | Builds the project and uploads the application to iTunes Connect.
 [certificate](certificate.html) | Lists all configured certificates for code signing iOS and Android applications with index and name.
+[certificate create-self-signed](certificate-create-self-signed.html) | Creates a self-signed certificate for code signing Android applications.
 [certificate export](certificate-export.html) | Exports a selected certificate from the server as a P12 file.
 [certificate import](certificate-import.html) | Imports an existing certificate from a P12 or a CER file stored on your local file system.
 [certificate remove](certificate-remove.html) | Removes a selected certificate from the server.

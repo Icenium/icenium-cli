@@ -546,6 +546,7 @@ interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
 	openAppManagerStore(): void;
 	publishLivePatch(platforms: string[]): IFuture<void>;
+	getGroups(): IFuture<void>;
 }
 
 interface IProgressIndicator {

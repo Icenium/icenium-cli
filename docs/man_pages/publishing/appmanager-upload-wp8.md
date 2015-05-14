@@ -3,7 +3,7 @@ appmanager upload wp8
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder appmanager upload wp8 [--download]`   
+General | `$ appbuilder appmanager upload wp8 [--download] [--publish] [--send-email] [--send-push] [--group [<Group ID>]]*`   
 
 Builds the project for Windows Phone and uploads the application to Telerik AppManager. <% if(isHtml) { %>After the upload completes, you need to go to your app in [Telerik AppManager](https://platform.telerik.com/appmanager), manually configure it for distribution and publish it.<% } %> 
 <% if(isConsole) { %>
@@ -17,6 +17,13 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Options
 * `--download` - If set, downloads the application package to the root of the project.
+* `--publish` - If set, the application package will be automatically published and visible for the members of its distribution groups. To add distribution groups, use `--groups` option.
+* `--send-email` - If set, an email with the link to the app will be send to all eligible users.
+* `--send-push` - If set, push notifications will be send to all registered devices in the groups, assigned to the published app.
+* `--group` - Sets the distribution groups of the application. You can set groups by index or name. <% if(isHtml) { %>To list available groups, run `$ appbuilder appmanager groups`<% } %>
+
+### Attributes
+* `<Group ID>` is the index or name of the group as listed by `$ appbuilder appmanager groups`.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
@@ -31,6 +38,7 @@ Command | Description
 [appmanager upload](appmanager.html) | Allows interaction with appmanager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager groups](appmanager-groups.html) | Lists all available user groups from Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
 [appstore upload](appstore-upload.html) | Builds the project and uploads the application to iTunes Connect.

@@ -138,7 +138,8 @@ $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 $injector.requireCommand("appmanager|upload|android", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|ios", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|wp8", "./commands/appmanager");
-
+$injector.requireCommand("appmanager|groups", "./commands/appmanager");
+ 
 $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
 $injector.requireCommand("dev-prepackage", "./commands/dev/prepackage");

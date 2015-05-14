@@ -435,6 +435,16 @@ declare module Server{
 		getLinuxBuildMachineStatus(): IFuture<string>;
 		getMacBuildMachineStatus(): IFuture<string>;
 	}
+	interface TamGroupData{
+		Name: string;
+		Id: string;
+	}
+	interface PublishSettings{
+		IsPublished: boolean;
+		NotifyByPush: boolean;
+		NotifyByEmail: boolean;
+		Groups: string[];
+	}
 	interface PatchData{
 		Platforms: Server.DevicePlatform[];
 	}
@@ -445,7 +455,8 @@ declare module Server{
 	}
 	interface ITamServiceContract{
 		verifyStoreCreated(): IFuture<void>;
-		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string): IFuture<void>;
+		getGroups(): IFuture<Server.TamGroupData[]>;
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<void>;
 		uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
 	}
