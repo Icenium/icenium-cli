@@ -19,10 +19,10 @@ class AppManagerService implements IAppManagerService {
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
 		private $buildService: Project.IBuildService,
-		private $pluginsService: IPluginsService,
 		private $progressIndicator: IProgressIndicator,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $injector: IInjector) { }
 
 	upload(platform: string): IFuture<void> {
 		return (() => {
@@ -90,10 +90,11 @@ class AppManagerService implements IAppManagerService {
 
 	private configureLivePatchPlugin(): IFuture<void> {
 		return (() => {
-			var plugins = this.$pluginsService.getInstalledPlugins();
-			if(!_.any(plugins, plugin => plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
+			var $pluginsService: IPluginsService = this.$injector.resolve("pluginsService");
+			var plugins = $pluginsService.getInstalledPlugins();
+			if(!_.any(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
 				this.$logger.warn("The AppManager LiveSync plugin is not enabled for your project. Enabling it now for the release build configuration...");
-				this.$pluginsService.addPlugin(AppManagerService.LIVEPATCH_PLUGIN_ID).wait();
+				$pluginsService.addPlugin(AppManagerService.LIVEPATCH_PLUGIN_ID).wait();
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");
 			}
 		}).future<void>()();
