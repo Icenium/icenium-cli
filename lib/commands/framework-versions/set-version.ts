@@ -3,11 +3,12 @@
 
 export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $injector: IInjector,
+		private $cordovaMigrationService: ICordovaMigrationService,
 		private $project: Project.IProject) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.onFrameworkVersionChanging(args[0]).wait();
+			this.$cordovaMigrationService.onFrameworkVersionChanging(args[0]).wait();
 			this.$project.projectData["FrameworkVersion"] = args[0];
 			this.$project.saveProject().wait();
 		}).future<void>()();

@@ -18,7 +18,6 @@ export class Project implements Project.IProject {
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 	private static INDENTATION = "     ";
-	private static EXPERIMENTAL_TAG = "Experimental";
 
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
@@ -29,7 +28,6 @@ export class Project implements Project.IProject {
 	public configurationSpecificData: IDictionary<IDictionary<any>>;
 
 	constructor(private $config: IConfiguration,
-		private $cordovaMigrationService: ICordovaMigrationService,
 		private $errors: IErrors,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
@@ -41,12 +39,9 @@ export class Project implements Project.IProject {
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
-		private $resources: IResourceLoader,
 		private $server: Server.IServer,
 		private $staticConfig: IStaticConfig,
-		private $templatesService: ITemplatesService,
-		private $prompter: IPrompter,
-		private $mobileHelper: Mobile.IMobileHelper) {
+		private $templatesService: ITemplatesService) {
 
 		this.configurationSpecificData = Object.create(null);
 		this.readProjectData().wait();
@@ -297,125 +292,6 @@ export class Project implements Project.IProject {
 			let projectDir = this.getProjectDir().wait();
 			let projectFiles = this.$projectFilesManager.enumerateProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles).wait();
 			return projectFiles;
-		}).future<string[]>()();
-	}
-
-	public onWPSdkVersionChanging(newVersion: string): IFuture<void> {
-		return ((): void => {
-			if(newVersion === this.projectData["WPSdk"]) {
-				return;
-			}
-
-			let validWPSdks = this.getSupportedWPFrameworks().wait();
-			if(!_.contains(validWPSdks, newVersion)) {
-				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
-			}
-
-			this.$logger.info("Migrating to WPSdk version %s", newVersion);
-			if(helpers.versionCompare(newVersion, "8.0") > 0) {
-				// at least Cordova 3.7 is required
-				if(helpers.versionCompare(this.projectData.FrameworkVersion, "3.7.0") < 0) {
-					let cordovaVersions = this.$cordovaMigrationService.getSupportedFrameworks().wait();
-
-					// Find last framework which is not experimental.
-					let selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1);
-					if(helpers.versionCompare(selectedFramework.Version, "3.7.0") < 0) {
-						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
-						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
-					}
-
-					let shouldUpdateFramework = this.$prompter.confirm(`You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.DisplayName}?`).wait()
-					if(shouldUpdateFramework) {
-						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
-						this.projectData.FrameworkVersion = selectedFramework.Version;
-					} else {
-						this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
-					}
-				}
-			}
-		}).future<void>()();
-	}
-
-	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
-		return ((): void => {
-			if(newVersion === this.projectData.FrameworkVersion) {
-				return;
-			}
-
-			this.ensureAllPlatformAssets().wait();
-
-			if(this.projectData.WPSdk && helpers.versionCompare(this.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
-				let shouldUpdateWPSdk = this.$prompter.confirm(`You cannot build with the Windows Phone ${this.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`).wait();
-				if(shouldUpdateWPSdk) {
-					this.onWPSdkVersionChanging("8.0").wait();
-					this.projectData.WPSdk = "8.0";
-				} else {
-					this.$errors.failWithoutHelp("Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.", newVersion);
-				}
-			}
-
-			let versionDisplayName = this.$cordovaMigrationService.getDisplayNameForVersion(newVersion).wait();
-			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
-			let oldVersion = this.projectData.FrameworkVersion;
-
-			_.each(this.configurations, (configuration: string) => {
-				let oldPluginsList = this.getProperty("CorePlugins", configuration);
-				let newPluginsList = this.$cordovaMigrationService.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
-				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
-				this.setProperty("CorePlugins", newPluginsList, configuration);
-			});
-
-			let backedUpFiles: string[] = [],
-				backupSuffix = ".backup";
-			try {
-				_.each(this.$mobileHelper.platformNames, (platform) => {
-					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
-					let cordovaJsFileName = path.join(this.getProjectDir().wait(), util.format("cordova.%s.js", platform).toLowerCase());
-					let cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
-					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
-					backedUpFiles.push(cordovaJsFileName);
-					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
-				});
-			} catch(error) {
-				_.each(backedUpFiles, file => {
-					this.$logger.trace("Reverting %s", file);
-					this.$fs.copyFile(file + backupSuffix, file).wait();
-				});
-				this.$errors.failWithoutHelp(error.message);
-			}
-			finally {
-				_.each(backedUpFiles, file => {
-					this.$fs.deleteFile(file + backupSuffix).wait();
-				});
-			}
-
-			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
-		}).future<void>()();
-	}
-
-	public getSupportedPlugins(): IFuture<string[]> {
-		return (() => {
-			let version: string;
-			if(this.projectData) {
-				version = this.projectData.FrameworkVersion;
-			} else {
-				let selectedFramework = _.last(_.select(this.$cordovaMigrationService.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf(Project.EXPERIMENTAL_TAG) === -1));
-				version = selectedFramework.Version;
-			}
-
-			return this.$cordovaMigrationService.pluginsForVersion(version).wait();
-		}).future<string[]>()();
-	}
-
-	public getSupportedWPFrameworks(): IFuture<string[]>{
-		return ((): string[]=> {
-			let validValues: string[] = [];
-			let projectSchema = this.getProjectSchema().wait();
-			if(projectSchema) {
-				validValues = this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]).wait();
-			}
-
-			return validValues;
 		}).future<string[]>()();
 	}
 

@@ -17,7 +17,6 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		private $server: Server.IServer,
 		private $projectConstants: Project.IProjectConstants) {
 
-		this.$project.ensureCordovaProject();
 	}
 
 	public getPlugins(keywords: string[]): IBasicPluginInformation[] {
@@ -104,10 +103,12 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	public getAvailablePlugins(): IFuture<Server.CordovaPluginData[]> {
+		this.$project.ensureCordovaProject();
 		return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion);
 	}
 
 	public createPluginData(plugin: Server.CordovaPluginData): IPlugin[] {
+		this.$project.ensureCordovaProject();
 		return [new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants)];
 	}
 
