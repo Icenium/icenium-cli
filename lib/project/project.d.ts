@@ -36,8 +36,13 @@ declare module Project {
 		ensureProject(): void;
 		ensureAllPlatformAssets(): IFuture<void>;
 		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
-		
 		getConfigurationsSpecifiedByUser(): string[];
+		/**
+		 * Checks wether compatible sdk versions for the given platform are used.
+		 * Issues a warning if there are updated versions available.
+		 * @param {string} platform Android, iOS or WP8
+		 */
+		checkSdkVersions(platform: string): void;
 	}
 
 	interface IFrameworkProject {
@@ -57,6 +62,13 @@ declare module Project {
 		completeProjectProperties(properties: any): boolean;
 		adjustBuildProperties(buildProperties: any, projectInformation?: IProjectInformation): any;
 		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void>;
+		/**
+		 * Checks wether compatible sdk versions for the given platform are used.
+		 * Issues a warning if there are updated versions available.
+		 * @param {string}       platform    Android, iOS or WP8
+		 * @param {IProjectData} projectData The project's data, needed to check an SDK version
+		 */
+		checkSdkVersions(platform: string, projectData: IProjectData): void;
 	}
 
 	interface IFrameworkProjectBase {

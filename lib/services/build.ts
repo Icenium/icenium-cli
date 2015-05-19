@@ -6,7 +6,6 @@ import querystring = require("querystring");
 import path = require("path");
 import os = require("os");
 import plist = require("plist");
-import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
 import AppIdentifier = require("../common/mobile/app-identifier");
@@ -30,9 +29,9 @@ export class BuildService implements Project.IBuildService {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
+		private $projectConstants: Project.IProjectConstants,
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions) { }
-
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
@@ -402,11 +401,11 @@ export class BuildService implements Project.IBuildService {
 				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 			}
 
-			this.executeBuildCordova(platform).wait();
+			this.executeBuildCore(platform).wait();
 		}).future<void>()();
 	}
 
-	private executeBuildCordova(platform: string): IFuture<void> {
+	private executeBuildCore(platform: string): IFuture<void> {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 
@@ -420,9 +419,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$loginManager.ensureLoggedIn().wait();
 
-			if(this.$mobileHelper.isWP8Platform(platform) && this.$project.projectData.WPSdk && this.$project.projectData.WPSdk === "8.0" && helpers.versionCompare(this.$project.projectData.FrameworkVersion,"3.7.0") >= 0) {
-				this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", this.$project.projectData.FrameworkVersion);
-			}
+			this.$project.checkSdkVersions(platform);
 
 			if(this.$options.companion) {
 				this.deployToIon(platform).wait();
@@ -433,10 +430,7 @@ export class BuildService implements Project.IBuildService {
 				}
 
 				let willDownload = this.$options.download;
-				let provisionTypes = [constants.ProvisionType.AdHoc];
-				if(willDownload) {
-					provisionTypes.push(constants.ProvisionType.Development);
-				}
+				let provisionTypes = _.values(constants.ProvisionType);
 
 				this.build({
 					platform: platform,

@@ -6,6 +6,7 @@ import util = require("util");
 
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
+import semver = require("semver");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
@@ -92,6 +93,12 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		properties.WP8ProductID = helpers.createGUID();
 		properties.WP8PublisherID = helpers.createGUID();
 		properties.WP8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
+	}
+
+	public checkSdkVersions(platform: string, projectData: IProjectData): void {
+		if(this.$mobileHelper.isWP8Platform(platform) && projectData.WPSdk && projectData.WPSdk === "8.0" && semver.gte(projectData.FrameworkVersion,"3.7.0")) {
+			this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", projectData.FrameworkVersion);
+		}
 	}
 
 	private getCorrectWP8PackageIdentityName(appIdentifier: string) {

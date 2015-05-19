@@ -418,6 +418,10 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
+	public checkSdkVersions(platform: string): void {
+		this.frameworkProject.checkSdkVersions(platform, this.projectData);
+	}
+
 	private printValidValuesOfProperty(property: any): IFuture<void> {
 		return (() => {
 			if(property.description) {

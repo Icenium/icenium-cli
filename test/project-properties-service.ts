@@ -54,6 +54,7 @@ class SampleProject implements Project.IFrameworkProject {
 		return null;
 	}
 	alterPropertiesForNewProject(properties: any, projectName: string): void {}
+	checkSdkVersions(platform: string, projectData: IProjectData): void { }
 	completeProjectProperties(properties: any): boolean {
 		return this.completeProjectePropertiesResult;
 	}

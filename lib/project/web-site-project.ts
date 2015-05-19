@@ -73,6 +73,8 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
+	
+	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
 
 	public projectTemplatesString(): IFuture<string> {
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.MobileWebsite\.(.+)\.zip/);
