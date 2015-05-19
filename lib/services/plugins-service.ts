@@ -56,7 +56,17 @@ export class PluginsService implements IPluginsService {
 			corePlugins = <string[]>_.union(this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME), this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
 		}
 
-		return _.map(corePlugins,(pluginIdentifier: string) => this.identifierToPlugin[pluginIdentifier]);
+		return _.map(corePlugins, pluginIdentifier => {
+			let plugin = this.identifierToPlugin[pluginIdentifier];
+			if (!plugin) {
+				let failMessage = config ?
+					`You have enabled an invalid plugin: ${pluginIdentifier} for the ${config} build configuration. Check your .${config}.abproject file in the project root and correct or remove the invalid plugin entry.` :
+					`You have enabled an invalid plugin: ${pluginIdentifier}. Check your ${this.$projectConstants.DEBUG_PROJECT_FILE_NAME} and ${this.$projectConstants.RELEASE_PROJECT_FILE_NAME} files in the project root and correct or remove the invalid plugin entry.`;
+				this.$errors.failWithoutHelp(failMessage);
+			}
+
+			return plugin;
+		});
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
