@@ -82,8 +82,8 @@ export class SamplesService implements ISamplesService {
 				let filepath = path.join(tempDir, sampleName);
 				let file = this.$fs.createWriteStream(filepath);
 				let fileEnd = this.$fs.futureFromEvent(file, "finish");
-
-				let response = this.$httpClient.httpRequest({ url: sample.zipUrl, pipeTo: file }).wait();
+				let accessToken = this.getGitHubAccessTokenQueryParameter("?").wait();
+				let response = this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
@@ -181,7 +181,8 @@ export class SamplesService implements ISamplesService {
 		return (() => {
 			try {
 				let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
-				let result = JSON.parse(this.$httpClient.httpRequest(requestUrl).wait().body);
+				let accessToken = this.getGitHubAccessTokenQueryParameter("&").wait();
+				let result = JSON.parse(this.$httpClient.httpRequest(`${requestUrl}${accessToken}`).wait().body);
 				return result;
 			} catch (error) {
 				this.$logger.debug(error);
@@ -217,6 +218,27 @@ export class SamplesService implements ISamplesService {
 
 		let matchedCategory = _.find(sortedCategories, category => category.regEx.test(description));
 		return matchedCategory ? matchedCategory.id : null;
+	}
+	
+	private getGitHubAccessTokenQueryParameter(queryToken: string): IFuture<string> {
+		return ((): string => {
+			let accessToken = "";
+			let tokenFile = this.$staticConfig.GITHUB_ACCESS_TOKEN_FILEPATH;
+			try {
+				let content = this.$fs.readFile(tokenFile).wait();
+				if(content) {
+					accessToken = `${queryToken}access_token=${content}`;
+				}
+			} catch(err) {
+				if(err.code !== "ENOENT") {
+					this.$logger.trace(`Error happened while trying to open '${tokenFile}'. Error is: ${err}`);
+				} else {
+					this.$logger.trace(`File '${tokenFile}' does not exist. GitHub api calls will be executed without access_token.`);
+				}
+			}
+
+			return accessToken;
+		}).future<string>()();
 	}
 }
 $injector.register("samplesService", SamplesService);

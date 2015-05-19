@@ -403,8 +403,12 @@ export class StaticConfig implements IStaticConfig {
 
 	public get HTML_CLI_HELPERS_DIR(): string {
 		return path.join(__dirname, "..", "docs", "helpers");
-		
 	}
+	
+	public get GITHUB_ACCESS_TOKEN_FILEPATH(): string {
+		let tokenFileName = ".abgithub";
+		return tokenFileName;
+	} 
 }
 
 export class HooksService implements IHooksService {
