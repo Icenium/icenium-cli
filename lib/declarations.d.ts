@@ -230,6 +230,10 @@ interface IConfiguration extends Config.IConfig {
 }
 
 interface IStaticConfig extends Config.IStaticConfig {
+	/**
+	 * The full path to the file, which contains GitHub access token used for GitHub api calls.
+	 */
+	GITHUB_ACCESS_TOKEN_FILEPATH: string;
 	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
 	triggerJsonSchemaValidation: boolean;

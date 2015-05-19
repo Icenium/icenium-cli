@@ -6,6 +6,7 @@ import fiber = require("fibers");
 import helpers = require("./helpers");
 import staticConfigBaseLib = require("./common/static-config-base");
 import configBaseLib = require("./common/config-base");
+import osenv = require("osenv");
 
 export class Configuration extends configBaseLib.ConfigBase implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
@@ -81,6 +82,7 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 $injector.register("config", Configuration);
 
 export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implements IStaticConfig {
+	private static TOKEN_FILENAME = ".abgithub";
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
@@ -95,6 +97,9 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public SYS_REQUIREMENTS_LINK = "http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/system-requirements-cli";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;
+	public get GITHUB_ACCESS_TOKEN_FILEPATH(): string {
+		return path.join(osenv.home(), StaticConfig.TOKEN_FILENAME);
+	}
 
 	public version = require("../package.json").version;
 
