@@ -439,7 +439,49 @@ describe("plugins-service", () => {
 		// Only cordovaPlugins are counted, availableMarketplacePlugins cannot fetched, but we still receive correct data for other plugins
 		assert.equal(2, availablePlugins.length);
 	});
+	describe("isPluginInstalled returns correct results", () => {
+		let installedMarketplacePlugins = [{
+					Identifier: "com.telerik.stripe",
+					Name: "Stripe",
+					Version: "1.0.4"
+				}
+			];
+		let availableMarketplacePlugins = [
+			{
+				Identifier: "com.telerik.stripe",
+				DefaultVersion: "1.0.4",
+				Versions: [{
+					Identifier: "com.telerik.stripe",
+					Name: "Stripe",
+					Version: "1.0.4"
+				}]
+			}
+		];
 
+		it("isPluginInstalled returns true when plugin is installed and plugin name is passed", () => {
+			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
+			let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			assert.isTrue(service.isPluginInstalled("stripe"));
+		});
+
+		it("isPluginInstalled returns true when plugin is installed and plugin identifier is passed", () => {
+			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
+			let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			assert.isTrue(service.isPluginInstalled("com.telerik.stripe"));
+		});
+
+		it("isPluginInstalled returns false when plugin is not installed and plugin name is passed", () => {
+			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
+			let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			assert.isFalse(service.isPluginInstalled("stripe"));
+		});
+
+		it("isPluginInstalled returns false when plugin is not installed and plugin identifier is passed", () => {
+			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
+			let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+			assert.isFalse(service.isPluginInstalled("com.telerik.stripe"));
+		});
+	});
 	describe("adding marketplace plugin works correctly",() => {
 		let service: IPluginsService,
 			options = require("../lib/common/options"),
