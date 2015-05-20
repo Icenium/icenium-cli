@@ -189,8 +189,8 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
-		let installedPlugin = this.getInstalledPluginByName(pluginName);
-		return installedPlugin !== null && installedPlugin !== undefined;
+		let installedPluginInstances = this.getInstalledPluginByName(pluginName);
+		return installedPluginInstances && installedPluginInstances.length > 0;
 	}
 
 	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {
