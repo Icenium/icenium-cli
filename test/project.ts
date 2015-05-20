@@ -233,6 +233,7 @@ describe("project integration tests", () => {
 			let projectName = "Test";
 			project = testInjector.resolve("project");
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			options.debug = options.release = false;
 		});
 
 		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0",() => {
@@ -503,7 +504,7 @@ function getProjectData(): IProjectData {
 
 describe("project unit tests", () => {
 	let projectProperties: IProjectPropertiesService, testInjector: IInjector;
-
+	let configSpecificData: any;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
@@ -514,6 +515,7 @@ describe("project unit tests", () => {
 		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
+		configSpecificData = undefined;
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
 	});
 
@@ -521,107 +523,159 @@ describe("project unit tests", () => {
 		it("sets unconstrained string property", () => {
 			let projectData = getProjectData();
 			projectData.DisplayName = "wrong";
-			projectProperties.updateProjectProperty(projectData, "set", "DisplayName", ["fine"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "DisplayName", ["fine"]).wait();
 			assert.equal("fine", projectData.DisplayName);
 		});
 
 		it("sets string property with custom validator", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			projectProperties.updateProjectProperty(projectData, "set", "ProjectName", ["fine"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "ProjectName", ["fine"]).wait();
 			assert.equal("fine", projectData.ProjectName);
 		});
 
 		it("disallows 'add' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "ProjectName", ["fine"]).wait());
+			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]).wait());
 		});
 
 		it("disallows 'del' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, "del", "ProjectName", ["fine"]).wait());
+			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]).wait());
 		});
 
 		it("sets bundle version when given proper input", () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30"]).wait();
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
 		it("throws on invalid bundle version string", () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "BundleVersion", ["10.20.30c"]).wait());
+			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]).wait());
 		});
 
 		it("sets enumerated property", () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
 		it("disallows unrecognized values for enumerated property", () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
+			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Portrait"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
-			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]).wait();
 			assert.deepEqual(["Portrait", "Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("appends to enumerated collection property with shorthand", () => {
 			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
-			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["1"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1"]).wait();
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
-			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["2"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["2"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("appends multiple values to enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
-			projectProperties.updateProjectProperty(projectData, "add", "iOSDeviceFamily", ["1", "2"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1", "2"]).wait();
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
 		it("removes from enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = ["Landscape", "Portrait"];
-			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
-			projectProperties.updateProjectProperty(projectData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("disallows unrecognized values for enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
+			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, "add", "deviceorientations", ["Landscape"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "deviceorientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
 		it("makes case-insensitive comparisons of property values", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, "add", "DeviceOrientations", ["Landscape"]).wait();
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]).wait();
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
+		});
+
+		it("adds CorePlugins to configuration specfic data when it is specified", () => {
+			// this is the equivalent of $ appbuilder prop set CorePlugins A B C --debug
+			let projectData = getProjectData();
+			configSpecificData = {
+				"CorePlugins": ["org.apache.cordova.battery-status",
+ 								"org.apache.cordova.camera",
+ 								"org.apache.cordova.contacts"]
+			};
+			
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "CorePlugins", ["org.apache.cordova.file"]).wait();
+			assert.deepEqual([], projectData.CorePlugins);
+			assert.deepEqual({
+				"CorePlugins": ["org.apache.cordova.battery-status",
+ 								"org.apache.cordova.camera",
+ 								"org.apache.cordova.contacts",
+								"org.apache.cordova.file"]
+			}, configSpecificData);
+		});
+		
+		it("removes value from configuration specfic data when CorePlugins are modified in it", () => {
+			// this is the equivalent of $ appbuilder prop remove CorePlugins A B C --debug
+			let projectData = getProjectData();
+			configSpecificData = {
+				"CorePlugins": ["org.apache.cordova.battery-status",
+ 								"org.apache.cordova.camera",
+ 								"org.apache.cordova.contacts"]
+			};
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "CorePlugins", ["org.apache.cordova.contacts"]).wait();
+			assert.deepEqual([], projectData.CorePlugins, "CorePlugins in project data should not be modified.");
+			assert.deepEqual({
+				"CorePlugins": ["org.apache.cordova.battery-status",
+ 								"org.apache.cordova.camera"]
+			}, configSpecificData, "CorePlugins in configuration specific data should be modified.");
+		});
+		
+		it("sets CorePlugins to configuration specfic data when it is specified", () => {
+			// this is the equivalent of $ appbuilder prop set CorePlugins A B C --debug
+			let projectData = getProjectData();
+			configSpecificData = {
+				"CorePlugins": ["org.apache.cordova.battery-status",
+ 								"org.apache.cordova.camera",
+ 								"org.apache.cordova.contacts"]
+			};
+			
+			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "CorePlugins", ["org.apache.cordova.file", "org.apache.cordova.camera"]).wait();
+			assert.deepEqual([], projectData.CorePlugins);
+			assert.deepEqual({
+				"CorePlugins": ["org.apache.cordova.file",
+ 								"org.apache.cordova.camera"]
+			}, configSpecificData);
 		});
 	});
 });

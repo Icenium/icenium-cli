@@ -14,7 +14,16 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 	}
 
 	execute(args:string[]): IFuture<void> {
-		return	this.$project.printProjectProperty(args[0]);
+		return ((): void => {
+			let configs = this.$project.getConfigurationsSpecifiedByUser();
+			if(configs.length) {
+				_.each(configs, config => {
+					this.$project.printProjectProperty(args[0], config).wait();
+				})
+			} else {
+				this.$project.printProjectProperty(args[0]).wait();
+			}
+		}).future<void>()();
 	}
 
 	allowedParameters:ICommandParameter[] = [new PrintProjectCommandParameter(this.$project)];
