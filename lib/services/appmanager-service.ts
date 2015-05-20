@@ -5,6 +5,8 @@ import constants = require("../common/mobile/constants");
 import util = require("util");
 import os = require("os");
 import options = require("../common/options");
+import helpers = require("../helpers");
+let Table = require("cli-table");
 
 class AppManagerService implements IAppManagerService {
 	private static LIVEPATCH_PLUGIN_ID = "com.telerik.LivePatch";
@@ -23,13 +25,13 @@ class AppManagerService implements IAppManagerService {
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $injector: IInjector) { }
 
-	upload(platform: string): IFuture<void> {
+	public upload(platform: string): IFuture<void> {
 		return (() => {
 			let mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
-			this.$logger.info("Accessing Telerik AppManager store.");
+			this.$logger.info("Accessing Telerik AppManager.");
 			this.$server.tam.verifyStoreCreated().wait();
 
 			this.$logger.info("Building release package.");
@@ -50,11 +52,61 @@ class AppManagerService implements IAppManagerService {
 			let projectName = this.$project.projectData.ProjectName;
 			let solutionPath = buildResult[0].solutionPath;
 			let projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
-			this.$server.tam.uploadApplication(projectName, projectName, projectPath).wait();
 
+			let publishSettings: Server.PublishSettings = {
+				IsPublished: options.publish,
+				NotifyByPush: options.sendPush,
+				NotifyByEmail: options.sendEmail,
+				Groups: []
+			};
+
+			if (options.group) {
+
+				if(!_.isArray(options.group)) {
+                    options.group = [options.group];
+				}
+
+				publishSettings.Groups = this.findGroups(options.group).wait();
+			}
+
+			if(!options.publish && options.sendEmail) {
+				this.$logger.warn("You have not set the --publish switch. Your users will not receive an email.");
+			}
+
+			if(!options.publish && options.sendPush) {
+				this.$logger.warn("You have not set the --publish switch. Your users will not receive a push notification.");
+			}
+
+			this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait();
 			this.$logger.info("Successfully uploaded package.");
-
 			this.openAppManagerStore();
+		}).future<void>()();
+	}
+
+	public getGroups(): IFuture<void> {
+		return (() => {
+			this.$loginManager.ensureLoggedIn().wait();
+
+			this.$logger.info("Accessing Telerik AppManager.");
+			this.$logger.info("Retrieving distribution groups from Telerik AppManager.");
+			let groups = this.$server.tam.getGroups().wait();
+
+			if (!groups.length) {
+				this.$logger.info("Cannot find distribution groups.");
+				return;
+			}
+
+			let table = new Table({
+				head: ["Index", "Name"],
+				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
+			});
+
+			_.forEach(groups, (group, index) => {
+				table.push([(index + 1).toString(), group.Name]);
+			});
+
+			this.$logger.out(table.toString());
+
 		}).future<void>()();
 	}
 
@@ -98,6 +150,28 @@ class AppManagerService implements IAppManagerService {
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");
 			}
 		}).future<void>()();
+	}
+
+	private findGroups(identityStrings:string[]): IFuture<string[]> {
+		return ((): string[] => {
+			let availableGroups = this.$server.tam.getGroups().wait();
+
+			if (!availableGroups.length) {
+				this.$errors.failWithoutHelp("Cannot find distribution groups.");
+			}
+
+			return _.map(identityStrings, identityStr => {
+				let group = helpers.findByNameOrIndex(identityStr, availableGroups, (group) => group.Name);
+
+				if (!group) {
+					this.$errors.failWithoutHelp ("Cannot find group that matches the provided <Group ID>: '%s'.To list the available groups, run $ appbuilder appmanager groups",
+						identityStr,
+						os.EOL);
+				}
+
+				return group.Id;
+			});
+		}).future<string[]>()();
 	}
 }
 $injector.register("appManagerService", AppManagerService);

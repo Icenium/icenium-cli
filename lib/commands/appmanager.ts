@@ -36,3 +36,14 @@ class AppManagerUploadWP8Command implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 }
 $injector.registerCommand("appmanager|upload|wp8", AppManagerUploadWP8Command);
+
+class AppManagerGetGroupsCommand implements ICommand {
+	constructor(private $appManagerService: IAppManagerService) { }
+
+	execute(args: string[]): IFuture<void> {
+		return this.$appManagerService.getGroups();
+	}
+
+	allowedParameters: ICommandParameter[] = [];
+}
+$injector.registerCommand("appmanager|groups", AppManagerGetGroupsCommand);

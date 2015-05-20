@@ -21,6 +21,7 @@ Command | Description
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager groups](appmanager-groups.html) | Lists all available user groups from Telerik AppManager.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
 [appstore upload](appstore-upload.html) | Builds the project and uploads the application to iTunes Connect.
 [certificate](certificate.html) | Lists all configured certificates for code signing iOS and Android applications with index and name.

@@ -16,7 +16,8 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `upload android` - Builds the project for Android and uploads the binary to Telerik AppManager.
 * `upload ios` - Builds the project for iOS and uploads the binary to Telerik AppManager.
 <% if(isCordova) { %>* `upload wp8` - Builds the project for Windows Phone and uploads the binary to Telerik AppManager.
-* `livesync` - Publishes a new Telerik AppManager LiveSync update of your application.<% } %> 
+* `livesync` - Publishes a new Telerik AppManager LiveSync update of your application.
+* `groups` - Lists all available user groups from Telerik AppManager.<% } %> 
 <% } %> 
 <% if(isHtml) { %> 
 ### Command Limitations
@@ -30,6 +31,7 @@ Command | Description
 [appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager groups](appmanager-groups.html) | Lists all available user groups from Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
 [appstore upload](appstore-upload.html) | Builds the project and uploads the application to iTunes Connect.
