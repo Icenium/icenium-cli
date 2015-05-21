@@ -573,6 +573,9 @@ interface IPublishConnection extends IStringDictionary {
 	name: string;
 }
 
+/**
+ * Represents all supported options.
+ */
 interface IOptions extends ICommonOptions {
 	validateOptions(): void;	
 	

@@ -17,7 +17,7 @@ let cordovaBlankTemplateZipFileIncorrectName = path.join(__dirname, "../resource
 import childProcessLib = require("../lib/common/child-process");
 import staticConfigLib = require("../lib/config");
 
-function isOsCaseInsensitive(testInjector: IInjector): boolean {
+function isOsCaseSensitive(testInjector: IInjector): boolean {
 	let hostInfo = testInjector.resolve("hostInfo");
 	return hostInfo.isLinux;
 };
@@ -97,7 +97,7 @@ describe("FileSystem", () => {
 				let tempDir = temp.mkdirSync("projectToUnzip");
 				let fs: IFileSystem = testInjector.resolve("fs");
 				let file = path.join(tempDir, ".abproject");
-				if(isOsCaseInsensitive(testInjector)) {
+				if(isOsCaseSensitive(testInjector)) {
 					assert.throws(() => fs.unzip(cordovaBlankTemplateZipFileIncorrectName, tempDir, undefined, [".abproject"]).wait());
 				}
 			});
@@ -107,7 +107,7 @@ describe("FileSystem", () => {
 				let tempDir = temp.mkdirSync("projectToUnzip");
 				let fs: IFileSystem = testInjector.resolve("fs");
 				let file = path.join(tempDir, ".abproject");
-				if(isOsCaseInsensitive(testInjector)) {
+				if(isOsCaseSensitive(testInjector)) {
 					assert.throws(() => fs.unzip(cordovaBlankTemplateZipFileIncorrectName, tempDir, {}, [".abproject"]).wait());
 				}
 			});
@@ -117,7 +117,7 @@ describe("FileSystem", () => {
 				let tempDir = temp.mkdirSync("projectToUnzip");
 				let fs: IFileSystem = testInjector.resolve("fs");
 				let file = path.join(tempDir, ".abproject");
-				if(isOsCaseInsensitive(testInjector)) {
+				if(isOsCaseSensitive(testInjector)) {
 					assert.throws(() => fs.unzip(cordovaBlankTemplateZipFileIncorrectName, tempDir, { caseSensitive: true }, [".abproject"]).wait());
 				}
 			});

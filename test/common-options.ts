@@ -263,13 +263,13 @@ describe("common options profile-dir tests", () => {
 		it("uses profile-dir from yargs when it exists", () => {
 
 			let expectedProfileDir = "TestDir";
-
+			
 			yargs.argv = {};
 			yargs.argv["profile-dir"] = expectedProfileDir;
 			
 			let options = createOptionsWithProfileDir("");
 			options.validateOptions();			
-
+			
 			assert.equal(options["profile-dir"], expectedProfileDir);
 			assert.equal(options["profileDir"], expectedProfileDir);
 		});
@@ -291,6 +291,6 @@ describe("common options profile-dir tests", () => {
 			
 			assert.equal(options["profileDir"], expectedProfileDir);
 			assert.equal(options["profile-dir"], expectedProfileDir);
-		});  
+		});
 	}); 
 });

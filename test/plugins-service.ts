@@ -576,8 +576,6 @@ describe("plugins-service", () => {
 
 			options.debug = true;
 			options.release = false;
-			console.log("installed plugins in debug config!!! ");
-			console.log(service.getInstalledPlugins());
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(),(pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(0, toastInDebugConfig.length, "Plugin toast should not be enabled in debug configuration.");
 		});

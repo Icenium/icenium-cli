@@ -107,7 +107,7 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 		let configurations: string[] = [ ProjectFilesManager.IGNORE_FILE ];
 		// unless release is explicitly set, we use debug config
 		let configFileName = "." +
-			((this.$options.release) ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME) +
+			(this.$options.release ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME) +
 			ProjectFilesManager.IGNORE_FILE;
 		configurations.push(configFileName);
 		return configurations;

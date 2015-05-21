@@ -10,7 +10,6 @@ import microTemplateServiceLib = require("../lib/common/services/micro-templatin
 import dynamicHelpServiceLib = require("../lib/common/services/dynamic-help-service");
 import dynamicHelpProviderLib = require("../lib/dynamic-help-provider");
 import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
-
 import optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
 
@@ -25,8 +24,8 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 	});
 	injector.register("errors", stubs.ErrorsStub);
 	injector.register("options", optionsLib.Options);
-	let options = injector.resolve("options");
-	options.help = true;
+	let $options = injector.resolve("options");
+	$options.help = true;
 	injector.register("logger", logger);
 
 	opts = opts || { isPlatformResult: true, isProjectTypeResult: true };
