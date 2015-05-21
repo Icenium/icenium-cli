@@ -109,11 +109,11 @@ export class UserDataStore implements IUserDataStore {
 	}
 
 	private getCookieFilePath(): string {
-		return path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".cookie");
+		return path.join(this.$options.profileDir, this.$config.AB_SERVER + ".cookie");
 	}
 
 	private getUserStateFilePath(): string {
-		return path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".user");
+		return path.join(this.$options.profileDir, this.$config.AB_SERVER + ".user");
 	}
 }
 $injector.register("userDataStore", UserDataStore);
@@ -175,7 +175,7 @@ export class LoginManager implements ILoginManager {
 
 	private doLogin(): IFuture<void> {
 		return (() => {
-			this.$fs.createDirectory(this.$options["profile-dir"]).wait();
+			this.$fs.createDirectory(this.$options.profileDir).wait();
 
 			this.loginInBrowser().wait();
 

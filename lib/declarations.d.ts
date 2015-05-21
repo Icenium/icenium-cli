@@ -577,7 +577,9 @@ interface IPublishConnection extends IStringDictionary {
  * Represents all supported options.
  */
 interface IOptions extends ICommonOptions {
-	validateOptions(): void;	
+	validateOptions(): void;
+	options: IDictionary<any>;
+	shorthands: string[];	
 	
 	companion: boolean;
 	download: boolean;
@@ -587,12 +589,11 @@ interface IOptions extends ICommonOptions {
 	deploy: string;
 	device: string;
 	file: string;
-	"save-to": string;
+	saveTo: string;
 	client: string;
 	available: boolean;
 	release: boolean;
 	debug: boolean;
-	"valid-value": boolean;
 	screenBuilderCacheDir: string;
 	force: boolean;
 	validValue: boolean;
@@ -602,9 +603,7 @@ interface IOptions extends ICommonOptions {
 	verified: boolean;
 	latest: boolean;
 	publish: boolean;
-	"send-push": boolean;
 	sendPush: boolean;
-	"send-email": boolean;
 	sendEmail: boolean;
 	group: string[];
 }

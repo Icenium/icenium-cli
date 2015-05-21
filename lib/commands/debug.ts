@@ -170,10 +170,10 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	}
 }
 
-let hostInfo = this.$injector.resolve("hostInfo");
-if(hostInfo.isWindows()) {
+let hostInfo: IHostInfo = this.$injector.resolve("hostInfo");
+if(hostInfo.isWindows) {
 	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
-} else if(hostInfo.isDarwin()) {
+} else if(hostInfo.isDarwin) {
 	$injector.register("debuggerPlatformServices", DarwinDebuggerPlatformServices);
 } else {
 	$injector.register("debuggerPlatformServices", {}); // for unsupported OSes

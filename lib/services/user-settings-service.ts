@@ -13,7 +13,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 
 	constructor(private $fs: IFileSystem,
 		$options: IOptions) {
-		this.userSettingsFile = path.join($options["profile-dir"], "local-user-settings.json");
+		this.userSettingsFile = path.join($options.profileDir, "local-user-settings.json");
 	}
 
 	public get userSettingsFilePath(): string {
@@ -40,7 +40,7 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 	constructor(private $fs: IFileSystem,
 				private $config: Config.IConfig,
 				private $options: IOptions) {
-		this.userSettingsFile = path.join(this.$options["profile-dir"], this.$config.AB_SERVER + ".user-settings.xml");
+		this.userSettingsFile = path.join(this.$options.profileDir, this.$config.AB_SERVER + ".user-settings.xml");
 	}
 
 	public get userSettingsFilePath(): string {
@@ -67,7 +67,7 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
 			if(!this.userSettingsData) {
-				this.$fs.createDirectory(this.$options["profile-dir"]).wait();
+				this.$fs.createDirectory(this.$options.profileDir).wait();
 
 				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath).wait()) {
 					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();

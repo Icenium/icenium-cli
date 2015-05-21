@@ -14,9 +14,9 @@ let knownOpts = {
 	"path": { type: optionType.String },
 	"help": { type: optionType.Boolean } ,
 	"verbose": { type: optionType.Boolean, alias: "v" },
-	"profile-dir": { type: optionType.String },
-	"some-dashed-value": { type: optionType.String },
-	"a-b-c-d-e-f-g": { type: optionType.String }
+	"profileDir": { type: optionType.String },
+	"someDashedValue": { type: optionType.String },
+	"aBCDEFG": { type: optionType.String }
 };
 
 function createTestInjector(): IInjector {
@@ -266,20 +266,19 @@ describe("common options profile-dir tests", () => {
 			
 			yargs.argv = {};
 			yargs.argv["profile-dir"] = expectedProfileDir;
+			yargs.argv["profileDir"] = expectedProfileDir;
 			
 			let options = createOptionsWithProfileDir("");
 			options.validateOptions();			
 			
-			assert.equal(options["profile-dir"], expectedProfileDir);
-			assert.equal(options["profileDir"], expectedProfileDir);
+			assert.equal(options.profileDir, expectedProfileDir);
 		});
 
 		it("sets default profile-dir when it is not passed on command line", () => {
 			let profileDir = "TestDir";
 			let options = createOptionsWithProfileDir("TestDir");
 			options.validateOptions();
-			assert.equal(options["profile-dir"], profileDir);
-			assert.equal(options["profileDir"], profileDir);
+			assert.equal(options.profileDir, profileDir);
 		});
 
 		it("uses profileDir from yargs when it exists", () => {
@@ -289,8 +288,7 @@ describe("common options profile-dir tests", () => {
 			let options = createOptionsWithProfileDir("");
 			options.validateOptions();
 			
-			assert.equal(options["profileDir"], expectedProfileDir);
-			assert.equal(options["profile-dir"], expectedProfileDir);
+			assert.equal(options.profileDir, expectedProfileDir);
 		});
 	}); 
 });

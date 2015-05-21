@@ -5,7 +5,6 @@ import util = require("util");
 import querystring = require("querystring");
 import path = require("path");
 import os = require("os");
-let options: any = require("../common/options");
 import plist = require("plist");
 import helpers = require("../helpers");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
@@ -31,7 +30,8 @@ export class BuildService implements Project.IBuildService {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $progressIndicator: IProgressIndicator) { }
+		private $progressIndicator: IProgressIndicator,
+		private $options: IOptions) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -120,8 +120,8 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
 
 				let certificateData: ICryptographicIdentity;
-				if(options.certificate) {
-					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+				if(this.$options.certificate) {
+					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
 				} else if(settings.buildForTAM) {
 					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
 						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
@@ -166,11 +166,11 @@ export class BuildService implements Project.IBuildService {
 				buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
 				buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
 
-				let completeAutoselect = (!options.provision && !options.certificate);
+				let completeAutoselect = (!this.$options.provision && !this.$options.certificate);
 
 				let provisionData: IProvision;
-				if(options.provision) {
-					provisionData = this.$identityManager.findProvision(options.provision).wait();
+				if(this.$options.provision) {
+					provisionData = this.$identityManager.findProvision(this.$options.provision).wait();
 					if(settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
 						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
@@ -178,16 +178,16 @@ export class BuildService implements Project.IBuildService {
 				} else if(!settings.buildForiOSSimulator) {
 					let deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
 					provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes, deviceIdentifier).wait();
-					options.provision = provisionData.Name;
+					this.$options.provision = provisionData.Name;
 				}
 				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
 
 				let certificateData: ICryptographicIdentity;
-				if(options.certificate) {
-					certificateData = this.$identityManager.findCertificate(options.certificate).wait();
+				if(this.$options.certificate) {
+					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
 				} else if(!settings.buildForiOSSimulator) {
 					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
-					options.certificate = certificateData.Alias;
+					this.$options.certificate = certificateData.Alias;
 				}
 				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
 
@@ -197,7 +197,7 @@ export class BuildService implements Project.IBuildService {
 						deviceIdentifier: settings.device ? settings.device.getIdentifier() : null
 					});
 					iOSDeploymentValidator.throwIfInvalid(
-						{ provisionOption: options.provision, certificateOption: options.certificate }).wait();
+						{ provisionOption: this.$options.provision, certificateOption: this.$options.certificate }).wait();
 				}
 
 				if(provisionData) {
@@ -214,7 +214,7 @@ export class BuildService implements Project.IBuildService {
 				return buildResult;
 			} else if(settings.platform === "WP8") {
 				let buildCompanyHubApp = !settings.downloadFiles;
-				if(this.$project.projectData.WPSdk === "8.1" && ((options.release && settings.downloadFiles) || settings.buildForTAM)) {
+				if(this.$project.projectData.WPSdk === "8.1" && ((this.$options.release && settings.downloadFiles) || settings.buildForTAM)) {
 					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
 						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
 						"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
@@ -304,7 +304,7 @@ export class BuildService implements Project.IBuildService {
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
-			settings.configuration = settings.configuration || (options.release ? "Release" : "Debug");
+			settings.configuration = settings.configuration || (this.$options.release ? "Release" : "Debug");
 			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);
 
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
@@ -386,7 +386,7 @@ export class BuildService implements Project.IBuildService {
 				platform: platform,
 				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
-				downloadedFilePath: options["save-to"],
+				downloadedFilePath: this.$options.saveTo,
 				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
 				device: device
 			}).wait();
@@ -410,11 +410,11 @@ export class BuildService implements Project.IBuildService {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 
-			if(options["save-to"]) {
-				options.download = true;
+			if(this.$options.saveTo) {
+				this.$options.download = true;
 			}
 
-			if(options.download && options.companion) {
+			if(this.$options.download && this.$options.companion) {
 				this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
 			}
 
@@ -424,15 +424,15 @@ export class BuildService implements Project.IBuildService {
 				this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", this.$project.projectData.FrameworkVersion);
 			}
 
-			if(options.companion) {
+			if(this.$options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
-				if(!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !options.download) {
+				if(!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
 					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
-					options.download = true;
+					this.$options.download = true;
 				}
 
-				let willDownload = options.download;
+				let willDownload = this.$options.download;
 				let provisionTypes = [constants.ProvisionType.AdHoc];
 				if(willDownload) {
 					provisionTypes.push(constants.ProvisionType.Development);
@@ -441,9 +441,9 @@ export class BuildService implements Project.IBuildService {
 				this.build({
 					platform: platform,
 					configuration: this.$project.getBuildConfiguration(),
-					showQrCodes: !options.download,
-					downloadFiles: options.download,
-					downloadedFilePath: options["save-to"],
+					showQrCodes: !this.$options.download,
+					downloadFiles: this.$options.download,
+					downloadedFilePath: this.$options.saveTo,
 					provisionTypes: provisionTypes
 				}).wait();
 			}

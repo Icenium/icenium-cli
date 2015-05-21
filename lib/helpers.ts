@@ -7,7 +7,6 @@ import querystring = require("querystring");
 import Future = require("fibers/future");
 import osenv = require("osenv");
 import commonHelpers = require("./common/helpers");
-let hostInfo = $injector.resolve("hostInfo");
 
 export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");

@@ -20,12 +20,12 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			deploy: { type: OptionType.String },
 			device: { type: OptionType.String },
 			file: { type: OptionType.String },
-			"save-to": { type: OptionType.String},
+			saveTo: { type: OptionType.String},
 			client: { type: OptionType.String },
 			available: { type: OptionType.Boolean },
 			release: { type: OptionType.Boolean, alias: "r" },
 			debug: { type: OptionType.Boolean, alias: "d" },
-			"valid-value": { type: OptionType.Boolean },
+			validValue: { type: OptionType.Boolean },
 			screenBuilderCacheDir: { type: OptionType.String },
 			force: { type: OptionType.Boolean, alias: "f" },
 			core: { type: OptionType.Boolean },
@@ -33,11 +33,11 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			latest: { type: OptionType.Boolean },
 			verified: { type: OptionType.Boolean },
 			publish: { type: OptionType.Boolean },
-			"send-push": { type: OptionType.Boolean },
-			"send-email": { type: OptionType.Boolean },
+			sendPush: { type: OptionType.Boolean },
+			sendEmail: { type: OptionType.Boolean },
 			group: { type: OptionType.Array } 
 		},
-		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share", "Telerik", "BlackDragon", ".appbuilder-cli")),
+		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
 			$errors, $staticConfig);
 		
 		let that = <any>this;

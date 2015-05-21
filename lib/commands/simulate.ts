@@ -138,11 +138,10 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-// TODO refactor this!
-let commonHostInfo = this.$injector.resolve("hostInfo");
-if(commonHostInfo.isWindows()) {
+let hostInfo = this.$injector.resolve("hostInfo");
+if(hostInfo.isWindows) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
-} else if(commonHostInfo.isDarwin()) {
+} else if(hostInfo.isDarwin) {
 	$injector.register("simulatorPlatformServices", MacSimulatorPlatformServices);
 } else {
 	$injector.register("simulatorPlatformServices", {});

@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-let options: any = require("../common/options");
 import Future = require("fibers/future");
 import util = require("util");
 import helpers = require("../helpers");
@@ -57,7 +56,8 @@ export class IdentityManager implements Server.IIdentityManager {
 		private $logger: ILogger,
 		private $errors: IErrors,
 		private $x509: IX509CertificateLoader,
-		private $injector: IInjector) {
+		private $injector: IInjector,
+		private $options: IOptions) {
 	}
 
 	public listCertificates(): IFuture<void> {
@@ -79,7 +79,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	private printProvisionData(provision: IProvision, provisionIndex: number): void {
 		this.$logger.out("%s: '%s', type: %s, App ID: '%s.%s'", (provisionIndex + 1).toString(), provision.Name, provision.ProvisionType,
 			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
-		if (options.verbose || options.v) {
+		if (this.$options.verbose) {
 			let devices = provision.ProvisionedDevices;
 			if(devices && devices.length) {
 				this.$logger.out("  Provisioned device identifiers:");
@@ -497,7 +497,8 @@ export class ExportCryptographicIdentity implements ICommand {
 		private $logger: ILogger,
 		private $errors: IErrors,
 		private $stringParameterBuilder: IStringParameterBuilder,
-		private $injector: IInjector) { }
+		private $injector: IInjector,
+		private $options: IOptions) { }
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index."),
 		new commandParams.StringCommandParameter(this.$injector)];
@@ -537,8 +538,8 @@ export class ExportCryptographicIdentity implements ICommand {
 	}
 
 	private getPath(): string {
-		let path: string = options.path;
-		delete options.path;
+		let path: string = this.$options.path;
+		delete this.$options.path;
 
 		if(!path) {
 			path = process.cwd();
@@ -726,7 +727,8 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 		private $errors: IErrors,
 		private $fs: IFileSystem,
 		private $server: Server.IServer,
-		private $stringParameterBuilder: IStringParameterBuilder) { }
+		private $stringParameterBuilder: IStringParameterBuilder,
+		private $options: IOptions) { }
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate signing request index to delete.")];
 
@@ -744,7 +746,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 	public downloadCertificate(uniqueName: string): IFuture<void> {
 		return ((): void => {
-			let targetFileName = options["save-to"];
+			let targetFileName = this.$options.saveTo;
 			if(targetFileName) {
 				if(this.$fs.exists(targetFileName).wait()) {
 					this.$errors.fail("The output file already exists.");
