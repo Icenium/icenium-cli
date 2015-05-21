@@ -42,7 +42,7 @@ export class SimulateCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 
 	public canExecute(args: string[]): IFuture<boolean> {
-		if(this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
+		if(!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on %s. The device simulator for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}
 
@@ -138,7 +138,7 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-let hostInfo = this.$injector.resolve("hostInfo");
+let hostInfo = $injector.resolve("hostInfo");
 if(hostInfo.isWindows) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
 } else if(hostInfo.isDarwin) {
