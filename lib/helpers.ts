@@ -7,7 +7,6 @@ import querystring = require("querystring");
 import Future = require("fibers/future");
 import osenv = require("osenv");
 import commonHelpers = require("./common/helpers");
-import hostInfo = require("./common/host-info");
 
 export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");
@@ -218,9 +217,4 @@ export function fill(value: string, times: number): string[]{
 	}
 
 	return repeatedValues;
-}
-
-export function defaultProfileDir(): string {
-	let cacheRootDirectoryPath = hostInfo.isWindows() ? process.env.LocalAppData : path.join(osenv.home(), ".local/share");
-	return path.join(cacheRootDirectoryPath, "Telerik", "BlackDragon", ".appbuilder-cli");
 }

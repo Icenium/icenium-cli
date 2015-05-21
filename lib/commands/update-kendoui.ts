@@ -2,7 +2,6 @@
 "use strict";
 import temp = require("temp");
 import path = require("path");
-import options = require("../common/options");
 let Table = require("cli-table");
 
 class UpdateKendoUICommand implements ICommand {
@@ -10,16 +9,15 @@ class UpdateKendoUICommand implements ICommand {
 	private static KENDO_CORE = "Kendo UI Core";
 	private static KENDO_PROFESSIONAL = "Kendo UI Professional";
 
-	constructor(
-		private $errors: IErrors
-		,private $logger: ILogger
-		,private $project: Project.IProject
-		,private $loginManager: ILoginManager
-		,private $server: Server.IServer
-		,private $prompter: IPrompter
-		,private $fs: IFileSystem
-		,private $httpClient: Server.IHttpClient
-		) {	}
+	constructor(private $errors: IErrors,
+		private $logger: ILogger,
+		private $project: Project.IProject,
+		private $loginManager: ILoginManager,
+		private $server: Server.IServer,
+		private $prompter: IPrompter,
+		private $fs: IFileSystem,
+		private $httpClient: Server.IHttpClient,
+		private $options: IOptions) {	}
 
 	allowedParameters: ICommandParameter[] = [];
 
@@ -29,7 +27,7 @@ class UpdateKendoUICommand implements ICommand {
 				this.$errors.fail("This command does not accept parameters.");
 			}
 
-			if(options.core && options.professional) {
+			if(this.$options.core && this.$options.professional) {
 				this.$errors.fail("You cannot specify core and professional options simultaneously.");
 			}
 
@@ -46,28 +44,28 @@ class UpdateKendoUICommand implements ICommand {
 			}
 
 			let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
-			if(options.verified) {
+			if(this.$options.verified) {
 				packages = _.filter(packages, pack => _.any(pack.VersionTags, tag => tag.toLowerCase() === UpdateKendoUICommand.VERIFIED_TAG));
 			}
 
-			if(options.core) {
+			if(this.$options.core) {
 				packages = _.filter(packages, pack => pack.Name === UpdateKendoUICommand.KENDO_CORE);
 			}
 
-			if(options.professional) {
+			if(this.$options.professional) {
 				packages = _.filter(packages, pack => pack.Name === UpdateKendoUICommand.KENDO_PROFESSIONAL);
 			}
 
 			if(packages.length === 0) {
 				let message = "Cannot find Kendo UI packages that match the provided parameters.";
-				if(options.professional) {
+				if(this.$options.professional) {
 					message += " Verify that your subscription plan provides 'Kendo UI Professional'.";
 				}
 				this.$errors.failWithoutHelp(message);
 			}
 
 			let downloadUri: string;
-			if(options.latest) {
+			if(this.$options.latest) {
 				let latestPackage = _.first(packages);
 				let sameDateItems = _.filter(packages, pack => pack.Version === latestPackage.Version);
 				if(sameDateItems.length > 1) {

@@ -6,7 +6,6 @@ import util = require("util");
 
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
-import options = require("../common/options");
 
 export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
@@ -22,8 +21,9 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader,
-		private $mobileHelper: Mobile.IMobileHelper) {
-		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
+		private $mobileHelper: Mobile.IMobileHelper,
+		$options: IOptions) {
+		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
 	public get name(): string {
@@ -109,7 +109,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
 		let projectData = projectInformation.projectData;
-		let configurationName = options.release ? "release" : "debug";
+		let configurationName = this.$options.release ? "release" : "debug";
+		
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 
 		if(buildProperties.Platform === "WP8") {

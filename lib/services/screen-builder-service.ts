@@ -3,7 +3,6 @@
 import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
-import options = require("../common/options");
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
@@ -16,7 +15,8 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $dependencyConfigService: IDependencyConfigService,
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
-		private $logger: ILogger) { }
+		private $logger: ILogger,
+		private $options: IOptions) { }
 
 	public get generatorName(): string {
 		return "generator-kendo-ui-mobile";
@@ -52,10 +52,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void> {
 		this.$logger.trace("Installing project dependencies using bower");
+
+		let projectDirPath = path.resolve(this.$options.path || ".");
 		let bowerModuleFilePath = require.resolve("bower");
 		let bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
 		let command = util.format("%s %s install", "node", bowerPath);
-		return this.$childProcess.exec(command, { cwd: screenBuilderOptions.projectPath });
+		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
 
 	private prepareScreenBuilder(): IFuture<void> {
@@ -94,7 +96,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			let connector = {
 				generatorsCache: appScaffoldingPath,
 				generatorsAlias: ['H'],
-				path: screenBuilderOptions.projectPath || path.resolve(options.path || "."),
+				path: screenBuilderOptions.projectPath || path.resolve(this.$options.path || "."),
 				dependencies: [util.format("%s@%s", generatorName, this.$dependencyConfigService.getGeneratorConfig(generatorName).wait().version)],
 				connect: (done:Function) => {
 					done();

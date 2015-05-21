@@ -3,7 +3,6 @@
 
 import os = require("os");
 import util = require("util");
-import options = require("../common/options");
 import pluginsDataLib = require("../plugins-data");
 import Future = require("fibers/future");
 import helpers = require("../common/helpers");
@@ -29,8 +28,8 @@ export class PluginsService implements IPluginsService {
 		private $project: Project.IProject,
 		private $prompter: IPrompter,
 		private $loginManager: ILoginManager,
-		private $projectConstants: Project.IProjectConstants) {
-	}
+		private $projectConstants: Project.IProjectConstants,
+		private $options: IOptions) { }
 
 	private loadPluginsData(): IFuture<void> {
 		return (() => {
@@ -45,15 +44,15 @@ export class PluginsService implements IPluginsService {
 
 	public getInstalledPlugins(): IPlugin[] {
 		let corePlugins: IPlugin[] = [];
-		if(options.debug) {
+		if(this.$options.debug) {
 			corePlugins = corePlugins.concat(this.getInstalledPluginsForConfiguration(this.$projectConstants.DEBUG_CONFIGURATION_NAME));
 		}
 
-		if(options.release) {
+		if(this.$options.release) {
 			corePlugins = corePlugins.concat(this.getInstalledPluginsForConfiguration(this.$projectConstants.RELEASE_CONFIGURATION_NAME));
 		}
 
-		if(!options.debug && !options.release) {
+		if(!this.$options.debug && !this.$options.release) {
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
@@ -166,7 +165,7 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public printPlugins(plugins: IPlugin[]): void {
-		if(options.available) {
+		if(this.$options.available) {
 			// Group marketplace plugins
 			let marketplacePlugins = _.filter(plugins,(pl) => pl.type === pluginsDataLib.PluginType.MarketplacePlugin);
 			let output = _.filter(plugins, pl => pl.type === pluginsDataLib.PluginType.CorePlugin || pl.type === pluginsDataLib.PluginType.AdvancedPlugin);

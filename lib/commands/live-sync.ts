@@ -2,7 +2,6 @@
 "use strict";
 import util = require("util");
 import path = require("path");
-let options: any = require("../common/options");
 let gaze = require("gaze");
 import helpers = require("./../helpers");
 import AppIdentifier = require("../common/mobile/app-identifier");

@@ -12,7 +12,7 @@ import temp = require("temp");
 import util = require("util");
 import mobileHelperLib = require("../lib/common/mobile/mobile-helper");
 import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
-import options = require("./../lib/common/options");
+import optionsLib = require("./../lib/options");
 import helpers = require("../lib/helpers");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
 import nativeScriptProjectLib = require("./../lib/project/nativescript-project");
@@ -28,6 +28,7 @@ import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabil
 import projectPropertiesService = require("../lib/services/project-properties-service");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
 import Future = require("fibers/future");
+import hostInfoLib = require("../lib/common/host-info");
 let projectConstants = new projectConstantsLib.ProjectConstants();
 let assert = require("chai").assert;
 temp.track();
@@ -136,23 +137,24 @@ function createTestInjector(): IInjector {
 		}
 	});
 	testInjector.register("projectPropertiesService", projectPropertiesService.ProjectPropertiesService);
+	testInjector.register("options", optionsLib.Options);
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 
 	return testInjector;
 }
 
 describe("project integration tests", () => {
-	let project: Project.IProject, testInjector: IInjector;
+	let project: Project.IProject, testInjector: IInjector, options: IOptions;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
-
+		options = testInjector.resolve("options");
 	});
 
 	describe("createNewProject", () => {
 		it("creates a valid project folder (Cordova project)", () => {
 			project = testInjector.resolve(projectlib.Project);
-			let options: any = require("./../lib/common/options");
 			let tempFolder = temp.mkdirSync("template");
 			let projectName = "Test";
 
@@ -185,7 +187,6 @@ describe("project integration tests", () => {
 
 		it("creates a valid project folder (NativeScript project)", () => {
 			project = testInjector.resolve(projectlib.Project);
-			let options: any = require("./../lib/common/options");
 			let tempFolder = temp.mkdirSync("template");
 			let projectName = "Test";
 
@@ -224,7 +225,6 @@ describe("project integration tests", () => {
 		beforeEach(() => {
 			prompter = testInjector.resolve("prompter");
 			prompter.confirmResult = true;
-			let options: any = require("../lib/common/options");
 			let tempFolder = temp.mkdirSync("template");
 
 			options.path = tempFolder;
@@ -296,12 +296,10 @@ describe("project integration tests", () => {
 	});
 
 	describe("Init command tests",() => {
-		let options: any;
 		let tempFolder: string;
 		let projectName = "Test";
 		let mobileHelper: Mobile.IMobileHelper;
 		beforeEach(() => {
-			options = require("../lib/common/options");
 			tempFolder = temp.mkdirSync("template");
 			options.path = tempFolder;
 			options.appid = "com.telerik.Test";
@@ -503,7 +501,7 @@ function getProjectData(): IProjectData {
 }
 
 describe("project unit tests", () => {
-	let projectProperties: IProjectPropertiesService, testInjector: IInjector;
+	let projectProperties: IProjectPropertiesService, testInjector: IInjector, options: IOptions;
 	let configSpecificData: any;
 	beforeEach(() => {
 		testInjector = createTestInjector();
@@ -517,6 +515,7 @@ describe("project unit tests", () => {
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
 		configSpecificData = undefined;
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
+		options = testInjector.resolve("options");
 	});
 
 	describe("updateProjectProperty", () => {
@@ -681,7 +680,7 @@ describe("project unit tests", () => {
 });
 
 describe("project unit tests (canonical paths)", () => {
-	let project: any, testInjector: IInjector, oldPath: string;
+	let project: any, testInjector: IInjector, oldPath: string, options: IOptions;
 	beforeEach(() => {
 		testInjector = createTestInjector();
 		testInjector.register("config", require("../lib/config").Configuration);
@@ -692,6 +691,7 @@ describe("project unit tests (canonical paths)", () => {
 		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.triggerJsonSchemaValidation = false;
 		project = testInjector.resolve("project");
+		options = testInjector.resolve("options");
 
 		oldPath = options.path;
 	});
@@ -725,7 +725,7 @@ describe("project unit tests (canonical paths)", () => {
 });
 
 describe("cordovaProject unit tests",() => {
-	let projectProperties: IProjectPropertiesService, testInjector: IInjector;
+	let projectProperties: IProjectPropertiesService, testInjector: IInjector, options: IOptions;
 
 	beforeEach(() => {
 		testInjector = createTestInjector();
@@ -737,6 +737,7 @@ describe("cordovaProject unit tests",() => {
 		let staticConfig = testInjector.resolve("staticConfig");
 		staticConfig.PROJECT_FILE_NAME = "";
 		config.AUTO_UPGRADE_PROJECT_FILE = false;
+		options = testInjector.resolve("options");
 
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
 	});

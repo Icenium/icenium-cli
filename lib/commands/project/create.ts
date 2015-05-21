@@ -3,7 +3,6 @@
 
 import Future = require("fibers/future");
 import path = require("path");
-import options = require("./../../common/options");
 import util = require("util");
 
 import ProjectCommandBaseLib = require("./project-command-base");
@@ -14,7 +13,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		private $nameCommandParameter: ICommandParameter,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-		private $screenBuilderService: IScreenBuilderService) {
+		private $screenBuilderService: IScreenBuilderService,
+		private $options: IOptions) {
 		super($errors, $project);
 	}
 
@@ -23,7 +23,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			this.validateProjectData();
 
 			let projectName = args[0];
-			let projectPath = path.resolve(options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
+			let projectPath = path.resolve(this.$options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
 
 			this.$project.createTemplateFolder(projectPath).wait();
 

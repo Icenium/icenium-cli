@@ -5,7 +5,6 @@ import util = require("util");
 import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
-let options: any = require("../common/options");
 import temp = require("temp");
 
 class ProjectIdCommandParameter implements ICommandParameter {

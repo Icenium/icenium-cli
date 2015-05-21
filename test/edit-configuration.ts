@@ -9,11 +9,12 @@ import stubs = require("./stubs");
 import childProcess = require("../lib/common/child-process");
 import fileSystem = require("../lib/common/file-system");
 import project = require("../lib/project");
-import options = require("../lib/common/options");
+import optionsPath = require("../lib/options");
 import editConfiguration = require("../lib/commands/edit-configuration");
 import yok = require("../lib/common/yok");
 import config = require("../lib/config");
 import helpers = require("../lib/helpers");
+import hostInfoLib = require("../lib/common/host-info");
 import os = require("os");
 import temp = require("temp");
 temp.track();
@@ -21,12 +22,16 @@ let assert: chai.Assert = chai.assert;
 
 function createTestInjector() {
 	let testInjector = new yok.Yok();
+
+	testInjector.register("options", optionsPath.Options);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("childProcess", childProcess.ChildProcess);
 	testInjector.register("fs", fileSystem.FileSystem);
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+
 	testInjector.register("project", {
 		getProjectDir: (): IFuture<string> => {
-			return (() => options.path).future<string>()();
+			return (() => testInjector.resolve("options").path).future<string>()();
 		},
 		ensureProject: () => {},
 		projectConfigFiles: [{ template: "android-manifest",
@@ -42,31 +47,31 @@ function createTestInjector() {
 	return testInjector;
 }
 
-function setTempDir(): string {
+function setTempDir(testInjector: IInjector): string {
 	let tempDir = temp.mkdirSync("edit-configuration");
-	options.path = tempDir;
+	testInjector.resolve("options").path = tempDir;
 	return tempDir;
 }
 
 describe("edit-configuration", () => {
 
 	it("throws error when no parameter is given", () => {
-		setTempDir();
 		let testInjector = createTestInjector();
-	 	let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		setTempDir(testInjector);
+		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		assert.throws(() => command.execute([]).wait());
 	});
 
 	it("throws error when wrong configuration file is given", () => {
-		setTempDir();
 		let testInjector = createTestInjector();
+		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		assert.throws(() => command.execute(["wrong"]).wait());
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
 		let testInjector = createTestInjector();
-		let tempDir = setTempDir();
+		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
 		let openArgument: string;
 		let opener: IOpener = testInjector.resolve("opener");
@@ -85,7 +90,7 @@ describe("edit-configuration", () => {
 
 	it("doesn't modify file if correct configuration file is given and it exists", () => {
 		let testInjector = createTestInjector();
-		let tempDir = setTempDir();
+		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
 		let openArgument: string;
 		let opener: IOpener = testInjector.resolve("opener");

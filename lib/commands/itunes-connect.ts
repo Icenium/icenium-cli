@@ -3,7 +3,6 @@
 
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
-let options: any = require("../common/options");
 let Table = require("cli-table");
 
 export class AppstoreApplicationCommandBase implements ICommand {
@@ -95,7 +94,8 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 		private $stringParameterBuilder: IStringParameterBuilder,
 		private $loginManager: ILoginManager,
 		private $injector: IInjector,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: Project.IProjectConstants,
+		private $options: IOptions) {
 		super($server, $logger, $prompter, $errors);
 	}
 
@@ -121,9 +121,9 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 				userName = this.getAppleId().wait();
 			}
 
-			if(options.provision) {
+			if(this.$options.provision) {
 				this.$logger.info("Checking provision.");
-				let provision = this.$identityManager.findProvision(options.provision).wait();
+				let provision = this.$identityManager.findProvision(this.$options.provision).wait();
 
 				if(provision.ProvisionType !== constants.ProvisionType.AppStore) {
 					this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",

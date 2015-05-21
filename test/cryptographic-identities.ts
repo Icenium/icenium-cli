@@ -1,7 +1,6 @@
 ///<reference path="./.d.ts"/>
 "use strict";
 
-require("./../lib/common/extensions");
 import yok = require("./../lib/common/yok");
 import stubs = require("./stubs");
 import Future = require("fibers/future");
@@ -10,6 +9,7 @@ import helpers = require("./../lib/helpers");
 import validatorsModule = require("./../lib/validators/cryptographic-identity-validators");
 import logger = require("../lib/common/logger");
 import commandsModule = require("./../lib/commands/cryptographic-identities");
+import hostInfoLib = require("./../lib/common/host-info");
 import x509 = require("./../lib/x509");
 import assert = require("assert");
 let todaysTime = new Date().getTime(),
@@ -42,6 +42,8 @@ function createTestInjector(provisions?: IProvision[], identities?: ICryptograph
 		}
 	});
 	testInjector.register("injector", testInjector);
+	testInjector.register("options", {});
+	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 
 	return testInjector;
 }

@@ -4,17 +4,10 @@
 import os = require("os");
 import path = require("path");
 import Future = require("fibers/future");
-import hostInfo = require("../host-info");
-import commonHostInfo = require("../common/host-info");
 
 export class SimulateCommand implements ICommand {
-	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
-	private static PLUGINS_API_CONTRACT: string = "/appbuilder/api/cordova/plugins/package";
-
 	private projectData: IProjectData;
-	private pluginsPath: string;
 	private simulatorPath: string;
-
 
 	constructor(private $errors: IErrors,
 		private $logger: ILogger,
@@ -26,9 +19,10 @@ export class SimulateCommand implements ICommand {
 		private $serverExtensionsService: IServerExtensionsService,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
 		private $staticConfig: IStaticConfig,
-		private $analyticsService: IAnalyticsService) {
+		private $analyticsService: IAnalyticsService,
+		private $hostCapabilities: IHostCapabilities) {
 			this.projectData = $project.projectData;
-		}
+	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
@@ -48,7 +42,7 @@ export class SimulateCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 
 	public canExecute(args: string[]): IFuture<boolean> {
-		if(!hostInfo.hostCapabilities[process.platform].debugToolsSupported) {
+		if(!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on %s. The device simulator for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}
 
@@ -96,7 +90,7 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	private static EXECUTABLE_NAME_WIN = "Icenium.Simulator.exe";
 
 	constructor(private $childProcess: IChildProcess,
-				private $errors: IErrors) { }
+				private $hostInfo: IHostInfo) { }
 
 	public getPackageName(): string {
 		return WinSimulatorPlatformServices.PACKAGE_NAME_WIN;
@@ -113,7 +107,7 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 
 	public canRunApplication(): IFuture<boolean> {
-		return hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.");
+		return this.$hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 }
 
@@ -144,9 +138,10 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-if(commonHostInfo.isWindows()) {
+let hostInfo = $injector.resolve("hostInfo");
+if(hostInfo.isWindows) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
-} else if(commonHostInfo.isDarwin()) {
+} else if(hostInfo.isDarwin) {
 	$injector.register("simulatorPlatformServices", MacSimulatorPlatformServices);
 } else {
 	$injector.register("simulatorPlatformServices", {});

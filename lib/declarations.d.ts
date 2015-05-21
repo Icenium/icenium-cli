@@ -572,3 +572,33 @@ interface IPublishConnection extends IStringDictionary {
 	publishUrl: string;
 	name: string;
 }
+
+/**
+ * Represents all supported options.
+ */
+interface IOptions extends ICommonOptions {
+	companion: boolean;
+	download: boolean;
+	certificate: string;
+	provision: string;
+	template: string;
+	deploy: string;
+	device: string;
+	saveTo: string;
+	client: string;
+	available: boolean;
+	release: boolean;
+	debug: boolean;
+	screenBuilderCacheDir: string;
+	force: boolean;
+	validValue: boolean;
+	deviceType: string;
+	core: boolean;
+	professional: boolean;
+	verified: boolean;
+	latest: boolean;
+	publish: boolean;
+	sendPush: boolean;
+	sendEmail: boolean;
+	group: string[];
+}

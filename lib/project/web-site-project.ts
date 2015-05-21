@@ -15,8 +15,9 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
 		private $templatesService: ITemplatesService,
-		$resources: IResourceLoader) {
-		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
+		$resources: IResourceLoader,
+		$options: IOptions) {
+		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
 	public get name(): string {

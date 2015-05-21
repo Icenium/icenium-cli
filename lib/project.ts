@@ -8,7 +8,6 @@ import util = require("util");
 import commonHelpers = require("./common/helpers");
 import Future = require("fibers/future");
 import helpers = require("./helpers");
-import options = require("./common/options");
 import projectPropertiesServiceLib = require("./services/project-properties-service");
 
 export class Project implements Project.IProject {
@@ -41,7 +40,10 @@ export class Project implements Project.IProject {
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $server: Server.IServer,
 		private $staticConfig: IStaticConfig,
-		private $templatesService: ITemplatesService) {
+		private $templatesService: ITemplatesService,
+		private $prompter: IPrompter,
+		private $mobileHelper: Mobile.IMobileHelper,
+		private $options: IOptions) {
 
 		this.configurationSpecificData = Object.create(null);
 		this.readProjectData().wait();
@@ -121,11 +123,11 @@ export class Project implements Project.IProject {
 
 	public get configurations(): string[] {
 		let configurations: string[] = [];
-		if(options.debug || options.d) {
+		if(this.$options.debug) {
 			configurations.push(this.$projectConstants.DEBUG_CONFIGURATION_NAME);
 		}
 
-		if(options.release || options.r) {
+		if(this.$options.release) {
 			configurations.push(this.$projectConstants.RELEASE_CONFIGURATION_NAME);
 		}
 
@@ -142,7 +144,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getBuildConfiguration(): string {
-		let configuration = options.release || options.r ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
+		let configuration = this.$options.release ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
 		return configuration.charAt(0).toUpperCase() + configuration.slice(1);
 	}
 
@@ -171,7 +173,7 @@ export class Project implements Project.IProject {
 			}
 			this.cachedProjectDir = null;
 
-			let projectDir = path.resolve(options.path || ".");
+			let projectDir = path.resolve(this.$options.path || ".");
 			while(true) {
 				this.$logger.trace("Looking for project in '%s'", projectDir);
 
@@ -270,7 +272,7 @@ export class Project implements Project.IProject {
 	}
 
 	public getNewProjectDir() {
-		return options.path || process.cwd();
+		return this.$options.path || process.cwd();
 	}
 
 	public ensureProject(): void {
@@ -309,11 +311,11 @@ export class Project implements Project.IProject {
 	
 	public getConfigurationsSpecifiedByUser(): string[] {
 		let configurations: string[] = [];
-		if(options.debug) {
+		if(this.$options.debug) {
 			configurations.push(this.$projectConstants.DEBUG_CONFIGURATION_NAME);
 		}
 		
-		if (options.release){
+		if (this.$options.release){
 			configurations.push(this.$projectConstants.RELEASE_CONFIGURATION_NAME);
 		}
 		
@@ -365,7 +367,7 @@ export class Project implements Project.IProject {
 				if(property) {
 					let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, mergedProjectData);
 
-					if(options.validValue) {
+					if(this.$options.validValue) {
 						// '$ appbuilder prop print <PropName> --validValue' called inside project dir
 						let prop: any = schema[normalizedPropertyName];
 						this.printValidValuesOfProperty(prop).wait();
@@ -380,7 +382,7 @@ export class Project implements Project.IProject {
 						}
 					}
 				} else {
-					if(options.validValue) {
+					if(this.$options.validValue) {
 						// 'appbuilder prop print --validValue' called inside project dir
 						let propKeys = _.keys(schema);
 						let sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
@@ -673,12 +675,12 @@ export class Project implements Project.IProject {
 					}
 
 					let debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
-					if(options.debug && !this.$fs.exists(debugProjectFile).wait()) {
+					if(this.$options.debug && !this.$fs.exists(debugProjectFile).wait()) {
 						this.$fs.writeJson(debugProjectFile, {}).wait();
 					}
 
 					let releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
-					if(options.release && !this.$fs.exists(releaseProjectFile).wait()) {
+					if(this.$options.release && !this.$fs.exists(releaseProjectFile).wait()) {
 						this.$fs.writeJson(releaseProjectFile, {}).wait();
 					}
 
@@ -722,12 +724,12 @@ export class Project implements Project.IProject {
 	private createFromTemplate(appname: string, projectDir: string): IFuture<void> {
 		return (() => {
 			let templatesDir = this.$templatesService.projectTemplatesDir;
-			let template = options.template || this.frameworkProject.defaultProjectTemplate;
+			let template = this.$options.template || this.frameworkProject.defaultProjectTemplate;
 			let templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
 
 			this.$logger.trace("Using template '%s'", templateFileName);
 			if(this.$fs.exists(templateFileName).wait()) {
-				projectDir = (options.path) ? projectDir : path.join(projectDir, appname);
+				projectDir = this.$options.path ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
 				this.createTemplateFolder(projectDir).wait();
 				try {
@@ -753,7 +755,7 @@ export class Project implements Project.IProject {
 				let templates = this.frameworkProject.projectTemplatesString().wait();
 
 				let message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
-					options.template,
+					this.$options.template,
 					os.EOL,
 					templates);
 				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });

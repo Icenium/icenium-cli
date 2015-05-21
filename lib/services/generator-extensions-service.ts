@@ -11,8 +11,9 @@ export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceL
 		$logger: ILogger,
 		$progressIndicator: IProgressIndicator,
 		$childProcess: IChildProcess,
-		$dependencyConfigService: IDependencyConfigService) {
-		super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService);
+		$dependencyConfigService: IDependencyConfigService,
+		$options: IOptions) {
+		super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService, $options);
 	}
 
 	public prepareGenerator(generatorName: string): IFuture<void> {

@@ -4,7 +4,6 @@
 import minimatch = require("minimatch");
 import path = require("path");
 import util = require("util");
-import options = require("../common/options");
 
 export class ConfigurationFile implements Project.IConfigurationFile {
 	constructor(public template: string,
@@ -21,7 +20,8 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $pathFilteringService: IPathFilteringService,
-		private $projectConstants: Project.IProjectConstants) { }
+		private $projectConstants: Project.IProjectConstants,
+		private $options: IOptions) { }
 
 	public get availableConfigFiles(): IDictionary<Project.IConfigurationFile> {
 		return {
@@ -107,7 +107,7 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 		let configurations: string[] = [ ProjectFilesManager.IGNORE_FILE ];
 		// unless release is explicitly set, we use debug config
 		let configFileName = "." +
-			((options.release || options.r) ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME) +
+			(this.$options.release ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME) +
 			ProjectFilesManager.IGNORE_FILE;
 		configurations.push(configFileName);
 		return configurations;

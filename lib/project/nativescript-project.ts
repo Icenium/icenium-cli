@@ -16,8 +16,9 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		$resources: IResourceLoader,
-		private $templatesService: ITemplatesService) {
-		super($logger, $fs, $resources, $errors, $jsonSchemaValidator);
+		private $templatesService: ITemplatesService,
+		$options: IOptions) {
+		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
 	public get name(): string {

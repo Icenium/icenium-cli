@@ -3,7 +3,6 @@
 
 import util = require("util");
 import path = require("path");
-let options: any = require("../common/options");
 let gaze = require("gaze");
 import helpers = require("./../helpers");
 import AppIdentifier = require("../common/mobile/app-identifier");
@@ -29,15 +28,16 @@ export class LiveSyncService implements ILiveSyncService {
 		private $project: Project.IProject,
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $dispatcher: IFutureDispatcher,
-		private $mobileHelper: Mobile.IMobileHelper) { }
+		private $mobileHelper: Mobile.IMobileHelper,
+		private $options: IOptions) { }
 
 	public livesync(platform: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			this.$devicesServices.initialize({ platform: platform, deviceId: options.device }).wait();
+			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = this.$devicesServices.platform;
 
-			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion && options.companion) {
+			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
 				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
 			}
 
@@ -45,27 +45,27 @@ export class LiveSyncService implements ILiveSyncService {
 				this.$errors.fail({ formatStr: constants.ERROR_NO_DEVICES, suppressCommandHelp: true });
 			}
 
-			if(!this.$project.capabilities.livesync && !options.companion) {
+			if(!this.$project.capabilities.livesync && !this.$options.companion) {
 				this.$errors.fail("Use $ appbuilder livesync cloud to sync your application to Telerik Nativescript Companion App. You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
-			if(!this.$project.capabilities.livesyncCompanion && options.companion) {
+			if(!this.$project.capabilities.livesyncCompanion && this.$options.companion) {
 				this.$errors.fail("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
 			let projectDir = this.$project.getProjectDir().wait();
 
 			let appIdentifier = AppIdentifier.createAppIdentifier(platform,
-				this.$project.projectData.AppIdentifier, options.companion);
+				this.$project.projectData.AppIdentifier, this.$options.companion);
 
-			if(options.file) {
-				this.$fs.tryExecuteFileOperation(options.file, () => this.sync(appIdentifier, projectDir, [path.resolve(options.file)]),  util.format("The file %s does not exist.", options.file));
+			if(this.$options.file) {
+				this.$fs.tryExecuteFileOperation(this.$options.file, () => this.sync(appIdentifier, projectDir, [path.resolve(this.$options.file)]),  util.format("The file %s does not exist.", this.$options.file));
 			} else {
 				let projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
 
 				this.sync(appIdentifier, projectDir, projectFiles).wait();
 
-				if(options.watch) {
+				if(this.$options.watch) {
 					this.liveSyncDevices(platform, projectDir, appIdentifier);
 					helpers.exitOnStdinEnd();
 					this.$dispatcher.run();

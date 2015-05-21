@@ -2,7 +2,6 @@
 "use strict";
 
 import path = require("path");
-import options = require("../common/options");
 import helpers = require("../helpers");
 import temp = require("temp");
 import util = require("util");
@@ -14,7 +13,8 @@ export class ExtensionsServiceBase {
 	constructor(public cacheDir: string,
 		protected $fs: IFileSystem,
 		protected $httpClient: Server.IHttpClient,
-		protected $logger: ILogger) {
+		protected $logger: ILogger,
+		protected $options: IOptions) {
 		if (this.$fs.exists(this.versionsFile).wait()) {
 			this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 		}
@@ -87,7 +87,7 @@ export class ExtensionsServiceBase {
 	}
 
 	private get versionsFile(): string {
-		return path.join(options.profileDir, "Cache", "extension-versions.json");
+		return path.join(this.$options.profileDir, "Cache", "extension-versions.json");
 	}
 
 	private saveVersionsFile() : IFuture<void> {

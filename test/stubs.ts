@@ -177,7 +177,7 @@ export class ErrorsStub implements IErrors {
 	}
 
 	failWithoutHelp(message: string, ...args: any[]): void {
-		throw new Error(message);	
+		throw new Error(message);
 	}
 
 	beginCommand(action:() => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
@@ -189,9 +189,6 @@ export class ErrorsStub implements IErrors {
 	}
 
 	verifyHeap(message: string): void { }
-
-	validateArgs(client: string, knownOpts: any, shorthands: any): any { return null; }
-	validateYargsArguments(parsed: any, knownOpts: any, shorthands: any, clientName?: string): void { }
 }
 
 export class ErrorsNoFailStub implements IErrors {

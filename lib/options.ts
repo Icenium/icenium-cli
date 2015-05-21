@@ -1,61 +1,46 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import path = require("path");
+import commonOptionsLibPath = require("./common/options");
 import osenv = require("osenv");
-import commonOptions = require("./common/options");
-import helpers = require("./helpers");
-import hostInfo = require("./common/host-info");
+import path = require("path");
 
-declare let exports: any;
+let OptionType = commonOptionsLibPath.OptionType;
 
-let knownOpts: any = {
-		"companion": Boolean,
-		"download": Boolean,
-		"certificate": String,
-		"provision": String,
-		"template": String,
-		"deploy": String,
-		"device": String,
-		"file": String,
-		"save-to": String,
-		"client": String,
-		"available": Boolean,
-		"release": Boolean,
-		"debug": Boolean,
-		"valid-value": Boolean,
-		"screenBuilderCacheDir": String,
-		"force": Boolean,
-		"verified": Boolean,
-		"core": Boolean,
-		"professional": Boolean,
-		"latest": Boolean,
-		"publish": Boolean,
-		"send-push": Boolean,
-		"send-email": Boolean,
-		"group": Array
-	},
-	shorthands: IStringDictionary = {
-		"t": "template",
-		"r": "release",
-		"d": "debug",
-		"f": "force"
-	};
-
-_.extend(commonOptions.knownOpts, knownOpts);
-_.extend(commonOptions.shorthands, shorthands);
-
-let defaultProfileDir = helpers.defaultProfileDir();
-commonOptions.setProfileDir(defaultProfileDir);
-
-let errors: IErrors = $injector.resolve("errors");
-_(errors.validateArgs("appbuilder", commonOptions.knownOpts, commonOptions.shorthands)).each((val,key) => {
-	key = shorthands[key] || key;
-	commonOptions[key] = val;
-}).value();
-
-commonOptions["screenBuilderCacheDir"] = (hostInfo.isWindows() && commonOptions.defaultProfileDir === commonOptions.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): commonOptions.profileDir;
-
-exports.knownOpts = knownOpts;
-exports.shorthands = shorthands;
-export = exports;
+export class Options extends commonOptionsLibPath.OptionsBase {
+	constructor($errors: IErrors,
+		$staticConfig: IStaticConfig,
+		$hostInfo: IHostInfo) {
+		super({
+			companion: { type: OptionType.Boolean },
+			download: { type: OptionType.Boolean },
+			certificate: { type: OptionType.String  },
+			provision: { type: OptionType.String  },
+			template: { type: OptionType.String, alias: "t" },
+			deploy: { type: OptionType.String },
+			device: { type: OptionType.String },
+			saveTo: { type: OptionType.String},
+			client: { type: OptionType.String },
+			available: { type: OptionType.Boolean },
+			release: { type: OptionType.Boolean, alias: "r" },
+			debug: { type: OptionType.Boolean, alias: "d" },
+			validValue: { type: OptionType.Boolean },
+			screenBuilderCacheDir: { type: OptionType.String },
+			force: { type: OptionType.Boolean, alias: "f" },
+			core: { type: OptionType.Boolean },
+			professional: { type: OptionType.Boolean },
+			latest: { type: OptionType.Boolean },
+			verified: { type: OptionType.Boolean },
+			publish: { type: OptionType.Boolean },
+			sendPush: { type: OptionType.Boolean },
+			sendEmail: { type: OptionType.Boolean },
+			group: { type: OptionType.Array } 
+		},
+		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
+			$errors, $staticConfig);
+		
+		let that = <any>this;
+		that.screenBuilderCacheDir = ($hostInfo.isWindows && this.defaultProfileDir === that.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): that.profileDir;
+	}
+}
+$injector.register("options", Options);

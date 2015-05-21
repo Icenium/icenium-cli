@@ -6,7 +6,6 @@ import util = require("util");
 import os = require("os");
 import temp = require("temp");
 import helpers = require("../helpers");
-let options: any = require("../common/options");
 
 class Sample {
 	constructor(public name: string,
@@ -40,7 +39,8 @@ export class SamplesService implements ISamplesService {
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
 		private $staticConfig: IStaticConfig,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: Project.IProjectConstants,
+		private $options: IOptions) {
 	}
 
 	public printSamplesInformation(framework?: string): IFuture<void> {
@@ -63,7 +63,7 @@ export class SamplesService implements ISamplesService {
 
 	public cloneSample(sampleName: string): IFuture<void> {
 		return (() => {
-			let cloneTo = options.path || sampleName;
+			let cloneTo = this.$options.path || sampleName;
 			if (this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}

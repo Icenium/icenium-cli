@@ -1,14 +1,14 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import options = require("../../common/options");
 
 export class ListPluginCommand implements ICommand {
-	constructor(private $pluginsService: IPluginsService) { }
+	constructor(private $pluginsService: IPluginsService,
+		private $options: IOptions) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			let plugins = options.available ? this.$pluginsService.getAvailablePlugins() : this.$pluginsService.getInstalledPlugins();
+			let plugins = this.$options.available ? this.$pluginsService.getAvailablePlugins() : this.$pluginsService.getInstalledPlugins();
 			this.$pluginsService.printPlugins(plugins);
 		}).future<void>()();
 	}
