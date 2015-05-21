@@ -10,13 +10,11 @@ fiberBootstrap.run(() => {
 	let project: Project.IProject = $injector.resolve("project");
 	let $fs: IFileSystem = $injector.resolve("fs");
 	project.ensureProject();
-	let projectFiles = $fs.enumerateFilesInDirectorySync(project.getProjectDir().wait());
 
-	let typeScriptFiles = _.filter(projectFiles, file => path.extname(file) === ".ts");
-	let definitionFiles = _.filter(typeScriptFiles, file => _.endsWith(file, ".d.ts"));
-	if(typeScriptFiles.length > definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
+	let typeScriptFiles = project.getTypeScriptFiles().wait();
+	if(typeScriptFiles.typeScriptFiles.length > typeScriptFiles.definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
 		let typeScriptCompilationService = $injector.resolve("typeScriptCompilationService");
-		typeScriptCompilationService.initialize(typeScriptFiles, definitionFiles);
+		typeScriptCompilationService.initialize(typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles);
 		typeScriptCompilationService.compileAllFiles().wait();
 	}
 });

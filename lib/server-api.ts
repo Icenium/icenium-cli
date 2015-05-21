@@ -216,6 +216,13 @@ export class MobileprovisionsService implements Server.IMobileprovisionsServiceC
 		return this.$serviceProxy.call<void>('RemoveProvision', 'DELETE', ['api','mobileprovisions',encodeURI(identifier.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 }
+export class NativescriptService implements Server.INativescriptServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>{
+		return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','nativescript','migrate',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+	}
+}
 export class BuildService implements Server.IBuildServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -516,6 +523,7 @@ export class ServiceContainer implements Server.IServer{
 	public itmstransporter: Server.IItmstransporterServiceContract = this.$injector.resolve(ItmstransporterService);
 	public kendo: Server.IKendoServiceContract = this.$injector.resolve(KendoService);
 	public mobileprovisions: Server.IMobileprovisionsServiceContract = this.$injector.resolve(MobileprovisionsService);
+	public nativescript: Server.INativescriptServiceContract = this.$injector.resolve(NativescriptService);
 	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
 	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
 	public packages: Server.IPackagesServiceContract = this.$injector.resolve(PackagesService);
