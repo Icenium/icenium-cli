@@ -43,6 +43,11 @@ declare module Project {
 		 * @param {string} platform Android, iOS or WP8
 		 */
 		checkSdkVersions(platform: string): void;
+		/**
+		* Checks if the project language is TypeScript.
+		* @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
+		*/
+		isTypeScriptProject(): IFuture<boolean>;
 	}
 
 	interface IFrameworkProject {

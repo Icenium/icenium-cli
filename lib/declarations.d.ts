@@ -384,11 +384,11 @@ interface IPathFilteringService {
 	isFileExcluded(file: string, rules: string[], rootDir: string): boolean
 }
 
-interface ICordovaMigrationService {
-	downloadCordovaMigrationData(): IFuture<void>;
+interface IFrameworkMigrationService {
+	downloadMigrationData(): IFuture<void>;
 	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion(version: string): IFuture<string[]>;
-	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+	pluginsForVersion?(version: string): IFuture<string[]>;
+	migratePlugins?(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 	getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]>;
 	getDisplayNameForVersion(version: string): IFuture<string>;
 	/**
@@ -402,7 +402,7 @@ interface ICordovaMigrationService {
 	 * @param  {string} newVersion The version to upgrade/downgrade to
 	 * @return {IFuture<void>}
 	 */
-	onWPSdkVersionChanging(newVersion: string): IFuture<void>;
+	onWPSdkVersionChanging?(newVersion: string): IFuture<void>;
 }
 
 interface ISamplesService {

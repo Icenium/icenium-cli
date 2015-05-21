@@ -5,29 +5,23 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder mobileframework [<Command>] [--path <Directory>]`
 
-Lists all supported versions of Apache Cordova.
+<% if(isHtml) { %>Lists all supported versions of the framework.<% } %>
 
-<% if(isConsole) { %>
-<% if(isNativeScript)  { %>
-WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
-<% } %>
-<% if(isMobileWebsite)  { %>
+<% if(isConsole && isMobileWebsite) { %>
 WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
 <% } %>
-<% } %>
-<% if((isConsole && isCordova) || isHtml) { %>
+<% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
 
 ### Attributes
 
 `<Command>` extends the `mobileframework` command. You can set the following values for this attribute.
-* `set` - Sets the selected framework version for the project and updates the plugins according to the new version.
+* `set` -Sets the selected framework version for the project.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 
 ### Related Commands

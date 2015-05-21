@@ -24,7 +24,7 @@ export class FrameworkVersion implements Server.FrameworkVersion {
 		public Version: string) { }
 }
 
-export class CordovaMigrationService implements ICordovaMigrationService {
+export class CordovaMigrationService implements IFrameworkMigrationService {
 	private _migrationData: MigrationData;
 	private minSupportedVersion: string = "3.0.0";
 	private invalidMarketplacePlugins: string[] = [];
@@ -122,7 +122,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}).future<string[]>()();
 	}
 
-	public downloadCordovaMigrationData(): IFuture<void> {
+	public downloadMigrationData(): IFuture<void> {
 		return (() => {
 			let json = this.$server.cordova.getMigrationData().wait();
 			let renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(

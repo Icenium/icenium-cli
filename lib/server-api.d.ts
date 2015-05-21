@@ -256,6 +256,14 @@ declare module Server{
 		importProvision(provision: any): IFuture<Server.ProvisionData>;
 		removeProvision(identifier: string): IFuture<void>;
 	}
+	interface NativeScriptMigrationData{
+		ObsoleteVersions: Server.FrameworkVersion[];
+		SupportedVersions: Server.FrameworkVersion[];
+	}
+	interface INativescriptServiceContract{
+		getMigrationData(): IFuture<Server.NativeScriptMigrationData>;
+		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
+	}
 	interface BuildIssueData{
 		Code: string;
 		File: string;
@@ -621,6 +629,7 @@ declare module Server{
 		itmstransporter: Server.IItmstransporterServiceContract;
 		kendo: Server.IKendoServiceContract;
 		mobileprovisions: Server.IMobileprovisionsServiceContract;
+		nativescript: Server.INativescriptServiceContract;
 		build: Server.IBuildServiceContract;
 		projects: Server.IProjectsServiceContract;
 		packages: Server.IPackagesServiceContract;

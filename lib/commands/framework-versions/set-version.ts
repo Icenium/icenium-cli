@@ -3,15 +3,12 @@
 
 export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $injector: IInjector,
-		private $cordovaMigrationService: ICordovaMigrationService,
-		private $project: Project.IProject) { }
+		private $cordovaMigrationService: IFrameworkMigrationService,
+		private $project: Project.IProject, 
+		private $nativeScriptMigrationService: IFrameworkMigrationService) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$cordovaMigrationService.onFrameworkVersionChanging(args[0]).wait();
-			this.$project.projectData["FrameworkVersion"] = args[0];
-			this.$project.saveProject().wait();
-		}).future<void>()();
+		return this.$project.updateProjectPropertyAndSave("set", "FrameworkVersion", args);
 	}
 
 	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(MobileFrameworkCommandParameter)];
@@ -21,26 +18,30 @@ $injector.registerCommand("mobileframework|set", SetFrameworkVersionCommand);
 export class MobileFrameworkCommandParameter implements ICommandParameter {
 	private static VERSION_REGEX = new RegExp("^(\\d+\\.){2}\\d+$");
 
-	constructor(private $cordovaMigrationService: ICordovaMigrationService,
+	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
 		private $project: Project.IProject,
-		private $errors: IErrors) { }
+		private $errors: IErrors,
+		private $nativeScriptMigrationService: IFrameworkMigrationService,
+		private $projectConstants: Project.IProjectConstants) { }
 
 	public mandatory = true;
 
 	public validate(value: string, errorMessage?: string): IFuture<boolean> {
 		return (() => {
-			this.$project.ensureCordovaProject();
-
+			this.$project.ensureProject();
 			if(value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {
-				let supportedVersions = this.$cordovaMigrationService.getSupportedVersions().wait();
+				let supportedVersions: string[];
+				let migrationService = this.$project.projectData.Framework === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
+				supportedVersions = migrationService.getSupportedVersions().wait();
+
 				if(_.contains(supportedVersions, value)) {
 					return true;
 				}
 
-				this.$errors.fail("The value %s is not a supported version. Supported versions are: %s", value, supportedVersions);
+				this.$errors.failWithoutHelp(`The value ${value} is not a supported version. Supported versions are: ${supportedVersions}`, value, supportedVersions);
 			}
 
-			this.$errors.fail("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");
+			this.$errors.failWithoutHelp("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");
 		}).future<boolean>()();
 	}
 }

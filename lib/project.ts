@@ -630,6 +630,18 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
+	public isTypeScriptProject(): IFuture<boolean> {
+		return ((): boolean => { 
+			let projectFiles = this.$fs.enumerateFilesInDirectorySync(this.getProjectDir().wait());
+			let typeScriptFiles = _.filter(projectFiles, file => path.extname(file) === ".ts");
+			let definitionFiles = _.filter(typeScriptFiles, file => _.endsWith(file, ".d.ts"));
+			if(typeScriptFiles.length > definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
+				return true;
+			}
+			return false;
+		}).future<boolean>()();
+	}
+
 	private getProjectRelativePath(fullPath: string, projectDir: string): string {
 		projectDir = path.join(projectDir, path.sep);
 		if (!_.startsWith(fullPath, projectDir)) {

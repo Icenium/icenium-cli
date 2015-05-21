@@ -35,6 +35,7 @@ npm-debug.log
 node_modules
 resources/App_Resources
 resources/Cordova
+resources/NativeScript
 resources/ItemTemplates
 resources/ProjectTemplates
 resources/json-schemas
