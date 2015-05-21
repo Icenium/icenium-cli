@@ -577,10 +577,6 @@ interface IPublishConnection extends IStringDictionary {
  * Represents all supported options.
  */
 interface IOptions extends ICommonOptions {
-	validateOptions(): void;
-	options: IDictionary<any>;
-	shorthands: string[];	
-	
 	companion: boolean;
 	download: boolean;
 	certificate: string;
@@ -588,7 +584,6 @@ interface IOptions extends ICommonOptions {
 	template: string;
 	deploy: string;
 	device: string;
-	file: string;
 	saveTo: string;
 	client: string;
 	available: boolean;

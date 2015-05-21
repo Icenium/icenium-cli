@@ -19,7 +19,6 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			template: { type: OptionType.String, alias: "t" },
 			deploy: { type: OptionType.String },
 			device: { type: OptionType.String },
-			file: { type: OptionType.String },
 			saveTo: { type: OptionType.String},
 			client: { type: OptionType.String },
 			available: { type: OptionType.Boolean },
