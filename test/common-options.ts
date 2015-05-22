@@ -146,6 +146,7 @@ describe("common options", () => {
 			options.validateOptions();
 
 			assert.isFalse(isExecutionStopped);
+			assert.isTrue(options.verbose);
 		});
 
 		it("breaks execution when valid shorthand option has incorrect value", () => {
