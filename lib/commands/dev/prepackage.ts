@@ -28,12 +28,12 @@ export class PrePackageCommand implements ICommand {
 			this.$jsonSchemaLoader.downloadSchemas().wait();
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();
-			this.$logger.info("Downloading cordova migration data.");
+			this.$logger.info("Downloading Cordova migration data.");
 			this.$cordovaMigrationService.downloadMigrationData().wait();
 			// Cordova files have to be downloaded after cordova migration data so we know which cordova versions we support
 			this.$logger.info("Downloading cordova.js files.");
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
-			this.$logger.info("Downloading nativescript migration data.")
+			this.$logger.info("Downloading NativeScript migration data.")
 			this.$nativeScriptMigrationService.downloadMigrationData().wait();
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

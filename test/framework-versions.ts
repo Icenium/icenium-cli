@@ -31,6 +31,9 @@ function createTestInjector(): IInjector {
 		},
 		saveProject: (): IFuture<void> => { return (() => { }).future<void>()() },
 		onFrameworkVersionChanging: (): IFuture<void> => { return (() => { }).future<void>()() },
+		capabilities: {
+			canChangeFrameworkVersion: true
+		},
 		projectType: 1 //Cordova
 	});
 	let migrationService = {
@@ -73,34 +76,52 @@ describe("mobileframework", () => {
 		let mobileFwCP: ICommandParameter;
 		let testInjector: IInjector;
 		beforeEach(() => {
-			let testInjector = createTestInjector();
-			mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
-				testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"), 
-				testInjector.resolve("projectConstants"));
-		});
-		it("fails when version is not in correct format", () => {
-			let message: string;
-			try {
-				mobileFwCP.validate("1").wait();
-			} catch(e) {
-				message = e.message;
-			}
-			assert.isTrue(message.indexOf("not in correct format") > -1);
+			testInjector = createTestInjector();
 		});
 
-		it("fails when version is not supported", () => {
-			let message: string;
-			try {
-				mobileFwCP.validate("1.0.5").wait();
-			} catch(e) {
-				message = e.message;
-			}
-
-			assert.isTrue(message.indexOf("not a supported version") > -1);
+		describe("canChangeFrameworkVersion is true", () => {
+			beforeEach(() => {
+				mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
+					testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"), 
+					testInjector.resolve("projectConstants"));
+			});
+			
+	
+			it("fails when version is not in correct format", () => {
+				let message: string;
+				try {
+					mobileFwCP.validate("1").wait();
+				} catch(e) {
+					message = e.message;
+				}
+				assert.isTrue(message.indexOf("not in correct format") > -1);
+			});
+	
+			it("fails when version is not supported", () => {
+				let message: string;
+				try {
+					mobileFwCP.validate("1.0.5").wait();
+				} catch(e) {
+					message = e.message;
+				}
+	
+				assert.isTrue(message.indexOf("not a supported version") > -1);
+			});
+	
+			it("returns true when version is correct", () => {
+				assert.isTrue(mobileFwCP.validate("1.0.0").wait());
+			});
 		});
 
-		it("returns true when version is correct", () => {
-			assert.isTrue(mobileFwCP.validate("1.0.0").wait());
+		describe("canChangeFrameworkVersion is false", () => {
+			it("validate method throws", () => {
+				let project: Project.IProject = testInjector.resolve("project");
+				project.capabilities.canChangeFrameworkVersion = false;
+				mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
+					testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"), 
+					testInjector.resolve("projectConstants"));
+				assert.throws(() => mobileFwCP.validate("1.0.0").wait());
+			})
 		});
 	});
 
@@ -119,6 +140,21 @@ describe("mobileframework", () => {
 			_.each(expectedOutput, version => {
 				assert.isTrue(message.indexOf(version) > -1);
 			});
+		});
+
+		it("print command should fail", () => {
+			let testInjector = createTestInjector();
+			let message: string;
+			testInjector.register("logger", {
+				info: (formatStr: string, ...args: string[]) => {
+					message += formatStr;
+				}
+			});
+			let project: Project.IProject = testInjector.resolve("project");
+			project.capabilities.canChangeFrameworkVersion = false;
+			let expectedOutput = ["version_1_0_0", "version_1_0_1"];
+			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
+			assert.throws(() => mbFrm.canExecute([]).wait());
 		});
 	});
 });

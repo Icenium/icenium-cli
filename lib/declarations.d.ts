@@ -162,6 +162,7 @@ interface IProjectCapabilities {
 	emulate: boolean;
 	publish: boolean;
 	uploadToAppstore: boolean;
+	canChangeFrameworkVersion: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -387,8 +388,6 @@ interface IPathFilteringService {
 interface IFrameworkMigrationService {
 	downloadMigrationData(): IFuture<void>;
 	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion?(version: string): IFuture<string[]>;
-	migratePlugins?(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 	getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]>;
 	getDisplayNameForVersion(version: string): IFuture<string>;
 	/**
@@ -397,6 +396,11 @@ interface IFrameworkMigrationService {
 	 * @return {IFuture<void>}
 	 */
 	onFrameworkVersionChanging(newVersion: string): IFuture<void>;
+}
+
+interface ICordovaMigrationService extends IFrameworkMigrationService {
+	pluginsForVersion(version: string): IFuture<string[]>;
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 	/**
 	 * Hook which is dynamically called when a project's windows phone sdk version is changing
 	 * @param  {string} newVersion The version to upgrade/downgrade to
@@ -436,7 +440,7 @@ interface IPluginsService {
 	 * @param  {string}        pluginName     The name of the plugin.
 	 * @param  {string}        version        The version of the plugin.
 	 * @param  {string[]}      configurations Configurations in which the plugin should be configured. Example: ['debug'], ['debug', 'release']
-	 * @return {IFuture<void>}                
+	 * @return {IFuture<void>}
 	 */
 	configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;

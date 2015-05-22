@@ -7,10 +7,12 @@ import helpers = require("./../helpers");
 
 export class NativeScriptMigrationService implements IFrameworkMigrationService {
 	private static TYPESCRIPT_ABBREVIATION = "TS";
-	private static JAVASCRIPT_ABBREVIATION = "JS";	
-	private nativeScriptMigrationFile: string = path.join(__dirname, "../../resources/NativeScript", "nativeScript-migration-data.json");
+	private static JAVASCRIPT_ABBREVIATION = "JS";
+	private static SUPPORTED_LANGUAGES = [NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION];
+	private nativeScriptMigrationFile: string;
 	private tnsModulesDirectoryPath: string;
 	private remoteTnsModulesDirectoryPath: string;
+
 	private _nativeScriptMigrationData: Server.NativeScriptMigrationData;
 	private get nativeScriptMigrationData(): IFuture<Server.NativeScriptMigrationData> {
 		return ((): Server.NativeScriptMigrationData => {
@@ -27,14 +29,12 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $resources: IResourceLoader,
 		private $config: IConfiguration,
 		private $httpClient: Server.IHttpClient) {
-			this.tnsModulesDirectoryPath = path.join(this.$resources.resolvePath("NativeScript"), "tns_modules");
+			let nativeScriptResourcesDir = this.$resources.resolvePath("NativeScript");
+			this.tnsModulesDirectoryPath = path.join(nativeScriptResourcesDir, "tns_modules");
 			this.remoteTnsModulesDirectoryPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript/tns_modules`;
+			this.nativeScriptMigrationFile =  path.join(nativeScriptResourcesDir, "nativeScript-migration-data.json");
 		}
-		
-	private parseMscorlibVersion(json: any): string {
-		return [json._Major, json._Minor, json._Build].join('.');
-	}
-		
+
 	public downloadMigrationData(): IFuture<void> {
 		return (() => {
 			this.$fs.deleteDirectory(this.tnsModulesDirectoryPath).wait();
@@ -50,9 +50,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			});
 
 			this.$fs.writeJson(this.nativeScriptMigrationFile, json).wait();
-			let supportedLanguages = [NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION];
 			let fileDownloadFutures = _(supportedVersions)
-									.map(supportedVersion => _.map(supportedLanguages, language => this.downloadTnsModules(language, supportedVersion.Version)))
+									.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsModules(language, supportedVersion.Version)))
 									.flatten<IFuture<void>>()
 									.value();
 			Future.wait(fileDownloadFutures);
@@ -138,6 +137,10 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			let migrationData = this.nativeScriptMigrationData.wait();
 			return _.map(migrationData.ObsoleteVersions, obsoleteVersion => obsoleteVersion.Version);
 		}).future<string[]>()();
+	}
+
+	private parseMscorlibVersion(json: any): string {
+		return [json._Major, json._Minor, json._Build].join('.');
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);

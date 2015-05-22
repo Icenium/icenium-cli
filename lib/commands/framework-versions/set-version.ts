@@ -29,6 +29,10 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 	public validate(value: string, errorMessage?: string): IFuture<boolean> {
 		return (() => {
 			this.$project.ensureProject();
+			if(!this.$project.capabilities.canChangeFrameworkVersion) {
+				this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`)
+			}
+
 			if(value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {
 				let supportedVersions: string[];
 				let migrationService = this.$project.projectData.Framework === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
@@ -38,7 +42,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 					return true;
 				}
 
-				this.$errors.failWithoutHelp(`The value ${value} is not a supported version. Supported versions are: ${supportedVersions}`, value, supportedVersions);
+				this.$errors.failWithoutHelp(`The value ${value} is not a supported version. Supported versions are: ${supportedVersions.join(", ")}`);
 			}
 
 			this.$errors.failWithoutHelp("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");

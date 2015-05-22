@@ -28,9 +28,10 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 	public canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
 			this.$project.ensureProject();
-			if(this.$project.projectData.Framework !== this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova && this.$project.projectData.Framework !== this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript) {
-				this.$errors.failWithoutHelp("This command is applicable only for Cordova and NativeScript projects.")
+			if(!this.$project.capabilities.canChangeFrameworkVersion) {
+				this.$errors.failWithoutHelp(`This command is not applicable to ${this.$project.projectData.Framework} projects.`);
 			}
+
 			return true;
 		}).future<boolean>()();
 	}

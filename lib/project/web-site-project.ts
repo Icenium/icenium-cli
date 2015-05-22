@@ -35,7 +35,8 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 			updateKendo: false,
 			emulate: false,
 			publish: true,
-			uploadToAppstore: false
+			uploadToAppstore: false,
+			canChangeFrameworkVersion: false
 		};
 	}
 

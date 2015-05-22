@@ -24,7 +24,7 @@ export class FrameworkVersion implements Server.FrameworkVersion {
 		public Version: string) { }
 }
 
-export class CordovaMigrationService implements IFrameworkMigrationService {
+export class CordovaMigrationService implements ICordovaMigrationService {
 	private _migrationData: MigrationData;
 	private minSupportedVersion: string = "3.0.0";
 	private invalidMarketplacePlugins: string[] = [];
