@@ -76,6 +76,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 	}
 
+	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
+
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {
 			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();

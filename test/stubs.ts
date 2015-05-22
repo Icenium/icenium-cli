@@ -338,6 +338,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
 
+	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
+
 	public getProjectFileSchema(): IDictionary<any> { return undefined; }
 
 	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
