@@ -126,12 +126,7 @@ export class PluginsService implements IPluginsService {
 
 			let pluginToAdd = this.getPluginByName(pluginName);
 			if(pluginToAdd.type === pluginsDataLib.PluginType.MarketplacePlugin) {
-				let versions = this.getPluginVersions(pluginName);
-				if(version && !_.any(versions, v => v.value === version)) {
-					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s", version, versions.map(v => v.value).join(", "));
-				} else if(!version) {
-					version = this.promptForVersion(pluginName, versions).wait();
-				}
+				version = this.selectPluginVersion(version, pluginToAdd).wait();
 			}
 
 			this.configurePlugin(pluginName, version).wait();
@@ -487,6 +482,11 @@ export class PluginsService implements IPluginsService {
 				if(!_.any(versions, v => v.value === version)) {
 					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
 				}
+			} else if(this.$options.latest) {
+				// server returns the versions in descending order
+				version = _.first(versions).value;
+			} else if(this.$options.default) {
+				version = (<IMarketplacePlugin>plugin).pluginVersionsData.DefaultVersion;
 			} else {
 				if(options && options.excludeCurrentVersion) {
 					let currentVersionIndex = _.findIndex(versions,(v) => v.value === plugin.data.Version);

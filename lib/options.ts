@@ -18,7 +18,6 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			provision: { type: OptionType.String  },
 			template: { type: OptionType.String, alias: "t" },
 			deploy: { type: OptionType.String },
-			device: { type: OptionType.String },
 			saveTo: { type: OptionType.String},
 			client: { type: OptionType.String },
 			available: { type: OptionType.Boolean },
@@ -34,7 +33,8 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			publish: { type: OptionType.Boolean },
 			sendPush: { type: OptionType.Boolean },
 			sendEmail: { type: OptionType.Boolean },
-			group: { type: OptionType.Array } 
+			group: { type: OptionType.Array },
+			default: {type: OptionType.Boolean}
 		},
 		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
 			$errors, $staticConfig);
