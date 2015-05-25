@@ -214,6 +214,19 @@ interface IProjectPropertiesService {
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file. 
 	 */
 	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
+
+	/**
+	 * Updates CorePlugins property value in all configurations.
+	 * @param {IProjectData} projectData The project data commonly written in .abproject.
+	 * @param {IDictionary<IProjectData>} configurationSpecificData Dictionary with all configuration specific data. 
+	 * @param {string} mode Type of operation which should be executed with the property.
+	 * @param {Array<any>} newValue The new value that should be used for CorePlugins modification.
+	 * @param {string[]} configurationsSpecifiedByUser The configurations which the user want to modify.
+	 * @return {IFuture<void>}
+	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
+	 * @throws Error when the different CorePlugins are enabled in projectData and any configuration specific data.
+	 */
+	updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
 }
 
 interface IServerConfigurationData {
