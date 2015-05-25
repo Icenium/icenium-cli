@@ -36,7 +36,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			updateKendo: false,
 			emulate: true,
 			publish: false,
-			uploadToAppstore: true
+			uploadToAppstore: true,
+			canChangeFrameworkVersion: true
 		};
 	}
 
