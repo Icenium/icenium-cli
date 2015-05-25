@@ -25,8 +25,8 @@ Command | Description
 [cloud&nbsp;export](project/creation/cloud-export.html) | Exports a selected project from the cloud and initializes it for development.
 [build `<Platform>`](project/testing/build.html) | Builds the project for a selected target platform and downloads the application package or produces a QR code for deploying the application package.
 [deploy `<Platform>`](project/testing/deploy.html) | Builds and deploys the project to a connected device.
-[livesync](project/testing/livesync.html) | Synchronizes the latest changes in your project to connected devices.
-[livesync&nbsp;cloud&nbsp;`<Platform>`](project/testing/livesync-cloud.html) | Synchronizes the project with the cloud to enable LiveSync for remote devices.
+[livesync&nbsp;cloud](project/testing/livesync-cloud.html) | Synchronizes the project with the cloud to enable LiveSync for remote devices.
+[livesync&nbsp;`<Platform>`](project/testing/livesync.html) | Synchronizes the latest changes in your project to connected devices.
 [debug](project/testing/debug.html) | Shows the debug tools to let you debug applications on connected devices.
 [simulate](project/testing/simulate.html) | Runs the current project in the device simulator.
 [emulate `<Platform>`](project/testing/emulate.html) | Runs the current project in the selected platform emulator.
