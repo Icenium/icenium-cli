@@ -501,8 +501,26 @@ interface IBasicPluginInformation {
 	version: string;
 }
 
+/**
+ * Extends Server's MarketplacePluginVersionsData interface.
+ */
+interface IMarketplacePluginVersionsData extends Server.MarketplacePluginVersionsData {
+	/**
+	 * The version of the plugin, that is marked as default. This version may not be the latest version.
+	 */
+	DefaultVersion: string;
+	/**
+	 * Id of the plugin.
+	 */
+	Identifier: string;
+	/**
+	 * The framework that is required in order to work with this plugin.
+	 */
+	Framework: string;
+}
+
 interface IMarketplacePlugin extends IPlugin {
-	pluginVersionsData: Server.MarketplacePluginVersionsData;
+	pluginVersionsData: IMarketplacePluginVersionsData;
 }
 
 interface ITypeScriptCompilerOptions {
@@ -601,4 +619,5 @@ interface IOptions extends ICommonOptions {
 	sendPush: boolean;
 	sendEmail: boolean;
 	group: string[];
+	default: boolean;
 }

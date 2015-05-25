@@ -80,7 +80,7 @@ export class MarketplacePluginData extends CordovaPluginData {
 	private static TELERIK_PUBLISHER_NAME = "Telerik plugins";
 	private static TELERIK_PARTNER_PUBLISHER_NAME = "Telerik partner plugins";
 
-	constructor(public pluginVersionsData: Server.MarketplacePluginVersionsData,
+	constructor(public pluginVersionsData: IMarketplacePluginVersionsData,
 		public data: Server.MarketplacePluginData,
 		$project: Project.IProject,
 		$projectConstants: Project.IProjectConstants) {
