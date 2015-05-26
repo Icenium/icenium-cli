@@ -19,6 +19,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void {
 		properties.DisplayName = projectName;
+		properties.Description = projectName;
 		let appid = this.$options.appid;
 		if(!this.$options.appid) {
 			appid = this.generateDefaultAppId(projectName);
