@@ -56,7 +56,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Device drivers required by your system to recognize the connected Android device
 * For testing in the native emulators
-	* JDK 7 or later
+	* JDK 8 or later
 	* Android SDK 19 or later
 	* (Optional) Genymotion
 
@@ -84,7 +84,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Device drivers required by your system to recognize the connected Android device
 * For testing in the native emulators
-	* JDK 7 or later
+	* JDK 8 or later
 	* Android SDK 19 or later
 	* (Optional) Genymotion
 
@@ -120,7 +120,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * G++ compiler
    * In the terminal, run `sudo apt-get install g++`
 * For testing in the native emulators
-	* JDK 7 or later
+	* JDK 8 or later
 	* Android SDK 19 or later
 	* (Optional) Genymotion
 
