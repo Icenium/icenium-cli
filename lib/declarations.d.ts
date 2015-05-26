@@ -691,3 +691,24 @@ interface IFrameworkVersion {
 	 */
 	displayName: string;
 }
+
+/**
+ * Describes WebViewService
+ */
+interface IWebViewService {
+	supportedWebViews: IDictionary<IWebView[]>;
+	getWebView(platform: string, webViewName: string): IWebView;
+	getWebViews(platform: string): IWebView[];
+	getWebViewNames(platform: string): string[];
+	enableWebView(platform: string, webViewName: string): IFuture<void>;
+}
+
+/**
+ * Describes WebView with name minSupportedVersion and pluginIdentifier.
+ */
+interface IWebView {
+	name: string;
+	minSupportedVersion: string;	
+	pluginIdentifier?: string;
+	default?: boolean;
+}

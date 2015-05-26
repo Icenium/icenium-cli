@@ -39,6 +39,7 @@ testInjector.register("prompter", {
 });
 testInjector.register("resources", {});
 testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() }});
+testInjector.register("webViewService", {});
 
 function registerMockedFS(mockResult: any): void {
 	testInjector.register("fs", {

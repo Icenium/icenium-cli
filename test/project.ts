@@ -139,6 +139,9 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectPropertiesService", projectPropertiesService.ProjectPropertiesService);
 	testInjector.register("options", optionsLib.Options);
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+	testInjector.register("webViewService", {
+		minSupportedVersion: "4.0.0"
+	});
 
 	return testInjector;
 }

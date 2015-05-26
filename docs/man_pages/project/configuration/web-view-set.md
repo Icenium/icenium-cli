@@ -1,29 +1,30 @@
-mobileframework set
+web-view set
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
+General | `$ appbuilder web-view set <Platform> <WebViewName>`
 
-<% if(isHtml) { %>Sets the selected framework version for the project.<% } %>
+Sets the selected web view for the current project and updates the integrated plugins to match it.
 
 <% if(isConsole)  { %>
-<% if(isCordova) { %>Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.<% } %>
-<% if(isNativeScript)  { %>Sets the selected NativeScript version for the project.<% } %>
+<% if(isNativeScript)  { %>
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help web-view set`
+<% } %>
 <% if(isMobileWebsite)  { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help web-view set`
 <% } %>
 <% } %>
-<% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
-### Options
-* `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
+<% if((isConsole && isCordova) || isHtml) { %>
 
 ### Attributes
-* `<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
+* `<Platform>` is the target mobile platform for which you want to change your web view. 
+* `<WebViewName>` is the web view name as listed by `$ appbuilder web-view`.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
+* You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
 
 ### Related Commands
@@ -38,5 +39,4 @@ Command | Description
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
 [web-view](web-view.html) | Lists all supported web views for different mobile platforms.
-[web-view set](web-view-set.html) | Sets the selected web view for the current project and updates the integrated plugins to match it.
 <% } %>
