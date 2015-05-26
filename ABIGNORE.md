@@ -7,6 +7,7 @@ To set exclude and include rules, you can create and manage an .abignore file in
 * [Create .abignore](#create-abignore)
 * [Adding rules and comments](#adding-rules-and-comments)
 * [Sample .abignore](#sample-abignore)
+* [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -89,16 +90,17 @@ When you create and modify your `.abignore` file, keep in mind the following spe
 * Each rule must start on a new line. 
 * Empty lines are ignored.
 * By default, all rules are exclude rules.
-* Starting with AppBuilder 2.6, newly created projects contain a default `.abignore` file. This file excludes the following files and subdirectories from your application package.
+* Starting with [AppBuilder 2.6\*](#troubleshooting), newly created projects contain a default `.abignore` file. This file excludes the following files and subdirectories from your application package.
    * All `Thumbs.db` files: Thumbnails cache files managed by Windows.
    * All `.DS_Store` files: Hidden OS X system files.
    * All `__MACOSX` directories and their contents: Hidden OS X system directories.
-   * `bin`: A subdirectory in projects created with Visual Studio. It contains your latest built application packages.
-   * `obj`: A subdirectory in projects created with Visual Studio. It contains the archived project files that AppBuilder sends to the build server.
-   * `.gitignore`: A file that Git uses to deremine which files and directories to ignore when you are making a commit.
-   * `.git`: A subdirectory in which Git stores your version control history and other relevant version control data. 
+   * The `bin` directory and its contents: A subdirectory in projects created with Visual Studio. It contains your latest built application packages.
+   * The `obj` directory and its contents: A subdirectory in projects created with Visual Studio. It contains the archived project files that AppBuilder sends to the build server.
+   * `.gitignore`: A file that Git uses to determine which files and directories to ignore when you are making a commit.
+   * The `.git` directory and its contents: A subdirectory in which Git stores your version control history and other relevant version control data. 
    * `.abignore`: This file contains exclude and include rules for your application package.
-   * `.ab`: The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
+   * The `.ab` directory and its contents: The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
+   * `.app.json`: This file contains configuration information about projects created with Screen Builder.
    * Files associated with popular development environments. 
 * For projects created with AppBuilder 2.5.2 or earlier, you need to manually create `.abignore`. For such projects, by default, the AppBuilder CLI excludes the following files and subdirectories. You do not need to manually list these files in your `.abignore` file.
    * `.ab:` The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
@@ -165,10 +167,10 @@ This is the markup of a sample `.abignore` file. This sample is based on the def
 
 # The following rule excludes any .DS_Store files and __MACOSX subdirectories and their contents from your project. This rule is useful for projects developed on OS X systems or projects in which you have added files or subdirectories created on an OS X system.
 **/.DS_Store
-*/**/__MACOSX/**/*
+**/__MACOSX/**/*
 
 # The following rule excludes any Thumbs.db files from your projects. Thumbs.db is a thumbnails cache file managed by Windows. This rule is useful for projects developed on Windows systems or projects in which you have added files or subdirectories created on a Windows system.
-*/**/Thumbs.db
+**/Thumbs.db
 
 # The following rule excludes .git subdirectories and their contents and the .gitignore file. This rule is useful for projects developed with Git version control.
 .git/**/*
@@ -179,15 +181,70 @@ bin/**/*
 obj/**/*
 
 # The following rule excludes all files with a selected name, located anywhere in your project. For example, views/my_views/my_page.html.
-*/**/my_page.html
+**/my_page.html
 
 # The following rule excludes all files that begin with a selected prefix. For example, the test prefix.
-*/**/test*.*
+**/test*.*
 
 # The following rule excludes all files that end in a selected suffix. For example, the debug suffix.
-*/**/*debug.*
+**/*debug.*
 
 # The following rule excludes all files with a selected extension. For example, Windows PowerShell scripts.
-*/**/*.ps1
+**/*.ps1
 
+```
+
+## Troubleshooting
+
+Between AppBuilder 2.6 and 2.7.3, the default `.abignore` file contained exclude rules with incorrect syntax. If you have created your project with an AppBuilder version between 2.6 and 2.7.3, you need to manually replace the contents of your default `.abignore` file with the following markup.
+
+```
+# .abignore lets you configure which of your files and folders should be excluded from your application package during the build process.
+# Each project created with AppBuilder 2.6 or later contains a default .abignore which lists a number of system files and folders that might affect the size of your app or might prevent build operations from completing successfully. 
+#
+# For more information about .abignore and how to write exclude and include rules for your projects, see http://docs.telerik.com/platform/appbuilder/testing-your-app/abignore
+
+# Windows files
+**/Thumbs.db
+
+# Mac OS files
+**/.DS_Store
+**/__MACOSX/**/*
+
+# Visual Studio files
+bin/**/*
+obj/**/*
+**/*.obj
+**/*.pdb
+**/*.user
+**/*.aps
+**/*.pch
+**/*.vspscc
+**/*_i.c
+**/*_p.c
+**/*.ncb
+**/*.suo
+**/*.tlb
+**/*.tlh
+**/*.ilk
+**/*.lib
+**/*.sbr
+
+# Source control files
+.gitignore
+.git/**/*
+
+# AppBuilder files
+.abignore
+.ab/**/*
+.app.json
+
+# TypeScript files
+**/*.ts
+**/*.map
+
+# Other
+**/*.bak
+**/*.cache
+**/*.log
 ```
