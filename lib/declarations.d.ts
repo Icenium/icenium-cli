@@ -162,6 +162,7 @@ interface IProjectCapabilities {
 	emulate: boolean;
 	publish: boolean;
 	uploadToAppstore: boolean;
+	canChangeFrameworkVersion: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -384,12 +385,33 @@ interface IPathFilteringService {
 	isFileExcluded(file: string, rules: string[], rootDir: string): boolean
 }
 
-interface ICordovaMigrationService {
-	downloadCordovaMigrationData(): IFuture<void>;
+/**
+ * Defines methods required for migrating Cordova or NativeScript projects.
+ */
+interface IFrameworkMigrationService {
+	/**
+	 * Downloads the data that is required in order to be able to migrate any project.
+	 * @return {IFuture<void>}
+	 */
+	downloadMigrationData(): IFuture<void>;
+
+	/**
+	 * Gives a list of all supported versions. Each version is a string in the following format <Major>.<Minor>.<Patch>
+	 * @return {IFuture<string[]>} List of all supported versions.
+	 */
 	getSupportedVersions(): IFuture<string[]>;
-	pluginsForVersion(version: string): IFuture<string[]>;
-	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
-	getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]>;
+
+	/**
+	 * Gives a list of all supported framework versions. Each one is presented with version and user-friendly display name.
+	 * @return {IFuture<IFrameworkVersion[]>} List of all supported frameworks, each one with version and display name.
+	 */
+	getSupportedFrameworks(): IFuture<IFrameworkVersion[]>;
+
+	/**
+	 * Gets the user-friendly name of the specified version.
+	 * @param  {string} version The version of the framework.
+	 * @return {IFuture<string>} User-friendly name of the specified version.
+	 */
 	getDisplayNameForVersion(version: string): IFuture<string>;
 	/**
 	 * Hook which is dynamically called when a project's framework version is changing
@@ -397,12 +419,31 @@ interface ICordovaMigrationService {
 	 * @return {IFuture<void>}
 	 */
 	onFrameworkVersionChanging(newVersion: string): IFuture<void>;
+}
+
+/**
+ * Defines methods required for migrating Cordova projects.
+ */
+interface ICordovaMigrationService extends IFrameworkMigrationService {
+	/**
+	 * Get all plugins available for specified version.
+	 * @param {string} version The Cordova Framework version.
+	 * @return {string[]} plugins available for the selected Cordova version
+	 */
+	pluginsForVersion(version: string): IFuture<string[]>;
+	/**
+	 * Migrate plugins from one Cordova version to another. 
+	 * @param {string} fromVersion The current Cordova Framework version.
+	 * @param {string} toVersion The Cordova Framework version to be used.
+	 * @return {string[]} Migrated plugins.
+	 */
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
 	/**
 	 * Hook which is dynamically called when a project's windows phone sdk version is changing
 	 * @param  {string} newVersion The version to upgrade/downgrade to
 	 * @return {IFuture<void>}
 	 */
-	onWPSdkVersionChanging(newVersion: string): IFuture<void>;
+	onWPSdkVersionChanging?(newVersion: string): IFuture<void>;
 }
 
 interface ISamplesService {
@@ -436,7 +477,7 @@ interface IPluginsService {
 	 * @param  {string}        pluginName     The name of the plugin.
 	 * @param  {string}        version        The version of the plugin.
 	 * @param  {string[]}      configurations Configurations in which the plugin should be configured. Example: ['debug'], ['debug', 'release']
-	 * @return {IFuture<void>}                
+	 * @return {IFuture<void>}
 	 */
 	configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
 	isPluginInstalled(pluginName: string): boolean;
@@ -620,4 +661,33 @@ interface IOptions extends ICommonOptions {
 	sendEmail: boolean;
 	group: string[];
 	default: boolean;
+}
+
+/**
+ * Describes the migration data for NativeScript project.
+ * This data is written in resource file.
+ */
+interface INativeScriptMigrationData{
+	/**
+	 * Versions that can be used for building the project, but cannot be migrated to other ones.
+	 */
+	obsoleteVersions: IFrameworkVersion[];
+	/**
+	 * Versions that can be used for building the project and it can be migrated between them.
+	 */
+	supportedVersions: IFrameworkVersion[];
+}
+
+/**
+ * Describes framework version with valid version and its display name.
+ */
+interface IFrameworkVersion {
+	/**
+	 * The version in format <Major>.<Minor>.<Patch>
+	 */
+	version: string;
+	/**
+	 * User friendly name, describing the version.
+	 */
+	displayName: string;
 }

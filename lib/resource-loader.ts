@@ -34,7 +34,7 @@ class ResourceDownloader implements IResourceDownloader {
 	constructor(private $server: Server.IServer,
 		private $fs: IFileSystem,
 		private $resources: IResourceLoader,
-		private $cordovaMigrationService: ICordovaMigrationService,
+		private $cordovaMigrationService: IFrameworkMigrationService,
 		private $mobileHelper: Mobile.IMobileHelper) { }
 
 	public downloadCordovaJsFiles(): IFuture<void> {

@@ -15,13 +15,9 @@ class RenamedPlugin {
 class MigrationData {
 	constructor(public renamedPlugins: RenamedPlugin[],
 		public supportedVersions: string[],
-		public integratedPlugins: { [version: string]: string[] }) {
+		public integratedPlugins: { [version: string]: string[] },
+		public supportedFrameworkVersions: IFrameworkVersion[]) {
 	}
-}
-
-export class FrameworkVersion implements Server.FrameworkVersion {
-	constructor(public DisplayName: string,
-		public Version: string) { }
 }
 
 export class CordovaMigrationService implements ICordovaMigrationService {
@@ -56,29 +52,20 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public getDisplayNameForVersion(version: string): IFuture<string> {
 		return ((): string => {
-			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: Server.FrameworkVersion) => fw.Version === version);
+			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: IFrameworkVersion) => fw.version === version);
 			if(framework) {
-				return framework.DisplayName;
+				return framework.displayName;
 			}
 
 			this.$errors.fail("Cannot find version %s in the supported versions.", version);
 		}).future<string>()();
 	}
 
-	public getSupportedFrameworks(): IFuture<Server.FrameworkVersion[]> {
+	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
 		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
+			return this.migrationData.wait().supportedFrameworkVersions;
 
-			let cliSupportedVersions: Server.FrameworkVersion[] = [];
-			_.each(this.$server.cordova.getCordovaFrameworkVersions().wait(), (fw: Server.FrameworkVersion) => {
-				let version = this.parseMscorlibVersion(fw.Version);
-				if(helpers.versionCompare(version, this.minSupportedVersion) >= 0) {
-					cliSupportedVersions.push(new FrameworkVersion(fw.DisplayName, version));
-				}
-			});
-
-			return cliSupportedVersions;
-		}).future<Server.FrameworkVersion[]>()();
+		}).future<IFrameworkVersion[]>()();
 	}
 
 	public getSupportedVersions(): IFuture<string[]> {
@@ -122,7 +109,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}).future<string[]>()();
 	}
 
-	public downloadCordovaMigrationData(): IFuture<void> {
+	public downloadMigrationData(): IFuture<void> {
 		return (() => {
 			let json = this.$server.cordova.getMigrationData().wait();
 			let renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(
@@ -137,8 +124,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			_.each(cliSupportedVersions, version => {
 				integratedPlugins[version] = json.IntegratedPlugins[version];
 			});
-
-			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins)
+			let supportedFrameworkVersion: IFrameworkVersion[] = _.map(json.SupportedFrameworkVersions, fv => { return {displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version)} });
+			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
 		}).future<void>()();
 	}
@@ -161,16 +148,16 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					let cordovaVersions = this.getSupportedFrameworks().wait();
 
 					// Find last framework which is not experimental.
-					let selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
-					if(helpers.versionCompare(selectedFramework.Version, "3.7.0") < 0) {
+					let selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
+					if(helpers.versionCompare(selectedFramework.version, "3.7.0") < 0) {
 						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
-						selectedFramework = _.findLast(cordovaVersions, cv => cv.DisplayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.Version) <= 0);
+						selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.version) <= 0);
 					}
 
-					let shouldUpdateFramework = this.$prompter.confirm(`You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.DisplayName}?`).wait()
+					let shouldUpdateFramework = this.$prompter.confirm(`You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`).wait()
 					if(shouldUpdateFramework) {
-						this.onFrameworkVersionChanging(selectedFramework.Version).wait();
-						this.$project.projectData.FrameworkVersion = selectedFramework.Version;
+						this.onFrameworkVersionChanging(selectedFramework.version).wait();
+						this.$project.projectData.FrameworkVersion = selectedFramework.version;
 					} else {
 						this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
 					}
@@ -185,6 +172,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				return;
 			}
 
+			let versionDisplayName = this.getDisplayNameForVersion(newVersion).wait();
 			this.$project.ensureAllPlatformAssets().wait();
 
 			if(this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
@@ -197,7 +185,6 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				}
 			}
 
-			let versionDisplayName = this.getDisplayNameForVersion(newVersion).wait();
 			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			let oldVersion = this.$project.projectData.FrameworkVersion;
 
@@ -240,8 +227,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			if(this.$project.projectData) {
 				version = this.$project.projectData.FrameworkVersion;
 			} else {
-				let selectedFramework = _.findLast(this.getSupportedFrameworks().wait(), (sv: Server.FrameworkVersion) => sv.DisplayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
-				version = selectedFramework.Version;
+				let selectedFramework = _.findLast(this.getSupportedFrameworks().wait(), (sv: IFrameworkVersion) => sv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
+				version = selectedFramework.version;
 			}
 
 			return this.pluginsForVersion(version).wait();

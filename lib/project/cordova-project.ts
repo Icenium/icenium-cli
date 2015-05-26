@@ -42,7 +42,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			updateKendo: true,
 			emulate: true,
 			publish: false,
-			uploadToAppstore: true
+			uploadToAppstore: true,
+			canChangeFrameworkVersion: true
 		};
 	}
 

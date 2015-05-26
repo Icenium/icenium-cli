@@ -24,6 +24,7 @@ $injector.require("marketplacePluginsService", "./services/marketplace-plugins-s
 $injector.require("pluginsService", "./services/plugins-service");
 
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
+$injector.require("nativeScriptMigrationService", "./services/nativescript-migration-service");
 $injector.require("samplesService", "./services/samples-service");
 $injector.requireCommand("sample|*list", "./commands/samples");
 $injector.requireCommand("sample|clone", "./commands/samples");
