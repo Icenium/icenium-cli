@@ -5,6 +5,7 @@ import dependencyExtensionsServiceLib = require("./dependency-extensions-service
 import hostInfo = require("./../common/host-info");
 import path = require("path");
 import util = require("util");
+import Future = require("fibers/future");
 
 export class AppScaffoldingExtensionsService extends dependencyExtensionsServiceLib.DependencyExtensionsServiceBase implements IAppScaffoldingExtensionsService {
 	private static APP_SCAFFOLDING_NAME = "app-scaffolding";
@@ -30,6 +31,9 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 			let afterPrepareAction = () => {
 				return (() => {
 					this.npmInstall("glob-watcher@0.0.8").wait(); // HACK: With this we are able to make paths shorter with 20 symbols.
+					
+					let generatorBaseDependencies = require(path.join(this.appScaffoldingPath, "node_modules", "screen-builder-base-generator", "package.json")).dependencies;
+					Future.wait(_.map(generatorBaseDependencies, (value, key) => this.npmInstall(`${key}@${value}`)));
 					this.npmInstall().wait();
 					this.npmDedupe().wait();
 				}).future<void>()();
