@@ -5,28 +5,29 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder webview [<Command>]`
 
-Lists the available web views for iOS and Android.
+Lists the available web views for iOS and Android. <% if(isHtml) { %>For more information about working with web views in Telerik AppBuilder, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>
 
 <% if(isConsole) { %>
 <% if(isNativeScript)  { %>
-WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help web-view`
+WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help webview`
 <% } %>
 <% if(isMobileWebsite)  { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help web-view`
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help webview`
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 
 ### Attributes
 
-`<Command>` extends the `web-view` command. You can set the following values for this attribute.
-* `set` - Sets the selected web view for the current project and updates the integrated plugins to match it.
+`<Command>` extends the `webview` command. You can set the following values for this attribute.
+* `set` - Sets the selected web view for the current project.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
+* You cannot configure web views for Windows Phone.
 
 ### Related Commands
 

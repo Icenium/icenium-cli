@@ -13,10 +13,10 @@ export class WebViewService implements IWebViewService {
 	public get supportedWebViews(): IDictionary<IWebView[]> { 
 		return {
 			'ios': [ 
-				{ name: "default", minSupportedVersion: "3.0.0", default: true }, 
+				{ name: "Default", minSupportedVersion: "3.0.0", default: true }, 
 				{ name: "WKWebView", minSupportedVersion: "3.7.0", pluginIdentifier: "com.telerik.plugins.wkwebview" }],
 			'android': [
-				{ name: "default", minSupportedVersion: "3.0.0", default: true }, 
+				{ name: "Default", minSupportedVersion: "3.0.0", default: true }, 
 				{ name: "Crosswalk", minSupportedVersion: "4.0.0", pluginIdentifier: "cordova-plugin-crosswalk-webview" }]
 		}
 	}

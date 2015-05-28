@@ -3,23 +3,33 @@ webview set
 
 Usage | Synopsis
 ------|-------
-General | Android | $ appbuilder web-view set android <Web View Name>
-iOS | $ appbuilder web-view set ios <Web View Name>
+Android | $ appbuilder webview set android <Web View Name>
+iOS | $ appbuilder webview set ios <Web View Name>
 
-Sets the selected web view for the current project.
+Sets the selected web view for the current project. <% if(isHtml) { %>Setting a pluggable web view also enables the respective Apache Cordova plugin for your project. For more information, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>  
 
 <% if(isConsole)  { %>
 <% if(isNativeScript)  { %>
-WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help web-view set`
+WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help webview set`
 <% } %>
 <% if(isMobileWebsite)  { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help web-view set`
+WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help webview set`
 <% } %>
+<% } %>
+<% if(isHtml) { %>
+### Prerequisites
+
+* If you want to use the `Crosswalk` web view for Android, verify that you meet the following requirements.
+    * Your project targets Apache Cordova 4.0.0 or later.
+    * Your Android devices run on Android 4.0 or later.
+* If you want to use the `WKWebView` web view for iOS, verify that you meet the following requirements.
+    * Your project targets Apache Cordova 3.7.0 or later.
+    * Your iOS devices run on iOS 8 or later.
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Attributes
-* `<Platform>` is the target mobile platform for which you want to change your web view. 
-* `<WebViewName>` is the web view name as listed by `$ appbuilder web-view`.
+
+* `<Web View Name>` is the web view name as listed by `$ appbuilder webview`
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
