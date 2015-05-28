@@ -1,11 +1,12 @@
-web-view set
+webview set
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder web-view set <Platform> <WebViewName>`
+General | Android | $ appbuilder web-view set android <Web View Name>
+iOS | $ appbuilder web-view set ios <Web View Name>
 
-Sets the selected web view for the current project and updates the integrated plugins to match it.
+Sets the selected web view for the current project.
 
 <% if(isConsole)  { %>
 <% if(isNativeScript)  { %>
@@ -16,7 +17,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
-
 ### Attributes
 * `<Platform>` is the target mobile platform for which you want to change your web view. 
 * `<WebViewName>` is the web view name as listed by `$ appbuilder web-view`.
@@ -26,6 +26,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 
 * You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
+* You cannot configure web views for Windows Phone.
 
 ### Related Commands
 
@@ -38,5 +39,5 @@ Command | Description
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
-[web-view](web-view.html) | Lists all supported web views for different mobile platforms.
+[webview](webview.html) | Lists the available web views for iOS and Android.
 <% } %>

@@ -1,11 +1,11 @@
-web-view
+webview
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder web-view [<Command>]`
+General | `$ appbuilder webview [<Command>]`
 
-Lists all supported web views for different mobile platforms.
+Lists the available web views for iOS and Android.
 
 <% if(isConsole) { %>
 <% if(isNativeScript)  { %>
@@ -39,5 +39,5 @@ Command | Description
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
-[web-view set](web-view-set.html) | Sets the selected web view for the current project and updates the integrated plugins to match it.
+[webview set](webview-set.html) | Sets the selected web view for the current project.
 <% } %>

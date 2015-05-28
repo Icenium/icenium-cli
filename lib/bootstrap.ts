@@ -183,5 +183,5 @@ $injector.require("projectCommandsService", "./services/project-commands-service
 $injector.requireCommand("screenbuilder", "./commands/screenbuilder");
 
 $injector.require("webViewService", "./services/web-view-service");
-$injector.requireCommand("web-view|*list", "./commands/web-view/list-web-views");
-$injector.requireCommand("web-view|set", "./commands/web-view/set-web-view");
+$injector.requireCommand("webview|*list", "./commands/web-view/list-web-views");
+$injector.requireCommand("webview|set", "./commands/web-view/set-web-view");

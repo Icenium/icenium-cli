@@ -31,4 +31,4 @@ export class ListWebViewsCommand implements ICommand {
 	
 	public allowedParameters: ICommandParameter[] = [];
 }
-$injector.registerCommand("web-view|*list", ListWebViewsCommand);
+$injector.registerCommand("webview|*list", ListWebViewsCommand);

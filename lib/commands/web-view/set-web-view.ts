@@ -55,4 +55,4 @@ export class SetWebViewCommand implements ICommand {
 	
 	public allowedParameters: ICommandParameter[] = [];		
 }
-$injector.registerCommand("web-view|set", SetWebViewCommand);
+$injector.registerCommand("webview|set", SetWebViewCommand);

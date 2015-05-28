@@ -13,10 +13,10 @@ export class WebViewService implements IWebViewService {
 	public get supportedWebViews(): IDictionary<IWebView[]> { 
 		return {
 			'ios': [ 
-				{ name: "Built-in", minSupportedVersion: "3.0.0", default: true }, 
+				{ name: "default", minSupportedVersion: "3.0.0", default: true }, 
 				{ name: "WKWebView", minSupportedVersion: "3.7.0", pluginIdentifier: "com.telerik.plugins.wkwebview" }],
 			'android': [
-				{ name: "Built-in", minSupportedVersion: "3.0.0", default: true }, 
+				{ name: "default", minSupportedVersion: "3.0.0", default: true }, 
 				{ name: "Crosswalk", minSupportedVersion: "4.0.0", pluginIdentifier: "cordova-plugin-crosswalk-webview" }]
 		}
 	}
@@ -57,13 +57,9 @@ export class WebViewService implements IWebViewService {
 	
 	private enableDefaultWebView(platform: string): IFuture<void> {
 		return (() => {
-			let webViews = this.getWebViews(platform);
-			_(webViews)
-			.filter(webView => !webView.default)
-			.each(webView => {
-				if(this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
-					this.$pluginsService.removePlugin(webView.pluginIdentifier).wait();
-				} })
+			_(this.getWebViews(platform))
+			.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
+			.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait())
 			.value();
 		}).future<void>()();
 	}
