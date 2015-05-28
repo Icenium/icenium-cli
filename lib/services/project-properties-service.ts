@@ -61,22 +61,18 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return dataToBeUpdated;
 	}
 
-	private validateProjectData(projectData: IProjectData, configurationSpecificData?: IProjectData): void {
-		let dataToValidate = Object.create(null);
-		_.extend(dataToValidate, projectData);
-		if(configurationSpecificData) {
-			_.extend(dataToValidate, configurationSpecificData);
-		}
-		this.$jsonSchemaValidator.validate(dataToValidate);
-	}
-
-	private notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): IFuture<void> {
+	public updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void> {
 		return ((): void => {
-			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
-			let propData = projectSchema[propertyName];
-			if(propData && propData.onChanging) {
-				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+			if(configurationsSpecifiedByUser.length === 1) {
+				this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
 			}
+
+			_.each(configurationsSpecifiedByUser, configuration => {
+				this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue).wait();
+			});
+
+			// check if CorePlugins in both configurations are the same
+			this.tryMovingCorePluginsToProjectData(projectData, configurationSpecificData);
 		}).future<void>()();
 	}
 
@@ -258,6 +254,73 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 			return properties;
 		}).future<any>()();
+	}
+
+	private notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): IFuture<void> {
+		return ((): void => {
+			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
+			let propData = projectSchema[propertyName];
+			if(propData && propData.onChanging) {
+				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+			}
+		}).future<void>()();
+	}
+
+	private moveCorePluginsToConfigurationSpecificData(projectData: IProjectData, configurationSpecificData:  IDictionary<IProjectData>): void {
+		if(projectData.CorePlugins && projectData.CorePlugins.length > 0) {
+			_.each(configurationSpecificData, (configurationData: IProjectData, configuration: string) => {
+				this.$logger.trace(`Move CorePlugins from project data to '${configuration}' configuration.`);
+				configurationData.CorePlugins = projectData.CorePlugins;
+			});
+		}
+		delete projectData.CorePlugins;
+	}
+
+	private validateAllProjectData(projectData: IProjectData, configurationSpecificData:IDictionary<IProjectData>): void {
+		let projectConfigurations = _.keys(configurationSpecificData);
+		_.each(projectConfigurations, configuration => {
+			this.validateProjectData(projectData, configurationSpecificData[configuration]);
+		});
+
+		this.validateProjectData(projectData);
+	}
+
+	private validateProjectData(projectData: IProjectData, configurationSpecificData?: IProjectData): void {
+		let dataToValidate = Object.create(null);
+		_.extend(dataToValidate, projectData);
+		if(configurationSpecificData) {
+			_.extend(dataToValidate, configurationSpecificData);
+		}
+		this.$jsonSchemaValidator.validate(dataToValidate);
+	}
+
+	private tryMovingCorePluginsToProjectData(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>): void {
+		if(this.shouldMoveCorePluginsToProjectData(configurationSpecificData)) {
+			this.$logger.trace("Moving CorePlugins from configuration specific data to project data.");
+			projectData.CorePlugins = configurationSpecificData[this.$projectConstants.DEBUG_CONFIGURATION_NAME].CorePlugins;
+			_.each(configurationSpecificData, (configurationData: IProjectData, configuration: string) => {
+				this.$logger.trace(`Removing property CorePlugins from '${configuration}' configuration.`)
+				delete configurationData.CorePlugins;
+			});
+
+			this.validateAllProjectData(projectData, configurationSpecificData);
+		}
+	}
+
+	private shouldMoveCorePluginsToProjectData(configurationSpecificData: IDictionary<IProjectData>): boolean {
+		let corePluginsInConfigs = _.map(configurationSpecificData, configData => configData.CorePlugins);
+		let corePluginsLenghtsInConfigs = _(corePluginsInConfigs)
+					.map(c => c.length)
+					.uniq()
+					.value();
+		let differencesBetweenPluginsInConfigs = _.difference.apply(null, corePluginsInConfigs);
+		// Check if the lengths of core plugins in all configuration files are the same.
+		if(corePluginsLenghtsInConfigs.length === 1 && differencesBetweenPluginsInConfigs.length === 0) {
+			this.$logger.trace("No difference between CorePlugins in each configuration detected. CorePlugins should be moved to project data.");
+			return true;
+		}
+		this.$logger.trace("There's difference between CorePlugins in configuration files. CorePlugins cannot be moved to project data.");
+		return false;
 	}
 }
 $injector.register("projectPropertiesService", ProjectPropertiesService);

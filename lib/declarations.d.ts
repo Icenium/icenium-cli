@@ -214,6 +214,7 @@ interface IProjectPropertiesService {
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file. 
 	 */
 	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
+	updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
 }
 
 interface IServerConfigurationData {

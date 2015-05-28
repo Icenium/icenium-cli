@@ -325,10 +325,8 @@ export class Project implements Project.IProject {
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			let debugConfigName = this.$projectConstants.DEBUG_CONFIGURATION_NAME;
-			let releaseConfigName = this.$projectConstants.RELEASE_CONFIGURATION_NAME;
+			let projectConfigurations = _.keys(this.configurationSpecificData);
 			let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
-
 			if(normalizedPropertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
 				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(normalizedPropertyName, propertyValues[0]);
 			}
@@ -338,19 +336,14 @@ export class Project implements Project.IProject {
 				if(normalizedPropertyName !== this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME){
 					this.$errors.failWithoutHelp("You cannot use this property in specific configuration.");
 				}
-
-				_.each(configurations, configuration => {
-					this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues).wait();
-					this.printProjectProperty(normalizedPropertyName, configuration).wait();
-					this.saveProject(this.getProjectDir().wait(), [configuration]).wait();
-				});
+				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, this.getConfigurationsSpecifiedByUser()).wait();
 			} else {
 				this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
 				_.each(this.configurationSpecificData, configSpecificData => this.$projectPropertiesService.removeProjectProperty(configSpecificData, normalizedPropertyName, this.projectData));
-				
-				this.printProjectProperty(normalizedPropertyName).wait();
-				this.saveProject(this.getProjectDir().wait()).wait();
 			}
+			
+			this.saveProject(this.getProjectDir().wait(), projectConfigurations).wait();
+			this.printProjectProperty(normalizedPropertyName).wait();
 		}).future<void>()();
 	}
 
@@ -374,6 +367,7 @@ export class Project implements Project.IProject {
 					} else {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if(_.has(mergedProjectData, normalizedPropertyName)) {
+							this.$logger.write(`The value of ${normalizedPropertyName} is: `);
 							this.$logger.out(mergedProjectData[normalizedPropertyName]);
 						} else if(this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
 							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);

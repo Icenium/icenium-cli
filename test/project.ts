@@ -677,6 +677,163 @@ describe("project unit tests", () => {
 			}, configSpecificData);
 		});
 	});
+	describe("updateCorePlugins", () => {
+		describe("modifies CorePlugins in configuration specific data, when it is specified", () => {
+			let configSpecificData: IDictionary<any>;
+			let projectData: IProjectData;
+			
+			beforeEach(() => {
+				projectData = getProjectData();
+				configSpecificData = {
+					debug: {
+						CorePlugins: ["org.apache.cordova.battery-status",
+										"org.apache.cordova.camera",
+										"org.apache.cordova.contacts"]
+					},
+					release: {
+						CorePlugins: ["org.apache.cordova.battery-status",
+										"org.apache.cordova.camera",
+										"org.apache.cordova.geolocation"]
+					}
+				};
+			});
+
+			it("adds CorePlugins to configuration specfic data when it is specified", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], ["debug"]).wait();
+				assert.deepEqual(undefined, projectData.CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.battery-status",
+	 								"org.apache.cordova.camera",
+	 								"org.apache.cordova.contacts",
+									"org.apache.cordova.file"],
+								configSpecificData["debug"].CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.battery-status",
+	 								"org.apache.cordova.camera",
+	 								"org.apache.cordova.geolocation"],
+								configSpecificData["release"].CorePlugins);
+			});
+
+			it("removes CorePlugin from debug configuration data when it is specified", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], ["debug"]).wait();
+				assert.deepEqual(undefined, projectData.CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.battery-status",
+	 								"org.apache.cordova.contacts"],
+								configSpecificData["debug"].CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.battery-status",
+	 								"org.apache.cordova.camera",
+	 								"org.apache.cordova.geolocation"],
+								configSpecificData["release"].CorePlugins);
+			});
+
+			it("sets CorePlugins to debug configuration when it is specified", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], ["debug"]).wait();
+				assert.deepEqual(undefined, projectData.CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.file"],
+								configSpecificData["debug"].CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.battery-status",
+	 								"org.apache.cordova.camera",
+	 								"org.apache.cordova.geolocation"],
+								configSpecificData["release"].CorePlugins);
+			});
+		});
+		describe("moves CorePlugins to projectData when they are the same in config files", () => {
+			it("after prop add", () => {
+				let configSpecificData: IDictionary<any> = {
+						debug: {
+							CorePlugins: ["org.apache.cordova.battery-status"]
+						},
+						release: {
+							CorePlugins: ["org.apache.cordova.battery-status",
+											"org.apache.cordova.geolocation"]
+						}
+				};
+				let projectData = getProjectData();
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				assert.deepEqual(["org.apache.cordova.battery-status",
+									"org.apache.cordova.geolocation"],
+								projectData.CorePlugins);
+	
+				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
+			});
+
+			it("after prop set", () => {
+				let configSpecificData: IDictionary<any> = {
+						debug: {
+							CorePlugins: ["org.apache.cordova.battery-status"]
+						},
+						release: {
+							CorePlugins: ["org.apache.cordova.geolocation"]
+						}
+				};
+				let projectData = getProjectData();
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
+	
+				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
+			});
+			
+			it("after prop rm", () => {
+				let configSpecificData: IDictionary<any> = {
+						debug: {
+							CorePlugins: ["org.apache.cordova.battery-status",
+											"org.apache.cordova.geolocation"]
+						},
+						release: {
+							CorePlugins: ["org.apache.cordova.geolocation"]
+						}
+				};
+				let projectData = getProjectData();
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
+				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
+	
+				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
+			});
+		});
+		
+		describe("moves CorePlugins to config specific data when it is modified", () => {
+			let configSpecificData: IDictionary<any> = {
+					debug: {},
+					release: {}
+			};
+			let projectData: IProjectData;
+			beforeEach(() => {
+				projectData = getProjectData();
+				projectData.CorePlugins = ["org.apache.cordova.battery-status"];
+			});
+
+			it("after prop add", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				assert.deepEqual(undefined,	projectData.CorePlugins);
+				assert.deepEqual(["org.apache.cordova.battery-status",
+									"org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
+			});
+
+			it("after prop set", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				assert.deepEqual(undefined, projectData.CorePlugins);
+	
+				assert.deepEqual(["org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
+			});
+			
+			it("after prop rm", () => {
+				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
+				assert.deepEqual(undefined, projectData.CorePlugins);
+	
+				assert.deepEqual([], configSpecificData["debug"].CorePlugins);
+				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
+			});
+		});
+	});
 });
 
 describe("project unit tests (canonical paths)", () => {
