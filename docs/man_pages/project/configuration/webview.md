@@ -1,28 +1,33 @@
-mobileframework
+webview
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder mobileframework [<Command>] [--path <Directory>]`
+General | `$ appbuilder webview [<Command>]`
 
-<% if(isHtml) { %>Lists all supported versions of the framework.<% } %>
+Lists the available web views for iOS and Android. <% if(isHtml) { %>For more information about working with web views in Telerik AppBuilder, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
+<% if(isConsole) { %>
+<% if(isNativeScript)  { %>
+WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help webview`
 <% } %>
-<% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
-### Options
-* `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
+<% if(isMobileWebsite)  { %>
+WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help webview`
+<% } %>
+<% } %>
+<% if((isConsole && isCordova) || isHtml) { %>
 
 ### Attributes
 
-`<Command>` extends the `mobileframework` command. You can set the following values for this attribute.
-* `set` -Sets the selected framework version for the project.
+`<Command>` extends the `webview` command. You can set the following values for this attribute.
+* `set` - Sets the selected web view for the current project.
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
+* You cannot run this command on NativeScript projects.
 * You cannot run this command on mobile website projects.
+* You cannot configure web views for Windows Phone.
 
 ### Related Commands
 
@@ -35,6 +40,5 @@ Command | Description
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
-[webview](webview.html) | Lists the available web views for iOS and Android.
 [webview set](webview-set.html) | Sets the selected web view for the current project.
 <% } %>

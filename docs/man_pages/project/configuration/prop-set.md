@@ -37,4 +37,6 @@ Command | Description
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
+[webview](webview.html) | Lists the available web views for iOS and Android.
+[webview set](webview-set.html) | Sets the selected web view for the current project.
 <% } %>

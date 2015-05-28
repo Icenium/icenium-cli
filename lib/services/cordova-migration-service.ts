@@ -37,8 +37,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $projectConstants: Project.IProjectConstants,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $prompter: IPrompter,
-		private $resources: IResourceLoader) {
-	}
+		private $resources: IResourceLoader,
+		private $webViewService: IWebViewService) { }
 
 	private get migrationData(): IFuture<MigrationData> {
 		return (() => {
@@ -63,6 +63,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
 		return (() => {
+			
 			return this.migrationData.wait().supportedFrameworkVersions;
 
 		}).future<IFrameworkVersion[]>()();
@@ -217,7 +218,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 				this.$project.setProperty("CorePlugins", newPluginsList, configuration);
 			});
-
+			
 			this.migrateCordovaJsFiles(newVersion).wait();
 
 			this.$logger.info("Successfully migrated to version %s", versionDisplayName);

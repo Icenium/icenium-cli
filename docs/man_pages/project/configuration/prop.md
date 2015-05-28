@@ -33,4 +33,6 @@ Command | Description
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
+[webview](webview.html) | Lists the available web views for iOS and Android.
+[webview set](webview-set.html) | Sets the selected web view for the current project.
 <% } %>
