@@ -16,7 +16,8 @@ class MigrationData {
 	constructor(public renamedPlugins: RenamedPlugin[],
 		public supportedVersions: string[],
 		public integratedPlugins: { [version: string]: string[] },
-		public supportedFrameworkVersions: IFrameworkVersion[]) {
+		public supportedFrameworkVersions: IFrameworkVersion[],
+		public corePluginRegex: string) {
 	}
 }
 
@@ -129,7 +130,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version)} })
 				.filter(fv => _.contains(cliSupportedVersions, fv.version))
 				.value();
-			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion);
+			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
 		}).future<void>()();
 	}

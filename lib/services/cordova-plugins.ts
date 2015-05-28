@@ -15,9 +15,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
 		private $server: Server.IServer,
-		private $projectConstants: Project.IProjectConstants) {
-
-	}
+		private $projectConstants: Project.IProjectConstants,
+		private $resources: IResourceLoader) { }
 
 	public getPlugins(keywords: string[]): IBasicPluginInformation[] {
 		this.configure();
@@ -114,7 +113,9 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
 		let pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
-		if (_.startsWith(pluginIdentifier, "org.apache.cordova")) {
+		let corePluginRegex = require(path.join(this.$resources.resolvePath("Cordova"), "cordova-migration-data.json")).corePluginRegex;
+		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier); 
+		if (isCorePlugin) {
 			pluginType = PluginsDataLib.PluginType.CorePlugin;
 		}
 
