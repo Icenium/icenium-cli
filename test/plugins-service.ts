@@ -10,6 +10,7 @@ import yok = require("../lib/common/yok");
 import optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
 import configLib = require("../lib/config");
+import resourcesLib = require("../lib/resource-loader");
 
 let assert = require("chai").assert;
 import Future = require("fibers/future");
@@ -92,6 +93,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("staticConfig", configLib.StaticConfig);
 	testInjector.register("options", optionsLib.Options);
+	testInjector.register("resources", resourcesLib.ResourceLoader);
 
 	return testInjector;
 }
@@ -250,6 +252,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("options", optionsLib.Options);
 	testInjector.register("staticConfig", {});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+	testInjector.register("resources", resourcesLib.ResourceLoader);
 
 	return testInjector;
 }
