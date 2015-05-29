@@ -176,7 +176,17 @@ export class BuildService implements Project.IBuildService {
 					}
 				} else if(!settings.buildForiOSSimulator) {
 					let deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
-					provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes, deviceIdentifier).wait();
+					try {
+						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
+					} catch (error) {
+						this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
+						let additionalInfo = error.message.split(os.EOL)[1];
+						if (additionalInfo) {
+							this.$logger.warn(additionalInfo);
+						}
+
+						provisionData = this.$identityManager.autoselectProvision(appIdentifier, _.values(constants.ProvisionType), deviceIdentifier).wait();
+					}
 					this.$options.provision = provisionData.Name;
 				}
 				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
@@ -386,7 +396,6 @@ export class BuildService implements Project.IBuildService {
 				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
 				downloadedFilePath: this.$options.saveTo,
-				provisionTypes: [constants.ProvisionType.AdHoc, constants.ProvisionType.Development],
 				device: device
 			}).wait();
 			return result;
@@ -429,16 +438,12 @@ export class BuildService implements Project.IBuildService {
 					this.$options.download = true;
 				}
 
-				let willDownload = this.$options.download;
-				let provisionTypes = _.values(constants.ProvisionType);
-
 				this.build({
 					platform: platform,
 					configuration: this.$project.getBuildConfiguration(),
 					showQrCodes: !this.$options.download,
 					downloadFiles: this.$options.download,
-					downloadedFilePath: this.$options.saveTo,
-					provisionTypes: provisionTypes
+					downloadedFilePath: this.$options.saveTo
 				}).wait();
 			}
 		}).future<void>()();
