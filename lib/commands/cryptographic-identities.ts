@@ -566,29 +566,38 @@ export class ImportCryptographicIdentity implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let certificateFile = args[0];
-			let password = args[1];
-			let isPasswordRequired = false;
+			let certificateFile = args[0],
+				password = args[1],
+				extension = path.extname(certificateFile).toLowerCase();
 
-			let extension = path.extname(certificateFile).toLowerCase();
 			if(extension !== ".p12" && extension !== ".cer") {
 				this.$errors.fail("To add a cryptographic identity to the list, import a P12 file " +
 					"that contains an existing cryptographic identity or a CER file that contains the " +
 					"certificate generated from a certificate signing request.")
 			}
+
 			let importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
 
 			if(!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
+			
+			let result = importType === CryptographicIdentityConstants.PKCS12CERTIFICATE ?
+						this.importCertificateWithPassword(importType, password, certificateFile).wait() :
+						this.importCertificateWithoutPassword(importType, certificateFile).wait();
 
-			if(!password && importType === CryptographicIdentityConstants.PKCS12CERTIFICATE) {
-				isPasswordRequired = true;
-			}
+			_.each(result, identity => {
+				this.$logger.info("Imported certificate '%s'.", identity.Alias);
+			});
+		}).future<void>()();
+	}
 
-			let targetFile : any;
-			let result : Server.CryptographicIdentityData[];
-			let noErrorOccurred : boolean;
+	private importCertificateWithPassword(importType: string, password: string, certificateFile: string): IFuture<Server.CryptographicIdentityData[]> {
+		return (() => {
+			let result: Server.CryptographicIdentityData[],
+				targetFile: any,
+				noErrorOccurred: boolean,
+				isPasswordRequired = !password;
 
 			for (let i = 0; i < CryptographicIdentityConstants.MAX_ALLOWED_PASSWORD_ATTEMPTS; ++i) {
 				noErrorOccurred = true;
@@ -599,7 +608,7 @@ export class ImportCryptographicIdentity implements ICommand {
 
 				try {
 					result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
-				} catch(err) {
+				} catch (err) {
 					noErrorOccurred = false;
 					isPasswordRequired = true;
 					this.$logger.error(err.message + os.EOL + "Verify that you have provided the correct file and password and try again.");
@@ -614,10 +623,19 @@ export class ImportCryptographicIdentity implements ICommand {
 				this.$errors.failWithoutHelp("You have reached the maximum number of authentication attempts for this operation.");
 			}
 
-			_.each(result, identity => {
-				this.$logger.info("Imported certificate '%s'.", identity.Alias);
-			});
-		}).future<void>()();
+			return result;
+		}).future<Server.CryptographicIdentityData[]>()();
+	}
+
+	private importCertificateWithoutPassword(importType: string, certificateFile: string): IFuture<Server.CryptographicIdentityData[]> {
+		return (() => {
+			try {
+				let targetFile = this.$fs.createReadStream(certificateFile);
+				return this.$server.identityStore.importIdentity(<any>importType, '', targetFile).wait();
+			} catch (error) {
+				this.$errors.failWithoutHelp(error.message);
+			}
+		}).future<Server.CryptographicIdentityData[]>()();
 	}
 }
 $injector.registerCommand("certificate|import", ImportCryptographicIdentity);
