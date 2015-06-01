@@ -4,17 +4,19 @@ prop add
 Usage | Synopsis
 ------|-------
 Add property | `$ appbuilder prop add <Property Name> <Value> [Value]*`
+<% if(isCordova) { %>Enable plugins for the Debug build configuration | `$ appbuilder prop add CorePlugins <Value> [Value]* --debug`
+Enable plugins for the Release build configuration | `$ appbuilder prop add CorePlugins <Value> [Value]* --release`<% } %> 
 
 Enables more options for the selected project property, if the property accepts multiple values. 
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
+<% if(isConsole && isMobileWebsite) { %>
 WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop add`
 <% } %>
-<% if(isCordova) { %>
-WARNING: Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
-<% } %>
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
+<% if(isCordova) { %>### Options
+
+* `--debug` - Enables the specified plugin(s) for the Debug build configuration only. This switch is applicable only to `$ appbuilder prop add CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - Enables the specified plugin(s) for the Release build configuration only. This switch is applicable only to `$ appbuilder prop add CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+<% } %>
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 * `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --validValue`. You can separate multiple values with a space.
@@ -22,8 +24,8 @@ WARNING: Do not modify the `CorePlugins` property with this command. Instead, us
 <% if(isHtml) { %>
 ### Command Limitations
 
-* Do not modify the `CorePlugins` property with this command. Instead, use the `$ appbuilder plugin <Command>`
 * You cannot run this command on mobile website projects.
+* You can set the `--debug` and `--release` switches only for the `CorePlugins` property for Apache Cordova projects.
 
 ### Related Commands
 

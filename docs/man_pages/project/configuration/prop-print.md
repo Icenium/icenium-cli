@@ -3,8 +3,8 @@ prop print
 
 Usage | Synopsis
 ------|-------
-Print all properties | `$ appbuilder prop print [--validValue] [--debug] [--release]`
-Print a selected property | `$ appbuilder prop print <Property Name> [--validValue] [--debug] [--release]`
+Print all properties | `$ appbuilder prop print [--validValue]<% if(isCordova) { %> [--debug] [--release]<% } %>`
+Print a selected property | `$ appbuilder prop print <Property Name> [--validValue]<% if(isCordova) { %> [--debug] [--release]<% } %>`
 
 Prints information about the configuration of the project or the selected property.  
 If `--validValue` is set, prints the valid configuration values.  
@@ -16,9 +16,10 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--validValue` - When set, prints the valid values for all valid project properties or for the selected property.
-* `--debug` - When set, prints information about your project settings for the Debug build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %>For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-* `--release` - When set, prints information about your project settings for the Release build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %>For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-
+<% if(isCordova) { %>  
+* `--debug` - When set, prints information about your project settings for the Debug build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - When set, prints information about your project settings for the Release build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+<% } %>
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 <% } %>
