@@ -25,7 +25,6 @@ Command | Description
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
 [add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
-[add-signin](add-signin.html) | Inserts a sign-in form in an existing application view.
-[add-signup](add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-authentication](add-authentication.html) | Inserts an authentication form in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 <% } %>
