@@ -31,6 +31,7 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			latest: { type: OptionType.Boolean },
 			verified: { type: OptionType.Boolean },
 			publish: { type: OptionType.Boolean },
+			public: { type: OptionType.Boolean },
 			sendPush: { type: OptionType.Boolean },
 			sendEmail: { type: OptionType.Boolean },
 			group: { type: OptionType.Array },

@@ -55,6 +55,7 @@ class AppManagerService implements IAppManagerService {
 
 			let publishSettings: Server.PublishSettings = {
 				IsPublished: this.$options.publish,
+				IsPublic: this.$options.public,
 				NotifyByPush: this.$options.sendPush,
 				NotifyByEmail: this.$options.sendEmail,
 				Groups: []
@@ -62,6 +63,10 @@ class AppManagerService implements IAppManagerService {
 
 			if (this.$options.group) {
 				publishSettings.Groups = this.findGroups(this.$options.group).wait();
+			}
+
+			if(!this.$options.publish && this.$options.public) {
+				this.$logger.warn("You have not set the --publish switch. Your app will become publicly available after you publish it manually in Telerik AppManager.");
 			}
 
 			if(!this.$options.publish && this.$options.sendEmail) {
@@ -72,8 +77,13 @@ class AppManagerService implements IAppManagerService {
 				this.$logger.warn("You have not set the --publish switch. Your users will not receive a push notification.");
 			}
 
-			this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait();
+			let uploadedAppData: Server.UploadedAppData = this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait();
 			this.$logger.info("Successfully uploaded package.");
+
+			if(this.$options.publish && this.$options.public){
+				this.$logger.info("Your app has been published successfully and is now available to download and install from: %s", uploadedAppData.InstallUrl);
+			}
+
 			this.openAppManagerStore();
 		}).future<void>()();
 	}

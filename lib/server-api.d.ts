@@ -442,8 +442,13 @@ declare module Server{
 		Name: string;
 		Id: string;
 	}
+	interface UploadedAppData{
+		InstallUrl: string;
+		Id: string;
+	}
 	interface PublishSettings{
 		IsPublished: boolean;
+		IsPublic: boolean;
 		NotifyByPush: boolean;
 		NotifyByEmail: boolean;
 		Groups: string[];
@@ -459,7 +464,7 @@ declare module Server{
 	interface ITamServiceContract{
 		verifyStoreCreated(): IFuture<void>;
 		getGroups(): IFuture<Server.TamGroupData[]>;
-		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<void>;
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
 		uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
 	}
