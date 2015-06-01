@@ -273,6 +273,7 @@ interface IDependencyConfigService {
 interface IServerConfiguration {
 	tfisServer: IFuture<string>;
 	assemblyVersion: IFuture<string>;
+	resourcesPath: IFuture<string>;
 }
 
 interface IExtensionPlatformServices {
@@ -457,6 +458,22 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 	 * @return {IFuture<void>}
 	 */
 	onWPSdkVersionChanging?(newVersion: string): IFuture<void>;
+}
+
+/**
+ * Defines data that is comming from server
+ */
+interface ICordovaJsonData {
+	deletedVersions: any;
+	supportedVersions: any;
+	minVersionsPerPlatform: any;
+	minimumSupportedVersion: string;
+	corePluginsMinimumVersion: string;
+	forceHardwareAccelerationAfter: string;
+	corePluginRegex: any;
+	defaultEnabledPluginsIncludeRegex: string;
+	defaultEnabledPluginsExcludeRegex: string;
+	renamedPlugins: any;
 }
 
 interface ISamplesService {

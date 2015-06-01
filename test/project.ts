@@ -142,6 +142,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("webViewService", {
 		minSupportedVersion: "4.0.0"
 	});
+	testInjector.register("serverConfiguration", {});
 
 	return testInjector;
 }
