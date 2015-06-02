@@ -101,18 +101,23 @@ export class PluginsService implements IPluginsService {
 			if(!_.any(this.getAvailablePlugins(),(pl) => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
 			}
-
-			let installedPlugins = this.getInstalledPluginsForConfiguration()
+			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration(); 
+			let installedPluginInstances = installedPluginsForConfiguration
 				.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase);
+			let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
+			if(!installedPluginInstances.length && pluginIdFromName) {
+				this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`)
+				installedPluginInstances = installedPluginsForConfiguration.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
+			}
 
-			if(installedPlugins && installedPlugins.length > 0) {
-				let installedPluginsType = _.chain(installedPlugins).groupBy((pl: IPlugin) => pl.type).keys().value();
+			if(installedPluginInstances && installedPluginInstances.length > 0) {
+				let installedPluginsType = _.chain(installedPluginInstances).groupBy((pl: IPlugin) => pl.type).keys().value();
 				if(installedPluginsType.length > 1) {
 					// We should NEVER get here. CorePlugins and Marketplace plugins cannot have duplicate identifiers.
 					this.$errors.failWithoutHelp("There are several plugins with name '%s' and they have different types: '%s'", pluginName, installedPluginsType.join(", "));
 				} else if(installedPluginsType.length === 1) {
 					if(installedPluginsType[0].toString() === pluginsDataLib.PluginType.MarketplacePlugin.toString()) {
-						return this.modifyInstalledMarketplacePlugin(pluginName, version).wait();
+						return this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version).wait();
 					} else {
 						// Check if plugin is installed for current configuration.
 						let installedPlugin = this.getInstalledPluginByName(pluginName);
@@ -141,12 +146,10 @@ export class PluginsService implements IPluginsService {
 			}
 
 			let installedPlugins = this.getInstalledPluginByName(pluginName);
-			let installedPlugin = installedPlugins[0];
-			if(!installedPlugin) {
+			let plugin = installedPlugins[0];
+			if(!plugin) {
 				this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}
-
-			let plugin = this.getPluginByName(pluginName, installedPlugin.data.Version);
 
 			if(this.$project.hasBuildConfigurations()) {
 				let configurations = this.$project.configurations;
@@ -213,7 +216,14 @@ export class PluginsService implements IPluginsService {
 	public getInstalledPluginByName(pluginName: string): IPlugin[] {
 		pluginName = pluginName.toLowerCase();
 		let installedPlugins = this.getInstalledPlugins();
-		return _.filter(installedPlugins,(plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
+		let installedPluginInstances =  _.filter(installedPlugins,(plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
+		let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
+		if(!installedPluginInstances.length && pluginIdFromName) {
+			this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`)
+			installedPluginInstances = installedPlugins.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
+		}
+
+		return installedPluginInstances;
 	}
 
 	private configurePluginCore(pluginName: string, configuration?: string, version?: string): IFuture<void> {
@@ -237,19 +247,20 @@ export class PluginsService implements IPluginsService {
 
 			let newCorePlugins = this.$project.getProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
 			// remove all instances of the plugin from current configuration
-			let lowerCasedPluginName = pluginName.toLowerCase();
-			let installedPlugin = this.getInstalledPluginsForConfiguration(configuration).filter((pl: IPlugin) => pl.data.Name.toLowerCase() === lowerCasedPluginName || pl.data.Identifier.toLowerCase() === lowerCasedPluginName);
+			let lowerCasePluginIdentifier = plugin.data.Identifier.toLowerCase();
+			let installedPlugin = this.getInstalledPluginsForConfiguration(configuration).filter((pl: IPlugin) => pl.data.Identifier.toLowerCase() === lowerCasePluginIdentifier);
 
 			_.each(installedPlugin, pl => newCorePlugins = _.without(newCorePlugins, pl.toProjectDataRecord(pl.data.Version)));
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
 			this.$project.setProperty(PluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version}` : "";
 			if(configuration) {
 				this.$project.saveProject(this.$project.getProjectDir().wait(), [configuration]).wait();
-				this.$logger.out("Plugin %s was successfully added for %s configuration.", pluginName, configuration);
+				this.$logger.out(`Plugin ${pluginName} was successfully added for ${configuration} configuration${versionString}.`);
 			} else {
 				this.$project.saveProject().wait();
-				this.$logger.out("Plugin %s was successfully added.", pluginName);
+				this.$logger.out(`Plugin ${pluginName} was successfully added${versionString}.`);
 			}
 		}).future<void>()();
 	}
@@ -497,6 +508,35 @@ export class PluginsService implements IPluginsService {
 
 			return version;
 		}).future<string>()();
+	}
+
+	/**
+	 * Gets the id of a plugin based on its name by checking all available plugins.
+	 * This is required in case the plugin is renamed, but its plugin identifier has not been changed.
+	 * @param {string} pluginName The plugin name that has to be checked.
+	 * @returns {string} The id of the plugin if there's only one plugin identifier for the specified name.
+	 * In case there are more than one ids for the specified name or there's no match, empty string is returned. 
+	 */
+	private getPluginIdFromName(pluginName: string): string {
+		let pluginNameToLowerCase = pluginName.toLowerCase();
+		let matchingPluginIds = _(this.getAvailablePlugins())
+			.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase)
+			.map(pl => pl.data.Identifier)
+			.unique()
+			.value();
+		if(matchingPluginIds.length === 1) {
+			return matchingPluginIds[0];
+		}
+		return "";
+	}
+
+	/**
+	 * Checks if the plugin type is Marketplace.
+	 * @param {IPlugin} plugin the instace that has to be checked.
+	 * @returns {boolean} true if the provided plugin is marketplace, false otherwise.
+	 */
+	private isMarketplacePlugin(plugin: IPlugin): boolean {
+		return plugin && plugin.type.toString().toLowerCase() === pluginsDataLib.PluginType.MarketplacePlugin.toString().toLowerCase();
 	}
 }
 $injector.register("pluginsService", PluginsService);
