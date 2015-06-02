@@ -519,14 +519,6 @@ interface IPluginsService {
 	 * @return {IBasicPluginInformation}            Basic information about the plugin
 	 */
 	getPluginBasicInformation(pluginName: string): IBasicPluginInformation;
-	/**
-	 * Checks wether a plugin is supported for a specific framework version
-	 * @param  {string}  plugin           The name of the plugin
-	 * @param  {string}  version          The plugin's version
-	 * @param  {string}  frameworkVersion The framework's version
-	 * @return {boolean}                  true if the plugin is supported, false otherwise
-	 */
-	isPluginSupported(plugin: string, version: string, frameworkVersion: string): boolean;
 }
 
 interface IPlugin {

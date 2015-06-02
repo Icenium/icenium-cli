@@ -21,7 +21,7 @@ testInjector.register("pluginsService", {
 			version: '1.0.0'
 		}
 	},
-	getPluginVersions: (pluginName: string) => {
+	getPluginVersions: (plugin: IPlugin) => {
 		return [{
 			name: '1.0.0',
 			value: '1.0.0',
@@ -29,7 +29,7 @@ testInjector.register("pluginsService", {
 		}]
 	},
 	removePlugin: (pluginName: string) => {return (() => { }).future<void>()() },
-	isPluginSupported: (plugin: string, version: string, migrationVersion: string) => { return true;}
+	isPluginSupported: (plugin: IPlugin, version: string, migrationVersion: string) => { return true;}
 });
 testInjector.register("project", {});
 testInjector.register("projectConstants", {});

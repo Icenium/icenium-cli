@@ -215,7 +215,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			let oldVersion = this.$project.projectData.FrameworkVersion;
-
+			let availablePlugins = this.$pluginsService.getAvailablePlugins();
 			this.invalidMarketplacePlugins = _(this.$project.configurations)
 				.map(configuration => <string[]>this.$project.getProperty("CorePlugins", configuration))
 				.union()
@@ -223,7 +223,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.unique()
 				.filter((plugin: string) => {
 					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin);
-					return _.contains(plugin, '@') && !this.$pluginsService.isPluginSupported(pluginBasicInformation.name, pluginBasicInformation.version, newVersion)
+					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version)
 				})
 				.value();
 				
