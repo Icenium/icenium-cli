@@ -5,8 +5,9 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-list`
 
-Inserts a list in an existing application view. You can connect the list to a data provider added with `$ appbuilder add-dataprovider` <% if(isHtml) { %>An interactive prompt guides you through the setup process.
-
+Inserts a list in an existing application view. You can connect the list to a data provider added with `$ appbuilder add-dataprovider` <% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
+<% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %> 
+<% if(isHtml) { %>
 ### Prerequisites
 
 * The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
@@ -28,6 +29,6 @@ Command | Description
 [add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
-[add-authentication](add-authentication.html) | Inserts an authentication form in an existing application view.
+[add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 <% } %>
