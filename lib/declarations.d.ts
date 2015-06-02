@@ -657,6 +657,7 @@ interface IOptions extends ICommonOptions {
 	verified: boolean;
 	latest: boolean;
 	publish: boolean;
+	public: boolean;
 	sendPush: boolean;
 	sendEmail: boolean;
 	group: string[];

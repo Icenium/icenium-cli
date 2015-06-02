@@ -5,30 +5,20 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager groups`
 
-Lists all available user groups from Telerik AppManager. <% if(isHtml) { %>If you have not managed distribution groups from [Telerik AppManager](https://platform.telerik.com/appmanager), a single 'Default Group' should be provided.
+Lists the distribution groups configured in your Telerik AppManager portal. If you have not configured any distribution groups in <% if(isHtml) { %>[<% } %>Telerik AppManager<% if(isHtml) { %>](https://platform.telerik.com/appmanager)<% } %>, this command returns `Default Group`.<% if(isHtml) { %> This group is created by default for all Telerik AppManager accounts.
 
-For more information about AppManager distribution groups, see [Adding AppManager Distribution Groups](http://docs.telerik.com/platform/appmanager/appmanager-portal/managing-groups/adding-distribution-group).<% } %>
-
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager groups`<% } %>
-<% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager groups` <% } %> 
-<% } %>
-<% if(isHtml) { %> 
-
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-* You cannot run this command on NativeScript projects.
+For more information about AppManager distribution groups, see [Adding Distribution Groups](http://docs.telerik.com/platform/appmanager/appmanager-portal/managing-groups/adding-distribution-group).
 
 ### Related Commands
 
 Command | Description
 ----------|----------
-[appmanager upload](appmanager.html) | Allows interaction with appmanager.
-[appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
+[appmanager upload](appmanager.html) | Lets you work with Telerik AppManager.
+[appmanager upload android](appmanager-upload-android.html) | Builds the project for Android and uploads the application to Telerik AppManager.
+[appmanager upload ios](appmanager-upload-ios.html) | Builds the project for iOS and uploads the application to Telerik AppManager.
+[appmanager upload wp8](appmanager-upload-wp8.html) | Builds the project for Windows Phone and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
-[appstore](appstore.html) | Allows interaction with iTunes Connect.
+[appstore](appstore.html) | Lets you work with your iTunes Connect account.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
 [appstore upload](appstore-upload.html) | Builds the project and uploads the application to iTunes Connect.
 [certificate](certificate.html) | Lists all configured certificates for code signing iOS and Android applications with index and name.
