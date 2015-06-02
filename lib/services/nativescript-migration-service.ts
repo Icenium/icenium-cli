@@ -74,10 +74,11 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				return framework.displayName;
 			}
 
+			this.checkIsVersionObsolete(version).wait();
 			this.$errors.failWithoutHelp("Cannot find version %s in the supported versions.", version);
 		}).future<string>()();
 	}
-	
+
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return (() => {
 			let projectDir = this.$project.getProjectDir().wait();
@@ -86,11 +87,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			// Check if current version is supported one. We cannot migrate ObsoleteVersions
 			let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
 			if(!_.contains(this.getSupportedVersions().wait(), currentFrameworkVersion)) {
-				if(_.contains(this.getObsoleteVersions().wait(), currentFrameworkVersion)) {
-					this.$errors.failWithoutHelp(`You can still build your project, but you cannot migrate from version '${currentFrameworkVersion}'. Consider creating a new NativeScript project.`)
-				} else {
-					this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`)
-				}
+				this.checkIsVersionObsolete(currentFrameworkVersion).wait();
+				this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`)
 			}
 
 			try {
@@ -144,6 +142,20 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			let migrationData = this.nativeScriptMigrationData.wait();
 			return _.map(migrationData.obsoleteVersions, obsoleteVersion => obsoleteVersion.version);
 		}).future<string[]>()();
+	}
+
+	/**
+	 * Checks if the provided {N} version is obsolete and fails with correct error message in such case.
+	 * If the version is not marked as obsolete, do nothing.
+	 * @param {string} version The version tha has to be checked.
+	 * @returns {IFuture<void>}
+	 */
+	private checkIsVersionObsolete(version: string): IFuture<void> {
+		return (() => {
+			if(_.any(this.getObsoleteVersions().wait(), obsoleteVersion => obsoleteVersion === version)) {
+				this.$errors.failWithoutHelp(`Your project targets NativeScript ${version}. This version is obsolete and cannot be migrated from the command line. If you want to migrate your project, create a new project and copy over your code and resources.`);
+			}
+		}).future<void>()();
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);
