@@ -20,6 +20,10 @@ export class PluginsService implements IPluginsService {
 
 		return this._identifierToPlugin;
 	}
+	
+	private pluginsForbiddenConfigurations: IStringDictionary = {
+		"com.telerik.LivePatch": this.$projectConstants.DEBUG_CONFIGURATION_NAME
+	}
 
 	constructor(private $cordovaPluginsService: ICordovaPluginsService,
 		private $marketplacePluginsService: ICordovaPluginsService,
@@ -129,8 +133,16 @@ export class PluginsService implements IPluginsService {
 				version = this.selectPluginVersion(version, pluginToAdd).wait();
 			}
 
-			this.configurePlugin(pluginName, version).wait();
-
+			let configurations = this.$project.configurations;
+			if(_(this.pluginsForbiddenConfigurations).keys().find(key => key === pluginToAdd.data.Identifier)) {
+				let forbiddenConfig = this.pluginsForbiddenConfigurations[pluginToAdd.data.Identifier];
+				if(this.$project.configurations.length === 1 && _.contains(this.$project.configurations, forbiddenConfig)) {
+					this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
+				}
+				configurations = [forbiddenConfig];
+			}
+			
+			this.configurePlugin(pluginName, version, configurations).wait();
 		}).future<void>()();
 	}
 
