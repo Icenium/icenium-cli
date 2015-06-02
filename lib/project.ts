@@ -446,11 +446,11 @@ export class Project implements Project.IProject {
 			return [property];
 		}
 
-		return _.map(property,  (value, key) => {
+		return [_.map(property,  (value, key) => {
 			// use '\n' not os.EOL as cli-table does not handle \r\n very well
 			let delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
 			return util.format('%s%s:%s%s', indentation, key, delimiter, this.getPropertyValueAsArray(value, indentation + '   ').join('\n'));
-		});
+		})];
 	}
 
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string, configuration?: string): any[] {
@@ -498,9 +498,11 @@ export class Project implements Project.IProject {
 
 	private printConfigurationSpecificDataForProperty(property: string, configuration?: string): void {
 		let data = this.getConfigurationSpecificDataForProperty(property, configuration);
-		let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
-		let table = commonHelpers.createTable(headers, data);
-		this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
+		if(data && data.length) {
+			let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
+			let table = commonHelpers.createTable(headers, data);
+			this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
+		}
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
