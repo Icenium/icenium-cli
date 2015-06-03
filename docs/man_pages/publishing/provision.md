@@ -22,10 +22,11 @@ Lists or lets you manage provisioning profiles for code signing iOS applications
 
 Command | Description
 ----------|----------
-[appmanager upload](appmanager.html) | Allows interaction with appmanager.
-[appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager upload](appmanager.html) | Lets you work with Telerik AppManager.
+[appmanager upload android](appmanager-upload-android.html) | Builds the project for Android and uploads the application to Telerik AppManager.
+[appmanager upload ios](appmanager-upload-ios.html) | Builds the project for iOS and uploads the application to Telerik AppManager.
+[appmanager upload wp8](appmanager-upload-wp8.html) | Builds the project for Windows Phone and uploads the application to Telerik AppManager.
+[appmanager livesync](appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published application.
 [appmanager groups](appmanager-groups.html) | Lists all available user groups from Telerik AppManager.
 [appstore](appstore.html) | Allows interaction with iTunes Connect.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.
