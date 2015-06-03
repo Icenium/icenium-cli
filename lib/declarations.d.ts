@@ -731,6 +731,7 @@ interface IWebViewService {
 	getWebViews(platform: string): IWebView[];
 	getWebViewNames(platform: string): string[];
 	enableWebView(platform: string, webViewName: string): IFuture<void>;
+	getCurrentWebViewName(platform: string): string;
 }
 
 /**
