@@ -5,8 +5,9 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-dataProvider`
 
-Connects your project to a Telerik Backend Services, JSON or OData data provider. <% if(isHtml) { %>After you configure the data provider, you can use it in your code or use it with the `add-list`, `add-signin` and `add-signup` commands to generate lists, sign-in and sign-up forms connected to the data provider. An interactive prompt guides you through the setup process.  
-
+Connects your project to a Telerik Backend Services, JSON or OData data provider. <% if(isHtml) { %>After you configure the data provider, you can use it in your code or use it with the `add-list`, `add-signin` and `add-signup` commands to generate lists, sign-in and sign-up forms connected to the data provider. An interactive prompt guides you through the setup process.<% } %>
+<% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
+<% if(isHtml) { %>
 ### Prerequisites
 
 * Verify that you have installed git on your system.
@@ -25,6 +26,6 @@ Command | Description
 [add-form](add-form.html) | Generates a generic input form that you can later fill in with any input field you like.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
-[add-authentication](add-authentication.html) | Inserts an authentication form in an existing application view.
+[add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 <% } %>

@@ -47,8 +47,8 @@ Command | Description
 [screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
 [add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
-[add-signin](screenbuilder/add-signing.html) | Inserts a sign-in form in an existing application view.
-[add-signup](screenbuilder/add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-authentication](screenbuilder/add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
+[add-about](screenbuilder/add-about.html) | Inserts a new about form in an existing application view.
 [add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
 [add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
 [add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.

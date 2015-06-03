@@ -5,8 +5,9 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-authentication`
 
-Inserts an authentication form in an existing application view. You can connect the form to a data provider added with `$ appbuilder add-dataprovider` <% if(isHtml) { %>An interactive prompt guides you through the setup process.
-
+Inserts sign-in and sign-up forms in an existing application view. You can connect the forms to a data provider added with `$ appbuilder add-dataprovider` <% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
+<% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
+<% if(isHtml) { %>
 ### Prerequisites
 
 * The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
