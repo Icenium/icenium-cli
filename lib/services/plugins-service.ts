@@ -144,7 +144,7 @@ export class PluginsService implements IPluginsService {
 				if(this.$project.configurations.length === 1 && _.contains(this.$project.configurations, forbiddenConfig)) {
 					this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
 				}
-				configurations = [forbiddenConfig];
+				configurations = _.without(this.$project.configurations, forbiddenConfig);
 			}
 			
 			this.configurePlugin(pluginName, version, configurations).wait();
