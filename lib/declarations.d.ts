@@ -341,7 +341,9 @@ interface IDependencyConfig {
 
 interface IAppScaffoldingConfig extends IDependencyConfig { }
 
-interface IGeneratorConfig extends IDependencyConfig { }
+interface IGeneratorConfig extends IDependencyConfig {
+	alias: string; 
+}
 
 interface IExtensionsServiceBase {
 	getExtensionVersion(packageName: string): string;

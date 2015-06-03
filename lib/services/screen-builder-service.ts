@@ -36,9 +36,13 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public allSupportedCommands(generatorName: string): IFuture<string[]> {
 		return (() => {
 			generatorName = generatorName || this.generatorName;
-			let scaffolderData = this.createScaffolder(generatorName).wait();
-			scaffolderData.scaffolder.listGenerators(scaffolderData.callback);
-			let allSupportedCommands = scaffolderData.future.wait();
+			// We should use "scaffolderData.scaffolder.listGenerators(scaffolderData.callback);"" but this generates empty app.json and .rc files every time
+			// and decided to list manually supported commands from .schema.json file for specified generator
+			
+			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
+			let pathToGenerator = path.join(this.$appScaffoldingExtensionsService.appScaffoldingPath, generatorConfig.alias, generatorConfig.version, "node_modules", generatorName);
+			let schema = require(path.join(pathToGenerator, ".schema.json"));
+			let allSupportedCommands = _.keys(schema);
 			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 		}).future<string[]>()();
 	}
@@ -88,6 +92,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return (() => {
 			this.prepareScreenBuilder().wait();
 			screenBuilderOptions = screenBuilderOptions || {};
+			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
 
 			let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
 
@@ -95,9 +100,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			let Scaffolder = require(cliServicePath);
 			let connector = {
 				generatorsCache: appScaffoldingPath,
-				generatorsAlias: ['H'],
+				generatorsAlias: [generatorConfig.alias],
 				path: screenBuilderOptions.projectPath || path.resolve(this.$options.path || "."),
-				dependencies: [util.format("%s@%s", generatorName, this.$dependencyConfigService.getGeneratorConfig(generatorName).wait().version)],
+				dependencies: [util.format("%s@%s", generatorName, generatorConfig.version)],
 				connect: (done:Function) => {
 					done();
 				},
