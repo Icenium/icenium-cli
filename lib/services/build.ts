@@ -179,13 +179,16 @@ export class BuildService implements Project.IBuildService {
 					try {
 						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
 					} catch (error) {
-						this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
-						let additionalInfo = error.message.split(os.EOL)[1];
-						if (additionalInfo) {
-							this.$logger.warn(additionalInfo);
+						if (!this.$options.download) {
+							this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
+							let additionalInfo = error.message.split(os.EOL)[1];
+							if (additionalInfo) {
+								this.$logger.warn(additionalInfo);
+							}
+							this.$logger.warn("Attempting to use Development provisioning profile instead.");
 						}
 
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, _.values(constants.ProvisionType), deviceIdentifier).wait();
+						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.Development], deviceIdentifier).wait();
 					}
 					this.$options.provision = provisionData.Name;
 				}
