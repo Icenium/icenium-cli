@@ -40,6 +40,8 @@ export class DeployHelper implements IDeployHelper {
 			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device}).wait();
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
+			
+			this.$options.justlaunch = true; 
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
 				if(!packageFile) {
