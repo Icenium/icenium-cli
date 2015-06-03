@@ -5,11 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
 
-<% if(isHtml) { %>Sets the selected framework version for the project.<% } %>
-
-<% if(isConsole)  { %>
+<% if(isHtml) { %>Sets the selected development framework version for the project.<% } %>
+<% if(isConsole) { %>
 <% if(isCordova) { %>Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.<% } %>
-<% if(isNativeScript)  { %>Sets the selected NativeScript version for the project.<% } %>
+<% if(isNativeScript)  { %>Sets the selected NativeScript version for the project and updates the NativeScript modules to match it.<% } %>
 <% if(isMobileWebsite)  { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
 <% } %>
@@ -31,7 +30,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 Command | Description
 ----------|----------
 [edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
-[mobileframework](mobileframework.html) | Lists all supported versions of Apache Cordova.
+[mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
