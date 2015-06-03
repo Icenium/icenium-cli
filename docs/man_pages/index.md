@@ -88,6 +88,7 @@ Command | Description
 [provision&nbsp;remove](publishing/provision-remove.html) | Removes a registered provisioning profile.
 [appstore&nbsp;list](publishing/appstore-list.html) | Lists all applications in iTunes Connect.
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
+[appmanager groups](publishing/appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
 [appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
 [appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
 [publish](publishing/publish.html) | Lets you manage your server connections or publishes your mobile website to a remote server.
