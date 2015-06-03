@@ -4,7 +4,7 @@ appmanager upload wp8
 Usage | Synopsis
 ------|-------
 Upload your app without publishing | `$ appbuilder appmanager upload wp8 [--download]`
-Upload and publish your app | `$ appbuilder appmanager upload wp8 [--download] --publish [--public] [--send-email] [--send-push] [--group <Group ID> [--group <Group ID>]*]`   
+Upload and publish your app | `$ appbuilder appmanager upload wp8 [--download] --publish [--send-email] [--send-push] [--group <Group ID> [--group <Group ID>]*]`   
 
 Builds the project for Windows Phone and uploads the application to Telerik AppManager. <% if(isHtml) { %>If you have not set the `--publish` switch, after the upload completes, you need to go to your app in [Telerik AppManager](https://platform.telerik.com/appmanager), manually configure it for distribution and publish it.<% } %> 
 <% if(isConsole) { %>
@@ -19,7 +19,6 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 ### Options
 * `--download` - If set, downloads the application package to the root of the project.
 * `--publish` - If set, after the upload completes, automatically publishes the application package for the members of its distribution groups. You can set additional distribution groups with the `--groups` option.
-* `--public` - If set, the published application will be available for download without requiring AppManager user credentials.
 * `--send-email` - If set, after publishing your app, Telerik AppManager sends an email with the link to the app to the distribution groups, assigned to the published app.<% if(isHtml) { %> This option is applicable only when the `--publish` switch is set.<% } %> 
 * `--send-push` - If set, after publishing your app, Telerik AppManager sends a push notification that a new version is available to all registered devices in the distribution groups, assigned to the published app.<% if(isHtml) { %> This option is applicable only when the `--publish` switch is set.<% } %>
 * `--group` - Assigns additional distribution groups for the application. You can set multiple groups by specifying the `--group` option multiple times. You can set a group by index or name. <% if(isHtml) { %>To list the available groups, run `$ appbuilder appmanager groups`<br/>This option is applicable only when the `--publish` switch is set.<% } %>
