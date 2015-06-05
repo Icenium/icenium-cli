@@ -325,32 +325,21 @@ export class Project implements Project.IProject {
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			let debugConfigName = this.$projectConstants.DEBUG_CONFIGURATION_NAME;
-			let releaseConfigName = this.$projectConstants.RELEASE_CONFIGURATION_NAME;
+			let projectConfigurations = _.keys(this.configurationSpecificData);
 			let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
-
 			if(normalizedPropertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
 				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(normalizedPropertyName, propertyValues[0]);
 			}
 
-			let configurations = this.getConfigurationsSpecifiedByUser();
-			if(configurations.length) {
-				if(normalizedPropertyName !== this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME){
-					this.$errors.failWithoutHelp("You cannot use this property in specific configuration.");
-				}
-
-				_.each(configurations, configuration => {
-					this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues).wait();
-					this.printProjectProperty(normalizedPropertyName, configuration).wait();
-					this.saveProject(this.getProjectDir().wait(), [configuration]).wait();
-				});
+			if(normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
+				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, this.getConfigurationsSpecifiedByUser()).wait();
 			} else {
 				this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
 				_.each(this.configurationSpecificData, configSpecificData => this.$projectPropertiesService.removeProjectProperty(configSpecificData, normalizedPropertyName, this.projectData));
-				
-				this.printProjectProperty(normalizedPropertyName).wait();
-				this.saveProject(this.getProjectDir().wait()).wait();
 			}
+			
+			this.saveProject(this.getProjectDir().wait(), projectConfigurations).wait();
+			this.printProjectProperty(normalizedPropertyName).wait();
 		}).future<void>()();
 	}
 
@@ -374,6 +363,7 @@ export class Project implements Project.IProject {
 					} else {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if(_.has(mergedProjectData, normalizedPropertyName)) {
+							this.$logger.write(`The value of ${normalizedPropertyName} is: `);
 							this.$logger.out(mergedProjectData[normalizedPropertyName]);
 						} else if(this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
 							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);
@@ -456,11 +446,11 @@ export class Project implements Project.IProject {
 			return [property];
 		}
 
-		return _.map(property,  (value, key) => {
+		return [_.map(property,  (value, key) => {
 			// use '\n' not os.EOL as cli-table does not handle \r\n very well
 			let delimiter = typeof value === "string" || value instanceof Array ? " " : '\n';
 			return util.format('%s%s:%s%s', indentation, key, delimiter, this.getPropertyValueAsArray(value, indentation + '   ').join('\n'));
-		});
+		})];
 	}
 
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string, configuration?: string): any[] {
@@ -508,9 +498,11 @@ export class Project implements Project.IProject {
 
 	private printConfigurationSpecificDataForProperty(property: string, configuration?: string): void {
 		let data = this.getConfigurationSpecificDataForProperty(property, configuration);
-		let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
-		let table = commonHelpers.createTable(headers, data);
-		this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
+		if(data && data.length) {
+			let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
+			let table = commonHelpers.createTable(headers, data);
+			this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
+		}
 	}
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {

@@ -38,9 +38,6 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 Command | Description
 ----------|----------
-[appmanager upload](appmanager.html) | Allows interaction with appmanager.
-[appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
 [appmanager upload](appmanager.html) | Lets you work with Telerik AppManager.
 [appmanager upload ios](appmanager-upload-ios.html) | Builds the project for iOS and uploads the application to Telerik AppManager.
 [appmanager livesync](appmanager-livesync.html) | Publishes a new update of your application in Telerik AppManager.

@@ -214,6 +214,19 @@ interface IProjectPropertiesService {
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file. 
 	 */
 	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
+
+	/**
+	 * Updates CorePlugins property value in all configurations.
+	 * @param {IProjectData} projectData The project data commonly written in .abproject.
+	 * @param {IDictionary<IProjectData>} configurationSpecificData Dictionary with all configuration specific data. 
+	 * @param {string} mode Type of operation which should be executed with the property.
+	 * @param {Array<any>} newValue The new value that should be used for CorePlugins modification.
+	 * @param {string[]} configurationsSpecifiedByUser The configurations which the user want to modify.
+	 * @return {IFuture<void>}
+	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
+	 * @throws Error when the different CorePlugins are enabled in projectData and any configuration specific data.
+	 */
+	updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
 }
 
 interface IServerConfigurationData {
@@ -260,6 +273,7 @@ interface IDependencyConfigService {
 interface IServerConfiguration {
 	tfisServer: IFuture<string>;
 	assemblyVersion: IFuture<string>;
+	resourcesPath: IFuture<string>;
 }
 
 interface IExtensionPlatformServices {
@@ -327,7 +341,9 @@ interface IDependencyConfig {
 
 interface IAppScaffoldingConfig extends IDependencyConfig { }
 
-interface IGeneratorConfig extends IDependencyConfig { }
+interface IGeneratorConfig extends IDependencyConfig {
+	alias: string; 
+}
 
 interface IExtensionsServiceBase {
 	getExtensionVersion(packageName: string): string;
@@ -444,6 +460,22 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 	 * @return {IFuture<void>}
 	 */
 	onWPSdkVersionChanging?(newVersion: string): IFuture<void>;
+}
+
+/**
+ * Defines data that is comming from server
+ */
+interface ICordovaJsonData {
+	deletedVersions: any;
+	supportedVersions: any;
+	minVersionsPerPlatform: any;
+	minimumSupportedVersion: string;
+	corePluginsMinimumVersion: string;
+	forceHardwareAccelerationAfter: string;
+	corePluginRegex: any;
+	defaultEnabledPluginsIncludeRegex: string;
+	defaultEnabledPluginsExcludeRegex: string;
+	renamedPlugins: any;
 }
 
 interface ISamplesService {
@@ -702,6 +734,7 @@ interface IWebViewService {
 	getWebViews(platform: string): IWebView[];
 	getWebViewNames(platform: string): string[];
 	enableWebView(platform: string, webViewName: string): IFuture<void>;
+	getCurrentWebViewName(platform: string): string;
 }
 
 /**

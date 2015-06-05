@@ -19,10 +19,11 @@ Lists or lets you manage certificate signing requests (CSR).
 
 Command | Description
 ----------|----------
-[appmanager upload](appmanager.html) | Allows interaction with appmanager.
-[appmanager upload android](appmanager-upload-android.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager upload ios](appmanager-upload-ios.html) | Builds the project and uploads the application to Telerik AppManager.
-[appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager upload](appmanager.html) | Lets you work with Telerik AppManager.
+[appmanager upload android](appmanager-upload-android.html) | Builds the project for Android and uploads the application to Telerik AppManager.
+[appmanager upload ios](appmanager-upload-ios.html) | Builds the project for iOS and uploads the application to Telerik AppManager.
+[appmanager upload wp8](appmanager-upload-wp8.html) | Builds the project for Windows Phone and uploads the application to Telerik AppManager.
+[appmanager livesync](appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published application.
 [appmanager groups](appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
 [appstore](appstore.html) | Lets you work with your iTunes Connect account.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.

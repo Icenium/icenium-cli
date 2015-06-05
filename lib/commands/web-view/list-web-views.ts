@@ -19,9 +19,10 @@ export class ListWebViewsCommand implements ICommand {
 				.keys()
 				.map((platform: string, index: number) => {
 					let webViews = _.filter(supportedWebViews[platform], webView => semver.gte(currentProjectVersion, webView.minSupportedVersion));
-					return [(++index).toString(), platform, _.map(webViews, webView => webView.name).join(",\n")]; })
+					return [(++index).toString(), platform, this.$webViewService.getCurrentWebViewName(platform), _.map(webViews, webView => webView.name).join(",\n")]; 
+				})
 				.value();
-			let headers =  ["#", "Platform", "Supported Web Views"];
+			let headers =  ["#", "Platform", "Current Web View", "Supported Web Views"];
 			let table = helpers.createTable(headers, data);
 			
 			this.$logger.out(table.toString());

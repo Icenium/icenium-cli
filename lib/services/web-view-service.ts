@@ -37,6 +37,16 @@ export class WebViewService implements IWebViewService {
 		return _.map(webViews, webView => webView.name.toLowerCase());	
 	}
 	
+	public getCurrentWebViewName(platform: string): string {
+		let webViews = this.getWebViews(platform);
+		let webView = _.find(webViews, webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier));
+		if(webView) {
+			return webView.name;
+		}
+		
+		return _.find(webViews, webView => webView.default).name;
+	}
+	
 	public enableWebView(platform: string, webViewName: string): IFuture<void> {
 		let webView = this.getWebView(platform, webViewName);
 		if(webView.default) { 

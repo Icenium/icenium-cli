@@ -3,8 +3,8 @@ prop print
 
 Usage | Synopsis
 ------|-------
-Print all properties | `$ appbuilder prop print [--validValue]`
-Print a selected property | `$ appbuilder prop print <Property Name> [--validValue]`
+Print all properties | `$ appbuilder prop print [--validValue]<% if(isCordova) { %> [--debug] [--release]<% } %>`
+Print a selected property | `$ appbuilder prop print <Property Name> [--validValue]<% if(isCordova) { %> [--debug] [--release]<% } %>`
 
 Prints information about the configuration of the project or the selected property.  
 If `--validValue` is set, prints the valid configuration values.  
@@ -16,7 +16,10 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--validValue` - When set, prints the valid values for all valid project properties or for the selected property.
-
+<% if(isCordova) { %>  
+* `--debug` - When set, prints information about your project settings for the Debug build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+* `--release` - When set, prints information about your project settings for the Release build configuration. This switch is applicable to the `$ appbuilder prop print` and `$ appbuilder prop print CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
+<% } %>
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 <% } %>
@@ -30,8 +33,8 @@ WARNING: This command and its extended commands are not applicable to mobile web
 Command | Description
 ----------|----------
 [edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
-[mobileframework](mobileframework.html) | Lists all supported versions of Apache Cordova.
-[mobileframework set](mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.
+[mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
+[mobileframework](mobileframework.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
