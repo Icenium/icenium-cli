@@ -4,7 +4,7 @@ appmanager upload ios
 Usage | Synopsis
 ------|-------
 Upload your app without publishing | `$ appbuilder appmanager upload ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--download]`
-Upload and publish your app |  `$ appbuilder appmanager upload ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--download] --publish [--public] [--send-email] [--send-push] [--group <Group ID> [--group <Group ID>]*]`
+Upload and publish your app |  `$ appbuilder appmanager upload ios [--certificate <Certificate ID>] [--provision <Provision ID>] [--download] --publish [--send-email] [--send-push] [--group <Group ID> [--group <Group ID>]*]`
 
 Builds the project for iOS and uploads the application to Telerik AppManager. <% if(isHtml) { %>If you have not set the `--publish` switch, after the upload completes, you need to go to your app in [Telerik AppManager](https://platform.telerik.com/appmanager), manually configure it for distribution and publish it.<% } %> 
 <% if(isConsole && isMobileWebsite) { %>
@@ -15,8 +15,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `--certificate` - Sets the certificate that you want to use for code signing your iOS app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
 * `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name.<% if(isHtml) { %>To list available provisioning profiles, run `$ appbuilder provision`<% } %>  
 * `--download` - If set, downloads the application package to the root of the project.
-* `--publish` - If set, after the upload completes, automatically publishes the application package for the members of its distribution groups. You can set additional distribution groups with the `--groups` option.
-* `--public` - If set, the published application will be available for download without requiring AppManager user credentials.
+* `--publish` - If set, after the upload completes, automatically publishes the application package for the members of its distribution groups. You can set additional distribution groups with the `--group` option.
 * `--send-email` - If set, after publishing your app, Telerik AppManager sends an email with the link to the app to the distribution groups, assigned to the published app.<% if(isHtml) { %> This option is applicable only when the `--publish` switch is set.<% } %> 
 * `--send-push` - If set, after publishing your app, Telerik AppManager sends a push notification that a new version is available to all registered devices in the distribution groups, assigned to the published app.<% if(isHtml) { %> This option is applicable only when the `--publish` switch is set.<% } %>
 * `--group` - Assigns additional distribution groups for the application. You can set multiple groups by specifying the `--group` option multiple times. You can set a group by index or name. <% if(isHtml) { %>To list the available groups, run `$ appbuilder appmanager groups`<br/>This option is applicable only when the `--publish` switch is set.<% } %>
@@ -38,7 +37,8 @@ Command | Description
 ----------|----------
 [appmanager upload](appmanager.html) | Lets you work with Telerik AppManager.
 [appmanager upload android](appmanager-upload-android.html) | Builds the project for Android and uploads the application to Telerik AppManager.
-[appmanager livesync](appmanager-livesync.html) | Publish a new update of your application in Telerik AppManager.
+[appmanager upload wp8](appmanager-upload-wp8.html) | Builds the project for Windows Phone and uploads the application to Telerik AppManager.
+[appmanager livesync](appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published application.
 [appmanager groups](appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
 [appstore](appstore.html) | Lets you work with your iTunes Connect account.
 [appstore list](appstore-list.html) | Lists all application records in iTunes Connect.

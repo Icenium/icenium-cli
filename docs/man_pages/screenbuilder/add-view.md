@@ -5,8 +5,9 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-view`
 
-Adds a new application view to your project. You can later add lists and forms to the view with the respective Screen Builder commands.<% if(isHtml) { %>An interactive prompt guides you through the setup process.
-
+Adds a new application view to your project. You can later add lists and forms to the view with the respective Screen Builder commands.<% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
+<% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %> 
+<% if(isHtml) { %>
 ### Command Limitations 
 
 * You can run this command only on projects created with Screen Builder.
@@ -23,6 +24,5 @@ Command | Description
 [add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
-[add-signin](add-signin.html) | Inserts a sign-in form in an existing application view.
-[add-signup](add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 <% } %>

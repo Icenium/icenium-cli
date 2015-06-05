@@ -22,6 +22,22 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		this.configure();
 		return this.search(keywords);
 	}
+	
+	// HACK: Information for this plugin is never returned from the server, so keep it here.
+	// TODO: Remove the LivePatch HACK when the server returns correct results.
+	// HACK: Platforms should be Server.DevicePlatform.Android, etc. but this fails at runtime that Server is not defined.
+	// 		 That's why the plugin type is declared as any insted of Server.CordovaPluginData
+	private livePatchPlugin: any = {
+		"Name": "Telerik AppManager LiveSync",
+		"Identifier": "com.telerik.LivePatch",
+		"Version": "1.0.0",
+		"Description": "This plugin adds Telerik AppManager LiveSync functionality",
+		"Url": "",
+		"Assets": [],
+		"Platforms": ["Android", "iOS", "WP8"],
+		"Variables": [],
+		"AndroidRequiredPermissions": ["android.permission.INTERNET"]
+	};
 
 	public search(keywords: string[]): IBasicPluginInformation[] {
 		let future = new Future<IBasicPluginInformation[]>();
@@ -102,8 +118,11 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	public getAvailablePlugins(): IFuture<Server.CordovaPluginData[]> {
-		this.$project.ensureCordovaProject();
-		return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion);
+		return ((): Server.CordovaPluginData[] => {
+			this.$project.ensureCordovaProject();
+			// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
+			return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).wait().concat([this.livePatchPlugin])
+		}).future<Server.CordovaPluginData[]>()();
 	}
 
 	public createPluginData(plugin: Server.CordovaPluginData): IPlugin[] {

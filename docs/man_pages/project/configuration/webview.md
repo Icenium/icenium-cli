@@ -34,7 +34,7 @@ WARNING: This command and its extended commands are not applicable to mobile web
 Command | Description
 ----------|----------
 [edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
-[mobileframework set](mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.
+[mobileframework](mobileframework.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.

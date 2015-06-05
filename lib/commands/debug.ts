@@ -19,7 +19,8 @@ export class DebugCommand implements ICommand {
 		private $serverExtensionsService: IServerExtensionsService,
 		private $sharedUserSettingsService: IUserSettingsService,
 		private $sharedUserSettingsFileService: IUserSettingsFileService,
-		private $processInfo: IProcessInfo) {
+		private $processInfo: IProcessInfo,
+		private $project: Project.IProject) {
 	}
 
 	allowedParameters: ICommandParameter[];
@@ -27,6 +28,7 @@ export class DebugCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
+			this.$project.ensureProject();
 
 			let debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
 			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
@@ -51,6 +53,7 @@ export class DebugCommand implements ICommand {
 
 			let debuggerParams = [
 				"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
+				"--app-ids", this.$project.projectData.AppIdentifier // We can specify more than one appid. They should be separated with ;.
 				];
 
 			this.$debuggerPlatformServices.runApplication(this.debuggerPath, debuggerParams);
@@ -170,7 +173,7 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 	}
 }
 
-let hostInfo: IHostInfo = this.$injector.resolve("hostInfo");
+let hostInfo: IHostInfo = $injector.resolve("hostInfo");
 if(hostInfo.isWindows) {
 	$injector.register("debuggerPlatformServices", WinDebuggerPlatformServices);
 } else if(hostInfo.isDarwin) {

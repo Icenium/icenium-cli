@@ -5,6 +5,7 @@ import path = require("path");
 import util = require("util");
 import Future = require("fibers/future");
 import frameworkProjectBaseLib = require("./framework-project-base");
+import semver = require("semver");
 
 export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -106,9 +107,16 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		return (() => {
 			let appResourcesDir = this.$resources.appResourcesDir;
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+			// In 0.10.0 original template, App_Resources directory is not included in app directory.
+			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
+			if(semver.eq(frameworkVersion, "0.9.0")  
+				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME)).wait() 
+				&& this.$fs.exists(path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME)).wait())) {
+				appResourcesHolderDirectory = projectDir;
+			}
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(projectDir, relativePath);
+				let targetFilePath = path.join(appResourcesHolderDirectory, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();

@@ -4,6 +4,7 @@
 	},
 	"generators": [{
 		"name": "generator-kendo-ui-mobile",
-		"version": "0.0.7"
+		"version": "0.0.7",
+		"alias": "H"
 	}]
 }

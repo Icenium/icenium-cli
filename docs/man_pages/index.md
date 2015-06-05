@@ -36,8 +36,8 @@ Command | Description
 [prop&nbsp;add](project/configuration/prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop&nbsp;set](project/configuration/prop-set.html) | Sets the selected project property and overwrites its current value.
 [prop&nbsp;remove](project/configuration/prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
-[mobileframework](project/configuration/mobileframework.html) | Lists all supported Apache Cordova versions.
-[mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected Apache Cordova version for the project and updates the plugins according to the new version.
+[mobileframework](project/configuration/mobileframework.html) | Lists all supported versions of the current development framework.
+[mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
 
 ## Screen Builder Development Commands
@@ -47,8 +47,8 @@ Command | Description
 [screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
 [add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
-[add-signin](screenbuilder/add-signing.html) | Inserts a sign-in form in an existing application view.
-[add-signup](screenbuilder/add-signup.html) | Inserts a sign-up form in an existing application view.
+[add-authentication](screenbuilder/add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
+[add-about](screenbuilder/add-about.html) | Inserts a new about form in an existing application view.
 [add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
 [add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
 [add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.
@@ -88,6 +88,7 @@ Command | Description
 [provision&nbsp;remove](publishing/provision-remove.html) | Removes a registered provisioning profile.
 [appstore&nbsp;list](publishing/appstore-list.html) | Lists all applications in iTunes Connect.
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
+[appmanager groups](publishing/appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
 [appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
 [appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
 [publish](publishing/publish.html) | Lets you manage your server connections or publishes your mobile website to a remote server.

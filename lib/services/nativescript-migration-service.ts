@@ -30,7 +30,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $project: Project.IProject,
 		private $resources: IResourceLoader,
 		private $config: IConfiguration,
-		private $httpClient: Server.IHttpClient) {
+		private $httpClient: Server.IHttpClient,
+		private $projectConstants: Project.IProjectConstants) {
 			this.nativeScriptResourcesDir = this.$resources.resolvePath("NativeScript");
 			this.tnsModulesDirectoryPath = path.join(this.nativeScriptResourcesDir, "tns_modules");
 			this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
@@ -74,23 +75,28 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				return framework.displayName;
 			}
 
+			this.checkIsVersionObsolete(version).wait();
 			this.$errors.failWithoutHelp("Cannot find version %s in the supported versions.", version);
 		}).future<string>()();
 	}
-	
+
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return (() => {
-			let projectDir = this.$project.getProjectDir().wait();
-			let tnsModulesProjectPath = path.join(projectDir, "app", "tns_modules");
-			let backupName = `${tnsModulesProjectPath}.backup`;
-			// Check if current version is supported one. We cannot migrate ObsoleteVersions
 			let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
+			if(currentFrameworkVersion === newVersion) {
+				return;
+			}
+
+			let projectDir = this.$project.getProjectDir().wait();
+			let tnsModulesProjectPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, "tns_modules");
+			let appResourcesRequiredPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME);
+			let appResourcesObsoletePath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME);
+			let backupName = `${tnsModulesProjectPath}.backup`;
+			let shouldRollBackAppResources = false;
+			// Check if current version is supported one. We cannot migrate ObsoleteVersions
 			if(!_.contains(this.getSupportedVersions().wait(), currentFrameworkVersion)) {
-				if(_.contains(this.getObsoleteVersions().wait(), currentFrameworkVersion)) {
-					this.$errors.failWithoutHelp(`You can still build your project, but you cannot migrate from version '${currentFrameworkVersion}'. Consider creating a new NativeScript project.`)
-				} else {
-					this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`)
-				}
+				this.checkIsVersionObsolete(currentFrameworkVersion).wait();
+				this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`)
 			}
 
 			try {
@@ -99,12 +105,21 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				let projectType = this.$project.isTypeScriptProject().wait() ? NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION : NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION;
 				let pathToNewTnsModules = path.join(this.tnsModulesDirectoryPath, projectType, this.getFileNameByVersion(newVersion));
 				this.$fs.unzip(pathToNewTnsModules, tnsModulesProjectPath).wait();
+				if(!this.$fs.exists(appResourcesRequiredPath).wait() && this.$fs.exists(appResourcesObsoletePath).wait()) {
+					this.$logger.info(`Moving ${appResourcesObsoletePath} to ${appResourcesRequiredPath}`);
+					shouldRollBackAppResources = true;
+					this.$fs.rename(appResourcesObsoletePath, appResourcesRequiredPath).wait();
+				}
 				this.$fs.deleteDirectory(backupName).wait();
 			} catch(err) {
 				this.$logger.trace("Error during migration. Trying to restore previous state.");
 				this.$logger.trace(err);
 				this.$fs.deleteDirectory(tnsModulesProjectPath).wait();
 				this.$fs.rename(backupName, tnsModulesProjectPath).wait();
+				if(shouldRollBackAppResources && this.$fs.exists(appResourcesRequiredPath).wait() && !this.$fs.exists(appResourcesObsoletePath).wait()) {
+					this.$logger.trace(`Moving ${appResourcesObsoletePath} to ${appResourcesRequiredPath}`);
+					this.$fs.rename(appResourcesRequiredPath, appResourcesObsoletePath).wait();
+				}
 				this.$errors.failWithoutHelp("Error during migration. Restored original state of the project.");
 			}
 		}).future<void>()();
@@ -144,6 +159,20 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			let migrationData = this.nativeScriptMigrationData.wait();
 			return _.map(migrationData.obsoleteVersions, obsoleteVersion => obsoleteVersion.version);
 		}).future<string[]>()();
+	}
+
+	/**
+	 * Checks if the provided {N} version is obsolete and fails with correct error message in such case.
+	 * If the version is not marked as obsolete, do nothing.
+	 * @param {string} version The version tha has to be checked.
+	 * @returns {IFuture<void>}
+	 */
+	private checkIsVersionObsolete(version: string): IFuture<void> {
+		return (() => {
+			if(_.any(this.getObsoleteVersions().wait(), obsoleteVersion => obsoleteVersion === version)) {
+				this.$errors.failWithoutHelp(`Your project targets NativeScript ${version}. This version is obsolete and cannot be migrated from the command line. If you want to migrate your project, create a new project and copy over your code and resources.`);
+			}
+		}).future<void>()();
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);
