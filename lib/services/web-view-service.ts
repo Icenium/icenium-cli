@@ -60,7 +60,7 @@ export class WebViewService implements IWebViewService {
 		return (() => {
 			if(!this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
 				this.$options.default = true;				
-				this.$pluginsService.configurePlugin(webView.pluginIdentifier).wait();
+				this.$pluginsService.addPlugin(webView.pluginIdentifier).wait();
 			}
 		}).future<void>()();
 	}
