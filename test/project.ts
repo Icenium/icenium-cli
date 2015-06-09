@@ -128,12 +128,22 @@ function createTestInjector(): IInjector {
 				version: '1.0.0'
 			}
 		},
-		getPluginVersions: (pluginName: string) => {
+		getPluginVersions: (plugin: IPlugin) => {
 			return [{
 				name: '1.0.0',
 				value: '1.0.0',
 				minCordova: '3.0.0'
 			}]
+		},
+		getAvailablePlugins: () => {
+			return [
+				{
+					data: {
+					Identifier: "Name",
+					Version: '1.0.0'
+					}
+				}
+			]
 		}
 	});
 	testInjector.register("projectPropertiesService", projectPropertiesService.ProjectPropertiesService);

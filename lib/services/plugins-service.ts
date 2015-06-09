@@ -85,8 +85,13 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public getAvailablePlugins(): IPlugin[] {
-		return _.values(this.identifierToPlugin);
+		let plugins = _.values(this.identifierToPlugin);
+		if(this.$project.projectData) {
+			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
+		}
+		return plugins;
 	}
+
 	private get configurations(): string[]{
 		return [this.$projectConstants.DEBUG_CONFIGURATION_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME];
 	}
@@ -136,6 +141,9 @@ export class PluginsService implements IPluginsService {
 			let pluginToAdd = this.getPluginByName(pluginName);
 			if(pluginToAdd.type === pluginsDataLib.PluginType.MarketplacePlugin) {
 				version = this.selectPluginVersion(version, pluginToAdd).wait();
+				if(!this.isPluginSupported(pluginToAdd, this.$project.projectData.FrameworkVersion, version)) {
+					this.$errors.failWithoutHelp(`Plugin ${pluginName} is not avaialble for framework version '${this.$project.projectData.FrameworkVersion}'.`);
+				}
 			}
 
 			let configurations = this.$project.configurations;
@@ -220,12 +228,18 @@ export class PluginsService implements IPluginsService {
 		return { name, version };
 	}
 
-	public isPluginSupported(plugin: string, version: string, frameworkVersion: string): boolean {
-		let pluginCordovaVersionRange = _.find(this.getPluginVersions(plugin), v => v.value === version).cordovaVersionRange;
-		return semver.satisfies(frameworkVersion, pluginCordovaVersionRange);
+	private isPluginSupported(plugin: IPlugin, frameworkVersion: string, pluginVersion?: string): boolean {
+		if(!this.isMarketplacePlugin(plugin)) {
+			return true;
+		}
+
+		pluginVersion = pluginVersion || plugin.data.Version;
+		let pluginVersions = this.getPluginVersions(plugin);
+		let version = _.find(pluginVersions, v => v.value === pluginVersion);
+		return version && semver.satisfies(frameworkVersion, version.cordovaVersionRange);
 	}
 
-	public getInstalledPluginByName(pluginName: string): IPlugin[] {
+	private getInstalledPluginByName(pluginName: string): IPlugin[] {
 		pluginName = pluginName.toLowerCase();
 		let installedPlugins = this.getInstalledPlugins();
 		let installedPluginInstances =  _.filter(installedPlugins,(plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
@@ -378,28 +392,19 @@ export class PluginsService implements IPluginsService {
 		return plugin;
 	}
 
-	public getPluginVersions(pluginName: string): IPluginVersion[] {
-		let toLowerCasePluginName = pluginName.toLowerCase();
-
-		let versions:any[] = [];
-		_.each(this.getAvailablePlugins(), (plugin:IPlugin) => {
-			if (plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName) {
-				let pluginVersionsData = (<IMarketplacePlugin>plugin).pluginVersionsData;
-				versions = _.map(pluginVersionsData.Versions, p => {
-					let pluginVersion: IPluginVersion = {
-						name: p.Version,
-						value: p.Version,
-						cordovaVersionRange: p.SupportedVersion
-					}
-
-					return pluginVersion;
-				});
-				return false;
+	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {
+		let pluginVersionsData = (<IMarketplacePlugin>plugin).pluginVersionsData;
+		return _.map(pluginVersionsData.Versions, p => {
+			let pluginVersion: IPluginVersion = {
+				name: p.Version,
+				value: p.Version,
+				cordovaVersionRange: p.SupportedVersion
 			}
-		});
 
-		return versions;
+			return pluginVersion;
+		});
 	}
+
 	private promptForVersion(pluginName: string, versions: any[]): IFuture<string> {
 		return (() => {
 			return versions.length > 1 ? this.promptForVersionCore(pluginName, versions).wait() : versions[0].value;
@@ -500,7 +505,7 @@ export class PluginsService implements IPluginsService {
 	private selectPluginVersion(version: string, plugin: IPlugin, options?: { excludeCurrentVersion: boolean }): IFuture<string> {
 		return ((): string => {
 			let pluginName = plugin.data.Name;
-			let versions = this.getPluginVersions(pluginName);
+			let versions = this.getPluginVersions(plugin);
 			if(version) {
 				if(!_.any(versions, v => v.value === version)) {
 					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
