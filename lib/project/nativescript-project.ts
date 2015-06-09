@@ -105,18 +105,18 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			let appResourcesDir = this.$resources.appResourcesDir;
+			let appResourcesDir = this.$resources.getPathToAppResources(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			// In 0.10.0 original template, App_Resources directory is not included in app directory.
 			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
 			if(semver.eq(frameworkVersion, "0.9.0")  
-				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME)).wait() 
-				&& this.$fs.exists(path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME)).wait())) {
+				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$projectConstants.APP_RESOURCES_DIR_NAME)).wait() 
+				&& this.$fs.exists(path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME)).wait())) {
 				appResourcesHolderDirectory = projectDir;
 			}
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(appResourcesHolderDirectory, relativePath);
+				let targetFilePath = path.join(appResourcesHolderDirectory,this.$projectConstants.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();

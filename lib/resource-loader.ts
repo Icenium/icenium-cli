@@ -6,7 +6,8 @@ import helpers = require("./helpers");
 import util = require("util");
 
 export class ResourceLoader implements IResourceLoader {
-	constructor(private $fs: IFileSystem) { }
+	constructor(private $fs: IFileSystem, 
+		private $projectConstants: Project.IProjectConstants) { }
 
 	resolvePath(resourcePath: string): string {
 		return path.join(__dirname, "../resources", resourcePath);
@@ -20,12 +21,12 @@ export class ResourceLoader implements IResourceLoader {
 		return this.$fs.readJson(this.resolvePath(resourcePath));
 	}
 
-	public get appResourcesDir(): string {
-		return this.resolvePath("App_Resources");
-	}
-
 	public buildCordovaJsFilePath(version: string, platform: string): string {
 		return path.join(this.resolvePath("Cordova"), version, util.format("cordova.%s.js", platform).toLowerCase());
+	}
+
+	public getPathToAppResources(framework: string) {
+		return path.join(this.resolvePath(framework), this.$projectConstants.APP_RESOURCES_DIR_NAME);
 	}
 }
 $injector.register("resources", ResourceLoader);

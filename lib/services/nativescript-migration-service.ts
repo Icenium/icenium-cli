@@ -89,8 +89,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			let projectDir = this.$project.getProjectDir().wait();
 			let tnsModulesProjectPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, "tns_modules");
-			let appResourcesRequiredPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME);
-			let appResourcesObsoletePath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_RESOURCES_DIR_NAME);
+			let appResourcesRequiredPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$projectConstants.APP_RESOURCES_DIR_NAME);
+			let appResourcesObsoletePath = path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME);
 			let backupName = `${tnsModulesProjectPath}.backup`;
 			let shouldRollBackAppResources = false;
 			// Check if current version is supported one. We cannot migrate ObsoleteVersions

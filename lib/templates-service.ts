@@ -70,19 +70,27 @@ export class TemplatesService implements ITemplatesService {
 
 	public unpackAppResources(): IFuture<void> {
 		return (() => {
-			let appResourcesDir = this.$resources.appResourcesDir;
-			this.$fs.deleteDirectory(appResourcesDir).wait();
-
-			let assetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
+			let cordovaAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
+			this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName).wait();
+			let nsAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.NS.Blank.zip");
+			this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName).wait();
+		}).future<void>()();
+	}
+	
+	private unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): IFuture<void> {
+		return (() => {
 			let unzipOps:IFuture<any>[] = [];
 			let unzipStream = this.$fs.createReadStream(assetsZipFileName)
 				.pipe(unzip.Parse())
 				.on("entry", (entry: ZipEntry) => {
-					if (entry.type !== "File" || !_.startsWith(entry.path.toLowerCase(), "app_resources/")) {
+					let indexOfAppResources = entry.path.toLowerCase().indexOf("app_resources/")
+					if (entry.type !== "File" || indexOfAppResources === -1) {
 						entry.autodrain();
 						return;
 					}
-					let assetTargetFileName = path.join(appResourcesDir, entry.path);
+
+					let entryPath = entry.path.substr(indexOfAppResources);
+					let assetTargetFileName = path.join(appResourcesDir, entryPath);
 					let mkdirFuture = this.$fs.createDirectory(path.dirname(assetTargetFileName));
 					mkdirFuture.resolve((err) => {
 						if (err) {
