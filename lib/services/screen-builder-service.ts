@@ -16,7 +16,8 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
 		private $logger: ILogger,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		private $fs: IFileSystem) { }
 
 	public get generatorName(): string {
 		return "generator-kendo-ui-mobile";
@@ -63,7 +64,19 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		let command = util.format("%s %s install", "node", bowerPath);
 		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
-
+	
+	public composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
+		return (() => { 
+			let screenBuilderOptions = bacisSceenBuilderOptions || {};
+			
+			if(this.$options.answers) {
+				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(this.$options.answers)).wait();
+			}
+			
+			return screenBuilderOptions;
+		}).future<IScreenBuilderOptions>()();
+	}
+	
 	private prepareScreenBuilder(): IFuture<void> {
 		return (() => {
 			this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
@@ -148,10 +161,11 @@ class ScreenBuilderDynamicCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		this.ensureScreenBuilderProject().wait();
-
-		let screenBuilderOptions = {
-			type: this.command.substr(this.command.indexOf("-") + 1)
-		};
+		
+		let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions({
+			type: this.command.substr(this.command.indexOf("-") + 1)			
+		}).wait();
+		
 		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
 	}
 

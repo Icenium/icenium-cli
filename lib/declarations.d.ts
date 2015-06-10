@@ -375,6 +375,7 @@ interface IScreenBuilderService {
 	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
 	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void>;
+	composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
 }
 
 interface IScreenBuilderOptions {
@@ -687,6 +688,7 @@ interface IOptions extends ICommonOptions {
 	group: string[];
 	default: boolean;
 	var: Object;
+	answers: string;
 }
 
 /**
