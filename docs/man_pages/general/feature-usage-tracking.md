@@ -27,4 +27,5 @@ Command | Description
 [autocomplete-status](autocomplete-status.html) | Prints the current status of your command-line completion settings.
 [autocomplete-enable](autocomplete-enable.html) | Enables command-line completion for bash and zsh shells.
 [autocomplete-disable](autocomplete-disable.html) | Disables command-line completion for bash and zsh shells.
+[doctor](doctor.html) | Checks your system and reports potential problems which may prevent developing with AppBuilder CLI.
 <% } %>
