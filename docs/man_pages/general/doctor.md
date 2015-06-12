@@ -3,7 +3,7 @@ doctor
 
 Usage | Synopsis
 ------|-------
-General | `$ tns doctor`
+General | `$ appbuilder doctor`
 
 Checks your system and reports potential problems which may prevent developing with AppBuilder CLI.
 
