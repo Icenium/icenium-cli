@@ -686,6 +686,7 @@ interface IOptions extends ICommonOptions {
 	sendEmail: boolean;
 	group: string[];
 	default: boolean;
+	var: Object;
 }
 
 /**

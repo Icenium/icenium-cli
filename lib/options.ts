@@ -35,7 +35,8 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			sendPush: { type: OptionType.Boolean },
 			sendEmail: { type: OptionType.Boolean },
 			group: { type: OptionType.Array },
-			default: {type: OptionType.Boolean}
+			default: {type: OptionType.Boolean},
+			var: {type: OptionType.Object}
 		},
 		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
 			$errors, $staticConfig);

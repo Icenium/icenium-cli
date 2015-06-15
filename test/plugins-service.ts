@@ -99,8 +99,8 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 }
 
 class PrompterStub implements IPrompter {
-	constructor(public choiceIndex: number, public versionIndex?: number) {}
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult();}
+	constructor(public choiceIndex: number, public versionIndex?: number, public pluginVariableResult?: any) {}
+	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(this.pluginVariableResult); }
 	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
 	getString(prompt: string): IFuture<string> { return Future.fromResult("");}
 	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> {
@@ -145,7 +145,7 @@ class ProjectStub {
 	}
 	
 	setProperty(propertyName:string, value:any, configuration: string): void {
-		if(propertyName === "CorePlugins" && configuration) {
+		if((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
 			this.configurationSpecificData[configuration][propertyName] = value;
 		} else {
 			this.projectData[propertyName] = value;
@@ -261,7 +261,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	return testInjector;
 }
 
-function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins: any[]): IInjector {
+function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins: any[], pluginVariableResult?: any): IInjector {
 	let testInjector = new yok.Yok();
 	let helpers = require("../lib/common/helpers");
 	helpers.isInteractive = () => { return true; }
@@ -302,11 +302,17 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("staticConfig", {});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("resources", resourcesLib.ResourceLoader);
-	testInjector.register("prompter", new PrompterStub(2));
+	testInjector.register("prompter", new PrompterStub(2, 0, pluginVariableResult));
 	return testInjector;
 }
 
 describe("plugins-service", () => {
+	afterEach(() => {
+		// reset options.debug and options.release
+		let testInjector = createTestInjectorForAvailableMarketplacePlugins([]);
+		let options = testInjector.resolve("options");
+		options.release = options.debug = false;
+	});
 	it("return count of installed plugins", () => {
 		let cordovaPlugins = [
 			{
@@ -1213,6 +1219,163 @@ describe("plugins-service", () => {
 			// assert.equal(0, availablePlugins.length);
 			// HACK - when LivePatch plugin is working correctly, remove the line below and use the assert above.
 			assert.equal(1, availablePlugins.length);
+		});
+	});
+	
+	describe("plugins with variables are added correctly",() => {
+		let testInjector: IInjector,
+			options: IOptions,
+			project: Project.IProject,
+			service: IPluginsService,
+			availableMarketplacePlugins = [{
+				"Identifier": "com.telerik.dropbox",
+				"DefaultVersion": "1.0.2",
+				"Framework": "cordova",
+				"Versions": [
+					{
+						"Publisher": {
+							"Name": "Telerik plugins",
+							"Url": "http://www.telerik.com/"
+						},
+						"Authors": [
+							"Telerik"
+						],
+						"SupportedVersion": ">=3.5.0",
+						"Name": "Dropbox",
+						"Identifier": "com.telerik.dropbox",
+						"Version": "1.0.2",
+						"Description": "Cordova Sync SDK",
+						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+						"Platforms": [
+							"Android",
+							"iOS"
+						],
+						"Variables": [
+							"APP_KEY",
+							"APP_SECRET"
+						]
+					}
+				]
+			}];
+
+		beforeEach(() => {
+			testInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
+			
+			options = testInjector.resolve("options");
+			project = testInjector.resolve("project");
+			service = testInjector.resolve(pluginsService.PluginsService);
+		});
+
+		it("when var option does not have configuration variables plugin vars are added to both configs", () => {
+			let expectedCordovaPluginVariables = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
+			options.var = {
+				"APP_KEY": 1,
+				"APP_SECRET": 2
+			}
+
+			service.addPlugin("com.telerik.dropbox").wait();
+			
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
+		});
+		
+		it("when var option has configuration variables plugin vars are added to correct configs", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '3', APP_SECRET: '4' } };
+			options.var = {
+				"debug": {
+					"APP_KEY": 1,
+					"APP_SECRET": 2
+				},
+				"release": {
+					"APP_KEY": 3,
+					"APP_SECRET": 4
+				}
+			}
+
+			service.addPlugin("com.telerik.dropbox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+		
+		it("when var option has configuration variables and plugin vars outside of them, plugin vars from configuration are used", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '3', APP_SECRET: '4' } };
+			options.var = {
+				"debug": {
+					"APP_KEY": 1,
+					"APP_SECRET": 2
+				},
+				"release": {
+					"APP_KEY": 3,
+					"APP_SECRET": 4
+				},
+				"APP_KEY": 5,
+				"APP_SECRET": 6
+			}
+
+			service.addPlugin("com.telerik.dropbox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+		
+		it("when var option has configuration variables for only one plugin var, the other values are populated from the var object", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '3' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '2', APP_SECRET: '3' } };
+			options.var = {
+				"debug": {
+					"APP_KEY": 1
+				},
+				"APP_KEY": 2,
+				"APP_SECRET": 3
+			}
+
+			service.addPlugin("com.telerik.dropbox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+		
+		it("when plugin variable is missing from var option, the value for it is taken from prompter", () => {
+			let APP_SECRET_VARIABLE = { "APP_SECRET": "4" };
+			let injector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins, APP_SECRET_VARIABLE);
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '3', APP_SECRET: '4' } };
+			options = injector.resolve("options");
+			options.var = {
+				"debug": {
+					"APP_KEY": 1,
+					"APP_SECRET": 2
+				},
+				"release": {
+					"APP_KEY": 3
+				}
+			}
+			service = injector.resolve(pluginsService.PluginsService);
+			project = injector.resolve("project");
+			service.addPlugin("com.telerik.dropbox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+		
+		it("when var option has configuration variables with different case, plugin variables are still saved as expected", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '3' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '2', APP_SECRET: '3' } };
+			options.var = {
+				"DeBuG": {
+					"APP_KEY": 1
+				},
+				"APP_Key": 2,
+				"ApP_SecReT": 3
+			}
+
+			service.addPlugin("com.telerik.dropbox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
 		});
 	});
 });

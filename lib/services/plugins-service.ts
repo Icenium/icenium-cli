@@ -368,7 +368,7 @@ export class PluginsService implements IPluginsService {
 				schema["default"] = () => pluginVariables[variableName];
 			}
 
-			return this.$prompter.get([schema]).wait();
+			return this.getPluginVariableFromVarOption(variableName, configuration) || this.$prompter.get([schema]).wait();
 		}).future<any>()();
 	}
 
@@ -554,6 +554,49 @@ export class PluginsService implements IPluginsService {
 	 */
 	private isMarketplacePlugin(plugin: IPlugin): boolean {
 		return plugin && plugin.type.toString().toLowerCase() === pluginsDataLib.PluginType.MarketplacePlugin.toString().toLowerCase();
+	}
+
+	/**
+	 * Checks if the specified CordovaPluginVariable exists in the --var option specified by user.
+	 * The variable can be added to --var option for configuration or globally, for ex.:
+	 * `--var.APP_ID myAppIdentifier` or `--var.debug.APP_ID myAppIdentifier`.
+	 * NOTE: If the variable is added for specific configuration and globally, 
+	 * the value for the specified configuration will be used as it has higher priority. For ex.:
+	 * `--var.APP_ID myAppIdentifier1 --var.debug.APP_ID myAppIdentifier2` will return myAppIdentifier2 for debug configuration
+	 * and myAppIdentifier for release configuration.
+	 * @param {string} variableName The name of the plugin variable.
+	 * @param {string} configuration The configuration for which the variable will be used.
+	 * @returns {any} The value of the plugin variable specified in --var or undefined.
+	 */
+	private getPluginVariableFromVarOption(variableName: string, configuration: string): any {
+		let varOption = this.$options.var;
+		configuration = configuration.toLowerCase();
+		let lowerCasedVariableName = variableName.toLowerCase();
+		if(varOption) {
+			let configVariableValue: string;
+			let generalVariableValue: string;
+			_.each(varOption, (propValue: any, propKey: string) => {
+				if(propKey.toLowerCase() === configuration) {
+					_.each(propValue, (configPropValue: string, configPropKey: string) => {
+						if(configPropKey.toLowerCase() === lowerCasedVariableName) {
+							configVariableValue = configPropValue;
+							return false;
+						}
+					});
+				} else if(propKey.toLowerCase() === lowerCasedVariableName) {
+					generalVariableValue = propValue;
+				}
+			});
+
+			let value = configVariableValue || generalVariableValue;
+			if(value) {
+				let obj = Object.create(null);
+				obj[variableName] = value.toString();
+				return obj;
+			}
+		}
+		
+		return undefined;
 	}
 }
 $injector.register("pluginsService", PluginsService);
