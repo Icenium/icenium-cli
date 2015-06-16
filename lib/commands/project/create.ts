@@ -27,13 +27,13 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 			this.$project.createTemplateFolder(projectPath).wait();
 
-			let screenBuilderOptions = {
+			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions({
 				projectPath: projectPath,
 				answers: {
 					name: projectName
 				}
-			};
-
+			}).wait();
+			
 			try {
 				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
 				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
