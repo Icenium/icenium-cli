@@ -14,10 +14,20 @@ export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
 	private user: any;
 
+	private static APPBUILDER_EDITION_TYPE: IStringDictionary = {
+		"Starter": "AppBuilder Starter Edition",
+		"Developer": "AppBuilder Developer Edition",
+		"Business": "AppBuilder Business Edition",
+		"Professional": "AppBuilder Professional Edition",
+		"Enterprise": "AppBuilder Enterprise Edition",
+		"Developer Plus": "Telerik Platform Developer Edition"
+	};
+
 	constructor(private $fs: IFileSystem,
 		private $config: Config.IConfig,
 		private $logger: ILogger,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		private $injector: IInjector) { }
 
 	public hasCookie(): IFuture<boolean> {
 		return (() => {
@@ -65,12 +75,16 @@ export class UserDataStore implements IUserDataStore {
 	}
 
 	public setUser(user?: any): IFuture<void> {
-		this.user = user;
-		if(user) {
-			return this.$fs.writeJson(this.getUserStateFilePath(), user);
-		} else {
-			return this.$fs.deleteFile(this.getUserStateFilePath());
-		}
+		return (() => {
+			this.user = user;
+			if(user) {
+				this.$fs.writeJson(this.getUserStateFilePath(), user).wait();
+				this.trackTenantInformation(user).wait();
+			} else {
+				this.$fs.deleteFile(this.getUserStateFilePath()).wait();
+			}
+		}).future<void>()();
+		
 	}
 
 	public clearLoginData(): IFuture<void> {
@@ -114,6 +128,18 @@ export class UserDataStore implements IUserDataStore {
 
 	private getUserStateFilePath(): string {
 		return path.join(this.$options.profileDir, this.$config.AB_SERVER + ".user");
+	}
+
+	private trackTenantInformation(userData: any): IFuture<void> {
+		return (() => {
+			if(userData) {
+				let tenant = userData.tenant;
+				let tenantEdition = UserDataStore.APPBUILDER_EDITION_TYPE[tenant.edition] || tenant.edition || "no-edition";
+				let tenantInfo = `${tenantEdition || "no-edition"} - ${tenant.license || "no-license"}`;
+				let $analyticsService = this.$injector.resolve("analyticsService");
+				$analyticsService.track("UserTenant", tenantInfo).wait();
+			}
+		}).future<void>()();
 	}
 }
 $injector.register("userDataStore", UserDataStore);
