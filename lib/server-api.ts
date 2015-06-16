@@ -245,8 +245,8 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public exportSolution(solutionSpaceName: string, solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('ExportSolution', 'GET', ['api','projects','export',encodeURI(solutionSpaceName.replace(/\\/g, '/')),encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
 	}
-	public getExportedSolution(solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('GetExportedSolution', 'GET', ['api','projects','export',encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
+	public exportProject(solutionSpaceName: string, solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('ExportProject', 'GET', ['api','projects','export',encodeURI(solutionSpaceName.replace(/\\/g, '/')),encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
 	}
 	public importPackage(solutionName: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('ImportPackage', 'POST', ['api','projects','import',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(parentIdentifier.replace(/\\/g, '/'))].join('/'), null, [{name: 'archivePackage', value: archivePackage, contentType: 'application/octet-stream'}], null);

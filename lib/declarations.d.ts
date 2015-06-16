@@ -609,9 +609,11 @@ interface IProcessInfo {
 
 interface IRemoteProjectService {
 	makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T>;
-	getProjectProperties(projectName: string): IFuture<any>;
-	getProjects(): IFuture<Server.TapSolutionData[]>;
-	getProjectName(projectId: string): IFuture<string>;
+	getProjectProperties(solutionName: string, projectName: string): IFuture<any>;
+	getSolutions(): IFuture<Server.TapSolutionData[]>;
+	getProjectsForSolution(solutionName: string): IFuture<Server.IWorkspaceItemData[]>;
+	getSolutionName(solutionId: string): IFuture<string>;
+	getProjectName(solutionId: string, projectId: string): IFuture<string>;
 }
 
 interface IProjectSimulatorService {
