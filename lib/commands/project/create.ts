@@ -1,7 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
 import path = require("path");
 import util = require("util");
 
@@ -13,6 +12,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		private $nameCommandParameter: ICommandParameter,
 		$project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
+		private $simulatorService: ISimulatorService,
 		private $screenBuilderService: IScreenBuilderService,
 		private $options: IOptions) {
 		super($errors, $project);
@@ -39,6 +39,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
 
 				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath, projectName).wait();
+				this.$simulatorService.launchSimulator().wait();
 			} catch(err) {
 				this.$fs.deleteDirectory(projectPath).wait();
 				throw err;

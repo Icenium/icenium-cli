@@ -1,5 +1,4 @@
 import path = require("path");
-import Future = require("fibers/future");
 
 class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	private static PACKAGE_NAME_WIN: string = "Telerik.BlackDragon.Client.Mobile.Tools.Package";
@@ -8,7 +7,7 @@ class WinSimulatorPlatformServices implements IExtensionPlatformServices {
 	constructor(private $childProcess: IChildProcess,
 				private $hostInfo: IHostInfo) { }
 
-	public getPackageName(): string {
+	public get packageName(): string {
 		return WinSimulatorPlatformServices.PACKAGE_NAME_WIN;
 	}
 
@@ -34,7 +33,7 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 
 	constructor(private $childProcess: IChildProcess) { }
 
-	public getPackageName() : string {
+	public get packageName() : string {
 		return MacSimulatorPlatformServices.PACKAGE_NAME_MAC;
 	}
 
@@ -54,7 +53,7 @@ class MacSimulatorPlatformServices implements IExtensionPlatformServices {
 	}
 }
 
-let hostInfo = $injector.resolve("hostInfo");
+let hostInfo: IHostInfo = $injector.resolve("hostInfo");
 if(hostInfo.isWindows) {
 	$injector.register("simulatorPlatformServices", WinSimulatorPlatformServices);
 } else if(hostInfo.isDarwin) {

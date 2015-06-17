@@ -30,7 +30,7 @@ export class DebugCommand implements ICommand {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.$project.ensureProject();
 
-			let debuggerPackageName = this.$debuggerPlatformServices.getPackageName();
+			let debuggerPackageName = this.$debuggerPlatformServices.packageName;
 			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
 			this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this)).wait();
 
@@ -116,7 +116,7 @@ class WinDebuggerPlatformServices extends  BaseDebuggerPlatformServices implemen
 		super($sharedUserSettingsFileService, $sharedUserSettingsService, $errors, $logger, $dispatcher);
 	}
 
-	public getPackageName(): string {
+	public get packageName(): string {
 		return WinDebuggerPlatformServices.PACKAGE_NAME_WIN;
 	}
 
@@ -151,7 +151,7 @@ class DarwinDebuggerPlatformServices extends BaseDebuggerPlatformServices implem
 		super($sharedUserSettingsFileService, $sharedUserSettingsService, $errors, $logger, $dispatcher);
 	}
 
-	public getPackageName(): string {
+	public get packageName(): string {
 		return DarwinDebuggerPlatformServices.PACKAGE_NAME_OSX;
 	}
 

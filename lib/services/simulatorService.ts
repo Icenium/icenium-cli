@@ -22,7 +22,7 @@ export class SimulatorService implements ISimulatorService {
 	public launchSimulator(): IFuture<void> {
 		this.$loginManager.ensureLoggedIn().wait();
 
-		let simulatorPackageName = this.$simulatorPlatformServices.getPackageName();
+		let simulatorPackageName = this.$simulatorPlatformServices.packageName;
 		this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 

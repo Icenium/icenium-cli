@@ -277,7 +277,7 @@ interface IServerConfiguration {
 }
 
 interface IExtensionPlatformServices {
-	getPackageName() : string;
+	packageName : string;
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
 	canRunApplication(): IFuture<boolean>;
