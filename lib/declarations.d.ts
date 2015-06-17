@@ -669,7 +669,6 @@ interface IOptions extends ICommonOptions {
 	deploy: string;
 	device: string;
 	saveTo: string;
-	client: string;
 	available: boolean;
 	release: boolean;
 	debug: boolean;
