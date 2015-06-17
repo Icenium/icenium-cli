@@ -575,6 +575,9 @@ export class PluginsService implements IPluginsService {
 		if(varOption) {
 			let configVariableValue: string;
 			let generalVariableValue: string;
+			 if(variableName.indexOf(".") !== -1) {
+				varOption = this.simplifyYargsObject(varOption, configuration);
+			 }
 			_.each(varOption, (propValue: any, propKey: string) => {
 				if(propKey.toLowerCase() === configuration) {
 					_.each(propValue, (configPropValue: string, configPropKey: string) => {
@@ -597,6 +600,44 @@ export class PluginsService implements IPluginsService {
 		}
 		
 		return undefined;
+	}
+
+	/**
+	 * Converts complicated yargs object with many subobjects, to simplified one.
+	 * Use it when the plugin variable contains dots ("."). In this case yargs treats them as inner object instead of propery name.
+	 * For ex. '--var.debug.DATA.APP.ID testId' will be converted to {debug: {DATA: {APP: {ID: testId}}}}, while we need {debug: {DATA.APP.ID: testId}}
+	 * '--var.DATA.APP.ID testId' will be converted to DATA: {APP: {ID: testId}}}, while we need {DATA.APP.ID: testId}
+	 * @param {any} obj varObject created by yargs
+	 * @param {string} configuration The configuration for which the plugin variable will be used.
+	 * @return {any} Converted object if the obj paramater is of type object, otherwise - the object itself.
+	 */
+	private simplifyYargsObject(obj: any, configuration: string): any {
+		if(obj && typeof(obj) === "object") {
+			let convertedObject:any = Object.create({});
+
+			_.each(obj, (propValue: any, propKey: string) => {
+				if(typeof(propValue) !== "object") {
+					convertedObject[propKey] = propValue;
+					return false;
+				}
+
+				let innerObj = this.simplifyYargsObject(propValue, configuration);
+				if(propKey.toLowerCase() === configuration.toLowerCase()) {
+					// for --var.debug.DATA.APP.ID testId
+					convertedObject[propKey] = innerObj;
+				} else {
+					// for --var.DATA.APP.ID testId
+					_.each(innerObj, (innerPropValue: any, innerPropKey: string) => {
+						convertedObject[`${propKey}.${innerPropKey}`] = innerPropValue;
+					});
+				}
+				
+			});
+
+			return convertedObject;
+		}
+
+		return obj;
 	}
 }
 $injector.register("pluginsService", PluginsService);

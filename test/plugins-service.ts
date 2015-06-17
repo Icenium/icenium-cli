@@ -1256,6 +1256,66 @@ describe("plugins-service", () => {
 						]
 					}
 				]
+			},
+			{
+				"Identifier": "com.telerik.fakeDropBox",
+				"DefaultVersion": "1.0.2",
+				"Framework": "cordova",
+				"Versions": [
+					{
+						"Publisher": {
+							"Name": "Telerik plugins",
+							"Url": "http://www.telerik.com/"
+						},
+						"Authors": [
+							"Telerik"
+						],
+						"SupportedVersion": ">=3.5.0",
+						"Name": "Dropbox",
+						"Identifier": "com.telerik.dropbox",
+						"Version": "1.0.2",
+						"Description": "Cordova Sync SDK",
+						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+						"Platforms": [
+							"Android",
+							"iOS"
+						],
+						"Variables": [
+							"APP.KEY.VAR.DATA",
+							"APP1.SECRET.SAMPLE.MSG"
+						]
+					}
+				]
+			},
+			{
+				"Identifier": "com.telerik.fakeDropBox2",
+				"DefaultVersion": "1.0.2",
+				"Framework": "cordova",
+				"Versions": [
+					{
+						"Publisher": {
+							"Name": "Telerik plugins",
+							"Url": "http://www.telerik.com/"
+						},
+						"Authors": [
+							"Telerik"
+						],
+						"SupportedVersion": ">=3.5.0",
+						"Name": "Dropbox",
+						"Identifier": "com.telerik.dropbox",
+						"Version": "1.0.2",
+						"Description": "Cordova Sync SDK",
+						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+						"Platforms": [
+							"Android",
+							"iOS"
+						],
+						"Variables": [
+							"APP.KEY.VAR.DATA",
+							"APP.KEY.SAME.MSG"
+						]
+					}
+				]
 			}];
 
 		beforeEach(() => {
@@ -1271,14 +1331,14 @@ describe("plugins-service", () => {
 			options.var = {
 				"APP_KEY": 1,
 				"APP_SECRET": 2
-			}
+			};
 
 			service.addPlugin("com.telerik.dropbox").wait();
 			
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
 		});
-		
+
 		it("when var option has configuration variables plugin vars are added to correct configs", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
 			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '3', APP_SECRET: '4' } };
@@ -1291,14 +1351,14 @@ describe("plugins-service", () => {
 					"APP_KEY": 3,
 					"APP_SECRET": 4
 				}
-			}
+			};
 
 			service.addPlugin("com.telerik.dropbox").wait();
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
 		});
-		
+
 		it("when var option has configuration variables and plugin vars outside of them, plugin vars from configuration are used", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '2' } };
 			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '3', APP_SECRET: '4' } };
@@ -1313,14 +1373,14 @@ describe("plugins-service", () => {
 				},
 				"APP_KEY": 5,
 				"APP_SECRET": 6
-			}
+			};
 
 			service.addPlugin("com.telerik.dropbox").wait();
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
 		});
-		
+
 		it("when var option has configuration variables for only one plugin var, the other values are populated from the var object", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '3' } };
 			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '2', APP_SECRET: '3' } };
@@ -1330,14 +1390,14 @@ describe("plugins-service", () => {
 				},
 				"APP_KEY": 2,
 				"APP_SECRET": 3
-			}
+			};
 
 			service.addPlugin("com.telerik.dropbox").wait();
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
 		});
-		
+
 		it("when plugin variable is missing from var option, the value for it is taken from prompter", () => {
 			let APP_SECRET_VARIABLE = { "APP_SECRET": "4" };
 			let injector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins, APP_SECRET_VARIABLE);
@@ -1352,7 +1412,7 @@ describe("plugins-service", () => {
 				"release": {
 					"APP_KEY": 3
 				}
-			}
+			};
 			service = injector.resolve(pluginsService.PluginsService);
 			project = injector.resolve("project");
 			service.addPlugin("com.telerik.dropbox").wait();
@@ -1360,7 +1420,7 @@ describe("plugins-service", () => {
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
 		});
-		
+
 		it("when var option has configuration variables with different case, plugin variables are still saved as expected", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.dropbox': { APP_KEY: '1', APP_SECRET: '3' } };
 			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.dropbox': { APP_KEY: '2', APP_SECRET: '3' } };
@@ -1370,12 +1430,79 @@ describe("plugins-service", () => {
 				},
 				"APP_Key": 2,
 				"ApP_SecReT": 3
-			}
+			};
 
 			service.addPlugin("com.telerik.dropbox").wait();
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+
+		it("when plugin variables have dots, yargs object is correctly converted and correct value is used", () => {
+			let expectedCordovaPluginVariables = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '2' } };
+			options.var = {
+				APP: {KEY: {VAR: {DATA: "1"}}},
+				APP1: {SECRET: {SAMPLE: {MSG: "2"}}}
+			};
+
+			service.addPlugin("com.telerik.fakeDropBox").wait();
+			
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
+		});
+
+		it("when plugin variables have dots and user pass configuration specific values, yargs object is correctly converted and correct values are used", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '2' } };
+			let expectedCordovaPluginVariablesInRelease =  { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '3', "APP1.SECRET.SAMPLE.MSG": '4' } };
+			options.var = {
+				debug: {
+					APP: {KEY: {VAR: {DATA: "1"}}},
+					APP1: {SECRET: {SAMPLE: {MSG: "2"}}}
+				},
+				release: {
+					APP: {KEY: {VAR: {DATA: "3"}}},
+					APP1: {SECRET: {SAMPLE: {MSG: "4"}}}
+				}
+			};
+
+			service.addPlugin("com.telerik.fakeDropBox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+
+		it("when plugin variables have dots and user pass configuration specific values and non-config ones correct ones are used after yargs convertion", () => {
+			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '3' } };
+			let expectedCordovaPluginVariablesInRelease =  { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '2', "APP1.SECRET.SAMPLE.MSG": '3' } };
+			options.var = {
+				debug: {
+					APP: {KEY: {VAR: {DATA: "1"}}}
+				},
+				APP: {KEY: {VAR: {DATA: "2"}}},
+				APP1: {SECRET: {SAMPLE: {MSG: "3"}}}
+			};
+
+			service.addPlugin("com.telerik.fakeDropBox").wait();
+
+			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
+			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
+		});
+		
+		it("when plugin variables have dots and first key of variables is the same yargs object is correctly converted and correct value is used", () => {
+			let expectedCordovaPluginVariables = { 'com.telerik.fakeDropBox2': { "APP.KEY.VAR.DATA": '1', "APP.KEY.SAME.MSG": '2' } };
+			options.var = {
+				APP: {
+					KEY: {
+						VAR: {DATA: "1"},
+						SAME: {MSG: "2"}
+					}
+				}
+			};
+
+			service.addPlugin("com.telerik.fakeDropBox2").wait();
+			
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
+			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
 		});
 	});
 });
