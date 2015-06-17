@@ -742,3 +742,14 @@ interface IWebView {
 	pluginIdentifier?: string;
 	default?: boolean;
 }
+
+/**
+ * Service for interaction with the simulator
+ */
+interface ISimulatorService {
+	/**
+	 * Used to start simulator
+	 * @return {IFuture<void>}
+	 */
+	launchSimulator(): IFuture<void>;
+}
