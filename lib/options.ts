@@ -36,7 +36,8 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			group: { type: OptionType.Array },
 			default: {type: OptionType.Boolean},
 			var: {type: OptionType.Object},
-			answers: { type: OptionType.String }
+			answers: { type: OptionType.String },
+			simulator: { type: OptionType.Boolean, default: true}
 		},
 		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
 			$errors, $staticConfig);

@@ -690,6 +690,7 @@ interface IOptions extends ICommonOptions {
 	default: boolean;
 	var: Object;
 	answers: string;
+	simulator: boolean;
 }
 
 /**

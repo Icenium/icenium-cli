@@ -11,7 +11,7 @@ Create with Screen Builder | `$ appbuilder create screenbuilder <App Name>` OR `
 Creates a project for hybrid, native or mobile website development. If `screenbuilder` and `<Type>` are not specified, creates a new project for hybrid development with Screen Builder.
 
 ### Attributes
-* `screenbuilder` - Creates a new project for hybrid development with Screen Builder. You can later run the Screen Builder commands for project development on this project.
+* `screenbuilder` - Creates a new project for hybrid development with Screen Builder and launches the device simulator afterwards. You can later run the Screen Builder commands for project development on this project.
 * `<Type>` extends the `create` command. You can set the following values for this attribute. 
 	* `hybrid` - Creates a new project from an **Apache Cordova** template.
 	* `native` - Creates a new project from a **NativeScript** template.

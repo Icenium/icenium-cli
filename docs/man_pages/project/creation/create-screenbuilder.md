@@ -3,13 +3,14 @@ create screenbuilder
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder create screenbuilder <App name> [--path <Directory>] [--appid <App ID>]`
+General | `$ appbuilder create screenbuilder <App name> [--path <Directory>] [--appid <App ID>] [--no-simulator]`
 
 Creates a new project for hybrid development with Screen Builder. <% if(isHtml) { %>Screen Builder lets you create a new project customized with navigation, home view and user interface skin. Later you can run the Screen Builder commands on this project to further customize it by adding application views, connecting to data sources, creating user registration and sign-in and adding forms, lists and fields.<% } %> 
 
 ### Options
 * `--path` - Specifies the directory where you want to create the project, if different from the current directory. The directory must be empty.
 * `--appid` - Sets the application identifier for your app. If not specified, the application identifier is set to `com.telerik.<App name>`. 
+* `--no-simulator` - If set, the Telerik AppBuilder CLI does not launch he device simulator after the project is created successfully. 
 
 ### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
