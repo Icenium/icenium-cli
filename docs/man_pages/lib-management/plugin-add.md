@@ -1,17 +1,22 @@
 plugin add
 ==========
 
-Usage | Synopsis
-------|-------
-List plugins | `$ appbuilder plugin add --available [--debug] [--release]`
-Add plugins | `$ appbuilder plugin add <Name or ID> [--debug] [--release]`
-Add a specific version of a plugin | `$ appbuilder plugin add <Name or ID>@<Version> [--debug] [--release]`
-Add latest version of a plugin | `$ appbuilder plugin add <Name or ID> --latest [--debug] [--release]`
-Add default version of a plugin | `$ appbuilder plugin add <Name or ID> --default [--debug] [--release]`
-Add plugin and specify plugin variables | `$ appbuilder plugin add <Name or ID> [--var.<variable_id> <variable value> [--var.<variable_id> <variable value>]*>]`
-Add plugin and specify plugin variables per configuration | `$ appbuilder plugin add <Name or ID> [--var.<configuration>.<variable_id> <variable value> [--var.<configuration>.<variable_id> <variable value>]*>]`
+Usage | Synopsis 
+------|---------
+List plugins | `$ appbuilder plugin add --available [--debug] [--release]` 
+Add a plugin | `$ appbuilder plugin add <Name or ID> [--debug] [--release]` 
+Add a specific version of a plugin | `$ appbuilder plugin add <Name or ID>@<Version> [--debug] [--release] [--var.<Variable ID> <Variable Value>]`[\*\*](#note)
+Add the latest version of a plugin | `$ appbuilder plugin add <Name or ID> --latest [--debug] [--release] [--var.<Variable ID> <Variable Value>]`[\*\*](#note)
+Add the default version of a plugin | `$ appbuilder plugin add <Name or ID> --default [--debug] [--release] [--var.<Variable ID> <Variable Value>]`[\*\*](#note)
+Add a plugin and set all variables from the command line | `$ appbuilder plugin add <Name or ID> --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>`[\*\*](#note)
+Add a specific version of a plugin and set all variables from the command line | `$ appbuilder plugin add <Name or ID>@<Version> --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>`[\*\*](#note)
+Add the latest version of a plugin and set all variables from the command line | `$ appbuilder plugin add <Name or ID> --latest --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>`[\*\*](#note)
+Add the default version of a plugin and set all variables from the command line | `$ appbuilder plugin add <Name or ID> --default --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>`[\*\*](#note)
 
-Enables a core, integrated or verified plugin for your project. <% if(isHtml) { %>If the plugin has plugin variables, the Telerik AppBuilder CLI shows an interactive prompt to let you set values for each plugin variable.<% } %>
+<% if(isHtml) { %><a id="note"></a><% } %>
+\*\* If the plugin has multiple variables, you can set `--var` for each variable.
+
+Enables a core, integrated or verified plugin for your project. <% if(isHtml) { %>If the plugin has plugin variables and you have not set one or more of them with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
 <% if(isConsole) { %>
 <% if(isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin add`
@@ -27,15 +32,14 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `--release` - Enables the specified plugin for the Release build configuration only. If `--available` is set, lists all plugins that you can enable for the Release build configuration.
 * `--latest` - Enables the latest version of the specified plugin.
 * `--default` - Enables the default version of the specified plugin.
-* `--var` - Sets the value for specified plugin variable. The following rules are applied when parsing the `--var` option:
-	* `--var.<variableName> <value>` - sets variable `<variableName>` to `<value>` in all configurations.
-	* `--var.<configuration>.<variableName> <value>` - sets variable `<variableName>` to `<value>` for specified configuration.
-	* `--var.<configuration>.<variableName> <configValue> --var.<variableName> <value>` - sets variable `<variableName>` to `<configValue>` for specified configuration and to `<value>` for all other configurations.
-	* If plugin requires two plugin variables, but you pass only one with `--var` option, you will be prompted to select value for the other one.
+* `--var.<Variable ID>` - Sets the value for the specified plugin variable in all configurations. If `--debug` or `--release` is specified, sets the variable for the respective configuration only.
+* `--var.debug.<Variable ID>` - Sets the value for the specified plugin variable for the Debug configuration only.
+* `--var.release.<Variable ID>` - Sets the value for the specified plugin variable for the Release configuration only.
 
 ### Attributes
 * `<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin add --available`
-* `<Version>` is the version of the plugin as listed by `$ appbuilder plugin add --available` 
+* `<Version>` is the version of the plugin as listed by `$ appbuilder plugin add --available`
+* `<Variable ID>` is the plugin variable as listed in the `plugin.xml` of the plugin. 
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations

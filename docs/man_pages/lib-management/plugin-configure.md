@@ -3,11 +3,14 @@ plugin configure
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder plugin configure <Name or ID> [--debug] [--release]`
-Specify plugin variables | `$ appbuilder plugin configure <Name or ID> [--var.<variable_id> <variable value> [--var.<variable_id> <variable value>]*>]`
-Specify plugin variables per configuration | `$ appbuilder plugin configure <Name or ID> [--var.<configuration>.<variable_id> <variable value> [--var.<configuration>.<variable_id> <variable value>]*>]`
+Call the interactive prompt to set plugin variables | `$ appbuilder plugin configure <Name or ID> [--debug] [--release]`
+Set one value for all applicable configurations | `$ appbuilder plugin configure <Name or ID> [--debug] [--release] --var.<Variable ID> <Variable Value>`[\*\*](#note)
+Set different values for all configurations | `$ appbuilder plugin configure <Name or ID> --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>]*>]`[\*\*](#note)
 
-Configures plugin variables for the selected core, integrated or verified plugin.
+<% if(isHtml) { %><a id="note"></a><% } %>
+\*\* If the plugin has multiple variables, you can set `--var` for each variable.
+
+Configures plugin variables for the selected core, integrated or verified plugin.<% if(isHtml) { %>If you have not set one or more of the plugin variables with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
 <% if(isConsole) { %>
 <% if(isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin configure`
@@ -18,16 +21,15 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Options
-* `--debug` - Sets the plugin variable for the Debug build configuration only. 
-* `--release` - Sets the plugin variable for the Release build configuration only.
-* `--var` - Sets the value for specified plugin variable. The following rules are applied when parsing the `--var` option:
-	* `--var.<variableName> <value>` - sets variable `<variableName>` to `<value>` in all configurations.
-	* `--var.<configuration>.<variableName> <value>` - sets variable `<variableName>` to `<value>` for specified configuration.
-	* `--var.<configuration>.<variableName> <configValue> --var.<variableName> <value>` - sets variable `<variableName>` to `<configValue>` for specified configuration and to `<value>` for all other configurations.
-	* If plugin requires two plugin variables, but you pass only one with `--var` option, you will be prompted to select value for the other one.
+* `--debug` - Sets the plugin variable for the Debug build configuration only. The plugin must be enabled for the specified configuration.
+* `--release` - Sets the plugin variable for the Release build configuration only. The plugin must be enabled for the specified configuration.
+* `--var.<Variable ID>` - Sets the value for the specified plugin variable in all configurations. If `--debug` or `--release` is specified, sets the variable for the respective configuration only, if the plugin is already enabled for this configuration.
+* `--var.debug.<Variable ID>` - Sets the value for the specified plugin variable for the Debug configuration only. The plugin must be enabled for the specified configuration.
+* `--var.release.<Variable ID>` - Sets the value for the specified plugin variable for the Release configuration only. The plugin must be enabled for the specified configuration.
 
 ### Attributes
 * `<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
+* `<Variable ID>` is the plugin variable as listed in the `plugin.xml` of the plugin.
 
 <% } %>
 <% if(isHtml) { %> 
