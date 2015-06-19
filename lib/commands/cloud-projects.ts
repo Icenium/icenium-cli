@@ -6,18 +6,17 @@ import path = require("path");
 import helpers = require("../helpers");
 import unzip = require("unzip");
 import temp = require("temp");
+import commonHelpers = require("../common/helpers");
 
-class ProjectIdCommandParameter implements ICommandParameter {
+class SolutionIdCommandParameter implements ICommandParameter {
 	constructor(private $remoteProjectService: IRemoteProjectService) { }
-	mandatory = true;
+	mandatory = false;
 
 	validate(validationValue?: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				let realProjectName = this.$remoteProjectService.getProjectName(validationValue.toString()).wait();
-				if(realProjectName) {
-					return true;
-				}
+				this.$remoteProjectService.getSolutionName(validationValue).wait();
+				return true;
 			}
 
 			return false;
@@ -27,21 +26,33 @@ class ProjectIdCommandParameter implements ICommandParameter {
 
 export class CloudListProjectsCommand implements ICommand {
 	constructor(private $logger: ILogger,
-		private $remoteProjectService: IRemoteProjectService) { }
+		private $remoteProjectService: IRemoteProjectService,
+		private $prompter: IPrompter,
+		private $errors: IErrors) { }
 
-	allowedParameters: ICommandParameter[] = [];
+	allowedParameters: ICommandParameter[] = [new SolutionIdCommandParameter(this.$remoteProjectService)];
 
-	private printProjects(projects: any) {
-		this.$logger.out("Projects:");
-		projects.forEach((project: any, index: number) => {
-			this.$logger.out("%s: '%s'", (index + 1).toString(), project.name);
-		});
+	private printList(solutionName: string, list: Server.IWorkspaceItemData[]): void {
+		let headers =  ["#", "Project Name"];
+		let data = list.map((proj: Server.IWorkspaceItemData, index: number) => [(++index).toString(), proj.Name]);
+		let table = commonHelpers.createTable(headers, data);
+		this.$logger.out(`Projects for ${solutionName} solution:`);
+		this.$logger.out(table.toString());
 	}
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let data = this.$remoteProjectService.getProjects().wait();
-			this.printProjects(data);
+			let projects: Server.IWorkspaceItemData[];
+			
+			let slnName: string;
+			if(args[0]) {
+				slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
+			} else {
+				let solutions = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
+				slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", solutions).wait();
+			}
+			projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait();
+			this.printList(slnName, projects);
 		}).future<void>()();
 	}
 }
@@ -54,18 +65,42 @@ export class CloudExportProjectsCommand implements ICommand {
 		private $project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
 		private $remoteProjectService: IRemoteProjectService,
-		private $server: Server.IServer) { }
+		private $server: Server.IServer,
+		private $prompter: IPrompter,
+		private $userDataStore: IUserDataStore) { }
 
-	allowedParameters: ICommandParameter[] = [new ProjectIdCommandParameter(this.$remoteProjectService)];
+	allowedParameters: ICommandParameter[] = [];
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let name = this.$remoteProjectService.getProjectName(args[0]).wait();
-			this.doExportRemoteProject(name).wait();
+			let projectName: string;
+			let slnName: string;
+			if(args[0]) {
+				slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
+			} else {
+				let solutions = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
+				slnName = this.$prompter.promptForChoice("Select solution for which to list projects:",solutions).wait();
+			}
+			
+			if(args[1]) {
+				projectName = this.$remoteProjectService.getProjectName(slnName, args[1]).wait();
+			} else {
+				let projectNames = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(sln => sln.Name);
+				if(projectNames.length === 1) {
+					projectName = projectNames[0];
+				} else if (projectNames.length > 1) {
+					projectName = this.$prompter.promptForChoice("Select project which you want to export:", projectNames).wait();
+				} else {
+					this.$logger.warn(`Solution ${slnName} does not have any projects.`);
+					return;
+				}
+			}
+
+			this.doExportRemoteProject(slnName, projectName).wait();
 		}).future<void>()();
 	}
 
-	private doExportRemoteProject(remoteProjectName: string): IFuture<void> {
+	private doExportRemoteProject(remoteSolutionName: string, remoteProjectName: string): IFuture<void> {
 		return (() => {
 			let projectDir = path.join(this.$project.getNewProjectDir(), remoteProjectName);
 			if(this.$fs.exists(projectDir).wait()) {
@@ -78,14 +113,16 @@ export class CloudExportProjectsCommand implements ICommand {
 			temp.track();
 			let projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
 			let unzipStream = this.$fs.createWriteStream(projectZipFilePath);
-			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.getExportedSolution(remoteProjectName, false, unzipStream)).wait();
+			let user = this.$userDataStore.getUser().wait();
+			let tenantId = user.tenant.id;
+			this.$remoteProjectService.makeTapServiceCall(() => this.$server.projects.exportProject(tenantId, remoteSolutionName, remoteProjectName, false, unzipStream)).wait();
 			this.$fs.unzip(projectZipFilePath, projectDir).wait();
 
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
 				let projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile).wait()) {
-					let properties = this.$remoteProjectService.getProjectProperties(remoteProjectName).wait();
+					let properties = this.$remoteProjectService.getProjectProperties(remoteSolutionName, remoteProjectName).wait();
 					this.$project.createProjectFile(projectDir, properties).wait();
 				}
 			}
@@ -95,6 +132,23 @@ export class CloudExportProjectsCommand implements ICommand {
 
 			this.$logger.info("%s has been successfully exported to %s", remoteProjectName, projectDir);
 		}).future<void>()();
+	}
+
+	canExecute(args: string[]): IFuture<boolean> {
+		return ((): boolean => {
+			if(args.length) {
+				if(args.length > 2) {
+					this.$errors.fail("This command accepts maximum two parameters - solution name and project name.");
+				}
+
+				let slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
+				if(args[1]){
+					this.$remoteProjectService.getProjectName(slnName, args[1]).wait();
+				}
+			}
+
+			return true;
+		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("cloud|export", CloudExportProjectsCommand);

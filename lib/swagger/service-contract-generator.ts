@@ -164,7 +164,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		let enumBlock: Swagger.IBlock;
 		let typeName = this.tsTypeSystemHelpers.translate(allowableValues.valueType);
 		if (!this.pendingModels[typeName]) {
-			enumBlock = new codeEntityLib.Block(util.format("enum %s", typeName));
+			enumBlock = new codeEntityLib.Block(util.format("const enum %s", typeName));
 			_.each(allowableValues.values, (value: string) => enumBlock.writeLine(util.format("%s,", value)));
 		}
 		this.pendingModels[typeName] = enumBlock;

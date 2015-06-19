@@ -310,6 +310,7 @@ declare module Server{
 		Category: string;
 		Group: string;
 		Identifier: string;
+		Icon: string;
 		DownloadUri: string;
 		DefaultName: string;
 		ShortDescription: string;
@@ -322,6 +323,7 @@ declare module Server{
 		Category: string;
 		Group: string;
 		Identifier: string;
+		Icon: string;
 		DownloadUri: string;
 		DefaultName: string;
 		ShortDescription: string;
@@ -353,7 +355,7 @@ declare module Server{
 		getProjectTemplates(): IFuture<Server.ProjectTemplateData[]>;
 		getItemTemplates(): IFuture<Server.ItemTemplateData[]>;
 		exportSolution(solutionSpaceName: string, solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
-		getExportedSolution(solutionName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
+		exportProject(solutionSpaceName: string, solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
 		importPackage(solutionName: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>;
 		importProject(solutionName: string, projectName: string, package_: any): IFuture<void>;
 		importLocalProject(solutionName: string, projectName: string, bucketKey: string): IFuture<void>;
