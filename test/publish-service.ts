@@ -24,6 +24,7 @@ function createTestInjector(publishConnections: IPublishConnection[]): IInjector
 	testInjector.register("project", {});
 	testInjector.register("projectConstants", {});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
+	let yargs = require("yargs");
 	testInjector.register("options", optionsLib.Options);
 
 	// Register mocked dependencies
@@ -120,13 +121,12 @@ describe("publish-service", () => {
 			
 			let expected: Server.FtpConnectionData = {
 				RemoteUrl: remotePublishUrl,
-				ShouldPurge: undefined,
+				ShouldPurge: false,
 				Username: 'username',
 				Password: 'password' 
 			}
 
 			service.publish('1', 'username', 'password').wait();
-
 			assert.deepEqual(serverFtpConnectionData, expected, 'Incorrect data to server provided');
 		});
 
@@ -152,7 +152,7 @@ describe("publish-service", () => {
 			
 			let expected: Server.FtpConnectionData = {
 				RemoteUrl: '127.0.0.1',
-				ShouldPurge: undefined,
+				ShouldPurge: false,
 				Username: 'username',
 				Password: 'password' 
 			}
