@@ -164,7 +164,7 @@ function getProjectFileName(configuration: string) {
 function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
 	let projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
-	let options = testInjector.resolve(optionsLib.Options);
+	let options = testInjector.resolve("options");
 	let project = testInjector.resolve("project");
 	let fs = testInjector.resolve("fs");
 

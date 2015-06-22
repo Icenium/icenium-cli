@@ -277,7 +277,7 @@ interface IServerConfiguration {
 }
 
 interface IExtensionPlatformServices {
-	getPackageName() : string;
+	packageName : string;
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
 	canRunApplication(): IFuture<boolean>;
@@ -690,6 +690,7 @@ interface IOptions extends ICommonOptions {
 	default: boolean;
 	var: Object;
 	answers: string;
+	simulator: boolean;
 }
 
 /**
@@ -741,4 +742,15 @@ interface IWebView {
 	minSupportedVersion: string;	
 	pluginIdentifier?: string;
 	default?: boolean;
+}
+
+/**
+ * Service for interaction with the simulator
+ */
+interface ISimulatorService {
+	/**
+	 * Used to start simulator
+	 * @return {IFuture<void>}
+	 */
+	launchSimulator(): IFuture<void>;
 }

@@ -168,7 +168,7 @@ export class Project implements Project.IProject {
 
 	public getProjectDir(): IFuture<string> {
 		return (() => {
-			if(this.cachedProjectDir !== "") {
+			if(this.cachedProjectDir) {
 				return this.cachedProjectDir;
 			}
 			this.cachedProjectDir = null;
