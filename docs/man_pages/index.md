@@ -11,8 +11,10 @@ Command | Description
 [login](general/login.html) | Logs you in the Telerik Platform.
 [logout](general/logout.html) | Logs you out from the Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
-[feature-usage-tracking](general/feature-usage-tracking.html) | Configures anonymous feature usage tracking.
+[usage-reporting](general/usage-reporting.html) | Configures anonymous usage reporting.
+[error-reporting](general/error-reporting.html) | Configures anonymous error reporting.
 [autocomplete](general/autocomplete.html) | Manages your command-line completion settings.
+[doctor](general/doctor.html) | Checks your system for configuration problems which might prevent the Telerik AppBuilder CLI from working properly.
 
 ## Project Development Commands
 Command | Description

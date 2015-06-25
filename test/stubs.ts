@@ -378,6 +378,7 @@ export class StaticConfig implements IStaticConfig {
 	public CLIENT_NAME = "appbuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
+	public ERROR_REPORT_SETTING_NAME = "AnaliticsSettings.TrackExceptions";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
 	public SYS_REQUIREMENTS_LINK = "";

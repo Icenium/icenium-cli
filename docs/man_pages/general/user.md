@@ -12,7 +12,8 @@ Prints information about the currently logged in user, including name, email add
 
 Command | Description
 ----------|----------
-[feature-usage-tracking](feature-usage-tracking.html) | Configures anonymous usage statistics tracking for the Telerik AppBuilder command-line interface.
+[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the Telerik AppBuilder CLI.
+[error-reporting](error-reporting.html) | Configures anonymous error reporting for the Telerik AppBuilder CLI.
 [login](login.html) | Opens a new browser window in which you can provide your login credentials for the Telerik Platform.
 [logout](logout.html) | Logs you out from the Telerik Platform.
 <% } %>
