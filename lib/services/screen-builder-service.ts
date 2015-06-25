@@ -92,7 +92,11 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		let type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 		type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
 
-		scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
+		if (type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE || screenBuilderOptions.answers) {
+				scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
+		} else {
+				scaffolder.promptGenerate(type, scaffolderData.callback);
+		}
 
 		return scaffolderData.future;
 	}
