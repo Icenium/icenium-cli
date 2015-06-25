@@ -568,7 +568,7 @@ describe("plugins-service", () => {
 				configurations: configs,
 				Version: version
 			};
-		}
+		};
 
 		describe("modifies marketplace plugin version in both configurations when different versions are used",() => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
@@ -923,6 +923,7 @@ describe("plugins-service", () => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
 						service = testInjector.resolve(pluginsService.PluginsService);
+						options = testInjector.resolve("options");
 					});
 					
 					it("when user wants to update same configuration only", ()=> {
@@ -1017,7 +1018,7 @@ describe("plugins-service", () => {
 			let testInjector: IInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 			testInjector.register("prompter", new PrompterStub(2));
 			service = testInjector.resolve(pluginsService.PluginsService);
-
+			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
 			assert.throws(() => service.addPlugin(`Toast@${versionToSet}`).wait());

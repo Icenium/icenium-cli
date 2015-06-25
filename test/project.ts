@@ -225,13 +225,6 @@ describe("project integration tests", () => {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
-
-		it("with long name should throw ", () => {
-			project = testInjector.resolve(projectlib.Project);
-			let projectName = "Thirtyone character long string";
-
-			assert.throws(() => project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait());
-		});
 	});
 
 	describe("updateProjectPropertiesAndSave",() => {
@@ -240,7 +233,7 @@ describe("project integration tests", () => {
 			prompter = testInjector.resolve("prompter");
 			prompter.confirmResult = true;
 			let tempFolder = temp.mkdirSync("template");
-
+			options = testInjector.resolve("options");
 			options.path = tempFolder;
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
@@ -315,9 +308,11 @@ describe("project integration tests", () => {
 		let mobileHelper: Mobile.IMobileHelper;
 		beforeEach(() => {
 			tempFolder = temp.mkdirSync("template");
+			options = testInjector.resolve("options");
 			options.path = tempFolder;
 			options.appid = "com.telerik.Test";
 			mobileHelper = testInjector.resolve("mobileHelper");
+			project = testInjector.resolve("project");
 		});
 
 		describe("NativeScript project", () => {
