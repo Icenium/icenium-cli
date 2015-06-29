@@ -39,12 +39,13 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
 
 				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath, projectName).wait();
-				if (this.$options.simulator) {
-					this.$simulatorService.launchSimulator().wait();
-				}
 			} catch(err) {
 				this.$fs.deleteDirectory(projectPath).wait();
 				throw err;
+			}
+			
+			if (this.$options.simulator) {
+				this.$simulatorService.launchSimulator().wait();
 			}
 		}).future<void>()();
 	}
