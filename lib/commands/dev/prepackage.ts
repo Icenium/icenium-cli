@@ -2,6 +2,7 @@
 "use strict";
 
 import Future = require("fibers/future");
+import path = require("path");
 
 export class PrePackageCommand implements ICommand {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
@@ -10,7 +11,8 @@ export class PrePackageCommand implements ICommand {
 		private $resourceDownloader: IResourceDownloader,
 		private $serviceProxy: Server.IServiceProxy,
 		private $templatesService: ITemplatesService,
-		private $nativeScriptMigrationService: IFrameworkMigrationService) { }
+		private $nativeScriptMigrationService: IFrameworkMigrationService,
+		private $fs: IFileSystem) { }
 
 	public disableAnalytics = true;
 
@@ -35,6 +37,11 @@ export class PrePackageCommand implements ICommand {
 			this.$nativeScriptMigrationService.downloadMigrationData().wait();
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();
+
+			let testCoverageResultsDir = path.join(__dirname, "../../../coverage");
+			this.$logger.trace(`Removing test coverage results directory: '${testCoverageResultsDir}'.`);
+			this.$fs.deleteDirectory(testCoverageResultsDir).wait();
+
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();
 	}
