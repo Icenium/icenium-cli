@@ -3,10 +3,19 @@ add-view
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder add-view`
+General | `$ appbuilder add-view` [--answers <File Path>]
 
 Adds a new application view to your project. You can later add lists and forms to the view with the respective Screen Builder commands.<% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
 <% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %> 
+
+### Options
+
+* `--answers` - If set, the Telerik AppBuilder CLI looks for the specified `JSON` file and tries to pull the configuration data required by the command. If one or more required properties are not specified, the Telerik AppBuilder CLI will prompt you to provide the missing values.
+
+### Attributes
+
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-view).
+
 <% if(isHtml) { %>
 ### Command Limitations 
 

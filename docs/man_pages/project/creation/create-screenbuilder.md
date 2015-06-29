@@ -3,18 +3,20 @@ create screenbuilder
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder create screenbuilder <App name> [--path <Directory>] [--appid <App ID>] [--no-simulator]`
+General | `$ appbuilder create screenbuilder <App name> [--answers <File Path>] [--path <Directory>] [--appid <App ID>] [--no-simulator]`
 
 Creates a new project for hybrid development with Screen Builder. <% if(isHtml) { %>Screen Builder lets you create a new project customized with navigation, home view and user interface skin. Later you can run the Screen Builder commands on this project to further customize it by adding application views, connecting to data sources, creating user registration and sign-in and adding forms, lists and fields.<% } %> 
 
 ### Options
 * `--path` - Specifies the directory where you want to create the project, if different from the current directory. The directory must be empty.
 * `--appid` - Sets the application identifier for your app. If not specified, the application identifier is set to `com.telerik.<App name>`. 
-* `--no-simulator` - If set, the Telerik AppBuilder CLI does not launch he device simulator after the project is created successfully. 
+* `--no-simulator` - If set, the Telerik AppBuilder CLI does not launch the device simulator after the project is created successfully. 
+* `--answers` - If set, the Telerik AppBuilder CLI looks for the specified `JSON` file and tries to pull the configuration data required by the command. If one or more required properties are not specified, the Telerik AppBuilder CLI will prompt you to provide the missing values.
 
 ### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 * `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#the-create-commands).
 
 <% if(isHtml) { %> 
 ### Related Commands
