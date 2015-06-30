@@ -16,7 +16,7 @@ Creates a new project for hybrid development with Screen Builder. <% if(isHtml) 
 ### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
 * `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#the-create-commands).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#create).
 
 <% if(isHtml) { %> 
 ### Related Commands
