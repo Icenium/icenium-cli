@@ -19,6 +19,7 @@ export class EmulateAndroidCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureAllPlatformAssets().wait();
 			this.$androidEmulatorServices.checkDependencies().wait();
 			this.$androidEmulatorServices.checkAvailability().wait();
 
@@ -33,6 +34,13 @@ export class EmulateAndroidCommand implements ICommand {
 
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
 		}).future<void>()();
+	}
+	
+	public canExecute(args: string[]): IFuture<boolean> {
+		return ((): boolean => {
+			this.$project.ensureProject();
+			return true;
+		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
@@ -51,6 +59,7 @@ export class EmulateIosCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureAllPlatformAssets().wait();
 			this.$iOSEmulatorServices.checkDependencies().wait();
 			this.$iOSEmulatorServices.checkAvailability().wait();
 			let app = "";
@@ -72,6 +81,13 @@ export class EmulateIosCommand implements ICommand {
 
 		}).future<void>()();
 	}
+
+	public canExecute(args: string[]): IFuture<boolean> {
+		return ((): boolean => {
+			this.$project.ensureProject();
+			return true;
+		}).future<boolean>()();
+	}
 }
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
 
@@ -87,6 +103,7 @@ export class EmulateWp8Command implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
+			this.$project.ensureAllPlatformAssets().wait();
 			this.$wp8EmulatorServices.checkDependencies().wait();
 			this.$wp8EmulatorServices.checkAvailability().wait();
 
@@ -102,6 +119,13 @@ export class EmulateWp8Command implements ICommand {
 
 			this.$wp8EmulatorServices.startEmulator(packageFilePath).wait();
 		}).future<void>()();
+	}
+
+	public canExecute(args: string[]): IFuture<boolean> {
+		return ((): boolean => {
+			this.$project.ensureProject();
+			return true;
+		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("emulate|wp8", EmulateWp8Command);
