@@ -112,5 +112,9 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public get HTML_CLI_HELPERS_DIR(): string {
 		return path.join(__dirname, "../docs/helpers");
 	}
+	
+	public get pathToPackageJson(): string {
+		return path.join(__dirname, "..", "package.json");
+	}
 }
 $injector.register("staticConfig", StaticConfig);

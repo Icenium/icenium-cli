@@ -11,6 +11,15 @@ function shallowCopy(obj) {
 	return result;
 }
 
+function getBuildVersion(version) {
+	var buildVersion = version !== undefined ? version : process.env["BUILD_NUMBER"];
+	if (process.env["BUILD_CAUSE_GHPRBCAUSE"]) {
+		buildVersion = "PR" + buildVersion;
+	}
+	
+	return buildVersion;
+}
+
 module.exports = function(grunt) {
 
 	// Windows cmd does not accept paths with / and unix shell does not accept paths with \\ and we need to execute from a sub-dir.
@@ -126,17 +135,20 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-ts");
 
 	grunt.registerTask("set_package_version", function(version) {
-		var fs = require("fs");
-		var buildVersion = version !== undefined ? version : process.env["BUILD_NUMBER"];
-		if (process.env["BUILD_CAUSE_GHPRBCAUSE"]) {
-			buildVersion = "PR" + buildVersion;
-		}
-
+		var buildVersion = getBuildVersion(version);
 		var packageJson = grunt.file.readJSON("package.json");
-		var versionParts = packageJson.version.split("-");
-		versionParts[1] = buildVersion;
-		packageJson.version = versionParts.join("-");
+		packageJson.buildVersion = buildVersion;
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
+	});
+	
+	grunt.registerTask("setPackageName", function (version) {
+		var fs = require("fs");
+		var fileExtension = ".tgz";
+		var buildVersion = getBuildVersion(version);
+		var packageJson = grunt.file.readJSON("package.json");
+		var oldFileName = packageJson.name + "-" + packageJson.version;
+		var newFileName = oldFileName + "-" + buildVersion;
+		fs.renameSync(oldFileName + fileExtension, newFileName + fileExtension);
 	});
 
 	grunt.registerTask("test", ["ts:devall", "shell:ci_unit_tests"]);
@@ -149,7 +161,8 @@ module.exports = function(grunt) {
 		"shell:ci_unit_tests",
 
 		"set_package_version",
-		"shell:build_package"
+		"shell:build_package",
+		"setPackageName"
 	]);
 
 	grunt.registerTask("default", "ts:devlib");
