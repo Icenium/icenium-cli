@@ -407,7 +407,11 @@ export class StaticConfig implements IStaticConfig {
 	public get GITHUB_ACCESS_TOKEN_FILEPATH(): string {
 		let tokenFileName = ".abgithub";
 		return tokenFileName;
-	} 
+	}
+	
+	public get pathToPackageJson(): string {
+		return path.join(__dirname, "..", "package.json");
+	}
 }
 
 export class HooksService implements IHooksService {
