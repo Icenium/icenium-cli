@@ -37,7 +37,7 @@ testInjector.register("projectPropertiesService", {});
 testInjector.register("prompter", {
 	promptForChoice: (promptMessage: string, choices: any[]) => { return (() => { return choices[0] }).future<string>()() }
 });
-testInjector.register("resources", {});
+testInjector.register("resources", {resolvePath: (x: string) => ""});
 testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() }});
 testInjector.register("webViewService", {});
 testInjector.register("serverConfiguration", {});
@@ -129,6 +129,36 @@ describe("cordova-migration-service", () => {
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
 			assert.deepEqual(service.migratePlugins(["org.apache.cordova.media"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.AudioHandler"]);
+		});
+
+		it("Adds default enabled plugin", () => {
+			registerMockedFS({
+				renamedPlugins: [],
+				defaultEnabledPluginsIncludeRegex: "(cordova-plugin-whitelist)",
+				defaultEnabledPluginsExcludeRegex: "^$",
+
+				integratedPlugins: {
+					"4.0.0": ["cordova-plugin-whitelist"],
+				}
+			});
+
+			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+			assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0").wait(), ["cordova-plugin-whitelist"]);
+		});
+
+		it("Adds default enabled plugin and respects exclusions", () => {
+			registerMockedFS({
+				renamedPlugins: [],
+				defaultEnabledPluginsIncludeRegex: "(cordova-plugin-whitelist)|(cordova-plugin-bla)",
+				defaultEnabledPluginsExcludeRegex: ".*bla",
+
+				integratedPlugins: {
+					"4.0.0": ["cordova-plugin-whitelist", "cordova-plugin-bla"],
+				}
+			});
+
+			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
+			assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0").wait(), ["cordova-plugin-whitelist"]);
 		});
 
 		it("Return renamed plugin if a rename matches and new plugin is marketplace", () => {
