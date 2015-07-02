@@ -30,6 +30,7 @@ declare module Swagger {
 	}
 
 	interface ICodeEntity {
+		opener?: string;
 		codeEntityType: any;
 	}
 

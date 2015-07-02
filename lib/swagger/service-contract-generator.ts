@@ -19,6 +19,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 	constructor(private $serviceContractProvider: Server.IServiceContractProvider) {
 		this.tsTypeSystemHelpers = new TSTypeSystemHelpersLib.TSTypeSystemHelpers();
+		this.pendingModels = {};
 	}
 
 	public generate(): IFuture<Server.IServiceContractClientCode> {
@@ -51,7 +52,6 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			serverClass.writeLine("constructor(private $injector: IInjector){ }");
 
 			_.each(swagger.apis, (apiPath: Swagger.ISwaggerApi) => {
-				this.pendingModels = {};
 				let swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
 
 				let models: Swagger.IBlock[] = this.generateModels(swaggerService.models);
@@ -61,7 +61,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 				_.each(_.keys(this.pendingModels), (modelName: string) => {
 					let model = this.pendingModels[modelName];
-					if(model) {
+					let modelBlockAdded = _.any(serverModuleDeclaration.codeEntities, ce => ce.opener === model.opener);
+					if(model && !modelBlockAdded) {
 						serverModuleDeclaration.addBlock(model);
 					}
 				});
@@ -161,13 +162,12 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 	}
 
 	private ensureEnumAdded(allowableValues: Swagger.IModelPropertyValue) {
-		let enumBlock: Swagger.IBlock;
 		let typeName = this.tsTypeSystemHelpers.translate(allowableValues.valueType);
 		if (!this.pendingModels[typeName]) {
-			enumBlock = new codeEntityLib.Block(util.format("const enum %s", typeName));
+			let enumBlock = new codeEntityLib.Block(util.format("const enum %s", typeName));
 			_.each(allowableValues.values, (value: string) => enumBlock.writeLine(util.format("%s,", value)));
+			this.pendingModels[typeName] = enumBlock;
 		}
-		this.pendingModels[typeName] = enumBlock;
 	}
 
 
