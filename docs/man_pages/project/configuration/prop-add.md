@@ -19,7 +19,7 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% } %>
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
-* `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --validValue`. You can separate multiple values with a space.
+* `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --valid-value`. You can separate multiple values with a space.
 <% } %> 
 <% if(isHtml) { %>
 ### Command Limitations
