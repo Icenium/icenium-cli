@@ -14,6 +14,7 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 	* [Install the Telerik AppBuilder CLI](#install-the-telerik-appbuilder-cli)
 	* [Configure Proxy Usage](#configure-proxy-usage)
 * [Quick Start](#quick-start "Get started with the Telerik AppBuilder CLI")
+* [Troubleshooting](#troubleshooting "Troubleshooting")
 * [Features](#features "What are the features of the Telerik AppBuilder CLI")
 * [How to Contribute](#contribution "How to contribute to the Telerik AppBuilder CLI")
 * [More Telerik AppBuilder Tools and Resources](#more-telerik-appbuilder-tools-and-resources "Get the other Telerik AppBuilder clients and tools")
@@ -139,6 +140,12 @@ OS | Node.js installed from http://nodejs.org/ | Node.js installed via package m
 Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
 OS X | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
 Linux | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
+
+To check if your system is configured properly, run the following command.
+
+```bash
+$ appbuilder doctor
+```
 
 [Back to Top][1]
 
@@ -320,6 +327,21 @@ To learn more about a command, run the command with the `--help` option. For exa
 ```bash
 $ appbuilder create --help
 ```
+
+[Back to Top][1]
+
+Troubleshooting
+===
+
+If the AppBuilder CLI does not behave as expected, you might be facing a configuration issue. For example, a missing `JAVA` path. To check if your system is configured properly for the AppBuilder CLI, run the following command.
+
+```bash
+$ appbuilder doctor
+```
+
+This command prints warnings about current configuration issues and provides basic information about how to resolve them.
+
+If addressing the configuration issues does not resolve your problem, you can [report an issue](CONTRIBUTING.md#report-an-issue), [post in the forums](http://www.telerik.com/forums/appbuilder) or [request assistance](http://www.telerik.com/account/support-tickets/my-support-tickets.aspx) from the Telerik support team.
 
 [Back to Top][1]
 
