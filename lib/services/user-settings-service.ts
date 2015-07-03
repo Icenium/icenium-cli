@@ -116,8 +116,11 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 				return null;
 			}
 
-			return data.$t || data;
+			if (data && data.$t) {
+				return data.$t;
+			}
 
+			return data;
 		}).future<T>()();
 	}
 

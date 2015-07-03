@@ -80,7 +80,7 @@ $injector.require("nativeScriptSimulatorService", "./services/project-simulator-
 $injector.require("mobileWebsiteSimulatorService", "./services/project-simulator-service");
 
 $injector.require("simulatorPlatformServices", "./services/simulatorPlatformServices");
-$injector.require("simulatorService", "./services/simulatorService");
+$injector.require("simulatorService", "./services/simulator-service");
 
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");

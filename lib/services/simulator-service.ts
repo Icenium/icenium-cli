@@ -27,7 +27,6 @@ export class SimulatorService implements ISimulatorService {
 		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 
 		this.$platformMigrator.ensureAllPlatformAssets().wait();
-
 		return this.runSimulator(simulatorPackageName);
 	}
 
@@ -49,12 +48,18 @@ export class SimulatorService implements ISimulatorService {
 			let simulatorParams = [
 				"--path", this.$project.getProjectDir().wait(),
 				"--assemblypaths", this.simulatorPath,
-				"--isfeaturetrackingenabled", this.$analyticsService.isEnabled().wait().toString(),
 				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];
 
-			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
+			if(this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME).wait()) {
+				simulatorParams.push("--trackfeatureusage");
+			}
 
+			if(this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME).wait()) {
+				simulatorParams.push("--trackexceptions");
+			}
+
+			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 		}).future<void>()();
 	}

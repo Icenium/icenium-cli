@@ -26,6 +26,7 @@ Command | Description
 [autocomplete-status](autocomplete-status.html) | Prints the current status of your command-line completion settings.
 [autocomplete-enable](autocomplete-enable.html) | Enables command-line completion for bash and zsh shells.
 [autocomplete-disable](autocomplete-disable.html) | Disables command-line completion for bash and zsh shells.
-[feature-usage-tracking](feature-usage-tracking.html) | Configures anonymous usage statistics tracking for the NativeScript command-line interface.
-[doctor](doctor.html) | Checks your system and reports potential problems which may prevent developing with AppBuilder CLI.
+[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the Telerik AppBuilder CLI.
+[error-reporting](error-reporting.html) | Configures anonymous error reporting for the Telerik AppBuilder CLI.
+[doctor](doctor.html) | Checks your system for configuration problems which might prevent the Telerik AppBuilder CLI from working properly.
 <% } %>

@@ -5,15 +5,15 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder doctor`
 
-Checks your system and reports potential problems which may prevent developing with AppBuilder CLI.
-
+Checks your system for configuration problems which might prevent the Telerik AppBuilder CLI from working properly.
 
 <% if(isHtml) { %> 
 ### Related Commands
 
 Command | Description
 ----------|----------
-[feature-usage-tracking](feature-usage-tracking.html) | Configures anonymous usage statistics tracking for the AppBuilder CLI.
+[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the Telerik AppBuilder CLI.
+[error-reporting](error-reporting.html) | Configures anonymous error reporting for the Telerik AppBuilder CLI.
 [autocomplete](autocomplete.html) | Prints your current command-line completion settings. If disabled, prompts you to enable it.
 [help](help.html) | Lists the available commands or shows information about the selected command.
 <% } %>
