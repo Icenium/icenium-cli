@@ -103,21 +103,23 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
 			let transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
-
-			plugins = _.map(plugins, plugin => {
-				_.each(transitions, transition => {
-					if(transition.from == plugin) {
-						plugin = transition.to;
-					}
-				});
-
-				return plugin;
-			});
+	
+			plugins = this.applyTransitions(plugins, transitions);
 
 			let supportedPlugins = this.pluginsForVersion(toVersion).wait();
 			plugins = _.filter(plugins, plugin => _.contains(supportedPlugins, plugin) || (_.contains(plugin, '@') && !_.contains(this.invalidMarketplacePlugins, plugin)));
 
-			return plugins;
+			let cordovaJsonData = this.getCordovaJsonData().wait();
+			let sourceSupportedPlugins = this.pluginsForVersion(fromVersion).wait();
+			let sourceSupportedPluginsRenamed = this.applyTransitions(sourceSupportedPlugins, transitions);
+			let defaultEnabledPluginsIncludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsIncludeRegex);
+			let defaultEnabledPluginsExcludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsExcludeRegex);
+			let newEnabledPlugins = _(supportedPlugins)
+					.filter(p => p.match(defaultEnabledPluginsIncludeRegex) && !p.match(defaultEnabledPluginsExcludeRegex))
+					.difference(sourceSupportedPluginsRenamed)
+					.value();
+
+			return _.union(plugins, newEnabledPlugins);
 		}).future<string[]>()();
 	}
 
@@ -329,6 +331,18 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	private parseMscorlibVersion(json: any): string {
 		return [json._Major, json._Minor, json._Build].join('.');
+	}
+	
+	private applyTransitions(plugins: string[], transitions: any[]): string[] {
+		return _.map(plugins, plugin => {
+			_.each(transitions, transition => {
+				if(transition.from === plugin) {
+					plugin = transition.to;
+				}
+			});
+
+			return plugin;
+		});
 	}
 }
 $injector.register("cordovaMigrationService", CordovaMigrationService);
