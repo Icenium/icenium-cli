@@ -151,6 +151,19 @@ module.exports = function(grunt) {
 		fs.renameSync(oldFileName + fileExtension, newFileName + fileExtension);
 	});
 
+	grunt.registerTask("delete_coverage_dir", function() {
+		var done = this.async();
+		var rimraf = require("rimraf");
+		rimraf("coverage", function(err) {
+			if(err) {
+				console.log("Error while deleting coverage directory from the package.");
+				done(false);
+			}
+
+			done();
+		});
+	});
+
 	grunt.registerTask("test", ["ts:devall", "shell:ci_unit_tests"]);
 	grunt.registerTask("pack", [
 		"ts:release_build",
@@ -161,6 +174,7 @@ module.exports = function(grunt) {
 		"shell:ci_unit_tests",
 
 		"set_package_version",
+		"delete_coverage_dir",
 		"shell:build_package",
 		"setPackageName"
 	]);
