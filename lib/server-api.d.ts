@@ -21,20 +21,20 @@ declare module Server{
 		HasAgreedToEula: boolean;
 		Tenant: Server.Tenant;
 	}
-	enum EditionType{
+	const enum EditionType{
 		Starter,
 		Developer,
 		DeveloperPlus,
 		Professional,
 		Business,
 	}
-	enum TenantStatus{
+	const enum TenantStatus{
 		Active,
 		Suspended,
 		Disabled,
 		Incomplete,
 	}
-	enum LicenseType{
+	const enum LicenseType{
 		Purchase,
 		Trial,
 	}
@@ -112,10 +112,15 @@ declare module Server{
 		BaseVariables: any;
 		PerConfigurationVariables: any;
 	}
-	enum MigrationType{
+	const enum MigrationType{
 		Create,
 		Update,
 		Delete,
+	}
+	const enum DevicePlatform{
+		iOS,
+		Android,
+		WP8,
 	}
 	interface ICordovaServiceContract{
 		getLiveSyncToken(solutionName: string, projectName: string): IFuture<string>;
@@ -150,7 +155,7 @@ declare module Server{
 		UniqueName: string;
 		Subject: string;
 	}
-	enum ImportType{
+	const enum ImportType{
 		Pkcs12,
 		X509Certificate,
 	}
@@ -203,8 +208,14 @@ declare module Server{
 		Width: number;
 		Height: number;
 	}
+	const enum ImageType{
+		Icon,
+		SplashScreen,
+	}
 	interface IImagesServiceContract{
 		resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>;
+		generate(solutionName: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>;
+		generateArchive(type: Server.ImageType, image: any, $resultStream: any): IFuture<void>;
 	}
 	interface Application{
 		AppleID: number;
@@ -245,7 +256,7 @@ declare module Server{
 		Certificates: string[];
 		ProvisionedDevices: string[];
 	}
-	enum ProvisionType{
+	const enum ProvisionType{
 		Development,
 		AdHoc,
 		Enterprise,
@@ -254,6 +265,7 @@ declare module Server{
 	interface IMobileprovisionsServiceContract{
 		getProvisions(): IFuture<Server.ProvisionData[]>;
 		importProvision(provision: any): IFuture<Server.ProvisionData>;
+		getProvision(identifier: string, $resultStream: any): IFuture<void>;
 		removeProvision(identifier: string): IFuture<void>;
 	}
 	interface INativescriptServiceContract{
@@ -294,7 +306,7 @@ declare module Server{
 		Targets: string[];
 		Properties: IDictionary<string>;
 	}
-	enum TargetResultStatus{
+	const enum TargetResultStatus{
 		Failure,
 		Skipped,
 		Success,
@@ -423,11 +435,6 @@ declare module Server{
 		CodesigningSettings: Server.ICodesigningIdentitySettings;
 		ProvisionSettings: Server.IMobileProjectProvisionSettings;
 		SolutionSettings: Server.ISolutionSettings;
-	}
-	enum DevicePlatform{
-		iOS,
-		Android,
-		WP8,
 	}
 	interface ISettingsServiceContract{
 		getSettings(solutionName: string): IFuture<Server.SettingsData>;
@@ -576,7 +583,15 @@ declare module Server{
 		LastPath: string;
 		ChangeType: string;
 	}
-	enum DiffBlockType{
+	const enum ChangeType{
+		None,
+		Added,
+		Modified,
+		Deleted,
+		Renamed,
+		Conflict,
+	}
+	const enum DiffBlockType{
 		Unchanged,
 		Inserted,
 		Modified,
@@ -586,7 +601,7 @@ declare module Server{
 		Local,
 		Remote,
 	}
-	enum ResetMode{
+	const enum ResetMode{
 		Hard,
 		Soft,
 	}

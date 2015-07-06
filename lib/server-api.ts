@@ -179,6 +179,12 @@ export class ImagesService implements Server.IImagesServiceContract{
 	public resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>{
 		return this.$serviceProxy.call<void>('ResizeImage', 'POST', ['api','images','resize',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'size', value: JSON.stringify(size), contentType: 'application/json'}], null);
 	}
+	public generate(solutionName: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>{
+		return this.$serviceProxy.call<string[]>('Generate', 'POST', ['api','images','generate',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'type': type }), 'application/json', [{name: 'image', value: image, contentType: 'application/octet-stream'}], null);
+	}
+	public generateArchive(type: Server.ImageType, image: any, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GenerateArchive', 'POST', ['api','images','generate'].join('/') + '?' + querystring.stringify({ 'type': type }), 'application/octet-stream', [{name: 'image', value: image, contentType: 'application/octet-stream'}], $resultStream);
+	}
 }
 export class ItmstransporterService implements Server.IItmstransporterServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
@@ -211,6 +217,9 @@ export class MobileprovisionsService implements Server.IMobileprovisionsServiceC
 	}
 	public importProvision(provision: any): IFuture<Server.ProvisionData>{
 		return this.$serviceProxy.call<Server.ProvisionData>('ImportProvision', 'POST', ['api','mobileprovisions'].join('/'), 'application/json', [{name: 'provision', value: provision, contentType: 'application/octet-stream'}], null);
+	}
+	public getProvision(identifier: string, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GetProvision', 'GET', ['api','mobileprovisions',encodeURI(identifier.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
 	}
 	public removeProvision(identifier: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('RemoveProvision', 'DELETE', ['api','mobileprovisions',encodeURI(identifier.replace(/\\/g, '/'))].join('/'), null, null, null);
