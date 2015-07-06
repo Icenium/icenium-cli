@@ -196,7 +196,6 @@ export class PublishService implements IPublishService {
 			try {
 				this.$progressIndicator.showProgressIndicator(this.$server.publish.publishFtp(projectName, projectName, ftpConnectionData), 6000).wait();
 			} catch (err) {
-				this.$logger.out();
 				if (err.message === PublishService.ERROR_MESSAGE_WHEN_PROJECT_EXISTS_ON_REMOTE) {
 					this.$errors.failWithoutHelp("This project already exists on the remote server. " + os.EOL + 
 									"To remove all files and upload the new ones on the remote server, run $ appbuilder publish --force");
@@ -205,7 +204,6 @@ export class PublishService implements IPublishService {
 				throw err;
 			}
 
-			this.$logger.printInfoMessageOnSameLine(os.EOL);
 			this.$logger.info("Project '%s' published successfully.", projectName);
 		}).future<void>()();
 	}

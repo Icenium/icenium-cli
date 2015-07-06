@@ -610,14 +610,13 @@ export class Project implements Project.IProject {
 			this.$logger.printInfoMessageOnSameLine("Uploading...");
 			if(fileSize > Project.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
-				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000, {surpressTrailingNewLine: true}).wait();
 				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
 			} else {
 				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
 					this.$fs.createReadStream(projectZipFile)), 2000).wait();
 			}
 
-			this.$logger.printInfoMessageOnSameLine(os.EOL);
 			this.$logger.trace("Project imported");
 		}).future<void>()();
 	}
