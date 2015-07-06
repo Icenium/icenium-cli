@@ -36,7 +36,8 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 			emulate: false,
 			publish: true,
 			uploadToAppstore: false,
-			canChangeFrameworkVersion: false
+			canChangeFrameworkVersion: false,
+			imageGeneration: false
 		};
 	}
 
@@ -57,6 +58,10 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public get startPackageActivity(): string {
+		throw new Error("Not applicable.");
+	}
+
+	public get relativeAppResourcesPath(): string {
 		throw new Error("Not applicable.");
 	}
 

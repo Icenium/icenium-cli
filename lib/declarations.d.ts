@@ -163,6 +163,7 @@ interface IProjectCapabilities {
 	publish: boolean;
 	uploadToAppstore: boolean;
 	canChangeFrameworkVersion: boolean;
+	imageGeneration: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -753,4 +754,12 @@ interface ISimulatorService {
 	 * @return {IFuture<void>}
 	 */
 	launchSimulator(): IFuture<void>;
+}
+
+
+/**
+ * Used to manage images
+ */
+interface IImageService {
+	generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void>;
 }
