@@ -1,10 +1,10 @@
 {
 	"appScaffolding": {
-		"version": "0.0.7"
+		"version": "0.0.8"
 	},
 	"generators": [{
 		"name": "generator-kendo-ui-mobile",
-		"version": "0.0.7",
+		"version": "0.0.8",
 		"alias": "H"
 	}]
 }
