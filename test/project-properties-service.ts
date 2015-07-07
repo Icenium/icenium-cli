@@ -38,6 +38,10 @@ class SampleProject implements Project.IFrameworkProject {
 	requiredAndroidApiLevel: number;
 	configFiles: Project.IConfigurationFile[];
 	startPackageActivity: string;
+
+	get relativeAppResourcesPath(): string {
+		return 'App_Resources';
+	}
 	getTemplateFilename(name: string): string {
 		return "";
 	}

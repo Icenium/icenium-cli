@@ -41,6 +41,7 @@ Command | Description
 [mobileframework](project/configuration/mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
+[generate](generate.html) | Generates splashscreens or icons based on a single high-resolution image and saves them to the project.
 
 ## Screen Builder Development Commands
 Command | Description

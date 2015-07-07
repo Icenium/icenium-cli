@@ -54,6 +54,11 @@ declare module Project {
 		 * @return {IFuture<ITypeScriptFiles>} all typeScript and all TypeScript definition files.
 		 */
 		getTypeScriptFiles(): IFuture<ITypeScriptFiles>
+		/**
+		 * Gets the path to the project's App_Resources folder
+		 * @return {IFuture<string>} The path to the App_Resources folder
+		 */
+		appResourcesPath(): IFuture<string>;
 	}
 
 	interface IFrameworkProject {
@@ -64,6 +69,12 @@ declare module Project {
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
 		startPackageActivity: string;
+		/**
+		 * The path to the App_Resources folder relative to the project's root
+		 * @type {string}
+		 */
+		relativeAppResourcesPath: string;
+
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;

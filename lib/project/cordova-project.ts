@@ -43,7 +43,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			emulate: true,
 			publish: false,
 			uploadToAppstore: true,
-			canChangeFrameworkVersion: true
+			canChangeFrameworkVersion: true,
+			imageGeneration: true
 		};
 	}
 
@@ -73,6 +74,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 
 	public get startPackageActivity(): string {
 		return ".TelerikCallbackActivity";
+	}
+
+	public get relativeAppResourcesPath(): string {
+		return 'App_Resources';
 	}
 
 	public getValidationSchemaId(): string {
