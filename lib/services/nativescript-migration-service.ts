@@ -4,16 +4,19 @@
 import Future = require("fibers/future");
 import path = require("path");
 import helpers = require("./../helpers");
+import semver = require("semver");
 
 export class NativeScriptMigrationService implements IFrameworkMigrationService {
 	private static TYPESCRIPT_ABBREVIATION = "TS";
 	private static JAVASCRIPT_ABBREVIATION = "JS";
 	private static SUPPORTED_LANGUAGES = [NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION];
 	private static REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME = "NativeScript.json";
+	private static PACKAGE_JSON_FILE_NAME = "package.json";
 	private nativeScriptResourcesDir: string;
 	private nativeScriptMigrationFile: string;
 	private tnsModulesDirectoryPath: string;
 	private remoteNativeScriptResourcesPath: string;
+	private nativeScriptDefaultPackageJsonFile: string;
 
 	private _nativeScriptMigrationData: INativeScriptMigrationData;
 	private get nativeScriptMigrationData(): IFuture<INativeScriptMigrationData> {
@@ -36,6 +39,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			this.tnsModulesDirectoryPath = path.join(this.nativeScriptResourcesDir, "tns_modules");
 			this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
 			this.nativeScriptMigrationFile =  path.join(this.nativeScriptResourcesDir, "nativeScript-migration-data.json");
+			this.nativeScriptDefaultPackageJsonFile = path.join(this.nativeScriptResourcesDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME)
 		}
 
 	public downloadMigrationData(): IFuture<void> {
@@ -50,6 +54,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 									.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsModules(language, supportedVersion.version)))
 									.flatten<IFuture<void>>()
 									.value();
+			fileDownloadFutures.push(this.downloadPackageJsonResourceFile());
 			Future.wait(fileDownloadFutures);
 		}).future<void>()();
 	}
@@ -83,6 +88,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return (() => {
 			let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
+			this.$logger.trace(`Migrating from version ${currentFrameworkVersion} to ${newVersion}.`);
 			if(currentFrameworkVersion === newVersion) {
 				return;
 			}
@@ -93,13 +99,17 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			let appResourcesObsoletePath = path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME);
 			let backupName = `${tnsModulesProjectPath}.backup`;
 			let shouldRollBackAppResources = false;
+
 			// Check if current version is supported one. We cannot migrate ObsoleteVersions
 			if(!_.contains(this.getSupportedVersions().wait(), currentFrameworkVersion)) {
 				this.checkIsVersionObsolete(currentFrameworkVersion).wait();
 				this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`)
 			}
 
+			this.ensurePackageJsonExists(projectDir, currentFrameworkVersion, newVersion).wait();
+
 			try {
+				// Always update tns-modules during migration
 				this.$fs.rename(tnsModulesProjectPath, backupName).wait();
 				this.$fs.createDirectory(tnsModulesProjectPath).wait();
 				let projectType = this.$project.isTypeScriptProject().wait() ? NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION : NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION;
@@ -126,11 +136,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	}
 
 	private downloadNativeScriptMigrationFile(): IFuture<void> {
-		return (() => {
-			let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
-			this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptMigrationFile).wait();
-		}).future<void>()();
-		
+		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
+		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptMigrationFile);
 	}
 
 	private downloadTnsModules(language: string, version: string): IFuture<void> {
@@ -139,7 +146,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		let filePath = path.join(this.tnsModulesDirectoryPath, language, fileName);
 		return this.$resourceDownloader.downloadResourceFromServer(remotePathUrl, filePath);
 	}
-	
+
 	private getFileNameByVersion(version: string): string {
 		return `${version}.zip`;
 	}
@@ -163,6 +170,22 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				this.$errors.failWithoutHelp(`Your project targets NativeScript ${version}. This version is obsolete and cannot be migrated from the command line. If you want to migrate your project, create a new project and copy over your code and resources.`);
 			}
 		}).future<void>()();
+	}
+	
+	private ensurePackageJsonExists(projectDir: string, currentFrameworkVersion: string, newVersion: string): IFuture<void> {
+		return (() => {
+			let npmVersions: string[] = (<any[]>this.$fs.readJson(this.nativeScriptMigrationFile).wait().npmVersions).map(npmVersion => npmVersion.version);
+			if(_.contains(npmVersions, newVersion)
+				&& !this.$fs.exists(path.join(projectDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME)).wait()) {
+				// From version 1.1.2 we need package.json file at the root of the project.
+				this.$fs.copyFile(this.nativeScriptDefaultPackageJsonFile, path.join(projectDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME)).wait();
+			}
+		}).future<void>()();
+	}
+	
+	private downloadPackageJsonResourceFile(): IFuture<void> {
+		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME}`;
+		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptDefaultPackageJsonFile);
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);
