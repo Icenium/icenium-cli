@@ -20,6 +20,16 @@ When you build without the `--download` switch, the Telerik AppBuilder CLI lets 
 
 When you build without the `--download` switch, you can deploy the app package on device only via QR code or by opening the link in the device browser. You cannot install the app package manually via cable connection.<% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
+<% if(isHtml) { %>
+### Prerequisites
+
+* If you want to re-deploy an already deployed Windows Phone 8.1 application, verify that you have updated the **BundleVersion** property in the project properties. Otherwise, your changes will not be updated on the device.<br/>To update the version property, run the following command.
+
+	```Shell
+	appbuilder prop set BundleVersion <Value>
+	```
+
+<% } %> 
 ### Options
 * `--debug` - If set, applies the Debug build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration.<% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>

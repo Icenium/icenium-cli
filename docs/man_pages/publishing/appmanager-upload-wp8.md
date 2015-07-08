@@ -16,6 +16,16 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %> 
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
+<% if(isHtml) { %>
+### Prerequisites
+
+* If you want to re-deploy an already deployed Windows Phone 8.1 application, verify that you have updated the **BundleVersion** property in the project properties. Otherwise, your changes will not be updated on the device.<br/>To update the version property, run the following command.
+
+	```Shell
+	appbuilder prop set BundleVersion <Value>
+	```
+
+<% } %>
 ### Options
 * `--download` - If set, downloads the application package to the root of the project.
 * `--publish` - If set, after the upload completes, automatically publishes the application package for the members of its distribution groups. You can set additional distribution groups with the `--groups` option.

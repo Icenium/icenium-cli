@@ -17,6 +17,11 @@ Builds the specified project in the cloud and runs it in the native emulator fro
 Before running the Windows Phone 8.0 or the Windows Phone 8.1 emulator, verify that your system meets the following requirements.
 * You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
 * You have installed the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
+* If you want to re-deploy an already deployed Windows Phone 8.1 application, verify that you have updated the **BundleVersion** property in the project properties. Otherwise, your changes will not be updated on the device.<br/>To update the version property, run the following command.
+
+	```Shell
+	appbuilder prop set BundleVersion <Value>
+	```
 <% } %> 
 <% if((isConsole && isWindows && isCordova) || isHtml) { %>
 ### Options
