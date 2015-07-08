@@ -14,7 +14,7 @@ Adds a new application view to your project. You can later add lists and forms t
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-view).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-view).<% } %> 
 
 <% if(isHtml) { %>
 ### Command Limitations 

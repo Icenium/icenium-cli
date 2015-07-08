@@ -14,7 +14,7 @@ Inserts an input field of a selected type with a label and placeholder text in a
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-field).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-field).<% } %> 
 
 <% if(isHtml) { %>
 ### Prerequisites

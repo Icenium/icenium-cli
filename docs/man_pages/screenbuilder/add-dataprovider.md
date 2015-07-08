@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-dataProvider` [--answers <File Path>]
 
-Connects your project to a Telerik Backend Services, JSON or OData data provider. <% if(isHtml) { %>After you configure the data provider, you can use it in your code or use it with the `add-list`, `add-signin` and `add-signup` commands to generate lists, sign-in and sign-up forms connected to the data provider. An interactive prompt guides you through the setup process.<% } %>
+Connects your project to a Telerik Backend Services, JSON, OData or a Progress Data Services data provider. <% if(isHtml) { %>After you configure the data provider, you can use it in your code or use it with the `add-list`, `add-signin` and `add-signup` commands to generate lists, sign-in and sign-up forms connected to the data provider. An interactive prompt guides you through the setup process.<% } %>
 <% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
 
 ### Options
@@ -14,7 +14,7 @@ Connects your project to a Telerik Backend Services, JSON or OData data provider
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-dataprovider).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-dataprovider).<% } %> 
 
 <% if(isHtml) { %>
 ### Prerequisites
