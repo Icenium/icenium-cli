@@ -14,7 +14,7 @@ Inserts a list in an existing application view. You can connect the list to a da
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-list).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-list).<% } %> 
 
 <% if(isHtml) { %>
 ### Prerequisites

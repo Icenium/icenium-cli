@@ -14,7 +14,7 @@ Inserts sign-in and sign-up forms in an existing application view. You can conne
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project. The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-authentication).
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-authentication).<% } %> 
 
 <% if(isHtml) { %>
 ### Prerequisites
