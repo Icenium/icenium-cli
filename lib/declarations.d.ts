@@ -614,6 +614,8 @@ interface IRemoteProjectService {
 	getProjectsForSolution(solutionName: string): IFuture<Server.IWorkspaceItemData[]>;
 	getSolutionName(solutionId: string): IFuture<string>;
 	getProjectName(solutionId: string, projectId: string): IFuture<string>;
+	exportProject(remoteSolutionName: string, remoteProjectName: string): IFuture<void>;
+	exportSolution(remoteSolutionName: string): IFuture<void>;
 }
 
 interface IProjectSimulatorService {

@@ -5,6 +5,8 @@ import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import optionsLib = require("../lib/options");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
+import projectConstantsLib = require("../lib/project/project-constants");
+import os = require("os");
 
 let assert = require("chai").assert;
 import Future = require("fibers/future");
@@ -82,6 +84,24 @@ function createTestInjector(): IInjector {
 			}
 		}
 	});
+	testInjector.register("project", {
+		getNewProjectDir:() => "proj dir",
+		createProjectFile: (projectDir: string, properties: any) => Future.fromResult()
+	});
+	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
+	testInjector.register("fs", {
+		exists: (path: string) => {
+			if(path.indexOf("abproject") !== -1) {
+				return Future.fromResult(true);
+			} else {
+				return Future.fromResult(false);
+			}
+		},
+		createWriteStream: (path: string) => {},
+		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
+		readDirectory: (projectDir: string) => Future.fromResult([])
+	});
+	testInjector.register("logger", stubs.LoggerStub);
 	return testInjector;
 }
 
@@ -204,7 +224,7 @@ describe("remote project service", () => {
 			assert.throws( () => remoteProjectService.getProjectName("Sln1", "5").wait() );
 		});
 
-		it("returns correct name when solution name and project name are", () => {
+		it("returns correct name when solution name and project name are correct", () => {
 			let projName = remoteProjectService.getProjectName("Sln1", "BlankProj").wait();
 			assert.deepEqual(expectedResult, projName);
 		});
