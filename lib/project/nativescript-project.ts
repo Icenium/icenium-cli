@@ -38,7 +38,9 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			emulate: true,
 			publish: false,
 			uploadToAppstore: true,
-			canChangeFrameworkVersion: true
+			canChangeFrameworkVersion: true,
+			imageGeneration: true,
+			wp8Supported: false
 		};
 	}
 
@@ -64,6 +66,10 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 
 	public get startPackageActivity(): string {
 		return "com.tns.NativeScriptActivity";
+	}
+
+	public get relativeAppResourcesPath(): string {
+		return path.join('app', 'App_Resources');
 	}
 
 	public getValidationSchemaId(): string {

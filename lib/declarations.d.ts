@@ -164,6 +164,7 @@ interface IProjectCapabilities {
 	uploadToAppstore: boolean;
 	canChangeFrameworkVersion: boolean;
 	imageGeneration: boolean;
+	wp8Supported: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -795,7 +796,7 @@ interface IImageService {
 	/**
 	 * Print image definitions
 	 */
-	printDefinitions(): void;
+	printDefinitions(): IFuture<void>;
 	/**
 	 * Generate images and save them to the project
 	 * @param  {string}           initialImagePath hi-res image from which to generate all the others
@@ -810,11 +811,4 @@ interface IImageService {
 	 * @return {IFuture<void>}
 	 */
 	promptForImageInformation(force: boolean): IFuture<void>;
-}
-/**
- * Used for managing images
- * @interface
- */
-interface IImageService {
-	generateImages(initialImagePath: string, imageType: Server.ImageType, force?: boolean): IFuture<void>;
 }

@@ -4,7 +4,6 @@
 import path = require("path");
 import helpers = require("./helpers");
 import util = require("util");
-import constants = require("./common/mobile/constants");
 
 export class ResourceLoader implements IResourceLoader {
 	constructor(private $fs: IFileSystem, 
@@ -45,7 +44,7 @@ class ResourceDownloader implements IResourceDownloader {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants) {
 			
-			this.imageDefinitionsResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/${constants.ImageConstants.ImageDefinitionsFileName}`;	
+			this.imageDefinitionsResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/${this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME}`;	
 		}
 
 	public downloadCordovaJsFiles(): IFuture<void> {
@@ -75,7 +74,7 @@ class ResourceDownloader implements IResourceDownloader {
 	}
 	
 	public downloadImageDefinitions(): IFuture<void> {
-		let targetPath = path.join(this.$projectConstants.APP_RESOURCES_DIR_NAME, constants.ImageConstants.ImageDefinitionsFileName);
+		let targetPath = path.join(this.$projectConstants.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME);
 		return this.downloadResourceFromServer(this.imageDefinitionsResourcesPath, this.$resources.resolvePath(targetPath));
 	}
 }
