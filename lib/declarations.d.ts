@@ -635,8 +635,18 @@ interface IAppManagerService {
 	getGroups(): IFuture<void>;
 }
 
+/**
+ * Used to show indication that a process is running
+ */
 interface IProgressIndicator {
-	showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void>;
+	/**
+	 * Prints indication that a process is running
+	 * @param  {IFuture<any>}	future		process
+	 * @param  {number}			timeout		time interval for printing indication
+	 * @param  {boolean}		options		whether to surpress the trailing new line printed after the process ends
+	 * @return {IFuture<void>}
+	 */
+	showProgressIndicator(future: IFuture<any>, timeout: number, options?: { surpressTrailingNewLine?: boolean }): IFuture<void>;
 }
 
 interface IDynamicSubCommandInfo {
@@ -753,4 +763,12 @@ interface ISimulatorService {
 	 * @return {IFuture<void>}
 	 */
 	launchSimulator(): IFuture<void>;
+}
+
+/**
+ * Used for managing images
+ * @interface
+ */
+interface IImageService {
+	generateImages(initialImagePath: string, imageType: Server.ImageType, force?: boolean): IFuture<void>;
 }

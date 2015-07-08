@@ -4,13 +4,24 @@
 export class ProgressIndicator implements IProgressIndicator {
 	constructor(private $logger: ILogger) { }
 
-	public showProgressIndicator(future: IFuture<any>, timeout: number): IFuture<void> {
+	public showProgressIndicator(future: IFuture<any>, timeout: number, options?: { surpressTrailingNewLine?: boolean }): IFuture<void> {
 		return (() => {
-			while(!future.isResolved()) {
-				this.$logger.printMsgWithTimeout(".", timeout).wait();
+			let surpressTrailingNewLine = options && options.surpressTrailingNewLine;
+			try {
+				while(!future.isResolved()) {
+					this.$logger.printMsgWithTimeout(".", timeout).wait();
+				}
+
+				// Make sure future is not left behind and prevent "There are outstanding futures." error.
+				future.wait();
+			} catch (err) {
+				this.$logger.out();
+				throw err;
 			}
-			// Make sure future is not left behind and prevent "There are outstanding futures." error.
-			future.wait();
+
+			if (!surpressTrailingNewLine) {
+				this.$logger.out();
+			}
 		}).future<void>()();
 	}
 }

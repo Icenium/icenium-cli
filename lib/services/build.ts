@@ -70,7 +70,6 @@ export class BuildService implements Project.IBuildService {
 
 			let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
 			this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000).wait();
-			this.$logger.printInfoMessageOnSameLine(os.EOL);
 
 			let body = buildProjectFuture.get();
 			let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
