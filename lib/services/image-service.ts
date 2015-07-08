@@ -48,7 +48,7 @@ class ImageService implements IImageService {
 		return (() => {
 			let imageDefinitionsFilePath = path.join(this.$projectConstants.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
 				imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath).wait(),
-				table = helpers.createTable(['Platform', 'Icon', 'Splashscreen'], []);
+				table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
 
 			_.each(imageDefinitionsContents, imageDefinition => {
 				if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
@@ -72,7 +72,7 @@ class ImageService implements IImageService {
 	public promptForImageInformation(force: boolean): IFuture<void> {
 		return (() => {
 			let imagePath = this.$prompter.getString('Enter image file path:').wait(),
-				imageOptions = ['Icons', 'SplashScreens'],
+				imageOptions = ['Icons', 'Splash Screens'],
 				chosenOption = this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions).wait(),
 				imageType = Server.ImageType.Icon;
 			
@@ -157,7 +157,7 @@ class ImageService implements IImageService {
 			}
 			
 			if (!this.$fs.exists(imagePath).wait()) {
-				this.$errors.failWithoutHelp(`Specified file ${imagePath} does not exist`);
+				this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
 			}
 			
 			if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {

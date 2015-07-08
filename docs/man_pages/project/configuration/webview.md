@@ -41,5 +41,7 @@ Command | Description
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
 [prop remove](prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [prop set](prop-set.html) | Sets the selected project property and overwrites its current value.
+[resource](resource.html) | Lists information about the image resources for all mobile platforms.
+[resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 [webview set](webview-set.html) | Sets the selected web view for the current project.
 <% } %>

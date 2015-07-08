@@ -67,7 +67,7 @@ class ResourceDownloader implements IResourceDownloader {
 			this.$fs.writeFile(targetPath, "").wait();
 			let file = this.$fs.createWriteStream(targetPath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. TargetPath is: '${targetPath}'.`)
+			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. Target path is: '${targetPath}'.`)
 			this.$httpClient.httpRequest({ url:remotePath, pipeTo: file}).wait();
 			fileEnd.wait();
 		}).future<void>()();

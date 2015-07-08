@@ -41,6 +41,8 @@ Command | Description
 [mobileframework](project/configuration/mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
+[resource](resource.html) | Lists information about the image resources for all mobile platforms.
+[resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 
 ## Screen Builder Development Commands
 Command | Description
