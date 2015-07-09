@@ -28,7 +28,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 Command | Description
 ----------|----------
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
-[mobileframework](mobileframework.html) | Sets the selected development framework version for the project.
+[mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.
 [prop add](prop-add.html) | Enables more options for the selected project property, if the property accepts multiple values.
