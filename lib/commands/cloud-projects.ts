@@ -60,7 +60,8 @@ $injector.registerCommand("cloud|*list", CloudListProjectsCommand);
 export class CloudExportProjectsCommand implements ICommand {
 	constructor(private $errors: IErrors,
 		private $remoteProjectService: IRemoteProjectService,
-		private $prompter: IPrompter) { }
+		private $prompter: IPrompter,
+		private $project: Project.IProject) { }
 
 	allowedParameters: ICommandParameter[] = [];
 
@@ -96,6 +97,10 @@ export class CloudExportProjectsCommand implements ICommand {
 			let solutionNames = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
 			if(!solutionNames || !solutionNames.length) {
 				this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
+			}
+			
+			if (this.$project.projectData) {
+				this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}
 
 			if(args && args.length) {

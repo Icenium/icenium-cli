@@ -266,6 +266,12 @@ describe("cloud project commands", () => {
 				it("fails when solution does not have any projects", () => {
 					assert.throws(() => exportProjectCommand.canExecute(["Sln2"]).wait())
 				});
+				
+				it("fails when there's projectData", () => {
+					let project = testInjector.resolve("project");
+					project.projectData = <any>{};
+					assert.throws(() => exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
+				});
 			});
 
 			it("fails when console is not interactive and command arguments are not passed", () => {
@@ -351,11 +357,6 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", () => {
 					fs.exists = (projectDir: string) => { return Future.fromResult(true);}
-					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
-				});
-
-				it("fails when there's projectData", () => {
-					project.projectData = <any>{};
 					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
 				});
 

@@ -9,7 +9,7 @@ import temp = require("temp");
 export class RemoteProjectService implements IRemoteProjectService {
 	private clientSolutions: Server.TapSolutionData[];
 	private clientProjectsPerSolution: IDictionary<Server.IWorkspaceItemData[]> = {};
-
+	
 	constructor(private $server: Server.IServer,
 				private $userDataStore: IUserDataStore,
 				private $serviceProxy: Server.IServiceProxy,
@@ -92,15 +92,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public exportProject(remoteSolutionName: string, remoteProjectName: string): IFuture<void> {
 		return (() => {
-			let projectDir = this.getExportDir(remoteProjectName).wait();
-
-			temp.track();
-			let projectZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
-			let unzipStream = this.$fs.createWriteStream(projectZipFilePath);
-			let tenantId = this.getUserTenantId().wait();
-
-			this.makeTapServiceCall(() => this.$server.projects.exportProject(tenantId, remoteSolutionName, remoteProjectName, false, unzipStream)).wait();
-			this.$fs.unzip(projectZipFilePath, projectDir).wait();
+			let projectDir = this.getExportDir(remoteSolutionName, (tenantId: string, dirName: string, unzipStream: any) => this.$server.projects.exportProject(tenantId, remoteSolutionName, remoteProjectName, false, unzipStream)).wait();
 			this.createProjectFile(projectDir, remoteSolutionName, remoteProjectName).wait();
 
 			this.$logger.info("%s has been successfully exported to %s", remoteProjectName, projectDir);
@@ -109,22 +101,15 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public exportSolution(remoteSolutionName: string): IFuture<void> {
 		return (() => {
-			let solutionDir = this.getExportDir(remoteSolutionName).wait();
-
-			temp.track();
-			let solutionZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
-			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
-			let tenantId = this.getUserTenantId().wait();
+			let solutionDir = this.getExportDir(remoteSolutionName, (tenantId: string, dirName: string, unzipStream: any) => this.$server.projects.exportSolution(tenantId, remoteSolutionName, false, unzipStream)).wait();
 			
-			this.makeTapServiceCall(() => this.$server.projects.exportSolution(tenantId, remoteSolutionName, false, unzipStream)).wait();
-			this.$fs.unzip(solutionZipFilePath, solutionDir).wait();
 			let projectsDirectories = this.$fs.readDirectory(solutionDir).wait();
 			projectsDirectories.forEach(projectName => this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName).wait());
 
 			this.$logger.info("%s has been successfully exported to %s", remoteSolutionName, solutionDir);
 		}).future<void>()();
 	}
-
+	
 	private getSolutionData(projectName: string): IFuture<Server.SolutionData> {
 		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, true));
 	}
@@ -135,16 +120,21 @@ export class RemoteProjectService implements IRemoteProjectService {
 		}).future<Server.IWorkspaceItemData>()();
 	}
 
-	private getExportDir(dirName: string): IFuture<string> {
+	private getExportDir(dirName: string, tapServiceCall: (tenantId: string, dirName: string, unzipStream: any) => IFuture<any>): IFuture<string> {
 		return ((): string =>{
 			let exportDir = path.join(this.$project.getNewProjectDir(), dirName);
 			if(this.$fs.exists(exportDir).wait()) {
 				this.$errors.fail("The folder %s already exists!", exportDir);
 			}
-			if (this.$project.projectData) {
-				this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
-			}
-
+			
+			temp.track();
+			let solutionZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
+			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
+			let tenantId = this.getUserTenantId().wait();
+			
+			this.makeTapServiceCall(() => tapServiceCall.apply(null, [tenantId, dirName, unzipStream])).wait();
+			this.$fs.unzip(solutionZipFilePath, exportDir).wait();
+			
 			return exportDir;
 		}).future<string>()();
 	}
@@ -166,7 +156,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 					this.$project.createProjectFile(projectDir, properties).wait();
 				}
 			} catch(e) {
-				this.$logger.warn("Couldn't create project file: %s", e.message);
+				this.$logger.warn(`Couldn't create project file: ${e.message}`);
 				this.$logger.trace(e);
 			}
 		}).future<void>()();
