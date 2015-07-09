@@ -13,6 +13,7 @@ export class ProjectConstants implements Project.IProjectConstants {
 	public EXPERIMENTAL_TAG = "Experimental";
 	public APP_RESOURCES_DIR_NAME = "App_Resources";
 	public NATIVESCRIPT_APP_DIR_NAME = "app";
+	public IMAGE_DEFINITIONS_FILE_NAME = 'image-definitions.json';
 
 	public TARGET_FRAMEWORK_IDENTIFIERS = {
 		Cordova: "Cordova",
@@ -20,4 +21,5 @@ export class ProjectConstants implements Project.IProjectConstants {
 		MobileWebsite: "MobileWebsite"
 	};
 }
+
 $injector.register("projectConstants", ProjectConstants);

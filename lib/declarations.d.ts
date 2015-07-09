@@ -163,6 +163,8 @@ interface IProjectCapabilities {
 	publish: boolean;
 	uploadToAppstore: boolean;
 	canChangeFrameworkVersion: boolean;
+	imageGeneration: boolean;
+	wp8Supported: boolean;
 }
 
 interface IProjectData extends IDictionary<any> {
@@ -317,8 +319,27 @@ interface IResourceLoader {
 	getPathToAppResources(framework: string): string;
 }
 
+/**
+ * Used to download resources from the server
+ */
 interface IResourceDownloader {
+	/**
+	 * Download all cordova javascript fies - Android, iOS and WP8
+	 * @return {IFuture<void>}
+	 */
 	downloadCordovaJsFiles(): IFuture<void>;
+	/**
+	 * Download a specific resource from the server
+	 * @param  {string}        remotePath the path to the resource on the remote server
+	 * @param  {string}        targetPath the path where the resource is written
+	 * @return {IFuture<void>}
+	 */
+	downloadResourceFromServer(remotePath: string, targetPath: string): IFuture<void>;
+	/**
+	 * Download image definitions json file from the server
+	 * @return {IFuture<void>}
+	 */
+	downloadImageDefinitions(): IFuture<void>;
 }
 
 interface IUserSettingsFileService {
@@ -701,6 +722,8 @@ interface IOptions extends ICommonOptions {
 	var: Object;
 	answers: string;
 	simulator: boolean;
+	icon: string;
+	splash: string;
 }
 
 /**
@@ -765,10 +788,27 @@ interface ISimulatorService {
 	launchSimulator(): IFuture<void>;
 }
 
+
 /**
- * Used for managing images
- * @interface
+ * Used to manage images
  */
 interface IImageService {
-	generateImages(initialImagePath: string, imageType: Server.ImageType, force?: boolean): IFuture<void>;
+	/**
+	 * Print image definitions
+	 */
+	printDefinitions(): IFuture<void>;
+	/**
+	 * Generate images and save them to the project
+	 * @param  {string}           initialImagePath hi-res image from which to generate all the others
+	 * @param  {Server.ImageType} imageType        Icon or Splashscreen
+	 * @param  {boolean}          force            whether to overwrite conflicting images
+	 * @return {IFuture<void>}
+	 */
+	generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void>;
+	/**
+	 * Prompt the user for more information about image generation
+	 * @param  {boolean}       force whether to overwrite conflicting images
+	 * @return {IFuture<void>}
+	 */
+	promptForImageInformation(force: boolean): IFuture<void>;
 }

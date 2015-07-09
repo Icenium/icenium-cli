@@ -30,7 +30,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $project: Project.IProject,
 		private $resources: IResourceLoader,
 		private $config: IConfiguration,
-		private $httpClient: Server.IHttpClient,
+		private $resourceDownloader: IResourceDownloader,
 		private $projectConstants: Project.IProjectConstants) {
 			this.nativeScriptResourcesDir = this.$resources.resolvePath("NativeScript");
 			this.tnsModulesDirectoryPath = path.join(this.nativeScriptResourcesDir, "tns_modules");
@@ -128,7 +128,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private downloadNativeScriptMigrationFile(): IFuture<void> {
 		return (() => {
 			let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
-			this.downloadResourceFromServer(remoteFilePath, this.nativeScriptMigrationFile).wait();
+			this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptMigrationFile).wait();
 		}).future<void>()();
 		
 	}
@@ -137,19 +137,9 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		let fileName = this.getFileNameByVersion(version);
 		let remotePathUrl = `${this.remoteNativeScriptResourcesPath}/tns_modules/${language}/${fileName}`;
 		let filePath = path.join(this.tnsModulesDirectoryPath, language, fileName);
-		return this.downloadResourceFromServer(remotePathUrl, filePath);
+		return this.$resourceDownloader.downloadResourceFromServer(remotePathUrl, filePath);
 	}
-
-	private downloadResourceFromServer(remotePath: string, targetPath: string): IFuture<void> {
-		return (() => {
-			this.$fs.writeFile(targetPath, "").wait();
-			let file = this.$fs.createWriteStream(targetPath);
-			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. TargetPath is: '${targetPath}'.`)
-			this.$httpClient.httpRequest({ url:remotePath, pipeTo: file}).wait();
-			fileEnd.wait();
-		}).future<void>()();
-	}
+	
 	private getFileNameByVersion(version: string): string {
 		return `${version}.zip`;
 	}

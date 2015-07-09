@@ -195,6 +195,12 @@ export class Project implements Project.IProject {
 		}).future<string>()();
 	}
 
+	public appResourcesPath(): IFuture<string> {
+		return (() => {
+			return path.join(this.getProjectDir().wait(), this.frameworkProject.relativeAppResourcesPath);
+		}).future<string>()();
+	}
+
 	public createTemplateFolder(projectDir: string): IFuture<void> {
 		return (() => {
 			this.$fs.createDirectory(projectDir).wait();
