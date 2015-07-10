@@ -2,6 +2,7 @@
 "use strict";
 
 import stubs = require("./stubs");
+import helpers = require("../lib/common/helpers");
 import yok = require("../lib/common/yok");
 import optionsLib = require("../lib/options");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
@@ -9,6 +10,7 @@ import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/project/project-constants");
 import os = require("os");
 
+let originalIsInteractiveMethod = helpers.isInteractive;
 let assert = require("chai").assert;
 import Future = require("fibers/future");
 import util = require("util");
@@ -72,9 +74,11 @@ export class PrompterStub {
 	}
 }
 
-function createTestInjector(promptSlnName?: string, promptPrjName?: string): IInjector {
+function createTestInjector(promptSlnName?: string, promptPrjName?: string, isInteractive?: boolean): IInjector {
 	let testInjector = new yok.Yok();
-
+	let helpers = require("../lib/common/helpers");
+	isInteractive = isInteractive === undefined ? true : false;
+	helpers.isInteractive = () => { return isInteractive; };
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
 		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
@@ -182,6 +186,9 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string): IIn
 			}, 
 			exportProject: (solutionSpaceName: string, solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
 				return Future.fromResult();
+			},
+			exportSolution: (solutionSpaceName: string, solutionName: string, skipMetadata: boolean, $resultStream: any) => {
+				return Future.fromResult();
 			}
 		}
 	});
@@ -195,7 +202,8 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string): IIn
 		},
 		createWriteStream: (path: string) => {},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
-	})
+		readDirectory: (projectDir: string) => Future.fromResult([])
+	});
 	testInjector.register("remoteProjectService", remoteProjectsServiceLib.RemoteProjectService);
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("project", {
@@ -208,46 +216,68 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string): IIn
 }
 
 describe("cloud project commands", () => {
+	after(() => {
+		helpers.isInteractive = originalIsInteractiveMethod;
+	});
+
 	describe("export project command", () => {
 		let testInjector: IInjector;
 		let exportProjectCommand: ICommand;
 
 		describe("canExecute", () => {
-			beforeEach(() => {
-				testInjector = createTestInjector();
+			describe("when console is interactive", () => {
+				beforeEach(() => {
+					testInjector = createTestInjector();
+					exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
+				});
+
+				it("returns true when no arguments are specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute([]).wait());
+				});
+
+				it("returns true when valid solution name is specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["Sln1"]).wait());
+				});
+
+				it("returns true when valid solution name and project name are specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
+				});
+
+				it("returns true when valid solution index is specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["1"]).wait());
+				});
+
+				it("returns true when valid solution id and project name are specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]).wait());
+				});
+
+				it("returns true when valid solution name and project id are specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]).wait());
+				});
+
+				it("returns true when valid solution id and project id are specified", () => {
+					assert.isTrue(exportProjectCommand.canExecute(["1", "2"]).wait());
+				});
+
+				it("fails when more than two arguments are passed", () => {
+					assert.throws(() => exportProjectCommand.canExecute(["1", "2", "3"]).wait())
+				});
+
+				it("fails when solution does not have any projects", () => {
+					assert.throws(() => exportProjectCommand.canExecute(["Sln2"]).wait())
+				});
+				
+				it("fails when there's projectData", () => {
+					let project = testInjector.resolve("project");
+					project.projectData = <any>{};
+					assert.throws(() => exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
+				});
+			});
+
+			it("fails when console is not interactive and command arguments are not passed", () => {
+				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-			});
-
-			it("returns true when no arguments are specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute([]).wait());
-			});
-
-			it("returns true when valid solution name is specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["Sln1"]).wait());
-			});
-
-			it("returns true when valid solution name and project name are specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
-			});
-
-			it("returns true when valid solution index is specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["1"]).wait());
-			});
-
-			it("returns true when valid solution id and project name are specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]).wait());
-			});
-
-			it("returns true when valid solution name and project id are specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]).wait());
-			});
-
-			it("returns true when valid solution id and project id are specified", () => {
-				assert.isTrue(exportProjectCommand.canExecute(["1", "2"]).wait());
-			});
-			
-			it("fails when more than two arguments are passed", () => {
-				assert.throws(() => exportProjectCommand.canExecute(["1", "2", "3"]).wait())
+				assert.throws(() => exportProjectCommand.canExecute([]).wait());
 			});
 		});
 
@@ -303,11 +333,6 @@ describe("cloud project commands", () => {
 					assert.isFalse(prompter.isPrompterCalled);
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 				});
-				
-				it("throws error when solution does not have any projects", () => {
-					exportProjectCommand.execute(["Sln2"]).wait()
-					assert.isTrue(logger.warnOutput.indexOf("does not have any projects.") > 0);
-				});
 			});
 
 			it("works correctly when no arguments are passed", () => {
@@ -332,11 +357,6 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", () => {
 					fs.exists = (projectDir: string) => { return Future.fromResult(true);}
-					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
-				});
-
-				it("fails when there's projectData", () => {
-					project.projectData = <any>{};
 					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
 				});
 
