@@ -199,7 +199,7 @@ You can set hybrid, native or website for `<Type>`.
 
 The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. 
 
-**Create new project from existing project**
+**Create new project from locally stored existing project**
 
 To initialize an existing project for development from the command line, navigate to the local directory that contains the project files and run the following command. 
 
@@ -211,6 +211,18 @@ The Telerik AppBuilder CLI attempts to retain any existing project configuration
 If the directory contains an existing AppBuilder project, after the operation completes, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device. 
 
 For more information about how to configure your project properties, run `appbuilder prop --help`.
+
+**Create new project from an existing project in the cloud**
+
+You can quickly get an existing project from the cloud by downloading it locally. Navigate to the directory in which you want to download your existing project and run the following command.
+
+```bash
+$ appbuilder cloud <Solution Name or Index> <Project Name or Index>
+```
+
+`<Solution Name or Index>` and `<Project Name or Index>` are the name or the index of the solution and project, respectively, as listed by `$ appbuilder cloud` or as they appear in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client.
+
+This operation creates a new directory named after the project which contains all your project files. After you navigate to the newly created directory, you can continue development immediately with the Telerik AppBuilder CLI.
 
 **Create new project from sample**
 

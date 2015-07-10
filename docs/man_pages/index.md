@@ -23,8 +23,8 @@ Command | Description
 [sample](project/creation/sample.html) | Lists sample apps.
 [sample&nbsp;clone](project/creation/sample-clone.html) | Clones a selected sample app.
 [init](project/creation/init.html) | Initializes an existing project for development.
-[cloud](project/creation/cloud.html) | Lists all projects associated with your Telerik Platform account.
-[cloud&nbsp;export](project/creation/cloud-export.html) | Exports a selected project from the cloud and initializes it for development.
+[cloud](project/creation/cloud.html) | Lists all solutions and projects associated with your Telerik Platform account.
+[cloud&nbsp;export](project/creation/cloud-export.html) | Exports one or all projects from a selected solution from the cloud.
 [build `<Platform>`](project/testing/build.html) | Builds the project for a selected target platform and downloads the application package or produces a QR code for deploying the application package.
 [deploy `<Platform>`](project/testing/deploy.html) | Builds and deploys the project to a connected device.
 [livesync&nbsp;cloud](project/testing/livesync-cloud.html) | Synchronizes the project with the cloud to enable LiveSync for remote devices.
