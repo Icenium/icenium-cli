@@ -32,9 +32,10 @@ Command | Description
 ----------|----------
 [create screenbuilder](../project/creation/create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder.html) | Shows all commands for project development with Screen Builder.
-[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
-[add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
+[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
+[add-form](add-form.html) | Inserts a generic input form in an existing application view.
+[add-list](add-list.html) | Inserts a list in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 <% } %>
