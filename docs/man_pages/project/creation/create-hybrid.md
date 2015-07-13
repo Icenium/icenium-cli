@@ -27,8 +27,8 @@ WARNING: Always run this command in an empty directory or specify `--path` to an
 
 Command | Description
 ----------|----------
-[cloud](cloud.html) | Lists all projects associated with your Telerik Platform account.
-[cloud export](cloud-export.html) | Exports one of your projects from the cloud and initializes it for development in the current directory.
+[cloud](cloud.html) | Lists all solutions and projects associated with your Telerik Platform account.
+[cloud export](cloud-export.html) | Exports one or all projects from a selected solution from the cloud.
 [create](create.html) | Creates a project for hybrid or native development.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create website](create-website.html) | Creates a new project from a Mobile Website-based template.

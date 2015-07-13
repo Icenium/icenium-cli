@@ -3,9 +3,10 @@ cloud export
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder cloud export <Project ID> [--path <Directory>]`
+Export selected project from solution | `$ appbuilder cloud export <Solution Name or Index> <Project Name or Index> [--path <Directory>]`
+Export all projects from solution | `$ appbuilder cloud export <Solution Name or Index> [--path <Directory>]`
 
-Exports one of your projects from the cloud and initializes it for development in the current directory. The current directory must be empty.
+Exports one or all projects from a selected solution in the cloud and initializes it for development. The current directory must be empty.
 
 <% if(isConsole) { %>WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.<% } %> 
 
@@ -13,7 +14,8 @@ Exports one of your projects from the cloud and initializes it for development i
 * `--path` - Specifies the directory where to export the selected project on your file system. The directory must be empty. If not set, exports the project in the current directory.
 
 ### Attributes
-* `<Project ID>` is the index or name of the project as listed by `$ appbuilder cloud`
+* `<Solution Name or Index>` is the name of the solution as listed by `$ appbuilder cloud` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client. <% if(isHtml) { %>When you do not specify a project, the Telerik AppBuilder CLI creates a new directory named after the solution and as many sub-directories named after the projects as needed inside the solution-named directory. The sub-directories contain all your project files. If the solution contains one project, this operation creates one sub-directory in the new solution-named directory.<% } %>
+* `<Project Name or Index>` is the name or the index of project, relative to its parent solution, as listed by `appbuilder cloud` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client. <% if(isHtml) { %>When you specify a project, the Telerik AppBuilder CLI creates a new directory named after the project. The sub-directory contains all your project files.<% } %> 
 <% if(isHtml) { %> 
 ### Command Limitations
 
@@ -23,7 +25,7 @@ Exports one of your projects from the cloud and initializes it for development i
 
 Command | Description
 ----------|----------
-[cloud](cloud.html) | Lists all projects associated with your Telerik Platform account.
+[cloud](cloud.html) | Lists all solutions and projects associated with your Telerik Platform account.
 [create](create.html) | Creates a project for hybrid or native development.
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
