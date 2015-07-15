@@ -212,6 +212,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	});
 	testInjector.register("prompter", new PrompterStub(promptSlnName, promptPrjName));
 	testInjector.register("logger", new LoggerStub());
+	testInjector.register("options", {});
 	return testInjector;
 }
 
@@ -373,7 +374,7 @@ describe("cloud project commands", () => {
 				});
 			})
 		});
-	});
+});
 
 	describe("list project command", () => {
 		let testInjector: IInjector;

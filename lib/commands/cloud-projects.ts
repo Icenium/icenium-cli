@@ -3,7 +3,6 @@
 
 import util = require("util");
 import path = require("path");
-import helpers = require("../helpers");
 import unzip = require("unzip");
 import commonHelpers = require("../common/helpers");
 
@@ -27,31 +26,40 @@ export class CloudListProjectsCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $remoteProjectService: IRemoteProjectService,
 		private $prompter: IPrompter,
+		private $options: IOptions,
 		private $errors: IErrors) { }
 
 	allowedParameters: ICommandParameter[] = [new SolutionIdCommandParameter(this.$remoteProjectService)];
 
-	private printList(solutionName: string, list: Server.IWorkspaceItemData[]): void {
-		let headers =  ["#", "Project Name"];
-		let data = list.map((proj: Server.IWorkspaceItemData, index: number) => [(++index).toString(), proj.Name]);
+	private printList(names: string[], solutionName?: string): void {
+		let isProject = !!solutionName;
+		let headers =  ["#", `${isProject ? 'Project' : 'Solution'} name`];
+		let data = names.map((name: string, index: number) => [(++index).toString(), name]);
 		let table = commonHelpers.createTable(headers, data);
-		this.$logger.out(`Projects for ${solutionName} solution:`);
+		if (isProject) {
+			this.$logger.out(`Projects for ${solutionName} solution:`);
+		}
+
 		this.$logger.out(table.toString());
 	}
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let projects: Server.IWorkspaceItemData[];
-			
 			let slnName: string;
 			if(args[0]) {
 				slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
 			} else {
 				let solutions = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
-				slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", solutions).wait();
+				if (this.$options.all || !commonHelpers.isInteractive()) {
+					this.printList(solutions);
+					return;
+				} else {
+					slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", solutions).wait();
+				}
 			}
-			projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait();
-			this.printList(slnName, projects);
+
+			let projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(proj => proj.Name);
+			this.printList(projects, slnName);
 		}).future<void>()();
 	}
 }
@@ -98,7 +106,7 @@ export class CloudExportProjectsCommand implements ICommand {
 			if(!solutionNames || !solutionNames.length) {
 				this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
 			}
-			
+
 			if (this.$project.projectData) {
 				this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 			}

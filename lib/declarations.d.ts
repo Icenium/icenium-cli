@@ -726,6 +726,7 @@ interface IOptions extends ICommonOptions {
 	simulator: boolean;
 	icon: string;
 	splash: string;
+	all: boolean;
 }
 
 /**
