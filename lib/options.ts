@@ -46,7 +46,7 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			$errors, $staticConfig);
 		
 		let that = <any>this;
-		that.screenBuilderCacheDir = ($hostInfo.isWindows && this.defaultProfileDir === that.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): that.profileDir;
+		that.screenBuilderCacheDir = path.join((($hostInfo.isWindows && this.defaultProfileDir === that.profileDir) ? path.join(process.env.LocalAppData, "Telerik"): that.profileDir), "sb");
 	}
 }
 $injector.register("options", Options);
