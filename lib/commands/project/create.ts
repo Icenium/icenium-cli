@@ -14,6 +14,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		private $projectConstants: Project.IProjectConstants,
 		private $screenBuilderService: IScreenBuilderService,
 		private $simulatorService: ISimulatorService,
+		private $simulatorPlatformServices: IExtensionPlatformServices,
 		$errors: IErrors,
 		$project: Project.IProject) {
 		super($errors, $project);
@@ -34,7 +35,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 					name: projectName
 				}
 			}).wait();
-			
+
 			try {
 				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
 				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
@@ -45,8 +46,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				this.$fs.deleteDirectory(projectPath).wait();
 				throw err;
 			}
-			
-			if (this.$options.simulator) {
+
+			if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
 		}).future<void>()();
