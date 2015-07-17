@@ -23,7 +23,7 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 		return (() => {
 			let extensionVersion = this.getExtensionVersion(dependencyExtensionName);
 			let cachedVersion = extensionVersion || DependencyExtensionsServiceBase.DEFAULT_CACHED_VERSION;
-			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb-generators/${dependencyExtensionName}-v${dependencyConfig.version}` : `${DependencyExtensionsServiceBase.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;
+			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb/generators/${dependencyExtensionName}/${dependencyConfig.version}` : `${DependencyExtensionsServiceBase.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;
 
 			this.$logger.trace("prepareDependencyExtension: Download url: %s, cached version", downloadUrl, cachedVersion);
 
