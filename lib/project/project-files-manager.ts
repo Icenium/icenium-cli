@@ -33,7 +33,7 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 			),
 			"nativescript-android-manifest": new ConfigurationFile(
 				"android-manifest",
-				"App_Resources/Android/AndroidManifest.xml",
+				"app/App_Resources/Android/AndroidManifest.xml",
 				"Mobile.NativeScript.Android.ManifestXml.zip",
 				"Opens AndroidManifest.xml for editing and creates it, if needed."
 			),
@@ -46,6 +46,12 @@ export class ProjectFilesManager implements Project.IProjectFilesManager {
 			"ios-info": new ConfigurationFile(
 				"ios-info",
 				"App_Resources/iOS/Info.plist",
+				"Mobile.iOS.InfoPlist.zip",
+				"Opens Info.plist for editing and creates it, if needed."
+			),
+			"nativescript-ios-info": new ConfigurationFile(
+				"ios-info",
+				"app/App_Resources/iOS/Info.plist",
 				"Mobile.iOS.InfoPlist.zip",
 				"Opens Info.plist for editing and creates it, if needed."
 			),
