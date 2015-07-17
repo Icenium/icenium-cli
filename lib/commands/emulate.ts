@@ -13,7 +13,8 @@ export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
 				private $buildService: Project.IBuildService,
 				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+				private $options: IOptions) { }
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -31,7 +32,7 @@ export class EmulateAndroidCommand implements ICommand {
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath
 			}).wait();
-
+			this.$options.justlaunch = true;
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
 		}).future<void>()();
 	}
