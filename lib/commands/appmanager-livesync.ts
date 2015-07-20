@@ -8,21 +8,27 @@ export class AppManagerLiveSyncCommand implements ICommand {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $appManagerService: IAppManagerService,
 		private $errors: IErrors,
-		private $logger:ILogger) { }
+		private $logger:ILogger,
+		private $config: Config.IConfig) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
+			let windowsPhonePlatformName = this.$mobileHelper.normalizePlatformName("WP8");
 			if(!args || args.length === 0) {
-				let options = this.$mobileHelper.platformNames.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
-				let selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", options).wait();
+				let availablePlatforms = this.$config.ON_PREM ? _.without(this.$mobileHelper.platformNames, windowsPhonePlatformName) : this.$mobileHelper.platformNames;
+				let selectionOptions = availablePlatforms.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
+				let selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", selectionOptions).wait();
 				if(selectedPlatform === AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION) {
-					this.$appManagerService.publishLivePatch(this.$mobileHelper.platformNames).wait();
+					this.$appManagerService.publishLivePatch(availablePlatforms).wait();
 				} else {
 					this.$appManagerService.publishLivePatch([selectedPlatform]).wait();
 				}
 			} else {
 				// make sure each platform is specified only once
 				let platforms = _.keys(_.groupBy(args, arg => this.$mobileHelper.normalizePlatformName(arg)));
+				if(this.$config.ON_PREM && _.contains(platforms, windowsPhonePlatformName)) {
+					this.$errors.failWithoutHelp(`You cannot upload updates for Windows Phone.`);
+				}
 				this.$appManagerService.publishLivePatch(platforms).wait();
 			}
 		}).future<void>()();

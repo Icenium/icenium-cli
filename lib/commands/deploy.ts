@@ -98,13 +98,16 @@ $injector.registerCommand("deploy|ios", DeployIosCommand);
 
 export class DeployWP8Command implements ICommand {
 	constructor(private $deployHelper: IDeployHelper,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $config: Config.IConfig) { }
 
 	public allowedParameters: ICommandParameter[] = [];
 
 	public execute(args: string[]): IFuture<void> {
 		return this.$deployHelper.deploy(this.$devicePlatformsConstants.WP8);
 	}
+
+	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand("deploy|wp8", DeployWP8Command);
 
