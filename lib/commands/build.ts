@@ -27,12 +27,15 @@ $injector.registerCommand("build|ios", BuildIosCommand);
 
 export class BuildWP8Command implements ICommand {
 	constructor(private $buildService: Project.IBuildService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $config: Config.IConfig) { }
 
 	allowedParameters: ICommandParameter[] = [];
 
 	execute(args: string[]): IFuture<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.WP8);
 	}
+
+	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand("build|wp8", BuildWP8Command);

@@ -27,13 +27,15 @@ $injector.registerCommand("appmanager|upload|ios", AppManagerUploadIosCommand);
 
 class AppManagerUploadWP8Command implements ICommand {
 	constructor(private $appManagerService: IAppManagerService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $config: Config.IConfig) { }
 
 	execute(args: string[]): IFuture<void> {
 		return this.$appManagerService.upload(this.$devicePlatformsConstants.WP8.toLowerCase());
 	}
 
 	allowedParameters: ICommandParameter[] = [];
+	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand("appmanager|upload|wp8", AppManagerUploadWP8Command);
 
