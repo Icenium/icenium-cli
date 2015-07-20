@@ -10,10 +10,11 @@ export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceL
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
 		$progressIndicator: IProgressIndicator,
+		$config: IConfiguration,
 		$childProcess: IChildProcess,
 		$dependencyConfigService: IDependencyConfigService,
 		$options: IOptions) {
-		super($fs, $httpClient, $logger, $progressIndicator, $childProcess, $dependencyConfigService, $options);
+		super($fs, $httpClient, $logger, $progressIndicator, $config, $childProcess, $dependencyConfigService, $options);
 	}
 
 	public prepareGenerator(generatorName: string): IFuture<void> {

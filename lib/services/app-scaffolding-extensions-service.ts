@@ -14,10 +14,11 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
 		$progressIndicator: IProgressIndicator,
+		$config: IConfiguration,
 		protected $childProcess: IChildProcess,
 		protected $dependencyConfigService: IDependencyConfigService,
 		$options: IOptions) {
-		super($options.screenBuilderCacheDir, $fs, $httpClient, $logger, $options, $progressIndicator); // We should pass here the correct profileDir
+		super($options.screenBuilderCacheDir, $fs, $httpClient, $logger, $options, $progressIndicator, $config); // We should pass here the correct profileDir
 	}
 
 	public get appScaffoldingPath(): string {
