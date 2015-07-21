@@ -21,9 +21,7 @@ export class EmulateAndroidCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureAllPlatformAssets().wait();
-			this.$androidEmulatorServices.checkDependencies().wait();
 			this.$androidEmulatorServices.checkAvailability().wait();
-
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.apk");
 			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
@@ -40,6 +38,7 @@ export class EmulateAndroidCommand implements ICommand {
 	public canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
 			this.$project.ensureProject();
+			this.$androidEmulatorServices.checkDependencies().wait();
 			return true;
 		}).future<boolean>()();
 	}
