@@ -186,6 +186,7 @@ interface IProjectData extends IDictionary<any> {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	iOSDeploymentTarget: string;
 	WP8ProductID: string;
 	WP8PublisherID: string;
 	WP8Publisher: string;
