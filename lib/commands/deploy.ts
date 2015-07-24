@@ -46,9 +46,9 @@ export class DeployHelper implements IDeployHelper {
 			this.$options.justlaunch = true; 
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
-				if(device.getPlatform().toLowerCase() === this.$devicePlatformsConstants.iOS.toLowerCase()) {
+				let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
+				if(deploymentTarget && device.getPlatform().toLowerCase() === this.$devicePlatformsConstants.iOS.toLowerCase()) {
 					let deviceVersion = _.take(device.getVersion().split("."), 2).join(".");
-					let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
 					if(helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
 						this.$logger.error(`You cannot deploy on device ${device.getIdentifier()} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
 						return Future.fromResult();
