@@ -1,41 +1,44 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
-import path = require("path");
-let gaze = require("gaze");
-import helpers = require("./../helpers");
-import AppIdentifier = require("../common/mobile/app-identifier");
+import androidLiveSyncServiceLib = require("../common/mobile/android/android-livesync-service");
 import constants = require("../common/mobile/constants");
+import helpers = require("./../helpers");
+import iOSProxyServices = require("./../common/mobile/ios/ios-proxy-services");
+import usbLivesyncServiceBaseLib = require("../common/services/usb-livesync-service-base");
 
-interface IProjectFileInfo {
-	fileName: string;
-	onDeviceName: string;
-	shouldIncludeFile: boolean;
-}
+let gaze = require("gaze");
+import Future = require("fibers/future");
+import path = require("path");
+import util = require("util");
 
-export class LiveSyncService implements ILiveSyncService {
+export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServiceBase implements ILiveSyncService {
 	private excludedProjectDirsAndFiles = [
 		"app_resources",
 		"plugins",
-		".*.tmp"
+		".*.tmp",
+		".ab"
 	];
 
-	constructor(private $devicesServices: Mobile.IDevicesServices,
-		private $logger: ILogger,
-		private $fs: IFileSystem,
+	constructor($devicesServices: Mobile.IDevicesServices,
+		$logger: ILogger,
+		$fs: IFileSystem,
 		private $errors: IErrors,
 		private $project: Project.IProject,
 		private $projectFilesManager: Project.IProjectFilesManager,
-		private $dispatcher: IFutureDispatcher,
-		private $mobileHelper: Mobile.IMobileHelper,
-		private $options: IOptions) { }
+		$dispatcher: IFutureDispatcher,
+		$mobileHelper: Mobile.IMobileHelper,
+		$options: IOptions,
+		$deviceAppDataFactory: Mobile.IDeviceAppDataFactory,
+		$localToDevicePathDataFactory: Mobile.ILocalToDevicePathDataFactory,
+		$injector: IInjector) {
+			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector) 
+		}
 
-	public livesync(platform: string): IFuture<void> {
+	public livesync(platform?: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device }).wait();
-			platform = this.$devicesServices.platform;
+			platform = this.initialize(platform).wait();
 
 			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
 				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
@@ -54,117 +57,128 @@ export class LiveSyncService implements ILiveSyncService {
 			}
 
 			let projectDir = this.$project.getProjectDir().wait();
-
-			let appIdentifier = AppIdentifier.createAppIdentifier(platform,
-				this.$project.projectData.AppIdentifier, this.$options.companion);
-
-			if(this.$options.file) {
-				this.$fs.tryExecuteFileOperation(this.$options.file, () => this.sync(appIdentifier, projectDir, [path.resolve(this.$options.file)]),  util.format("The file %s does not exist.", this.$options.file));
-			} else {
-				let projectFiles = this.$project.enumerateProjectFiles(this.excludedProjectDirsAndFiles).wait();
-
-				this.sync(appIdentifier, projectDir, projectFiles).wait();
-
-				if(this.$options.watch) {
-					this.liveSyncDevices(platform, projectDir, appIdentifier);
-					helpers.exitOnStdinEnd();
-					this.$dispatcher.run();
-				}
-			}
-		}).future<void>()();
-	}
-
-	private getProjectFileInfo(fileName: string): IProjectFileInfo {
-		let platforms = this.$mobileHelper.platformNames;
-		let parsed = this.parseFile(fileName, platforms, this.$devicesServices.platform);
-		if(!parsed) {
-			parsed = this.parseFile(fileName, ["debug", "release"], "debug");
-		}
-
-		return parsed || {
-			fileName: fileName,
-			onDeviceName: fileName,
-			shouldIncludeFile: true
-		};
-	}
-
-	private parseFile(fileName: string, validValues: string[], value: string): any {
-		let regex = util.format("^(.+?)[.](%s)([.].+?)$", validValues.join("|"));
-		let parsed = fileName.match(new RegExp(regex, "i"));
-		if(parsed) {
-			return {
-				fileName: fileName,
-				onDeviceName: parsed[1] + parsed[3],
-				shouldIncludeFile: parsed[2].toLowerCase() === value.toLowerCase()
-			};
-		}
-
-		return undefined;
-	}
-
-	private sync(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: string[]): IFuture<void> {
-		let projectFilesInfo: IProjectFileInfo[] = [];
-
-		_.each(projectFiles,(projectFile: string) => {
-			let projectFileInfo = this.getProjectFileInfo(projectFile);
-			if(projectFileInfo.shouldIncludeFile) {
-				projectFilesInfo.push(projectFileInfo);
-			}
-		});
-
-		return this.syncCore(appIdentifier, projectDir, projectFilesInfo);
-	}
-
-	private syncCore(appIdentifier: Mobile.IAppIdentifier, projectDir: string, projectFiles: IProjectFileInfo[]): IFuture<void> {
-		return (() => {
-			let action = (device: Mobile.IDevice): IFuture<void> => {
+			
+			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
-					let platformSpecificProjectPath = appIdentifier.deviceProjectPath;
-					let localDevicePaths = this.getLocalToDevicePaths(projectDir, projectFiles, platformSpecificProjectPath);
-					device.sync(localDevicePaths, appIdentifier, this.$project.getLiveSyncUrl()).wait();
+					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);				
 				}).future<void>()();
-			};
-
-			this.$devicesServices.execute(action).wait();
+			}
+			
+			let platformSpecificLiveSyncServices: IDictionary<any> = {
+				"android": AndroidLiveSyncService,
+				"ios": IOSLiveSyncService
+			}
+			
+			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir, projectDir, this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, notInstalledAppOnDeviceAction).wait();
+			
 		}).future<void>()();
-	}
-
-	private getLocalToDevicePaths(localProjectPath: string, projectFiles: IProjectFileInfo[], deviceProjectPath: string): Mobile.ILocalToDevicePathData[] {
-		let localToDevicePaths = _.map(projectFiles,(projectFileInfo: IProjectFileInfo) => {
-			let relativeToProjectBasePath = helpers.getRelativeToRootPath(localProjectPath, projectFileInfo.onDeviceName);
-			let devicePath = path.join(deviceProjectPath, relativeToProjectBasePath);
-			return this.$mobileHelper.generateLocalToDevicePathData(projectFileInfo.fileName, helpers.fromWindowsRelativePathToUnix(devicePath), relativeToProjectBasePath);
-		});
-
-		return localToDevicePaths;
-	}
-
-	private liveSyncDevices(platform: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
-		let _this = this;
-
-		gaze(projectDir + "/**/*", function(err: any, watcher: any) {
-			this.on('changed',(filePath: string) => {
-				if(!_this.$projectFilesManager.isProjectFileExcluded(projectDir, filePath, _this.excludedProjectDirsAndFiles)) {
-					_this.batchLiveSync(filePath, projectDir, appIdentifier);
-				}
-			});
-		});
-	}
-
-	private timer: NodeJS.Timer = null;
-	private syncQueue: string[] = [];
-	private batchLiveSync(filePath: string, projectDir: string, appIdentifier: Mobile.IAppIdentifier): void {
-		if(!this.timer) {
-			this.timer = setInterval(() => {
-				let filesToSync = this.syncQueue;
-				if(filesToSync.length > 0) {
-					this.syncQueue = [];
-					this.$logger.trace("Syncing %s", filesToSync.join(", "));
-					this.$dispatcher.dispatch(() => this.sync(appIdentifier, projectDir, filesToSync));
-				}
-			}, 500);
-		}
-		this.syncQueue.push(filePath);
 	}
 }
 $injector.register("liveSyncService", LiveSyncService);
+
+export class IOSLiveSyncService implements IPlatformSpecificLiveSyncService {
+	constructor(private _device: Mobile.IDevice,
+		private $injector: IInjector) { }
+		
+	private get device(): Mobile.IDevice {
+		return <Mobile.IiOSDevice>this._device;
+	}	
+	
+	public restartApplication(deviceAppData: Mobile.IDeviceAppData, localToDevicePaths?: Mobile.ILocalToDevicePathData[]): IFuture<void> {
+		return (() => {
+			this.device.fileSystem.deleteFile("/Library/Preferences/ServerInfo.plist", deviceAppData.appIdentifier);
+			let notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this.device});
+			notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
+			notificationProxyClient.closeSocket();
+		}).future<void>()();			
+	}
+}
+
+export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiveSyncService implements IPlatformSpecificLiveSyncService {
+	private static DEVICE_TMP_DIR_FORMAT_V2 = "/data/local/tmp/12590FAA-5EDD-4B12-856D-F52A0A1599F2/%s";
+	private static DEVICE_TMP_DIR_FORMAT_V3 = "/mnt/sdcard/Android/data/%s/files/12590FAA-5EDD-4B12-856D-F52A0A1599F2";
+	private static DEVICE_PATH_SEPARATOR = "/";
+	
+	private _tmpRoots: IStringDictionary = {};
+	
+	constructor(private _device: Mobile.IDevice,
+		private $config: IConfiguration,
+		private $errors: IErrors,
+	 	$fs: IFileSystem,
+		private $injector: IInjector,
+		$mobileHelper: Mobile.IMobileHelper,
+		private $options: IOptions,
+		private $project: Project.IProject,
+		private $server: Server.IServer) {
+			super(<Mobile.IAndroidDevice>_device, $fs, $mobileHelper);
+		}
+	
+	public restartApplication(deviceAppData: Mobile.IDeviceAppData, localToDevicePaths?: Mobile.ILocalToDevicePathData[]): IFuture<void> {
+		return (() => {
+			let liveSyncVersion = this.getLiveSyncVersion(deviceAppData.appIdentifier).wait();
+			let liveSyncRoot = this.getLiveSyncRoot(deviceAppData.appIdentifier, liveSyncVersion);
+			let dirs:IStringDictionary = Object.create(null);
+
+			_.each(localToDevicePaths, (localToDevicePathData: Mobile.ILocalToDevicePathData) => {
+				let relativeToProjectBasePath = helpers.fromWindowsRelativePathToUnix(localToDevicePathData.getRelativeToProjectBasePath());
+				let devicePath = this.$mobileHelper.buildDevicePath(liveSyncRoot, relativeToProjectBasePath);
+
+				this.device.fileSystem.transferFile(localToDevicePathData.getLocalPath(), devicePath).wait();
+
+				if (liveSyncVersion === 2) {
+					let parts = relativeToProjectBasePath.split(AndroidLiveSyncService.DEVICE_PATH_SEPARATOR);
+					let currentPath = "";
+					_.each(parts, p => {
+						if(p !== "") {
+							currentPath = this.$mobileHelper.buildDevicePath(currentPath, p);
+							if(!dirs[currentPath]) {
+								dirs[currentPath] = currentPath;
+								this.ensureFullAccessPermissions(this.$mobileHelper.buildDevicePath(liveSyncRoot, currentPath)).wait();
+							}
+						}
+					});
+				}
+			});
+
+			this.ensureFullAccessPermissions(liveSyncRoot).wait();
+			
+			let commands: string[];
+			if(this.$options.watch || this.$options.file) {
+				commands = [ this.liveSyncCommands.SyncFilesCommand(), this.liveSyncCommands.RefreshCurrentViewCommand() ] ;
+			} else {
+				let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
+				
+				let liveSyncDeviceAppData = (<ILiveSyncDeviceAppData>deviceAppData);
+				let liveSyncUrl = liveSyncDeviceAppData.liveSyncFormat ? util.format(liveSyncDeviceAppData.liveSyncFormat, this.$config.AB_SERVER, liveSyncToken) : this.$project.getLiveSyncUrl();
+				
+				commands = [ this.liveSyncCommands.DeployProjectCommand(liveSyncUrl), this.liveSyncCommands.ReloadStartViewCommand() ];
+			}
+			
+			this.createCommandsFileOnDevice(liveSyncRoot, commands).wait();
+			
+			this.device.adb.sendBroadcastToDevice("com.telerik.LiveSync", { "app-id": deviceAppData.appIdentifier }).wait();
+		}).future<void>()();
+	}
+	
+	private getLiveSyncVersion(appIdentifier: string): IFuture<number> {
+		return this.device.adb.sendBroadcastToDevice(constants.CHECK_LIVESYNC_INTENT_NAME, {"app-id": appIdentifier});
+	}
+	
+	private getLiveSyncRoot(appIdentifier: string, liveSyncVersion: number): string {
+		if(!this._tmpRoots[appIdentifier]) {
+			if (liveSyncVersion === 2) {
+				this._tmpRoots[appIdentifier] = util.format(AndroidLiveSyncService.DEVICE_TMP_DIR_FORMAT_V2, appIdentifier);
+			} else if (liveSyncVersion === 3) {
+				this._tmpRoots[appIdentifier] = util.format(AndroidLiveSyncService.DEVICE_TMP_DIR_FORMAT_V3, appIdentifier);
+			} else {
+				this.$errors.fail("Unsupported LiveSync version: %d", liveSyncVersion);
+			}
+		}
+
+		return this._tmpRoots[appIdentifier];
+	}
+	
+	 private ensureFullAccessPermissions(devicePath: string): IFuture<void> {
+		return this.device.adb.executeShellCommand(`chmod 0777 ${devicePath}`);
+	}
+}

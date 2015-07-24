@@ -195,3 +195,5 @@ $injector.require("imageService", "./services/image-service");
 
 $injector.requireCommand("resource|*list", "./commands/resource");
 $injector.requireCommand("resource|create", "./commands/resource");
+
+$injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");

@@ -8,7 +8,6 @@ import os = require("os");
 import plist = require("plist");
 import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
 import constants = require("../common/mobile/constants");
-import AppIdentifier = require("../common/mobile/app-identifier");
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
@@ -31,7 +30,9 @@ export class BuildService implements Project.IBuildService {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants,
 		private $progressIndicator: IProgressIndicator,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory) { }
+		
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
@@ -174,7 +175,7 @@ export class BuildService implements Project.IBuildService {
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
 					}
 				} else if(!settings.buildForiOSSimulator) {
-					let deviceIdentifier = settings.device ? settings.device.getIdentifier() : undefined;
+					let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
 					try {
 						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
 					} catch (error) {
@@ -205,7 +206,7 @@ export class BuildService implements Project.IBuildService {
 				if(!completeAutoselect) {
 					let iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
 						appIdentifier: appIdentifier,
-						deviceIdentifier: settings.device ? settings.device.getIdentifier() : null
+						deviceIdentifier: settings.device ? settings.device.deviceInfo.identifier : null
 					});
 					iOSDeploymentValidator.throwIfInvalid(
 						{ provisionOption: this.$options.provision, certificateOption: this.$options.certificate }).wait();
@@ -462,8 +463,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.importProject().wait();
 
-			let appIdentifier = AppIdentifier.createAppIdentifier(platform, this.$project.projectData.AppIdentifier, true);
-
+			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.projectData.AppIdentifier, platform);	
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);

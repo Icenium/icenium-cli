@@ -415,6 +415,10 @@ export class StaticConfig implements IStaticConfig {
 	public get pathToPackageJson(): string {
 		return path.join(__dirname, "..", "package.json");
 	}
+	
+	public getAdbFilePath(): IFuture<string> {
+		return Future.fromResult("");
+	}
 }
 
 export class HooksService implements IHooksService {

@@ -4,7 +4,6 @@ import util = require("util");
 import path = require("path");
 let gaze = require("gaze");
 import helpers = require("./../helpers");
-import AppIdentifier = require("../common/mobile/app-identifier");
 import constants = require("../common/mobile/constants");
 import commandParams = require("../common/command-params");
 
