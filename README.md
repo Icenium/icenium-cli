@@ -23,10 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.10.1 
-Release date: 2015, July 1
+Latest version: Telerik AppBuilder 2.11 
+Release date: 2015, July 27
 
-> Telerik AppBuilder 2.10.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.10.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-10-1" target="_blank">Telerik AppBuilder 2.10.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.10, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-10" target="_blank">Telerik AppBuilder 2.10 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
 ### System Requirements
 
@@ -360,10 +360,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.10.1 
-Release date: 2015, July 1
+Latest version: Telerik AppBuilder 2.11 
+Release date: 2015, July 27
 
-> Telerik AppBuilder 2.10.1 is a maintenance release. For a complete list of the updates available in Telerik AppBuilder 2.10.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-10-1" target="_blank">Telerik AppBuilder 2.10.1 Release Notes</a>.<br/>For a complete list of the features available in the earlier major release Telerik AppBuilder 2.10, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-10" target="_blank">Telerik AppBuilder 2.10 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -457,7 +457,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 &nbsp;   | Create projects with Screen Builder | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
 &nbsp;   | Initialize existing projects for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Export existing projects from your Telerik Platform account and initialize them for development | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
-&nbsp;   | Develop with NativeScript 1.0.1 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Develop with NativeScript 1.1.2 | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Migrate between supported NativeScript versions | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Customize the Debug and Release build configurations | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Run apps in the device simulator | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">

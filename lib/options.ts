@@ -39,13 +39,14 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			answers: { type: OptionType.String },
 			simulator: { type: OptionType.Boolean, default: true},
 			icon: { type: OptionType.String},
-			splash: { type: OptionType.String}
+			splash: { type: OptionType.String},
+			all: { type: OptionType.Boolean}
 		},
 		path.join($hostInfo.isWindows ? process.env.LocalAppData : path.join(osenv.home(), ".local/share"), "Telerik", "BlackDragon", ".appbuilder-cli"),
 			$errors, $staticConfig);
 		
 		let that = <any>this;
-		that.screenBuilderCacheDir = ($hostInfo.isWindows && this.defaultProfileDir === that.profileDir) ? path.join(process.env.LocalAppData, "Telerik", "sb"): that.profileDir;
+		that.screenBuilderCacheDir = path.join((($hostInfo.isWindows && this.defaultProfileDir === that.profileDir) ? path.join(process.env.LocalAppData, "Telerik"): that.profileDir), "sb");
 	}
 }
 $injector.register("options", Options);

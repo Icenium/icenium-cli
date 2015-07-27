@@ -57,6 +57,13 @@ class DoctorService implements IDoctorService {
 				+ "download and install Mono 3.12 or later from http://www.mono-project.com/download/" + os.EOL);
 			result = true;
 		}
+		if(!sysInfo.gitVer) {
+			this.$logger.warn("WARNING: Git is not installed or not configured properly.");
+			this.$logger.out("You will not be able to create and work with Screen Builder projects." + os.EOL
+				+ "To be able to work with Screen Builder projects, download and install Git as described" + os.EOL
+				+ "in https://git-scm.com/downloads and add the git executable to your PATH." + os.EOL);
+			result = true;
+		}
 
 		return result;
 	}
