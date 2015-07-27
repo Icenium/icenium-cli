@@ -14,13 +14,14 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if(isHtml) { %> 
 ### Prerequisites
 
-* Verify that the image source for your icons is an at least **1024x1024** pixels `PNG` image.
-* Verify that the image source for your splash screens is an at least **2048x2048** pixels `PNG` image. Any logos should be centered.
+* Verify that the image source for your icons is at least **768x768** pixels `PNG` image. The recommended dimensions are **1024x1024** pixels.
+* Verify that the image source for your splash screens is at least **2048x2048** pixels `PNG` image. Any logos should be centered.
+* Verify that the image source size does not exceed 2MB.
 <% } %>
 
 ### Options
-* `--icon` - Creates all required icons for all mobile platforms from a single high-resolution image. The source image must be at least a **1024x1024** pixels `PNG` image.
-* `--splash` - Creates all required splash screens from a single high-resolution image. The source image must be an at least **2048x2048** pixels `PNG` image. If you are using a logo, the logo must be located in the center of the image.
+* `--icon` - Creates all required icons for all mobile platforms from a single high-resolution image. The source image must be at least **768x768** pixels `PNG` image.
+* `--splash` - Creates all required splash screens from a single high-resolution image. The source image must be at least **2048x2048** pixels `PNG` image. If you are using a logo, the logo must be located in the center of the image.
 * `--force` - If set, replaces any conflicting existing images without prompting you to confirm the operation.
 
 ### Attributes

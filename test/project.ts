@@ -505,7 +505,8 @@ function getProjectData(): IProjectData {
 		],
 		"CorePlugins": [ ],
 		"CordovaPluginVariables": {},
-		"WPSdk": "8.0"
+		"WPSdk": "8.0",
+		"iOSDeploymentTarget": "8.0"
 	};
 }
 

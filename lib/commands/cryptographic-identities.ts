@@ -325,7 +325,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 				});
 			}
 
-			return this.$prompter.get(schema).wait();
+			return schema.length ? this.$prompter.get(schema).wait() : {};
 
 		}).future<IIdentityInformation>()();
 	}
@@ -471,6 +471,7 @@ $injector.registerCommand("certificate|*list", ListCertificatesCommand);
 export class RemoveCryptographicIdentity implements ICommand {
 	constructor(private $server: Server.IServer,
 		private $prompter: IPrompter,
+		private $options: IOptions,
 		private $identityManager: Server.IIdentityManager,
 		private $stringParameterBuilder : IStringParameterBuilder) { }
 
@@ -481,7 +482,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 			let nameOrIndex = args[0];
 			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
 
-			if(this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
+			if(this.$options.force || this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
 			}
 		}).future<void>()();

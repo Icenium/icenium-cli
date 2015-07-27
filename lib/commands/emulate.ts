@@ -13,16 +13,15 @@ export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
 				private $buildService: Project.IBuildService,
 				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+				private $options: IOptions) { }
 
 	public allowedParameters: ICommandParameter[] = [];
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureAllPlatformAssets().wait();
-			this.$androidEmulatorServices.checkDependencies().wait();
 			this.$androidEmulatorServices.checkAvailability().wait();
-
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.apk");
 			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
@@ -31,7 +30,7 @@ export class EmulateAndroidCommand implements ICommand {
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath
 			}).wait();
-
+			this.$options.justlaunch = true;
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
 		}).future<void>()();
 	}
@@ -39,6 +38,7 @@ export class EmulateAndroidCommand implements ICommand {
 	public canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
 			this.$project.ensureProject();
+			this.$androidEmulatorServices.checkDependencies().wait();
 			return true;
 		}).future<boolean>()();
 	}

@@ -186,6 +186,7 @@ interface IProjectData extends IDictionary<any> {
 	iOSStatusBarStyle: string;
 	iOSDeviceFamily: string[];
 	iOSBackgroundMode: string[];
+	iOSDeploymentTarget: string;
 	WP8ProductID: string;
 	WP8PublisherID: string;
 	WP8Publisher: string;
@@ -207,20 +208,20 @@ interface IProjectPropertiesService {
 	getValidValuesForProperty(propData: any): IFuture<string[]>;
 	getPropertiesForAllSupportedProjects(): IFuture<string>;
 	/**
-	 * Removes property from the project and validates the result data.  If it is configuration specific (commonly written in .debug.abproject or .release.abproject) 
+	 * Removes property from the project and validates the result data.  If it is configuration specific (commonly written in .debug.abproject or .release.abproject)
 	 * you have to pass the projectData as last parameter of the method.
 	 * @param {IProjectData} dataToBeUpdated The data from which to remove the property.
-	 * @param {string} propertyName The name of the property that should be removed from the data. 
+	 * @param {string} propertyName The name of the property that should be removed from the data.
 	 * @param {IProjectData} projectData Optional parameter. The project data, commonly written in .abproject. Set this property whenever you want to remove property from configuration specific data.
 	 * @return {IProjectData} Modified data. In case configurationSpecificData exists, returns it, else returns projectData.
-	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file. 
+	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
 	 */
 	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
 
 	/**
 	 * Updates CorePlugins property value in all configurations.
 	 * @param {IProjectData} projectData The project data commonly written in .abproject.
-	 * @param {IDictionary<IProjectData>} configurationSpecificData Dictionary with all configuration specific data. 
+	 * @param {IDictionary<IProjectData>} configurationSpecificData Dictionary with all configuration specific data.
 	 * @param {string} mode Type of operation which should be executed with the property.
 	 * @param {Array<any>} newValue The new value that should be used for CorePlugins modification.
 	 * @param {string[]} configurationsSpecifiedByUser The configurations which the user want to modify.
@@ -278,10 +279,12 @@ interface IServerConfiguration {
 	resourcesPath: IFuture<string>;
 }
 
-interface IExtensionPlatformServices {
+interface IExtensionPlatformServices extends IRunValidator {
 	packageName : string;
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
+}
+interface IRunValidator {
 	canRunApplication(): IFuture<boolean>;
 }
 
@@ -363,7 +366,7 @@ interface IDependencyConfig {
 interface IAppScaffoldingConfig extends IDependencyConfig { }
 
 interface IGeneratorConfig extends IDependencyConfig {
-	alias: string; 
+	alias: string;
 }
 
 interface IExtensionsServiceBase {
@@ -470,7 +473,7 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 	 */
 	pluginsForVersion(version: string): IFuture<string[]>;
 	/**
-	 * Migrate plugins from one Cordova version to another. 
+	 * Migrate plugins from one Cordova version to another.
 	 * @param {string} fromVersion The current Cordova Framework version.
 	 * @param {string} toVersion The Cordova Framework version to be used.
 	 * @return {string[]} Migrated plugins.
@@ -726,6 +729,7 @@ interface IOptions extends ICommonOptions {
 	simulator: boolean;
 	icon: string;
 	splash: string;
+	all: boolean;
 }
 
 /**
@@ -774,7 +778,7 @@ interface IWebViewService {
  */
 interface IWebView {
 	name: string;
-	minSupportedVersion: string;	
+	minSupportedVersion: string;
 	pluginIdentifier?: string;
 	default?: boolean;
 }

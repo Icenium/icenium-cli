@@ -40,6 +40,8 @@ Command | Description
 [prop&nbsp;remove](project/configuration/prop-remove.html) | Disables options for the selected project property, if the property accepts multiple values.
 [mobileframework](project/configuration/mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
+[webview](project/configuration/webview.html) | Lists the available web views for iOS and Android.
+[webview&nbsp;set](project/configuration/webview-set.html) | Sets the selected web view for the current project.
 [update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
 [resource](resource.html) | Lists information about the image resources for all mobile platforms.
 [resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.

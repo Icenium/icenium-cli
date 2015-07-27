@@ -7,14 +7,16 @@ import util = require("util");
 import ProjectCommandBaseLib = require("./project-command-base");
 
 export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
-	constructor($errors: IErrors,
-		private $fs: IFileSystem,
+	constructor(private $fs: IFileSystem,
+		private $logger: ILogger,
 		private $nameCommandParameter: ICommandParameter,
-		$project: Project.IProject,
+		private $options: IOptions,
 		private $projectConstants: Project.IProjectConstants,
-		private $simulatorService: ISimulatorService,
 		private $screenBuilderService: IScreenBuilderService,
-		private $options: IOptions) {
+		private $simulatorService: ISimulatorService,
+		private $simulatorPlatformServices: IExtensionPlatformServices,
+		$errors: IErrors,
+		$project: Project.IProject) {
 		super($errors, $project);
 	}
 
@@ -33,18 +35,19 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 					name: projectName
 				}
 			}).wait();
-			
+
 			try {
 				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
 				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
 
 				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath, projectName).wait();
 			} catch(err) {
+				this.$logger.trace(err);
 				this.$fs.deleteDirectory(projectPath).wait();
 				throw err;
 			}
-			
-			if (this.$options.simulator) {
+
+			if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
 		}).future<void>()();

@@ -87,4 +87,11 @@ describe("PathFilteringService", () => {
 		let expected = ["a","b"];
 		assert.deepEqual(actual, expected);
 	});
+
+	it("ignore .files", () => {
+		let projectFiles = prefixWithProjectDir(["test/A", "test/.B", "test/C"]);
+		let actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["test/**/*"], projectDir);
+		let expected: string[] = [];
+		assert.deepEqual(actual, expected);
+	});
 });

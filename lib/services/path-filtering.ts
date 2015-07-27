@@ -39,12 +39,12 @@ export class PathFilteringService implements IPathFilteringService {
 			let shouldInclude = rule[0] === '!';
 			if (shouldInclude) {
 				rule = rule.substr(1);
-				let ruleMatched = minimatch(file, rule, {nocase: true});
+				let ruleMatched = minimatch(file, rule, {nocase: true, dot: true});
 				if (ruleMatched) {
 					fileMatched = true;
 				}
 			} else {
-				let options = {nocase: true, nonegate: false};
+				let options = {nocase: true, nonegate: false, dot: true};
 				if (rule[0] === '\\' && rule[1] === '!') {
 					rule = rule.substr(1);
 					options.nonegate = true;
