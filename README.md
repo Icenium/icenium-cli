@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 2.11 
-Release date: 2015, July 27
+Release date: 2015, July 28
 
 > For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
@@ -361,7 +361,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 2.11 
-Release date: 2015, July 27
+Release date: 2015, July 28
 
 > For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
