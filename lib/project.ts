@@ -513,6 +513,10 @@ export class Project implements Project.IProject {
 
 	public validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean> {
 		return (() => {
+			if (!property) {
+				this.$errors.fail("Please specify a property name.");
+			}
+
 			let validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
 			if(_.contains(validProperties, property)) {
 				let normalizedPropertyName =  this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
