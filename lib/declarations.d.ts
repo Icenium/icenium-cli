@@ -651,6 +651,12 @@ interface ILiveSyncService {
 	livesync(platform?: string): IFuture<void>;
 }
 
+interface ILiveSyncDeviceAppData extends Mobile.IDeviceAppData {
+	liveSyncFormat: string;
+	encodeLiveSyncHostUri(hostUri: string): string;
+	getLiveSyncNotSupportedError(device: Mobile.IDevice): string;	
+} 
+
 interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
 	openAppManagerStore(): void;

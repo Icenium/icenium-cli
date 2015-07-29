@@ -82,6 +82,10 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 $injector.register("config", Configuration);
 
 export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implements IStaticConfig {
+	constructor($injector: IInjector) {
+		super($injector);
+	} 
+	
 	private static TOKEN_FILENAME = ".abgithub";
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
