@@ -106,13 +106,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			// HACK - yargs parses double values (8.0) as integers (8)
-			if(normalizedProperty === "WPSdk") {
-				if(propertyValue.indexOf(".") === -1) {
-					propertyValue += ".0";
-				}
-			}
-
 			this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue).wait();
 
 			if(configurationSpecificData) {

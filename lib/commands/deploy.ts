@@ -4,6 +4,7 @@
 import util = require("util");
 import Future = require("fibers/future");
 import commandParams = require("../common/command-params");
+import helpers = require("../common/helpers");
 
 export class DeployHelper implements IDeployHelper {
 	constructor(protected $devicesServices: Mobile.IDevicesServices,
@@ -14,7 +15,8 @@ export class DeployHelper implements IDeployHelper {
 		protected $liveSyncService: ILiveSyncService,
 		protected $errors: IErrors,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		private $devicePlatformsConstants:Mobile.IDevicePlatformsConstants) { }
 
 
 	public deploy(platform?: string): IFuture<void> {
@@ -44,6 +46,15 @@ export class DeployHelper implements IDeployHelper {
 			this.$options.justlaunch = true; 
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
+				let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
+				if(deploymentTarget && device.deviceInfo.platform.toLowerCase() === this.$devicePlatformsConstants.iOS.toLowerCase()) {
+					let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
+					if(helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
+						this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
+						return Future.fromResult();
+					}
+				}
+
 				if(!packageFile) {
 					let packageDefs = this.$buildService.deploy(this.$devicesServices.platform, device).wait();
 					packageFile = packageDefs[0].localFile;

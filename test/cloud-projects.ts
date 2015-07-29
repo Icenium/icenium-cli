@@ -77,7 +77,7 @@ export class PrompterStub {
 function createTestInjector(promptSlnName?: string, promptPrjName?: string, isInteractive?: boolean): IInjector {
 	let testInjector = new yok.Yok();
 	let helpers = require("../lib/common/helpers");
-	isInteractive = isInteractive === undefined ? true : false;
+	isInteractive = isInteractive !== false;
 	helpers.isInteractive = () => { return isInteractive; };
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
@@ -212,6 +212,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	});
 	testInjector.register("prompter", new PrompterStub(promptSlnName, promptPrjName));
 	testInjector.register("logger", new LoggerStub());
+	testInjector.register("options", {});
 	return testInjector;
 }
 
@@ -373,7 +374,7 @@ describe("cloud project commands", () => {
 				});
 			})
 		});
-	});
+});
 
 	describe("list project command", () => {
 		let testInjector: IInjector;
@@ -434,6 +435,45 @@ describe("cloud project commands", () => {
 
 			it("when solution name is NOT passed", () => {
 				listProjectCommand.execute([]).wait();
+			});
+		});
+		
+		describe("lists solutions", () => {
+			it("when no parameter provided in NON-interactive console", () => {
+				testInjector = createTestInjector("Sln1", "BlankProj", false);
+				let logger = testInjector.resolve("logger");
+				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
+				assert.equal("", logger.outOutput);
+				
+				listProjectCommand.execute([]).wait();
+				
+				let sln1Index = logger.outOutput.indexOf("Sln1"),
+					sln2Index = logger.outOutput.indexOf("Sln2"),
+					sln3Index = logger.outOutput.indexOf("Sln3");
+
+				assert.isTrue(sln1Index !== -1);
+				assert.isTrue(sln2Index !== -1);
+				assert.isTrue(sln3Index !== -1);
+			});
+			
+			it("when --all option provided in interactive console", () => {
+				testInjector = createTestInjector("Sln1", "BlankProj");
+				let logger = testInjector.resolve("logger"),
+					opts = testInjector.resolve("options");
+				
+				opts.all = true;
+				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
+				assert.equal("", logger.outOutput);
+				
+				listProjectCommand.execute([]).wait();
+				
+				let sln1Index = logger.outOutput.indexOf("Sln1"),
+					sln2Index = logger.outOutput.indexOf("Sln2"),
+					sln3Index = logger.outOutput.indexOf("Sln3");
+
+				assert.isTrue(sln1Index !== -1);
+				assert.isTrue(sln2Index !== -1);
+				assert.isTrue(sln3Index !== -1);
 			});
 		});
 	});
