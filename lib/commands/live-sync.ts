@@ -47,11 +47,14 @@ $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand)
 
 class LiveSyncWP8Command implements ICommand {
 	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $config: Config.IConfig) { }
 	execute(args: string[]): IFuture<void> {
 		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
 	}
 
 	allowedParameters: ICommandParameter[] = [];
+
+	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand(["livesync|wp8", "live-sync|wp8"], LiveSyncWP8Command);

@@ -96,6 +96,10 @@ export class ServiceProxy implements Server.IServiceProxy {
 
 	private ensureUpToDate(): IFuture<void> {
 		return (() => {
+			if(this.$config.ON_PREM) {
+				return;
+			}
+
 			try {
 				if (!this.latestVersion) {
 					this.latestVersion = JSON.parse(this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder").wait().body)["dist-tags"].latest;
