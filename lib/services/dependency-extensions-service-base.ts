@@ -14,7 +14,8 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 		$httpClient: Server.IHttpClient,
 		$logger: ILogger,
 		$options: IOptions,
-		private $progressIndicator: IProgressIndicator) {
+		private $progressIndicator: IProgressIndicator,
+		private $config: IConfiguration) {
 		super(cacheDir, $fs, $httpClient, $logger, $options);
 	}
 
@@ -22,7 +23,7 @@ export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.Ext
 		return (() => {
 			let extensionVersion = this.getExtensionVersion(dependencyExtensionName);
 			let cachedVersion = extensionVersion || DependencyExtensionsServiceBase.DEFAULT_CACHED_VERSION;
-			let downloadUrl = util.format("%s/v%s/%s.zip", DependencyExtensionsServiceBase.SCREEN_BUILDER_BUCKET_NAME, dependencyConfig.version, dependencyExtensionName);
+			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb/generators/${dependencyExtensionName}/${dependencyConfig.version}` : `${DependencyExtensionsServiceBase.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;
 
 			this.$logger.trace("prepareDependencyExtension: Download url: %s, cached version", downloadUrl, cachedVersion);
 

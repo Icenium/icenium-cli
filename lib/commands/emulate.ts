@@ -95,7 +95,8 @@ export class EmulateWp8Command implements ICommand {
 	constructor(private $project: Project.IProject,
 		private $buildService: Project.IBuildService,
 		private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $config: Config.IConfig) {
 		this.$project.ensureProject();
 	}
 
@@ -127,5 +128,7 @@ export class EmulateWp8Command implements ICommand {
 			return true;
 		}).future<boolean>()();
 	}
+
+	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand("emulate|wp8", EmulateWp8Command);
