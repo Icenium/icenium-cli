@@ -25,6 +25,7 @@ Inserts an about form in an existing application view. <% if(isHtml) { %>An inte
 ### Command Limitations 
 
 * You can run this command only on projects created with Screen Builder.
+* You cannot use this command to modify projects created with earlier versions of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
 
 ### Related Commands
 
