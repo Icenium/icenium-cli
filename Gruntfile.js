@@ -36,6 +36,7 @@ module.exports = function(grunt) {
 		dateString: now.substr(0, now.indexOf("T")),
 
 		pkg: grunt.file.readJSON("package.json"),
+		commonDtsFileCreation: grunt.file.write(require("path").join("lib", "common", ".d.ts"), ""),
 
 		ts: {
 			options: {
@@ -48,17 +49,17 @@ module.exports = function(grunt) {
 			},
 
 			devlib: {
-				src: ["lib/**/*.ts"],
+				src: ["lib/**/*.ts", "!lib/common/node_modules/**/*.ts"],
 				reference: "lib/.d.ts"
 			},
 
 			devall: {
-				src: ["lib/**/*.ts", "test/**/*.ts"],
+				src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts", "lib/common/test/unit-tests/**/*.ts", "definitions/**/*.ts", "!lib/common/test/.d.ts"],
 				reference: "lib/.d.ts"
 			},
 
 			release_build: {
-				src: ["lib/**/*.ts", "test/**/*.ts"],
+				src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts"],
 				reference: "lib/.d.ts",
 				options: {
 					sourceMap: false,
@@ -69,7 +70,7 @@ module.exports = function(grunt) {
 
 		watch: {
 			devall: {
-				files: ["lib/**/*.ts", 'test/**/*.ts'],
+				files: ["lib/**/*.ts", 'test/**/*.ts', "!lib/common/node_modules/**/*.ts"],
 				tasks: ['ts:devall'],
 				options: {
 					atBegin: true,
@@ -125,7 +126,7 @@ module.exports = function(grunt) {
 		},
 
 		clean: {
-			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/hooks/**/*.js", "*.tgz"]
+			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/**/*.json", "!lib/common/Gruntfile.js", "!lib/common/node_modules/**/*", "!lib/common/hooks/**/*.js", "!lib/common/bin/*.js", "*.tgz"]
 		}
 	});
 
