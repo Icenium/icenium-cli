@@ -37,6 +37,15 @@ module.exports = function(grunt) {
 
 		pkg: grunt.file.readJSON("package.json"),
 		commonDtsFileCreation: grunt.file.write(require("path").join("lib", "common", ".d.ts"), ""),
+		
+		// When there are node_modules inside lib\common directory, CLI behaves incorrectly, so delete this dir.
+		removeCommonNodeModules: require("rimraf")(require("path").join("lib", "common", "node_modules"), function(err) {
+			if(err) {
+				console.log("Error while deleting common lib node_modules directory.");
+			} else {
+				console.log("Successfully deleted node_modules directory of common lib.");
+			}
+		}),
 
 		ts: {
 			options: {

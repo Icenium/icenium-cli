@@ -92,7 +92,7 @@
     "grunt-shell": "0.6.4",
     "grunt-ts": "2.0.1",
     "istanbul": "0.3.14",
-    "mocha": "1.14.x",
+    "mocha": "2.2.5",
     "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
     "spec-xunit-file": "0.0.1-3"
   },
