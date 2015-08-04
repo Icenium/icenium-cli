@@ -49,7 +49,8 @@ module.exports = function(grunt) {
 				sourceMap: true,
 				declaration: false,
 				removeComments: false,
-				noImplicitAny: true
+				noImplicitAny: true,
+				experimentalDecorators: true
 			},
 
 			devlib: {
