@@ -23,10 +23,12 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.11 
-Release date: 2015, July 28
+Latest version: Telerik AppBuilder 2.11.1 
+Release date: 2015, August 5
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
+> Telerik AppBuilder 2.11.1 is an update release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.11.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11-1" target="_blank">Telerik AppBuilder 2.11.1 Release Notes</a>.
+>
+> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
 ### System Requirements
 
@@ -360,10 +362,12 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.11 
-Release date: 2015, July 28
+Latest version: Telerik AppBuilder 2.11.1 
+Release date: 2015, August 5
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 2.11, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
+> Telerik AppBuilder 2.11.1 is an update release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.11.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11-1" target="_blank">Telerik AppBuilder 2.11.1 Release Notes</a>.
+>
+> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
@@ -376,6 +380,7 @@ Platform | Operation | Windows | OS&nbsp;X | Linux
 **Cross-platform** | Develop hybrid mobile apps locally | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Develop hybrid mobile apps with third-party tools | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Develop hybrid mobile apps with Sublime Text | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
+&nbsp;   | Develop hybrid mobile apps for Apple Watch | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Log in and out of the Telerik Platform | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | View login information | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/support.png" style="width: 16px;">
 &nbsp;   | Switch Telerik AppBuilder accounts | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;"> | <img src="https://raw.github.com/Icenium/icenium-cli/release/no-support.png" style="width: 16px;">
