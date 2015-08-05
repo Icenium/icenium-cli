@@ -8,7 +8,7 @@
     "appbuilder": "./bin/appbuilder.js"
   },
   "scripts": {
-    "test": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- --ui mocha-fibers --recursive --reporter spec-xunit-file --require test/test-bootstrap.js --timeout 15000 test/",
+    "test": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- --ui mocha-fibers --recursive --reporter spec-xunit-file --require test/test-bootstrap.js --timeout 15000 test/ lib/common/test/unit-tests",
     "postinstall": "node postinstall.js",
     "preuninstall": "node preuninstall.js",
     "prepublish": "node prepublish.js"
@@ -27,6 +27,7 @@
   "dependencies": {
     "JSV": "4.0.2",
     "binary-reader": "0.1.0",
+    "bluebird": "2.9.34",
     "bower": "1.3.9",
     "bplist-parser": "0.0.6",
     "bufferpack": "0.0.6",
@@ -70,7 +71,7 @@
     "string-to-json": "0.1.0",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
     "temp": "0.8.1",
-    "typescript": "1.5.0-beta",
+    "typescript": "1.5.3",
     "unzip": "0.1.11",
     "valid-url": "1.0.9",
     "validator": "3.2.1",
@@ -83,14 +84,14 @@
   "analyze": true,
   "devDependencies": {
     "chai": "1.8.x",
-    "file": "0.2.1",
-    "grunt": "0.4.2",
-    "grunt-contrib-clean": "0.5.0",
-    "grunt-contrib-watch": "0.5.3",
-    "grunt-shell": "0.6.4",
-    "grunt-ts": "2.0.1",
-    "istanbul": "0.3.14",
-    "mocha": "1.14.x",
+    "file": "0.2.2",
+    "grunt": "0.4.5",
+    "grunt-contrib-clean": "0.6.0",
+    "grunt-contrib-watch": "0.6.1",
+    "grunt-shell": "1.1.2",
+    "grunt-ts": "4.2.0",
+    "istanbul": "0.3.17",
+    "mocha": "2.2.5",
     "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
     "spec-xunit-file": "0.0.1-3"
   },

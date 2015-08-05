@@ -1,4 +1,3 @@
-var util = require("util");
 var os = require("os");
 
 var now = new Date().toISOString();
@@ -27,6 +26,13 @@ module.exports = function(grunt) {
 	process.env.path = process.env.path + (os.platform() === "win32" ? ";" : ":") + "node_modules/.bin";
 
 	var defaultEnvironment = "sit";
+	// When there are node_modules inside lib\common directory, CLI behaves incorrectly, so delete this dir.
+	var path = require("path");
+	var commonLibNodeModules = path.join("lib", "common", "node_modules");
+	if(require("fs").existsSync(commonLibNodeModules)) {
+		grunt.file.delete(commonLibNodeModules);
+	}
+	grunt.file.write(path.join("lib", "common", ".d.ts"), "");
 
 	grunt.initConfig({
 		deploymentEnvironment: process.env["DeploymentEnvironment"] || defaultEnvironment,
@@ -36,7 +42,6 @@ module.exports = function(grunt) {
 		dateString: now.substr(0, now.indexOf("T")),
 
 		pkg: grunt.file.readJSON("package.json"),
-
 		ts: {
 			options: {
 				target: 'es5',
@@ -44,21 +49,22 @@ module.exports = function(grunt) {
 				sourceMap: true,
 				declaration: false,
 				removeComments: false,
-				noImplicitAny: true
+				noImplicitAny: true,
+				experimentalDecorators: true
 			},
 
 			devlib: {
-				src: ["lib/**/*.ts"],
+				src: ["lib/**/*.ts", "!lib/common/node_modules/**/*.ts"],
 				reference: "lib/.d.ts"
 			},
 
 			devall: {
-				src: ["lib/**/*.ts", "test/**/*.ts"],
+				src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts", "lib/common/test/unit-tests/**/*.ts", "definitions/**/*.ts", "!lib/common/test/.d.ts"],
 				reference: "lib/.d.ts"
 			},
 
 			release_build: {
-				src: ["lib/**/*.ts", "test/**/*.ts"],
+				src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts"],
 				reference: "lib/.d.ts",
 				options: {
 					sourceMap: false,
@@ -69,7 +75,7 @@ module.exports = function(grunt) {
 
 		watch: {
 			devall: {
-				files: ["lib/**/*.ts", 'test/**/*.ts'],
+				files: ["lib/**/*.ts", 'test/**/*.ts', "!lib/common/node_modules/**/*.ts"],
 				tasks: ['ts:devall'],
 				options: {
 					atBegin: true,
@@ -125,7 +131,7 @@ module.exports = function(grunt) {
 		},
 
 		clean: {
-			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/hooks/**/*.js", "*.tgz"]
+			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/**/*.json", "!lib/common/Gruntfile.js", "!lib/common/node_modules/**/*", "!lib/common/hooks/**/*.js", "!lib/common/bin/*.js", "*.tgz"]
 		}
 	});
 
