@@ -253,7 +253,7 @@ export class BuildService implements Project.IBuildService {
 		return ((): Project.IBuildResult => {
 			Object.keys(buildProperties).forEach((prop) => {
 				if(buildProperties[prop] === undefined) {
-					this.$errors.fail(util.format("Build property '%s' is undefined.", prop));
+					this.$logger.warn(`Build property '${prop}' is undefined. The property is optional, but you can set it by running '${this.$staticConfig.CLIENT_NAME.toLowerCase()} prop set ${prop} <value>'.`);
 				}
 
 				if(_.isArray(buildProperties[prop])) {

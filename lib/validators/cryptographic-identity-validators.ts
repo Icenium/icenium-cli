@@ -11,7 +11,7 @@ import path = require("path");
 
 export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<ISelfSignedIdentityModel> {
 	public static DATE_FORMAT = "YYYY-MM-DD";
-	public static GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE = new Date("2033-10-23");
+	public static GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE = new Date(2033, 9, 23, 0, 0, 0, 0);
 
 	public static EMPTY_FIELD_ERROR_MESSAGE_PATTERN = "%s is required";
 	public static INVALID_FIELD_ERROR_MESSAGE_PATTERN = "%s is invalid";
