@@ -126,7 +126,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			let future = new Future<void>();
 			let callback = (err:any, data:any) => {
 				if (err) {
-					let error = this.getErrorsRecursive(err.errors).join('\n');
+					let error = this.getErrorsRecursive(err).join('\n');
 					this.$logger.trace("ScreenBuilder error while prompting: %s", err);
 					future.throw(error);
 				} else {
@@ -138,14 +138,14 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<{ scaffolder: any; future: IFuture<any>; callback: Function }>()();
 	}
 	
-	private getErrorsRecursive(errors: any): string[] {
-		let resultArray = _.map(errors, (e:any) => e.message),
-			childErrors = _(errors)
-							.map((e:any) => this.getErrorsRecursive(e.errors))
+	private getErrorsRecursive(errorObject: any): string[] {
+		let errorMessage = errorObject.message,
+			childErrors = _(errorObject.errors)
+							.map(errObj => this.getErrorsRecursive(errObj))
 							.flatten<string>()
 							.value();
 
-		return _.union(resultArray, childErrors);
+		return _.union([errorMessage], childErrors);
 	}
 
 	private registerCommand(command: string, generatorName: string): void {

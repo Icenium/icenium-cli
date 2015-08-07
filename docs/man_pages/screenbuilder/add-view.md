@@ -21,6 +21,7 @@ Adds a new application view to your project. You can later add lists and forms t
 
 * You can run this command only on projects created with Screen Builder.
 * Verify that you have installed git on your system.
+* You cannot use this command to modify projects created with earlier versions of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
 
 ### Related Commands
 

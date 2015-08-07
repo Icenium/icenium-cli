@@ -25,6 +25,7 @@ Inserts an input field of a selected type with a label and placeholder text in a
 ### Command Limitations 
 
 * You can run this command only on projects created with Screen Builder.
+* You cannot use this command to modify projects created with earlier versions of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
 
 ### Related Commands
 

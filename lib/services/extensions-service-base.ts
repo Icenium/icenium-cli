@@ -51,7 +51,7 @@ export class ExtensionsServiceBase {
 				this.$logger.debug("Cached version is: %s", cachedVersion);
 			}
 
-			if( helpers.versionCompare(cachedVersion, extensionVersion) < 0) {
+			if( this.shouldUpdatePackage(cachedVersion, extensionVersion) ) {
 				this.$logger.printInfoMessageOnSameLine(util.format("Updating %s package...", packageName));
 				let zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
@@ -83,7 +83,7 @@ export class ExtensionsServiceBase {
 	}
 
 	public shouldUpdatePackage(cachedVersion: string, extensionVersion: string): boolean {
-		return helpers.versionCompare(cachedVersion, extensionVersion) < 0;
+		return helpers.versionCompare(cachedVersion, extensionVersion) !== 0;
 	}
 
 	private get versionsFile(): string {
