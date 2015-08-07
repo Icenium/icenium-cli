@@ -31,8 +31,11 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		$options: IOptions,
 		$deviceAppDataFactory: Mobile.IDeviceAppDataFactory,
 		$localToDevicePathDataFactory: Mobile.ILocalToDevicePathDataFactory,
-		$injector: IInjector) {
-			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector) 
+		$injector: IInjector,
+		$childProcess: IChildProcess,
+		$iOSEmulatorServices: Mobile.IiOSSimulatorService,
+		$hostInfo: IHostInfo) {
+			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector, $childProcess, $iOSEmulatorServices, $hostInfo) 
 		}
 
 	public livesync(platform?: string): IFuture<void> {
@@ -63,13 +66,15 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);				
 				}).future<void>()();
 			}
-			
+
 			let platformSpecificLiveSyncServices: IDictionary<any> = {
 				"android": AndroidLiveSyncService,
 				"ios": IOSLiveSyncService
 			}
-			
-			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir, projectDir, this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, notInstalledAppOnDeviceAction).wait();
+
+			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir, 
+				this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, () => Future.fromResult(), notInstalledAppOnDeviceAction, 
+				() => Future.fromResult()).wait();
 			
 		}).future<void>()();
 	}
