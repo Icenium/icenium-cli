@@ -657,8 +657,8 @@ interface ILiveSyncService {
 interface ILiveSyncDeviceAppData extends Mobile.IDeviceAppData {
 	liveSyncFormat: string;
 	encodeLiveSyncHostUri(hostUri: string): string;
-	getLiveSyncNotSupportedError(device: Mobile.IDevice): string;	
-} 
+	getLiveSyncNotSupportedError(device: Mobile.IDevice): string;
+}
 
 interface IAppManagerService {
 	upload(platform: string): IFuture<void>;
@@ -823,4 +823,16 @@ interface IImageService {
 	 * @return {IFuture<void>}
 	 */
 	promptForImageInformation(force: boolean): IFuture<void>;
+}
+
+/**
+ * The backend of 'remote' command.
+ * Listens on an API endpoint to launch ios simulator
+ */
+interface IRemoteService {
+	/**
+	 * Listens on an API endpoint to launch ios simulator
+	 * @param portNumber
+	 */
+	startApiServer(portNumber: number): IFuture<void>;
 }

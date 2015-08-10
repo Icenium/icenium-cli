@@ -143,11 +143,12 @@ $injector.requireCommand("appmanager|upload|android", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|ios", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|wp8", "./commands/appmanager");
 $injector.requireCommand("appmanager|groups", "./commands/appmanager");
- 
+
 $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
 $injector.requireCommand("dev-prepackage", "./commands/dev/prepackage");
 $injector.require("platformServices", "./commands/simulate");
+$injector.require("remoteService", "./services/remote-service");
 $injector.requireCommand("remote", "./commands/remote");
 $injector.require("clientUserSettingsFileService", "./services/user-settings-service");
 $injector.require("clientSpecificUserSettingsService", "./services/user-settings-service");
