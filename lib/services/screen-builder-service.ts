@@ -128,7 +128,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				if (err) {
 					let error = this.getErrorsRecursive(err).join('\n');
 					this.$logger.trace("ScreenBuilder error while prompting: %s", err);
-					future.throw(error);
+					future.throw(new Error(error));
 				} else {
 					future.return(data);
 				}

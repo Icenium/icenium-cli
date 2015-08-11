@@ -365,7 +365,7 @@ describe("cloud project commands", () => {
 					fs.exists = (param: string) => Future.fromResult(false);
 					project.createProjectFile = (projectDir: string, properties: any) => {
 						let future = new Future<void>();
-						future.throw("error is raised");
+						future.throw(new Error("error is raised"));
 						return future;
 					}
 					logger = testInjector.resolve("logger");
