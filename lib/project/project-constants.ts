@@ -11,7 +11,6 @@ export class ProjectConstants implements Project.IProjectConstants {
 	public CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
 	public APPIDENTIFIER_PROPERTY_NAME = "AppIdentifier";
 	public EXPERIMENTAL_TAG = "Experimental";
-	public APP_RESOURCES_DIR_NAME = "App_Resources";
 	public NATIVESCRIPT_APP_DIR_NAME = "app";
 	public IMAGE_DEFINITIONS_FILE_NAME = 'image-definitions.json';
 

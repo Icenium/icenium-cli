@@ -137,7 +137,6 @@ declare module Project {
 		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
 		APPIDENTIFIER_PROPERTY_NAME: string;
 		EXPERIMENTAL_TAG: string;
-		APP_RESOURCES_DIR_NAME: string;
 		NATIVESCRIPT_APP_DIR_NAME: string;
 		IMAGE_DEFINITIONS_FILE_NAME: string;
 	}

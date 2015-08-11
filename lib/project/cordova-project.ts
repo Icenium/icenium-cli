@@ -22,6 +22,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $projectFilesManager: Project.IProjectFilesManager,
 		private $templatesService: ITemplatesService,
 		$resources: IResourceLoader,
+		private $staticConfig: Config.IStaticConfig,
 		private $mobileHelper: Mobile.IMobileHelper,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
@@ -156,7 +157,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME, relativePath);
+				let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();

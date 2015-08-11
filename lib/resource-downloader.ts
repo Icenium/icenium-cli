@@ -2,34 +2,6 @@
 "use strict";
 
 import path = require("path");
-import helpers = require("./helpers");
-import util = require("util");
-
-export class ResourceLoader implements IResourceLoader {
-	constructor(private $fs: IFileSystem, 
-		private $projectConstants: Project.IProjectConstants) { }
-
-	resolvePath(resourcePath: string): string {
-		return path.join(__dirname, "../resources", resourcePath);
-	}
-
-	openFile(resourcePath: string): any {
-		return this.$fs.createReadStream(this.resolvePath(resourcePath));
-	}
-
-	readJson(resourcePath: string): IFuture<any> {
-		return this.$fs.readJson(this.resolvePath(resourcePath));
-	}
-
-	public buildCordovaJsFilePath(version: string, platform: string): string {
-		return path.join(this.resolvePath("Cordova"), version, util.format("cordova.%s.js", platform).toLowerCase());
-	}
-
-	public getPathToAppResources(framework: string) {
-		return path.join(this.resolvePath(framework), this.$projectConstants.APP_RESOURCES_DIR_NAME);
-	}
-}
-$injector.register("resources", ResourceLoader);
 
 class ResourceDownloader implements IResourceDownloader {
 	private imageDefinitionsResourcesPath: string;
@@ -42,6 +14,7 @@ class ResourceDownloader implements IResourceDownloader {
 		private $resources: IResourceLoader,
 		private $cordovaMigrationService: IFrameworkMigrationService,
 		private $mobileHelper: Mobile.IMobileHelper,
+		private $staticConfig: Config.IStaticConfig,
 		private $projectConstants: Project.IProjectConstants) {
 			
 			this.imageDefinitionsResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/${this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME}`;	
@@ -74,7 +47,7 @@ class ResourceDownloader implements IResourceDownloader {
 	}
 	
 	public downloadImageDefinitions(): IFuture<void> {
-		let targetPath = path.join(this.$projectConstants.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME);
+		let targetPath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME);
 		return this.downloadResourceFromServer(this.imageDefinitionsResourcesPath, this.$resources.resolvePath(targetPath));
 	}
 }

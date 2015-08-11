@@ -12,6 +12,7 @@ let commandParams = require("../lib/common/command-params");
 import commonOptionsLib = require("../lib/common/options");
 let optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
+import resourcesLib = require("../lib/common/resource-loader");
 
 let isCommandExecuted: boolean;
 
@@ -179,6 +180,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("commandsService", commandsServiceFile.CommandsService);
 	testInjector.register("stringParameter", commandParams.StringCommandParameter);
 	testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
+	testInjector.register("resources", resourcesLib.ResourceLoader);
 	testInjector.register("commandsServiceProvider", {
 		registerDynamicSubCommands: () => {}
 	});
@@ -192,7 +194,7 @@ function createTestInjector(): IInjector {
 	testInjector.registerCommand("commandWithStringParamBuilder", MockCommandWithStringParamBuilder);
 	testInjector.registerCommand("commandWithIsDisabledSetToTrue", MockCommandWithIsDisabledToTrue);
 	testInjector.registerCommand("commandWithDashedOptions", MockCommandWithSpecificDashedOptions);
-	
+
 	return testInjector;
 }
 
@@ -388,7 +390,7 @@ describe("commands service", () => {
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 		});
-		
+
 		it("executes command when it has its own dashed options and a global one is passed", () => {
 			process.argv.push("--log");
 			process.argv.push("trace");

@@ -314,14 +314,6 @@ interface IPackageDownloadViewModel {
 	packageUrls?: IPackageDownloadLink[];
 }
 
-interface IResourceLoader {
-	resolvePath(path: string): string;
-	openFile(path: string): any;
-	readJson(path: string): IFuture<any>;
-	buildCordovaJsFilePath(version: string, platform: string): string;
-	getPathToAppResources(framework: string): string;
-}
-
 /**
  * Used to download resources from the server
  */
