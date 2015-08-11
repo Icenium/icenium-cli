@@ -15,7 +15,7 @@ testInjector.register("errors", {});
 testInjector.register("logger", {});
 testInjector.register("mobileHelper", {});
 testInjector.register("pluginsService", {
-	getPluginBasicInformation: (pluginName: string) => { 
+	getPluginBasicInformation: (pluginName: string) => {
 		return {
 			name: 'Name',
 			version: '1.0.0'
@@ -42,6 +42,8 @@ testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { r
 testInjector.register("webViewService", {});
 testInjector.register("serverConfiguration", {});
 testInjector.register("httpClient", {});
+testInjector.register("cordovaResources", {});
+
 
 function registerMockedFS(mockResult: any): void {
 	testInjector.register("fs", {

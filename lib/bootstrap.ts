@@ -10,6 +10,7 @@ $injector.require("serverConfiguration", "./server-config");
 $injector.requireCommand("dev-config", "./commands/dev/config");
 $injector.requireCommand("dev-config-apply", "./commands/dev/config-apply");
 $injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
+$injector.require("cordovaResources", "./cordova-resource-loader");
 $injector.require("resourceDownloader", "./resource-downloader");
 $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("templatesService", "./templates-service");

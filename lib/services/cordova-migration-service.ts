@@ -25,15 +25,16 @@ class MigrationData {
 export class CordovaMigrationService implements ICordovaMigrationService {
 	private static CORDOVA_JSON_FILE_NAME = "cordova.json";
 	private static CORDOVA_FOLDER_NAME = "Cordova";
-	
+
 	private _migrationData: MigrationData;
 	private minSupportedVersion: string = "3.0.0";
 	private invalidMarketplacePlugins: string[] = [];
 	private cordovaMigrationFile: string = path.join(__dirname, "../../resources/Cordova", "cordova-migration-data.json");
 
-	constructor(private $fs: IFileSystem,
-		private $server: Server.IServer,
+	constructor(private $cordovaResources: ICordovaResourceLoader,
 		private $errors: IErrors,
+		private $fs: IFileSystem,
+		private $httpClient: Server.IHttpClient,
 		private $logger: ILogger,
 		private $loginManager:ILoginManager,
 		private $mobileHelper: Mobile.IMobileHelper,
@@ -43,9 +44,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $prompter: IPrompter,
 		private $resources: IResourceLoader,
-		private $webViewService: IWebViewService,
+		private $server: Server.IServer,
 		private $serverConfiguration: IServerConfiguration,
-		private $httpClient: Server.IHttpClient) { }
+		private $webViewService: IWebViewService) { }
 
 	private get migrationData(): IFuture<MigrationData> {
 		return (() => {
@@ -56,7 +57,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			return this._migrationData;
 		}).future<MigrationData>()();
 	}
-	
+
 	public getCordovaJsonData(): IFuture<ICordovaJsonData> {
 		return this.$fs.readJson(this.cordovaJsonFilePath);
 	}
@@ -74,7 +75,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
 		return (() => {
-			
+
 			return this.migrationData.wait().supportedFrameworkVersions;
 
 		}).future<IFrameworkVersion[]>()();
@@ -103,7 +104,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
 			let transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
-	
+
 			plugins = this.applyTransitions(plugins, transitions);
 
 			let supportedPlugins = this.pluginsForVersion(toVersion).wait();
@@ -144,17 +145,17 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.value();
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
-			
+
 			this.downloadCordovaJsonFile().wait();
 		}).future<void>()();
 	}
-	
+
 	private downloadCordovaJsonFile(): IFuture<void> {
 		return (() => {
 			let file = this.$fs.createWriteStream(this.cordovaJsonFilePath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-			
-			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;			
+
+			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
 			this.$httpClient.httpRequest({ url: cordovaJsonPath, pipeTo: file}).wait();
 			fileEnd.wait();
 		}).future<void>()();
@@ -228,13 +229,13 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version)
 				})
 				.value();
-				
+
 			if (this.invalidMarketplacePlugins.length > 0) {
 				this.promptUserForInvalidPluginsAction(this.invalidMarketplacePlugins, newVersion).wait();
 			}
-			
+
 			let cordovaJsonData = this.getCordovaJsonData().wait();
-			
+
 			if(semver.gte(newVersion, cordovaJsonData.forceHardwareAccelerationAfter)) {
 				this.$project.projectData.AndroidHardwareAcceleration = "true";
 				this.$project.saveProject().wait();
@@ -251,7 +252,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 				this.$project.setProperty("CorePlugins", newPluginsList, configuration);
 			});
-			
+
 			this.migrateCordovaJsFiles(newVersion).wait();
 
 			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
@@ -271,7 +272,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			return this.pluginsForVersion(version).wait();
 		}).future<string[]>()();
 	}
-	
+
 	private get cordovaJsonFilePath(): string {
 		return path.join(this.$resources.resolvePath(CordovaMigrationService.CORDOVA_FOLDER_NAME), CordovaMigrationService.CORDOVA_JSON_FILE_NAME)
 	}
@@ -284,7 +285,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				_.each(this.$mobileHelper.platformNames, (platform) => {
 					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
 					let cordovaJsFileName = path.join(this.$project.getProjectDir().wait(), `cordova.${platform}.js`.toLowerCase());
-					let cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(newVersion, platform);
+					let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(newVersion, platform);
 					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
 					backedUpFiles.push(cordovaJsFileName);
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
@@ -332,7 +333,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	private parseMscorlibVersion(json: any): string {
 		return [json._Major, json._Minor, json._Build].join('.');
 	}
-	
+
 	private applyTransitions(plugins: string[], transitions: any[]): string[] {
 		return _.map(plugins, plugin => {
 			_.each(transitions, transition => {
