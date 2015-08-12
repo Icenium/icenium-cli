@@ -1,18 +1,19 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import yok = require("../lib/common/yok");
+import {Yok} from "../lib/common/yok";
 import future = require("fibers/future");
-import stubs = require("./stubs");
-let commandsServiceFile = require("../lib/common/services/commands-service");
-let configFile = require("../lib/config");
-import util = require("util");
-let assert = require("chai").assert;
-let commandParams = require("../lib/common/command-params");
-import commonOptionsLib = require("../lib/common/options");
-let optionsLib = require("../lib/options");
-import hostInfoLib = require("../lib/common/host-info");
-import resourcesLib = require("../lib/common/resource-loader");
+import * as stubs from "./stubs";
+import {CommandsService} from "../lib/common/services/commands-service";
+import {Configuration} from "../lib/config";
+import * as util from "util";
+import {assert} from "chai";
+import {StringCommandParameter, StringParameterBuilder} from "../lib/common/command-params";
+import {OptionType} from "../lib/common/options";
+import {Options} from "../lib/options";
+import {HostInfo} from "../lib/common/host-info";
+import {AnalyticsService} from "../lib/common/services/analytics-service";
+// import resourcesLib = require("../lib/common/resource-loader");
 
 let isCommandExecuted: boolean;
 
@@ -163,24 +164,29 @@ class MockCommandWithSpecificDashedOptions {
 	allowedParameters: ICommandParameter[] = [];
 	dashedOptions: IDictionary<IDashedOption> = {
 		"test1": {
-			type: commonOptionsLib.OptionType.Boolean
+			type: OptionType.Boolean
 		}
 	}
 }
 
 function createTestInjector(): IInjector {
-	let testInjector = new yok.Yok();
-	testInjector.register("hostInfo", hostInfoLib.HostInfo);
-	testInjector.register("config", configFile.Configuration);
+	let testInjector = new Yok();
+	testInjector.register("hostInfo", HostInfo);
+	testInjector.register("config", Configuration);
 	testInjector.register("logger", LoggerStubWithErrorOnFatal);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("errors", stubs.ErrorsNoFailStub);
 	testInjector.register("staticConfig", stubs.StaticConfig);
 	testInjector.register("hooksService", stubs.HooksService);
-	testInjector.register("commandsService", commandsServiceFile.CommandsService);
-	testInjector.register("stringParameter", commandParams.StringCommandParameter);
-	testInjector.register("stringParameterBuilder", commandParams.StringParameterBuilder);
-	testInjector.register("resources", resourcesLib.ResourceLoader);
+	testInjector.register("commandsService", CommandsService);
+	testInjector.register("stringParameter", StringCommandParameter);
+	testInjector.register("stringParameterBuilder", StringParameterBuilder);
+	testInjector.register("analyticsService", {
+		checkConsent: (): IFuture<void> => { return ((): void => { }).future<void>()() },
+		trackFeature: (featureName: string): IFuture<void> => { return ((): void => { }).future<void>()() }
+	});
+	testInjector.register("resources", {});
+	testInjector.register("injector", testInjector);
 	testInjector.register("commandsServiceProvider", {
 		registerDynamicSubCommands: () => {}
 	});
@@ -198,6 +204,27 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
+function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInjector {
+	testInjector.register("resources", {
+		readJson: (resourcePath: string): IFuture<any> => {
+			return (() => {
+				return commandHelpData;
+			}).future()();
+		},
+		resolvePath: (resourcePath: string): string => {
+			return '';
+		}
+	});
+
+	for (let command in commandHelpData) {
+		testInjector.registerCommand(command, {
+			execute: (args: string[]): IFuture<void> => { return ((): void => { }).future<void>()() }
+		});
+	}
+
+	return testInjector;
+}
+
 describe("commands service", () => {
 	beforeEach(() => isCommandExecuted = false);
 
@@ -206,8 +233,8 @@ describe("commands service", () => {
 		let testInjector: IInjector;
 		beforeEach(() => {
 			testInjector = createTestInjector();
-			testInjector.register("options", optionsLib.Options);
-			commandsService = testInjector.resolve(commandsServiceFile.CommandsService);
+			testInjector.register("options", Options);
+			commandsService = testInjector.resolve(CommandsService);
 		});
 
 		it("executes command which has only StringCommandParameter when param is NOT passed", () => {
@@ -374,7 +401,7 @@ describe("commands service", () => {
 		it("does not execute command when it has its own dashed options and invalid one is passed", () => {
 			// this is valid globally, but this command has its own dashed options and availableDevices is not part of them
 			process.argv.push("--availableDevices");
-			testInjector.register("options", optionsLib.Options);
+			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
 			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
 			assert.isFalse(isCommandExecuted);
@@ -384,7 +411,7 @@ describe("commands service", () => {
 		it("executes command when it has its own dashed options and one of them is passed", () => {
 			// this is NOT valid globally, but this command has its own dashed options and test1 is part of them
 			process.argv.push("--test1");
-			testInjector.register("options", optionsLib.Options);
+			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
 			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
 			assert.isTrue(isCommandExecuted);
@@ -394,12 +421,47 @@ describe("commands service", () => {
 		it("executes command when it has its own dashed options and a global one is passed", () => {
 			process.argv.push("--log");
 			process.argv.push("trace");
-			testInjector.register("options", optionsLib.Options);
+			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
 			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 			process.argv.pop();
+		});
+	});
+	describe("executeCommandUnchecked", () => {
+		let commandsService: any;
+		let testInjector: IInjector;
+		let loggerOutput: string;
+		beforeEach(() => {
+			loggerOutput = '';
+			testInjector = createTestInjector();
+			testInjector.register("options", Options);
+			testInjector.register("logger", {
+				info: (str: string): void => {
+					loggerOutput += str;
+				}
+			});
+		});
+
+		it("shows command help message after successful command execute", () => {
+			let commandHelpData = { testingCommand: "testingCommand" };
+			testInjector = setUpTestInjector(testInjector, commandHelpData)
+			commandsService = testInjector.resolve("commandsService");
+
+			commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []).wait();
+
+			assert.deepEqual(loggerOutput, commandHelpData.testingCommand);
+		});
+
+		it("does not show command help message after unsuccessful command execute", () => {
+			let commandHelpData = { testingCommand: "testingCommand" };
+			testInjector = setUpTestInjector(testInjector, commandHelpData)
+			commandsService = testInjector.resolve("commandsService");
+
+			commandsService.executeCommandUnchecked("nonExistingCommand", []).wait();
+
+			assert.deepEqual(loggerOutput, '');
 		});
 	});
 });
