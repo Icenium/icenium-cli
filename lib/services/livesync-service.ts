@@ -9,8 +9,8 @@ import usbLivesyncServiceBaseLib = require("../common/services/usb-livesync-serv
 
 let gaze = require("gaze");
 import Future = require("fibers/future");
-import path = require("path");
-import util = require("util");
+import * as path from "path";
+import * as util from "util";
 
 export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServiceBase implements ILiveSyncService {
 	private excludedProjectDirsAndFiles = [
@@ -35,7 +35,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		$childProcess: IChildProcess,
 		$iOSEmulatorServices: Mobile.IiOSSimulatorService,
 		$hostInfo: IHostInfo) {
-			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector, $childProcess, $iOSEmulatorServices, $hostInfo) 
+			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector, $childProcess, $iOSEmulatorServices, $hostInfo)
 		}
 
 	public livesync(platform?: string): IFuture<void> {
@@ -60,22 +60,22 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 			}
 
 			let projectDir = this.$project.getProjectDir().wait();
-			
+
 			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
-					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);				
+					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);
 				}).future<void>()();
-			}
+			};
 
 			let platformSpecificLiveSyncServices: IDictionary<any> = {
 				"android": AndroidLiveSyncService,
 				"ios": IOSLiveSyncService
-			}
+			};
 
-			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir, 
-				this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, () => Future.fromResult(), notInstalledAppOnDeviceAction, 
+			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir,
+				this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, () => Future.fromResult(), notInstalledAppOnDeviceAction,
 				() => Future.fromResult()).wait();
-			
+
 		}).future<void>()();
 	}
 }
@@ -84,18 +84,18 @@ $injector.register("liveSyncService", LiveSyncService);
 export class IOSLiveSyncService implements IPlatformSpecificLiveSyncService {
 	constructor(private _device: Mobile.IDevice,
 		private $injector: IInjector) { }
-		
+
 	private get device(): Mobile.IDevice {
 		return <Mobile.IiOSDevice>this._device;
-	}	
-	
+	}
+
 	public restartApplication(deviceAppData: Mobile.IDeviceAppData, localToDevicePaths?: Mobile.ILocalToDevicePathData[]): IFuture<void> {
 		return (() => {
 			this.device.fileSystem.deleteFile("/Library/Preferences/ServerInfo.plist", deviceAppData.appIdentifier);
 			let notificationProxyClient = this.$injector.resolve(iOSProxyServices.NotificationProxyClient, {device: this.device});
 			notificationProxyClient.postNotification("com.telerik.app.refreshWebView");
 			notificationProxyClient.closeSocket();
-		}).future<void>()();			
+		}).future<void>()();
 	}
 }
 
@@ -103,9 +103,9 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 	private static DEVICE_TMP_DIR_FORMAT_V2 = "/data/local/tmp/12590FAA-5EDD-4B12-856D-F52A0A1599F2/%s";
 	private static DEVICE_TMP_DIR_FORMAT_V3 = "/mnt/sdcard/Android/data/%s/files/12590FAA-5EDD-4B12-856D-F52A0A1599F2";
 	private static DEVICE_PATH_SEPARATOR = "/";
-	
+
 	private _tmpRoots: IStringDictionary = {};
-	
+
 	constructor(private _device: Mobile.IDevice,
 		private $config: IConfiguration,
 		private $errors: IErrors,
@@ -117,7 +117,7 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 		private $server: Server.IServer) {
 			super(<Mobile.IAndroidDevice>_device, $fs, $mobileHelper);
 		}
-	
+
 	public restartApplication(deviceAppData: Mobile.IDeviceAppData, localToDevicePaths?: Mobile.ILocalToDevicePathData[]): IFuture<void> {
 		return (() => {
 			let liveSyncVersion = this.getLiveSyncVersion(deviceAppData.appIdentifier).wait();
@@ -146,29 +146,29 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 			});
 
 			this.ensureFullAccessPermissions(liveSyncRoot).wait();
-			
+
 			let commands: string[];
 			if(this.$options.watch || this.$options.file) {
 				commands = [ this.liveSyncCommands.SyncFilesCommand(), this.liveSyncCommands.RefreshCurrentViewCommand() ] ;
 			} else {
 				let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
-				
+
 				let liveSyncDeviceAppData = (<ILiveSyncDeviceAppData>deviceAppData);
 				let liveSyncUrl = liveSyncDeviceAppData.liveSyncFormat ? util.format(liveSyncDeviceAppData.liveSyncFormat, this.$config.AB_SERVER, liveSyncToken) : this.$project.getLiveSyncUrl();
-				
+
 				commands = [ this.liveSyncCommands.DeployProjectCommand(liveSyncUrl), this.liveSyncCommands.ReloadStartViewCommand() ];
 			}
-			
+
 			this.createCommandsFileOnDevice(liveSyncRoot, commands).wait();
-			
+
 			this.device.adb.sendBroadcastToDevice("com.telerik.LiveSync", { "app-id": deviceAppData.appIdentifier }).wait();
 		}).future<void>()();
 	}
-	
+
 	private getLiveSyncVersion(appIdentifier: string): IFuture<number> {
 		return this.device.adb.sendBroadcastToDevice(constants.CHECK_LIVESYNC_INTENT_NAME, {"app-id": appIdentifier});
 	}
-	
+
 	private getLiveSyncRoot(appIdentifier: string, liveSyncVersion: number): string {
 		if(!this._tmpRoots[appIdentifier]) {
 			if (liveSyncVersion === 2) {
@@ -182,8 +182,8 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 
 		return this._tmpRoots[appIdentifier];
 	}
-	
+
 	 private ensureFullAccessPermissions(devicePath: string): IFuture<void> {
-		return this.device.adb.executeShellCommand(`chmod 0777 ${devicePath}`);
+		return this.device.adb.executeShellCommand(["chmod", "0777", `${devicePath}`]);
 	}
 }
