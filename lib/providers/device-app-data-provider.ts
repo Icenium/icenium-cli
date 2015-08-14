@@ -75,11 +75,11 @@ export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBase
 	}
 
 	public get deviceProjectRootPath(): string {
-		return this.getDeviceProjectRootPath(path.join("/data/data", this.appIdentifier, "files"));
+		return this.getDeviceProjectRootPath(path.join("/mnt/sdcard/Android/data", this.appIdentifier, "files"));
 	}
 
 	public get liveSyncFormat(): string {
-		return "%s/Mist/MobilePackage/nsredirect?token=%s";
+		return null;
 	}
 
 	public encodeLiveSyncHostUri(hostUri: string): string {
