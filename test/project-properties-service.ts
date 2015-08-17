@@ -7,11 +7,12 @@ import fs = require("fs");
 import path = require("path");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
+import configLib = require("../lib/config");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
 let assert: chai.Assert = chai.assert;
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
-let resourceLoaderFile = require("../lib/resource-loader");
+let resourceLoaderFile = require("../lib/common/resource-loader");
 import projectConstantsLib = require("../lib/project/project-constants");
 
 function createTestInjector(): IInjector {
@@ -21,6 +22,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("jsonSchemaValidator", stubs.JsonSchemaValidator);
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("fs", stubs.FileSystemStub);
+	testInjector.register("staticConfig", configLib.StaticConfig);
 	testInjector.register("resources", resourceLoaderFile.ResourceLoader);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);

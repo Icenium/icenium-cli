@@ -25,6 +25,7 @@ import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validato
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import childProcessLib = require("../lib/common/child-process");
 import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
+import cordovaResourcesLib = require("../lib/cordova-resource-loader");
 import projectPropertiesService = require("../lib/services/project-properties-service");
 import cordovaMigrationService = require("../lib/services/cordova-migration-service");
 import Future = require("fibers/future");
@@ -89,6 +90,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", stubs.TemplateServiceStub);
 	testInjector.register("userDataStore", {});
 	testInjector.register("qr", {});
+	testInjector.register("cordovaResources", cordovaResourcesLib.CordovaResourceLoader);
 	testInjector.register("cordovaMigrationService", cordovaMigrationService.CordovaMigrationService);
 	testInjector.register("resources", $injector.resolve("resources"));
 	testInjector.register("pathFilteringService", stubs.PathFilteringServiceStub);
@@ -122,7 +124,7 @@ function createTestInjector(): IInjector {
 
 
 	testInjector.register("pluginsService", {
-		getPluginBasicInformation: (pluginName: string) => { 
+		getPluginBasicInformation: (pluginName: string) => {
 			return {
 				name: 'Name',
 				version: '1.0.0'
@@ -249,7 +251,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
 
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
-			
+
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk must be downgraded to 8.0 when downgrading Cordova version from 3.7.0");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
 		});
@@ -292,7 +294,7 @@ describe("project integration tests", () => {
 		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0",() => {
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
-			
+
 			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.0"]).wait();
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version should have been migrated to 8.0");
 			prompter.confirmCalled = false;
@@ -643,7 +645,7 @@ describe("project unit tests", () => {
  								"org.apache.cordova.camera",
  								"org.apache.cordova.contacts"]
 			};
-			
+
 			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "CorePlugins", ["org.apache.cordova.file"]).wait();
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
@@ -653,7 +655,7 @@ describe("project unit tests", () => {
 								"org.apache.cordova.file"]
 			}, configSpecificData);
 		});
-		
+
 		it("removes value from configuration specfic data when CorePlugins are modified in it", () => {
 			// this is the equivalent of $ appbuilder prop remove CorePlugins A B C --debug
 			let projectData = getProjectData();
@@ -669,7 +671,7 @@ describe("project unit tests", () => {
  								"org.apache.cordova.camera"]
 			}, configSpecificData, "CorePlugins in configuration specific data should be modified.");
 		});
-		
+
 		it("sets CorePlugins to configuration specfic data when it is specified", () => {
 			// this is the equivalent of $ appbuilder prop set CorePlugins A B C --debug
 			let projectData = getProjectData();
@@ -678,7 +680,7 @@ describe("project unit tests", () => {
  								"org.apache.cordova.camera",
  								"org.apache.cordova.contacts"]
 			};
-			
+
 			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "CorePlugins", ["org.apache.cordova.file", "org.apache.cordova.camera"]).wait();
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
@@ -691,7 +693,7 @@ describe("project unit tests", () => {
 		describe("modifies CorePlugins in configuration specific data, when it is specified", () => {
 			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
-			
+
 			beforeEach(() => {
 				projectData = getProjectData();
 				configSpecificData = {
@@ -711,13 +713,13 @@ describe("project unit tests", () => {
 			it("adds CorePlugins to configuration specfic data when it is specified", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], ["debug"]).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.contacts",
 									"org.apache.cordova.file"],
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.geolocation"],
@@ -727,11 +729,11 @@ describe("project unit tests", () => {
 			it("removes CorePlugin from debug configuration data when it is specified", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], ["debug"]).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.contacts"],
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.geolocation"],
@@ -741,10 +743,10 @@ describe("project unit tests", () => {
 			it("sets CorePlugins to debug configuration when it is specified", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], ["debug"]).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.file"],
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.geolocation"],
@@ -768,7 +770,7 @@ describe("project unit tests", () => {
 				assert.deepEqual(["org.apache.cordova.battery-status",
 									"org.apache.cordova.geolocation"],
 								projectData.CorePlugins);
-	
+
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 			});
@@ -785,11 +787,11 @@ describe("project unit tests", () => {
 				let projectData = getProjectData();
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
 				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
-	
+
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 			});
-			
+
 			it("after prop rm", () => {
 				let configSpecificData: IDictionary<any> = {
 						debug: {
@@ -803,12 +805,12 @@ describe("project unit tests", () => {
 				let projectData = getProjectData();
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
 				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
-	
+
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 			});
 		});
-		
+
 		describe("moves CorePlugins to config specific data when it is modified", () => {
 			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
@@ -832,24 +834,24 @@ describe("project unit tests", () => {
 			it("after prop set", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
-			
+
 			it("after prop rm", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual([], configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 		});
-		
+
 		describe("modifies CorePlugins in configuration specific data, even if it is NOT specified when CorePlugins are different in the configurations", () => {
 			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
-			
+
 			beforeEach(() => {
 				projectData = getProjectData();
 				configSpecificData = {
@@ -869,13 +871,13 @@ describe("project unit tests", () => {
 			it("adds CorePlugins to configuration specfic data", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.contacts",
 									"org.apache.cordova.file"],
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.camera",
 	 								"org.apache.cordova.geolocation",
@@ -886,11 +888,11 @@ describe("project unit tests", () => {
 			it("removes CorePlugin from all configurations", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], []).wait();
 				assert.deepEqual(undefined, projectData.CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.contacts"],
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(["org.apache.cordova.battery-status",
 	 								"org.apache.cordova.geolocation"],
 								configSpecificData["release"].CorePlugins);
@@ -899,15 +901,15 @@ describe("project unit tests", () => {
 			it("sets CorePlugins to both configurations when it is specified", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], []).wait();
 				assert.deepEqual(["org.apache.cordova.file"], projectData.CorePlugins);
-	
+
 				assert.deepEqual(undefined,
 								configSpecificData["debug"].CorePlugins);
-	
+
 				assert.deepEqual(undefined,
 								configSpecificData["release"].CorePlugins);
 			});
 		});
-		
+
 		it("throws exception when different CorePlugins are part of both .abproject and any config specific file", () => {
 			let projectData = getProjectData();
 			projectData.CorePlugins = ["org.apache.cordova.battery-status"]

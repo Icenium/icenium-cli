@@ -34,6 +34,7 @@ class ImageService implements IImageService {
 		private $projectConstants: Project.IProjectConstants,
 		private $project: Project.IProject,
 		private $prompter: IPrompter,
+		private $staticConfig: Config.IStaticConfig,
 		private $resources: IResourceLoader,
 		private $server: Server.IServer) {
 
@@ -46,7 +47,7 @@ class ImageService implements IImageService {
 	
 	public printDefinitions(): IFuture<void> {
 		return (() => {
-			let imageDefinitionsFilePath = path.join(this.$projectConstants.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
+			let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
 				imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath).wait(),
 				table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
 

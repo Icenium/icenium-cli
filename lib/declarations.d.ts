@@ -314,14 +314,6 @@ interface IPackageDownloadViewModel {
 	packageUrls?: IPackageDownloadLink[];
 }
 
-interface IResourceLoader {
-	resolvePath(path: string): string;
-	openFile(path: string): any;
-	readJson(path: string): IFuture<any>;
-	buildCordovaJsFilePath(version: string, platform: string): string;
-	getPathToAppResources(framework: string): string;
-}
-
 /**
  * Used to download resources from the server
  */
@@ -835,4 +827,17 @@ interface IRemoteService {
 	 * @param portNumber
 	 */
 	startApiServer(portNumber: number): IFuture<void>;
+}
+
+/**
+ *	Used for managing cordova-related resources
+ */
+interface ICordovaResourceLoader {
+	/**
+	 * Builds the absolute path to a Cordova javascript file.
+	 * @param  {string} version  The Cordova version
+	 * @param  {string} platform The Platform - Android, iOS or WP8
+	 * @return {string}          Absolute path to Cordova javascript file
+	 */
+	buildCordovaJsFilePath(version: string, platform: string): string;
 }

@@ -12,18 +12,20 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
 	private static WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME = "CN=Telerik";
 
-	constructor(private $config: IConfiguration,
+	constructor($errors: IErrors,
 		$fs: IFileSystem,
-		$errors: IErrors,
-		private $jsonSchemaConstants: IJsonSchemaConstants,
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
+		$options: IOptions,
+		$resources: IResourceLoader,
+		private $cordovaResources: ICordovaResourceLoader,
+		private $config: IConfiguration,
+		private $jsonSchemaConstants: IJsonSchemaConstants,
+		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants,
 		private $projectFilesManager: Project.IProjectFilesManager,
-		private $templatesService: ITemplatesService,
-		$resources: IResourceLoader,
-		private $mobileHelper: Mobile.IMobileHelper,
-		$options: IOptions) {
+		private $staticConfig: Config.IStaticConfig,
+		private $templatesService: ITemplatesService) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
@@ -129,7 +131,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
 		let projectData = projectInformation.projectData;
 		let configurationName = this.$options.release ? "release" : "debug";
-		
+
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 
 		if(buildProperties.Platform === "WP8") {
@@ -156,7 +158,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME, relativePath);
+				let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
@@ -173,7 +175,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			let cordovaJsFileName = path.join(projectDir, util.format("cordova.%s.js", platform).toLowerCase());
 			if (!this.$fs.exists(cordovaJsFileName).wait()) {
 				this.printAssetUpdateMessage();
-				let cordovaJsSourceFilePath = this.$resources.buildCordovaJsFilePath(frameworkVersion, platform);
+				let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform);
 				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
 			}
 		}).future<void>()();

@@ -45,7 +45,7 @@ export class FileSystemStub implements IFileSystem {
 	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
 		return undefined;
 	}
-	
+
 	unzip(zipFile: string, destination: string): IFuture<void> {
 		return undefined;
 	}
@@ -389,6 +389,9 @@ export class StaticConfig implements IStaticConfig {
 	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
 	public SYS_REQUIREMENTS_LINK = "";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
+	public APP_RESOURCES_DIR_NAME = "App_Resources";
+	public COMMAND_HELP_FILE_NAME = 'command-help.json';
+	public RESOURCE_DIR_PATH = path.join(__dirname, "resources");
 	public QR_SIZE = 300;
 	public version = "1";
 	helpTextPath = "help";
@@ -410,16 +413,16 @@ export class StaticConfig implements IStaticConfig {
 	public get HTML_CLI_HELPERS_DIR(): string {
 		return path.join(__dirname, "..", "docs", "helpers");
 	}
-	
+
 	public get GITHUB_ACCESS_TOKEN_FILEPATH(): string {
 		let tokenFileName = ".abgithub";
 		return tokenFileName;
 	}
-	
+
 	public get pathToPackageJson(): string {
 		return path.join(__dirname, "..", "package.json");
 	}
-	
+
 	public getAdbFilePath(): IFuture<string> {
 		return Future.fromResult("");
 	}

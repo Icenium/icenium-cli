@@ -1,0 +1,15 @@
+{
+	"create|screenbuilder": "You can now go into your project directory and run `$ appbuilder add-view`.",
+
+	"create|*default": "You can now go into your project directory and run `$ appbuilder add-view`.",
+
+	"add-about": "You can check out your about page in the simulator by running `$ appbuilder simulate`",
+
+	"add-dataprovider": "You can now add a form to your project by running `$ appbuilder add-form`.",
+
+	"add-field": "You can perhaps add another field or deploy the application on a device by running `$ appbuilder deploy` to see what it looks like.",
+
+	"add-form": "You can now add a field to this form by running `$ appbuilder add-field`.",
+
+	"add-view": "You can now add a data provider or a form to your project by running `$ appbuilder add-dataprovider` or `$ appbuilder add-form` respectively."
+}

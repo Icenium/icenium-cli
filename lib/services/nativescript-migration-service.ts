@@ -32,6 +32,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $logger: ILogger,
 		private $project: Project.IProject,
 		private $resources: IResourceLoader,
+		private $staticConfig: Config.IStaticConfig,
 		private $config: IConfiguration,
 		private $resourceDownloader: IResourceDownloader,
 		private $projectConstants: Project.IProjectConstants) {
@@ -95,8 +96,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			let projectDir = this.$project.getProjectDir().wait();
 			let tnsModulesProjectPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, "tns_modules");
-			let appResourcesRequiredPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$projectConstants.APP_RESOURCES_DIR_NAME);
-			let appResourcesObsoletePath = path.join(projectDir, this.$projectConstants.APP_RESOURCES_DIR_NAME);
+			let appResourcesRequiredPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$staticConfig.APP_RESOURCES_DIR_NAME);
+			let appResourcesObsoletePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME);
 			let backupName = `${tnsModulesProjectPath}.backup`;
 			let shouldRollBackAppResources = false;
 
