@@ -1,14 +1,14 @@
 ///<reference path=".d.ts"/>
 "use strict";
-import path = require("path");
-import util = require("util");
-import fiber = require("fibers");
-import helpers = require("./helpers");
-import staticConfigBaseLib = require("./common/static-config-base");
-import configBaseLib = require("./common/config-base");
-import osenv = require("osenv");
+import * as path from "path";
+import * as util from "util";
+import * as fiber from "fibers";
+import * as helpers from "./helpers";
+import {StaticConfigBase} from "./common/static-config-base";
+import {ConfigBase} from "./common/config-base";
+import * as osenv from "osenv";
 
-export class Configuration extends configBaseLib.ConfigBase implements IConfiguration { // User specific config
+export class Configuration extends ConfigBase implements IConfiguration { // User specific config
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG: boolean;
@@ -81,11 +81,12 @@ export class Configuration extends configBaseLib.ConfigBase implements IConfigur
 }
 $injector.register("config", Configuration);
 
-export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implements IStaticConfig {
+export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	constructor($injector: IInjector) {
 		super($injector);
-	} 
-	
+		this.RESOURCE_DIR_PATH = path.join(this.RESOURCE_DIR_PATH, "../../resources");
+	}
+
 	private static TOKEN_FILENAME = ".abgithub";
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
@@ -117,7 +118,7 @@ export class StaticConfig extends staticConfigBaseLib.StaticConfigBase implement
 	public get HTML_CLI_HELPERS_DIR(): string {
 		return path.join(__dirname, "../docs/helpers");
 	}
-	
+
 	public get pathToPackageJson(): string {
 		return path.join(__dirname, "..", "package.json");
 	}

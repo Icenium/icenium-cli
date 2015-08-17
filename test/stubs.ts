@@ -391,6 +391,7 @@ export class StaticConfig implements IStaticConfig {
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public APP_RESOURCES_DIR_NAME = "App_Resources";
 	public COMMAND_HELP_FILE_NAME = 'command-help.json';
+	public RESOURCE_DIR_PATH = path.join(__dirname, "resources");
 	public QR_SIZE = 300;
 	public version = "1";
 	helpTextPath = "help";
