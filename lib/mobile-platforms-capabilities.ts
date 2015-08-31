@@ -30,7 +30,7 @@ export class MobilePlatformsCapabilities implements Mobile.IPlatformsCapabilitie
 				companion: true,
 				hostPlatformsForDeploy: ["win32"]
 			}
-		}
+		};
 
 		return this.platformCapabilities;
 	}

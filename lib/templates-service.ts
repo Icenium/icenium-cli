@@ -1,12 +1,10 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import path = require("path");
-import helpers = require("./helpers");
-import options = require("./common/options");
+import * as path from "path";
+import * as helpers from "./helpers";
 import Future = require("fibers/future");
-import util = require("util");
-import unzip = require("unzip");
+import * as unzip from "unzip";
 
 export class ConfigurationFile {
 	constructor(public template: string,
@@ -48,7 +46,7 @@ export class TemplatesService implements ITemplatesService {
 			let templatesDir = this.projectTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir).wait();
 			this.$fs.createDirectory(templatesDir).wait();
-			
+
 			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
 		}).future<void>()();
 	}
@@ -61,7 +59,7 @@ export class TemplatesService implements ITemplatesService {
 			this.$fs.createDirectory(templatesDir).wait();
 
 			_.each(templates, (template) => {
-				if (template["Category"] == "Configuration") {
+				if (template["Category"] === "Configuration") {
 					this.downloadTemplate(template, templatesDir).wait();
 				}
 			});
@@ -76,14 +74,14 @@ export class TemplatesService implements ITemplatesService {
 			this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName).wait();
 		}).future<void>()();
 	}
-	
+
 	private unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): IFuture<void> {
 		return (() => {
 			let unzipOps:IFuture<any>[] = [];
 			let unzipStream = this.$fs.createReadStream(assetsZipFileName)
 				.pipe(unzip.Parse())
 				.on("entry", (entry: ZipEntry) => {
-					let indexOfAppResources = entry.path.toLowerCase().indexOf("app_resources/")
+					let indexOfAppResources = entry.path.toLowerCase().indexOf("app_resources/");
 					if (entry.type !== "File" || indexOfAppResources === -1) {
 						entry.autodrain();
 						return;
@@ -118,7 +116,7 @@ export class TemplatesService implements ITemplatesService {
 			let file = this.$fs.createWriteStream(filepath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			let response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
+			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 		}).future<void>()();
 	}

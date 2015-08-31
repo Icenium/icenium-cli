@@ -6,10 +6,7 @@ import constants = require("../common/mobile/constants");
 import helpers = require("./../helpers");
 import iOSProxyServices = require("./../common/mobile/ios/ios-proxy-services");
 import usbLivesyncServiceBaseLib = require("../common/services/usb-livesync-service-base");
-
-let gaze = require("gaze");
 import Future = require("fibers/future");
-import * as path from "path";
 import * as util from "util";
 
 export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServiceBase implements ILiveSyncService {
@@ -35,7 +32,18 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		$childProcess: IChildProcess,
 		$iOSEmulatorServices: Mobile.IiOSSimulatorService,
 		$hostInfo: IHostInfo) {
-			super($devicesServices, $mobileHelper, $localToDevicePathDataFactory, $logger, $options, $deviceAppDataFactory, $fs, $dispatcher, $injector, $childProcess, $iOSEmulatorServices, $hostInfo)
+			super($devicesServices,
+				$mobileHelper,
+				$localToDevicePathDataFactory,
+				$logger,
+				$options,
+				$deviceAppDataFactory,
+				$fs,
+				$dispatcher,
+				$injector,
+				$childProcess,
+				$iOSEmulatorServices,
+				$hostInfo);
 		}
 
 	public livesync(platform?: string): IFuture<void> {

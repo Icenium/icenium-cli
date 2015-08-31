@@ -1,14 +1,12 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import os = require("os");
-import path = require("path");
-import util = require("util");
-
-import commonHelpers = require("./common/helpers");
+import {EOL} from "os";
+import * as path from "path";
+import * as util from "util";
+import * as commonHelpers from "./common/helpers";
 import Future = require("fibers/future");
-import helpers = require("./helpers");
-import projectPropertiesServiceLib = require("./services/project-properties-service");
+import * as helpers from "./helpers";
 
 export class Project implements Project.IProject {
 	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
@@ -81,8 +79,8 @@ export class Project implements Project.IProject {
 
 	public getConfigFileContent(template: string): IFuture<any> {
 		return (() => {
-			let configFile = _.find(this.projectConfigFiles, configFile => configFile.template === template);
-			if(configFile) {
+			let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
+			if (configFile) {
 				try {
 					let configFileContent = this.$fs.readText(configFile.filepath).wait();
 					return configFileContent;
@@ -109,7 +107,7 @@ export class Project implements Project.IProject {
 				}
 			});
 
-			return result.join("\n")
+			return result.join("\n");
 		}
 
 		return this.configurationFilesStringCore(this.frameworkProject.configFiles);
@@ -230,7 +228,7 @@ export class Project implements Project.IProject {
 
 	public createNewProject(projectName: string, framework: string): IFuture<void> {
 		if(!projectName) {
-			this.$errors.fail("No project name specified.")
+			this.$errors.fail("No project name specified.");
 		}
 
 		let projectDir = this.getNewProjectDir();
@@ -256,7 +254,7 @@ export class Project implements Project.IProject {
 			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
 
 			this.createProjectFileFromExistingProject(projectDir, appName).wait();
-			this.$logger.info("Successfully initialized %s project.", framework); 
+			this.$logger.info("Successfully initialized %s project.", framework);
 		}).future<void>()();
 	}
 
@@ -270,9 +268,8 @@ export class Project implements Project.IProject {
 			try {
 				this.validateProjectData(this.projectData);
 				this.saveProject(projectDir).wait();
-			}
-			catch(e) {
-				this.$errors.fail("There was an error while initialising the project: " + os.EOL + e);
+			} catch(e) {
+				this.$errors.fail("There was an error while initialising the project: " + EOL + e);
 			}
 		}).future<void>()();
 	}
@@ -314,17 +311,17 @@ export class Project implements Project.IProject {
 			return dir;
 		}).future<string>()();
 	}
-	
+
 	public getConfigurationsSpecifiedByUser(): string[] {
 		let configurations: string[] = [];
 		if(this.$options.debug) {
 			configurations.push(this.$projectConstants.DEBUG_CONFIGURATION_NAME);
 		}
-		
+
 		if (this.$options.release){
 			configurations.push(this.$projectConstants.RELEASE_CONFIGURATION_NAME);
 		}
-		
+
 		return configurations;
 	}
 
@@ -343,7 +340,7 @@ export class Project implements Project.IProject {
 				this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
 				_.each(this.configurationSpecificData, configSpecificData => this.$projectPropertiesService.removeProjectProperty(configSpecificData, normalizedPropertyName, this.projectData));
 			}
-			
+
 			this.saveProject(this.getProjectDir().wait(), projectConfigurations).wait();
 			this.printProjectProperty(normalizedPropertyName).wait();
 		}).future<void>()();
@@ -461,8 +458,8 @@ export class Project implements Project.IProject {
 
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string, configuration?: string): any[] {
 		let numberOfConfigs = configuration ? 1 : _.keys(this.configurationSpecificData).length;
-		let configsDataForProperty: any[] = configuration ? 
-			this.getPropertyValueAsArray(this.configurationSpecificData[configuration][normalizedPropertyName], '') : 
+		let configsDataForProperty: any[] = configuration ?
+			this.getPropertyValueAsArray(this.configurationSpecificData[configuration][normalizedPropertyName], '') :
 			_(this.configurationSpecificData)
 			.values()
 			.map(config => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
@@ -490,14 +487,14 @@ export class Project implements Project.IProject {
 		} else {
 			properties = _(this.configurationSpecificData)
 			.values()
-			.map(properties => _.keys(properties))
+			.map(_properties => _.keys(_properties))
 			.flatten<string>()
 			.uniq()
 			.value();
 		}
 
 		if(properties.length > 0) {
-			this.$logger.out("%sConfiguration specific properties: ", os.EOL);
+			this.$logger.out("%sConfiguration specific properties: ", EOL);
 			_.forEach(properties, property => this.printConfigurationSpecificDataForProperty(property, configuration));
 		}
 	}
@@ -507,7 +504,7 @@ export class Project implements Project.IProject {
 		if(data && data.length) {
 			let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
 			let table = commonHelpers.createTable(headers, data);
-			this.$logger.out("%s:%s%s", property, os.EOL, table.toString());
+			this.$logger.out("%s:%s%s", property, EOL, table.toString());
 		}
 	}
 
@@ -632,9 +629,9 @@ export class Project implements Project.IProject {
 	}
 
 	public isTypeScriptProject(): IFuture<boolean> {
-		return ((): boolean => { 
+		return ((): boolean => {
 			let typeScriptFiles = this.getTypeScriptFiles().wait();
-			
+
 			if(typeScriptFiles.typeScriptFiles.length > typeScriptFiles.definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
 				return true;
 			}
@@ -665,7 +662,7 @@ export class Project implements Project.IProject {
 			projectData: this.projectData,
 			configurationSpecificData: this.configurationSpecificData,
 			hasBuildConfigurations: this._hasBuildConfigurations
-		}
+		};
 	}
 
 	private readProjectData(): IFuture<void> {
@@ -694,7 +691,7 @@ export class Project implements Project.IProject {
 					this.projectData = data;
 					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
 					shouldSaveProject = this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || shouldSaveProject;
-					
+
 					if(this.$staticConfig.triggerJsonSchemaValidation) {
 						this.$jsonSchemaValidator.validate(this.projectData);
 					}
@@ -730,9 +727,9 @@ export class Project implements Project.IProject {
 						});
 					}
 					this.$errors.fail({
-						formatStr: "The project file %s is corrupted." + os.EOL +
-						"Consider restoring an earlier version from your source control or backup." + os.EOL +
-						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + os.EOL +
+						formatStr: "The project file %s is corrupted." + EOL +
+						"Consider restoring an earlier version from your source control or backup." + EOL +
+						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + EOL +
 						"Additional technical information: %s",
 						suppressCommandHelp: true
 					},
@@ -771,8 +768,7 @@ export class Project implements Project.IProject {
 					this.removeExtraFiles(projectDir).wait();
 					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
-				}
-				catch(ex) {
+				} catch(ex) {
 					this.$fs.deleteDirectory(projectDir).wait();
 					throw ex;
 				}
@@ -781,7 +777,7 @@ export class Project implements Project.IProject {
 
 				let message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
 					this.$options.template,
-					os.EOL,
+					EOL,
 					templates);
 				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 			}
@@ -808,7 +804,7 @@ export class Project implements Project.IProject {
 		return ((): any => {
 			let projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
 				let extension = path.extname(file);
-				return extension == ".proj" || extension == ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
+				return extension === ".proj" || extension === ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
 			});
 
 			if(projectFile) {

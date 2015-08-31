@@ -1,14 +1,8 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
-import util = require("util");
-import Future = require("fibers/future");
-import progress = require('progress-stream');
-import filesize = require('filesize');
-import Url = require("url");
-import helpers = require("./helpers");
-import zlib = require("zlib");
+import * as util from "util";
+import * as helpers from "./helpers";
 
 export class ServiceProxy implements Server.IServiceProxy {
 	private latestVersion: string = null;
@@ -104,8 +98,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 				if (!this.latestVersion) {
 					this.latestVersion = JSON.parse(this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder").wait().body)["dist-tags"].latest;
 				}
-			}
-			catch (error) {
+			} catch (error) {
 				this.$logger.debug("Failed to retrieve version from npm");
 				this.latestVersion = "0.0.0";
 			}
@@ -117,24 +110,6 @@ export class ServiceProxy implements Server.IServiceProxy {
 	}
 }
 $injector.register("serviceProxy", ServiceProxy);
-
-function quote(s: string): string {
-	return "'" + s + "'";
-}
-
-function escapeKeyword(s: string): string {
-	switch (s) {
-		case "package":
-			return s + "_";
-		default:
-			return s;
-	}
-}
-
-function toClassName(contractName: string): string {
-	return contractName.replace(/I(\w+)Contract/, "$1");
-}
-
 
 class CodePrinter {
 	private indent = "";

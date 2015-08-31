@@ -1,8 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import helpers = require("../common/helpers");
-import path = require("path");
+import * as helpers from "../common/helpers";
+import * as path from "path";
 import temp = require("temp");
 
 class ImageData {
@@ -44,7 +44,7 @@ class ImageService implements IImageService {
 			this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 		}
 	}
-	
+
 	public printDefinitions(): IFuture<void> {
 		return (() => {
 			let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
@@ -53,36 +53,36 @@ class ImageService implements IImageService {
 
 			_.each(imageDefinitionsContents, imageDefinition => {
 				if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
-					return;				
+					return;
 				}
 
 				let maxLength = Math.max(imageDefinition.Icons.length, imageDefinition.SplashScreens.length);
-	
+
 				for (let i = 0; i < maxLength; ++i) {
 					let platformName = i ? '' : imageDefinition.Platform;
 					this.pushImageToTable(table, platformName, imageDefinition.Icons[i], imageDefinition.SplashScreens[i]);
 				}
-				
+
 				table.push(['', '', '']);
 			});
-			
+
 			this.$logger.out(table.toString());
 		}).future<void>()();
 	}
-	
+
 	public promptForImageInformation(force: boolean): IFuture<void> {
 		return (() => {
 			let imagePath = this.$prompter.getString('Enter image file path:').wait(),
 				imageOptions = ['Icons', 'Splash Screens'],
 				chosenOption = this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions).wait(),
 				imageType = Server.ImageType.Icon;
-			
+
 			imagePath = helpers.trimSymbol(imagePath, '"');
-			
+
 			if (chosenOption === imageOptions[1]) {
 				imageType = Server.ImageType.SplashScreen;
 			}
-			
+
 			this.generateImages(imagePath, imageType, force).wait();
 		}).future<void>()();
 	}
@@ -132,6 +132,7 @@ class ImageService implements IImageService {
 			switch (chosenOption) {
 				case replaceOptions[0]:
 					this.replaceAll = true;
+					return this.$fs.copyFile(imagePath, projectImagePath).wait();
 				case replaceOptions[1]:
 					return this.$fs.copyFile(imagePath, projectImagePath).wait();
 				case replaceOptions[3]:
@@ -139,39 +140,39 @@ class ImageService implements IImageService {
 			}
 		}).future<void>()();
 	}
-	
+
 	private pushImageToTable(table: any, platform: string, icon: ImageData, splashScreen: ImageData): void {
 		let iconPath = this.getImagePath(icon),
 			iconDimensions = this.getImageDimensions(icon),
 			splashScreenPath = this.getImagePath(splashScreen),
 			splashScreenDimensions = this.getImageDimensions(splashScreen);
-		
+
 		table.push([platform, iconPath, splashScreenPath]);
 		table.push(['', iconDimensions, splashScreenDimensions]);
 		table.push(['', '', '']);
 	}
-	
+
 	private validateImage(imagePath: string): IFuture<void> {
 		return (() => {
 			if (!imagePath) {
 				this.$errors.failWithoutHelp('You must providе a valid image path.');
 			}
-			
+
 			if (!this.$fs.exists(imagePath).wait()) {
 				this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
 			}
-			
+
 			if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {
 				this.$errors.failWithoutHelp('You must specify a PNG image source.');
 			}
 		}).future<void>()();
 	}
-	
-	private getImageDimensions(image: ImageData): string { 
+
+	private getImageDimensions(image: ImageData): string {
 		return image ? `Dimensions: ${image.Width}x${image.Height}` : '';
 	}
-	
-	private getImagePath(image: ImageData): string { 
+
+	private getImagePath(image: ImageData): string {
 		return image ? `Path: ${image.FileName}` : '';
 	}
 }

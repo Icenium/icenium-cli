@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import constants = require("../common/mobile/constants");
-import util = require("util");
-import os = require("os");
-import helpers = require("../helpers");
+import * as constants from "../common/mobile/constants";
+import {EOL} from "os";
+import * as helpers from "../helpers";
 let Table = require("cli-table");
 
 class AppManagerService implements IAppManagerService {
@@ -130,7 +129,7 @@ class AppManagerService implements IAppManagerService {
 
 			let cachedOptionsRelease = this.$options.release;
 			this.$options.release = true;
-			
+
 			this.configureLivePatchPlugin().wait();
 
 			this.$logger.warn("If you have not published an AppManager LiveSync-enabled version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
@@ -168,12 +167,12 @@ class AppManagerService implements IAppManagerService {
 			}
 
 			return _.map(identityStrings, identityStr => {
-				let group = helpers.findByNameOrIndex(identityStr, availableGroups, (group) => group.Name);
+				let group = helpers.findByNameOrIndex(identityStr, availableGroups, _group => _group.Name);
 
 				if (!group) {
 					this.$errors.failWithoutHelp ("Cannot find group that matches the provided <Group ID>: '%s'.To list the available groups, run $ appbuilder appmanager groups",
 						identityStr,
-						os.EOL);
+						EOL);
 				}
 
 				return group.Id;

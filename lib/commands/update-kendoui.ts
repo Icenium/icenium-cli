@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 import temp = require("temp");
-import path = require("path");
+import * as path from "path";
 let Table = require("cli-table");
 
 class UpdateKendoUICommand implements ICommand {
@@ -137,7 +137,7 @@ class UpdateKendoUICommand implements ICommand {
 			let filepath = temp.path({suffix: ".zip", prefix: "abkendoupdate-"});
 			let file = this.$fs.createWriteStream(filepath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-			let response = this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
+			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 
 			let outDir = path.join(this.$project.getProjectDir().wait(), "kendo");

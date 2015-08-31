@@ -1,9 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import serverExtensionsBaseLib = require("./extensions-service-base");
-import path = require("path");
+import * as serverExtensionsBaseLib from "./extensions-service-base";
+import * as path from "path";
 
 export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsServiceBase implements IServerExtensionsService {
 	constructor($logger: ILogger,

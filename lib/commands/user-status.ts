@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 
 "use strict";
-import util = require("util");
+import * as util from "util";
 
 export class UserStatusCommand implements ICommand {
 	constructor(private $userDataStore: IUserDataStore,
@@ -16,8 +16,7 @@ export class UserStatusCommand implements ICommand {
 		"DeveloperPlus": "Telerik Platform Developer Edition",
 		"Professional": "AppBuilder Professional Edition",
 		"Business": "AppBuilder Business Edition"
-
-	}
+	};
 
 	public execute(args:string[]): IFuture<void> {
 		return (() => {

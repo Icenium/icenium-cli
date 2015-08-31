@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import os = require("os");
-import child_process = require("child_process");
-import path = require("path");
-import Future = require("fibers/future");
-import helpers = require("../helpers");
+import * as os from "os";
+import * as child_process from "child_process";
+import * as path from "path";
+import * as helpers from "../helpers";
 let gaze = require("gaze");
 
 export class DebugCommand implements ICommand {

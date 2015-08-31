@@ -1,8 +1,6 @@
 ///<reference path=".d.ts"/>
 "use strict";
-
-import helpers = require("./common/helpers");
-import Future = require("fibers/future");
+import * as helpers from "./common/helpers";
 
 export class ProcessInfo implements IProcessInfo {
 	constructor(private $childProcess: IChildProcess,

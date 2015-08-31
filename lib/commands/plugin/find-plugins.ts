@@ -1,9 +1,8 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import service = require("../../services/cordova-plugins");
-import util = require("util");
-import os = require("os");
+import * as service from "../../services/cordova-plugins";
+import {EOL} from "os";
 
 export class FindPluginsCommand implements ICommand {
 	constructor(private $cordovaPluginsService: service.CordovaPluginsService,
@@ -33,9 +32,9 @@ export class FindPluginsCommand implements ICommand {
 	}
 
 	private composePluginDescription(plugin: IBasicPluginInformation) {
-		let description = util.format("Name: %s%s", plugin.name, os.EOL);
-		description += util.format("Description: %s%s", this.trim(plugin.description), os.EOL);
-		description += util.format("Version: %s%s", plugin.version, os.EOL);
+		let description = "Name: " + plugin.name + EOL +
+			"Description: " + this.trim(plugin.description) + EOL +
+			"Version: " + plugin.version + EOL;
 		return description;
 	}
 

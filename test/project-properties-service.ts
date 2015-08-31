@@ -2,14 +2,10 @@
 "use strict";
 
 import Future = require("fibers/future");
-import chai = require("chai");
-import fs = require("fs");
-import path = require("path");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import configLib = require("../lib/config");
-import cordovaMigrationService = require("../lib/services/cordova-migration-service");
-let assert: chai.Assert = chai.assert;
+import {assert} from "chai";
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
 let resourceLoaderFile = require("../lib/common/resource-loader");
@@ -59,8 +55,8 @@ class SampleProject implements Project.IFrameworkProject {
 	projectTemplatesString(): IFuture<string> {
 		return null;
 	}
-	alterPropertiesForNewProject(properties: any, projectName: string): void {}
-	checkSdkVersions(platform: string, projectData: IProjectData): void { }
+	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */}
+	checkSdkVersions(platform: string, projectData: IProjectData): void {/* mock */ }
 	completeProjectProperties(properties: any): boolean {
 		return this.completeProjectePropertiesResult;
 	}

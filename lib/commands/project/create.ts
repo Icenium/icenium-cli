@@ -1,8 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-
-import path = require("path");
-import util = require("util");
+import * as path from "path";
 
 import ProjectCommandBaseLib = require("./project-command-base");
 

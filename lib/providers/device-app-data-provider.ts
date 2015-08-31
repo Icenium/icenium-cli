@@ -4,8 +4,7 @@
 import deviceAppDataBaseLib = require("../common/mobile/device-app-data/device-app-data-base");
 import Future = require("fibers/future");
 import querystring = require("querystring");
-import path = require("path");
-import util = require("util");
+import * as path from "path";
 
 let ANDROID_PROJECT_PATH = "/mnt/sdcard/Icenium/";
 let IOS_PROJECT_PATH = "/Documents";
@@ -13,9 +12,9 @@ let NATIVESCRIPT_ION_APP_IDENTIFIER = "com.telerik.NativeScript";
 
 export class AndroidAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
 	private static ANDROID_CHECK_LIVE_SYNC_INTENT = "com.telerik.IsLiveSyncSupported";
-	
+
 	constructor(_appIdentifier: string) {
-		super(_appIdentifier); 
+		super(_appIdentifier);
 	}
 
 	public get deviceProjectRootPath(): string {
@@ -72,9 +71,9 @@ export class AndroidCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAp
 
 export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
 	constructor(_appIdentifier: string) {
-		super(NATIVESCRIPT_ION_APP_IDENTIFIER); 
+		super(NATIVESCRIPT_ION_APP_IDENTIFIER);
 	}
-	
+
 	public get deviceProjectRootPath(): string {
 		return this.getDeviceProjectRootPath(path.join("/data/data", this.appIdentifier, "files"));
 	}
@@ -179,7 +178,7 @@ export class IOSNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.
 
 export class WP8CompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
 	constructor() {
-		super("{9155af5b-e7ed-486d-bc6b-35087fb59ecc}")
+		super("{9155af5b-e7ed-486d-bc6b-35087fb59ecc}");
 	}
 
 	public get deviceProjectRootPath(): string {
@@ -205,7 +204,7 @@ export class WP8CompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDat
 
 export class DeviceAppDataProvider implements Mobile.IDeviceAppDataProvider {
 	constructor(private $project: Project.IProject) { }
-	
+
 	public createFactoryRules(): IDictionary<Mobile.IDeviceAppDataFactoryRule> {
 		let rules: IDictionary<IDictionary<Mobile.IDeviceAppDataFactoryRule>>= {
 			Cordova: {
@@ -221,7 +220,7 @@ export class DeviceAppDataProvider implements Mobile.IDeviceAppDataProvider {
 					vanilla: "",
 					companion: WP8CompanionAppIdentifier
 				}
-			}, 
+			},
 			NativeScript: {
 				Android: {
 					vanilla: AndroidAppIdentifier,
@@ -232,8 +231,8 @@ export class DeviceAppDataProvider implements Mobile.IDeviceAppDataProvider {
 					companion: IOSNativeScriptCompanionAppIdentifier
 				}
 			}
-		}
-		
+		};
+
 		return rules[this.$project.projectData.Framework];
 	}
 }

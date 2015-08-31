@@ -1,9 +1,8 @@
 ///<reference path=".d.ts"/>
 "use strict";
-import http = require("http");
-import url = require("url");
-import path = require("path");
-import helpers = require("./helpers");
+import * as http from "http";
+import * as url from "url";
+import * as path from "path";
 
 export class HttpServer implements IHttpServer {
 	constructor(private $logger: ILogger,
@@ -32,7 +31,7 @@ export class HttpServer implements IHttpServer {
 		});
 	}
 
-	public serveFile(fileName: string): (request: http.ServerRequest, response: http.ServerResponse) => void {
+	public serveFile(fileName: string): (_request: http.ServerRequest, _response: http.ServerResponse) => void {
 		return (request: http.ServerRequest, response: http.ServerResponse) => {
 			let mimeTypes: IStringDictionary = {
 				".html": "text/html",

@@ -3,10 +3,9 @@
 
 import yok = require("../lib/common/yok");
 let testInjector = new yok.Yok();
-import stubs = require("./stubs");
-let configFile = require("../lib/config");
+import * as stubs from "./stubs";
 let assert = require("chai").assert;
-let commandParams = require("../lib/common/command-params");
+import * as commandParams from "../lib/common/command-params";
 
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("stringParameter", commandParams.StringCommandParameter);

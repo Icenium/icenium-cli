@@ -1,11 +1,11 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import os = require("os");
+import {EOL} from "os";
 
 export class SimulatorService implements ISimulatorService {
 	private simulatorPath: string;
-	
+
 	constructor(private $errors: IErrors,
 		private $logger: ILogger,
 		private $loginManager: ILoginManager,
@@ -35,7 +35,7 @@ export class SimulatorService implements ISimulatorService {
 			this.$logger.info(); // HACK - display simulator downloading indicator correctly
 			let isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
 			if (isRunning) {
-				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + os.EOL +
+				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + EOL +
 					"Close it and run $ appbuilder simulate again.");
 			}
 		}).future<void>()();

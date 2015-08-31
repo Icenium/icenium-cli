@@ -6,8 +6,7 @@ import yok = require("../lib/common/yok");
 import optionsLib = require("../lib/options");
 import analyticsServiceLib = require("../lib/common/services/analytics-service");
 import Future = require("fibers/future");
-import util = require("util");
-import os = require("os");
+import * as os from "os";
 import staticConfigLib = require("../lib/config");
 import helpersLib = require("../lib/common/helpers");
 import hostInfoLib = require("../lib/common/host-info");
@@ -18,7 +17,7 @@ let lastSavedSettingNameAndValue = "";
 let lastTrackedExceptionMsg = "";
 let lastUsedEqatecSettings: any;
 let isEqatecStopCalled = false;
-let eqatec = require("../lib/common/vendor/EqatecMonitor");
+require("../lib/common/vendor/EqatecMonitor"); // note - it modifies global scope!
 let originalEqatec = global._eqatec;
 
 function setGlobalEqatec(shouldSetUserThrowException: boolean, shouldStartThrow: boolean): void {
@@ -36,7 +35,7 @@ function setGlobalEqatec(shouldSetUserThrowException: boolean, shouldStartThrow:
 					lastTrackedExceptionMsg = message;
 				},
 				stop: () => { isEqatecStopCalled = true; },
-				setInstallationID: (guid: string) => {},
+				setInstallationID: (guid: string) => { /*a mock*/ },
 				setUserID: (userId: string) => {
 					if(shouldSetUserThrowException) {
 						throw new Error("setUserID throws");
@@ -47,14 +46,14 @@ function setGlobalEqatec(shouldSetUserThrowException: boolean, shouldStartThrow:
 						throw new Error("start throws");
 					}
 				}
-			}
+			};
 		}
-	}
+	};
 }
 
 class UserSettingsServiceStub {
 	constructor(public featureTracking: boolean,
-		public exceptionsTracking: boolean, 
+		public exceptionsTracking: boolean,
 		public testInjector: IInjector) {}
 
 	getSettingValue<T>(settingName: string): IFuture<T> {
@@ -79,13 +78,13 @@ class UserSettingsServiceStub {
 }
 
 interface ITestScenario {
-	canDoRequest: boolean,
-	prompterConfirmResult: boolean,
-	isInteractive: boolean,
-	featureTracking: boolean,
-	exceptionsTracking: boolean,
-	shouldSetUserThrowException: boolean,
-	shouldStartThrow: boolean
+	canDoRequest: boolean;
+	prompterConfirmResult: boolean;
+	isInteractive: boolean;
+	featureTracking: boolean;
+	exceptionsTracking: boolean;
+	shouldSetUserThrowException: boolean;
+	shouldStartThrow: boolean;
 }
 
 function createTestInjector(testScenario: ITestScenario): IInjector {
@@ -103,7 +102,7 @@ function createTestInjector(testScenario: ITestScenario): IInjector {
 			return "UnitTests";
 		},
 		getPrivacyPolicyLink: () => {
-			return "privacy policy link"
+			return "privacy policy link";
 		},
 		getUserId: () => {
 			return Future.fromResult("UnitTestsUserId");
@@ -208,7 +207,7 @@ describe("analytics-service", () => {
 
 	describe("trackException", () => {
 		let exception = "Exception";
-		let message = "Track Exception Msg"
+		let message = "Track Exception Msg";
 		it("tracks when all conditions are correct", () => {
 			let testInjector = createTestInjector(baseTestScenario);
 			let service: IAnalyticsService = testInjector.resolve("analyticsService");
@@ -325,7 +324,7 @@ describe("analytics-service", () => {
 			assert.isTrue(isEqatecStopCalled);
 		});
 	});
-	
+
 	describe("getStatusMessage", () => {
 		it("returns correct string results when status is enabled", () => {
 			let testInjector = createTestInjector(baseTestScenario);

@@ -1,9 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import util = require("util");
-import os = require("os");
+import * as path from "path";
+import * as util from "util";
+import {EOL} from "os";
 import temp = require("temp");
 import helpers = require("../helpers");
 
@@ -33,7 +33,6 @@ export class SamplesService implements ISamplesService {
 		{ id: "advanced", regEx: /\w?/, name: "Advanced APIs", order: 3, matchOrder: 4 }
 	];
 
-	private _samples: Sample[];
 	constructor(private $logger: ILogger,
 		private $errors: IErrors,
 		private $fs: IFileSystem,
@@ -45,19 +44,19 @@ export class SamplesService implements ISamplesService {
 
 	public printSamplesInformation(framework?: string): IFuture<void> {
 		return (() => {
-			this.$logger.info("You can choose a sample from the following: %s", os.EOL);
+			this.$logger.info("You can choose a sample from the following: %s", EOL);
 			if(framework) {
 				this.printSamplesInformationForFramework(framework).wait();
 			} else {
-				_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS).forEach(framework => this.printSamplesInformationForFramework(framework).wait());
+				_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
 			}
 		}).future<void>()();
 	}
 
 	private printSamplesInformationForFramework(framework: string): IFuture<void> {
 		return (() => {
-			this.$logger.info("%s samples:%s=========================%s", framework, os.EOL, os.EOL);
-			this.$logger.info(this.getSamplesInformation(framework).wait() + os.EOL + os.EOL);
+			this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
+			this.$logger.info(this.getSamplesInformation(framework).wait() + EOL + EOL);
 		}).future<void>()();
 	}
 
@@ -69,7 +68,7 @@ export class SamplesService implements ISamplesService {
 			}
 
 			let sampleNameLower = sampleName.toLowerCase();
-			let sample = _.find(this.getSamples().wait(), (sample: Sample) => sample.name.toLowerCase() === sampleNameLower);
+			let sample = _.find(this.getSamples().wait(), (_sample: Sample) => _sample.name.toLowerCase() === sampleNameLower);
 			if (!sample) {
 				this.$errors.fail("There is no sample named '%s'.", sampleName);
 			}
@@ -83,7 +82,7 @@ export class SamplesService implements ISamplesService {
 				let file = this.$fs.createWriteStream(filepath);
 				let fileEnd = this.$fs.futureFromEvent(file, "finish");
 				let accessToken = this.getGitHubAccessTokenQueryParameter("?").wait();
-				let response = this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
+				this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
 				fileEnd.wait();
 
 				this.$fs.unzip(filepath, tempDir).wait();
@@ -93,12 +92,11 @@ export class SamplesService implements ISamplesService {
 				_.each(files, file => {
 					let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
 					this.$fs.copyFile(file, targetDir).wait();
-				})
+				});
 			} finally {
 				try {
 					this.$fs.deleteDirectory(tempDir).wait();
-				}
-				catch (error) {
+				} catch (error) {
 					this.$logger.debug(error);
 				}
 			}
@@ -119,27 +117,27 @@ export class SamplesService implements ISamplesService {
 				return {
 					name: category.name,
 					samples: _.filter(availableSamples, sample => sample.type === category.id)
-				}
+				};
 			});
 
 			let outputLines: string[] = [];
 			_.each(categories, category => {
-				if (category.samples.length == 0) {
+				if (category.samples.length === 0) {
 					return;
 				}
 
-				outputLines.push(util.format("   %s:%s   ======================", category.name, os.EOL));
+				outputLines.push(util.format("   %s:%s   ======================", category.name, EOL));
 
 				_.each(category.samples, (sample: Sample) => {
 					let nameRow = util.format("      Sample: %s", sample.displayName);
 					let descriptionRow = util.format("      Description: %s", sample.description);
 					let gitClone = util.format("      Github repository page: %s", sample.githubUrl);
 					let cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
-					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(os.EOL));
+					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(EOL));
 				});
 			});
 
-			return outputLines.join(os.EOL + os.EOL);
+			return outputLines.join(EOL + EOL);
 		}).future<string>()();
 	}
 
@@ -219,7 +217,7 @@ export class SamplesService implements ISamplesService {
 		let matchedCategory = _.find(sortedCategories, category => category.regEx.test(description));
 		return matchedCategory ? matchedCategory.id : null;
 	}
-	
+
 	private getGitHubAccessTokenQueryParameter(queryToken: string): IFuture<string> {
 		return ((): string => {
 			let accessToken = "";

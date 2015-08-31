@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import path = require("path");
+import * as path from "path";
 import semver = require("semver");
-import helpers = require("./../helpers");
+import * as helpers from "../helpers";
 
 class RenamedPlugin {
 	constructor(public version: string,
@@ -100,7 +99,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let biggerVersion = isUpgrade ? toVersion : fromVersion;
 
 			let renames = _.select(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
-				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0
+				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0;
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
 			let transitions = _.map(renames, rename => isUpgrade ? { from: rename.oldName, to: rename.newName } : { from: rename.newName, to: rename.oldName });
@@ -140,7 +139,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				integratedPlugins[version] = json.IntegratedPlugins[version];
 			});
 			let supportedFrameworkVersion: IFrameworkVersion[] = _(json.SupportedFrameworkVersions)
-				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version)} })
+				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version)}; })
 				.filter(fv => _.contains(cliSupportedVersions, fv.version))
 				.value();
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
@@ -185,7 +184,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 						selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.version) <= 0);
 					}
 
-					let shouldUpdateFramework = this.$prompter.confirm(`You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`).wait()
+					let promptStr = `You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`;
+					let shouldUpdateFramework = this.$prompter.confirm(promptStr).wait();
 					if(shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.version).wait();
 						this.$project.projectData.FrameworkVersion = selectedFramework.version;
@@ -226,7 +226,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.unique()
 				.filter((plugin: string) => {
 					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin);
-					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version)
+					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version);
 				})
 				.value();
 
@@ -274,7 +274,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	}
 
 	private get cordovaJsonFilePath(): string {
-		return path.join(this.$resources.resolvePath(CordovaMigrationService.CORDOVA_FOLDER_NAME), CordovaMigrationService.CORDOVA_JSON_FILE_NAME)
+		return path.join(this.$resources.resolvePath(CordovaMigrationService.CORDOVA_FOLDER_NAME), CordovaMigrationService.CORDOVA_JSON_FILE_NAME);
 	}
 
 	private migrateCordovaJsFiles(newVersion: string): IFuture<void> {
@@ -347,4 +347,3 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	}
 }
 $injector.register("cordovaMigrationService", CordovaMigrationService);
-

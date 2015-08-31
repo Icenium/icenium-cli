@@ -4,7 +4,6 @@
 import helpers = require("../lib/common/helpers");
 let assert = require("chai").assert;
 
-
 describe("common helpers", () => {
 	describe("remove<T>",() => {
 		it("removes single element from array correctly", () => {

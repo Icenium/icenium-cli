@@ -2,10 +2,8 @@
 "use strict";
 
 import plugman = require("plugman");
-import path = require("path");
-import util = require("util");
-import os = require("os");
-import validUrl = require("valid-url");
+import * as path from "path";
+import * as util from "util";
 import Future = require("fibers/future");
 import temp = require("temp");
 import PluginsDataLib = require("./../plugins-data");
@@ -22,7 +20,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		this.configure();
 		return this.search(keywords);
 	}
-	
+
 	// HACK: Information for this plugin is never returned from the server, so keep it here.
 	// TODO: Remove the LivePatch HACK when the server returns correct results.
 	// HACK: Platforms should be Server.DevicePlatform.Android, etc. but this fails at runtime that Server is not defined.
@@ -66,7 +64,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 					if (this.isError(result)) {
 						future.throw(result);
 					} else {
-						future.return(util.format("The plugin has been successfully fetched to %s", result));
+						future.return("The plugin has been successfully fetched to " + result);
 					}
 				});
 			} catch(e) {
@@ -121,7 +119,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		return ((): Server.CordovaPluginData[] => {
 			this.$project.ensureCordovaProject();
 			// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
-			return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).wait().concat([this.livePatchPlugin])
+			return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).wait().concat([this.livePatchPlugin]);
 		}).future<Server.CordovaPluginData[]>()();
 	}
 
@@ -133,7 +131,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
 		let pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
 		let corePluginRegex = require(path.join(this.$resources.resolvePath("Cordova"), "cordova-migration-data.json")).corePluginRegex;
-		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier); 
+		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier);
 		if (isCorePlugin) {
 			pluginType = PluginsDataLib.PluginType.CorePlugin;
 		}

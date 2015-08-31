@@ -3,14 +3,10 @@
 
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-import optionsLib = require("../lib/options");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import projectConstantsLib = require("../lib/project/project-constants");
-import os = require("os");
-
-let assert = require("chai").assert;
+import {assert} from "chai";
 import Future = require("fibers/future");
-import util = require("util");
 
 function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();
@@ -19,7 +15,7 @@ function createTestInjector(): IInjector {
 		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
-		setSolutionSpaceName: (tenantId: string) => {}
+		setSolutionSpaceName: (tenantId: string) => { /*intentionally empty body*/ }
 	});
 	testInjector.register("server", {
 		tap: {
@@ -39,7 +35,7 @@ function createTestInjector(): IInjector {
 					"description": "AppBuilder cross platform project"
 				}]);
 			}
-		}, 
+		},
 		projects: {
 			getSolution: (projectName: string, checkUpgradability: boolean) => {
 				return Future.fromResult({
@@ -97,7 +93,7 @@ function createTestInjector(): IInjector {
 				return Future.fromResult(false);
 			}
 		},
-		createWriteStream: (path: string) => {},
+		createWriteStream: (path: string) => { /* intentionally empty body*/},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
 		readDirectory: (projectDir: string) => Future.fromResult([])
 	});
@@ -112,18 +108,18 @@ describe("remote project service", () => {
 			testInjector = createTestInjector();
 			remoteProjectService = testInjector.resolve(remoteProjectsServiceLib.RemoteProjectService);
 		});
-	
+
 	it("getSolutions returns correct sorted results", () => {
 		let solutions = remoteProjectService.getSolutions().wait();
 		let expectedResult = ["Sln1", "Sln2"];
 		assert.deepEqual(expectedResult, solutions.map(sln => sln.name));
 	});
-	
+
 	describe("getProjectsForSolution", () => {
 		it("fails when solution name does not exist", () => {
 			assert.throws( () => remoteProjectService.getProjectsForSolution("Invalid name").wait() );
 		});
-	
+
 		it("returns correct sorted result when name is correct", () => {
 			let projects = remoteProjectService.getProjectsForSolution("Sln1").wait();
 			let expectedResult = ["ABlankProjMobileTesting", "BlankProj"];
@@ -205,7 +201,7 @@ describe("remote project service", () => {
 			assert.deepEqual(expectedResult, properties);
 		});
 	});
-	
+
 	describe("getProjectName", () => {
 		let expectedResult = "BlankProj";
 		it("fails when solution name is not correct", () => {

@@ -1,8 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
-
 export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	private static ARRAY_START_CHAR = "[";
 	private static ARRAY_END_CHAR = "]";
@@ -82,7 +80,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 			return TSTypeSystemHelpers.ANY_TYPE_NAME;
 		} else {
 			let value = typeName.substr(keyValueSeparatorIndex + 1, typeName.indexOf(TSTypeSystemHelpers.ARRAY_END_CHAR) - keyValueSeparatorIndex - 1);
-			return util.format("IDictionary<%s>", this.translate(value));
+			return `IDictionary<${this.translate(value)}>`;
 		}
 	}
 }

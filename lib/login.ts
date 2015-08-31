@@ -1,14 +1,12 @@
 ///<reference path=".d.ts"/>
 "use strict";
-import http = require("http");
-import util = require("util");
-import path = require("path");
-import url = require("url");
+import * as http from "http";
+import * as path from "path";
+import * as url from "url";
 import Future = require("fibers/future");
-import helpers = require("./helpers");
-import querystring = require("querystring");
-import cookielib = require("cookie");
-import commandParams = require("./common/command-params");
+import * as helpers from "./helpers";
+import * as querystring from "querystring";
+import * as cookielib from "cookie";
 
 export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
@@ -84,7 +82,7 @@ export class UserDataStore implements IUserDataStore {
 				this.$fs.deleteFile(this.getUserStateFilePath()).wait();
 			}
 		}).future<void>()();
-		
+
 	}
 
 	public clearLoginData(): IFuture<void> {
@@ -286,7 +284,7 @@ export class LoginManager implements ILoginManager {
 		return (() => {
 			let response = this.$httpClient.httpRequest({
 				method: "POST",
-				url: util.format("%s://%s/appbuilder/Mist/Authentication/Login", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER),
+				url: `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/Authentication/Login`,
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},

@@ -1,7 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-import helpers = require("./../../helpers");
-import projectPropertyCommandBaseLib = require("./prop-command-base");
+import * as projectPropertyCommandBaseLib from "./prop-command-base";
 
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
 	constructor($staticConfig: IStaticConfig,
@@ -19,7 +18,7 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 			if(configs.length) {
 				_.each(configs, config => {
 					this.$project.printProjectProperty(args[0], config).wait();
-				})
+				});
 			} else {
 				this.$project.printProjectProperty(args[0]).wait();
 			}

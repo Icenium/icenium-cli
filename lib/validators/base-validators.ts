@@ -58,7 +58,7 @@ export class Helpers {
 			let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
 			let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 			if (firstFailedValidationResult) {
-				return firstFailedValidationResult
+				return firstFailedValidationResult;
 			}
 			return ValidationResult.ValidationResult.Successful;
 		}).future<IValidationResult>()();

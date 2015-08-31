@@ -1,8 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 import Future = require("fibers/future");
-import path = require("path");
-import util = require("util");
+import * as path from "path";
+import * as util from "util";
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
@@ -39,7 +39,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			generatorName = generatorName || this.generatorName;
 			// We should use "scaffolderData.scaffolder.listGenerators(scaffolderData.callback);"" but this generates empty app.json and .rc files every time
 			// and decided to list manually supported commands from .schema.json file for specified generator
-			
+
 			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
 			let pathToGenerator = path.join(this.$appScaffoldingExtensionsService.appScaffoldingPath, generatorConfig.alias, generatorConfig.version, "node_modules", generatorName);
 			let schema = require(path.join(pathToGenerator, ".schema.json"));
@@ -64,19 +64,19 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		let command = util.format("%s %s install", "node", bowerPath);
 		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
-	
+
 	public composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
-		return (() => { 
+		return (() => {
 			let screenBuilderOptions = bacisSceenBuilderOptions || {};
-			
+
 			if(this.$options.answers) {
 				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(this.$options.answers)).wait();
 			}
-			
+
 			return screenBuilderOptions;
 		}).future<IScreenBuilderOptions>()();
 	}
-	
+
 	private prepareScreenBuilder(): IFuture<void> {
 		return (() => {
 			this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
@@ -137,7 +137,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			return {scaffolder: scaffolder, future: future, callback: callback};
 		}).future<{ scaffolder: any; future: IFuture<any>; callback: Function }>()();
 	}
-	
+
 	private getErrorsRecursive(errorObject: any): string[] {
 		let errorMessage = errorObject.message,
 			childErrors = _(errorObject.errors)
@@ -171,11 +171,11 @@ class ScreenBuilderDynamicCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		this.ensureScreenBuilderProject().wait();
-		
+
 		let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions({
-			type: this.command.substr(this.command.indexOf("-") + 1)			
+			type: this.command.substr(this.command.indexOf("-") + 1)
 		}).wait();
-		
+
 		return this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions);
 	}
 
@@ -192,4 +192,3 @@ class ScreenBuilderDynamicCommand implements ICommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 }
-

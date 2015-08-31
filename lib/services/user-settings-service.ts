@@ -1,12 +1,10 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import xmlMapping = require("xml-mapping");
-import Future = require("fibers/future");
-import path = require("path");
-import util = require("util");
-import helpers = require("../helpers");
-import userSettingsServiceBaseLib = require("./../common/services/user-settings-service");
+import * as xmlMapping from "xml-mapping";
+import * as path from "path";
+import * as helpers from "../helpers";
+import * as userSettingsServiceBaseLib from "../common/services/user-settings-service";
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
@@ -196,4 +194,3 @@ export class UserSettingsService implements UserSettings.IUserSettingsService {
 	}
 }
 $injector.register("userSettingsService", UserSettingsService);
-

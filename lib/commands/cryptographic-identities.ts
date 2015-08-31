@@ -1,14 +1,13 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import util = require("util");
-import helpers = require("../helpers");
-import path = require("path");
+import * as util from "util";
+import * as helpers from "../helpers";
+import * as path from "path";
 import moment = require("moment");
 import validators = require("../validators/cryptographic-identity-validators");
 import iosValidators = require("../validators/ios-deployment-validator");
-import os = require("os");
+import * as os from "os";
 import commandParams = require("../common/command-params");
 
 class CryptographicIdentityConstants {
@@ -22,7 +21,7 @@ class CryptographicIdentityConstants {
 
 interface IFailedProvision {
 	provision: IProvision;
-	error: string
+	error: string;
 }
 
 export class CryptographicIdentityStoreService implements ICryptographicIdentityStoreService {
@@ -85,7 +84,7 @@ export class IdentityManager implements Server.IIdentityManager {
 				this.$logger.out("  Provisioned device identifiers:");
 				devices.sort();
 				_.forEach(devices, (device, deviceIndex) => {
-					this.$logger.out("    " + devices[deviceIndex])
+					this.$logger.out("    " + devices[deviceIndex]);
 				});
 			} else {
 				this.$logger.out("  No provisioned devices.");
@@ -513,7 +512,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			let name = identity.Alias;
 			let sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
 
-			if(sanitizedName.length == 0) {
+			if(sanitizedName.length === 0) {
 				sanitizedName = "exported_certificate";
 				this.$logger.warn("Certificate name contains only invalid characters: Defaulting to %s!", sanitizedName);
 			} else {
@@ -574,7 +573,7 @@ export class ImportCryptographicIdentity implements ICommand {
 			if(extension !== ".p12" && extension !== ".cer") {
 				this.$errors.fail("To add a cryptographic identity to the list, import a P12 file " +
 					"that contains an existing cryptographic identity or a CER file that contains the " +
-					"certificate generated from a certificate signing request.")
+					"certificate generated from a certificate signing request.");
 			}
 
 			let importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
@@ -582,7 +581,7 @@ export class ImportCryptographicIdentity implements ICommand {
 			if(!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
-			
+
 			let result = importType === CryptographicIdentityConstants.PKCS12CERTIFICATE ?
 						this.importCertificateWithPassword(importType, password, certificateFile).wait() :
 						this.importCertificateWithoutPassword(importType, certificateFile).wait();

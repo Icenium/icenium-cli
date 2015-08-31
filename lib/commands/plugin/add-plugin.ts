@@ -32,7 +32,7 @@ export class AddPluginCommand implements ICommand {
 						}
 					}
 
-					return _.any(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name)
+					return _.any(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name);
 				});
 				this.$pluginsService.printPlugins(plugins);
 			} else {

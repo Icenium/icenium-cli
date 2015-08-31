@@ -1,3 +1,1 @@
 require("./typescript-compilation.js");
-
-

@@ -1,15 +1,13 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
-import util = require("util");
-import path = require("path");
-import helpers = require("../helpers");
+import * as path from "path";
+import * as helpers from "../helpers";
 import temp = require("temp");
 
 export class RemoteProjectService implements IRemoteProjectService {
 	private clientSolutions: Server.TapSolutionData[];
 	private clientProjectsPerSolution: IDictionary<Server.IWorkspaceItemData[]> = {};
-	
+
 	constructor(private $server: Server.IServer,
 				private $userDataStore: IUserDataStore,
 				private $serviceProxy: Server.IServiceProxy,
@@ -44,7 +42,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			return result.name;
 		}).future<string>()();
 	}
-	
+
 	public getProjectName(solutionId: string, projectId: string): IFuture<string> {
 		return ((): string => {
 			let slnName = this.getSolutionName(solutionId).wait();
@@ -102,14 +100,14 @@ export class RemoteProjectService implements IRemoteProjectService {
 	public exportSolution(remoteSolutionName: string): IFuture<void> {
 		return (() => {
 			let solutionDir = this.getExportDir(remoteSolutionName, (tenantId: string, dirName: string, unzipStream: any) => this.$server.projects.exportSolution(tenantId, remoteSolutionName, false, unzipStream)).wait();
-			
+
 			let projectsDirectories = this.$fs.readDirectory(solutionDir).wait();
 			projectsDirectories.forEach(projectName => this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName).wait());
 
 			this.$logger.info("%s has been successfully exported to %s", remoteSolutionName, solutionDir);
 		}).future<void>()();
 	}
-	
+
 	private getSolutionData(projectName: string): IFuture<Server.SolutionData> {
 		return this.makeTapServiceCall(() => this.$server.projects.getSolution(projectName, true));
 	}
@@ -120,21 +118,21 @@ export class RemoteProjectService implements IRemoteProjectService {
 		}).future<Server.IWorkspaceItemData>()();
 	}
 
-	private getExportDir(dirName: string, tapServiceCall: (tenantId: string, dirName: string, unzipStream: any) => IFuture<any>): IFuture<string> {
+	private getExportDir(dirName: string, tapServiceCall: (_tenantId: string, _dirName: string, _unzipStream: any) => IFuture<any>): IFuture<string> {
 		return ((): string =>{
 			let exportDir = path.join(this.$project.getNewProjectDir(), dirName);
 			if(this.$fs.exists(exportDir).wait()) {
 				this.$errors.fail("The folder %s already exists!", exportDir);
 			}
-			
+
 			temp.track();
 			let solutionZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
 			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
 			let tenantId = this.getUserTenantId().wait();
-			
+
 			this.makeTapServiceCall(() => tapServiceCall.apply(null, [tenantId, dirName, unzipStream])).wait();
 			this.$fs.unzip(solutionZipFilePath, exportDir).wait();
-			
+
 			return exportDir;
 		}).future<string>()();
 	}

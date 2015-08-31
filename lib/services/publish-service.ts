@@ -1,10 +1,10 @@
 ﻿///<reference path="../.d.ts"/>
 "use strict";
 
-import os = require("os");
-import helpers = require("../common/helpers");
-import path = require("path");
-import util = require("util");
+import {EOL} from "os";
+import * as helpers from "../common/helpers";
+import * as path from "path";
+import * as util from "util";
 let Table = require("cli-table");
 
 export class PublishService implements IPublishService {
@@ -147,8 +147,8 @@ export class PublishService implements IPublishService {
 			try {
 				this.allPublishConnections = this.$fs.readJson(publishFilePath).wait() || [];
 			} catch (err) {
-				this.$errors.failWithoutHelp("The publish file %s is corrupted." + os.EOL +
-						"Consider restoring an earlier version from your source control or backup." + os.EOL +
+				this.$errors.failWithoutHelp("The publish file %s is corrupted." + EOL +
+						"Consider restoring an earlier version from your source control or backup." + EOL +
 						"Additional technical information: %s", publishFilePath, err.toString());
 			}
 		}).future<void>()();
@@ -197,7 +197,7 @@ export class PublishService implements IPublishService {
 				this.$progressIndicator.showProgressIndicator(this.$server.publish.publishFtp(projectName, projectName, ftpConnectionData), 6000).wait();
 			} catch (err) {
 				if (err.message === PublishService.ERROR_MESSAGE_WHEN_PROJECT_EXISTS_ON_REMOTE) {
-					this.$errors.failWithoutHelp("This project already exists on the remote server. " + os.EOL + 
+					this.$errors.failWithoutHelp("This project already exists on the remote server. " + EOL +
 									"To remove all files and upload the new ones on the remote server, run $ appbuilder publish --force");
 				}
 
@@ -209,10 +209,10 @@ export class PublishService implements IPublishService {
 	}
 
 	private savePublishJsonFile(): IFuture<void> {
-		return (() => { 
+		return (() => {
 			let projectDir = this.$project.getProjectDir().wait();
 			this.$fs.writeJson(path.join(projectDir, PublishService.JSON_PUBLISH_FILE_NAME), this.allPublishConnections).wait();
-		}).future<void>()()
+		}).future<void>()();
 	}
 
 	private validateId(id: number): void {

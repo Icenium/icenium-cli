@@ -1,16 +1,14 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
+import * as path from "path";
 import temp = require("temp");
-import util = require("util");
 import jsonSchemaResolverPath = require("./json-schema-resolver");
 
 export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 	private schemasFolderPath: string = null;
 	private schemas: IDictionary<ISchema> = null;
-	private schema: ISchema = null;
 	private loadedSchemas: IDictionary<ISchema> = null;
 
 	public constructor(private $config: IConfiguration,
@@ -39,7 +37,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			let file = this.$fs.createWriteStream(filePath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			let schemasEndpoint = util.format("http://%s/appbuilder/Resources/Files/Schemas.zip", this.$config.AB_SERVER);
+			let schemasEndpoint = `http://${this.$config.AB_SERVER}/appbuilder/Resources/Files/Schemas.zip`;
 			this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file}).wait();
 			fileEnd.wait();
 

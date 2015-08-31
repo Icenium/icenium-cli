@@ -1,9 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import os = require("os");
-import path = require("path");
-import serverExtensionsBaseLib = require("./extensions-service-base");
-import util = require("util");
+import * as serverExtensionsBaseLib from "./extensions-service-base";
 
 export class DependencyExtensionsServiceBase extends serverExtensionsBaseLib.ExtensionsServiceBase implements IDependencyExtensionsServiceBase {
 	private static SCREEN_BUILDER_BUCKET_NAME = "http://s3.amazonaws.com/screenbuilder-cli";

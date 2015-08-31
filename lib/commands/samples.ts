@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import path = require("path");
+import * as path from "path";
 
 export class PrintSamplesCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
@@ -16,7 +15,7 @@ export class PrintSamplesCommand implements ICommand {
 		return this.$config.ON_PREM;
 	}
 
-	allowedParameters: ICommandParameter[] = []
+	allowedParameters: ICommandParameter[] = [];
 }
 $injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, {frameworkIdentifier: ""}));
 
@@ -35,7 +34,7 @@ export class CloneSampleCommand implements ICommand {
 		return this.$config.ON_PREM;
 	}
 
-	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$samplesService, this.$fs, this.$errors, this.$options)]
+	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$samplesService, this.$fs, this.$errors, this.$options)];
 }
 $injector.registerCommand("sample|clone", CloneSampleCommand);
 

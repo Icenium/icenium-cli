@@ -1,9 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import util = require("util");
-
+import * as path from "path";
+import * as util from "util";
 import frameworkProjectBaseLib = require("./framework-project-base");
 import helpers = require("./../common/helpers");
 import semver = require("semver");
@@ -220,7 +219,6 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 			properties.WP8WindowsPublisherName = wp8WindowsPublisherName;
 			updated = true;
 		}
-
 
 		return updated;
 	}

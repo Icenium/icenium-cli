@@ -1,5 +1,4 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
 
 export class DynamicHelpProvider implements IDynamicHelpProvider {

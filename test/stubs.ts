@@ -1,9 +1,10 @@
 ///<reference path=".d.ts"/>
+/* tslint:disable:no-empty */
 "use strict";
 
 import Future = require("fibers/future");
-import util = require("util");
-import path = require("path");
+import * as util from "util";
+import * as path from "path";
 
 export class LoggerStub implements ILogger {
 	constructor() {

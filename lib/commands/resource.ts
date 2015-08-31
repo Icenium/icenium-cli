@@ -1,9 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import commandParams = require("../common/command-params");
-import helpers = require("../common/helpers");
+import * as helpers from "../common/helpers";
 
 class Resource implements ICommand {
 	constructor(private $imageService: IImageService) { }

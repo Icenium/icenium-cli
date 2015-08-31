@@ -1,10 +1,8 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
 
-import util = require("util");
-import path = require("path");
-import helpers = require("../helpers");
+import * as path from "path";
+import * as helpers from "../helpers";
 
 export class EditConfigurationCommandParameter implements ICommandParameter {
 	constructor(private $errors: IErrors,
@@ -18,8 +16,7 @@ export class EditConfigurationCommandParameter implements ICommandParameter {
 			if(!template) {
 				if(validationValue) {
 					this.$errors.fail("There is no matching configuration file for: %s", validationValue);
-				}
-				else {
+				} else {
 					this.$errors.fail("You must choose which configuration file to edit!");
 				}
 			}

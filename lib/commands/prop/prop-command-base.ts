@@ -1,6 +1,5 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-import helpers = require("./../../helpers");
 
 export class ProjectPropertyCommandBase {
 	protected projectSchema: any;

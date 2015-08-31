@@ -4,40 +4,39 @@
 import stubs = require("./stubs");
 import helpers = require("../lib/common/helpers");
 import yok = require("../lib/common/yok");
-import optionsLib = require("../lib/options");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/project/project-constants");
-import os = require("os");
+import {EOL} from "os";
 
 let originalIsInteractiveMethod = helpers.isInteractive;
 let assert = require("chai").assert;
 import Future = require("fibers/future");
-import util = require("util");
+import * as util from "util";
 
 export class LoggerStub implements ILogger {
 	public outOutput = "";
 	public infoOutput = "";
 	public warnOutput = "";
-			
+
 	constructor() {
 		// uncomment when debugging unit tests to print to the console
 		//this.setLevel("DEBUG");
 	}
 
-	setLevel(level: string): void {}
+	setLevel(level: string): void { /* mock */ }
 	getLevel(): string { return undefined; }
-	fatal(formatStr: string, ...args:string[]): void {}
-	error(formatStr: string, ...args:string[]): void {}
+	fatal(formatStr: string, ...args:string[]): void {/* mock */}
+	error(formatStr: string, ...args:string[]): void {/* mock */}
 	warn(formatStr: string, ...args:string[]): void {
 		args.unshift(formatStr);
-		this.warnOutput += util.format.apply(null, args) + os.EOL;
+		this.warnOutput += util.format.apply(null, args) + EOL;
 	}
 	info(formatStr: string, ...args:string[]): void {
 		args.unshift(formatStr);
-		this.infoOutput += util.format.apply(null, args) + os.EOL;
+		this.infoOutput += util.format.apply(null, args) + EOL;
 	}
-	debug(formatStr: string, ...args:string[]): void {}
+	debug(formatStr: string, ...args:string[]): void {/* mock */}
 	trace(formatStr: string, ...args:string[]): void {
 		// uncomment when debugging unit tests to print to the console
 		//args.unshift(formatStr);
@@ -46,14 +45,14 @@ export class LoggerStub implements ILogger {
 
 	out(formatStr: string, ...args:string[]): void {
 		args.unshift(formatStr);
-		this.outOutput += util.format.apply(null, args) + os.EOL;
+		this.outOutput += util.format.apply(null, args) + EOL;
 	}
 
-	write(...args:string[]): void { }
+	write(...args:string[]): void {/* mock */}
 
 	prepare(item: any): string { return item; }
 
-	printInfoMessageOnSameLine(message: string): void { }
+	printInfoMessageOnSameLine(message: string): void {/* mock */}
 	printMsgWithTimeout(message: string, timeout: number): IFuture<void> {
 		return null;
 	}
@@ -65,11 +64,11 @@ export class PrompterStub {
 	promptForChoice(promptMessage: string, choices: any[]): IFuture<any> {
 		this.isPrompterCalled = true;
 		if(promptMessage.indexOf("solution") === -1) {
-			assert.isTrue(_.contains(choices, this.promptPrjName))
+			assert.isTrue(_.contains(choices, this.promptPrjName));
 			return Future.fromResult(this.promptPrjName);
 		}
 
-		assert.isTrue(_.contains(choices, this.promptSlnName))
+		assert.isTrue(_.contains(choices, this.promptSlnName));
 		return Future.fromResult(this.promptSlnName);
 	}
 }
@@ -84,7 +83,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
-		setSolutionSpaceName: (tenantId: string) => {}
+		setSolutionSpaceName: (tenantId: string) => {/* mock */}
 	});
 	testInjector.register("server", {
 		tap: {
@@ -112,7 +111,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 					"description": "AppBuilder cross platform project"
 				}]);
 			}
-		}, 
+		},
 		projects: {
 			getSolution: (slnName: string, checkUpgradability: boolean) => {
 				if(slnName === "Sln1") {
@@ -154,7 +153,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 							}
 						],
 						"IsUpgradeable": false
-					}); 
+					});
 				} else if (slnName === "Sln2") {
 					return Future.fromResult({
 						"Name": "Sln1",
@@ -181,9 +180,9 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 							}
 						],
 						"IsUpgradeable": false
-					}); 
+					});
 				}
-			}, 
+			},
 			exportProject: (solutionSpaceName: string, solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
 				return Future.fromResult();
 			},
@@ -200,7 +199,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 				return Future.fromResult(false);
 			}
 		},
-		createWriteStream: (path: string) => {},
+		createWriteStream: (path: string) => {/* mock */},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
 		readDirectory: (projectDir: string) => Future.fromResult([])
 	});
@@ -261,13 +260,13 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when more than two arguments are passed", () => {
-					assert.throws(() => exportProjectCommand.canExecute(["1", "2", "3"]).wait())
+					assert.throws(() => exportProjectCommand.canExecute(["1", "2", "3"]).wait());
 				});
 
 				it("fails when solution does not have any projects", () => {
-					assert.throws(() => exportProjectCommand.canExecute(["Sln2"]).wait())
+					assert.throws(() => exportProjectCommand.canExecute(["Sln2"]).wait());
 				});
-				
+
 				it("fails when there's projectData", () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
@@ -314,7 +313,7 @@ describe("cloud project commands", () => {
 					exportProjectCommand.execute(["1", "2"]).wait();
 				});
 			});
-			
+
 			describe("works correctly when only solution name is passed", () => {
 				beforeEach(() => {
 					testInjector = createTestInjector("Sln1", "BlankProj");
@@ -357,7 +356,7 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when projectDir exists", () => {
-					fs.exists = (projectDir: string) => { return Future.fromResult(true);}
+					fs.exists = (projectDir: string) => { return Future.fromResult(true); };
 					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
 				});
 
@@ -367,12 +366,12 @@ describe("cloud project commands", () => {
 						let future = new Future<void>();
 						future.throw(new Error("error is raised"));
 						return future;
-					}
+					};
 					logger = testInjector.resolve("logger");
 					exportProjectCommand.execute(["Sln1", "BlankProj"]).wait();
 					assert.isTrue(logger.warnOutput.indexOf("Couldn't create project file: error is raised") !== -1);
 				});
-			})
+			});
 		});
 });
 
@@ -386,7 +385,7 @@ describe("cloud project commands", () => {
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
 				commandParamter = listProjectCommand.allowedParameters[0];
 			});
-			
+
 			it("validate method returns true when valid solution name is passed", () => {
 				assert.isTrue(commandParamter.validate("Sln1").wait());
 			});
@@ -402,7 +401,7 @@ describe("cloud project commands", () => {
 			it("validate method throws error when invalid solution id is passed", () => {
 				assert.throws(() => commandParamter.validate("100").wait());
 			});
-			
+
 			it("validate method returns false when validation value is not passed", () => {
 				assert.isFalse(commandParamter.validate(undefined).wait());
 			});
@@ -416,15 +415,15 @@ describe("cloud project commands", () => {
 				logger = testInjector.resolve("logger");
 				assert.equal("", logger.outOutput);
 			});
-			
+
 			afterEach(() => {
 				let blankProjIndex = logger.outOutput.indexOf("BlankProj");
-				let aBlankPrjMobileTestingIndex = logger.outOutput.indexOf("ABlankProjMobileTesting") 
+				let aBlankPrjMobileTestingIndex = logger.outOutput.indexOf("ABlankProjMobileTesting");
 				assert.isTrue(blankProjIndex !== -1);
 				assert.isTrue(aBlankPrjMobileTestingIndex !== -1);
 				assert.isTrue(aBlankPrjMobileTestingIndex < blankProjIndex);
 			});
-			
+
 			it("when solution name is passed", () => {
 				listProjectCommand.execute(["Sln1"]).wait();
 			});
@@ -437,16 +436,16 @@ describe("cloud project commands", () => {
 				listProjectCommand.execute([]).wait();
 			});
 		});
-		
+
 		describe("lists solutions", () => {
 			it("when no parameter provided in NON-interactive console", () => {
 				testInjector = createTestInjector("Sln1", "BlankProj", false);
 				let logger = testInjector.resolve("logger");
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
 				assert.equal("", logger.outOutput);
-				
+
 				listProjectCommand.execute([]).wait();
-				
+
 				let sln1Index = logger.outOutput.indexOf("Sln1"),
 					sln2Index = logger.outOutput.indexOf("Sln2"),
 					sln3Index = logger.outOutput.indexOf("Sln3");
@@ -455,18 +454,18 @@ describe("cloud project commands", () => {
 				assert.isTrue(sln2Index !== -1);
 				assert.isTrue(sln3Index !== -1);
 			});
-			
+
 			it("when --all option provided in interactive console", () => {
 				testInjector = createTestInjector("Sln1", "BlankProj");
 				let logger = testInjector.resolve("logger"),
 					opts = testInjector.resolve("options");
-				
+
 				opts.all = true;
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
 				assert.equal("", logger.outOutput);
-				
+
 				listProjectCommand.execute([]).wait();
-				
+
 				let sln1Index = logger.outOutput.indexOf("Sln1"),
 					sln2Index = logger.outOutput.indexOf("Sln2"),
 					sln3Index = logger.outOutput.indexOf("Sln3");

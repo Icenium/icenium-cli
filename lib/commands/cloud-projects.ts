@@ -1,9 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
-import path = require("path");
-import unzip = require("unzip");
 import commonHelpers = require("../common/helpers");
 
 class SolutionIdCommandParameter implements ICommandParameter {
@@ -127,7 +124,7 @@ export class CloudExportProjectsCommand implements ICommand {
 					}
 				}
 			} else if(!commonHelpers.isInteractive()) {
-				this.$errors.fail("When console is not interactive, you have to provide at least one argument.")
+				this.$errors.fail("When console is not interactive, you have to provide at least one argument.");
 			}
 
 			return true;

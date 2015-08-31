@@ -6,7 +6,6 @@ import cordovaProjectLib = require("./../lib/project/cordova-project");
 import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
 import childProcess = require("../lib/common/child-process");
 import fslib = require("./../lib/common/file-system");
-import helpers = require("../lib/common/helpers");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
 import pluginsService = require("./../lib/services/plugins-service");
 import projectLib = require("./../lib/project");
@@ -20,12 +19,11 @@ import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabil
 import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
 import hostInfoLib = require("../lib/common/host-info");
 import optionsLib = require("../lib/options");
-
 import assert = require("assert");
 import Future = require("fibers/future");
-import path = require("path");
+import * as path from "path";
 import temp = require("temp");
-import util = require("util");
+import * as util from "util";
 temp.track();
 
 let mockProjectNameValidator = {
@@ -95,9 +93,9 @@ function createTestInjector() {
 	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
-		validate: (data: IProjectData) => { },
-		validateWithBuildSchema: (data: IProjectData, platformName: string): void => { },
-		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => { }
+		validate: (data: IProjectData) => { /* mock */ },
+		validateWithBuildSchema: (data: IProjectData, platformName: string): void => {/* mock */},
+		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => {/* mock */}
 	});
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
@@ -199,14 +197,12 @@ function assertCorePluginsCount(configuration?: string) {
 		}
 	];
 
-
-
 	let projectFilePath = path.join(tempFolder, getProjectFileName(configuration));
 	let abProjectContent = fs.readJson(projectFilePath).wait();
 
 	updateTestInjector(testInjector, getCordovaPluginsData(abProjectContent["CorePlugins"]), availableMarketplacePlugins);
 	let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
-	project.getProperty = (propertyName: string, configuration: string) => {
+	project.getProperty = (propertyName: string, _configuration: string) => {
 		return abProjectContent[propertyName];
 	};
 

@@ -2,8 +2,7 @@
 "use strict";
 
 import Future = require("fibers/future");
-import util = require("util");
-import querystring = require('querystring');
+import * as util from "util";
 
 export class MultipartUploadService implements IMultipartUploadService {
 	private static CHUNK_SIZE = 1024 * 1024 * 20;
@@ -33,7 +32,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 				// exclusive endByte
 				endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;
 
-				// In case the last chunk is shorter than CHUNK_SIZE or 
+				// In case the last chunk is shorter than CHUNK_SIZE or
 				// this chunk is before last and last one's length is shorter than MIN_CHUNK_SIZE
 				// set the endByte to the last byte of the file.
 				if(endByte > fileSize || (fileSize - endByte) < MultipartUploadService.MIN_CHUNK_SIZE) {

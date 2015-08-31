@@ -1,7 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-
-import frameworkProjectResolverBaseLib = require("./framework-project-resolver-base");
+import * as frameworkProjectResolverBaseLib from "./framework-project-resolver-base";
 
 export class FrameworkProjectResolver extends frameworkProjectResolverBaseLib.FrameworkProjectResolverBase implements Project.IFrameworkProjectResolver {
 	constructor($errors: IErrors,

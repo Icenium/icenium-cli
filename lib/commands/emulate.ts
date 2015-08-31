@@ -1,13 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import Fiber = require("fibers");
-import Future = require("fibers/future");
+import * as path from "path";
 import minimatch = require("minimatch");
-import iconv = require("iconv-lite");
-import osenv = require("osenv");
-import helpers = require("../helpers");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
@@ -24,7 +19,7 @@ export class EmulateAndroidCommand implements ICommand {
 			this.$androidEmulatorServices.checkAvailability().wait();
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.apk");
-			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+			this.$buildService.build(<Project.IBuildSettings>{
 				platform: this.$devicePlatformsConstants.Android,
 				showQrCodes: false,
 				downloadFiles: true,
@@ -34,7 +29,7 @@ export class EmulateAndroidCommand implements ICommand {
 			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
 		}).future<void>()();
 	}
-	
+
 	public canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
 			this.$project.ensureProject();
@@ -110,7 +105,7 @@ export class EmulateWp8Command implements ICommand {
 
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.xap");
-			let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
+			this.$buildService.build(<Project.IBuildSettings>{
 				platform: this.$devicePlatformsConstants.WP8,
 				configuration: "Debug",
 				showQrCodes: false,
