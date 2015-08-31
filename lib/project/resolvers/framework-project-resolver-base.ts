@@ -1,8 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-
-import util = require("util");
-import helpers = require("./../../helpers");
+import * as helpers from "../../helpers";
 
 export class FrameworkProjectResolverBase implements Project.IFrameworkProjectResolverBase {
 	constructor(private $errors: IErrors,

@@ -29,7 +29,7 @@ export class ServerConfiguration implements IServerConfiguration {
 			return this.getConfigurationFromServer().wait().assemblyVersion;
 		}).future<string>()();
 	}
-	
+
 	public get resourcesPath(): IFuture<string> {
 		return (() => {
 			let resourcesRelativePath = this.getConfigurationFromServer().wait().resourcesPath;

@@ -1,12 +1,5 @@
 ///<reference path=".d.ts"/>
 "use strict";
-import fs = require("fs");
-import path = require("path");
-import util = require("util");
-import querystring = require("querystring");
-import Future = require("fibers/future");
-import osenv = require("osenv");
-import commonHelpers = require("./common/helpers");
 
 export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");
@@ -17,7 +10,10 @@ export function getRelativeToRootPath(rootPath: string, filePath: string): strin
 	return relativeToRootPath;
 }
 
-export function toHash(collection: any, keySelector: (value: any, positionOrKey: any, collection: any) => string, valueSelector: (value: any, positionOrKey: any, collection: any) => any): any {
+export function toHash(collection: any,
+	keySelector: (value: any, positionOrKey: any, _collection: any) => string,
+	valueSelector: (_value: any, _positionOrKey: any, _collection1: any) => any
+	): any {
 	let result:any = {};
 	if (_.isArray(collection)) {
 		for (let i = 0; i < collection.length; ++i) {
@@ -126,14 +122,14 @@ export function formatListForDisplayInMultipleColumns(list: string[]): string {
 	return bestFormatting.formatted;
 }
 
-export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (item: T) => string): T {
+export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (_item: T) => string): T {
 	if (!identityStr) {
 		return undefined;
 	}
 
 	data = _.sortBy(data, selector);
 
-	let identityData = _.find(data, (item) => selector(item).indexOf(identityStr) === 0);
+	let identityData = _.find(data, item => selector(item).indexOf(identityStr) === 0);
 	if (identityData) {
 		return identityData;
 	}
@@ -151,7 +147,6 @@ export function findByNameOrIndex<T>(identityStr: string, data: T[], selector: (
 }
 
 export function exitOnStdinEnd(): void {
-	process.stdin.on("data", () => {});
 	process.stdin.on("end", () => process.exit());
 }
 
@@ -169,7 +164,7 @@ export function versionCompare(version1: string, version2: string): number {
 		if (v1array[i] !== v2array[i]) {
 			return v1array[i] > v2array[i] ? 1 : -1;
 		}
-	} 
+	}
 
 	return 0;
 }

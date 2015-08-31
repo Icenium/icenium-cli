@@ -1,6 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-import projectPropertyCommandBaseLib = require("./prop-command-base");
+import * as projectPropertyCommandBaseLib from "./prop-command-base";
 
 export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
 	constructor($staticConfig: IStaticConfig,

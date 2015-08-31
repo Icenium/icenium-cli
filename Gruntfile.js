@@ -15,7 +15,7 @@ function getBuildVersion(version) {
 	if (process.env["BUILD_CAUSE_GHPRBCAUSE"]) {
 		buildVersion = "PR" + buildVersion;
 	}
-	
+
 	return buildVersion;
 }
 
@@ -73,6 +73,17 @@ module.exports = function(grunt) {
 			}
 		},
 
+		tslint: {
+            build: {
+                files: {
+                    src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts", "lib/common/test/unit-tests/**/*.ts", "definitions/**/*.ts", "!**/*.d.ts"]
+                },
+                options: {
+                    configuration: grunt.file.readJSON("./tslint.json")
+                }
+            }
+        },
+
 		watch: {
 			devall: {
 				files: ["lib/**/*.ts", 'test/**/*.ts', "!lib/common/node_modules/**/*.ts"],
@@ -93,7 +104,7 @@ module.exports = function(grunt) {
 			apply_resources_environment: {
 				command: "node bin/appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>"
 			},
-			
+
 			prepare_resources: {
 				command: "node bin/appbuilder.js dev-prepackage"
 			},
@@ -139,6 +150,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks("grunt-shell");
 	grunt.loadNpmTasks("grunt-ts");
+	grunt.loadNpmTasks("grunt-tslint");
 
 	grunt.registerTask("set_package_version", function(version) {
 		var buildVersion = getBuildVersion(version);
@@ -146,7 +158,7 @@ module.exports = function(grunt) {
 		packageJson.buildVersion = buildVersion;
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
-	
+
 	grunt.registerTask("setPackageName", function (version) {
 		var fs = require("fs");
 		var fileExtension = ".tgz";
@@ -176,7 +188,7 @@ module.exports = function(grunt) {
 
 		"shell:apply_resources_environment",
 		"shell:prepare_resources",
-		"shell:apply_deployment_environment", 
+		"shell:apply_deployment_environment",
 		"shell:ci_unit_tests",
 
 		"set_package_version",
@@ -184,6 +196,6 @@ module.exports = function(grunt) {
 		"shell:build_package",
 		"setPackageName"
 	]);
-
+	grunt.registerTask("lint", ["tslint:build"]);
 	grunt.registerTask("default", "ts:devlib");
 };

@@ -35,9 +35,6 @@ export class PortCommandParameter implements ICommandParameter {
 }
 
 export class RemoteCommand implements ICommand {
-	private appBuilderDir: string;
-	private packageLocation: string;
-
 	constructor(private $remoteService: IRemoteService,
 		private $errors: IErrors,
 		private $hostInfo: IHostInfo) {

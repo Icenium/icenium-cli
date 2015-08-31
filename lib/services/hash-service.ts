@@ -3,7 +3,7 @@
 
 import Future = require("fibers/future");
 let crypto = require("crypto");
-import util = require("util");
+import * as util from "util";
 
 export class HashService implements IHashService {
 	constructor(private $fs: IFileSystem,

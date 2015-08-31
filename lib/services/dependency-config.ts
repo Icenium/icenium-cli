@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import path = require("path");
+import * as path from "path";
 
 export class DependencyConfigService implements IDependencyConfigService {
 	private static DEPENDENCY_CONFIG_NAME = "dependency-config.json";

@@ -1,8 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
-
 export class JsonSchemaResolver implements IJsonSchemaResolver {
 	private schemasCache: IDictionary<any>;
 

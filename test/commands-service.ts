@@ -1,4 +1,5 @@
 ///<reference path=".d.ts"/>
+/* tslint:disable:no-empty */
 "use strict";
 
 import {Yok} from "../lib/common/yok";
@@ -12,8 +13,6 @@ import {StringCommandParameter, StringParameterBuilder} from "../lib/common/comm
 import {OptionType} from "../lib/common/options";
 import {Options} from "../lib/options";
 import {HostInfo} from "../lib/common/host-info";
-import {AnalyticsService} from "../lib/common/services/analytics-service";
-// import resourcesLib = require("../lib/common/resource-loader");
 
 let isCommandExecuted: boolean;
 
@@ -166,7 +165,7 @@ class MockCommandWithSpecificDashedOptions {
 		"test1": {
 			type: OptionType.Boolean
 		}
-	}
+	};
 }
 
 function createTestInjector(): IInjector {
@@ -182,8 +181,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("stringParameter", StringCommandParameter);
 	testInjector.register("stringParameterBuilder", StringParameterBuilder);
 	testInjector.register("analyticsService", {
-		checkConsent: (): IFuture<void> => { return ((): void => { }).future<void>()() },
-		trackFeature: (featureName: string): IFuture<void> => { return ((): void => { }).future<void>()() }
+		checkConsent: (): IFuture<void> => { return future.fromResult(); },
+		trackFeature: (featureName: string): IFuture<void> => { return future.fromResult(); }
 	});
 	testInjector.register("resources", {});
 	testInjector.register("injector", testInjector);
@@ -218,7 +217,7 @@ function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInj
 
 	for (let command in commandHelpData) {
 		testInjector.registerCommand(command, {
-			execute: (args: string[]): IFuture<void> => { return ((): void => { }).future<void>()() }
+			execute: (args: string[]): IFuture<void> => { return future.fromResult(); }
 		});
 	}
 
@@ -446,7 +445,7 @@ describe("commands service", () => {
 
 		it("shows command help message after successful command execute", () => {
 			let commandHelpData = { testingCommand: "testingCommand" };
-			testInjector = setUpTestInjector(testInjector, commandHelpData)
+			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
 			commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []).wait();
@@ -456,7 +455,7 @@ describe("commands service", () => {
 
 		it("does not show command help message after unsuccessful command execute", () => {
 			let commandHelpData = { testingCommand: "testingCommand" };
-			testInjector = setUpTestInjector(testInjector, commandHelpData)
+			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
 			commandsService.executeCommandUnchecked("nonExistingCommand", []).wait();

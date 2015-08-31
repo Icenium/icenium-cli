@@ -1,13 +1,10 @@
 ///<reference path=".d.ts"/>
+"use strict";
 
 import Future = require("fibers/future");
-import chai = require("chai");
-import fs = require("fs");
-import path = require("path");
-import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-import cordovaMigrationService = require("../lib/services/cordova-migration-service");
-let assert: chai.Assert = chai.assert;
+import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
+import {assert} from "chai";
 
 let testInjector = new yok.Yok();
 testInjector.register("server", {});
@@ -19,31 +16,30 @@ testInjector.register("pluginsService", {
 		return {
 			name: 'Name',
 			version: '1.0.0'
-		}
+		};
 	},
 	getPluginVersions: (plugin: IPlugin) => {
 		return [{
 			name: '1.0.0',
 			value: '1.0.0',
 			minCordova: '3.0.0'
-		}]
+		}];
 	},
-	removePlugin: (pluginName: string) => {return (() => { }).future<void>()() },
+	removePlugin: (pluginName: string) => { return Future.fromResult(); },
 	isPluginSupported: (plugin: IPlugin, version: string, migrationVersion: string) => { return true;}
 });
 testInjector.register("project", {});
 testInjector.register("projectConstants", {});
 testInjector.register("projectPropertiesService", {});
 testInjector.register("prompter", {
-	promptForChoice: (promptMessage: string, choices: any[]) => { return (() => { return choices[0] }).future<string>()() }
+	promptForChoice: (promptMessage: string, choices: any[]) => { return Future.fromResult<string>(choices[0]); }
 });
 testInjector.register("resources", {resolvePath: (x: string) => ""});
-testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() }});
+testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Future.fromResult(); }});
 testInjector.register("webViewService", {});
 testInjector.register("serverConfiguration", {});
 testInjector.register("httpClient", {});
 testInjector.register("cordovaResources", {});
-
 
 function registerMockedFS(mockResult: any): void {
 	testInjector.register("fs", {

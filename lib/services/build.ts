@@ -1,13 +1,13 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
-import querystring = require("querystring");
-import path = require("path");
-import os = require("os");
-import plist = require("plist");
-import iOSDeploymentValidatorLib = require("../validators/ios-deployment-validator");
-import constants = require("../common/mobile/constants");
+import * as util from "util";
+import * as querystring from "querystring";
+import * as path from "path";
+import {EOL} from "os";
+import * as plist from "plist";
+import * as iOSDeploymentValidatorLib from "../validators/ios-deployment-validator";
+import * as constants from "../common/mobile/constants";
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
@@ -32,7 +32,7 @@ export class BuildService implements Project.IBuildService {
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions,
 		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory) { }
-		
+
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
@@ -181,7 +181,7 @@ export class BuildService implements Project.IBuildService {
 					} catch (error) {
 						if (!this.$options.download) {
 							this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
-							let additionalInfo = error.message.split(os.EOL)[1];
+							let additionalInfo = error.message.split(EOL)[1];
 							if (additionalInfo) {
 								this.$logger.warn(additionalInfo);
 							}
@@ -463,7 +463,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.importProject().wait();
 
-			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.projectData.AppIdentifier, platform);	
+			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.projectData.AppIdentifier, platform);
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
@@ -479,5 +479,3 @@ export class BuildService implements Project.IBuildService {
 	}
 }
 $injector.register("buildService", BuildService);
-
-

@@ -1,7 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
+import * as util from "util";
 let jsv = require("JSV").JSV;
 
 export class JsonSchemaValidator implements IJsonSchemaValidator {
@@ -11,7 +11,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	private static BUILD_SCHEMA_ID_PREFIX = "Build-";
 	private static PREDEFINED_ERRORS: IStringDictionary = {
 		AppIdentifier: "The application identifier must consist of at least three alphanumeric strings separated by a dot. The alphanumeric strings must start with a letter."
-	}
+	};
 
 	private environment: any = null;
 	private _validPropertiesCache: IDictionary<any>;
@@ -46,14 +46,9 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return this._validPropertiesCache[key];
 	}
 
-	public validate(data: IProjectData): void {
-		let validationErrors = this.getValidationErrors(data);
-		this.validateCore(data);
-	}
-
 	public validateWithBuildSchema(data: IProjectData, platformName: string): void {
 		let buildSchemaName = this.getBuildSchemaName(platformName);
-		this.validateCore(data, { validationSchemaName: buildSchemaName, usePredefinedErrors: false });
+		this.validate(data, { validationSchemaName: buildSchemaName, usePredefinedErrors: false });
 	}
 
 	public isValid(data: IProjectData): boolean {
@@ -119,7 +114,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return util.format("%s%s", JsonSchemaValidator.BUILD_SCHEMA_ID_PREFIX, platformName);
 	}
 
-	private validateCore(data: IProjectData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}) {
+	public validate(data: IProjectData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}) {
 		let validationErrors = this.getValidationErrors(data, opts);
 		if(_.keys(validationErrors).length !== 0) {
 			let output = _.values(validationErrors).join("\n");

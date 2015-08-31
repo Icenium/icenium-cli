@@ -1,11 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import path = require("path");
-import util = require("util");
-
-import frameworkProjectBaseLib = require("./framework-project-base");
-import helpers = require("../common/helpers");
+import future = require("fibers/future");
+import * as frameworkProjectBaseLib from "./framework-project-base";
 
 export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -76,12 +72,12 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public getTemplateFilename(name: string): string {
-		return util.format("Telerik.Mobile.MobileWebsite.%s.zip", name);
+		return `Telerik.Mobile.MobileWebsite.${name}.zip`;
 	}
 
-	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
-	
-	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
+	public alterPropertiesForNewProject(properties: any, projectName: string): void { /* method is not used for web site projects */ }
+
+	public checkSdkVersions(platform: string, projectData: IProjectData): void { /* method is not used for web site projects */ }
 
 	public projectTemplatesString(): IFuture<string> {
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.MobileWebsite\.(.+)\.zip/);
@@ -92,11 +88,11 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
-		return (() => { }).future<any>()();
+		return future.fromResult();
 	}
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
-		return (() => { }).future<void>()();
+		return future.fromResult();
 	}
 
 	public completeProjectProperties(properties: IProjectData): boolean {

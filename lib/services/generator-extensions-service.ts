@@ -1,9 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import appScaffoldingExtensionsServiceLib = require("./app-scaffolding-extensions-service");
-import path = require("path");
-import util = require("util");
+import * as appScaffoldingExtensionsServiceLib from "./app-scaffolding-extensions-service";
+import * as path from "path";
+import * as util from "util";
 
 export class GeneratorExtensionsService extends appScaffoldingExtensionsServiceLib.AppScaffoldingExtensionsService implements IGeneratorExtensionsService {
 	constructor($fs: IFileSystem,

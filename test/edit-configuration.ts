@@ -3,19 +3,17 @@
 
 import chai = require("chai");
 import fs = require("fs");
-import path = require("path");
-import Future = require("fibers/future");
+import * as path from "path";
 import stubs = require("./stubs");
 import childProcess = require("../lib/common/child-process");
 import fileSystem = require("../lib/common/file-system");
-import project = require("../lib/project");
 import optionsPath = require("../lib/options");
 import editConfiguration = require("../lib/commands/edit-configuration");
 import yok = require("../lib/common/yok");
 import config = require("../lib/config");
 import helpers = require("../lib/helpers");
 import hostInfoLib = require("../lib/common/host-info");
-import os = require("os");
+import {EOL} from "os";
 import temp = require("temp");
 temp.track();
 let assert: chai.Assert = chai.assert;
@@ -33,7 +31,7 @@ function createTestInjector() {
 		getProjectDir: (): IFuture<string> => {
 			return (() => testInjector.resolve("options").path).future<string>()();
 		},
-		ensureProject: () => {},
+		ensureProject: () => { /* mock*/},
 		projectConfigFiles: [{ template: "android-manifest",
 			filepath: "App_Resources/Android/AndroidManifest.xml",
 			templateFilepath: "Mobile.Cordova.Android.ManifestXml.zip",
@@ -111,7 +109,7 @@ describe("edit-configuration", () => {
 		expectedContent = helpers.stringReplaceAll(expectedContent, "\n", "");
 
 		let actualContent = fs.readFileSync(templateFilePath).toString();
-		actualContent = helpers.stringReplaceAll(actualContent, os.EOL, "");
+		actualContent = helpers.stringReplaceAll(actualContent, EOL, "");
 
 		assert.equal(openArgument, templateFilePath);
 		assert.isTrue(fs.existsSync(templateFilePath));

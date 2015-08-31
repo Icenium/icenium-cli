@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import path = require("path");
+import * as path from "path";
 
 export class ProjectSimulatorService implements IProjectSimulatorService {
 
@@ -20,7 +19,6 @@ $injector.register("projectSimulatorService", ProjectSimulatorService);
 
 export class CordovaSimulatorService implements IProjectSimulatorService {
 	private static PLUGINS_PACKAGE_IDENTIFIER: string = "Plugins";
-	private static PLUGINS_API_CONTRACT: string = "/appbuilder/api/cordova/plugins/package";
 
 	constructor(private $config: IConfiguration,
 		private $fs: IFileSystem,
@@ -50,8 +48,6 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		return (() => {
 			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
 			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
-
-			let pluginsApiEndpoint = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + CordovaSimulatorService.PLUGINS_API_CONTRACT;
 
 			if (!this.$fs.exists(pluginsPath).wait()) {
 				let zipFile: any;

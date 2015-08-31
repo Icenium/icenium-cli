@@ -1,14 +1,11 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import path = require("path");
 
 require("./../bootstrap");
 import fiberBootstrap = require("./../fiber-bootstrap");
 fiberBootstrap.run(() => {
 	$injector.require("typeScriptCompilationService", "./common/services/typescript-compilation-service");
-
 	let project: Project.IProject = $injector.resolve("project");
-	let $fs: IFileSystem = $injector.resolve("fs");
 	project.ensureProject();
 
 	let typeScriptFiles = project.getTypeScriptFiles().wait();

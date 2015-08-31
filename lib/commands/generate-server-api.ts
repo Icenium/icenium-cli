@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import path = require("path");
+import * as path from "path";
 
 export class GenerateServerApiCommand implements ICommand {
 	constructor(private $serviceContractGenerator: Server.IServiceContractGenerator,

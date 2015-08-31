@@ -6,8 +6,7 @@ import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");
 import ValidationResult = require("../common/validators/validation-result");
 import BaseValidators = require("./base-validators");
-import util = require("util");
-import path = require("path");
+import * as util from "util";
 
 export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<ISelfSignedIdentityModel> {
 	public static DATE_FORMAT = "YYYY-MM-DD";

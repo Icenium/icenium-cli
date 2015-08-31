@@ -1,8 +1,7 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import path = require("path");
+import * as path from "path";
 
 export class PrePackageCommand implements ICommand {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
@@ -35,7 +34,7 @@ export class PrePackageCommand implements ICommand {
 			this.$resourceDownloader.downloadCordovaJsFiles().wait();
 			this.$logger.info("Downloading image definitions.");
 			this.$resourceDownloader.downloadImageDefinitions().wait();
-			this.$logger.info("Downloading NativeScript migration data.")
+			this.$logger.info("Downloading NativeScript migration data.");
 			this.$nativeScriptMigrationService.downloadMigrationData().wait();
 			this.$logger.info("Unpacking app resources.");
 			this.$templatesService.unpackAppResources().wait();

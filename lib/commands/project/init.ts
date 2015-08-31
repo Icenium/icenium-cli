@@ -1,8 +1,8 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import util = require("util");
+import * as path from "path";
+import * as util from "util";
 
 class FileDescriptor {
 	constructor(public path: string, public type: string) { }

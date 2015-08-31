@@ -4,8 +4,7 @@
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import Future = require("fibers/future");
-import util = require("util");
-let assert = require("chai").assert;
+import {assert} from "chai";
 let staticConfig: any =  {
 	TRACK_FEATURE_USAGE_SETTING_NAME: "AnalyticsSettings.TrackFeatureUsage",
 	TRACK_EXCEPTIONS_SETTING_NAME: "AnalyticsSettings.TrackExceptions"
@@ -53,7 +52,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 			passedParametersToSimulator = applicationParams;
 		}
 	});
-	
+
 	testInjector.register("staticConfig", staticConfigLib.StaticConfig);
 	testInjector.register("analyticsService", {
 		isEnabled: (featureName: string) => {
@@ -62,7 +61,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 			} else if (featureName === staticConfig.TRACK_EXCEPTIONS_SETTING_NAME) {
 				return Future.fromResult(isExceptionsTrackingEnabled);
 			}
-			
+
 			return Future.fromResult(undefined);
 		}
 	});
@@ -75,7 +74,7 @@ describe("simulator-service", () => {
 		let testInjector: IInjector;
 		let baseExpectedParameters: string[];
 		let testSpecificParams: string[];
-	
+
 		beforeEach(() => {
 			baseExpectedParameters = [
 				"--path", projectDir,
@@ -84,42 +83,42 @@ describe("simulator-service", () => {
 			];
 			testSpecificParams = [];
 		});
-	
+
 		afterEach(() => {
 			let service = testInjector.resolve("simulatorService");
 			service.launchSimulator().wait();
-			let staticConfig: IStaticConfig = testInjector.resolve("staticConfig");
-			baseExpectedParameters = baseExpectedParameters.concat([staticConfig.ANALYTICS_API_KEY]);
+			let _staticConfig: IStaticConfig = testInjector.resolve("staticConfig");
+			baseExpectedParameters = baseExpectedParameters.concat([_staticConfig.ANALYTICS_API_KEY]);
 			testSpecificParams = testSpecificParams.concat(baseParams);
 			assert.deepEqual(baseExpectedParameters.concat(testSpecificParams), passedParametersToSimulator);
 		});
-	
+
 		it("passed parameters are correct when featureUsageTracking and exceptionsTracking are disabled", () => {
 			testInjector = createTestInjector(false, false);
 		});
-	
+
 		it("passed parameters are correct when featureUsageTracking and exceptionsTracking are enabled", () => {
 			testInjector = createTestInjector(true, true);
 			testSpecificParams = ["--trackfeatureusage", "--trackexceptions"];
 		});
-		
+
 		it("passed parameters are correct when featureUsageTracking is enabled and exceptionsTracking is disabled", () => {
 			testInjector = createTestInjector(true, false);
 			testSpecificParams = ["--trackfeatureusage"];
 		});
-		
+
 		it("passed parameters are correct when featureUsageTracking is disabled and exceptionsTracking is enabled", () => {
 			testInjector = createTestInjector(false, true);
 			testSpecificParams = ["--trackexceptions"];
 		});
 	});
-	
+
 	it("launchSimulator fails when simulator is running during download of new version", () => {
 		let testInjector = createTestInjector(true, true, true, true);
 		let service = testInjector.resolve("simulatorService");
 		assert.throws(() => service.launchSimulator().wait());
 	});
-	
+
 	it("launchSimulator does not fail when simulator is running during download of new version", () => {
 		let testInjector = createTestInjector(true, true, false, true);
 		let service = testInjector.resolve("simulatorService");

@@ -1,39 +1,36 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import projectlib = require("./../lib/project");
-import fslib = require("./../lib/common/file-system");
-import projectPropertiesLib = require("../lib/services/project-properties-service");
-import yok = require("./../lib/common/yok");
-import stubs = require("./stubs");
-import fs = require("fs");
-import path = require("path");
+import * as projectlib from "../lib/project";
+import * as fslib from "../lib/common/file-system";
+import * as projectPropertiesLib from "../lib/services/project-properties-service";
+import * as yok from "../lib/common/yok";
+import * as stubs from "./stubs";
+import * as fs from "fs";
+import * as path from "path";
 import temp = require("temp");
-import util = require("util");
-import mobileHelperLib = require("../lib/common/mobile/mobile-helper");
-import devicePlatformsLib = require("../lib/common/mobile/device-platforms-constants");
-import optionsLib = require("./../lib/options");
-import helpers = require("../lib/helpers");
-import cordovaProjectLib = require("./../lib/project/cordova-project");
-import nativeScriptProjectLib = require("./../lib/project/nativescript-project");
-import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
-import projectFilesManagerLib = require("../lib/project/project-files-manager");
-import projectConstantsLib = require("../lib/project/project-constants");
-import jsonSchemaLoaderLib = require("../lib/json-schema/json-schema-loader");
-import jsonSchemaResolverLib = require("../lib/json-schema/json-schema-resolver");
-import jsonSchemaValidatorLib = require("../lib/json-schema/json-schema-validator");
-import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
-import childProcessLib = require("../lib/common/child-process");
-import mobilePlatformsCapabilitiesLib = require("../lib/mobile-platforms-capabilities");
-import cordovaResourcesLib = require("../lib/cordova-resource-loader");
-import projectPropertiesService = require("../lib/services/project-properties-service");
-import cordovaMigrationService = require("../lib/services/cordova-migration-service");
+import * as util from "util";
+import * as mobileHelperLib from "../lib/common/mobile/mobile-helper";
+import * as devicePlatformsLib from "../lib/common/mobile/device-platforms-constants";
+import * as optionsLib from "../lib/options";
+import * as cordovaProjectLib from "./../lib/project/cordova-project";
+import * as nativeScriptProjectLib from "./../lib/project/nativescript-project";
+import * as projectFilesManagerLib from "../lib/project/project-files-manager";
+import * as projectConstantsLib from "../lib/project/project-constants";
+import * as jsonSchemaLoaderLib from "../lib/json-schema/json-schema-loader";
+import * as jsonSchemaResolverLib from "../lib/json-schema/json-schema-resolver";
+import * as jsonSchemaValidatorLib from "../lib/json-schema/json-schema-validator";
+import * as jsonSchemaConstantsLib from "../lib/json-schema/json-schema-constants";
+import * as childProcessLib from "../lib/common/child-process";
+import * as mobilePlatformsCapabilitiesLib from "../lib/mobile-platforms-capabilities";
+import * as cordovaResourcesLib from "../lib/cordova-resource-loader";
+import * as projectPropertiesService from "../lib/services/project-properties-service";
+import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
 import Future = require("fibers/future");
-import hostInfoLib = require("../lib/common/host-info");
-let projectConstants = new projectConstantsLib.ProjectConstants();
-let assert = require("chai").assert;
+import * as hostInfoLib from "../lib/common/host-info";
+import {assert} from "chai";
 temp.track();
-
+let projectConstants = new projectConstantsLib.ProjectConstants();
 
 class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
@@ -47,7 +44,7 @@ class PrompterStub implements IPrompter {
 		this.confirmCalled = true;
 		return Future.fromResult(this.confirmResult);
 	}
-	public dispose() { }
+	public dispose() { /* intentionally empty body */ }
 }
 
 let mockProjectNameValidator = {
@@ -57,10 +54,6 @@ let mockProjectNameValidator = {
 		return true;
 	}
 };
-
-function createFrameworkVersion(version: string) {
-	return { Version: version, DisplayName: version };
-}
 
 function createTestInjector(): IInjector {
 	require("../lib/common/logger");
@@ -116,26 +109,25 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
-	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return (() => { }).future<void>()() } });
+	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Future.fromResult(); } });
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
-	testInjector.register("httpClient", {});
+	testInjector.register("httpClient", { /*intentionally empty body */ });
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
-
 
 	testInjector.register("pluginsService", {
 		getPluginBasicInformation: (pluginName: string) => {
 			return {
 				name: 'Name',
 				version: '1.0.0'
-			}
+			};
 		},
 		getPluginVersions: (plugin: IPlugin) => {
 			return [{
 				name: '1.0.0',
 				value: '1.0.0',
 				minCordova: '3.0.0'
-			}]
+			}];
 		},
 		getAvailablePlugins: () => {
 			return [
@@ -145,7 +137,7 @@ function createTestInjector(): IInjector {
 					Version: '1.0.0'
 					}
 				}
-			]
+			];
 		}
 	});
 	testInjector.register("projectPropertiesService", projectPropertiesService.ProjectPropertiesService);
@@ -223,7 +215,7 @@ describe("project integration tests", () => {
 			delete testProperties.ProjectGuid;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for(let key in testProperties) {
+			for (let key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
@@ -336,7 +328,6 @@ describe("project integration tests", () => {
 
 			it("existing TypeScript.Blank project has project files after init",() => {
 				options.template = "TypeScript.Blank";
-				let project: Project.IProject = testInjector.resolve("project");
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
 				let projectFile = path.join(projectDir, ".abproject");
@@ -390,7 +381,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
-				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -401,7 +392,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
-				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova TypeScript.Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -412,7 +403,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
-				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Drawer template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -423,7 +414,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
-				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Empty template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -434,7 +425,7 @@ describe("project integration tests", () => {
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
-				let cordovaMandatoryFiles = _.forEach(mobileHelper.platformNames, platform => {
+				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.TabStrip template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
 				});
@@ -691,7 +682,6 @@ describe("project unit tests", () => {
 	});
 	describe("updateCorePlugins", () => {
 		describe("modifies CorePlugins in configuration specific data, when it is specified", () => {
-			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
 
 			beforeEach(() => {
@@ -756,7 +746,7 @@ describe("project unit tests", () => {
 
 		describe("moves CorePlugins to projectData when they are the same in config files", () => {
 			it("after prop add", () => {
-				let configSpecificData: IDictionary<any> = {
+				configSpecificData = {
 						debug: {
 							CorePlugins: ["org.apache.cordova.battery-status"]
 						},
@@ -776,7 +766,7 @@ describe("project unit tests", () => {
 			});
 
 			it("after prop set", () => {
-				let configSpecificData: IDictionary<any> = {
+				configSpecificData = {
 						debug: {
 							CorePlugins: ["org.apache.cordova.battery-status"]
 						},
@@ -793,7 +783,7 @@ describe("project unit tests", () => {
 			});
 
 			it("after prop rm", () => {
-				let configSpecificData: IDictionary<any> = {
+				configSpecificData = {
 						debug: {
 							CorePlugins: ["org.apache.cordova.battery-status",
 											"org.apache.cordova.geolocation"]
@@ -812,7 +802,6 @@ describe("project unit tests", () => {
 		});
 
 		describe("moves CorePlugins to config specific data when it is modified", () => {
-			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
 			beforeEach(() => {
 				projectData = getProjectData();
@@ -849,7 +838,6 @@ describe("project unit tests", () => {
 		});
 
 		describe("modifies CorePlugins in configuration specific data, even if it is NOT specified when CorePlugins are different in the configurations", () => {
-			let configSpecificData: IDictionary<any>;
 			let projectData: IProjectData;
 
 			beforeEach(() => {
@@ -912,7 +900,7 @@ describe("project unit tests", () => {
 
 		it("throws exception when different CorePlugins are part of both .abproject and any config specific file", () => {
 			let projectData = getProjectData();
-			projectData.CorePlugins = ["org.apache.cordova.battery-status"]
+			projectData.CorePlugins = ["org.apache.cordova.battery-status"];
 			configSpecificData = {
 				debug: {
 					CorePlugins: ["org.apache.cordova.contacts"]
@@ -929,7 +917,7 @@ describe("project unit tests", () => {
 
 		it("does not throw exception when the same CorePlugins are part of both .abproject and any config specific file", () => {
 			let projectData = getProjectData();
-			projectData.CorePlugins = ["org.apache.cordova.battery-status"]
+			projectData.CorePlugins = ["org.apache.cordova.battery-status"];
 			configSpecificData = {
 				debug: {
 					CorePlugins: ["org.apache.cordova.battery-status"]
@@ -970,25 +958,25 @@ describe("project unit tests (canonical paths)", () => {
 
 	it("no ending path separator", () => {
 		options.path = "test";
-		let project = testInjector.resolve(projectlib.Project);
+		project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("one ending path separator", () => {
 		options.path = "test" + path.sep;
-		let project = testInjector.resolve(projectlib.Project);
+		project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("multiple ending path separator", () => {
 		options.path = "test" + path.sep + path.sep;
-		let project = testInjector.resolve(projectlib.Project);
+		project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
 	});
 
 	it("do not remove separators which are not at the end", () => {
 		options.path = "test" + path.sep + "test" + path.sep;
-		let project = testInjector.resolve(projectlib.Project);
+		project = testInjector.resolve(projectlib.Project);
 		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test" + path.sep + "test"));
 	});
 });

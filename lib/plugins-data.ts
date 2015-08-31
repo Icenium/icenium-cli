@@ -1,8 +1,8 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import os = require("os");
-import util = require("util");
+import {EOL} from "os";
+import * as util from "util";
 
 export enum PluginType {
 	CorePlugin = 0,
@@ -67,7 +67,7 @@ export class CordovaPluginData implements IPlugin {
 						output.push(util.format("        %s: %s", variableName, variables[variableName]));
 					});
 
-					result.push(output.join(os.EOL));
+					result.push(output.join(EOL));
 				}
 			}
 		});

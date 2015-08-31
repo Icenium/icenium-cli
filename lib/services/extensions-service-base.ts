@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import helpers = require("../helpers");
+import * as path from "path";
+import * as helpers from "../helpers";
 import temp = require("temp");
-import util = require("util");
 temp.track();
 
 export class ExtensionsServiceBase {
@@ -52,7 +51,7 @@ export class ExtensionsServiceBase {
 			}
 
 			if( this.shouldUpdatePackage(cachedVersion, extensionVersion) ) {
-				this.$logger.printInfoMessageOnSameLine(util.format("Updating %s package...", packageName));
+				this.$logger.printInfoMessageOnSameLine(`Updating ${packageName} package...`);
 				let zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
 
 				if(actions.beforeDownloadAction) {

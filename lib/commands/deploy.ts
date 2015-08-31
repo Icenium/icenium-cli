@@ -1,10 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import util = require("util");
 import Future = require("fibers/future");
-import commandParams = require("../common/command-params");
-import helpers = require("../common/helpers");
+import * as helpers from "../common/helpers";
 
 export class DeployHelper implements IDeployHelper {
 	constructor(protected $devicesServices: Mobile.IDevicesServices,
@@ -17,7 +15,6 @@ export class DeployHelper implements IDeployHelper {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $options: IOptions,
 		private $devicePlatformsConstants:Mobile.IDevicePlatformsConstants) { }
-
 
 	public deploy(platform?: string): IFuture<void> {
 		this.$project.ensureProject();
@@ -42,8 +39,8 @@ export class DeployHelper implements IDeployHelper {
 			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device}).wait();
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
-			
-			this.$options.justlaunch = true; 
+
+			this.$options.justlaunch = true;
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
 				let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
@@ -106,7 +103,6 @@ export class DeployIosCommand implements ICommand {
 }
 $injector.registerCommand("deploy|ios", DeployIosCommand);
 
-
 export class DeployWP8Command implements ICommand {
 	constructor(private $deployHelper: IDeployHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
@@ -121,4 +117,3 @@ export class DeployWP8Command implements ICommand {
 	public isDisabled = this.$config.ON_PREM;
 }
 $injector.registerCommand("deploy|wp8", DeployWP8Command);
-

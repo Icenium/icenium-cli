@@ -2,15 +2,13 @@
 "use strict";
 
 import yok = require("../lib/common/yok");
-
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import hostInfoLib = require("../lib/common/host-info");
 import temp = require("temp");
 temp.track();
-import util = require("util");
-let assert = require("chai").assert;
-let fileSys = require("fs");
+import {assert} from "chai";
+import * as fileSys from "fs";
 
 let fileSystemFile = require("../lib/common/file-system");
 let hashServiceFile = require("../lib/services/hash-service");
@@ -37,11 +35,11 @@ function createTestInjector(): IInjector {
 
 function createTempFile(data: string): IFuture<string> {
 	let future = new Future<string>();
-	let myData = data; // "Some data that has to be uploaded.";
+	let myData = new Buffer(data); // "Some data that has to be uploaded.";
 	let pathToTempFile: string;
 	temp.open("tempHashServiceTestsFile", function(err, info) {
 		if(!err) {
-			fileSys.write(info.fd, myData);
+			fileSys.write(info.fd, myData, 0, data.length, 0);
 			pathToTempFile = info.path;
 			future.return(pathToTempFile);
 		} else {
@@ -113,14 +111,14 @@ describe("hash service", () => {
 
 		it("does not fail when input parameters are correct", () => {
 			failed = false;
-			
+
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
 			// NOTE: in case you change testFile string passed to createTempFile, you should create new hash file as well.
 			let filePath = createTempFile("testFile").wait();
-			let expectedHash = "kpcHKUXV7JjoyHcXqsVB5EAz+HX1ffWA/X48ozSakHgaNR3OiEctsMKafwewR836Gi4dRyBsjW+GkR+hTQ4Qog=="
+			let expectedHash = "kpcHKUXV7JjoyHcXqsVB5EAz+HX1ffWA/X48ozSakHgaNR3OiEctsMKafwewR836Gi4dRyBsjW+GkR+hTQ4Qog==";
 			let hash = hashService.getFileHash(filePath, "utf8", "sha512", "base64").wait();
-			
+
 			assert.isFalse(failed);
 			assert.equal(expectedHash, hash);
 		});

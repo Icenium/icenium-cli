@@ -1,15 +1,15 @@
 ///<reference path=".d.ts"/>
 "use strict";
 
-import helpers = require("../lib/helpers");
-let assert = require("chai").assert;
+import * as helpers from "../lib/helpers";
+import {assert} from "chai";
 
 describe("helpers", () => {
 	describe("toHash", () => {
 		it("converts array to hash", () => {
 			let source = ["one", "two"];
-			let result:any = helpers.toHash(source, (value) => value, (value, key, source) => {
-					return {key: key, value: value, source: source};
+			let result:any = helpers.toHash(source, (value) => value, (value, key, _source) => {
+					return {key: key, value: value, source: _source};
 				});
 
 			assert.equal(2, Object.keys(result).length);
@@ -26,8 +26,8 @@ describe("helpers", () => {
 		it("converts hash to another hash", () => {
 			let source = {one:1, two:2};
 			let result:any = helpers.toHash(source, (value, key) => key,
-				(value, key, source) => {
-					return {key: key, value: value, source: source};
+				(value, key, _source) => {
+					return {key: key, value: value, source: _source};
 				});
 
 			assert.equal(2, Object.keys(result).length);
@@ -71,7 +71,7 @@ describe("helpers", () => {
 			let source = [{name: "2"}, {name: "3"}];
 			let result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
 			assert.equal(result.name, "3");
-		})
+		});
 	});
 
 	describe("formatListOfNames", () => {
@@ -104,7 +104,7 @@ describe("helpers", () => {
 		it("should merge deep objects with different root property", () => {
 			assert.deepEqual({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}, k: { l: { m: { n: { p: 1}}}}}, helpers.mergeRecursive({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}}, { k: { l: { m: { n: { p: 1}}}}}));
 		});
-	})
+	});
 
 	describe("versionCompare", () => {
 		it("should throw error on non-matching versions", () => {
@@ -131,5 +131,5 @@ describe("helpers", () => {
 			assert.equal(1, helpers.versionCompare("2014.1.403.0", "0.0.0.0"));
 			assert.equal(-1, helpers.versionCompare("2014.1.403.0", "2014.1.601.0"));
 		});
-	})
+	});
 });

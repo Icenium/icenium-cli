@@ -2,8 +2,8 @@
 "use strict";
 
 import minimatch = require("minimatch");
-import path = require("path");
-import util = require("util");
+import * as path from "path";
+import * as util from "util";
 
 export class ConfigurationFile implements Project.IConfigurationFile {
 	constructor(public template: string,

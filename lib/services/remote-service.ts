@@ -76,7 +76,7 @@ export class RemoteService implements IRemoteService {
 	private static AppBuilderClientToSimulatorDeviceNameMapping: IStringDictionary = {
 		"iphoneandipod"	: "iPhone-4s",
 		"ipad": "iPad-2"
-	}
+	};
 }
 
 $injector.register("remoteService", RemoteService);

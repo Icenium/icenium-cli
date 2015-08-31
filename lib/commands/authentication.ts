@@ -1,8 +1,5 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
-
-import commandParams = require("../common/command-params");
 
 export class LoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }

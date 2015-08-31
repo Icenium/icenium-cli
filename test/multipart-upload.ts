@@ -2,15 +2,13 @@
 "use strict";
 
 import yok = require("../lib/common/yok");
-
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import temp = require("temp");
 import hostInfoLib = require("../lib/common/host-info");
 temp.track();
-import util = require("util");
-let assert = require("chai").assert;
-let fileSys = require("fs");
+import {assert} from "chai";
+import * as fileSys from "fs";
 
 let multipartUploadServiceFile = require("../lib/services/multipart-upload");
 let fileSystemFile = require("../lib/common/file-system");
@@ -18,12 +16,10 @@ let hashServiceFile = require("../lib/services/hash-service");
 
 class ServiceProxy implements Server.IServiceProxy {
 	call<T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> {
-		return (() => { }).future<any>()();
+		return (() => {/*intentionally empty*/}).future<any>()();
 	}
-	setShouldAuthenticate(shouldAuthenticate: boolean): void {
-	}
-	setSolutionSpaceName(solutionSpaceName: string): void {
-	}
+	setShouldAuthenticate(shouldAuthenticate: boolean): void { /* mock */}
+	setSolutionSpaceName(solutionSpaceName: string): void { /* mock */ }
 }
 
 function createTestInjector(): IInjector {
@@ -43,11 +39,11 @@ function createTestInjector(): IInjector {
 
 function createTempFile(data: string): IFuture<string> {
 	let future = new Future<string>();
-	let myData = data; // "Some data that has to be uploaded.";
+	let myData = new Buffer(data); // "Some data that has to be uploaded.";
 	let pathToTempFile: string;
 	temp.open("tempMultipartUploadFile", function(err, info) {
 		if(!err) {
-			fileSys.write(info.fd, myData);
+			fileSys.write(info.fd, myData, 0, data.length, 0);
 			pathToTempFile = info.path;
 			future.return(pathToTempFile);
 		} else {
@@ -61,7 +57,7 @@ function createTempFile(data: string): IFuture<string> {
 function createTestScenarioForContentRangeValidation(data: string): IFuture<string[]> {
 	return (() => {
 		let testInjector = createTestInjector();
-		
+
 		testInjector.register("server", {
 			upload: {
 				completeUpload(path: string, originalFileHash: string): IFuture<void>{
@@ -83,15 +79,12 @@ function createTestScenarioForContentRangeValidation(data: string): IFuture<stri
 					actualContentRanges.push(headers["Content-Range"]);
 				}).future<any>()();
 			},
-			setShouldAuthenticate: (shouldAuthenticate: boolean): void => { },
-			setSolutionSpaceName: (solutionSpaceName: string): void => { }
+			setShouldAuthenticate: (shouldAuthenticate: boolean): void => {/* mock */ },
+			setSolutionSpaceName: (solutionSpaceName: string): void => {/* mock */ }
 		});
-
-		let fs: IFileSystem = testInjector.resolve("fs");
 
 		let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
 		let tempFilePath = createTempFile(data).wait();
-		let size = fs.getFileSize(tempFilePath).wait();
 
 		mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
 
@@ -132,10 +125,8 @@ describe("multipart upload service", () => {
 			});
 			testInjector.register("serviceProxy", ServiceProxy);
 
-			let fs: IFileSystem = testInjector.resolve("fs");
 			let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
 			let tempFilePath = createTempFile("Some data that has to be uploaded.").wait();
-			let size = fs.getFileSize(tempFilePath).wait();
 
 			mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
 			assert.isTrue(initUploadCalled);

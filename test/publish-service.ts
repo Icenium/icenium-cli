@@ -8,7 +8,6 @@ import Future = require("fibers/future");
 import yok = require("../lib/common/yok");
 import optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
-
 import assert = require("assert");
 
 let writeJsonData: any;
@@ -24,20 +23,19 @@ function createTestInjector(publishConnections: IPublishConnection[]): IInjector
 	testInjector.register("project", {});
 	testInjector.register("projectConstants", {});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
-	let yargs = require("yargs");
 	testInjector.register("options", optionsLib.Options);
 
 	// Register mocked dependencies
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: (future: IFuture<any>, timeout: number) => { 
-			return future; 
+		showProgressIndicator: (future: IFuture<any>, timeout: number) => {
+			return future;
 		}
 	});
 
 	testInjector.register("projectFilesManager", {
-		excludeFile: (projectDir: string, excludeFilePath: string) => {}
+		excludeFile: (projectDir: string, excludeFilePath: string) => { /* intentionally empty body */}
 	});
-	
+
 	testInjector.register("prompter", {
 		getString: (prompt: string) => {
 			return (() => {
@@ -79,11 +77,8 @@ function createTestInjector(publishConnections: IPublishConnection[]): IInjector
 		projectData: {
 			ProjectName: "ProjectName"
 		},
-		ensureProject: () => { 
-		},
-		importProject: () => { 
-			return (() => {}).future<void>()();
-		}
+		ensureProject: () => { /* intentionally empty body */ },
+		importProject: () => { return Future.fromResult(); }
 	});
 
 	testInjector.register("server", {
@@ -118,13 +113,13 @@ describe("publish-service", () => {
 
 			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			
+
 			let expected: Server.FtpConnectionData = {
 				RemoteUrl: remotePublishUrl,
 				ShouldPurge: false,
 				Username: 'username',
-				Password: 'password' 
-			}
+				Password: 'password'
+			};
 
 			service.publish('1', 'username', 'password').wait();
 			assert.deepEqual(serverFtpConnectionData, expected, 'Incorrect data to server provided');
@@ -149,13 +144,13 @@ describe("publish-service", () => {
 
 			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			
+
 			let expected: Server.FtpConnectionData = {
 				RemoteUrl: '127.0.0.1',
 				ShouldPurge: false,
 				Username: 'username',
-				Password: 'password' 
-			}
+				Password: 'password'
+			};
 
 			service.publish('127.0.0.1', 'username', 'password').wait();
 
@@ -289,7 +284,7 @@ describe("publish-service", () => {
 
 			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			
+
 			service.removeConnection('1').wait();
 
 			assert.deepEqual(writeJsonData, [ftpPublishConnection], '$fs.writeJson called with incorrect data');
@@ -300,10 +295,9 @@ describe("publish-service", () => {
 
 			let testInjector = createTestInjector(initialPublishConnections);
 			service = testInjector.resolve(publishService.PublishService);
-			
+
 			assert.throws(() => service.removeConnection('1').wait(), 'Connection with invalid id successfully deleted');
 		});
 	});
 
 });
-

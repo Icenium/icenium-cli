@@ -7,14 +7,14 @@ import assert = require("assert");
 class BuildCommandBase implements ICommand {
 	constructor(private $project: Project.IProject,
 		private $errors: IErrors) { }
-	
+
 	allowedParameters: ICommandParameter[] = [];
-	
+
 	execute(args: string[]): IFuture<void> {
 		assert.fail("","", "You should never get here. Please contact Telerik support and send the output of your command, executed with `--log trace`.");
 		return Future.fromResult();
 	}
-	
+
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
 			this.$project.ensureProject();
@@ -25,11 +25,14 @@ class BuildCommandBase implements ICommand {
 		}).future<boolean>()();
 	}
 }
+
 export class BuildAndroidCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
-		$errors: IErrors) { super($project, $errors) }
+		$errors: IErrors) {
+			super($project, $errors);
+		}
 
 	execute(args: string[]): IFuture<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.Android);
@@ -41,7 +44,9 @@ export class BuildIosCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
-		$errors: IErrors) { super($project, $errors) }
+		$errors: IErrors) {
+			super($project, $errors);
+		}
 
 	execute(args: string[]): IFuture<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS);
@@ -54,7 +59,9 @@ export class BuildWP8Command extends BuildCommandBase {
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
 		$errors: IErrors,
-		private $config: Config.IConfig) { super($project, $errors) }
+		private $config: Config.IConfig) {
+			super($project, $errors);
+		}
 
 	execute(args: string[]): IFuture<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.WP8);

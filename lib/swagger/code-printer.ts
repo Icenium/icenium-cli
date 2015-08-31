@@ -1,12 +1,12 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import os = require("os");
+import {EOL} from "os";
 import codeEntityLib = require("./code-entity");
 
 export class SwaggerCodePrinter {
 	private static INDENT_CHAR = "\t";
-	private static NEW_LINE_CHAR = os.EOL;
+	private static NEW_LINE_CHAR = EOL;
 	private static START_BLOCK_CHAR = "{";
 	private static END_BLOCK_CHAR = "}";
 

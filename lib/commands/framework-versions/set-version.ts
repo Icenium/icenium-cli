@@ -28,7 +28,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 		return (() => {
 			this.$project.ensureProject();
 			if(!this.$project.capabilities.canChangeFrameworkVersion) {
-				this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`)
+				this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`);
 			}
 
 			if(value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {

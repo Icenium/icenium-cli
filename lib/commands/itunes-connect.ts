@@ -1,8 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import constants = require("../common/mobile/constants");
-import commandParams = require("../common/command-params");
+import * as constants from "../common/mobile/constants";
+import * as commandParams from "../common/command-params";
 let Table = require("cli-table");
 
 export class AppstoreApplicationCommandBase implements ICommand {
@@ -46,7 +46,7 @@ export class ListApplicationsReadyForUploadCommand extends AppstoreApplicationCo
 	}
 
     allowedParameters = [new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
-	
+
     execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
@@ -160,7 +160,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 			this.$server.itmstransporter.uploadApplication(projectData.ProjectName, projectData.ProjectName,
 				projectPath, theApp.AppleID, userName, password).wait();
 
-			this.$logger.info("Upload complete.")
+			this.$logger.info("Upload complete.");
 		}).future<void>()();
 	}
 }

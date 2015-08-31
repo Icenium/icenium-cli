@@ -1,8 +1,8 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import path = require("path");
-import util = require("util");
+import * as path from "path";
+import * as util from "util";
 import Future = require("fibers/future");
 import frameworkProjectBaseLib = require("./framework-project-base");
 import semver = require("semver");
@@ -62,7 +62,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		return [
 			allConfigFiles["nativescript-ios-info"],
 			allConfigFiles["nativescript-android-manifest"]
-		]
+		];
 	}
 
 	public get startPackageActivity(): string {
@@ -85,13 +85,13 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 	}
 
-	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
+	public checkSdkVersions(platform: string, projectData: IProjectData): void { /* this method is not applicable to {N} projects */ }
 
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {
 			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();
 			return templateStrings.replace(/TS[.]/g, "TypeScript.");
-		}).future<string>()()
+		}).future<string>()();
 	}
 
 	public getProjectFileSchema(): IDictionary<any> {
@@ -116,8 +116,8 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			// In 0.10.0 original template, App_Resources directory is not included in app directory.
 			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
-			if(semver.eq(frameworkVersion, "0.9.0")  
-				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait() 
+			if(semver.eq(frameworkVersion, "0.9.0")
+				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait()
 				&& this.$fs.exists(path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait())) {
 				appResourcesHolderDirectory = projectDir;
 			}

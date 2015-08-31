@@ -1,12 +1,10 @@
 ///<reference path="../.d.ts"/>
-
 "use strict";
 
 import ValidationResult = require("../common/validators/validation-result");
 import BaseValidators = require("./base-validators");
-import Future = require("fibers/future");
-import helpers = require("./../helpers");
-import util = require("util");
+import * as helpers from "../helpers";
+import * as util from "util";
 
 export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<IiOSDeploymentValidatorModel> {
 	private static NOT_SPECIFIED_PROVISION_ERROR_MESSAGE = "Please specify the provisioning profile (with option --provision) that should be used when building the project.";
@@ -113,4 +111,3 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 	}
 }
 $injector.register("iOSDeploymentValidator", IOSDeploymentValidator);
-

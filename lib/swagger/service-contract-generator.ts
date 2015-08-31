@@ -1,5 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
+
 import codeEntityLib = require("./code-entity");
 import TSTypeSystemHelpersLib = require("./ts-type-system-helpers");
 import swaggerCodePrinterLib = require("./code-printer");
@@ -166,7 +167,6 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			this.pendingModels[typeName] = enumBlock;
 		}
 	}
-
 
 	private generateService(swaggerService: Swagger.ISwaggerServiceContract, serverModuleName: string): Swagger.IService {
 		let swaggerServiceContractName = this.getSwaggerServiceContractName(swaggerService);
@@ -416,7 +416,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 
 		let queryParams = this.getSwaggerParamsByType(operation, ParamTypes.Query);
 		if (queryParams.length > 0) {
-			let queryParamMap = _.map(queryParams, (param) => `'${param.name}': ${param.name}`).join(", ")
+			let queryParamMap = _.map(queryParams, (param) => `'${param.name}': ${param.name}`).join(", ");
 			callPath += ` + '?' + querystring.stringify({ ${queryParamMap} })`;
 		}
 		return callPath;
@@ -444,7 +444,7 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			result.push(`{name: ${this.quote(bodyParam.name)}, value: ${paramValue}, contentType: ${this.quote(contentType)}}`);
 		});
 
-		if (result.length == 0) {
+		if (result.length === 0) {
 			return "null";
 		}
 		return "[" + result.toString() + "]";

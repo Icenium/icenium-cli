@@ -1,13 +1,12 @@
 ///<reference path=".d.ts"/>
-
 "use strict";
-import path = require("path");
+
+import * as path from "path";
 import yok = require("../lib/common/yok");
 import helpCommand = require("../lib/common/commands/help");
 import stubs = require("./stubs");
 import Future = require("fibers/future");
 import microTemplateServiceLib = require("../lib/common/services/micro-templating-service");
-import dynamicHelpServiceLib = require("../lib/common/services/dynamic-help-service");
 import dynamicHelpProviderLib = require("../lib/dynamic-help-provider");
 import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
 import optionsLib = require("../lib/options");
@@ -29,7 +28,7 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 	injector.register("logger", logger);
 
 	opts = opts || { isPlatformResult: true, isProjectTypeResult: true };
-	
+
 	injector.register("dynamicHelpProvider", dynamicHelpProviderLib.DynamicHelpProvider);
 	injector.register("dynamicHelpService", {
 		isProjectType: (...args: string[]): IFuture<boolean> => { return Future.fromResult(opts.isProjectTypeResult); },
@@ -48,9 +47,9 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 		}
 	});
 	injector.register("microTemplateService", microTemplateServiceLib.MicroTemplateService);
-	injector.register("htmlHelpService", htmlHelpServiceLib.HtmlHelpService); 
+	injector.register("htmlHelpService", htmlHelpServiceLib.HtmlHelpService);
 	injector.register("opener", {
-		open(target: string, appname?: string): void {}
+		open(target: string, appname?: string): void {/* mock */}
 	});
 	injector.register("commandsServiceProvider", {
 		getDynamicCommands: (): IFuture<string[]> => {
@@ -58,12 +57,10 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 		}
 	});
 
-
-
 	injector.registerCommand("foo", {});
 
 	return injector;
-}
+};
 
 describe("help", () => {
 	it("processes substitution points",() => {
@@ -76,7 +73,7 @@ describe("help", () => {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
 			readText: () => Future.fromResult("bla <%= #{module.command} %> bla")
 		});
-		
+
 		let help = injector.resolve(helpCommand.HelpCommand);
 		help.execute(["foo"]).wait();
 		assert.isTrue(injector.resolve("logger").output.indexOf("bla woot bla") >= 0);

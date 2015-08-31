@@ -4,7 +4,7 @@
 import initCommandLib = require("../commands/project/init-project");
 import projectCommandLib = require("../commands/project/create-project");
 import samplesLib =require("../commands/samples");
-import util = require("util");
+import * as util from "util";
 
 class CommandsServiceProvider implements ICommandsServiceProvider {
 	private commands: IDynamicSubCommandInfo[];

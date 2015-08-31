@@ -1,13 +1,7 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import commonHelpers = require("./../common/helpers");
-
-import path = require("path");
-import util = require("util");
-
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
-	private projectSchema: any;
 	private assetUpdateMessagePrinted = false;
 
 	constructor(protected $logger: ILogger,
@@ -23,7 +17,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		let appid = this.$options.appid;
 		if(!this.$options.appid) {
 			appid = this.generateDefaultAppId(projectName);
-			this.$logger.warn("--appid was not specified. Defaulting to " + appid)
+			this.$logger.warn("--appid was not specified. Defaulting to " + appid);
 		}
 
 		properties.AppIdentifier = appid;
@@ -39,7 +33,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 
 			if (dir) {
 				let files = this.$fs.readDirectory(dir).wait();
-				let platformFiles = _.each(files, (file) => {
+				_.each(files, (file) => {
 					let matches = file.match(fileMask);
 					if(matches) {
 						result.push(matches[1].toLowerCase());

@@ -14,7 +14,7 @@ export class HostCapabilities implements IHostCapabilities {
 			"linux": {
 				debugToolsSupported: false
 			}
-		}
+		};
 	}
 }
 $injector.register("hostCapabilities", HostCapabilities);

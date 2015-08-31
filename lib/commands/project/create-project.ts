@@ -1,7 +1,6 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
-
-import ProjectCommandBaseLib = require("./project-command-base");
+import * as ProjectCommandBaseLib from "./project-command-base";
 
 export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	constructor($errors: IErrors,

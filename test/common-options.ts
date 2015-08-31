@@ -4,8 +4,7 @@
 let optionsPath = require("../lib/common/options");
 import errorsLib = require("../lib/common/errors");
 import yok = require("./../lib/common/yok");
-let yargs = require("yargs");
-let assert = require("chai").assert;
+import {assert} from "chai";
 let optionType = optionsPath.OptionType;
 
 let isExecutionStopped = false;
@@ -28,7 +27,7 @@ function createTestInjector(): IInjector {
 		CLIENT_NAME: ""
 	});
 	testInjector.register("hostInfo", {});
-	
+
 	return testInjector;
 }
 
@@ -41,7 +40,7 @@ describe("common options", () => {
 	let testInjector: IInjector;
 	beforeEach(() => {
 		testInjector = createTestInjector();
-		
+
 		let errors = new errorsLib.Errors();
 		errors.failWithoutHelp = (message: string, ...args: any[]): void => {
 			isExecutionStopped = true;
@@ -49,7 +48,7 @@ describe("common options", () => {
 		errors.fail = (message: string, ...args: any[]): void => {
 			isExecutionStopped = true;
 		};
-		
+
 		testInjector.register("errors", errors);
 		isExecutionStopped = false;
 	});
@@ -110,7 +109,7 @@ describe("common options", () => {
 			process.argv.pop();
 			process.argv.pop();
 			assert.isTrue(isExecutionStopped);
-		}); 
+		});
 
 		it("does not break execution when valid shorthand option has correct value", () => {
 			process.argv.push('-v');
@@ -258,7 +257,7 @@ describe("common options", () => {
 				assert.isFalse(isExecutionStopped, "Dashed options should be validated in specific way. Make sure validation allows yargs specific behavior:" +
 					"Dashed options (special-dashed-v) are added to yargs.argv in two ways: special-dashed-v and specialDashedV");
 			});
-			
+
 		});
 	});
 });
@@ -277,11 +276,7 @@ describe("common options profile-dir tests", () => {
 		it("uses profile-dir from yargs when it exists", () => {
 
 			let expectedProfileDir = "TestDir";
-			
-			let optionValues = {
-				"profile-dir": expectedProfileDir,
-				profileDir: expectedProfileDir
-			};
+
 			process.argv.push("--profile-dir");
 			process.argv.push(expectedProfileDir);
 			let options = createOptionsWithProfileDir("");
@@ -300,9 +295,6 @@ describe("common options profile-dir tests", () => {
 
 		it("uses profileDir from yargs when it exists", () => {
 			let expectedProfileDir = "TestDir";
-			let optionValues = {
-				profileDir: expectedProfileDir
-			};
 			process.argv.push("--profileDir");
 			process.argv.push(expectedProfileDir);
 			let options = createOptionsWithProfileDir("");
@@ -311,5 +303,5 @@ describe("common options profile-dir tests", () => {
 			process.argv.pop();
 			assert.equal(options.profileDir, expectedProfileDir);
 		});
-	}); 
+	});
 });

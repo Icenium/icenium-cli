@@ -1,8 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-
-import util = require("util");
-import PluginsDataLib = require("./../plugins-data");
+import * as PluginsDataLib from "../plugins-data";
 
 export class MarketplacePluginsService implements ICordovaPluginsService {
 

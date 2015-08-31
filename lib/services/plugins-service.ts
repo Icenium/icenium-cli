@@ -1,11 +1,11 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import os = require("os");
-import util = require("util");
-import pluginsDataLib = require("../plugins-data");
+import {EOL} from "os";
+import * as util from "util";
+import * as pluginsDataLib from "../plugins-data";
 import Future = require("fibers/future");
-import helpers = require("../common/helpers");
+import * as helpers from "../common/helpers";
 import semver = require("semver");
 
 export class PluginsService implements IPluginsService {
@@ -15,15 +15,15 @@ export class PluginsService implements IPluginsService {
 	private _identifierToPlugin: IDictionary<IPlugin>;
 	private get identifierToPlugin(): IDictionary<IPlugin> {
 		if (!this._identifierToPlugin) {
-			this.loadPluginsData().wait();	
+			this.loadPluginsData().wait();
 		}
 
 		return this._identifierToPlugin;
 	}
-	
+
 	private pluginsForbiddenConfigurations: IStringDictionary = {
 		"com.telerik.LivePatch": this.$projectConstants.DEBUG_CONFIGURATION_NAME
-	}
+	};
 
 	constructor(private $cordovaPluginsService: ICordovaPluginsService,
 		private $marketplacePluginsService: ICordovaPluginsService,
@@ -110,12 +110,12 @@ export class PluginsService implements IPluginsService {
 			if(!_.any(this.getAvailablePlugins(),(pl) => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
 			}
-			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration(); 
+			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration();
 			let installedPluginInstances = installedPluginsForConfiguration
 				.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase);
 			let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
 			if(!installedPluginInstances.length && pluginIdFromName) {
-				this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`)
+				this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`);
 				installedPluginInstances = installedPluginsForConfiguration.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
 			}
 
@@ -154,7 +154,7 @@ export class PluginsService implements IPluginsService {
 				}
 				configurations = _.without(this.$project.configurations, forbiddenConfig);
 			}
-			
+
 			this.configurePlugin(pluginName, version, configurations).wait();
 		}).future<void>()();
 	}
@@ -245,7 +245,7 @@ export class PluginsService implements IPluginsService {
 		let installedPluginInstances =  _.filter(installedPlugins,(plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
 		let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
 		if(!installedPluginInstances.length && pluginIdFromName) {
-			this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`)
+			this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`);
 			installedPluginInstances = installedPlugins.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
 		}
 
@@ -295,7 +295,7 @@ export class PluginsService implements IPluginsService {
 		return (() => {
 			let pluginData = plugin.data;
 			let cordovaPluginVariables = this.$project.getProperty(PluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
-			
+
 			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
 				_.each(pluginData.Variables, variableName => {
 					delete cordovaPluginVariables[pluginData.Identifier][variableName];
@@ -376,10 +376,10 @@ export class PluginsService implements IPluginsService {
 		let plugins = this.getAvailablePlugins();
 		let toLowerCasePluginName = pluginName.toLowerCase();
 
-		let plugin = _.find(plugins, (plugin: IPlugin) => {
-			let condition = plugin.data.Name.toLowerCase() === toLowerCasePluginName || plugin.data.Identifier.toLowerCase() === toLowerCasePluginName;
+		let plugin = _.find(plugins, (_plugin: IPlugin) => {
+			let condition = _plugin.data.Name.toLowerCase() === toLowerCasePluginName || _plugin.data.Identifier.toLowerCase() === toLowerCasePluginName;
 			if(version) {
-				condition = condition && plugin.data.Version === version;
+				condition = condition && _plugin.data.Version === version;
 			}
 
 			return condition;
@@ -399,7 +399,7 @@ export class PluginsService implements IPluginsService {
 				name: p.Version,
 				value: p.Version,
 				cordovaVersionRange: p.SupportedVersion
-			}
+			};
 
 			return pluginVersion;
 		});
@@ -419,7 +419,7 @@ export class PluginsService implements IPluginsService {
 			} else {
 				this.$errors.failWithoutHelp(`You must specify valid version in order to update your plugin when terminal is not interactive.`);
 			}
-			
+
 			return version;
 		}).future<string>()();
 	}
@@ -429,15 +429,15 @@ export class PluginsService implements IPluginsService {
 		let outputLines:string[] = [];
 
 		_.each(Object.keys(groups),(group: string) => {
-			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], os.EOL));
+			outputLines.push(util.format("%s:%s======================", PluginsService.MESSAGES[+group], EOL));
 
 			let sortedPlugins = _.sortBy(groups[group], (plugin: IPlugin) => plugin.data.Name);
 			_.each(sortedPlugins, (plugin: IPlugin) => {
-				outputLines.push(plugin.pluginInformation.join(os.EOL));
+				outputLines.push(plugin.pluginInformation.join(EOL));
 			});
 		});
 
-		this.$logger.out(outputLines.join(os.EOL + os.EOL));
+		this.$logger.out(outputLines.join(EOL + EOL));
 	}
 
 	private modifyInstalledMarketplacePlugin(pluginName: string, version: string): IFuture<void> {
@@ -532,7 +532,7 @@ export class PluginsService implements IPluginsService {
 	 * This is required in case the plugin is renamed, but its plugin identifier has not been changed.
 	 * @param {string} pluginName The plugin name that has to be checked.
 	 * @returns {string} The id of the plugin if there's only one plugin identifier for the specified name.
-	 * In case there are more than one ids for the specified name or there's no match, empty string is returned. 
+	 * In case there are more than one ids for the specified name or there's no match, empty string is returned.
 	 */
 	private getPluginIdFromName(pluginName: string): string {
 		let pluginNameToLowerCase = pluginName.toLowerCase();
@@ -560,7 +560,7 @@ export class PluginsService implements IPluginsService {
 	 * Checks if the specified CordovaPluginVariable exists in the --var option specified by user.
 	 * The variable can be added to --var option for configuration or globally, for ex.:
 	 * `--var.APP_ID myAppIdentifier` or `--var.debug.APP_ID myAppIdentifier`.
-	 * NOTE: If the variable is added for specific configuration and globally, 
+	 * NOTE: If the variable is added for specific configuration and globally,
 	 * the value for the specified configuration will be used as it has higher priority. For ex.:
 	 * `--var.APP_ID myAppIdentifier1 --var.debug.APP_ID myAppIdentifier2` will return myAppIdentifier2 for debug configuration
 	 * and myAppIdentifier for release configuration.
@@ -598,7 +598,7 @@ export class PluginsService implements IPluginsService {
 				return obj;
 			}
 		}
-		
+
 		return undefined;
 	}
 
@@ -631,7 +631,7 @@ export class PluginsService implements IPluginsService {
 						convertedObject[`${propKey}.${innerPropKey}`] = innerPropValue;
 					});
 				}
-				
+
 			});
 
 			return convertedObject;

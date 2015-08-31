@@ -1,15 +1,13 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import os = require("os");
+import {EOL} from "os";
 import xmlMapping = require("xml-mapping");
-import util = require("util");
-import Future = require("fibers/future");
-import helpers = require("../helpers");
+import * as util from "util";
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	private static PROJECT_VERSION_DEFAULT_VALUE = 1;
-	
+
 	constructor(private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
 		private $errors: IErrors,
@@ -162,7 +160,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			_.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
 			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
-			return result.join(os.EOL + os.EOL);
+			return result.join(EOL + EOL);
 		}).future<string>()();
 	}
 
@@ -217,14 +215,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				});
 			}
 			if (value.validationMessage) {
-				help.push("    " + value.validationMessage.replace(os.EOL, os.EOL + "    "));
-			}
-			else if (value.regex) {
+				help.push("    " + value.validationMessage.replace(EOL, EOL + "    "));
+			} else if (value.regex) {
 				help.push("    Valid values match /" + value.regex.toString() + "/");
 			}
 		});
 
-		return help.join(os.EOL);
+		return help.join(EOL);
 	}
 
 	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): IFuture<any> {
@@ -300,7 +297,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 									.first()
 									.CorePlugins;
 			_.each(configurationSpecificData, (configurationData: IProjectData, configuration: string) => {
-				this.$logger.trace(`Removing property CorePlugins from '${configuration}' configuration.`)
+				this.$logger.trace(`Removing property CorePlugins from '${configuration}' configuration.`);
 				delete configurationData.CorePlugins;
 			});
 

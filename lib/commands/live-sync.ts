@@ -1,11 +1,5 @@
 ///<reference path="../.d.ts"/>
 "use strict";
-import util = require("util");
-import path = require("path");
-let gaze = require("gaze");
-import helpers = require("./../helpers");
-import constants = require("../common/mobile/constants");
-import commandParams = require("../common/command-params");
 
 interface IProjectFileInfo {
 	fileName: string;
