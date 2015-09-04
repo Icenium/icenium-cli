@@ -389,11 +389,14 @@ interface IAppScaffoldingExtensionsService {
 interface IScreenBuilderService {
 	generatorName: string;
 	commandsPrefix: string;
-	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<void>;
+	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
 	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
 	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void>;
 	composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
+	ensureScreenBuilderProject(projectDir: string): IFuture<void>;
+	shouldUpgrade(): IFuture<boolean>;
+	upgrade(): IFuture<void>;
 }
 
 interface IScreenBuilderOptions {
@@ -862,4 +865,14 @@ interface IAppStoreService {
 	 * @param password
 	 */
 	getApplicationsReadyForUpload(userName: string, password: string): IFuture<Server.Application[]>;
+}
+
+
+/**
+ *	Used for communicating with screenbuilder generators
+ */
+interface IScaffolder {
+	scaffolder: any;
+	future: IFuture<any>;
+	callback: Function;
 }
