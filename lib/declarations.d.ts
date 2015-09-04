@@ -42,6 +42,8 @@ declare module Server {
 		solutionPath: string;
 		relativePath: string;
 		localFile?: string;
+		disposition: string;
+		format: string;
 	}
 
 	interface IBuildResult {

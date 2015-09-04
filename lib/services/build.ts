@@ -81,7 +81,9 @@ export class BuildService implements Project.IBuildService {
 					platform: buildResult.Platform,
 					solution: solutionName,
 					solutionPath: solutionPath,
-					relativePath: buildResult.FullPath
+					relativePath: buildResult.FullPath,
+					disposition: buildResult.Disposition,
+					format: buildResult.Format
 				};
 			});
 
@@ -339,8 +341,9 @@ export class BuildService implements Project.IBuildService {
 			if(settings.showQrCodes) {
 				let urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
 				let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
+				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) =>  !def.disposition || def.disposition === "BuildResult");
 
-				let packageDownloadViewModels = _.map(packageDefs, (def: Server.IPackageDef): IPackageDownloadViewModel => {
+				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
 					let liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
 
 					let packageUrl = (urlKind !== "package")
