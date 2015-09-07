@@ -34,6 +34,10 @@ export class LoggerStub implements ILogger {
 
 	write(...args:string[]): void { }
 
+	printMarkdown(...args:string[]): void {
+		this.output += util.format.apply(null, args) + "\n";
+	}
+
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }

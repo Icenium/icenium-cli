@@ -50,6 +50,8 @@ export class LoggerStub implements ILogger {
 
 	write(...args:string[]): void {/* mock */}
 
+	printMarkdown(...args:string[]): void {/* mock */}
+
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void {/* mock */}
