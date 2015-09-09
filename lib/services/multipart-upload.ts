@@ -6,7 +6,6 @@ import * as util from "util";
 
 export class MultipartUploadService implements IMultipartUploadService {
 	private static CHUNK_SIZE = 1024 * 1024 * 20;
-	private static MIN_CHUNK_SIZE = 1024 * 1024 * 2;
 	private static INPUT_FILE_ENCODING = "binary";
 	private static HASH_ALGORITHM = "sha512";
 	private static HASH_ENCODING = "base64";
@@ -32,10 +31,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 				// exclusive endByte
 				endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;
 
-				// In case the last chunk is shorter than CHUNK_SIZE or
-				// this chunk is before last and last one's length is shorter than MIN_CHUNK_SIZE
-				// set the endByte to the last byte of the file.
-				if(endByte > fileSize || (fileSize - endByte) < MultipartUploadService.MIN_CHUNK_SIZE) {
+				if(endByte > fileSize) {
 					endByte = fileSize;
 				}
 

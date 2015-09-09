@@ -33,7 +33,6 @@ function createTestInjector(): IInjector {
 	testInjector.register("multipartUploadService", multipartUploadServiceFile.MultipartUploadService);
 	// Hack the static variables
 	multipartUploadServiceFile.MultipartUploadService.CHUNK_SIZE = 10;
-	multipartUploadServiceFile.MultipartUploadService.MIN_CHUNK_SIZE = 2;
 	return testInjector;
 }
 
@@ -155,7 +154,7 @@ describe("multipart upload service", () => {
 
 		/* fileSize = (x*chunkSize) + 1 */
 		it("sends correct Content-Ranges when fileSize is multiple of chunk size plus one", () => {
-			let expectedContentRanges = ["bytes 0-9/21", "bytes 10-20/21"];
+			let expectedContentRanges = ["bytes 0-9/21", "bytes 10-19/21", "bytes 20-20/21"];
 			let actualContentRanges = createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(21)).wait();
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
