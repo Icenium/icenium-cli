@@ -35,6 +35,8 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 
 	write(...args: string[]): void { }
 
+	printMarkdown(...args:string[]): void {/* mock */}
+
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }
@@ -438,6 +440,9 @@ describe("commands service", () => {
 			testInjector.register("options", Options);
 			testInjector.register("logger", {
 				info: (str: string): void => {
+					loggerOutput += str;
+				},
+				printMarkdown: (str: string): void => {
 					loggerOutput += str;
 				}
 			});

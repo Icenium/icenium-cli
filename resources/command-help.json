@@ -1,15 +1,19 @@
 {
-	"create|screenbuilder": "You can now go into your project directory and run `$ appbuilder add-view`.",
+	"create|screenbuilder": "Run `$ cd %s` to switch to your project directory and continue working there. Once in the project root, you can add a new view or connect to a data provider by running `$ appbuilder add-view` or `$ appbuilder add-dataprovider`, respectively.",
 
-	"create|*default": "You can now go into your project directory and run `$ appbuilder add-view`.",
+	"create|*default": "Run `$ cd %s` to switch to your project directory and continue working there. Once in the project root, you can add a new view or connect to a data provider by running `$ appbuilder add-view` or `$ appbuilder add-dataprovider`, respectively.",
 
-	"add-about": "You can check out your about page in the simulator by running `$ appbuilder simulate`",
+	"add-about": "You can now add another view by running `$ appbuilder add-view`.",
 
-	"add-dataprovider": "You can now add a form to your project by running `$ appbuilder add-form`.",
+	"add-dataprovider": "You can now add authentication and authorization capabilities or add a list view by running `$ appbuilder add-authentication` or `$ appbuilder add-list`, respectively.",
 
-	"add-field": "You can perhaps add another field or deploy the application on a device by running `$ appbuilder deploy` to see what it looks like.",
+	"add-field": "You can now add another field by running `$ appbuilder add-field`.",
 
 	"add-form": "You can now add a field to this form by running `$ appbuilder add-field`.",
 
-	"add-view": "You can now add a data provider or a form to your project by running `$ appbuilder add-dataprovider` or `$ appbuilder add-form` respectively."
+	"add-view": "You can now add a data provider, a form, or an about page to your project by running `$ appbuilder add-dataprovider`, `$ appbuilder add-form`, or `$ appbuilder add-about`, respectively.",
+
+	"add-authentication": "You can now add another view by running `$ appbuilder add-view`.",
+
+	"add-list": "You can now add another view by running `$ appbuilder add-view`."
 }
