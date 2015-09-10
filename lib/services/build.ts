@@ -179,7 +179,7 @@ export class BuildService implements Project.IBuildService {
 				} else if(!settings.buildForiOSSimulator) {
 					let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
 					try {
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
+						provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
 					} catch (error) {
 						if (!this.$options.download) {
 							this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
