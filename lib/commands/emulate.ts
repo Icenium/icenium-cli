@@ -61,14 +61,8 @@ export class EmulateIosCommand implements ICommand {
 
 			if(!this.$options.availableDevices) {
 				let tempDir = this.$project.getTempDir("emulatorfiles").wait();
-				let packageDefs = this.$buildService.build(<Project.IBuildSettings>{
-					platform: this.$devicePlatformsConstants.iOS,
-					showQrCodes: false,
-					downloadFiles: true,
-					downloadedFilePath: path.join(tempDir, "package.ipa"),
-					buildForiOSSimulator: true
-				}).wait();
-				this.$fs.unzip(packageDefs[0].localFile, tempDir).wait();
+				let packageFile = this.$buildService.buildForDeploy(this.$devicePlatformsConstants.iOS, path.join(tempDir, "package.ipa"), true).wait();
+				this.$fs.unzip(packageFile, tempDir).wait();
 			 	app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
 			}
 

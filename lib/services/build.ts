@@ -28,7 +28,6 @@ export class BuildService implements Project.IBuildService {
 		private $platformMigrator: Project.IPlatformMigrator,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $projectConstants: Project.IProjectConstants,
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions,
 		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory) { }
@@ -393,19 +392,22 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IPackageDef[]>()();
 	}
 
-	public deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]> {
+	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string> {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
-			let result = this.build({
+			let buildResult = this.build({
 				platform: platform,
 				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
-				downloadedFilePath: this.$options.saveTo,
+				downloadedFilePath: downloadedFilePath,
+				buildForiOSSimulator: buildForiOSSimulator,
 				device: device
 			}).wait();
+
+			let result =  _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
 			return result;
-		}).future<Server.IPackageDef[]>()();
+		}).future<string>()();
 	}
 
 	public executeBuild(platform: string): IFuture<void> {

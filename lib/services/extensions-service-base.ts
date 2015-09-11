@@ -3,8 +3,6 @@
 
 import * as path from "path";
 import * as helpers from "../helpers";
-import temp = require("temp");
-temp.track();
 
 export class ExtensionsServiceBase {
 	private extensionVersions: IStringDictionary = {};
@@ -52,14 +50,13 @@ export class ExtensionsServiceBase {
 
 			if( this.shouldUpdatePackage(cachedVersion, extensionVersion) ) {
 				this.$logger.printInfoMessageOnSameLine(`Updating ${packageName} package...`);
-				let zipFileName = temp.path({ path:  path.join(this.cacheDir, packageName + ".zip") });
+				let zipFileName = path.join(this.cacheDir, packageName + ".zip");
 
 				if(actions.beforeDownloadAction) {
 					actions.beforeDownloadAction().wait();
 				}
 
 				this.$fs.deleteDirectory(extensionPath).wait();
-
 				this.$fs.createDirectory(extensionPath).wait();
 				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
 
@@ -73,6 +70,7 @@ export class ExtensionsServiceBase {
 					}
 					this.saveVersionsFile().wait();
 				} catch(err) {
+					this.$fs.deleteFile(zipFileName);
 					this.$fs.deleteDirectory(extensionPath).wait();
 					throw err;
 				}
