@@ -124,7 +124,7 @@ declare module Project {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		buildForDeploy(platform: string, device?: Mobile.IDevice): IFuture<string>;
+		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string>;
 	}
 
 	interface IBuildSettings {
@@ -842,4 +842,24 @@ interface ICordovaResourceLoader {
 	 * @return {string}          Absolute path to Cordova javascript file
 	 */
 	buildCordovaJsFilePath(version: string, platform: string): string;
+}
+
+/**
+ * Interact with iTunes Connect store
+ */
+interface IAppStoreService {
+	/**
+	 * Upload to itunes connect
+	 * @param userName
+	 * @param password
+	 * @param application
+	 */
+	upload(userName: string, password: string, application: string): IFuture<void>;
+
+	/**
+	 * Query the server for applications ready to upload to itunes connect
+	 * @param userName
+	 * @param password
+	 */
+	getApplicationsReadyForUpload(userName: string, password: string): IFuture<Server.Application[]>;
 }
