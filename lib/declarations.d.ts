@@ -124,7 +124,7 @@ declare module Project {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
 		executeBuild(platform: string): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		deploy(platform: string, device?: Mobile.IDevice): IFuture<Server.IPackageDef[]>;
+		buildForDeploy(platform: string, device?: Mobile.IDevice): IFuture<string>;
 	}
 
 	interface IBuildSettings {

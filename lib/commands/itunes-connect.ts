@@ -148,6 +148,7 @@ export class UploadApplicationCommand extends AppstoreApplicationCommandBase {
 				configuration: "Release",
 				provisionTypes: [constants.ProvisionType.AppStore]
 			}).wait();
+			buildResult = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 			if(!buildResult[0] || !buildResult[0].solutionPath) {
 				this.$errors.fail({ formatStr: "Build failed.", suppressCommandHelp: true });
 			}

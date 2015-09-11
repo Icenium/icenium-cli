@@ -137,6 +137,7 @@ $injector.requireCommand("certificate-request|remove", "./commands/cryptographic
 $injector.requireCommand("certificate-request|download", "./commands/cryptographic-identities");
 
 $injector.requireCommand("user", "./commands/user-status");
+$injector.require("appStoreService", "./services/appstore-service");
 $injector.requireCommand("appstore|list", "./commands/itunes-connect");
 $injector.requireCommand("appstore|upload", "./commands/itunes-connect");
 $injector.requireCommand("appmanager|upload|android", "./commands/appmanager");

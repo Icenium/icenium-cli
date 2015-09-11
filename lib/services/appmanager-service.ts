@@ -43,6 +43,7 @@ class AppManagerService implements IAppManagerService {
 				downloadFiles: this.$options.download
 			}).wait();
 
+			buildResult = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 			if(!buildResult[0] || !buildResult[0].solutionPath) {
 				this.$errors.fail({ formatStr: "Build failed.", suppressCommandHelp: true });
 			}

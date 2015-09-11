@@ -13,8 +13,7 @@ export class DeployHelper implements IDeployHelper {
 		protected $liveSyncService: ILiveSyncService,
 		protected $errors: IErrors,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $options: IOptions,
-		private $devicePlatformsConstants:Mobile.IDevicePlatformsConstants) { }
+		private $options: IOptions) { }
 
 	public deploy(platform?: string): IFuture<void> {
 		this.$project.ensureProject();
@@ -26,16 +25,15 @@ export class DeployHelper implements IDeployHelper {
 			this.$errors.failWithoutHelp("On your current OS, you cannot deploy apps on connected %s devices.", this.$mobileHelper.normalizePlatformName(platform));
 		}
 
+		if (this.$options.companion) {
+			return this.$liveSyncService.livesync(platform);
+		}
+
 		return this.deployCore(platform);
 	}
 
 	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
-			if (this.$options.companion) {
-				this.$liveSyncService.livesync(platform).wait();
-				return;
-			}
-
 			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device}).wait();
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
@@ -44,17 +42,16 @@ export class DeployHelper implements IDeployHelper {
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
 				let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
-				if(deploymentTarget && device.deviceInfo.platform.toLowerCase() === this.$devicePlatformsConstants.iOS.toLowerCase()) {
+				if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
 					let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
-					if(helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
+					if (helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
 						this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
 						return Future.fromResult();
 					}
 				}
 
-				if(!packageFile) {
-					let packageDefs = this.$buildService.deploy(this.$devicesServices.platform, device).wait();
-					packageFile = packageDefs[0].localFile;
+				if (!packageFile) {
+					packageFile = this.$buildService.buildForDeploy(this.$devicesServices.platform, this.$options.saveTo, false, device).wait();
 
 					this.$logger.debug("Ready to deploy %s", packageFile);
 					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
