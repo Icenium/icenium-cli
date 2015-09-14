@@ -464,6 +464,7 @@ declare module Server{
 	}
 	interface PatchData{
 		Platforms: Server.DevicePlatform[];
+		IsMandatory: boolean;
 	}
 	interface FeatureStatus{
 		IsAvailable: boolean;
