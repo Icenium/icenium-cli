@@ -3,7 +3,7 @@ appmanager livesync
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder appmanager livesync [<Platforms>] [--isMandatory]`
+General | `$ appbuilder appmanager livesync [<Platforms>] [--mandatory]`
 
 Publishes a new Telerik AppManager LiveSync update of your published application. <% if(isHtml) { %>If you have not enabled the AppManager LiveSync plugin for your project, it will be automatically enabled for the release build configuration. If you do not specify a platform, the AppBuilder CLI will prompt you to choose your target mobile platforms.
 
@@ -16,7 +16,7 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Options
-* `--isMandatory` - If set, the app users will have to install the required update first in order to continue utilizing the app. Use this option to provide critical bug fixes to your published app.
+* `--mandatory` - If set, the app users will have to install the required update first in order to continue utilizing the app. Use this option to provide critical bug fixes to your published app.
 
 ### Attributes
 `<Platforms>` is one or more target platforms, separated by a space, for which you want to create a Telerik AppManager LiveSync update. You can set the following target platforms.

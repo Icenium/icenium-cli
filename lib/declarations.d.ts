@@ -723,7 +723,7 @@ interface IOptions extends ICommonOptions {
 	sendPush: boolean;
 	sendEmail: boolean;
 	group: string[];
-	isMandatory: boolean;
+	mandatory: boolean;
 	default: boolean;
 	var: Object;
 	answers: string;
