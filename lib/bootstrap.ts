@@ -145,7 +145,12 @@ $injector.requireCommand("appmanager|upload|ios", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|wp8", "./commands/appmanager");
 $injector.requireCommand("appmanager|groups", "./commands/appmanager");
 
-$injector.requireCommand("update-kendoui", "./commands/update-kendoui");
+$injector.require("kendoUIService", "./services/kendoui-service");
+
+$injector.requireCommand("update-kendoui", "./commands/kendoui-install");
+$injector.requireCommand("kendoui|*list", "./commands/kendoui-list");
+$injector.requireCommand("kendoui|install", "./commands/kendoui-install");
+$injector.requireCommand("kendoui|notes", "./commands/kendoui-notes");
 
 $injector.requireCommand("upgrade-screenbuilder", "./commands/upgrade-screenbuilder");
 

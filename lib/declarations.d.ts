@@ -58,8 +58,10 @@ declare module Server {
 		Keywords: string[];
 		Name: string;
 		Version: string;
+		ReleaseNotesUrl: string;
 		NeedPurchase: boolean;
 		VersionTags: string[];
+		HasReleaseNotes: boolean;
 	}
 }
 
@@ -684,6 +686,10 @@ interface IDynamicSubCommandInfo {
 	commandConstructor: Function;
 }
 
+interface IKendoUIService {
+	getKendoPackages(options: IKendoUIFilterOptions): IFuture<Server.IKendoDownloadablePackageData[]>;
+}
+
 interface IPublishService {
 	publish(idOrUrl: string, username: string, password: string): IFuture<void>;
 	listAllConnections(): void;
@@ -734,6 +740,15 @@ interface IOptions extends ICommonOptions {
 	icon: string;
 	splash: string;
 	all: boolean;
+}
+
+/**
+ * Describes options with which kendo ui packages can be filtered
+ */
+interface IKendoUIFilterOptions {
+	verified: boolean;
+	core: boolean;
+	professional: boolean;
 }
 
 /**
