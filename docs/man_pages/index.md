@@ -42,7 +42,9 @@ Command | Description
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
 [webview](project/configuration/webview.html) | Lists the available web views for iOS and Android.
 [webview&nbsp;set](project/configuration/webview-set.html) | Sets the selected web view for the current project.
-[update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
+[kendoui](lib-management/kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
+[kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
+[kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
 [resource](resource.html) | Lists information about the image resources for all mobile platforms.
 [resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 

@@ -1,49 +1,15 @@
 update-kendoui
 ==========
 
-Usage | Synopsis
-------|-------
-List all versions | `$ appbuilder update-kendoui [--verified] [--latest]`
-List Kendo UI Core versions | `$ appbuilder update-kendoui --core [--verified]`
-List Kendo UI Professional versions | `$ appbuilder update-kendoui --professional [--verified]`
-Install latest Kendo UI Core | `$ appbuilder update-kendoui --core --latest [--verified]`
-Install latest Kendo UI Professional | `$ appbuilder update-kendoui --professional --latest [--verified]`
+> WARNING: This command is deprecated and will be removed in a future release. Use `$ appbuilder kendoui install` instead.
 
-Lists officially supported Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory.<% if(isHtml || isCordova) { %> The verified tag marks stable Kendo UI Service Pack releases.<% } %> 
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help update-kendoui`
-<% } %>
-<% if(isNativeScript) { %>
-WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help update-kendoui`
-<% } %>
-<% } %>
-<% if((isConsole && isCordova) || isHtml) { %>  
-### Options
-* `--verified` - Lists versions marked with verified tag. If both package type and `--latest` are set, installs the latest stable Kendo UI Service Pack package of the specified type.
-* `--core` - Lists Kendo UI Core versions. If `--latest` is set, installs the latest Kendo UI Core package.
-* `--professional` - Lists Kendo UI Professional versions. If `--latest` is set, installs the latest Kendo UI Professional package.
-* `--latest` - Lists the latest stable Kendo UI Service Pack packages. If a package type is set, installs the latest stable Kendo UI Service Pack package of the specified type.
-
-<% if(isConsole) { %>  
-WARNING: You cannot set `--core` and `--professional` simultaneously.
-<% } %>
-<% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
-* You cannot set `--core` and `--professional` simultaneously.
 
 ### Related Commands
 
 Command | Description
 ----------|----------
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
-[plugin configure](plugin-configure.html) | Configures plugin variables for selected core, integrated or verified plugin.
-[plugin remove](plugin-remove.html) | Disables a core, integrated or verified plugin from your project.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
+[kendoui](kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
+[kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
+[kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
 <% } %>
