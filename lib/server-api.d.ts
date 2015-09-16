@@ -144,6 +144,8 @@ declare module Server{
 		Alias: string;
 		Attributes: IDictionary<string>;
 		Certificate: string;
+		Thumbprint: string;
+		ExpirationDate: Date;
 	}
 	interface IdentityGenerationData{
 		SubjectNameValues: IDictionary<string>;
@@ -211,6 +213,7 @@ declare module Server{
 	const enum ImageType{
 		Icon,
 		SplashScreen,
+		NinePatch,
 	}
 	interface IImagesServiceContract{
 		resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>;
@@ -232,8 +235,10 @@ declare module Server{
 	interface KendoDownloadablePackageData{
 		Id: string;
 		DownloadUrl: string;
+		ReleaseNotesUrl: string;
 		NeedPurchase: boolean;
 		VersionTags: string[];
+		HasReleaseNotes: boolean;
 		Name: string;
 		Version: string;
 	}
@@ -255,6 +260,7 @@ declare module Server{
 		ExpirationDate: Date;
 		Certificates: string[];
 		ProvisionedDevices: string[];
+		ApplicationGroups: string[];
 	}
 	const enum ProvisionType{
 		Development,
