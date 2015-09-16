@@ -138,7 +138,10 @@ class AppManagerService implements IAppManagerService {
 
 			this.$project.importProject().wait();
 			this.$logger.printInfoMessageOnSameLine("Publishing patch for " + platforms.join(", ") + "...");
-			this.$progressIndicator.showProgressIndicator(this.$server.tam.uploadPatch(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, <any>{ Platforms: platforms }), 2000).wait();
+
+			let patchData = <any> { Platforms: platforms, IsMandatory: this.$options.mandatory };
+			let patchUpload = this.$server.tam.uploadPatch(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, patchData);
+			this.$progressIndicator.showProgressIndicator(patchUpload, 2000).wait();
 
 			this.$options.release = cachedOptionsRelease;
 
