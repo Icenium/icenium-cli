@@ -51,6 +51,7 @@ Command | Description
 -------|----------
 [create screenbuilder](project/creation/create.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[upgrade-screenbuilder](screenbuilder/upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
 [add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
 [add-authentication](screenbuilder/add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.

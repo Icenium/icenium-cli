@@ -14,7 +14,7 @@ Connects your project to a Telerik Backend Services, JSON, OData or a Progress D
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-dataprovider).<% } %> 
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-dataprovider).<% } %>
 
 <% if(isHtml) { %>
 ### Prerequisites
@@ -32,6 +32,7 @@ Command | Description
 ----------|----------
 [create screenbuilder](../project/creation/create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[upgrade-screenbuilder](upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 [add-field](add-field.html) | Inserts an input field in an existing form.

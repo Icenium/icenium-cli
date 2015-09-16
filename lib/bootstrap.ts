@@ -147,6 +147,8 @@ $injector.requireCommand("appmanager|groups", "./commands/appmanager");
 
 $injector.requireCommand("update-kendoui", "./commands/update-kendoui");
 
+$injector.requireCommand("upgrade-screenbuilder", "./commands/upgrade-screenbuilder");
+
 $injector.requireCommand("dev-prepackage", "./commands/dev/prepackage");
 $injector.require("platformServices", "./commands/simulate");
 $injector.require("remoteService", "./services/remote-service");

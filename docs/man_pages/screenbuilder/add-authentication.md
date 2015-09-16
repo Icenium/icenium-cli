@@ -14,7 +14,7 @@ Inserts sign-in and sign-up forms in an existing application view. You can conne
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-authentication).<% } %> 
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-authentication).<% } %>
 
 <% if(isHtml) { %>
 ### Prerequisites
@@ -23,7 +23,7 @@ Inserts sign-in and sign-up forms in an existing application view. You can conne
 * You must have at least one data provider configured with `$ appbuilder add-dataprovider`
 * Verify that you have installed git on your system.
 
-### Command Limitations 
+### Command Limitations
 
 * You can run this command only on projects created with Screen Builder.
 * You cannot use this command to modify projects created with earlier versions of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
@@ -34,6 +34,7 @@ Command | Description
 ----------|----------
 [create screenbuilder](../project/creation/create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder.html) | Shows all commands for project development with Screen Builder.
+[upgrade-screenbuilder](upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
 [add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
 [add-field](add-field.html) | Inserts an input field in an existing form.

@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder screenbuilder`
 
-Shows all commands for project development with Screen Builder. 
+Shows all commands for project development with Screen Builder.
 
 <% if(isConsole) { %>WARNING: This set of commands is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
 
@@ -19,7 +19,7 @@ Command | Description
 [add-list](add-list.html) | Inserts a list in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Prerequisites
 
 * Verify that you have installed git on your system.
@@ -32,4 +32,5 @@ Command | Description
 Command | Description
 ----------|----------
 [create screenbuilder](../project/creation/create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
+[upgrade-screenbuilder](upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
 <% } %>
