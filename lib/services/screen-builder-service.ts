@@ -25,7 +25,6 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		private $generatorExtensionsService: IGeneratorExtensionsService,
 		private $injector: IInjector,
 		private $logger: ILogger,
-		private $options: IOptions,
 		private $prompter: IPrompter,
 		private $fs: IFileSystem) { }
 
@@ -37,9 +36,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "add";
 	}
 
-	public prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean> {
+	public prepareAndGeneratePrompt(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean> {
 		return (() => {
-			let scaffolderData = this.promptGenerate(generatorName, screenBuilderOptions).wait(),
+			let scaffolderData = this.promptGenerate(generatorName, projectPath, screenBuilderOptions).wait(),
 				scaffolderFutureResult = scaffolderData.future.wait(),
 				disableCommandHelpSuggestion = false;
 
@@ -62,7 +61,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 					scaffolderData.scaffolder.upgrade(callback);
 
 					future.wait();
-					this.promptGenerate(generatorName, screenBuilderOptions).wait().future.wait();
+					this.promptGenerate(generatorName, projectPath, screenBuilderOptions).wait().future.wait();
 				}
 
 				disableCommandHelpSuggestion = !shouldMigrate;
@@ -97,31 +96,31 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void> {
+	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions, projectPath: string): IFuture<void> {
 		this.$logger.trace("Installing project dependencies using bower");
 
-		let projectDirPath = path.resolve(this.$options.path || ".");
+		let projectDirPath = path.resolve(projectPath || ".");
 		let bowerModuleFilePath = require.resolve("bower");
 		let bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
 		let command = util.format("%s %s install", "node", bowerPath);
 		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
 
-	public composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
+	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
 		return (() => {
 			let screenBuilderOptions = bacisSceenBuilderOptions || {};
 
-			if(this.$options.answers) {
-				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(this.$options.answers)).wait();
+			if(answers) {
+				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers)).wait();
 			}
 
 			return screenBuilderOptions;
 		}).future<IScreenBuilderOptions>()();
 	}
 
-	public promptGenerate(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
+	public promptGenerate(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
 		return (() => {
-			let scaffolderData = this.createScaffolder(generatorName, screenBuilderOptions).wait();
+			let scaffolderData = this.createScaffolder(generatorName, projectPath, screenBuilderOptions).wait();
 			let scaffolder = scaffolderData.scaffolder;
 			let type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 			type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
@@ -144,10 +143,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	public shouldUpgrade(): IFuture<boolean> {
+	public shouldUpgrade(projectPath: string): IFuture<boolean> {
 		return (() => {
 			if (!this.shouldUpgradeCached) {
-				let scaffolderData = this.createScaffolder(this.generatorName).wait();
+				let scaffolderData = this.createScaffolder(this.generatorName, projectPath).wait();
 
 				scaffolderData.scaffolder.initContext({ collectMetadata: true }, scaffolderData.callback);
 
@@ -158,13 +157,13 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<boolean>()();
 	}
 
-	public upgrade(): IFuture<void> {
+	public upgrade(projectPath: string): IFuture<void> {
 		return (() => {
-			if (!this.shouldUpgrade().wait()) {
+			if (!this.shouldUpgrade(projectPath).wait()) {
 				return;
 			}
 
-			let scaffolderData = this.createScaffolder(this.generatorName).wait();
+			let scaffolderData = this.createScaffolder(this.generatorName, projectPath).wait();
 
 			scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
@@ -182,7 +181,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	private getScaffolder(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<any> {
+	private getScaffolder(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<any> {
 		return (() => {
 			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
 
@@ -193,7 +192,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			let connector = {
 				generatorsCache: appScaffoldingPath,
 				generatorsAlias: [generatorConfig.alias],
-				path: screenBuilderOptions && screenBuilderOptions.projectPath || path.resolve(this.$options.path || "."),
+				path: screenBuilderOptions && screenBuilderOptions.projectPath || path.resolve(projectPath || "."),
 				dependencies: [util.format("%s@%s", generatorName, generatorConfig.version)],
 				connect: (done:Function) => {
 					done();
@@ -205,12 +204,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<IScaffolder>()();
 	}
 
-	private createScaffolder(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
+	private createScaffolder(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
 		return (() => {
 			this.prepareScreenBuilder().wait();
 			screenBuilderOptions = screenBuilderOptions || {};
 
-			let scaffolder = this.getScaffolder(generatorName, screenBuilderOptions).wait();
+			let scaffolder = this.getScaffolder(generatorName, projectPath, screenBuilderOptions).wait();
 			let future = new Future<any>();
 			let callback = (err:Error, data:any) => {
 				if (err) {
@@ -257,6 +256,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 	constructor(public generatorName: string,
 		public command: string,
 		private $fs: IFileSystem,
+		private $options: IOptions,
 		private $project: Project.IProject,
 		private $screenBuilderService: IScreenBuilderService) { }
 
@@ -266,11 +266,11 @@ class ScreenBuilderDynamicCommand implements ICommand {
 			let projectDir = this.$project.getProjectDir().wait();
 			this.$screenBuilderService.ensureScreenBuilderProject(projectDir).wait();
 
-			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions({
+			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				type: this.command.substr(this.command.indexOf("-") + 1)
 			}).wait();
 
-			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, screenBuilderOptions).wait();
+			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, this.$options.path, screenBuilderOptions).wait();
 		}).future<void>()();
 	}
 

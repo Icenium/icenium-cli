@@ -27,7 +27,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 
 			this.$project.createTemplateFolder(projectPath).wait();
 
-			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions({
+			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				projectPath: projectPath,
 				answers: {
 					name: projectName
@@ -35,8 +35,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			}).wait();
 
 			try {
-				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, screenBuilderOptions).wait();
-				this.$screenBuilderService.installAppDependencies(screenBuilderOptions).wait();
+				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, this.$options.path, screenBuilderOptions).wait();
+				this.$screenBuilderService.installAppDependencies(screenBuilderOptions, this.$options.path).wait();
 
 				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath, projectName).wait();
 			} catch(err) {

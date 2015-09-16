@@ -389,14 +389,14 @@ interface IAppScaffoldingExtensionsService {
 interface IScreenBuilderService {
 	generatorName: string;
 	commandsPrefix: string;
-	prepareAndGeneratePrompt(generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
+	prepareAndGeneratePrompt(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
 	allSupportedCommands(generatorName?: string): IFuture<string[]>;
 	generateAllCommands(generatorName: string): IFuture<void>;
-	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions): IFuture<void>;
-	composeScreenBuilderOptions(bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
+	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions, projectPath: string): IFuture<void>;
+	composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
 	ensureScreenBuilderProject(projectDir: string): IFuture<void>;
-	shouldUpgrade(): IFuture<boolean>;
-	upgrade(): IFuture<void>;
+	shouldUpgrade(projectPath: string): IFuture<boolean>;
+	upgrade(projectPath: string): IFuture<void>;
 }
 
 interface IScreenBuilderOptions {
