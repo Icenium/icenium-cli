@@ -45,4 +45,5 @@ docs/html
 **/obj
 **/bin/Microsoft.NodejsTools.WebRole.dll
 **/.vs
+**/.vscode
 **/.ntvs_analysis.dat
