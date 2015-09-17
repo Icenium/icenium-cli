@@ -39,7 +39,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * Windows 7 or later
-* .NET 4.0 or later
+* .NET 4.5 or later
 * Node.js
 	* (Windows 7 systems): Node.js 0.10.26 or a later stable official 0.x release except 0.10.34<br/>A [known issue](https://github.com/joyent/node/issues/8894) prevents the Telerik AppBuilder CLI from working properly with Node.js 0.10.34.
 	* (Windows 8 and later systems): Node.js 0.12.0 or a later stable official 0.x release<br/>A [known issue](https://github.com/SBoudrias/Inquirer.js/issues/235) in Inquirer.js prevents the interactive prompts from working properly in `cmd` shells on Windows 8 or later systems with Node.js 0.10.x.
