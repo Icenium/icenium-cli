@@ -13,7 +13,7 @@ export enum PluginType {
 export class CordovaPluginData implements IPlugin {
 	public configurations: string[];
 
-	constructor(public data: Server.CordovaPluginData,
+	constructor(public data: IMarketplacePluginData,
 		public type: PluginType,
 		protected $project: Project.IProject,
 		protected $projectConstants: Project.IProjectConstants) {
@@ -80,8 +80,8 @@ export class MarketplacePluginData extends CordovaPluginData {
 	private static TELERIK_PUBLISHER_NAME = "Telerik plugins";
 	private static TELERIK_PARTNER_PUBLISHER_NAME = "Telerik partner plugins";
 
-	constructor(public pluginVersionsData: IMarketplacePluginVersionsData,
-		public data: Server.MarketplacePluginData,
+	constructor(public pluginVersionsData: IMarketplacePluginVersionsDataBase,
+		public data: IMarketplacePluginData,
 		$project: Project.IProject,
 		$projectConstants: Project.IProjectConstants) {
 		super(data, PluginType.MarketplacePlugin, $project, $projectConstants);
@@ -90,9 +90,12 @@ export class MarketplacePluginData extends CordovaPluginData {
 
 	public get pluginInformation(): string[] {
 		let additionalPluginData = [
-			this.buildRow("Downloads count", this.data.DownloadsCount.toString()),
 			this.buildRow("Available versions",  _.map(this.pluginVersionsData.Versions, pl => pl.Version).join(", "))
 		];
+
+		if(this.data.DownloadsCount) {
+			additionalPluginData.unshift(this.buildRow("Downloads count", this.data.DownloadsCount.toString()));
+		}
 
 		let publisherName = this.getPublisherName(this.data.Publisher);
 		if(publisherName) {

@@ -3,7 +3,7 @@
 
 import {CordovaPluginsService} from "./../lib/services/cordova-plugins";
 import {MarketplacePluginsService} from "./../lib/services/marketplace-plugins-service";
-import {PluginsService} from "./../lib/services/plugins-service";
+import {CordovaProjectPluginsService} from "./../lib/services/cordova-project-plugins-service";
 import * as stubs from "./stubs";
 import {Yok} from "../lib/common/yok";
 import {Options} from "../lib/options";
@@ -308,7 +308,7 @@ describe("plugins-service", () => {
 
 		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-		let service: IPluginsService = testInjector.resolve(PluginsService);
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let installedPlugins = service.getInstalledPlugins();
 
 		assert.equal(3, installedPlugins.length);
@@ -357,7 +357,7 @@ describe("plugins-service", () => {
 
 			let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			service.addPlugin("Toast").wait();
 			let installedPlugins = service.getInstalledPlugins();
 
@@ -408,7 +408,7 @@ describe("plugins-service", () => {
 
 		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-		let service: IPluginsService = testInjector.resolve(PluginsService);
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		service.removePlugin("Stripe").wait();
 
 		assert.equal(3, service.getInstalledPlugins().length);
@@ -423,7 +423,7 @@ describe("plugins-service", () => {
 
 		let testInjector = createTestInjector([], installedMarketplacePlugins, []);
 
-		let service: IPluginsService = testInjector.resolve(PluginsService);
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		assert.throws(() => service.getInstalledPlugins());
 	});
 	it("does not fail if data for one of the plugins cannot be fetched", () => {
@@ -471,7 +471,7 @@ describe("plugins-service", () => {
 			throw new Error("MockMarketPlace throws error when creating plugin data.");
 		};
 
-		let service: IPluginsService = testInjector.resolve(PluginsService);
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let availablePlugins = service.getAvailablePlugins();
 
 		// Only cordovaPlugins are counted, availableMarketplacePlugins cannot fetched, but we still receive correct data for other plugins
@@ -500,25 +500,25 @@ describe("plugins-service", () => {
 
 		it("isPluginInstalled returns true when plugin is installed and plugin name is passed", () => {
 			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			assert.isTrue(service.isPluginInstalled("stripe"));
 		});
 
 		it("isPluginInstalled returns true when plugin is installed and plugin identifier is passed", () => {
 			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			assert.isTrue(service.isPluginInstalled("com.telerik.stripe"));
 		});
 
 		it("isPluginInstalled returns false when plugin is not installed and plugin name is passed", () => {
 			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			assert.isFalse(service.isPluginInstalled("stripe"));
 		});
 
 		it("isPluginInstalled returns false when plugin is not installed and plugin identifier is passed", () => {
 			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			assert.isFalse(service.isPluginInstalled("com.telerik.stripe"));
 		});
 	});
@@ -543,7 +543,7 @@ describe("plugins-service", () => {
 
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
-				service = testInjector.resolve(PluginsService);
+				service = testInjector.resolve(CordovaProjectPluginsService);
 
 				options.debug = options.release = false;
 				service.addPlugin(`Toast@${versionToSet}`).wait();
@@ -574,7 +574,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true, "release");
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
@@ -593,7 +593,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true, "release");
 			testInjector.register("prompter", new PrompterStub(0));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
@@ -613,7 +613,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
-				service = testInjector.resolve(PluginsService);
+				service = testInjector.resolve(CordovaProjectPluginsService);
 				options = testInjector.resolve("options");
 
 				options.debug = true;
@@ -643,7 +643,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
-				service = testInjector.resolve(PluginsService);
+				service = testInjector.resolve(CordovaProjectPluginsService);
 				options = testInjector.resolve("options");
 
 				options.debug = false;
@@ -686,7 +686,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 
 			options.debug = false;
@@ -708,7 +708,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 
 			options.debug = true;
@@ -730,7 +730,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, false);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 
 			options.debug = true;
@@ -744,7 +744,7 @@ describe("plugins-service", () => {
 
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
@@ -756,7 +756,7 @@ describe("plugins-service", () => {
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 
 			options.debug = true;
@@ -779,7 +779,7 @@ describe("plugins-service", () => {
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 
 			options.debug = true;
@@ -790,7 +790,7 @@ describe("plugins-service", () => {
 		it("throws error when console is non-interactive and user had not specified version for plugin",() => {
 			testInjector = createTestInjectorForProjectWithBothConfigurations([], [], false);
 			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
@@ -802,7 +802,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
-				service = testInjector.resolve(PluginsService);
+				service = testInjector.resolve(CordovaProjectPluginsService);
 				options = testInjector.resolve("options");
 
 				options.debug = options.release = false;
@@ -848,7 +848,7 @@ describe("plugins-service", () => {
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
-						service = testInjector.resolve(PluginsService);
+						service = testInjector.resolve(CordovaProjectPluginsService);
 						options = testInjector.resolve("options");
 					});
 
@@ -884,7 +884,7 @@ describe("plugins-service", () => {
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
-						service = testInjector.resolve(PluginsService);
+						service = testInjector.resolve(CordovaProjectPluginsService);
 						options = testInjector.resolve("options");
 					});
 
@@ -944,7 +944,7 @@ describe("plugins-service", () => {
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
-						service = testInjector.resolve(PluginsService);
+						service = testInjector.resolve(CordovaProjectPluginsService);
 					});
 
 					afterEach(() => {
@@ -979,7 +979,7 @@ describe("plugins-service", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 			testInjector.register("prompter", new PrompterStub(2));
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
@@ -995,7 +995,7 @@ describe("plugins-service", () => {
 		beforeEach(() => {
 			testInjector = createTestInjectorForProjectWithBothConfigurations([], [], true);
 			testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = false;
@@ -1079,7 +1079,7 @@ describe("plugins-service", () => {
 
 			let project: Project.IProject = testInjector.resolve("project");
 			project.projectData.FrameworkVersion = "3.5.0";
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
 			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
 			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
@@ -1127,7 +1127,7 @@ describe("plugins-service", () => {
 
 			let project: Project.IProject = testInjector.resolve("project");
 			project.projectData.FrameworkVersion = "3.5.0";
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
 			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
 			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
@@ -1175,7 +1175,7 @@ describe("plugins-service", () => {
 
 			let project: Project.IProject = testInjector.resolve("project");
 			project.projectData.FrameworkVersion = "3.2.0";
-			let service: IPluginsService = testInjector.resolve(PluginsService);
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
 			assert.isFalse(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
 			assert.isFalse(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
@@ -1286,7 +1286,7 @@ describe("plugins-service", () => {
 
 			options = testInjector.resolve("options");
 			project = testInjector.resolve("project");
-			service = testInjector.resolve(PluginsService);
+			service = testInjector.resolve(CordovaProjectPluginsService);
 		});
 
 		it("when var option does not have configuration variables plugin vars are added to both configs", () => {
@@ -1376,7 +1376,7 @@ describe("plugins-service", () => {
 					"APP_KEY": 3
 				}
 			};
-			service = injector.resolve(PluginsService);
+			service = injector.resolve(CordovaProjectPluginsService);
 			project = injector.resolve("project");
 			service.addPlugin("com.telerik.dropbox").wait();
 
