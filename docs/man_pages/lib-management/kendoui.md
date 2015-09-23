@@ -4,8 +4,8 @@ kendoui
 Usage | Synopsis
 ------|-------
 List all versions | `$ appbuilder kendoui [--verified] [--latest]`
-List Kendo UI Core versions | `$ appbuilder kendoui --core [--verified]`
-List Kendo UI Professional versions | `$ appbuilder kendoui --professional [--verified]`
+List Kendo UI Core versions | `$ appbuilder kendoui --core [--verified] [--latest]`
+List Kendo UI Professional versions | `$ appbuilder kendoui --professional [--verified] [--latest]`
 
 Lists the available Kendo UI Core and Kendo UI Professional packages that you can add to your project.<% if(isHtml || isCordova) { %> The verified tag marks stable Kendo UI Service Pack releases.<% } %> 
 <% if(isConsole) { %>
@@ -18,10 +18,10 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>  
 ### Options
-* `--verified` - Lists versions marked with the Verified tag.
+* `--verified` - Lists stable Kendo UI Service Pack packages.
 * `--core` - Lists Kendo UI Core versions.
 * `--professional` - Lists Kendo UI Professional versions.
-* `--latest` - Lists the latest stable Kendo UI Service Pack packages.
+* `--latest` - Lists the latest available Kendo UI packages.
 
 <% if(isConsole) { %>  
 WARNING: You cannot set `--core` and `--professional` simultaneously.

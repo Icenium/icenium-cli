@@ -43,10 +43,10 @@ Command | Description
 [webview](project/configuration/webview.html) | Lists the available web views for iOS and Android.
 [webview&nbsp;set](project/configuration/webview-set.html) | Sets the selected web view for the current project.
 [kendoui](lib-management/kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
-[kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
-[kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
-[resource](resource.html) | Lists information about the image resources for all mobile platforms.
-[resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
+[kendoui install](lib-management/kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
+[kendoui notes](lib-management/kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
+[resource](lib-management/resource.html) | Lists information about the image resources for all mobile platforms.
+[resource create](lib-management/resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 
 ## Screen Builder Development Commands
 Command | Description
