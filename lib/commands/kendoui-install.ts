@@ -2,6 +2,7 @@
 "use strict";
 import temp = require("temp");
 import * as path from "path";
+import * as util from "util";
 import {KendoUIBaseCommand} from "./kendoui-base";
 
 class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
@@ -26,18 +27,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 		return (() => {
 			let packages = this.getKendoPackages().wait();
 
-			let downloadUri: string;
-			if(this.$options.latest) {
-				let latestPackage = _.first(packages);
-				let sameDateItems = _.filter(packages, pack => pack.Version === latestPackage.Version);
-				if(sameDateItems.length > 1) {
-					downloadUri = this.selectKendoVersion(sameDateItems).wait();
-				} else {
-					downloadUri = latestPackage.DownloadUrl;
-				}
-			} else {
-				downloadUri = this.selectKendoVersion(packages).wait();
-			}
+			let selectedPackage = this.selectKendoVersion(packages).wait();
 
 			let confirm = this.$options.force || this.$prompter.confirm(
 				"This operation will overwrite existing Kendo UI framework files and " +
@@ -48,29 +38,35 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 				return;
 			}
 
-			this.updateKendoFiles(downloadUri).wait();
+			this.updateKendoFiles(selectedPackage.DownloadUrl, selectedPackage.Version).wait();
 
 		}).future<void>()();
 	}
 
-	private selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): IFuture<string> {
-		return ((): string => {
-			this.$logger.out("You can download and install the following Kendo UI packages.");
-			this.$logger.out(this.getKendoPackagesAsTable(packages));
-			let schema: IPromptSchema = {
-				type: "input",
-				name: "packageIdx",
-				message: "Enter the index of the package that you want to install.",
-				validate: (value: string) => {
-					let num = parseInt(value, 10);
-					return !isNaN(num) && num >= 1 && num <= packages.length ? true : `Valid values are between 1 and ${packages.length}.`;
-				}
-			};
+	private selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): IFuture<Server.IKendoDownloadablePackageData> {
+		return ((): Server.IKendoDownloadablePackageData => {
+			let selectedPackage: Server.IKendoDownloadablePackageData;
+			if (packages.length === 1) {
+				selectedPackage = _.first(packages);
+			} else {
+				this.$logger.out("You can download and install the following Kendo UI packages.");
+				this.$logger.out(this.getKendoPackagesAsTable(packages));
+				let schema: IPromptSchema = {
+					type: "input",
+					name: "packageIdx",
+					message: "Enter the index of the package that you want to install.",
+					validate: (value: string) => {
+						let num = parseInt(value, 10);
+						return !isNaN(num) && num >= 1 && num <= packages.length ? true : `Valid values are between 1 and ${packages.length}.`;
+					}
+				};
 
-			let choice = this.$prompter.get([schema]).wait();
-			let packageIdx = parseInt(choice.packageIdx, 10) - 1;
-			let selectedPackage = packages[packageIdx];
-			if (selectedPackage.HasReleaseNotes) {
+				let choice = this.$prompter.get([schema]).wait();
+				let packageIdx = parseInt(choice.packageIdx, 10) - 1;
+				selectedPackage = packages[packageIdx];
+			}
+
+			if (selectedPackage.HasReleaseNotes && !this.$options.force) {
 				let shouldShowReleaseNotes = this.$prompter.confirm(
 				"Do you want to review the release notes for this package?",
 				() => true).wait();
@@ -81,11 +77,11 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 
 			this.$logger.trace("The selected package is:");
 			this.$logger.trace(selectedPackage);
-			return selectedPackage.DownloadUrl;
-		}).future<string>()();
+			return selectedPackage;
+		}).future<Server.IKendoDownloadablePackageData>()();
 	}
 
-	private updateKendoFiles(downloadUri: string): IFuture<void> {
+	private updateKendoFiles(downloadUri: string, version: string): IFuture<void> {
 		return (() => {
 			temp.track();
 
@@ -115,7 +111,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 				this.$fs.deleteDirectory(backupFolder).wait();
 			}
 
-			this.$logger.info("Successfully updated Kendo UI.");
+			this.$logger.printMarkdown(util.format("Successfully updated Kendo UI to version `%s`.", version));
 		}).future<void>()();
 	}
 }
