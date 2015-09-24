@@ -749,6 +749,8 @@ interface IKendoUIFilterOptions {
 	verified: boolean;
 	core: boolean;
 	professional: boolean;
+	latest: boolean;
+	withReleaseNotesOnly: boolean;
 }
 
 /**

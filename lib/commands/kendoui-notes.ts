@@ -20,7 +20,7 @@ class KendoUINotesCommand extends KendoUIBaseCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let packages = _.filter(this.getKendoPackages().wait(), p => p.HasReleaseNotes);
+			let packages = this.getKendoPackages({withReleaseNotesOnly: true}).wait();
 			if (packages.length === 1) {
 				this.$opener.open(_.first(packages).ReleaseNotesUrl);
 				return;

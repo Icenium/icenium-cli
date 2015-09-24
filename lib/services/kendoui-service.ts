@@ -27,6 +27,15 @@ export class KendoUIService implements IKendoUIService {
 					packages = _.filter(packages, pack => pack.Name === KendoUIService.KENDO_PROFESSIONAL);
 				}
 
+				if (options.withReleaseNotesOnly) {
+					packages = _.filter(packages, pack => pack.HasReleaseNotes);
+				}
+
+				if (options.latest) {
+					let latestPackage = _.first(packages);
+					packages = _.filter(packages, pack => pack.Version === latestPackage.Version);
+				}
+
 				this._packages = packages;
 			}
 

@@ -33,7 +33,7 @@ export class KendoUIBaseCommand implements ICommand {
 		return Future.fromResult();
 	}
 
-	public getKendoPackages(): IFuture<Server.IKendoDownloadablePackageData[]>{
+	public getKendoPackages(configuration?: { withReleaseNotesOnly: boolean }): IFuture<Server.IKendoDownloadablePackageData[]>{
 		return (() => {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.$project.ensureCordovaProject();
@@ -41,7 +41,14 @@ export class KendoUIBaseCommand implements ICommand {
 				this.$errors.fail(`This operation is not applicable to ${this.$project.projectData.Framework} projects.`);
 			}
 
-			let kendoFilterOptions = { core: this.$options.core, professional: this.$options.professional, verified: this.$options.verified };
+			let kendoFilterOptions: IKendoUIFilterOptions = {
+				core: this.$options.core,
+				professional: this.$options.professional,
+				verified: this.$options.verified,
+				latest: this.$options.latest,
+				withReleaseNotesOnly: configuration && configuration.withReleaseNotesOnly
+			};
+
 			let packages = this.$kendoUIService.getKendoPackages(kendoFilterOptions).wait();
 
 			if (packages.length === 0) {
