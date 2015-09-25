@@ -20,10 +20,10 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>  
 ### Options
-* `--verified` - Lists versions marked with the Verified tag. If both package type and `--latest` are set, installs the latest stable Kendo UI Service Pack package of the specified type.
+* `--verified` - Lists stable Kendo UI Service Pack packages. If both package type and `--latest` are set, installs the latest stable Kendo UI Service Pack package of the specified type.
 * `--core` - Lists Kendo UI Core versions. If `--latest` is set, installs the latest Kendo UI Core package.
 * `--professional` - Lists Kendo UI Professional versions. If `--latest` is set, installs the latest Kendo UI Professional package.
-* `--latest` - Lists the latest stable Kendo UI Service Pack packages. If a package type is set, installs the latest stable Kendo UI Service Pack package of the specified type.
+* `--latest` - Lists the latest available Kendo UI packages. If a package type is set, installs the latest available Kendo UI package of the specified type.
 
 <% if(isConsole) { %>  
 WARNING: You cannot set `--core` and `--professional` simultaneously.
