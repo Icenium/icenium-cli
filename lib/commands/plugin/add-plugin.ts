@@ -23,7 +23,7 @@ export class AddPluginCommand implements ICommand {
 								let defaultVersion = (<any>marketPlacePlugin.pluginVersionsData).DefaultVersion;
 
 								if(defaultVersion !== installedPlugin.data.Version) { // The default version is installed, we need to change DefaultVersion property
-									marketPlacePlugin.data = _.find(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === defaultVersion);
+									marketPlacePlugin.data = <any>_.find(marketPlacePlugin.pluginVersionsData.Versions, versionData => versionData.Version === defaultVersion);
 									(<any>marketPlacePlugin.pluginVersionsData).DefaultVersion = marketPlacePlugin.data.Version;
 								}
 								return false;

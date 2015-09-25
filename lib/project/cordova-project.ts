@@ -19,6 +19,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		$resources: IResourceLoader,
 		private $cordovaResources: ICordovaResourceLoader,
 		private $config: IConfiguration,
+		private $injector: IInjector,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants,
@@ -26,6 +27,10 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
+	}
+
+	public get pluginsService(): IPluginsService {
+		return this.$injector.resolve("cordovaProjectPluginsService");
 	}
 
 	public get name(): string {

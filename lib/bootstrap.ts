@@ -21,6 +21,8 @@ $injector.require("screenBuilderService", "./services/screen-builder-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
+$injector.require("cordovaProjectPluginsService", "./services/cordova-project-plugins-service");
+$injector.require("nativeScriptProjectPluginsService", "./services/nativescript-project-plugins-service");
 $injector.require("pluginsService", "./services/plugins-service");
 
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
@@ -206,3 +208,4 @@ $injector.requireCommand("resource|*list", "./commands/resource");
 $injector.requireCommand("resource|create", "./commands/resource");
 
 $injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
+$injector.require("nativeScriptResources", "./nativescript-resources");

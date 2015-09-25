@@ -48,7 +48,7 @@ declare module Project {
 		* @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
 		*/
 		isTypeScriptProject(): IFuture<boolean>;
-		
+
 		/**
 		 * Returns new object, containing all typeScript and all TypeScript definition files.
 		 * @return {IFuture<ITypeScriptFiles>} all typeScript and all TypeScript definition files.
@@ -74,6 +74,11 @@ declare module Project {
 		 * @type {string}
 		 */
 		relativeAppResourcesPath: string;
+
+		/**
+		 * The service that allows working with plugins for the current project type.
+		 */
+		pluginsService: IPluginsService;
 
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
@@ -139,6 +144,7 @@ declare module Project {
 		EXPERIMENTAL_TAG: string;
 		NATIVESCRIPT_APP_DIR_NAME: string;
 		IMAGE_DEFINITIONS_FILE_NAME: string;
+		PACKAGE_JSON_NAME: string;
 	}
 
 	interface ITargetFrameworkIdentifiers {
