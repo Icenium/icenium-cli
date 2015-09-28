@@ -378,7 +378,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 	private findPluginsByName(name: string): IFuture<IBasicPluginInformation[]> {
 		return (() => {
-			let nativescriptUrl = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,description&sort=rating+desc&q=name:${name}&start=0&size=100`;
+			let nativescriptUrl = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,description&sort=rating+desc&q=name:"${name}"&start=0&size=100`;
 			let result = this.$httpClient.httpRequest(nativescriptUrl).wait().body;
 			if(result) {
 				let npmSearchResult: any[] = JSON.parse(result).results;
