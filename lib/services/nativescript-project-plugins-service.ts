@@ -8,6 +8,7 @@ import * as shelljs from "shelljs";
 import * as semver from "semver";
 import {getFuturesResults} from "../common/helpers";
 import {MarketplacePluginData} from "../plugins-data";
+import Future = require("fibers/future");
 import temp = require("temp");
 temp.track();
 
@@ -48,7 +49,19 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
 		return ((): IBasicPluginInformation[] => {
 			let findPluginByNameFutures = _.map(keywords, keyword => this.findPluginsByName(keyword));
-			return getFuturesResults<IBasicPluginInformation>(findPluginByNameFutures, plugins => !!plugins && !!plugins.length);
+			Future.wait(findPluginByNameFutures);
+			let findPluginsResults: IBasicPluginInformation[][] = findPluginByNameFutures.map(f => f.get()).filter(plugins => !!plugins && !!plugins.length);
+
+			let pluginsNamesInGroups = findPluginsResults.map(res => _.map(res, r => r.name));
+			let matchingNames = _.intersection.apply(this, pluginsNamesInGroups);
+			let pluginsFound: IBasicPluginInformation[] = [];
+			_.each(_.flatten<IBasicPluginInformation>(findPluginsResults), basicInfo => {
+				if(!_.any(pluginsFound, pl => pl.name === basicInfo.name) && _.contains(matchingNames, basicInfo.name)) {
+					pluginsFound.push(basicInfo);
+				}
+			});
+
+			return pluginsFound;
 		}).future<IBasicPluginInformation[]>()();
 	}
 
@@ -311,7 +324,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		return ((): IPlugin => {
 			let plugin: IPlugin;
 			try {
-				let url = `${NativeScriptProjectPluginsService.NPM_REGISTRY_URL}/${packageName}?version=${version || "latest"}`;
+				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version || "latest");
 
 				// This call will return error with message '{}' in case there's no such package.
 				let result = this.$httpClient.httpRequest(url).wait().body;
@@ -378,7 +391,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 	private findPluginsByName(name: string): IFuture<IBasicPluginInformation[]> {
 		return (() => {
-			let nativescriptUrl = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,description&sort=rating+desc&q=name:"${name}"&start=0&size=100`;
+			let nativescriptUrl = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,description&sort=rating+desc&q=name:"${encodeURIComponent(name)}"&start=0&size=10000`;
 			let result = this.$httpClient.httpRequest(nativescriptUrl).wait().body;
 			if(result) {
 				let npmSearchResult: any[] = JSON.parse(result).results;
@@ -420,7 +433,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		return (() => {
 			let packageJsonContent: any;
 			try {
-				let url = `${NativeScriptProjectPluginsService.NPM_REGISTRY_URL}/${packageName}?version=${version}`;
+				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version);
 				// This call will return error with message '{}' in case there's no such package.
 				let result = this.$httpClient.httpRequest(url).wait().body;
 				packageJsonContent = JSON.parse(result);
@@ -470,7 +483,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 				if(jsonInfo.nativescript && jsonInfo.nativescript.platforms) {
 					let matchingVersion = semver.maxSatisfying(_.values(jsonInfo.nativescript.platforms), `>=${this.$project.projectData.FrameworkVersion}`);
-					if(!matchingVersion) {
+					if(matchingVersion) {
 						this.$errors.failWithoutHelp(`Plugin ${name} requires newer version of NativeScript, your project targets ${this.$project.projectData.FrameworkVersion}.`);
 					}
 				}
@@ -500,6 +513,10 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 			return basicInfo;
 		}).future<IBasicPluginInformation>()();
+	}
+
+	private static buildNpmRegistryUrl(packageName: string, version: string): string {
+		return `${NativeScriptProjectPluginsService.NPM_REGISTRY_URL}/${encodeURIComponent(packageName)}?version=${encodeURIComponent(version)}`;
 	}
 }
 $injector.register("nativeScriptProjectPluginsService", NativeScriptProjectPluginsService);

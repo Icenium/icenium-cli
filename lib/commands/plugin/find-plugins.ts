@@ -27,6 +27,10 @@ export class FindPluginsCommand implements ICommand {
 	}
 
 	private printPlugins(plugins: IBasicPluginInformation[]) {
+		if(!plugins || plugins.length === 0) {
+			this.$errors.failWithoutHelp("Could not find any plugins matching the provided arguments.");
+		}
+
 		_.each(plugins, (plugin) => {
 			let pluginDescription = this.composePluginDescription(plugin);
 			this.$logger.info(pluginDescription);
