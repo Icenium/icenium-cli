@@ -65,12 +65,12 @@ Command | Description
 ## Plugin Management Commands
 Command | Description
 -------|----------
-[plugin](lib-management/plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin&nbsp;add](lib-management/plugin-add.html) | Enables a core, integrated or verified plugin for your project.
+[plugin](lib-management/plugin.html) | Lists all plugins that are currently enabled for your project.
+[plugin&nbsp;add](lib-management/plugin-add.html) | Enables plugin for your project.
 [plugin&nbsp;configure](lib-management/plugin-configure.html) | Configures plugin variables for the selected core, integrated or verified plugin.
-[plugin&nbsp;remove](lib-management/plugin-remove.html) | Disables a core, integrated or verified plugin for your project.
-[plugin&nbsp;find](lib-management/plugin-find.html) | Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-[plugin&nbsp;fetch](lib-management/plugin-fetch.html) | Imports an Apache Cordova plugin into your project.
+[plugin&nbsp;remove](lib-management/plugin-remove.html) | Disables plugin for your project.
+[plugin&nbsp;find](lib-management/plugin-find.html) | Searches for plugins by keyword.
+[plugin&nbsp;fetch](lib-management/plugin-fetch.html) | Imports plugin into your project.
 
 ## Device Commands
 Command | Description

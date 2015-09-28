@@ -32,7 +32,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `<Variable ID>` is the plugin variable as listed in the `plugin.xml` of the plugin.
 
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
@@ -45,9 +45,9 @@ Command | Description
 [kendoui](kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
 [kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
 [kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
-[plugin remove](plugin-remove.html) | Disables a core, integrated or verified plugin from your project.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
+[plugin](plugin.html) | Lists all plugins that are currently enabled for your project.
+[plugin add](plugin-add.html) | Enables plugin for your project.
+[plugin remove](plugin-remove.html) | Disables plugin from your project.
+[plugin find](plugin-find.html) | Searches by one or more keywords for plugins.
+[plugin fetch](plugin-fetch.html) | Imports the selected plugin into your project.
 <% } %>

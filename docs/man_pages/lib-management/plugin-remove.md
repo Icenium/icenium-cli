@@ -5,24 +5,19 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin remove <Name or ID> [--debug] [--release]`
 
-Disables a core, integrated or verified plugin from your project.
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
+Disables plugin from your project.
+<% if(isConsole && isMobileWebsite) { %>
 WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin remove`
-<% } %>
-<% if(isNativeScript) { %>
-WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help plugin remove`
-<% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 ### Options
-* `--debug` - Disables the specified plugin for the Debug build configuration only. 
+* `--debug` - Disables the specified plugin for the Debug build configuration only.
 * `--release` - Disables the specified plugin for the Release build configuration only.
 
 ### Attributes
 * `<Name or ID>` is the name or ID of the plugin as listed by `$ appbuilder plugin`
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
@@ -35,9 +30,9 @@ Command | Description
 [kendoui](kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
 [kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
 [kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
+[plugin](plugin.html) | Lists all plugins that are currently enabled for your project.
+[plugin add](plugin-add.html) | Enables plugin for your project.
 [plugin configure](plugin-configure.html) | Configures plugin variables for selected core, integrated or verified plugin.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
+[plugin find](plugin-find.html) | Searches by one or more keywords for plugins.
+[plugin fetch](plugin-fetch.html) | Imports the selected plugin into your project.
 <% } %>
