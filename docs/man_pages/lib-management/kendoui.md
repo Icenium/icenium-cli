@@ -40,10 +40,10 @@ Command | Description
 ----------|----------
 [kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
 [kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
-[plugin configure](plugin-configure.html) | Configures plugin variables for selected core, integrated or verified plugin.
-[plugin remove](plugin-remove.html) | Disables a core, integrated or verified plugin from your project.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
+[plugin](plugin.html) | Lists all Apache Cordova plugins or custom npm or NativeScript modules that are currently enabled for your project.
+[plugin add](plugin-add.html) | Enables a Apache Cordova plugins or custom npm or NativeScript modules for your project.
+[plugin configure](plugin-configure.html) | Configures plugin variables for selected core, integrated or verified Apache Cordova plugins.
+[plugin remove](plugin-remove.html) | Disables Apache Cordova plugins or custom npm or NativeScript modules from your project.
+[plugin find](plugin-find.html) | Searches by one or more keywords for Apache Cordova plugins or custom npm or NativeScript modules.
+[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugins or custom npm or NativeScript modules into your project.
 <% } %>
