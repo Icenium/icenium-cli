@@ -415,7 +415,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 			let tempInstallDir = temp.mkdirSync("nativeScriptPluginInstallation");
 			let pathToInstalledPlugin: string;
 			try {
-				let npmInstallOutput = this.$childProcess.exec(`npm install ${identifier} --production`, {cwd: tempInstallDir}).wait();
+				let npmInstallOutput = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, {cwd: tempInstallDir}).wait();
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
 				let npmOutputMatch = npmInstallOutput.match(/.*?@.*?\s+?(.*?node_modules.*?)\r?\n?$/m);
 				if(npmOutputMatch) {
