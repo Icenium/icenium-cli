@@ -81,7 +81,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 			};
 
 			this.sync(platform, this.$project.projectData.AppIdentifier, projectDir,
-				this.excludedProjectDirsAndFiles, projectDir + "/**/*", platformSpecificLiveSyncServices, notInstalledAppOnDeviceAction,
+				this.excludedProjectDirsAndFiles, projectDir, platformSpecificLiveSyncServices, notInstalledAppOnDeviceAction,
 				() => Future.fromResult()).wait();
 
 		}).future<void>()();
