@@ -23,12 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.11.3 
-Release date: 2015, August 24
+Latest version: Telerik AppBuilder 2.12 
+Release date: 2015, October 1
 
-> Telerik AppBuilder 2.11.3 is an update release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.11.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11-3" target="_blank">Telerik AppBuilder 2.11.3 Release Notes</a>.
->
-> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.12, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-12" target="_blank">Telerik AppBuilder 2.12 Release Notes</a>.
 
 ### System Requirements
 
@@ -365,12 +363,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.11.3 
-Release date: 2015, August 24
+Latest version: Telerik AppBuilder 2.12 
+Release date: 2015, October 1
 
-> Telerik AppBuilder 2.11.3 is an update release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.11.3, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11-3" target="_blank">Telerik AppBuilder 2.11.3 Release Notes</a>.
->
-> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-11" target="_blank">Telerik AppBuilder 2.11 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.12, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-12" target="_blank">Telerik AppBuilder 2.12 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
