@@ -61,6 +61,9 @@ export class CordovaService implements Server.ICordovaServiceContract{
 	public getMarketplacePluginsData(framework: string): IFuture<Server.MarketplacePluginVersionsData[]>{
 		return this.$serviceProxy.call<Server.MarketplacePluginVersionsData[]>('GetMarketplacePluginsData', 'GET', ['api','cordova','marketplace-directory',encodeURI(framework.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
+	public getMarketplacePluginVersionsData(): IFuture<Server.CordovaMarketplacePluginVersionsData[]>{
+		return this.$serviceProxy.call<Server.CordovaMarketplacePluginVersionsData[]>('GetMarketplacePluginVersionsData', 'GET', ['api','cordova','marketplace-plugins'].join('/'), 'application/json', null, null);
+	}
 	public getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>{
 		return this.$serviceProxy.call<Server.DevicePlatform[]>('GetCurrentPlatforms', 'GET', ['api','cordova','platforms',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
@@ -141,19 +144,6 @@ export class InternalExtensionsService implements Server.IInternalExtensionsServ
 		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 }
-export class UploadService implements Server.IUploadServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public completeUpload(path: string, originalFileHash: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('CompleteUpload', 'POST', ['api','upload','complete',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'originalFileHash': originalFileHash }), null, null, null);
-	}
-	public initUpload(path: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
-	}
-	public uploadChunk(path: string, content: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
-	}
-}
 export class FilesystemService implements Server.IFilesystemServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -171,6 +161,19 @@ export class FilesystemService implements Server.IFilesystemServiceContract{
 	}
 	public remove(solutionName: string, path: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('Remove', 'DELETE', ['api','filesystem',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+}
+export class UploadService implements Server.IUploadServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public completeUpload(path: string, originalFileHash: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('CompleteUpload', 'POST', ['api','upload','complete',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'originalFileHash': originalFileHash }), null, null, null);
+	}
+	public initUpload(path: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public uploadChunk(path: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
 	}
 }
 export class ImagesService implements Server.IImagesServiceContract{
@@ -230,6 +233,9 @@ export class NativescriptService implements Server.INativescriptServiceContract{
 	}
 	public migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>{
 		return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','nativescript','migrate',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+	}
+	public getMarketplacePluginVersionsData(): IFuture<Server.NativeScriptMarketplacePluginVersionsData[]>{
+		return this.$serviceProxy.call<Server.NativeScriptMarketplacePluginVersionsData[]>('GetMarketplacePluginVersionsData', 'GET', ['api','nativescript','marketplace-plugins'].join('/'), 'application/json', null, null);
 	}
 }
 export class BuildService implements Server.IBuildServiceContract{
@@ -526,8 +532,8 @@ export class ServiceContainer implements Server.IServer{
 	public everlive: Server.IEverliveServiceContract = this.$injector.resolve(EverliveService);
 	public extensions: Server.IExtensionsServiceContract = this.$injector.resolve(ExtensionsService);
 	public internalExtensions: Server.IInternalExtensionsServiceContract = this.$injector.resolve(InternalExtensionsService);
-	public upload: Server.IUploadServiceContract = this.$injector.resolve(UploadService);
 	public filesystem: Server.IFilesystemServiceContract = this.$injector.resolve(FilesystemService);
+	public upload: Server.IUploadServiceContract = this.$injector.resolve(UploadService);
 	public images: Server.IImagesServiceContract = this.$injector.resolve(ImagesService);
 	public itmstransporter: Server.IItmstransporterServiceContract = this.$injector.resolve(ItmstransporterService);
 	public kendo: Server.IKendoServiceContract = this.$injector.resolve(KendoService);

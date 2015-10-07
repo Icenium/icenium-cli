@@ -364,6 +364,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
 
 	public completeProjectProperties(properties: any): boolean { return false; }
+
+	public pluginsService: IPluginsService;
 }
 
 export class ProjectFilesManager implements Project.IProjectFilesManager {

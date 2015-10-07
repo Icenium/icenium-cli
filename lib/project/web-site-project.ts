@@ -16,6 +16,11 @@ export class MobileWebSiteProject extends frameworkProjectBaseLib.FrameworkProje
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
+	public get pluginsService(): IPluginsService {
+		this.$errors.failWithoutHelp("You cannot work with plugins inside Mobile WebSite projects.");
+		return null;
+	}
+
 	public get name(): string {
 		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite;
 	}

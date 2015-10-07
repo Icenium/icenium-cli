@@ -42,9 +42,11 @@ Command | Description
 [mobileframework&nbsp;set](project/configuration/mobileframework-set.html) | Sets the selected development framework version for the project.
 [webview](project/configuration/webview.html) | Lists the available web views for iOS and Android.
 [webview&nbsp;set](project/configuration/webview-set.html) | Sets the selected web view for the current project.
-[update-kendoui](lib-management/update-kendoui.html) | Updates or adds Kendo UI Core or Kendo UI Professional to your project.
-[resource](resource.html) | Lists information about the image resources for all mobile platforms.
-[resource create](resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
+[kendoui](lib-management/kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
+[kendoui install](lib-management/kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
+[kendoui notes](lib-management/kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
+[resource](lib-management/resource.html) | Lists information about the image resources for all mobile platforms.
+[resource create](lib-management/resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 
 ## Screen Builder Development Commands
 Command | Description
@@ -60,15 +62,15 @@ Command | Description
 [add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
 [add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.
 
-## Plugin Management Commands
+## Apache Cordova Plugin and NativeScript Module Management Commands
 Command | Description
 -------|----------
-[plugin](lib-management/plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin&nbsp;add](lib-management/plugin-add.html) | Enables a core, integrated or verified plugin for your project.
-[plugin&nbsp;configure](lib-management/plugin-configure.html) | Configures plugin variables for the selected core, integrated or verified plugin.
-[plugin&nbsp;remove](lib-management/plugin-remove.html) | Disables a core, integrated or verified plugin for your project.
-[plugin&nbsp;find](lib-management/plugin-find.html) | Searches for plugins in the Apache Cordova Plugin Registry by keyword.
-[plugin&nbsp;fetch](lib-management/plugin-fetch.html) | Imports an Apache Cordova plugin into your project.
+[plugin](lib-management/plugin.html) | Lists all Apache Cordova plugins or custom npm or NativeScript modules that are currently enabled for your project.
+[plugin add](lib-management/plugin-add.html) | Enables a Apache Cordova plugins or custom npm or NativeScript modules for your project.
+[plugin configure](lib-management/plugin-configure.html) | Configures plugin variables for selected core, integrated or verified Apache Cordova plugins.
+[plugin remove](lib-management/plugin-remove.html) | Disables Apache Cordova plugins or custom npm or NativeScript modules from your project.
+[plugin find](lib-management/plugin-find.html) | Searches by one or more keywords for Apache Cordova plugins or custom npm or NativeScript modules.
+[plugin fetch](lib-management/plugin-fetch.html) | Imports the selected Apache Cordova plugins or custom npm or NativeScript modules into your project.
 
 ## Device Commands
 Command | Description

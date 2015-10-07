@@ -103,16 +103,16 @@ class ImageService implements IImageService {
 			this.$logger.printInfoMessageOnSameLine('Extracting images');
 			this.$progressIndicator.showProgressIndicator(this.$fs.unzip(resultImageArchivePath, tempDir), 2000).wait();
 			this.$fs.unzip(resultImageArchivePath, tempDir).wait();
-			this.$fs.deleteFile(resultImageArchivePath).wait();
 
-			let images = this.$fs.enumerateFilesInDirectorySync(tempDir);
+			let imageBasePath = path.join(tempDir, 'App_Resources'),
+				images = this.$fs.enumerateFilesInDirectorySync(imageBasePath);
 
 			_.each(images, imagePath => {
 				if (!this.$project.capabilities.wp8Supported && ~imagePath.indexOf(this.$devicePlatformsConstants.WP8)) {
 					return;
 				}
 
-				let projectImagePath = path.join(this.$project.appResourcesPath().wait(), imagePath.substring(tempDir.length));
+				let projectImagePath = path.join(this.$project.appResourcesPath().wait(), imagePath.substring(imageBasePath.length));
 				this.copyImageToProject(imagePath, projectImagePath).wait();
 			});
 		}).future<void>()();

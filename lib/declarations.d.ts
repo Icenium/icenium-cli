@@ -58,8 +58,10 @@ declare module Server {
 		Keywords: string[];
 		Name: string;
 		Version: string;
+		ReleaseNotesUrl: string;
 		NeedPurchase: boolean;
 		VersionTags: string[];
+		HasReleaseNotes: boolean;
 	}
 }
 
@@ -520,12 +522,48 @@ interface ICordovaPluginsService {
 	createPluginData(plugin: any): IPlugin[];
 }
 
+/**
+ * Defines methods required to work with plugins.
+ */
 interface IPluginsService {
-	getAvailablePlugins(): IPlugin[];
+	/**
+	 * Gets all available plugins for the current project type.
+	 * NOTE: For NativeScript projects the count of listed NPM packages and NPM plugins is controlled
+	 * via pluginsCount parameter.
+	 * @param {number} pluginsCount - number of NPM packages and NativeScript NPM Plugins to be shown.
+	 * The count is for each of the groups separately.
+	 * @return {IPlugin[]} - Array of plugins found.
+	 */
+	getAvailablePlugins(pluginsCount?: number): IPlugin[];
+
+	/**
+	 * Provides information about all installed plugins.
+	 * @return {IPlugin[]} Array of all installed plugins and information about each of them.
+	 */
 	getInstalledPlugins(): IPlugin[];
+
+	/**
+	 * Shows information about specified plugins.
+	 * @param {IPlugin[]} plugins Array of plugins that will be printed.
+	 * @return {void}
+	 */
 	printPlugins(plugins: IPlugin[]): void;
+
+	/**
+	 * Adds plugin to the current project, so it can be used in the application.
+	 * @param {string} pluginName The name of the plugin that has to be added. It can contains the required version.
+	 * For example these are valid names: "lodash", "lodash@3.10.1"
+	 * @return {IFuture<void>}
+	 */
 	addPlugin(pluginName: string): IFuture<void>;
+
+	/**
+	 * Removes plugin from the current project.
+	 * @param {string} pluginName The name of the plugin that has to be removed.
+	 * @return {IFuture<void>}
+	 */
 	removePlugin(pluginName: string): IFuture<void>;
+
 	/**
 	 * Used to configure a plugin.
 	 * @param  {string}        pluginName     The name of the plugin.
@@ -534,6 +572,13 @@ interface IPluginsService {
 	 * @return {IFuture<void>}
 	 */
 	configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
+
+	/**
+	 * Checks if the specified plugin is installed for the current project.
+	 * @param {string} pluginName The name of the plugin which has to be checked. It can contain the required version.
+	 * For example these are valid names: "lodash", "lodash@3.10.1"
+	 * @return {boolean} 'true' in case the plugin with specified version is installed, false otherwise.
+	 */
 	isPluginInstalled(pluginName: string): boolean;
 	/**
 	 * Returns basic information about the plugin - it's name, version and cordova version range
@@ -541,14 +586,73 @@ interface IPluginsService {
 	 * @return {IBasicPluginInformation}            Basic information about the plugin
 	 */
 	getPluginBasicInformation(pluginName: string): IBasicPluginInformation;
+
+	/**
+	 * Copies the source code of a plugin inside the project and adds it as a reference, so it can be used within the application.
+	 * @param {string} pluginIdentifier The identifier of the plugin that will be copied to the source code.
+	 * @return {IFuture<void>}
+	 */
+	fetch(pluginIdentifiers: string): IFuture<void>;
+
+	/**
+	 * Search for plugins based on specified keywords and returns basic information about each of them.
+	 * @param {string[]} keywords Array of keywords that will be used for searching.
+	 * @return {IBasicPluginInformation[]} Array of information for all available plugins matching at least one of the specified keywords.
+	 */
+	findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]>;
 }
 
 interface IPlugin {
-	data: Server.CordovaPluginData;
+	data: IPluginInfoBase;
 	type: any;
 	configurations: string[];
 	pluginInformation: string[];
 	toProjectDataRecord(version?: string): string;
+}
+
+/**
+ * Describes basic information for each plugin.
+ */
+interface IPluginInfoBase {
+	/**
+	 * Authors of the plugin provided as string array.
+	 */
+	Authors: string[];
+
+	/**
+	 * Supported framework versions, commonly declared as range, for ex. '>=1.3.0' or '>3.5.0'.
+	 */
+	SupportedVersion: string;
+
+	/**
+	 * Name of the plugin.
+	 */
+	Name: string;
+
+	/**
+	 * Current plugin version.
+	 */
+	Version: string;
+
+	/**
+	 * Basic explanation what is this plugin used for.
+	 */
+	Description: string;
+
+	/**
+	 * Url to github or homepage of the plugin.
+	 */
+	Url: string;
+
+	/**
+	 * Mobile platforms that can use this plugin, for example ['ios', 'android'].
+	 */
+	Platforms: string[];
+
+	/**
+	 * Plugin specific identifier. It can differ from plugin's name.
+	 */
+	Identifier: string;
 }
 
 interface IPluginVersion {
@@ -604,6 +708,62 @@ interface IMarketplacePluginVersionsData extends Server.MarketplacePluginVersion
 	 * The framework that is required in order to work with this plugin.
 	 */
 	Framework: string;
+}
+
+/**
+ * Should be the same as Server's MarketplacePluginVersionsDataBase
+ */
+interface IMarketplacePluginVersionsDataBase {
+	/**
+	 * Information for each available version of the plugin.
+	 */
+	Versions: IMarketplacePluginData[];
+
+	/**
+	 * Unique plugin id.
+	 */
+	Identifier: string;
+
+	/**
+	 * The default version of the plugin that will be used in case the user does not specify another one.
+	 */
+	DefaultVersion: string;
+
+	/**
+	 * Mobile framework that can use this plugin, for example 'Cordova' or 'NativeScript'.
+	 */
+	Framework: string;
+}
+
+/**
+ * Should be the same as Server's class IMarketplacePluginData/CordovaMarketplacePluginData
+ */
+interface IMarketplacePluginData extends IPluginInfoBase {
+	/**
+	 * The author of the plugin, Telerik or Telerik Partner in most of the cases.
+	 */
+	Publisher: Server.MarketplacePluginPublisher;
+
+	/**
+	 * Number of downloads of the plugin.
+	 */
+	DownloadsCount: number;
+
+	/**
+	 * Assets
+	 */
+	Assets?: string[];
+
+	/**
+	 * Permissions that has to be approved by user when the application is used on Android
+	 * in order to use the plugin.
+	 */
+	AndroidRequiredPermissions?: string[];
+
+	/**
+	 * Variables, that have to be set in the application in order to be able to use the plugin correctly.
+	 */
+	Variables: string[];
 }
 
 interface IMarketplacePlugin extends IPlugin {
@@ -684,6 +844,10 @@ interface IDynamicSubCommandInfo {
 	commandConstructor: Function;
 }
 
+interface IKendoUIService {
+	getKendoPackages(options: IKendoUIFilterOptions): IFuture<Server.IKendoDownloadablePackageData[]>;
+}
+
 interface IPublishService {
 	publish(idOrUrl: string, username: string, password: string): IFuture<void>;
 	listAllConnections(): void;
@@ -734,6 +898,18 @@ interface IOptions extends ICommonOptions {
 	icon: string;
 	splash: string;
 	all: boolean;
+	count: number;
+}
+
+/**
+ * Describes options with which kendo ui packages can be filtered
+ */
+interface IKendoUIFilterOptions {
+	verified: boolean;
+	core: boolean;
+	professional: boolean;
+	latest: boolean;
+	withReleaseNotesOnly: boolean;
 }
 
 /**
@@ -876,4 +1052,26 @@ interface IScaffolder {
 	scaffolder: any;
 	future: IFuture<any>;
 	callback: Function;
+}
+
+/**
+ * Describes common variables in AppBuilder CLI's resources related to
+ * NativeScript projects.
+ */
+interface INativeScriptResources {
+	/**
+	 * The root folder where AppBuilder CLI will place all NativeScript default resources.
+	 */
+	nativeScriptResourcesDir: string;
+
+	/**
+	 * The path to default package.json file, which can be used when we have to generate package.json for the user.
+	 */
+	nativeScriptDefaultPackageJsonFile: string;
+
+	/**
+	 * The path to nativescript-migration-data.json, which contains useful information for migration between
+	 * different NativeScript versions.
+	 */
+	nativeScriptMigrationFile: string;
 }

@@ -1,30 +1,36 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import * as service from "../../services/cordova-plugins";
 import {EOL} from "os";
 
 export class FindPluginsCommand implements ICommand {
-	constructor(private $cordovaPluginsService: service.CordovaPluginsService,
-				private $logger: ILogger) {
-	}
+	constructor(private $errors: IErrors,
+				private $logger: ILogger,
+				private $pluginsService: IPluginsService) {	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
 	public canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
+			if(!args.length) {
+				this.$errors.fail("You have to provide all required parameters.");
+			}
 			return true;
 		}).future<boolean>()();
 	}
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			let plugins = this.$cordovaPluginsService.getPlugins(args);
+			let plugins = this.$pluginsService.findPlugins(args).wait();
 			this.printPlugins(plugins);
 		}).future<void>()();
 	}
 
 	private printPlugins(plugins: IBasicPluginInformation[]) {
+		if(!plugins || plugins.length === 0) {
+			this.$errors.failWithoutHelp("Could not find any plugins matching the provided arguments.");
+		}
+
 		_.each(plugins, (plugin) => {
 			let pluginDescription = this.composePluginDescription(plugin);
 			this.$logger.info(pluginDescription);

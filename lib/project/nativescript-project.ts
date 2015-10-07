@@ -19,10 +19,14 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
+		private $injector: IInjector,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
+	public get pluginsService(): IPluginsService {
+		return this.$injector.resolve("nativeScriptProjectPluginsService");
+	}
 	public get name(): string {
 		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
 	}

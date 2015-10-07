@@ -52,14 +52,14 @@ declare module Server{
 		SolutionSpaceName: string;
 	}
 	interface CordovaPluginData{
+		Assets: string[];
+		AndroidRequiredPermissions: string[];
 		Name: string;
 		Identifier: string;
 		Version: string;
 		Description: string;
 		Url: string;
-		Assets: string[];
 		Platforms: Server.DevicePlatform[];
-		AndroidRequiredPermissions: string[];
 		Variables: string[];
 	}
 	interface CordovaRenamedPlugin{
@@ -82,6 +82,29 @@ declare module Server{
 		Url: string;
 	}
 	interface MarketplacePluginData{
+		Name: string;
+		Identifier: string;
+		Version: string;
+		Description: string;
+		Url: string;
+		Platforms: Server.DevicePlatform[];
+		Variables: string[];
+		Publisher: Server.MarketplacePluginPublisher;
+		Authors: string[];
+		DownloadsCount: number;
+		SupportedVersion: string;
+		Assets: string[];
+		AndroidRequiredPermissions: string[];
+	}
+	interface MarketplacePluginVersionsData{
+		Identifier: string;
+		DefaultVersion: string;
+		Framework: string;
+		Versions: Server.MarketplacePluginData[];
+	}
+	interface CordovaMarketplacePluginData{
+		Assets: string[];
+		AndroidRequiredPermissions: string[];
 		Publisher: Server.MarketplacePluginPublisher;
 		Authors: string[];
 		DownloadsCount: number;
@@ -91,13 +114,14 @@ declare module Server{
 		Version: string;
 		Description: string;
 		Url: string;
-		Assets: string[];
 		Platforms: Server.DevicePlatform[];
-		AndroidRequiredPermissions: string[];
 		Variables: string[];
 	}
-	interface MarketplacePluginVersionsData{
-		Versions: Server.MarketplacePluginData[];
+	interface CordovaMarketplacePluginVersionsData{
+		Versions: Server.CordovaMarketplacePluginData[];
+		Identifier: string;
+		DefaultVersion: string;
+		Framework: string;
 	}
 	interface PropertyMigration{
 		BaseValue: string;
@@ -133,6 +157,7 @@ declare module Server{
 		getCordovaFrameworkVersions(): IFuture<Server.FrameworkVersion[]>;
 		getMarketplacePluginData(pluginId: string, version: string): IFuture<Server.CordovaPluginData>;
 		getMarketplacePluginsData(framework: string): IFuture<Server.MarketplacePluginVersionsData[]>;
+		getMarketplacePluginVersionsData(): IFuture<Server.CordovaMarketplacePluginVersionsData[]>;
 		getCurrentPlatforms(solutionName: string, projectName: string): IFuture<Server.DevicePlatform[]>;
 		addPlatform(platform: Server.DevicePlatform, solutionName: string, projectName: string): IFuture<Server.MigrationResult>;
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
@@ -144,6 +169,8 @@ declare module Server{
 		Alias: string;
 		Attributes: IDictionary<string>;
 		Certificate: string;
+		Thumbprint: string;
+		ExpirationDate: Date;
 	}
 	interface IdentityGenerationData{
 		SubjectNameValues: IDictionary<string>;
@@ -188,11 +215,6 @@ declare module Server{
 		publish(package_: any): IFuture<void>;
 		deleteExtension(extensionName: string, version: string): IFuture<void>;
 	}
-	interface IUploadServiceContract{
-		completeUpload(path: string, originalFileHash: string): IFuture<void>;
-		initUpload(path: string): IFuture<void>;
-		uploadChunk(path: string, content: any): IFuture<void>;
-	}
 	interface SolutionInfo{
 		SolutionName: string;
 		SolutionSpaceName: string;
@@ -204,6 +226,11 @@ declare module Server{
 		createDirectory(solutionName: string, path: string): IFuture<void>;
 		remove(solutionName: string, path: string): IFuture<void>;
 	}
+	interface IUploadServiceContract{
+		completeUpload(path: string, originalFileHash: string): IFuture<void>;
+		initUpload(path: string): IFuture<void>;
+		uploadChunk(path: string, content: any): IFuture<void>;
+	}
 	interface Size{
 		Width: number;
 		Height: number;
@@ -211,6 +238,7 @@ declare module Server{
 	const enum ImageType{
 		Icon,
 		SplashScreen,
+		NinePatch,
 	}
 	interface IImagesServiceContract{
 		resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>;
@@ -232,8 +260,10 @@ declare module Server{
 	interface KendoDownloadablePackageData{
 		Id: string;
 		DownloadUrl: string;
+		ReleaseNotesUrl: string;
 		NeedPurchase: boolean;
 		VersionTags: string[];
+		HasReleaseNotes: boolean;
 		Name: string;
 		Version: string;
 	}
@@ -255,6 +285,7 @@ declare module Server{
 		ExpirationDate: Date;
 		Certificates: string[];
 		ProvisionedDevices: string[];
+		ApplicationGroups: string[];
 	}
 	const enum ProvisionType{
 		Development,
@@ -268,8 +299,28 @@ declare module Server{
 		getProvision(identifier: string, $resultStream: any): IFuture<void>;
 		removeProvision(identifier: string): IFuture<void>;
 	}
+	interface NativeScriptMarketplacePluginData{
+		Publisher: Server.MarketplacePluginPublisher;
+		Authors: string[];
+		DownloadsCount: number;
+		SupportedVersion: string;
+		Name: string;
+		Identifier: string;
+		Version: string;
+		Description: string;
+		Url: string;
+		Platforms: Server.DevicePlatform[];
+		Variables: string[];
+	}
+	interface NativeScriptMarketplacePluginVersionsData{
+		Versions: Server.NativeScriptMarketplacePluginData[];
+		Identifier: string;
+		DefaultVersion: string;
+		Framework: string;
+	}
 	interface INativescriptServiceContract{
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
+		getMarketplacePluginVersionsData(): IFuture<Server.NativeScriptMarketplacePluginVersionsData[]>;
 	}
 	interface BuildIssueData{
 		Code: string;
@@ -641,8 +692,8 @@ declare module Server{
 		everlive: Server.IEverliveServiceContract;
 		extensions: Server.IExtensionsServiceContract;
 		internalExtensions: Server.IInternalExtensionsServiceContract;
-		upload: Server.IUploadServiceContract;
 		filesystem: Server.IFilesystemServiceContract;
+		upload: Server.IUploadServiceContract;
 		images: Server.IImagesServiceContract;
 		itmstransporter: Server.IItmstransporterServiceContract;
 		kendo: Server.IKendoServiceContract;
