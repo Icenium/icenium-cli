@@ -21,6 +21,8 @@ $injector.require("screenBuilderService", "./services/screen-builder-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
+$injector.require("cordovaProjectPluginsService", "./services/cordova-project-plugins-service");
+$injector.require("nativeScriptProjectPluginsService", "./services/nativescript-project-plugins-service");
 $injector.require("pluginsService", "./services/plugins-service");
 
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
@@ -145,7 +147,12 @@ $injector.requireCommand("appmanager|upload|ios", "./commands/appmanager");
 $injector.requireCommand("appmanager|upload|wp8", "./commands/appmanager");
 $injector.requireCommand("appmanager|groups", "./commands/appmanager");
 
-$injector.requireCommand("update-kendoui", "./commands/update-kendoui");
+$injector.require("kendoUIService", "./services/kendoui-service");
+
+$injector.requireCommand("update-kendoui", "./commands/kendoui-install");
+$injector.requireCommand("kendoui|*list", "./commands/kendoui-list");
+$injector.requireCommand("kendoui|install", "./commands/kendoui-install");
+$injector.requireCommand("kendoui|notes", "./commands/kendoui-notes");
 
 $injector.requireCommand("upgrade-screenbuilder", "./commands/upgrade-screenbuilder");
 
@@ -201,3 +208,4 @@ $injector.requireCommand("resource|*list", "./commands/resource");
 $injector.requireCommand("resource|create", "./commands/resource");
 
 $injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
+$injector.require("nativeScriptResources", "./nativescript-resources");

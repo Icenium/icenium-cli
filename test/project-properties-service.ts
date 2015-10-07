@@ -66,6 +66,7 @@ class SampleProject implements Project.IFrameworkProject {
 	ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return Future.fromResult();
 	}
+	pluginsService: IPluginsService;
 }
 
 describe("projectPropertiesService", () => {

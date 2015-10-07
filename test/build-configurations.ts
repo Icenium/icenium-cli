@@ -3,11 +3,11 @@
 
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
+import cordovaProjectPluginsService = require("../lib/services/cordova-project-plugins-service");
 import frameworkProjectResolverLib = require("../lib/project/resolvers/framework-project-resolver");
 import childProcess = require("../lib/common/child-process");
 import fslib = require("./../lib/common/file-system");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
-import pluginsService = require("./../lib/services/plugins-service");
 import projectLib = require("./../lib/project");
 import projectPropertiesLib = require("../lib/services/project-properties-service");
 import projectConstantsLib = require("../lib/project/project-constants");
@@ -99,6 +99,7 @@ function createTestInjector() {
 	});
 
 	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
+	testInjector.register("cordovaProjectPluginsService", cordovaProjectPluginsService.CordovaProjectPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("prompter", {});
 	testInjector.register("multipartUploadService", {});
@@ -201,7 +202,7 @@ function assertCorePluginsCount(configuration?: string) {
 	let abProjectContent = fs.readJson(projectFilePath).wait();
 
 	updateTestInjector(testInjector, getCordovaPluginsData(abProjectContent["CorePlugins"]), availableMarketplacePlugins);
-	let service: IPluginsService = testInjector.resolve(pluginsService.PluginsService);
+	let service: IPluginsService = testInjector.resolve("cordovaProjectPluginsService");
 	project.getProperty = (propertyName: string, _configuration: string) => {
 		return abProjectContent[propertyName];
 	};

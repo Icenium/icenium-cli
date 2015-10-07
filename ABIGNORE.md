@@ -96,6 +96,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    * All `__MACOSX` directories and their contents: Hidden OS X system directories.
    * The `bin` directory and its contents: A subdirectory in projects created with Visual Studio. It contains your latest built application packages.
    * The `obj` directory and its contents: A subdirectory in projects created with Visual Studio. It contains the archived project files that AppBuilder sends to the build server.
+   * The `.vs` directory and its contents: A subdirectory in projects created with Visual Studio 2015. It contains information, related specifically to your project in Visual Studio.
    * `.gitignore`: A file that Git uses to determine which files and directories to ignore when you are making a commit.
    * The `.git` directory and its contents: A subdirectory in which Git stores your version control history and other relevant version control data. 
    * `.abignore`: This file contains exclude and include rules for your application package.

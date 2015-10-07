@@ -13,7 +13,7 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
-* `--download` - If set, downloads the application package to the root of the project.
+* `--download` - If set, downloads the application package and its decrypted `AndroidManifest.xml` to the root of the project.
 * `--publish` - If set, after the upload completes, automatically publishes the application package for the members of its distribution groups. You can set additional distribution groups with the `--groups` option.
 * `--public` - If set, the published application will be available for download without requiring AppManager user credentials.
 * `--send-email` - If set, after publishing your app, Telerik AppManager sends an email with the link to the app to the distribution groups, assigned to the published app.<% if(isHtml) { %> This option is applicable only when the `--publish` switch is set.<% } %> 

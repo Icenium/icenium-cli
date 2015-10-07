@@ -13,6 +13,7 @@ export class ProjectConstants implements Project.IProjectConstants {
 	public EXPERIMENTAL_TAG = "Experimental";
 	public NATIVESCRIPT_APP_DIR_NAME = "app";
 	public IMAGE_DEFINITIONS_FILE_NAME = 'image-definitions.json';
+	public PACKAGE_JSON_NAME = "package.json";
 
 	public TARGET_FRAMEWORK_IDENTIFIERS = {
 		Cordova: "Cordova",

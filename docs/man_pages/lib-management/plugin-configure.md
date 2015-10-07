@@ -7,6 +7,8 @@ Call the interactive prompt to set plugin variables | `$ appbuilder plugin confi
 Set one value for all applicable configurations | `$ appbuilder plugin configure <Name or ID> [--debug] [--release] --var.<Variable ID> <Variable Value>`[\*\*](#note)
 Set different values for all configurations | `$ appbuilder plugin configure <Name or ID> --var.debug.<Variable ID> <Variable Value> --var.release.<Variable ID> <Variable Value>]*>]`[\*\*](#note)
 
+<% var plugins =""; if(isCordova || isMobileWebsite) { plugins+="Apache Cordova plugins" } if(isHtml || (isConsole && isMobileWebsite)) { plugins+=" or " } if(isNativeScript || isMobileWebsite) { plugins+="custom npm or NativeScript modules" } %>
+
 <% if(isHtml) { %><a id="note"></a><% } %>
 \*\* If the plugin has multiple variables, you can set `--var` for each variable.
 
@@ -32,7 +34,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 * `<Variable ID>` is the plugin variable as listed in the `plugin.xml` of the plugin.
 
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
@@ -42,9 +44,12 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 Command | Description
 ----------|----------
-[plugin](plugin.html) | Lists all core, integrated and verified plugins that are currently enabled for your project.
-[plugin add](plugin-add.html) | Enables a core, integrated or verified plugin for your project.
-[plugin remove](plugin-remove.html) | Disables a core, integrated or verified plugin from your project.
-[plugin find](plugin-find.html) | Searches by one or more keywords for plugins in the Apache Cordova Plugin Registry.
-[plugin fetch](plugin-fetch.html) | Imports the selected Apache Cordova plugin into your project.
+[kendoui](kendoui.html) | Lists the available Kendo UI Core or Kendo UI Professional packages that you can add to your project.
+[kendoui install](kendoui-install.html) | Updates or adds Kendo UI Code or Kendo UI Professional to your project.
+[kendoui notes](kendoui-notes.html) | Shows release notes for the available Kendo UI Core and Kendo UI Professional packages.
+[plugin](plugin.html) | Lists all <%=plugins%> that are currently enabled for your project.
+[plugin add](plugin-add.html) | Enables <%=plugins%> for your project.
+[plugin remove](plugin-remove.html) | Disables <%=plugins%> from your project.
+[plugin find](plugin-find.html) | Searches by one or more keywords for <%=plugins%>.
+[plugin fetch](plugin-fetch.html) | Imports the selected <%=plugins%> into your project.
 <% } %>

@@ -9,42 +9,35 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private static JAVASCRIPT_ABBREVIATION = "JS";
 	private static SUPPORTED_LANGUAGES = [NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION];
 	private static REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME = "NativeScript.json";
-	private static PACKAGE_JSON_FILE_NAME = "package.json";
-	private nativeScriptResourcesDir: string;
-	private nativeScriptMigrationFile: string;
+
 	private tnsModulesDirectoryPath: string;
 	private remoteNativeScriptResourcesPath: string;
-	private nativeScriptDefaultPackageJsonFile: string;
-
 	private _nativeScriptMigrationData: INativeScriptMigrationData;
 	private get nativeScriptMigrationData(): IFuture<INativeScriptMigrationData> {
 		return ((): INativeScriptMigrationData => {
-			this._nativeScriptMigrationData = this._nativeScriptMigrationData || this.$fs.readJson(this.nativeScriptMigrationFile).wait();
+			this._nativeScriptMigrationData = this._nativeScriptMigrationData || this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait();
 			return this._nativeScriptMigrationData;
 		}).future<INativeScriptMigrationData>()();
 	}
 
-	constructor(private $fs: IFileSystem,
-		private $server: Server.IServer,
+	constructor(private $config: IConfiguration,
 		private $errors: IErrors,
+		private $fs: IFileSystem,
 		private $logger: ILogger,
+		private $nativeScriptResources: INativeScriptResources,
 		private $project: Project.IProject,
-		private $resources: IResourceLoader,
-		private $staticConfig: Config.IStaticConfig,
-		private $config: IConfiguration,
+		private $projectConstants: Project.IProjectConstants,
 		private $resourceDownloader: IResourceDownloader,
-		private $projectConstants: Project.IProjectConstants) {
-			this.nativeScriptResourcesDir = this.$resources.resolvePath("NativeScript");
-			this.tnsModulesDirectoryPath = path.join(this.nativeScriptResourcesDir, "tns_modules");
+		private $server: Server.IServer,
+		private $staticConfig: Config.IStaticConfig){
+			this.tnsModulesDirectoryPath = path.join(this.$nativeScriptResources.nativeScriptResourcesDir, "tns_modules");
 			this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
-			this.nativeScriptMigrationFile =  path.join(this.nativeScriptResourcesDir, "nativeScript-migration-data.json");
-			this.nativeScriptDefaultPackageJsonFile = path.join(this.nativeScriptResourcesDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME);
 		}
 
 	public downloadMigrationData(): IFuture<void> {
 		return (() => {
-			this.$fs.deleteDirectory(this.nativeScriptResourcesDir).wait();
-			this.$fs.createDirectory(this.nativeScriptResourcesDir).wait();
+			this.$fs.deleteDirectory(this.$nativeScriptResources.nativeScriptResourcesDir).wait();
+			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir).wait();
 
 			// Make sure to download this file first, as data from it is used for fileDownloadFutures
 			this.downloadNativeScriptMigrationFile().wait();
@@ -105,7 +98,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				this.$errors.failWithoutHelp(`You cannot migrate from version ${currentFrameworkVersion}.`);
 			}
 
-			this.ensurePackageJsonExists(projectDir, currentFrameworkVersion, newVersion).wait();
+			this.ensurePackageJsonExists(projectDir, newVersion).wait();
 
 			try {
 				// Always update tns-modules during migration
@@ -136,7 +129,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 	private downloadNativeScriptMigrationFile(): IFuture<void> {
 		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
-		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptMigrationFile);
+		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.$nativeScriptResources.nativeScriptMigrationFile);
 	}
 
 	private downloadTnsModules(language: string, version: string): IFuture<void> {
@@ -171,20 +164,20 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}).future<void>()();
 	}
 
-	private ensurePackageJsonExists(projectDir: string, currentFrameworkVersion: string, newVersion: string): IFuture<void> {
+	private ensurePackageJsonExists(projectDir: string, newVersion: string): IFuture<void> {
 		return (() => {
-			let npmVersions: string[] = (<any[]>this.$fs.readJson(this.nativeScriptMigrationFile).wait().npmVersions).map(npmVersion => npmVersion.version);
+			let npmVersions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().npmVersions).map(npmVersion => npmVersion.version);
 			if(_.contains(npmVersions, newVersion)
-				&& !this.$fs.exists(path.join(projectDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME)).wait()) {
+				&& !this.$fs.exists(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
 				// From version 1.1.2 we need package.json file at the root of the project.
-				this.$fs.copyFile(this.nativeScriptDefaultPackageJsonFile, path.join(projectDir, NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME)).wait();
+				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 			}
 		}).future<void>()();
 	}
 
 	private downloadPackageJsonResourceFile(): IFuture<void> {
-		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.PACKAGE_JSON_FILE_NAME}`;
-		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.nativeScriptDefaultPackageJsonFile);
+		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${this.$projectConstants.PACKAGE_JSON_NAME}`;
+		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile);
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);
