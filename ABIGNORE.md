@@ -83,7 +83,7 @@ For more information about working with build configurations in the AppBuilder C
 
 ## Adding rules and comments
 
-> When you edit `.abignore`, make sure that your exclude and include rules comply with the glob syntax and any syntax specifics of the minimatch matching library.<br/>For more information about glob syntax, see <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?glob+7" target="_blank">Glob in the Linux Programmer's Manual</a>.<br/>For more information about minimatch syntax, see <a href="https://github.com/isaacs/minimatch#comparisons-to-other-fnmatchglob-implementations" target="_blank">Comparisons to other fnmatch/glob implementations</a>.
+> When you edit `.abignore`, make sure that your exclude and include rules comply with the glob syntax and any syntax specifics of the minimatch matching library.<br/>For more information about glob syntax, see <a href="http://man7.org/linux/man-pages/man7/glob.7.html" target="_blank">Glob in the Linux Programmer's Manual</a>.<br/>For more information about minimatch syntax, see <a href="https://github.com/isaacs/minimatch#comparisons-to-other-fnmatchglob-implementations" target="_blank">Comparisons to other fnmatch/glob implementations</a>.
 
 When you create and modify your `.abignore` file, keep in mind the following specifics.
    
@@ -123,7 +123,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    index?.*
    ```
 
-   For more information about glob syntax, see <a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?glob+7" target="_blank">Glob in the Linux Programmer's Manual</a>.<br/>For more information about minimatch syntax, see <a href="https://github.com/isaacs/minimatch#comparisons-to-other-fnmatchglob-implementations" target="_blank">Comparisons to other fnmatch/glob implementations</a>.
+   For more information about glob syntax, see <a href="http://man7.org/linux/man-pages/man7/glob.7.html" target="_blank">Glob in the Linux Programmer's Manual</a>.<br/>For more information about minimatch syntax, see <a href="https://github.com/isaacs/minimatch#comparisons-to-other-fnmatchglob-implementations" target="_blank">Comparisons to other fnmatch/glob implementations</a>.
 * File paths must be relative to the location of `.abignore` and must be in the following format: `directory/subdirectory/file`.<br/>For example:
 
    ```
