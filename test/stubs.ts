@@ -495,3 +495,9 @@ export class PrompterStub implements IPrompter {
 	}
 	dispose(): void { }
 }
+
+export class MessagesServiceStub implements IMessagesService {
+	pathsToMessageJsonFiles: string[];
+
+	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [id, ...args]); }
+}

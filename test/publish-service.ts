@@ -2,12 +2,12 @@
 "use strict";
 
 import publishService = require("./../lib/services/publish-service");
-import errorsLib = require("./../lib/common/errors");
-import stubs = require("./stubs");
+import {Errors} from "./../lib/common/errors";
+import {MessagesServiceStub, LoggerStub, StaticConfig} from "./stubs";
 import Future = require("fibers/future");
 import yok = require("../lib/common/yok");
-import optionsLib = require("../lib/options");
-import hostInfoLib = require("../lib/common/host-info");
+import {Options} from "../lib/options";
+import {HostInfo} from "../lib/common/host-info";
 import assert = require("assert");
 
 let writeJsonData: any;
@@ -16,14 +16,15 @@ let serverFtpConnectionData: Server.FtpConnectionData;
 
 function createTestInjector(publishConnections: IPublishConnection[]): IInjector {
 	let testInjector = new yok.Yok();
-	testInjector.register("errors", errorsLib.Errors);
-	testInjector.register("logger", stubs.LoggerStub);
-	testInjector.register("staticConfig", stubs.StaticConfig);
+	testInjector.register("messagesService", MessagesServiceStub);
+	testInjector.register("errors", Errors);
+	testInjector.register("logger", LoggerStub);
+	testInjector.register("staticConfig", StaticConfig);
 	testInjector.register("projectConstants", {});
 	testInjector.register("project", {});
 	testInjector.register("projectConstants", {});
-	testInjector.register("hostInfo", hostInfoLib.HostInfo);
-	testInjector.register("options", optionsLib.Options);
+	testInjector.register("hostInfo", HostInfo);
+	testInjector.register("options", Options);
 
 	// Register mocked dependencies
 	testInjector.register("progressIndicator", {
