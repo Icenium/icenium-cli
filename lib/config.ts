@@ -84,6 +84,7 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 		this.RESOURCE_DIR_PATH = path.join(this.RESOURCE_DIR_PATH, "../../resources");
 	}
 
+	private startPackageActivityName: string;
 	private static TOKEN_FILENAME = ".abgithub";
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
@@ -93,8 +94,16 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 
 	public get START_PACKAGE_ACTIVITY_NAME(): string {
-		let project: Project.IProject = $injector.resolve("project");
-		return project.startPackageActivity;
+		if(!this.startPackageActivityName) {
+			let project: Project.IProject = $injector.resolve("project");
+			this.startPackageActivityName = project.startPackageActivity;
+		}
+
+		return this.startPackageActivityName;
+	}
+
+	public set START_PACKAGE_ACTIVITY_NAME(value: string) {
+		this.startPackageActivityName = value;
 	}
 
 	public SYS_REQUIREMENTS_LINK = "http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/system-requirements-cli";
@@ -118,6 +127,10 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 
 	public get pathToPackageJson(): string {
 		return path.join(__dirname, "..", "package.json");
+	}
+
+	public get PATH_TO_BOOTSTRAP(): string {
+		return path.join(__dirname, "bootstrap");
 	}
 }
 $injector.register("staticConfig", StaticConfig);

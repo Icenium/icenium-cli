@@ -191,7 +191,7 @@ $injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilitie
 $injector.require("hostCapabilities", "./host-capabilities");
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");
-$injector.require("logcatPrinter", "./providers/logcat-printer");
+$injector.require("deviceLogProvider", "./providers/device-log-provider");
 $injector.require("progressIndicator", "./progress-indicator");
 
 $injector.require("projectCommandsService", "./services/project-commands-service");

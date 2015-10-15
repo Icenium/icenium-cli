@@ -2,7 +2,7 @@
 "use strict";
 
 require("./../bootstrap");
-import fiberBootstrap = require("./../fiber-bootstrap");
+import fiberBootstrap = require("./../common/fiber-bootstrap");
 fiberBootstrap.run(() => {
 	$injector.require("typeScriptCompilationService", "./common/services/typescript-compilation-service");
 	let project: Project.IProject = $injector.resolve("project");
