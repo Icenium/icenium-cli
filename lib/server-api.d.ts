@@ -103,12 +103,12 @@ declare module Server{
 		Versions: Server.MarketplacePluginData[];
 	}
 	interface CordovaMarketplacePluginData{
-		Assets: string[];
-		AndroidRequiredPermissions: string[];
 		Publisher: Server.MarketplacePluginPublisher;
 		Authors: string[];
 		DownloadsCount: number;
 		SupportedVersion: string;
+		Assets: string[];
+		AndroidRequiredPermissions: string[];
 		Name: string;
 		Identifier: string;
 		Version: string;
@@ -122,6 +122,7 @@ declare module Server{
 		Identifier: string;
 		DefaultVersion: string;
 		Framework: string;
+		PageUrl: string;
 	}
 	interface PropertyMigration{
 		BaseValue: string;
@@ -213,7 +214,7 @@ declare module Server{
 	}
 	interface IInternalExtensionsServiceContract{
 		publish(package_: any): IFuture<void>;
-		deleteExtension(extensionName: string, version: string): IFuture<void>;
+		deleteExtension(extensionName: string, extensionVersion: string): IFuture<void>;
 	}
 	interface SolutionInfo{
 		SolutionName: string;
@@ -317,6 +318,7 @@ declare module Server{
 		Identifier: string;
 		DefaultVersion: string;
 		Framework: string;
+		PageUrl: string;
 	}
 	interface INativescriptServiceContract{
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
@@ -364,6 +366,51 @@ declare module Server{
 	}
 	interface IBuildServiceContract{
 		buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>;
+	}
+	interface NpmSearchPackageEntry{
+		Name: string;
+		Description: string;
+		Authors: string[];
+		HomePage: string;
+		Licenses: string[];
+		Modified: Date;
+		Version: string;
+		KeyWords: string[];
+		Rating: number;
+	}
+	interface NpmSearchResult{
+		Results: Server.NpmSearchPackageEntry[];
+		Total: number;
+	}
+	interface Repository{
+		Type: string;
+		Url: string;
+	}
+	interface NpmVersion{
+		Name: string;
+		Description: string;
+		HomePage: string;
+		Repository: Server.Repository;
+		Version: string;
+	}
+	interface NpmPackage{
+		Name: string;
+		Description: string;
+		HomePage: string;
+		Repository: Server.Repository;
+		Versions: IDictionary<NpmVersion>;
+		DistTags: IDictionary<string>;
+		LatestVersion: string;
+	}
+	const enum SortOrder{
+		Default,
+		RatingAscending,
+		RatingDescending,
+	}
+	interface INpmServiceContract{
+		queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>;
+		getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>;
+		getNpmPackageDownloads(packageName: string): IFuture<number>;
 	}
 	interface ProjectTemplateData{
 		CanCreateProject: boolean;
@@ -428,9 +475,9 @@ declare module Server{
 		getSolution(solutionName: string, checkUpgradability: boolean): IFuture<Server.SolutionData>;
 		canLoadSolution(solutionName: string): IFuture<boolean>;
 		deleteSolution(solutionName: string): IFuture<void>;
-		createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
-		createProject1(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
+		createSolution(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
 		renameSolution(solutionName: string, newSolutionName: string): IFuture<void>;
+		createProject(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
 		deleteProject(solutionName: string, projectName: string): IFuture<void>;
 		setProjectProperty(solutionName: string, projectName: string, configuration: string, changeset: IDictionary<string>): IFuture<void>;
 		renameProject(solutionName: string, projectName: string, newProjectName: string): IFuture<void>;
@@ -700,6 +747,7 @@ declare module Server{
 		mobileprovisions: Server.IMobileprovisionsServiceContract;
 		nativescript: Server.INativescriptServiceContract;
 		build: Server.IBuildServiceContract;
+		npm: Server.INpmServiceContract;
 		projects: Server.IProjectsServiceContract;
 		packages: Server.IPackagesServiceContract;
 		publish: Server.IPublishServiceContract;

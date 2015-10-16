@@ -140,8 +140,8 @@ export class InternalExtensionsService implements Server.IInternalExtensionsServ
 	public publish(package_: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('Publish', 'POST', ['api','internal','extensions','publish'].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
 	}
-	public deleteExtension(extensionName: string, version: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(version.replace(/\\/g, '/'))].join('/'), null, null, null);
+	public deleteExtension(extensionName: string, extensionVersion: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(extensionVersion.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 }
 export class FilesystemService implements Server.IFilesystemServiceContract{
@@ -245,6 +245,19 @@ export class BuildService implements Server.IBuildServiceContract{
 		return this.$serviceProxy.call<Server.BuildResultData>('BuildProject', 'POST', ['api','build',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json'}], null);
 	}
 }
+export class NpmService implements Server.INpmServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>{
+		return this.$serviceProxy.call<Server.NpmSearchResult>('QueryNpmSearch', 'GET', ['api','npm','search'].join('/') + '?' + querystring.stringify({ 'packageName': packageName, 'size': size, 'sortOrder': sortOrder, 'start': start }), 'application/json', null, null);
+	}
+	public getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>{
+		return this.$serviceProxy.call<Server.NpmPackage>('GetNpmPackageInfo', 'GET', ['api','npm','info',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public getNpmPackageDownloads(packageName: string): IFuture<number>{
+		return this.$serviceProxy.call<number>('GetNpmPackageDownloads', 'GET', ['api','npm','downloads',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+}
 export class ProjectsService implements Server.IProjectsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -279,7 +292,7 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 		return this.$serviceProxy.call<void>('SaveProjectContents', 'PUT', ['api','projects','contents',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'projectContents', value: JSON.stringify(projectContents), contentType: 'application/json'}], null);
 	}
 	public upgradeSolution(solutionName: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UpgradeSolution', 'UPGRADE', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
+		return this.$serviceProxy.call<void>('UpgradeSolution', 'UPGRADE', ['api','projects','upgrade',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 	public getSolution(solutionName: string, checkUpgradability: boolean): IFuture<Server.SolutionData>{
 		return this.$serviceProxy.call<Server.SolutionData>('GetSolution', 'GET', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'checkUpgradability': checkUpgradability }), 'application/json', null, null);
@@ -290,14 +303,14 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public deleteSolution(solutionName: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('DeleteSolution', 'DELETE', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
-	public createProject(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
-		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
-	}
-	public createProject1(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
-			return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	public createSolution(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('CreateSolution', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 	public renameSolution(solutionName: string, newSolutionName: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('RenameSolution', 'PUT', ['api','projects','rename',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(newSolutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public createProject(solutionName: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 	public deleteProject(solutionName: string, projectName: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('DeleteProject', 'DELETE', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, null, null);
@@ -497,7 +510,7 @@ export class VersioncontrolService implements Server.IVersioncontrolServiceContr
 		return this.$serviceProxy.call<Server.VersionControlData>('GetInfo', 'GET', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'info'].join('/'), 'application/json', null, null);
 	}
 	public track(solutionName: string): IFuture<Server.ChangeItemData[]>{
-		return this.$serviceProxy.call<Server.ChangeItemData[]>('Track', 'POST', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'status'].join('/'), 'application/json', null, null);
+		return this.$serviceProxy.call<Server.ChangeItemData[]>('Track', 'GET', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'status'].join('/'), 'application/json', null, null);
 	}
 	public getStatus(solutionName: string, filePaths: string[]): IFuture<Server.ChangeItemData[]>{
 		return this.$serviceProxy.call<Server.ChangeItemData[]>('GetStatus', 'XGET', ['api','versioncontrol',encodeURI(solutionName.replace(/\\/g, '/')),'status','files'].join('/'), 'application/json', [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
@@ -540,6 +553,7 @@ export class ServiceContainer implements Server.IServer{
 	public mobileprovisions: Server.IMobileprovisionsServiceContract = this.$injector.resolve(MobileprovisionsService);
 	public nativescript: Server.INativescriptServiceContract = this.$injector.resolve(NativescriptService);
 	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
+	public npm: Server.INpmServiceContract = this.$injector.resolve(NpmService);
 	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
 	public packages: Server.IPackagesServiceContract = this.$injector.resolve(PackagesService);
 	public publish: Server.IPublishServiceContract = this.$injector.resolve(PublishService);
