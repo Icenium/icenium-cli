@@ -209,3 +209,4 @@ $injector.requireCommand("resource|create", "./commands/resource");
 
 $injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
 $injector.require("nativeScriptResources", "./nativescript-resources");
+$injector.requireCommand("dev-find-plugins", "./commands/dev/find-top-plugins");

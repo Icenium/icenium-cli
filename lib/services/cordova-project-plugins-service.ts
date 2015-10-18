@@ -417,6 +417,8 @@ export class CordovaProjectPluginsService implements IPluginsService {
 
 			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 			let pluginVariables = cordovaPluginVariables[plugin.Identifier];
+			console.log("$$$$$$$$$$$$$$$$$$", pluginVariables, "$$$$$$$$$$$$$$$$$$$$$$$");
+			console.log("#################", plugin, "#################");
 			if(pluginVariables && pluginVariables[variableName]) {
 				schema["default"] = () => pluginVariables[variableName];
 			}
