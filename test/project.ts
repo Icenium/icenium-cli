@@ -314,16 +314,16 @@ describe("project integration tests", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let tnsDir = path.join(projectDir, "app", "tns_modules");
-				assert.isTrue(fs.existsSync(tnsDir), "NativeScript Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
+				let packageJson = path.join(projectDir, "package.json");
+				assert.isTrue(fs.existsSync(packageJson), "NativeScript Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let tnsDir = path.join(projectDir, "app", "tns_modules");
-				assert.isTrue(fs.existsSync(tnsDir), "NativeScript TypeScript.Blank template does not contain mandatory 'tns_modules' directory. This directory is required in init command. You should check if this is problem with the template or change init command to use another file.");
+				let packageJson = path.join(projectDir, "package.json");
+				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
 			it("existing TypeScript.Blank project has project files after init",() => {

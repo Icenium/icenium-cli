@@ -13,6 +13,7 @@ export class InitProjectCommand implements ICommand {
 	public projectDir: string;
 	public tnsModulesDir: FileDescriptor;
 	public indexHtml: FileDescriptor;
+	public packageJson: FileDescriptor;
 	public projectFilesDescriptors: any;
 
 	constructor(private $project: Project.IProject,
@@ -26,6 +27,7 @@ export class InitProjectCommand implements ICommand {
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "app", "tns_modules"), "directory");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
 		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => new FileDescriptor(util.format("cordova.%s.js", platform).toLowerCase(), "file"));
+		this.packageJson = new FileDescriptor(path.join(this.projectDir, this.$projectConstants.PACKAGE_JSON_NAME), "file");
 
 		this.generateMandatoryAndForbiddenFiles();
 	}
@@ -80,13 +82,13 @@ export class InitProjectCommand implements ICommand {
 		this.projectFilesDescriptors = Object.create(null);
 
 		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.cordovaFiles, [this.tnsModulesDir]);
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.tnsModulesDir], this.cordovaFiles.concat([this.indexHtml]));
+		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.packageJson], this.cordovaFiles.concat([this.indexHtml]));
 		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite, [this.indexHtml], this.cordovaFiles.concat([this.tnsModulesDir]));
 	}
 
-	private generateMandatoryAndForbiddenFilesCore(frameworkIdentifer: string, manddatorFiles: FileDescriptor[], forbiddenFiles: FileDescriptor[]): void {
+	private generateMandatoryAndForbiddenFilesCore(frameworkIdentifer: string, mandatoryFiles: FileDescriptor[], forbiddenFiles: FileDescriptor[]): void {
 		this.projectFilesDescriptors[frameworkIdentifer] = {
-			"mandatoryFiles": manddatorFiles,
+			"mandatoryFiles": mandatoryFiles,
 			"forbiddenFiles": forbiddenFiles
 		};
 	}
