@@ -73,7 +73,13 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 			if(content && content.dependencies) {
 				let items =  _.map(content.dependencies, (version: string, name: string) => {
 					let marketplacePlugin = _.find(this.getMarketplacePlugins().wait(), pl => pl.data.Name === name && pl.data.Version === version);
-					return marketplacePlugin || this.getDataForNpmPackage(name, version).wait();
+					let plugin = marketplacePlugin || this.getDataForNpmPackage(name, version).wait()
+								|| this.getDataForLocalPlugin(name, version).wait()
+								|| this.getDataFromGitHubUrl(name, version).wait();
+					if(!plugin) {
+						this.$logger.warn(`Unable to find information about plugin '${name}' with version '${version}'.`);
+					}
+					return plugin;
 				}).filter(i => !!i);
 
 				return items;
@@ -322,40 +328,78 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 	private getDataForNpmPackage(packageName: string, version?: string): IFuture<IPlugin> {
 		return ((): IPlugin => {
-			let plugin: IPlugin;
 			try {
 				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version || "latest");
 
 				// This call will return error with message '{}' in case there's no such package.
 				let result = this.$httpClient.httpRequest(url).wait().body;
-				let jsonResult = JSON.parse(result);
-				let platforms: string[];
-				let supportedVersion: string;
-				let type = PluginType.NpmPlugin;
-				if(jsonResult.nativescript && jsonResult.nativescript.platforms) {
-					type = PluginType.NpmNativeScriptPlugin;
-					platforms = _.keys(jsonResult.nativescript.platforms);
-					supportedVersion = semver.maxSatisfying(_.values(jsonResult.nativescript.platforms), ">=0.0.0");
-				}
-
-				let data: IPluginInfoBase = {
-					Authors: jsonResult.author ? [jsonResult.author.name] : null,
-					Name: jsonResult.name,
-					Identifier: jsonResult.name,
-					Version: jsonResult.version,
-					Url: jsonResult.repository.url || jsonResult.homepage,
-					Platforms: platforms,
-					Description: jsonResult.description,
-					SupportedVersion: supportedVersion
-				};
-
-				return new NativeScriptPluginData(data, type, this.$project);
+				return this.constructNativeScriptPluginData(result).wait();
 			} catch(err) {
 				this.$logger.trace(`Unable to get data for npm package ${packageName} with version ${version}`, err);
 			}
 
-			return plugin;
+			return null;
 		}).future<IPlugin>()();
+	}
+
+	private getDataForLocalPlugin(packageName: string, pathToPlugin?: string): IFuture<IPlugin> {
+		return ((): IPlugin => {
+			if(!!pathToPlugin.match(/^file:/)) {
+				pathToPlugin = pathToPlugin.replace("file:", "");
+			}
+
+			if(this.checkIsValidLocalPlugin(pathToPlugin).wait()) {
+				let fullPath = path.resolve(pathToPlugin);
+				let packageJsonContent = this.$fs.readText(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+				return this.constructNativeScriptPluginData(packageJsonContent).wait();
+			}
+
+			return null;
+		}).future<IPlugin>()();
+	}
+
+	private getDataFromGitHubUrl(packageName: string, url?: string): IFuture<IPlugin> {
+		return ((): IPlugin => {
+			/* From `npm help install`:
+			 * <protocol> is one of git, git+ssh, git+http, or git+https. If no <commit-ish> is specified, then master is used.
+			 */
+			if(!!url.match(/^(http|git)/)) {
+				let pathToInstalledPackage = this.installPackageToTempDir(url).wait();
+				if(pathToInstalledPackage) {
+					let packageJsonContent = this.$fs.readText(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+					return this.constructNativeScriptPluginData(packageJsonContent).wait();
+				}
+			}
+
+			return null;
+		}).future<IPlugin>()();
+	}
+
+	private constructNativeScriptPluginData(packageJsonContent: string): IFuture<NativeScriptPluginData> {
+		return ((): NativeScriptPluginData => {
+			let jsonResult = JSON.parse(packageJsonContent);
+			let platforms: string[];
+			let supportedVersion: string;
+			let type = PluginType.NpmPlugin;
+			if(jsonResult.nativescript && jsonResult.nativescript.platforms) {
+				type = PluginType.NpmNativeScriptPlugin;
+				platforms = _.keys(jsonResult.nativescript.platforms);
+				supportedVersion = semver.maxSatisfying(_.values(jsonResult.nativescript.platforms), ">=0.0.0");
+			}
+
+			let data: IPluginInfoBase = {
+				Authors: jsonResult.author ? [jsonResult.author.name] : null,
+				Name: jsonResult.name,
+				Identifier: jsonResult.name,
+				Version: jsonResult.version,
+				Url: jsonResult.repository.url || jsonResult.homepage,
+				Platforms: platforms,
+				Description: jsonResult.description,
+				SupportedVersion: supportedVersion
+			};
+
+			return new NativeScriptPluginData(data, type, this.$project);
+		}).future<NativeScriptPluginData>()();
 	}
 
 	private checkIsValidLocalPlugin(pluginName: string): IFuture<boolean> {
