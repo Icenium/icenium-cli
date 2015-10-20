@@ -72,7 +72,7 @@
     "string-to-json": "0.1.0",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
     "temp": "0.8.1",
-    "typescript": "1.6.0-beta",
+    "typescript": "1.6.2",
     "unzip": "0.1.11",
     "valid-url": "1.0.9",
     "validator": "3.2.1",
@@ -96,7 +96,7 @@
     "mocha": "2.2.5",
     "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
     "spec-xunit-file": "0.0.1-3",
-    "tslint": "2.5.0-beta"
+    "tslint": "2.5.1"
   },
   "bundledDependencies": [],
   "license": "Apache-2.0",
