@@ -69,10 +69,11 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 
 			let projectDir = this.$project.getProjectDir().wait();
 
-			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<void> => {
+			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<boolean> => {
 				return (() => {
 					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);
-				}).future<void>()();
+					return false;
+				}).future<boolean>()();
 			};
 
 			let platformSpecificLiveSyncServices: IDictionary<any> = {
