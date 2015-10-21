@@ -40,4 +40,4 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 		}).future<boolean>()();
 	}
 }
-$injector.registerCommand("mobileframework|*print", PrintFrameworkVersionsCommand);
+$injector.registerCommand(["mobileframework|*print", "prop|print|frameworkversion"], PrintFrameworkVersionsCommand);

@@ -101,6 +101,8 @@ $injector.requireCommand("prop|set", "./commands/prop/prop-set");
 $injector.requireCommand("prop|rm", "./commands/prop/prop-remove");
 $injector.requireCommand("prop|remove", "./commands/prop/prop-remove");
 $injector.requireCommand("prop|print", "./commands/prop/prop-print");
+$injector.requireCommand("prop|print|frameworkversion", "./commands/framework-versions/print-versions");
+$injector.requireCommand("prop|set|frameworkversion", "./commands/framework-versions/set-version");
 
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");

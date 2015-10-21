@@ -11,7 +11,7 @@ export class SetFrameworkVersionCommand implements ICommand {
 
 	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(MobileFrameworkCommandParameter)];
 }
-$injector.registerCommand("mobileframework|set", SetFrameworkVersionCommand);
+$injector.registerCommand(["mobileframework|set", "prop|set|frameworkversion"], SetFrameworkVersionCommand);
 
 export class MobileFrameworkCommandParameter implements ICommandParameter {
 	private static VERSION_REGEX = new RegExp("^(\\d+\\.){2}\\d+$");
