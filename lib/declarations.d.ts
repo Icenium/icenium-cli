@@ -487,6 +487,24 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 }
 
 /**
+ * Defines a DTO helper object for migrations
+ */
+interface INativeScriptMigrationConfiguration {
+	tnsModulesProjectPath: string;
+	tnsTypingsPath: string;
+	packageJsonContents: any;
+
+	tnsModulesBackupName: string;
+	typingsBackupName: string;
+	oldPackageJsonContents: any;
+
+	pathToPackageJson: string;
+	projectDir: string;
+	appResourcesRequiredPath: string;
+	appResourcesObsoletePath: string;
+}
+
+/**
  * Defines data that is comming from server
  */
 interface ICordovaJsonData {
@@ -918,13 +936,17 @@ interface IKendoUIFilterOptions {
  */
 interface INativeScriptMigrationData{
 	/**
-	 * Versions that can be used for building the project, but cannot be migrated to other ones.
+	 * Versions that cannot be used for building the project and cannot be migrated to other ones.
 	 */
-	obsoleteVersions: IFrameworkVersion[];
+	deletedVersions: IFrameworkVersion[];
 	/**
 	 * Versions that can be used for building the project and it can be migrated between them.
 	 */
 	supportedVersions: IFrameworkVersion[];
+	/**
+	 * From this version onwards tns_modules are included as an npm dependency rather than physical files.
+	 */
+	modulesNpmMinimumVersion: string;
 }
 
 /**
@@ -939,6 +961,10 @@ interface IFrameworkVersion {
 	 * User friendly name, describing the version.
 	 */
 	displayName: string;
+	/**
+	 * Version string for tns-core-modules dependency
+	 */
+	modulesVersion?: string;
 }
 
 /**
