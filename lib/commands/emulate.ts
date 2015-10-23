@@ -66,7 +66,7 @@ export class EmulateIosCommand implements ICommand {
 			 	app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
 			}
 
-			this.$iOSEmulatorServices.startEmulator(app).wait();
+			this.$iOSEmulatorServices.startEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
 
 		}).future<void>()();
 	}
