@@ -6,6 +6,8 @@ import constants = require("../common/mobile/constants");
 import helpers = require("./../helpers");
 import iOSProxyServices = require("./../common/mobile/ios/ios-proxy-services");
 import usbLivesyncServiceBaseLib = require("../common/services/usb-livesync-service-base");
+import liveSyncConstants = require("../livesync-constants");
+
 import Future = require("fibers/future");
 import * as util from "util";
 
@@ -110,7 +112,6 @@ export class IOSLiveSyncService implements IPlatformSpecificLiveSyncService {
 
 export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiveSyncService implements IPlatformSpecificLiveSyncService {
 	private static DEVICE_TMP_DIR_FORMAT_V2 = "/data/local/tmp/12590FAA-5EDD-4B12-856D-F52A0A1599F2/%s";
-	private static DEVICE_TMP_DIR_FORMAT_V3 = "/mnt/sdcard/Android/data/%s/files/12590FAA-5EDD-4B12-856D-F52A0A1599F2";
 	private static DEVICE_PATH_SEPARATOR = "/";
 
 	private _tmpRoots: IStringDictionary = {};
@@ -183,7 +184,7 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 			if (liveSyncVersion === 2) {
 				this._tmpRoots[appIdentifier] = util.format(AndroidLiveSyncService.DEVICE_TMP_DIR_FORMAT_V2, appIdentifier);
 			} else if (liveSyncVersion === 3) {
-				this._tmpRoots[appIdentifier] = util.format(AndroidLiveSyncService.DEVICE_TMP_DIR_FORMAT_V3, appIdentifier);
+				this._tmpRoots[appIdentifier] = `${util.format(liveSyncConstants.DEVICE_TMP_DIR_FORMAT_V3, appIdentifier)}${AndroidLiveSyncService.DEVICE_PATH_SEPARATOR}${liveSyncConstants.LIVESYNC_FOLDER_GUID}`;
 			} else {
 				this.$errors.fail("Unsupported LiveSync version: %d", liveSyncVersion);
 			}

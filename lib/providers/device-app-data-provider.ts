@@ -5,6 +5,8 @@ import deviceAppDataBaseLib = require("../common/mobile/device-app-data/device-a
 import Future = require("fibers/future");
 import querystring = require("querystring");
 import * as path from "path";
+import util = require("util");
+import liveSyncConstants = require("../livesync-constants");
 
 let ANDROID_PROJECT_PATH = "/mnt/sdcard/Icenium/";
 let IOS_PROJECT_PATH = "/Documents";
@@ -75,11 +77,11 @@ export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBase
 	}
 
 	public get deviceProjectRootPath(): string {
-		return this.getDeviceProjectRootPath(path.join("/data/data", this.appIdentifier, "files"));
+		return util.format(liveSyncConstants.DEVICE_TMP_DIR_FORMAT_V3, this.appIdentifier);
 	}
 
 	public get liveSyncFormat(): string {
-		return "%s/Mist/MobilePackage/nsredirect?token=%s";
+		return null;
 	}
 
 	public encodeLiveSyncHostUri(hostUri: string): string {
