@@ -502,6 +502,11 @@ interface INativeScriptMigrationConfiguration {
 	projectDir: string;
 	appResourcesRequiredPath: string;
 	appResourcesObsoletePath: string;
+
+	valuesStylesXmlPath: string;
+	valuesV21StylesXmlPath: string;
+
+	shouldRollBackAppResources: boolean;
 }
 
 /**

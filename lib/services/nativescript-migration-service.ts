@@ -4,6 +4,8 @@
 import Future = require("fibers/future");
 import * as path from "path";
 import * as semver from "semver";
+import * as util from "util";
+import {EOL} from "os";
 
 export class NativeScriptMigrationService implements IFrameworkMigrationService {
 	private static TYPESCRIPT_ABBREVIATION = "TS";
@@ -13,6 +15,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private static TYPINGS = "typings";
 	private static TNS_CORE_MODULES = "tns-core-modules";
 	private static TNS_MODULES = "tns_modules";
+	private static STYLES_XML_NAME = "styles.xml";
+	private static STYLES_XML_RELATIVE_PATH_FORMAT = path.join("App_Resources", "Android", "%s", NativeScriptMigrationService.STYLES_XML_NAME);
 
 	private tnsModulesDirectoryPath: string;
 	private remoteNativeScriptResourcesPath: string;
@@ -35,7 +39,10 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				pathToPackageJson: this.getPathToProjectPackageJson().wait(),
 				projectDir: projectDir,
 				appResourcesRequiredPath: path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$staticConfig.APP_RESOURCES_DIR_NAME),
-				appResourcesObsoletePath: path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME)
+				appResourcesObsoletePath: path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME),
+				valuesStylesXmlPath: path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.getStylesXmlRelativePath("values").wait()),
+				valuesV21StylesXmlPath: path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.getStylesXmlRelativePath("values-v21").wait()),
+				shouldRollBackAppResources: false
 			};
 		}
 
@@ -139,14 +146,14 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return (() => {
 			try {
 				// Always update tns-modules during migration
-				this.$fs.rename(this.nativeScriptMigrationConfiguration.tnsModulesProjectPath, this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
+				this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.tnsModulesProjectPath, this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
 				this.$fs.createDirectory(this.nativeScriptMigrationConfiguration.tnsModulesProjectPath).wait();
 				this.extractTnsModulesPackage(newVersion, this.nativeScriptMigrationConfiguration.tnsModulesProjectPath).wait();
 				this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
 			} catch (err) {
 				this.traceError(err);
 				this.restoreOriginalTnsModulesDirectory().wait();
-				this.moveAppResourcesDirectory(this.nativeScriptMigrationConfiguration.appResourcesRequiredPath, this.nativeScriptMigrationConfiguration.appResourcesObsoletePath).wait();
+				this.rollbackAppResourcesToObsoletePath().wait();
 				this.$errors.failWithoutHelp("Error during migration. Restored original state of the project.");
 			}
 		}).future<void>()();
@@ -154,10 +161,16 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 	private migrateByGettingTnsModulesFromNpm(newVersion: string): IFuture<void> {
 		return (() => {
-			this.promptForConfirmation(`Migrating from NativeScript ${this.$project.projectData.FrameworkVersion} to ${newVersion} requires removing the "${NativeScriptMigrationService.TNS_MODULES}" directory to your project and modifying your ${this.$projectConstants.PACKAGE_JSON_NAME} file to include the required dependencies. Are you sure you want to continue?`).wait();
-
+			let migrationMessage = `Migrating from NativeScript ${this.$project.projectData.FrameworkVersion} to ${newVersion} requires:`;
+			migrationMessage += EOL + `*	removing the \`${NativeScriptMigrationService.TNS_MODULES}\` directory`;
+			migrationMessage += EOL + `*	removing the \`${this.getStylesXmlRelativePath("values*").wait()}\` files`;
+			migrationMessage += EOL + `*	modifying your \`${this.$projectConstants.PACKAGE_JSON_NAME}\` file to include the required dependencies.`;
+			this.$logger.printMarkdown(migrationMessage);
+			this.promptForConfirmation("Are you sure you want to continue?").wait();
+			let valuesStylesXmlPathBackupName = this.getBackupName(this.nativeScriptMigrationConfiguration.valuesStylesXmlPath);
+			let valuesV21StylesXmlPathBackupName = this.getBackupName(this.nativeScriptMigrationConfiguration.valuesV21StylesXmlPath);
 			try {
-				this.$fs.rename(this.nativeScriptMigrationConfiguration.tnsModulesProjectPath, this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
+				this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.tnsModulesProjectPath, this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
 				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion).wait();
 				this.executeMigrationActions(this.nativeScriptMigrationConfiguration.packageJsonContents,
 					this.nativeScriptMigrationConfiguration.tnsModulesProjectPath,
@@ -166,19 +179,25 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 					() => this.$fs.unzip(this.getPathToTypingsZip(newVersion),
 					this.nativeScriptMigrationConfiguration.tnsTypingsPath)).wait();
 
-				this.moveAppResourcesDirectory(this.nativeScriptMigrationConfiguration.appResourcesObsoletePath, this.nativeScriptMigrationConfiguration.appResourcesRequiredPath).wait();
+				this.nativeScriptMigrationConfiguration.shouldRollBackAppResources =  this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.appResourcesObsoletePath, this.nativeScriptMigrationConfiguration.appResourcesRequiredPath).wait();
+				this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.valuesStylesXmlPath, valuesStylesXmlPathBackupName).wait();
+				this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.valuesV21StylesXmlPath, valuesV21StylesXmlPathBackupName).wait();
 				this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.typingsBackupName).wait();
 				this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.tnsModulesBackupName).wait();
+				this.$fs.deleteDirectory(valuesStylesXmlPathBackupName).wait();
+				this.$fs.deleteDirectory(valuesV21StylesXmlPathBackupName).wait();
 			} catch (err) {
 				this.traceError(err);
 				this.restoreOriginalTnsModulesDirectory().wait();
-				this.moveAppResourcesDirectory(this.nativeScriptMigrationConfiguration.appResourcesRequiredPath, this.nativeScriptMigrationConfiguration.appResourcesObsoletePath).wait();
+				this.rollbackAppResourcesToObsoletePath().wait();
 				this.executeMigrationActions(this.nativeScriptMigrationConfiguration.oldPackageJsonContents,
 					this.nativeScriptMigrationConfiguration.tnsModulesBackupName,
 					this.nativeScriptMigrationConfiguration.tnsModulesProjectPath,
 					() => this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.tnsTypingsPath),
 					() => Future.fromResult()).wait();
 
+				this.$fs.renameIfExists(valuesStylesXmlPathBackupName, this.nativeScriptMigrationConfiguration.valuesStylesXmlPath).wait();
+				this.$fs.renameIfExists(valuesV21StylesXmlPathBackupName, this.nativeScriptMigrationConfiguration.valuesV21StylesXmlPath).wait();
 				let message = "Error during migration. Restored original state of the project.";
 				if (err.errorCode === ErrorCodes.RESOURCE_PROBLEM) {
 					message = err.message;
@@ -355,16 +374,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			let projectType = this.$project.isTypeScriptProject().wait() ? NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION : NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION;
 			let pathToNewTnsModules = path.join(this.tnsModulesDirectoryPath, projectType, this.getFileNameByVersion(newVersion));
 			this.$fs.unzip(pathToNewTnsModules, tnsModulesProjectPath).wait();
-			this.moveAppResourcesDirectory(this.nativeScriptMigrationConfiguration.appResourcesObsoletePath, this.nativeScriptMigrationConfiguration.appResourcesRequiredPath).wait();
-		}).future<void>()();
-	}
-
-	private moveAppResourcesDirectory(from: string, to: string): IFuture<void> {
-		return (() => {
-			if (this.$fs.exists(from).wait() && !this.$fs.exists(to).wait()) {
-				this.$logger.trace(`Moving ${from} to ${to}`);
-				this.$fs.rename(from, to).wait();
-			}
+			this.nativeScriptMigrationConfiguration.shouldRollBackAppResources = this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.appResourcesObsoletePath, this.nativeScriptMigrationConfiguration.appResourcesRequiredPath).wait();
 		}).future<void>()();
 	}
 
@@ -380,7 +390,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private restoreOriginalTnsModulesDirectory(): IFuture<void> {
 		return (() => {
 			this.deleteOriginalTnsModulesDirectory().wait();
-			this.$fs.rename(this.nativeScriptMigrationConfiguration.tnsModulesBackupName, this.nativeScriptMigrationConfiguration.tnsModulesProjectPath).wait();
+			this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.tnsModulesBackupName, this.nativeScriptMigrationConfiguration.tnsModulesProjectPath).wait();
 		}).future<void>()();
 	}
 
@@ -390,9 +400,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			if (this.$project.isTypeScriptProject().wait()) {
 				beforeRenameAction().wait();
 
-				if (this.$fs.exists(oldPath).wait()) {
-					this.$fs.rename(oldPath, newPath).wait();
-				}
+				this.$fs.renameIfExists(oldPath, newPath).wait();
 
 				afterRenameAction().wait();
 			}
@@ -412,6 +420,41 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			return versionObject.modulesVersion;
 		}).future<string>()();
+	}
+
+	private getStylesXmlRelativePath(valuesDirName: string): IFuture<string> {
+		return ((): string => {
+			let pathToStylesXml = util.format(NativeScriptMigrationService.STYLES_XML_RELATIVE_PATH_FORMAT, valuesDirName);
+			if(this.shouldDeleteOnlyStylesXml(pathToStylesXml).wait()) {
+				return pathToStylesXml;
+			} else {
+				return path.dirname(pathToStylesXml);
+			}
+		}).future<string>()();
+	}
+
+	private shouldDeleteOnlyStylesXml(pathToStylesXml: string): IFuture<boolean> {
+		return ((): boolean => {
+			pathToStylesXml = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, pathToStylesXml);
+			let valuesDirectory = path.dirname(pathToStylesXml);
+			if(this.$fs.exists(pathToStylesXml).wait()) {
+				let filesInDir = this.$fs.enumerateFilesInDirectorySync(valuesDirectory);
+				// styles.xml is only file in this dir, let's delete the whole dir
+				return filesInDir.length !== 1;
+			}
+
+			return true;
+		}).future<boolean>()();
+	}
+
+	private rollbackAppResourcesToObsoletePath(): IFuture<void> {
+		return ((): void => {
+			if(this.nativeScriptMigrationConfiguration.shouldRollBackAppResources) {
+				this.$fs.renameIfExists(this.nativeScriptMigrationConfiguration.appResourcesRequiredPath, this.nativeScriptMigrationConfiguration.appResourcesObsoletePath).wait();
+			}
+
+			this.nativeScriptMigrationConfiguration.shouldRollBackAppResources = false;
+		}).future<void>()();
 	}
 }
 $injector.register("nativeScriptMigrationService", NativeScriptMigrationService);

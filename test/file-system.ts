@@ -127,4 +127,30 @@ describe("FileSystem", () => {
 			});
 		});
 	});
+
+	describe("renameIfExists", () => {
+		it("returns true when file is renamed", () => {
+			let testInjector = createTestInjector();
+			let tempDir = temp.mkdirSync("renameIfExists");
+			let testFileName = path.join(tempDir, "testRenameIfExistsMethod");
+			let newFileName = path.join(tempDir, "newfilename");
+
+			let fs: IFileSystem = testInjector.resolve("fs");
+			fs.writeFile(testFileName, "data").wait();
+
+			let result = fs.renameIfExists(testFileName, newFileName).wait();
+			assert.isTrue(result, "On successfull rename, result must be true.");
+			assert.isTrue(fs.exists(newFileName).wait(), "Renamed file should exists.");
+			assert.isFalse(fs.exists(testFileName).wait(), "Original file should not exist.");
+		});
+
+		it("returns false when file does not exist", () => {
+			let testInjector = createTestInjector();
+			let fs: IFileSystem = testInjector.resolve("fs");
+			let newName = "tempDir2";
+			let result = fs.renameIfExists("tempDir", newName).wait();
+			assert.isFalse(result, "On successfull rename, result must be true.");
+			assert.isFalse(fs.exists(newName).wait(), "Original file should not exist.");
+		});
+	});
 });

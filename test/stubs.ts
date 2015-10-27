@@ -148,6 +148,10 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
+	renameIfExists(oldPath: string, newPath: string): IFuture<boolean> {
+		return undefined;
+	}
+
 	symlink(sourePath: string, destinationPath: string): IFuture<void> {
 		return undefined;
 	}
