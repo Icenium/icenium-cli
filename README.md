@@ -23,12 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 2.12.1 
-Release date: 2015, October 8
+Latest version: Telerik AppBuilder 2.14 
+Release date: November 4, 2015
 
-> Telerik AppBuilder 2.12.1 is a maintenance release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.12.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-12-1" target="_blank">Telerik AppBuilder 2.12.1 Release Notes</a>.
->
-> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/2x/v2-12" target="_blank">Telerik AppBuilder 2.12 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.14, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-14" target="_blank">Telerik AppBuilder 2.14 Release Notes</a>.
 
 ### System Requirements
 
@@ -41,10 +39,8 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Windows 7 or later
 * .NET 4.5 or later
 * Node.js
-	* (Windows 7 systems): The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/) or [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) stable official release
-	* (Windows 8 and later systems): The latest [Node.js 0.12.x](https://nodejs.org/dist/latest-v0.12.x/) stable official release
-
-	> **IMPORTANT:** You cannot install and run the AppBuilder CLI on systems running Node.js 4.x.
+	* (Windows 7 systems): The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/), [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) or [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/) stable official release
+	* (Windows 8 and later systems): The latest [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) or [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/) stable official release
 * An Internet browser (latest official release) with enabled cookies
 * (Optional) git<br/>git is required for development with Screen Builder.
 
@@ -74,9 +70,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements**
 
 * OS X Mavericks
-* The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/) or [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) stable official release
-	
-	> **IMPORTANT:** You cannot install and run the AppBuilder CLI on systems running Node.js 4.x.
+* The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/), [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) or [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/) stable official release* An Internet browser (latest official release) with enabled cookies
 * An Internet browser (latest official release) with enabled cookies
 * Mono 3.12 or later
 * (Optional) git<br/>git is required for development with Screen Builder.
@@ -104,9 +98,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 **Minimum Software Requirements** 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
-* The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/) or [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) stable official release<br/>You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
-	
-	> **IMPORTANT:** You cannot install and run the AppBuilder CLI on systems running Node.js 4.x.
+* The latest Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/), [0.12.x](https://nodejs.org/dist/latest-v0.12.x/) or [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/) stable official release<br/>You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
 * An Internet browser (latest official release) with enabled cookies
 * (64-bit systems) The runtime libraries for the ia32/i386 architecture
    * In the terminal, run the following command.
@@ -365,12 +357,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 2.12.1 
-Release date: 2015, October 8
+Latest version: Telerik AppBuilder 2.14 
+Release date: November 4, 2015
 
-> Telerik AppBuilder 2.12.1 is a maintenance release. For a complete list of the improvements and updates available in Telerik AppBuilder 2.12.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-12-1" target="_blank">Telerik AppBuilder 2.12.1 Release Notes</a>.
->
-> For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/2x/v2-12" target="_blank">Telerik AppBuilder 2.12 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 2.14, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v2-14" target="_blank">Telerik AppBuilder 2.14 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
