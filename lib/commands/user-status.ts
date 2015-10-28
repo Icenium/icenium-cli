@@ -10,14 +10,6 @@ export class UserStatusCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	private licenseNames: IStringDictionary = {
-		"Starter": "AppBuilder Starter Edition",
-		"Developer": "AppBuilder Developer Edition",
-		"DeveloperPlus": "Telerik Platform Developer Edition",
-		"Professional": "AppBuilder Professional Edition",
-		"Business": "AppBuilder Business Edition"
-	};
-
 	public execute(args:string[]): IFuture<void> {
 		return (() => {
 			let user = this.$userDataStore.getUser().wait();
@@ -28,7 +20,7 @@ export class UserStatusCommand implements ICommand {
 			};
 
 			if (user.tenant) {
-				fields["License"] = util.format("%s (%s)", this.licenseNames[user.tenant.edition] || user.tenant.edition, user.tenant.license);
+				fields["License"] = util.format("%s (%s)", user.tenant.editionType, user.tenant.license);
 				let expires = new Date(Date.parse(user.tenant.expSoft));
 				fields["License expires"] = expires.toLocaleDateString();
 				fields["Licensed by"] = user.tenant.name;

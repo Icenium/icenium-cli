@@ -12,15 +12,6 @@ export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
 	private user: any;
 
-	private static APPBUILDER_EDITION_TYPE: IStringDictionary = {
-		"Starter": "AppBuilder Starter Edition",
-		"Developer": "AppBuilder Developer Edition",
-		"Business": "AppBuilder Business Edition",
-		"Professional": "AppBuilder Professional Edition",
-		"Enterprise": "AppBuilder Enterprise Edition",
-		"Developer Plus": "Telerik Platform Developer Edition"
-	};
-
 	constructor(private $fs: IFileSystem,
 		private $config: Config.IConfig,
 		private $logger: ILogger,
@@ -130,12 +121,10 @@ export class UserDataStore implements IUserDataStore {
 
 	private trackTenantInformation(userData: any): IFuture<void> {
 		return (() => {
-			if(userData) {
-				let tenant = userData.tenant;
-				let tenantEdition = UserDataStore.APPBUILDER_EDITION_TYPE[tenant.edition] || tenant.edition || "no-edition";
-				let tenantInfo = `${tenantEdition || "no-edition"} - ${tenant.license || "no-license"}`;
+			if(userData && userData.tenant) {
+				let tenantEdition = userData.tenant.editionType || "no-edition";
 				let $analyticsService = this.$injector.resolve("analyticsService");
-				$analyticsService.track("UserTenant", tenantInfo).wait();
+				$analyticsService.track("UserTenant", tenantEdition).wait();
 			}
 		}).future<void>()();
 	}
