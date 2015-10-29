@@ -460,10 +460,18 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 			let pathToInstalledPlugin: string;
 			try {
 				let npmInstallOutput = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, {cwd: tempInstallDir}).wait();
+				let pathToPackage = path.join(tempInstallDir, NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME);
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
 				let npmOutputMatch = npmInstallOutput.match(/.*?@.*?\s+?(.*?node_modules.*?)\r?\n?$/m);
 				if(npmOutputMatch) {
 					pathToInstalledPlugin = path.join(tempInstallDir, npmOutputMatch[1]);
+				} else if(this.$fs.exists(pathToPackage).wait()) {
+					// In new npm versions output has different format
+					// Most probably the package is installed inside node_modules dir in temp folder.
+					let dirs = this.$fs.readDirectory(pathToPackage).wait().filter(dirName => dirName !== ".bin");
+					if(dirs.length === 1) {
+						pathToInstalledPlugin = path.join(pathToPackage, _.first(dirs));
+					}
 				}
 			} catch (err) {
 				this.$logger.trace(err);
