@@ -19,7 +19,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		".ab"
 	];
 
-	constructor($devicesServices: Mobile.IDevicesServices,
+	constructor($devicesService: Mobile.IDevicesService,
 		$logger: ILogger,
 		$fs: IFileSystem,
 		private $errors: IErrors,
@@ -34,7 +34,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		$childProcess: IChildProcess,
 		$iOSEmulatorServices: Mobile.IiOSSimulatorService,
 		$hostInfo: IHostInfo) {
-			super($devicesServices,
+			super($devicesService,
 				$mobileHelper,
 				$localToDevicePathDataFactory,
 				$logger,
@@ -57,7 +57,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				this.$errors.fail("The AppBuilder Companion app is not available on %s devices.", platform);
 			}
 
-			if(!this.$devicesServices.hasDevices) {
+			if(!this.$devicesService.hasDevices) {
 				this.$errors.fail({ formatStr: constants.ERROR_NO_DEVICES, suppressCommandHelp: true });
 			}
 

@@ -441,6 +441,10 @@ export class StaticConfig implements IStaticConfig {
 	public getAdbFilePath(): IFuture<string> {
 		return Future.fromResult("");
 	}
+
+	public get PATH_TO_BOOTSTRAP(): string {
+		return path.join(__dirname, "..", "lib","bootstrap");
+	}
 }
 
 export class HooksService implements IHooksService {

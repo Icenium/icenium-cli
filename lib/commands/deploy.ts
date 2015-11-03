@@ -5,7 +5,7 @@ import Future = require("fibers/future");
 import * as helpers from "../common/helpers";
 
 export class DeployHelper implements IDeployHelper {
-	constructor(protected $devicesServices: Mobile.IDevicesServices,
+	constructor(protected $devicesService: Mobile.IDevicesService,
 		protected $logger: ILogger,
 		protected $fs: IFileSystem,
 		protected $project: Project.IProject,
@@ -34,7 +34,7 @@ export class DeployHelper implements IDeployHelper {
 
 	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
-			this.$devicesServices.initialize({ platform: platform, deviceId: this.$options.device}).wait();
+			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device}).wait();
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
 
@@ -51,7 +51,7 @@ export class DeployHelper implements IDeployHelper {
 				}
 
 				if (!packageFile) {
-					packageFile = this.$buildService.buildForDeploy(this.$devicesServices.platform, this.$options.saveTo, false, device).wait();
+					packageFile = this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
 
 					this.$logger.debug("Ready to deploy %s", packageFile);
 					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
@@ -59,7 +59,7 @@ export class DeployHelper implements IDeployHelper {
 				return device.deploy(packageFile, packageName);
 			};
 
-			this.$devicesServices.execute(action).wait();
+			this.$devicesService.execute(action).wait();
 		}).future<void>()();
 	}
 }

@@ -38,7 +38,7 @@
     "cookie": "0.1.0",
     "express": "4.8.5",
     "ffi": "https://github.com/icenium/node-ffi/tarball/v2.0.0.0",
-    "fibers": "https://github.com/icenium/node-fibers/tarball/v1.0.6.1",
+    "fibers": "https://github.com/Icenium/node-fibers/tarball/v1.0.6.2",
     "filesize": "2.0.3",
     "gaze": "0.5.1",
     "hex": "0.0.1",
