@@ -9,6 +9,7 @@ declare module Server{
 		expSoft: Date;
 		expStrict: Date;
 		edition: string;
+		editionType: string;
 		status: string;
 		projectSlots: number;
 		license: string;

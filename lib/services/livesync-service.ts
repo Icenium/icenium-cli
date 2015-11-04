@@ -33,6 +33,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 		$injector: IInjector,
 		$childProcess: IChildProcess,
 		$iOSEmulatorServices: Mobile.IiOSSimulatorService,
+		$hooksService: IHooksService,
 		$hostInfo: IHostInfo) {
 			super($devicesService,
 				$mobileHelper,
@@ -45,6 +46,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				$injector,
 				$childProcess,
 				$iOSEmulatorServices,
+				$hooksService,
 				$hostInfo);
 		}
 
