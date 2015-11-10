@@ -167,6 +167,21 @@ declare module Server{
 		getCordovaPluginVariables(solutionName: string, projectName: string): IFuture<Server.CordovaPluginVariablesData>;
 		setCordovaPluginVariable(solutionName: string, projectName: string, pluginId: string, variableName: string, configuration: string, value: string): IFuture<void>;
 	}
+	interface ApplicationProjectInfo{
+		AppId: string;
+		ProjectName: string;
+		SolutionName: string;
+		SolutionSpaceName: string;
+	}
+	interface IAppsCordovaServiceContract{
+		getLiveSyncToken(appId: string, projectName: string): IFuture<string>;
+		getCurrentPlatforms(appId: string, projectName: string): IFuture<Server.DevicePlatform[]>;
+		addPlatform(appId: string, projectName: string, platform: Server.DevicePlatform): IFuture<Server.MigrationResult>;
+		migrate(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
+		getProjectCordovaPlugins(appId: string, projectName: string): IFuture<Server.CordovaPluginData[]>;
+		getCordovaPluginVariables(appId: string, projectName: string): IFuture<Server.CordovaPluginVariablesData>;
+		setCordovaPluginVariable(appId: string, projectName: string, pluginId: string, variableName: string, configuration: string, value: string): IFuture<void>;
+	}
 	interface CryptographicIdentityData{
 		Alias: string;
 		Attributes: IDictionary<string>;
@@ -217,6 +232,11 @@ declare module Server{
 		publish(package_: any): IFuture<void>;
 		deleteExtension(extensionName: string, extensionVersion: string): IFuture<void>;
 	}
+	interface IUploadServiceContract{
+		completeUpload(path: string, originalFileHash: string): IFuture<void>;
+		initUpload(path: string): IFuture<void>;
+		uploadChunk(path: string, content: any): IFuture<void>;
+	}
 	interface SolutionInfo{
 		SolutionName: string;
 		SolutionSpaceName: string;
@@ -228,10 +248,18 @@ declare module Server{
 		createDirectory(solutionName: string, path: string): IFuture<void>;
 		remove(solutionName: string, path: string): IFuture<void>;
 	}
-	interface IUploadServiceContract{
-		completeUpload(path: string, originalFileHash: string): IFuture<void>;
-		initUpload(path: string): IFuture<void>;
-		uploadChunk(path: string, content: any): IFuture<void>;
+	interface ApplicationInfo{
+		AppId: string;
+		SolutionName: string;
+		SolutionSpaceName: string;
+	}
+	interface IAppsFilesServiceContract{
+		getFile(appId: string, path: string, $resultStream: any): IFuture<void>;
+		save(appId: string, path: string, content: any): IFuture<void>;
+		createDirectory(appId: string, path: string): IFuture<void>;
+		remove(appId: string, path: string): IFuture<void>;
+		rename(appId: string, path: string, destinationAppId: string, newPath: string): IFuture<void>;
+		copy(appId: string, path: string, destinationAppId: string, destination: string): IFuture<void>;
 	}
 	interface Size{
 		Width: number;
@@ -242,10 +270,17 @@ declare module Server{
 		SplashScreen,
 		NinePatch,
 	}
+	interface IAppsImagesServiceContract{
+		resizeImage(appId: string, path: string, size: Server.Size): IFuture<void>;
+		generate(appId: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>;
+	}
 	interface IImagesServiceContract{
 		resizeImage(solutionName: string, path: string, size: Server.Size): IFuture<void>;
 		generate(solutionName: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>;
 		generateArchive(type: Server.ImageType, image: any, $resultStream: any): IFuture<void>;
+	}
+	interface IAppsItmstransporterServiceContract{
+		uploadApplication(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>;
 	}
 	interface Application{
 		AppleID: number;
@@ -277,6 +312,10 @@ declare module Server{
 		getPackages(): IFuture<Server.KendoDownloadablePackageData[]>;
 		changeKendoPackage(solutionName: string, projectName: string, packageId: string): IFuture<void>;
 		getCurrentPackage(solutionName: string, projectName: string): IFuture<Server.KendoPackageData>;
+	}
+	interface IAppsKendoServiceContract{
+		changeKendoPackage(appId: string, projectName: string, packageId: string): IFuture<void>;
+		getCurrentPackage(appId: string, projectName: string): IFuture<Server.KendoPackageData>;
 	}
 	interface ProvisionData{
 		Identifier: string;
@@ -325,93 +364,8 @@ declare module Server{
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
 		getMarketplacePluginVersionsData(): IFuture<Server.NativeScriptMarketplacePluginVersionsData[]>;
 	}
-	interface BuildIssueData{
-		Code: string;
-		File: string;
-		ProjectFile: string;
-		Target: string;
-		Message: string;
-		LineNumber: number;
-		ColumnNumber: number;
-		EndLineNumber: number;
-		EndColumnNumber: number;
-		IsRealError: boolean;
-	}
-	interface TaskItemData{
-		ItemSpec: string;
-		Properties: IDictionary<string>;
-		Comparer: any;
-		Count: number;
-		Keys: string[];
-		Values: string[];
-		Item: string;
-	}
-	interface TargetResultData{
-		Status: string;
-		Items: Server.TaskItemData[];
-	}
-	interface BuildResultData{
-		Errors: Server.BuildIssueData[];
-		Warnings: Server.BuildIssueData[];
-		Output: string;
-		ResultsByTarget: IDictionary<TargetResultData>;
-	}
-	interface BuildRequestData{
-		Targets: string[];
-		Properties: IDictionary<string>;
-	}
-	const enum TargetResultStatus{
-		Failure,
-		Skipped,
-		Success,
-	}
-	interface IBuildServiceContract{
-		buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>;
-	}
-	interface NpmSearchPackageEntry{
-		Name: string;
-		Description: string;
-		Authors: string[];
-		HomePage: string;
-		Licenses: string[];
-		Modified: Date;
-		Version: string;
-		KeyWords: string[];
-		Rating: number;
-	}
-	interface NpmSearchResult{
-		Results: Server.NpmSearchPackageEntry[];
-		Total: number;
-	}
-	interface Repository{
-		Type: string;
-		Url: string;
-	}
-	interface NpmVersion{
-		Name: string;
-		Description: string;
-		HomePage: string;
-		Repository: Server.Repository;
-		Version: string;
-	}
-	interface NpmPackage{
-		Name: string;
-		Description: string;
-		HomePage: string;
-		Repository: Server.Repository;
-		Versions: IDictionary<NpmVersion>;
-		DistTags: IDictionary<string>;
-		LatestVersion: string;
-	}
-	const enum SortOrder{
-		Default,
-		RatingAscending,
-		RatingDescending,
-	}
-	interface INpmServiceContract{
-		queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>;
-		getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>;
-		getNpmPackageDownloads(packageName: string): IFuture<number>;
+	interface IAppsNativescriptServiceContract{
+		migrate(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
 	}
 	interface ProjectTemplateData{
 		CanCreateProject: boolean;
@@ -484,25 +438,163 @@ declare module Server{
 		renameProject(solutionName: string, projectName: string, newProjectName: string): IFuture<void>;
 		createNewProjectItem(solutionName: string, projectName: string, itemIdentifier: string, expansionData: Server.ItemTemplateExpansionData): IFuture<Server.ProjectItemInfo[]>;
 	}
+	interface IAppsProjectsServiceContract{
+		exportProject(appId: string, projectName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
+		importPackage(appId: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>;
+		importProject(appId: string, projectName: string, package_: any): IFuture<void>;
+		importLocalProject(appId: string, projectName: string, bucketKey: string): IFuture<void>;
+		getProjectContents(appId: string, projectName: string): IFuture<string>;
+		saveProjectContents(appId: string, projectName: string, projectContents: string): IFuture<void>;
+		createProject(appId: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
+		deleteProject(appId: string, projectName: string): IFuture<void>;
+		setProjectProperty(appId: string, projectName: string, configuration: string, changeset: IDictionary<string>): IFuture<void>;
+		renameProject(appId: string, projectName: string, newProjectName: string): IFuture<void>;
+		createNewProjectItem(appId: string, projectName: string, itemIdentifier: string, expansionData: Server.ItemTemplateExpansionData): IFuture<Server.ProjectItemInfo[]>;
+	}
+	interface ApplicationCreationData{
+		AccountId: string;
+		AppData: IDictionary<Object>;
+		ProjectName: string;
+		TemplateIdentifier: string;
+		Arguments: IDictionary<string>;
+	}
+	interface ApplicationServiceData{
+		Type: string;
+		Comparer: any;
+		Count: number;
+		Keys: string[];
+		Values: Server.Object[];
+		Item: Server.Object;
+	}
+	interface IAppsServiceContract{
+		exportApplication(appId: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
+		createApplication(applicationData: Server.ApplicationCreationData): IFuture<IDictionary<Object>>;
+		enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
+		getApplication(appId: string, checkUpgradability: boolean): IFuture<Server.SolutionData>;
+		canLoadApplication(appId: string): IFuture<boolean>;
+		deleteApplication(appId: string): IFuture<void>;
+		upgradeApplication(appId: string): IFuture<void>;
+		getApplicationServices(appId: string): IFuture<Server.ApplicationServiceData[]>;
+		enableApplicationService(appId: string, serviceData: IDictionary<Object>): IFuture<IDictionary<Object>>;
+	}
 	interface PackageData{
 		Name: string;
 		Version: string;
+	}
+	interface IAppsBowerServiceContract{
+		installDependencies(appId: string, projectName: string): IFuture<void>;
+		installPackage(appId: string, projectName: string, packageName: string, version: string): IFuture<void>;
+		getInstalledPackages(appId: string, projectName: string): IFuture<Server.PackageData[]>;
 	}
 	interface BowerPackagesFilters{
 		Blacklist: string[];
 		DuplicatesList: IDictionary<string>;
 	}
-	interface IPackagesServiceContract{
+	interface IBowerServiceContract{
 		installDependencies(solutionName: string, projectName: string): IFuture<void>;
 		installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void>;
 		getInstalledPackages(solutionName: string, projectName: string): IFuture<Server.PackageData[]>;
 		getFilters(): IFuture<Server.BowerPackagesFilters>;
+	}
+	interface BuildIssueData{
+		Code: string;
+		File: string;
+		ProjectFile: string;
+		Target: string;
+		Message: string;
+		LineNumber: number;
+		ColumnNumber: number;
+		EndLineNumber: number;
+		EndColumnNumber: number;
+		IsRealError: boolean;
+	}
+	interface TaskItemData{
+		ItemSpec: string;
+		Properties: IDictionary<string>;
+		Comparer: any;
+		Count: number;
+		Keys: string[];
+		Values: string[];
+		Item: string;
+	}
+	interface TargetResultData{
+		Status: string;
+		Items: Server.TaskItemData[];
+	}
+	interface BuildResultData{
+		Errors: Server.BuildIssueData[];
+		Warnings: Server.BuildIssueData[];
+		Output: string;
+		ResultsByTarget: IDictionary<TargetResultData>;
+	}
+	interface BuildRequestData{
+		Targets: string[];
+		Properties: IDictionary<string>;
+	}
+	const enum TargetResultStatus{
+		Failure,
+		Skipped,
+		Success,
+	}
+	interface IBuildServiceContract{
+		buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>;
+	}
+	interface IAppsBuildServiceContract{
+		buildProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>;
+	}
+	interface NpmSearchPackageEntry{
+		Name: string;
+		Description: string;
+		Authors: string[];
+		HomePage: string;
+		Licenses: string[];
+		Modified: Date;
+		Version: string;
+		KeyWords: string[];
+		Rating: number;
+	}
+	interface NpmSearchResult{
+		Results: Server.NpmSearchPackageEntry[];
+		Total: number;
+	}
+	interface Repository{
+		Type: string;
+		Url: string;
+	}
+	interface NpmVersion{
+		Name: string;
+		Description: string;
+		HomePage: string;
+		Repository: Server.Repository;
+		Version: string;
+	}
+	interface NpmPackage{
+		Name: string;
+		Description: string;
+		HomePage: string;
+		Repository: Server.Repository;
+		Versions: IDictionary<NpmVersion>;
+		DistTags: IDictionary<string>;
+		LatestVersion: string;
+	}
+	const enum SortOrder{
+		Default,
+		RatingAscending,
+		RatingDescending,
+	}
+	interface INpmServiceContract{
+		queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>;
+		getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>;
+		getNpmPackageDownloads(packageName: string): IFuture<number>;
 	}
 	interface FtpConnectionData{
 		RemoteUrl: string;
 		ShouldPurge: boolean;
 		Username: string;
 		Password: string;
+	}
+	interface IAppsPublishServiceContract{
+		publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
 	}
 	interface IPublishServiceContract{
 		publishFtp(solutionName: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
@@ -512,6 +604,10 @@ declare module Server{
 		saveUserSettings(content: any): IFuture<void>;
 		getSolutionUserSettings(solutionName: string, $resultStream: any): IFuture<void>;
 		saveSolutionUserSettings(solutionName: string, content: any): IFuture<void>;
+	}
+	interface IAppsRawSettingsServiceContract{
+		getSolutionUserSettings(appId: string, $resultStream: any): IFuture<void>;
+		saveSolutionUserSettings(appId: string, content: any): IFuture<void>;
 	}
 	interface DevicePlatformIdentityAliasDictionary{
 		Comparer: any;
@@ -534,6 +630,13 @@ declare module Server{
 		CodesigningSettings: Server.ICodesigningIdentitySettings;
 		ProvisionSettings: Server.IMobileProjectProvisionSettings;
 		SolutionSettings: Server.ISolutionSettings;
+	}
+	interface IAppsSettingsServiceContract{
+		getSettings(appId: string): IFuture<Server.SettingsData>;
+		setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>;
+		setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>;
+		setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>;
+		updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>;
 	}
 	interface ISettingsServiceContract{
 		getSettings(solutionName: string): IFuture<Server.SettingsData>;
@@ -577,6 +680,15 @@ declare module Server{
 		uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
 	}
+	interface IAppsTamServiceContract{
+		uploadApplication(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
+		uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
+	}
+	interface IAppsTapServiceContract{
+		getRemote(appId: string): IFuture<string>;
+		setRemote(appId: string, remoteUrl: string): IFuture<void>;
+		initCurrentUserSharedRepository(appId: string): IFuture<boolean>;
+	}
 	interface TapSolutionData{
 		id: string;
 		name: string;
@@ -586,6 +698,7 @@ declare module Server{
 	}
 	interface Collaborator{
 		email: string;
+		role: string;
 		id: string;
 		name: string;
 	}
@@ -609,7 +722,7 @@ declare module Server{
 		getRemote(solutionName: string): IFuture<string>;
 		setRemote(solutionName: string, remoteUrl: string): IFuture<void>;
 		getUsersForProject(solutionName: string): IFuture<Server.Collaborator[]>;
-		initCurrentUserSharedRepository(solutionName: string): IFuture<void>;
+		initCurrentUserSharedRepository(solutionName: string): IFuture<boolean>;
 		getWorkspaces(accountId: string): IFuture<Server.TapWorkspaceData[]>;
 		getServiceApplications(serviceType: string, accountId: string): IFuture<Server.TapSolutionData[]>;
 		getServiceApplicationProjectKey(serviceType: string, id: string): IFuture<string>;
@@ -705,6 +818,34 @@ declare module Server{
 		Hard,
 		Soft,
 	}
+	interface IAppsVersioncontrolServiceContract{
+		init(appId: string): IFuture<void>;
+		rollback(appId: string, versionName: string): IFuture<void>;
+		reset(appId: string, resetMode: Server.ResetMode, versionName: string): IFuture<void>;
+		merge(appId: string, versionName: string): IFuture<Server.BranchItemData>;
+		revert(appId: string, versionName: string, filePaths: string[]): IFuture<void>;
+		resolve(appId: string, versionName: string, filePaths: string[]): IFuture<void>;
+		checkout(appId: string, versionName: string, filePaths: string[]): IFuture<void>;
+		add(appId: string, filePaths: string[]): IFuture<void>;
+		remove(appId: string, filePaths: string[]): IFuture<void>;
+		getBranches(appId: string): IFuture<Server.BranchItemData[]>;
+		getCurrentBranch(appId: string): IFuture<Server.BranchItemData>;
+		checkoutBranch(appId: string, branchName: string, createBranch: boolean, versionName: string): IFuture<Server.BranchItemData>;
+		createBranch(appId: string, branchName: string, versionName: string): IFuture<Server.BranchItemData>;
+		deleteBranch(appId: string, branchName: string, forceDelete: boolean): IFuture<void>;
+		getRemote(appId: string): IFuture<string>;
+		setRemote(appId: string, remoteData: Server.GitRemoteData): IFuture<void>;
+		getInfo(appId: string): IFuture<Server.VersionControlData>;
+		track(appId: string): IFuture<Server.ChangeItemData[]>;
+		getStatus(appId: string, filePaths: string[]): IFuture<Server.ChangeItemData[]>;
+		getDiff(appId: string, versionName: string, contextSize: number, otherVersionName: string, filePaths: string[]): IFuture<Server.DiffLineResultData[]>;
+		getConflicts(appId: string, contextSize: number, filePaths: string[]): IFuture<Server.DiffLineResultData[]>;
+		getCommits(appId: string, endDate: Date, startDate: Date): IFuture<Server.ChangeSetData[]>;
+		getCommit(appId: string, versionName: string): IFuture<Server.ChangeSetData>;
+		getChanges(appId: string, versionName: string): IFuture<Server.ChangeItemData[]>;
+		getContents(appId: string, versionName: string, filePath: string): IFuture<string>;
+		getHistory(appId: string, versionName: string, filePath: string): IFuture<Server.HistoryItemData[]>;
+	}
 	interface IVersioncontrolServiceContract{
 		init(solutionName: string): IFuture<void>;
 		rollback(solutionName: string, versionName: string): IFuture<void>;
@@ -736,27 +877,43 @@ declare module Server{
 	interface IServer{
 		authentication: Server.IAuthenticationServiceContract;
 		cordova: Server.ICordovaServiceContract;
+		appsCordova: Server.IAppsCordovaServiceContract;
 		identityStore: Server.IIdentityStoreServiceContract;
 		everlive: Server.IEverliveServiceContract;
 		extensions: Server.IExtensionsServiceContract;
 		internalExtensions: Server.IInternalExtensionsServiceContract;
-		filesystem: Server.IFilesystemServiceContract;
 		upload: Server.IUploadServiceContract;
+		filesystem: Server.IFilesystemServiceContract;
+		appsFiles: Server.IAppsFilesServiceContract;
+		appsImages: Server.IAppsImagesServiceContract;
 		images: Server.IImagesServiceContract;
+		appsItmstransporter: Server.IAppsItmstransporterServiceContract;
 		itmstransporter: Server.IItmstransporterServiceContract;
 		kendo: Server.IKendoServiceContract;
+		appsKendo: Server.IAppsKendoServiceContract;
 		mobileprovisions: Server.IMobileprovisionsServiceContract;
 		nativescript: Server.INativescriptServiceContract;
-		build: Server.IBuildServiceContract;
-		npm: Server.INpmServiceContract;
+		appsNativescript: Server.IAppsNativescriptServiceContract;
 		projects: Server.IProjectsServiceContract;
-		packages: Server.IPackagesServiceContract;
+		appsProjects: Server.IAppsProjectsServiceContract;
+		apps: Server.IAppsServiceContract;
+		appsBower: Server.IAppsBowerServiceContract;
+		bower: Server.IBowerServiceContract;
+		build: Server.IBuildServiceContract;
+		appsBuild: Server.IAppsBuildServiceContract;
+		npm: Server.INpmServiceContract;
+		appsPublish: Server.IAppsPublishServiceContract;
 		publish: Server.IPublishServiceContract;
 		rawSettings: Server.IRawSettingsServiceContract;
+		appsRawSettings: Server.IAppsRawSettingsServiceContract;
+		appsSettings: Server.IAppsSettingsServiceContract;
 		settings: Server.ISettingsServiceContract;
 		status: Server.IStatusServiceContract;
 		tam: Server.ITamServiceContract;
+		appsTam: Server.IAppsTamServiceContract;
+		appsTap: Server.IAppsTapServiceContract;
 		tap: Server.ITapServiceContract;
+		appsVersioncontrol: Server.IAppsVersioncontrolServiceContract;
 		versioncontrol: Server.IVersioncontrolServiceContract;
 	}
 }

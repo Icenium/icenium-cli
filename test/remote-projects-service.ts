@@ -15,29 +15,39 @@ function createTestInjector(): IInjector {
 		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
-		setSolutionSpaceName: (tenantId: string) => { /*intentionally empty body*/ }
+		makeTapServiceCall: (call: () => IFuture<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
+	});
+	testInjector.register("serviceProxyBase", {
+		call: (tenantId: string) => { return Future.fromResult(
+				[{
+					"id": "id2",
+					"name": "Sln2",
+					"type": "Hybrid",
+					"accountId": "accountId",
+					"settings": {},
+					"isMigrating": false,
+					"description": "AppBuilder cross platform project"
+				},
+				{
+					"id": "id1",
+					"name": "Sln1",
+					"type": "Hybrid",
+					"accountId": "accountId",
+					"settings": {},
+					"isMigrating": false,
+					"description": "AppBuilder cross platform project"
+				}]);
+			},
+		setShouldAuthenticate: (shouldAuthenticate: boolean) => false
 	});
 	testInjector.register("server", {
 		tap: {
 			getExistingClientSolutions: () => {
-				return Future.fromResult(
-				[{
-					"id": "id2",
-					"name": "Sln2",
-					"accountId": "accountId",
-					"workspaceId": "workspaceId2",
-					"description": "AppBuilder cross platform project"
-				},{
-					"id": "id1",
-					"name": "Sln1",
-					"accountId": "accountId",
-					"workspaceId": "workspaceId1",
-					"description": "AppBuilder cross platform project"
-				}]);
+				return Future.fromResult();
 			}
 		},
-		projects: {
-			getSolution: (projectName: string, checkUpgradability: boolean) => {
+		apps: {
+			getApplication: (slnName: string, checkUpgradability: boolean) => {
 				return Future.fromResult({
 					"Name": "Sln1",
 					"Items": [
@@ -77,6 +87,14 @@ function createTestInjector(): IInjector {
 					],
 					"IsUpgradeable": false
 				});
+			},
+			exportApplication: (solutionName: string, skipMetadata: boolean, $resultStream: any) => {
+				return Future.fromResult();
+			}
+		},
+		appsProjects: {
+			exportProject: (solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
+				return Future.fromResult();
 			}
 		}
 	});
@@ -110,7 +128,7 @@ describe("remote project service", () => {
 		});
 
 	it("getSolutions returns correct sorted results", () => {
-		let solutions = remoteProjectService.getSolutions().wait();
+		let solutions = remoteProjectService.getAvailableAppsAndSolutions().wait();
 		let expectedResult = ["Sln1", "Sln2"];
 		assert.deepEqual(expectedResult, solutions.map(sln => sln.name));
 	});
@@ -177,28 +195,6 @@ describe("remote project service", () => {
 		it("returns correct properties when solution name and project id are correct", () => {
 			let properties = remoteProjectService.getProjectProperties("1", "2").wait();
 			assert.deepEqual(expectedPropertiesResult, properties);
-		});
-	});
-
-	describe("getSolutionName", () => {
-		let expectedResult = "Sln1";
-
-		it("fails when solution name is not correct", () => {
-			assert.throws( () => remoteProjectService.getSolutionName("Invalid name").wait() );
-		});
-
-		it("fails when solution index is not correct", () => {
-			assert.throws( () => remoteProjectService.getSolutionName("5").wait() );
-		});
-
-		it("returns correct name when solution name is correct", () => {
-			let properties = remoteProjectService.getSolutionName("Sln1").wait();
-			assert.deepEqual(expectedResult, properties);
-		});
-
-		it("returns correct name when solution name is correct", () => {
-			let properties = remoteProjectService.getSolutionName("1").wait();
-			assert.deepEqual(expectedResult, properties);
 		});
 	});
 

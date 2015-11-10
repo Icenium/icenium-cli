@@ -83,6 +83,31 @@ export class CordovaService implements Server.ICordovaServiceContract{
 		return this.$serviceProxy.call<void>('SetCordovaPluginVariable', 'POST', ['api','cordova','plugins',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),'variables',encodeURI(pluginId.replace(/\\/g, '/')),encodeURI(variableName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
 	}
 }
+export class AppsCordovaService implements Server.IAppsCordovaServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public getLiveSyncToken(appId: string, projectName: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetLiveSyncToken', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'liveSyncToken'].join('/'), 'application/json', null, null);
+	}
+	public getCurrentPlatforms(appId: string, projectName: string): IFuture<Server.DevicePlatform[]>{
+		return this.$serviceProxy.call<Server.DevicePlatform[]>('GetCurrentPlatforms', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'platforms'].join('/'), 'application/json', null, null);
+	}
+	public addPlatform(appId: string, projectName: string, platform: Server.DevicePlatform): IFuture<Server.MigrationResult>{
+		return this.$serviceProxy.call<Server.MigrationResult>('AddPlatform', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'platforms',encodeURI((<any>platform).replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public migrate(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>{
+		return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'migrate'].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
+	}
+	public getProjectCordovaPlugins(appId: string, projectName: string): IFuture<Server.CordovaPluginData[]>{
+		return this.$serviceProxy.call<Server.CordovaPluginData[]>('GetProjectCordovaPlugins', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'plugins'].join('/'), 'application/json', null, null);
+	}
+	public getCordovaPluginVariables(appId: string, projectName: string): IFuture<Server.CordovaPluginVariablesData>{
+		return this.$serviceProxy.call<Server.CordovaPluginVariablesData>('GetCordovaPluginVariables', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'plugins','variables'].join('/'), 'application/json', null, null);
+	}
+	public setCordovaPluginVariable(appId: string, projectName: string, pluginId: string, variableName: string, configuration: string, value: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetCordovaPluginVariable', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'cordova',encodeURI(projectName.replace(/\\/g, '/')),'plugins','variables',encodeURI(pluginId.replace(/\\/g, '/')),encodeURI(variableName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{name: 'value', value: JSON.stringify(value), contentType: 'application/json'}], null);
+	}
+}
 export class IdentityStoreService implements Server.IIdentityStoreServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -144,6 +169,19 @@ export class InternalExtensionsService implements Server.IInternalExtensionsServ
 		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(extensionVersion.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 }
+export class UploadService implements Server.IUploadServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public completeUpload(path: string, originalFileHash: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('CompleteUpload', 'POST', ['api','upload','complete',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'originalFileHash': originalFileHash }), null, null, null);
+	}
+	public initUpload(path: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public uploadChunk(path: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+}
 export class FilesystemService implements Server.IFilesystemServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -163,17 +201,36 @@ export class FilesystemService implements Server.IFilesystemServiceContract{
 		return this.$serviceProxy.call<void>('Remove', 'DELETE', ['api','filesystem',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 }
-export class UploadService implements Server.IUploadServiceContract{
+export class AppsFilesService implements Server.IAppsFilesServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public completeUpload(path: string, originalFileHash: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('CompleteUpload', 'POST', ['api','upload','complete',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'originalFileHash': originalFileHash }), null, null, null);
+	public getFile(appId: string, path: string, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GetFile', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
 	}
-	public initUpload(path: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('InitUpload', 'POST', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	public save(appId: string, path: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('Save', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
 	}
-	public uploadChunk(path: string, content: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api','upload',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	public createDirectory(appId: string, path: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('CreateDirectory', 'MKDIR', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public remove(appId: string, path: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Remove', 'DELETE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public rename(appId: string, path: string, destinationAppId: string, newPath: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Rename', 'MOVE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'destinationAppId': destinationAppId }), null, [{name: 'newPath', value: JSON.stringify(newPath), contentType: 'application/json'}], null);
+	}
+	public copy(appId: string, path: string, destinationAppId: string, destination: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Copy', 'COPY', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'files',encodeURI(path.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'destinationAppId': destinationAppId }), null, [{name: 'destination', value: JSON.stringify(destination), contentType: 'application/json'}], null);
+	}
+}
+export class AppsImagesService implements Server.IAppsImagesServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public resizeImage(appId: string, path: string, size: Server.Size): IFuture<void>{
+		return this.$serviceProxy.call<void>('ResizeImage', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'images','resize',encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{name: 'size', value: JSON.stringify(size), contentType: 'application/json'}], null);
+	}
+	public generate(appId: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>{
+		return this.$serviceProxy.call<string[]>('Generate', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'images','generate',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'type': type }), 'application/json', [{name: 'image', value: image, contentType: 'application/octet-stream'}], null);
 	}
 }
 export class ImagesService implements Server.IImagesServiceContract{
@@ -187,6 +244,13 @@ export class ImagesService implements Server.IImagesServiceContract{
 	}
 	public generateArchive(type: Server.ImageType, image: any, $resultStream: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('GenerateArchive', 'POST', ['api','images','generate'].join('/') + '?' + querystring.stringify({ 'type': type }), 'application/octet-stream', [{name: 'image', value: image, contentType: 'application/octet-stream'}], $resultStream);
+	}
+}
+export class AppsItmstransporterService implements Server.IAppsItmstransporterServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public uploadApplication(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'itmstransporter','upload',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
 }
 export class ItmstransporterService implements Server.IItmstransporterServiceContract{
@@ -210,6 +274,16 @@ export class KendoService implements Server.IKendoServiceContract{
 	}
 	public getCurrentPackage(solutionName: string, projectName: string): IFuture<Server.KendoPackageData>{
 		return this.$serviceProxy.call<Server.KendoPackageData>('GetCurrentPackage', 'GET', ['api','kendo',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),'version'].join('/'), 'application/json', null, null);
+	}
+}
+export class AppsKendoService implements Server.IAppsKendoServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public changeKendoPackage(appId: string, projectName: string, packageId: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('ChangeKendoPackage', 'PATCH', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'kendo',encodeURI(projectName.replace(/\\/g, '/')),'migrate'].join('/') + '?' + querystring.stringify({ 'packageId': packageId }), null, null, null);
+	}
+	public getCurrentPackage(appId: string, projectName: string): IFuture<Server.KendoPackageData>{
+		return this.$serviceProxy.call<Server.KendoPackageData>('GetCurrentPackage', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'kendo',encodeURI(projectName.replace(/\\/g, '/')),'version'].join('/'), 'application/json', null, null);
 	}
 }
 export class MobileprovisionsService implements Server.IMobileprovisionsServiceContract{
@@ -238,24 +312,11 @@ export class NativescriptService implements Server.INativescriptServiceContract{
 		return this.$serviceProxy.call<Server.NativeScriptMarketplacePluginVersionsData[]>('GetMarketplacePluginVersionsData', 'GET', ['api','nativescript','marketplace-plugins'].join('/'), 'application/json', null, null);
 	}
 }
-export class BuildService implements Server.IBuildServiceContract{
+export class AppsNativescriptService implements Server.IAppsNativescriptServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>{
-		return this.$serviceProxy.call<Server.BuildResultData>('BuildProject', 'POST', ['api','build',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json'}], null);
-	}
-}
-export class NpmService implements Server.INpmServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>{
-		return this.$serviceProxy.call<Server.NpmSearchResult>('QueryNpmSearch', 'GET', ['api','npm','search'].join('/') + '?' + querystring.stringify({ 'packageName': packageName, 'size': size, 'sortOrder': sortOrder, 'start': start }), 'application/json', null, null);
-	}
-	public getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>{
-		return this.$serviceProxy.call<Server.NpmPackage>('GetNpmPackageInfo', 'GET', ['api','npm','info',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
-	}
-	public getNpmPackageDownloads(packageName: string): IFuture<number>{
-		return this.$serviceProxy.call<number>('GetNpmPackageDownloads', 'GET', ['api','npm','downloads',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	public migrate(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>{
+		return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'nativescript','migrate',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
 	}
 }
 export class ProjectsService implements Server.IProjectsServiceContract{
@@ -325,20 +386,135 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 		return this.$serviceProxy.call<Server.ProjectItemInfo[]>('CreateNewProjectItem', 'POST', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(itemIdentifier.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
 }
-export class PackagesService implements Server.IPackagesServiceContract{
+export class AppsProjectsService implements Server.IAppsProjectsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public exportProject(appId: string, projectName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('ExportProject', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','export',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
+	}
+	public importPackage(appId: string, projectName: string, parentIdentifier: string, archivePackage: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('ImportPackage', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','import',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(parentIdentifier.replace(/\\/g, '/'))].join('/'), null, [{name: 'archivePackage', value: archivePackage, contentType: 'application/octet-stream'}], null);
+	}
+	public importProject(appId: string, projectName: string, package_: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('ImportProject', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','importProject',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
+	}
+	public importLocalProject(appId: string, projectName: string, bucketKey: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('ImportLocalProject', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','importProject',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(bucketKey.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public getProjectContents(appId: string, projectName: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetProjectContents', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','contents',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public saveProjectContents(appId: string, projectName: string, projectContents: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SaveProjectContents', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','contents',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'projectContents', value: JSON.stringify(projectContents), contentType: 'application/json'}], null);
+	}
+	public createProject(appId: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	}
+	public deleteProject(appId: string, projectName: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('DeleteProject', 'DELETE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public setProjectProperty(appId: string, projectName: string, configuration: string, changeset: IDictionary<string>): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetProjectProperty', 'PATCH', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{name: 'changeset', value: JSON.stringify(changeset), contentType: 'application/json'}], null);
+	}
+	public renameProject(appId: string, projectName: string, newProjectName: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('RenameProject', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','rename',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(newProjectName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public createNewProjectItem(appId: string, projectName: string, itemIdentifier: string, expansionData: Server.ItemTemplateExpansionData): IFuture<Server.ProjectItemInfo[]>{
+		return this.$serviceProxy.call<Server.ProjectItemInfo[]>('CreateNewProjectItem', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(itemIdentifier.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	}
+}
+export class AppsService implements Server.IAppsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public exportApplication(appId: string, skipMetadata: boolean, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('ExportApplication', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'export'].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
+	}
+	public createApplication(applicationData: Server.ApplicationCreationData): IFuture<IDictionary<Object>>{
+		return this.$serviceProxy.call<IDictionary<Object>>('CreateApplication', 'POST', ['api','apps'].join('/'), 'application/json', [{name: 'applicationData', value: JSON.stringify(applicationData), contentType: 'application/json'}], null);
+	}
+	public enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('EnableApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
+	}
+	public getApplication(appId: string, checkUpgradability: boolean): IFuture<Server.SolutionData>{
+		return this.$serviceProxy.call<Server.SolutionData>('GetApplication', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'checkUpgradability': checkUpgradability }), 'application/json', null, null);
+	}
+	public canLoadApplication(appId: string): IFuture<boolean>{
+		return this.$serviceProxy.call<boolean>('CanLoadApplication', 'EXISTS', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public deleteApplication(appId: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('DeleteApplication', 'DELETE', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public upgradeApplication(appId: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UpgradeApplication', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'upgrade'].join('/'), null, null, null);
+	}
+	public getApplicationServices(appId: string): IFuture<Server.ApplicationServiceData[]>{
+		return this.$serviceProxy.call<Server.ApplicationServiceData[]>('GetApplicationServices', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'services'].join('/'), 'application/json', null, null);
+	}
+	public enableApplicationService(appId: string, serviceData: IDictionary<Object>): IFuture<IDictionary<Object>>{
+		return this.$serviceProxy.call<IDictionary<Object>>('EnableApplicationService', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'services'].join('/'), 'application/json', [{name: 'serviceData', value: JSON.stringify(serviceData), contentType: 'application/json'}], null);
+	}
+}
+export class AppsBowerService implements Server.IAppsBowerServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public installDependencies(appId: string, projectName: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('InstallDependencies', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'bower','dependencies',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public installPackage(appId: string, projectName: string, packageName: string, version: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('InstallPackage', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'bower',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(packageName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'version': version }), null, null, null);
+	}
+	public getInstalledPackages(appId: string, projectName: string): IFuture<Server.PackageData[]>{
+		return this.$serviceProxy.call<Server.PackageData[]>('GetInstalledPackages', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'bower',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+}
+export class BowerService implements Server.IBowerServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
 	public installDependencies(solutionName: string, projectName: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('InstallDependencies', 'POST', ['api','packages','dependencies',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, null, null);
+		return this.$serviceProxy.call<void>('InstallDependencies', 'POST', ['api','bower','dependencies',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
 	public installPackage(solutionName: string, projectName: string, packageName: string, version: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('InstallPackage', 'PUT', ['api','packages',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(packageName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'version': version }), null, null, null);
+		return this.$serviceProxy.call<void>('InstallPackage', 'PUT', ['api','bower',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(packageName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'version': version }), null, null, null);
 	}
 	public getInstalledPackages(solutionName: string, projectName: string): IFuture<Server.PackageData[]>{
-		return this.$serviceProxy.call<Server.PackageData[]>('GetInstalledPackages', 'GET', ['api','packages',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+		return this.$serviceProxy.call<Server.PackageData[]>('GetInstalledPackages', 'GET', ['api','bower',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 	public getFilters(): IFuture<Server.BowerPackagesFilters>{
-		return this.$serviceProxy.call<Server.BowerPackagesFilters>('GetFilters', 'GET', ['api','packages','filters'].join('/'), 'application/json', null, null);
+		return this.$serviceProxy.call<Server.BowerPackagesFilters>('GetFilters', 'GET', ['api','bower','filters'].join('/'), 'application/json', null, null);
+	}
+}
+export class BuildService implements Server.IBuildServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>{
+		return this.$serviceProxy.call<Server.BuildResultData>('BuildProject', 'POST', ['api','build',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json'}], null);
+	}
+}
+export class AppsBuildService implements Server.IAppsBuildServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public buildProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): IFuture<Server.BuildResultData>{
+		return this.$serviceProxy.call<Server.BuildResultData>('BuildProject', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'build',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json'}], null);
+	}
+}
+export class NpmService implements Server.INpmServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public queryNpmSearch(packageName: string, size: number, sortOrder: Server.SortOrder, start: number): IFuture<Server.NpmSearchResult>{
+		return this.$serviceProxy.call<Server.NpmSearchResult>('QueryNpmSearch', 'GET', ['api','npm','search'].join('/') + '?' + querystring.stringify({ 'packageName': packageName, 'size': size, 'sortOrder': sortOrder, 'start': start }), 'application/json', null, null);
+	}
+	public getNpmPackageInfo(packageName: string): IFuture<Server.NpmPackage>{
+		return this.$serviceProxy.call<Server.NpmPackage>('GetNpmPackageInfo', 'GET', ['api','npm','info',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public getNpmPackageDownloads(packageName: string): IFuture<number>{
+		return this.$serviceProxy.call<number>('GetNpmPackageDownloads', 'GET', ['api','npm','downloads',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+}
+export class AppsPublishService implements Server.IAppsPublishServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('PublishFtp', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'publish','ftp',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'ftpConnectionData', value: JSON.stringify(ftpConnectionData), contentType: 'application/json'}], null);
 	}
 }
 export class PublishService implements Server.IPublishServiceContract{
@@ -362,6 +538,35 @@ export class RawSettingsService implements Server.IRawSettingsServiceContract{
 	}
 	public saveSolutionUserSettings(solutionName: string, content: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('SaveSolutionUserSettings', 'POST', ['api','rawSettings','solution',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+}
+export class AppsRawSettingsService implements Server.IAppsRawSettingsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public getSolutionUserSettings(appId: string, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GetSolutionUserSettings', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'rawSettings','solution'].join('/'), 'application/octet-stream', null, $resultStream);
+	}
+	public saveSolutionUserSettings(appId: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('SaveSolutionUserSettings', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'rawSettings','solution'].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	}
+}
+export class AppsSettingsService implements Server.IAppsSettingsServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public getSettings(appId: string): IFuture<Server.SettingsData>{
+		return this.$serviceProxy.call<Server.SettingsData>('GetSettings', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','solution'].join('/'), 'application/json', null, null);
+	}
+	public setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetCodesignIdentity', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','codesignIdentity',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'platform': platform }), null, [{name: 'identityAlias', value: JSON.stringify(identityAlias), contentType: 'application/json'}], null);
+	}
+	public setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetMobileProvision', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','mobileProvision',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'provisionIdentifier', value: JSON.stringify(provisionIdentifier), contentType: 'application/json'}], null);
+	}
+	public setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetActiveBuildConfiguration', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','buildConfiguration',encodeURI(buildConfiguration.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UpdateSettingsProjectIdentifier', 'PATCH', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','updateProjectIdentifier',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'newProjectIdentity', value: JSON.stringify(newProjectIdentity), contentType: 'application/json'}], null);
 	}
 }
 export class SettingsService implements Server.ISettingsServiceContract{
@@ -412,6 +617,29 @@ export class TamService implements Server.ITamServiceContract{
 		return this.$serviceProxy.call<Server.FeatureStatus>('GetAccountStatus', 'GET', ['api','tam','account','status'].join('/'), 'application/json', null, null);
 	}
 }
+export class AppsTamService implements Server.IAppsTamServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public uploadApplication(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
+		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','applications',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	}
+	public uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadPatch', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','patches',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'patchData', value: JSON.stringify(patchData), contentType: 'application/json'}], null);
+	}
+}
+export class AppsTapService implements Server.IAppsTapServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public getRemote(appId: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetRemote', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), 'application/json', null, null);
+	}
+	public setRemote(appId: string, remoteUrl: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetRemote', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), null, [{name: 'remoteUrl', value: JSON.stringify(remoteUrl), contentType: 'application/json'}], null);
+	}
+	public initCurrentUserSharedRepository(appId: string): IFuture<boolean>{
+		return this.$serviceProxy.call<boolean>('InitCurrentUserSharedRepository', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','userProjects','initSharedRepository'].join('/'), 'application/json', null, null);
+	}
+}
 export class TapService implements Server.ITapServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -430,8 +658,8 @@ export class TapService implements Server.ITapServiceContract{
 	public getUsersForProject(solutionName: string): IFuture<Server.Collaborator[]>{
 		return this.$serviceProxy.call<Server.Collaborator[]>('GetUsersForProject', 'GET', ['api','tap','userProjects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
-	public initCurrentUserSharedRepository(solutionName: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('InitCurrentUserSharedRepository', 'POST', ['api','tap','userProjects',encodeURI(solutionName.replace(/\\/g, '/')),'initSharedRepository'].join('/'), null, null, null);
+	public initCurrentUserSharedRepository(solutionName: string): IFuture<boolean>{
+		return this.$serviceProxy.call<boolean>('InitCurrentUserSharedRepository', 'POST', ['api','tap','userProjects',encodeURI(solutionName.replace(/\\/g, '/')),'initSharedRepository'].join('/'), 'application/json', null, null);
 	}
 	public getWorkspaces(accountId: string): IFuture<Server.TapWorkspaceData[]>{
 		return this.$serviceProxy.call<Server.TapWorkspaceData[]>('GetWorkspaces', 'GET', ['api','tap','workspaces',encodeURI(accountId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
@@ -453,6 +681,88 @@ export class TapService implements Server.ITapServiceContract{
 	}
 	public getReadNotifications(accountId: string, fromDate: Date): IFuture<Server.TapNotificationData[]>{
 		return this.$serviceProxy.call<Server.TapNotificationData[]>('GetReadNotifications', 'GET', ['api','tap','notifications',encodeURI(accountId.replace(/\\/g, '/')),'read'].join('/') + '?' + querystring.stringify({ 'fromDate': fromDate }), 'application/json', null, null);
+	}
+}
+export class AppsVersioncontrolService implements Server.IAppsVersioncontrolServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public init(appId: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Init', 'INIT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol'].join('/'), null, null, null);
+	}
+	public rollback(appId: string, versionName: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Rollback', 'ROLLBACK', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), null, null, null);
+	}
+	public reset(appId: string, resetMode: Server.ResetMode, versionName: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('Reset', 'RESET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol'].join('/') + '?' + querystring.stringify({ 'resetMode': resetMode, 'versionName': versionName }), null, null, null);
+	}
+	public merge(appId: string, versionName: string): IFuture<Server.BranchItemData>{
+		return this.$serviceProxy.call<Server.BranchItemData>('Merge', 'MERGE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), 'application/json', null, null);
+	}
+	public revert(appId: string, versionName: string, filePaths: string[]): IFuture<void>{
+		return this.$serviceProxy.call<void>('Revert', 'REVERT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','files'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public resolve(appId: string, versionName: string, filePaths: string[]): IFuture<void>{
+		return this.$serviceProxy.call<void>('Resolve', 'RESOLVE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','files'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public checkout(appId: string, versionName: string, filePaths: string[]): IFuture<void>{
+		return this.$serviceProxy.call<void>('Checkout', 'CHECKOUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','files'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public add(appId: string, filePaths: string[]): IFuture<void>{
+		return this.$serviceProxy.call<void>('Add', 'ADD', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','files'].join('/'), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public remove(appId: string, filePaths: string[]): IFuture<void>{
+		return this.$serviceProxy.call<void>('Remove', 'REMOVE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','files'].join('/'), null, [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public getBranches(appId: string): IFuture<Server.BranchItemData[]>{
+		return this.$serviceProxy.call<Server.BranchItemData[]>('GetBranches', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','branches'].join('/'), 'application/json', null, null);
+	}
+	public getCurrentBranch(appId: string): IFuture<Server.BranchItemData>{
+		return this.$serviceProxy.call<Server.BranchItemData>('GetCurrentBranch', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','branch'].join('/'), 'application/json', null, null);
+	}
+	public checkoutBranch(appId: string, branchName: string, createBranch: boolean, versionName: string): IFuture<Server.BranchItemData>{
+		return this.$serviceProxy.call<Server.BranchItemData>('CheckoutBranch', 'CHECKOUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','branches',encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'createBranch': createBranch, 'versionName': versionName }), 'application/json', null, null);
+	}
+	public createBranch(appId: string, branchName: string, versionName: string): IFuture<Server.BranchItemData>{
+		return this.$serviceProxy.call<Server.BranchItemData>('CreateBranch', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','branches',encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), 'application/json', null, null);
+	}
+	public deleteBranch(appId: string, branchName: string, forceDelete: boolean): IFuture<void>{
+		return this.$serviceProxy.call<void>('DeleteBranch', 'DELETE', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','branches',encodeURI(branchName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'forceDelete': forceDelete }), null, null, null);
+	}
+	public getRemote(appId: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetRemote', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','remote'].join('/'), 'application/json', null, null);
+	}
+	public setRemote(appId: string, remoteData: Server.GitRemoteData): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetRemote', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','remote'].join('/'), null, [{name: 'remoteData', value: JSON.stringify(remoteData), contentType: 'application/json'}], null);
+	}
+	public getInfo(appId: string): IFuture<Server.VersionControlData>{
+		return this.$serviceProxy.call<Server.VersionControlData>('GetInfo', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','info'].join('/'), 'application/json', null, null);
+	}
+	public track(appId: string): IFuture<Server.ChangeItemData[]>{
+		return this.$serviceProxy.call<Server.ChangeItemData[]>('Track', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','status'].join('/'), 'application/json', null, null);
+	}
+	public getStatus(appId: string, filePaths: string[]): IFuture<Server.ChangeItemData[]>{
+		return this.$serviceProxy.call<Server.ChangeItemData[]>('GetStatus', 'XGET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','status','files'].join('/'), 'application/json', [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public getDiff(appId: string, versionName: string, contextSize: number, otherVersionName: string, filePaths: string[]): IFuture<Server.DiffLineResultData[]>{
+		return this.$serviceProxy.call<Server.DiffLineResultData[]>('GetDiff', 'XGET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol',encodeURI(versionName.replace(/\\/g, '/')),'diff','files'].join('/') + '?' + querystring.stringify({ 'contextSize': contextSize, 'otherVersionName': otherVersionName }), 'application/json', [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public getConflicts(appId: string, contextSize: number, filePaths: string[]): IFuture<Server.DiffLineResultData[]>{
+		return this.$serviceProxy.call<Server.DiffLineResultData[]>('GetConflicts', 'XGET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','conflicts','files'].join('/') + '?' + querystring.stringify({ 'contextSize': contextSize }), 'application/json', [{name: 'filePaths', value: JSON.stringify(filePaths), contentType: 'application/json'}], null);
+	}
+	public getCommits(appId: string, endDate: Date, startDate: Date): IFuture<Server.ChangeSetData[]>{
+		return this.$serviceProxy.call<Server.ChangeSetData[]>('GetCommits', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','commits'].join('/') + '?' + querystring.stringify({ 'endDate': endDate, 'startDate': startDate }), 'application/json', null, null);
+	}
+	public getCommit(appId: string, versionName: string): IFuture<Server.ChangeSetData>{
+		return this.$serviceProxy.call<Server.ChangeSetData>('GetCommit', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol','commit'].join('/') + '?' + querystring.stringify({ 'versionName': versionName }), 'application/json', null, null);
+	}
+	public getChanges(appId: string, versionName: string): IFuture<Server.ChangeItemData[]>{
+		return this.$serviceProxy.call<Server.ChangeItemData[]>('GetChanges', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol',encodeURI(versionName.replace(/\\/g, '/')),'changes'].join('/'), 'application/json', null, null);
+	}
+	public getContents(appId: string, versionName: string, filePath: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetContents', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol',encodeURI(versionName.replace(/\\/g, '/')),'contents',encodeURI(filePath.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public getHistory(appId: string, versionName: string, filePath: string): IFuture<Server.HistoryItemData[]>{
+		return this.$serviceProxy.call<Server.HistoryItemData[]>('GetHistory', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'versioncontrol',encodeURI(versionName.replace(/\\/g, '/')),'history',encodeURI(filePath.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 }
 export class VersioncontrolService implements Server.IVersioncontrolServiceContract{
@@ -541,27 +851,43 @@ export class ServiceContainer implements Server.IServer{
 	constructor(private $injector: IInjector){ }
 	public authentication: Server.IAuthenticationServiceContract = this.$injector.resolve(AuthenticationService);
 	public cordova: Server.ICordovaServiceContract = this.$injector.resolve(CordovaService);
+	public appsCordova: Server.IAppsCordovaServiceContract = this.$injector.resolve(AppsCordovaService);
 	public identityStore: Server.IIdentityStoreServiceContract = this.$injector.resolve(IdentityStoreService);
 	public everlive: Server.IEverliveServiceContract = this.$injector.resolve(EverliveService);
 	public extensions: Server.IExtensionsServiceContract = this.$injector.resolve(ExtensionsService);
 	public internalExtensions: Server.IInternalExtensionsServiceContract = this.$injector.resolve(InternalExtensionsService);
-	public filesystem: Server.IFilesystemServiceContract = this.$injector.resolve(FilesystemService);
 	public upload: Server.IUploadServiceContract = this.$injector.resolve(UploadService);
+	public filesystem: Server.IFilesystemServiceContract = this.$injector.resolve(FilesystemService);
+	public appsFiles: Server.IAppsFilesServiceContract = this.$injector.resolve(AppsFilesService);
+	public appsImages: Server.IAppsImagesServiceContract = this.$injector.resolve(AppsImagesService);
 	public images: Server.IImagesServiceContract = this.$injector.resolve(ImagesService);
+	public appsItmstransporter: Server.IAppsItmstransporterServiceContract = this.$injector.resolve(AppsItmstransporterService);
 	public itmstransporter: Server.IItmstransporterServiceContract = this.$injector.resolve(ItmstransporterService);
 	public kendo: Server.IKendoServiceContract = this.$injector.resolve(KendoService);
+	public appsKendo: Server.IAppsKendoServiceContract = this.$injector.resolve(AppsKendoService);
 	public mobileprovisions: Server.IMobileprovisionsServiceContract = this.$injector.resolve(MobileprovisionsService);
 	public nativescript: Server.INativescriptServiceContract = this.$injector.resolve(NativescriptService);
-	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
-	public npm: Server.INpmServiceContract = this.$injector.resolve(NpmService);
+	public appsNativescript: Server.IAppsNativescriptServiceContract = this.$injector.resolve(AppsNativescriptService);
 	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
-	public packages: Server.IPackagesServiceContract = this.$injector.resolve(PackagesService);
+	public appsProjects: Server.IAppsProjectsServiceContract = this.$injector.resolve(AppsProjectsService);
+	public apps: Server.IAppsServiceContract = this.$injector.resolve(AppsService);
+	public appsBower: Server.IAppsBowerServiceContract = this.$injector.resolve(AppsBowerService);
+	public bower: Server.IBowerServiceContract = this.$injector.resolve(BowerService);
+	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
+	public appsBuild: Server.IAppsBuildServiceContract = this.$injector.resolve(AppsBuildService);
+	public npm: Server.INpmServiceContract = this.$injector.resolve(NpmService);
+	public appsPublish: Server.IAppsPublishServiceContract = this.$injector.resolve(AppsPublishService);
 	public publish: Server.IPublishServiceContract = this.$injector.resolve(PublishService);
 	public rawSettings: Server.IRawSettingsServiceContract = this.$injector.resolve(RawSettingsService);
+	public appsRawSettings: Server.IAppsRawSettingsServiceContract = this.$injector.resolve(AppsRawSettingsService);
+	public appsSettings: Server.IAppsSettingsServiceContract = this.$injector.resolve(AppsSettingsService);
 	public settings: Server.ISettingsServiceContract = this.$injector.resolve(SettingsService);
 	public status: Server.IStatusServiceContract = this.$injector.resolve(StatusService);
 	public tam: Server.ITamServiceContract = this.$injector.resolve(TamService);
+	public appsTam: Server.IAppsTamServiceContract = this.$injector.resolve(AppsTamService);
+	public appsTap: Server.IAppsTapServiceContract = this.$injector.resolve(AppsTapService);
 	public tap: Server.ITapServiceContract = this.$injector.resolve(TapService);
+	public appsVersioncontrol: Server.IAppsVersioncontrolServiceContract = this.$injector.resolve(AppsVersioncontrolService);
 	public versioncontrol: Server.IVersioncontrolServiceContract = this.$injector.resolve(VersioncontrolService);
 }
 $injector.register('server', ServiceContainer);
