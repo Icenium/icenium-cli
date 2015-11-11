@@ -12,7 +12,7 @@ class DoctorService implements IDoctorService {
 
 	public printWarnings(): boolean {
 		let result = false;
-		let sysInfo = this.$sysInfo.getSysInfo();
+		let sysInfo = this.$sysInfo.getSysInfo().wait();
 
 		if (!sysInfo.adbVer) {
 			this.$logger.warn("WARNING: adb from the Android SDK is not installed or is not configured properly. ");
