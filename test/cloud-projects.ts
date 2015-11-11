@@ -32,6 +32,9 @@ export class LoggerStub implements ILogger {
 		args.unshift(formatStr);
 		this.warnOutput += util.format.apply(null, args) + EOL;
 	}
+	warnWithLabel(formatStr: string, ...args:string[]): void {
+		this.warn(formatStr, ...args);
+	}
 	info(formatStr: string, ...args:string[]): void {
 		args.unshift(formatStr);
 		this.infoOutput += util.format.apply(null, args) + EOL;
