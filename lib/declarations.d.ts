@@ -9,7 +9,10 @@ declare module Server {
 	interface IServiceProxy {
 		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T>;
 		setShouldAuthenticate(shouldAuthenticate: boolean): void;
-		setSolutionSpaceName(solutionSpaceName: string): void;
+	}
+
+	interface IAppBuilderServiceProxy extends IServiceProxy {
+		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T>
 	}
 
 	interface IServiceContractClientCode {
@@ -812,14 +815,13 @@ interface IProcessInfo {
 }
 
 interface IRemoteProjectService {
-	makeTapServiceCall<T>(call: () => IFuture<T>): IFuture<T>;
 	getProjectProperties(solutionName: string, projectName: string): IFuture<any>;
-	getSolutions(): IFuture<Server.TapSolutionData[]>;
-	getProjectsForSolution(solutionName: string): IFuture<Server.IWorkspaceItemData[]>;
-	getSolutionName(solutionId: string): IFuture<string>;
+	getProjectsForSolution(solutionId: string): IFuture<Server.IWorkspaceItemData[]>;
 	getProjectName(solutionId: string, projectId: string): IFuture<string>;
 	exportProject(remoteSolutionName: string, remoteProjectName: string): IFuture<void>;
 	exportSolution(remoteSolutionName: string): IFuture<void>;
+	getAvailableAppsAndSolutions(): IFuture<ITapAppData[]>;
+	getSolutionData(propertyValue: string): IFuture<Server.SolutionData>;
 }
 
 interface IProjectSimulatorService {
@@ -1105,4 +1107,58 @@ interface INativeScriptResources {
 	 * different NativeScript versions.
 	 */
 	nativeScriptMigrationFile: string;
+}
+
+/**
+ * Describes information for applications returned by TAP
+ */
+interface ITapAppData {
+	/**
+	 * AccountId of the owner of the project.
+	 */
+	accountId: string;
+
+	/**
+	 * Platform application Identifier.
+	 */
+	id: string;
+
+	/**
+	 * Type of the application (Hybrid, Native, etc.).
+	 */
+	type: string;
+
+	/**
+	 * Specific settings of the application.
+	 */
+	settings: any;
+
+	/**
+	 * Unique name of the application.
+	 * NOTE: It is unique in the context of applications only. Old Solutions and new apps may have the same name.
+	 */
+	name: string;
+
+	/**
+	 * Description of the application.
+	 */
+	description: string;
+
+	/**
+	 * The name that can be used by the users when they want to specify app for export.
+	 * This property is set client side, it does not exist in TAP.
+	 */
+	displayName: string;
+
+	/**
+	 * The name that will be shown to the users in the prompter.
+	 * This property is set client side, it does not exist in TAP.
+	 */
+	colorizedDisplayName: string;
+
+	/**
+	 * Indicates if the application is migrated (true) or not (false).
+	 * This property is set client side, it does not exist in TAP.
+	 */
+	isApp: boolean;
 }

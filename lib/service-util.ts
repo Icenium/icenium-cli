@@ -4,25 +4,22 @@
 import * as util from "util";
 import * as helpers from "./helpers";
 
-export class ServiceProxy implements Server.IServiceProxy {
+export class ServiceProxyBase implements Server.IServiceProxy {
 	private latestVersion: string = null;
 	private shouldAuthenticate: boolean = true;
-	private solutionSpaceName: string;
 
-	constructor(private $httpClient: Server.IHttpClient,
-		private $userDataStore: IUserDataStore,
-		private $logger: ILogger,
-		private $config: IConfiguration,
-		private $staticConfig: IStaticConfig,
-		private $errors: IErrors) {
+	constructor(protected $httpClient: Server.IHttpClient,
+		protected $userDataStore: IUserDataStore,
+		protected $logger: ILogger,
+		protected $config: IConfiguration,
+		protected $staticConfig: IStaticConfig,
+		protected $errors: IErrors) {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
 		return(() => {
 			this.ensureUpToDate().wait();
 			headers = headers || Object.create(null);
-
-			headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 
 			let cookies: IStringDictionary;
 			if (this.shouldAuthenticate) {
@@ -40,7 +37,7 @@ export class ServiceProxy implements Server.IServiceProxy {
 			let requestOpts: any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
-				path: "/appbuilder/" + path,
+				path:  `/${path}`,
 				method: method,
 				headers: headers,
 				pipeTo: resultStream
@@ -84,10 +81,6 @@ export class ServiceProxy implements Server.IServiceProxy {
 		this.shouldAuthenticate = shouldAuthenticate;
 	}
 
-	public setSolutionSpaceName(solutionSpaceName: string): void {
-		this.solutionSpaceName = solutionSpaceName;
-	}
-
 	private ensureUpToDate(): IFuture<void> {
 		return (() => {
 			if(this.$config.ON_PREM) {
@@ -109,7 +102,64 @@ export class ServiceProxy implements Server.IServiceProxy {
 		}).future<void>()();
 	}
 }
-$injector.register("serviceProxy", ServiceProxy);
+$injector.register("serviceProxyBase", ServiceProxyBase);
+
+export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.IAppBuilderServiceProxy {
+	private solutionSpaceName: string;
+	public useSolutionSpaceNameHeader = true;
+
+	constructor(protected $httpClient: Server.IHttpClient,
+		protected $userDataStore: IUserDataStore,
+		protected $logger: ILogger,
+		protected $config: IConfiguration,
+		protected $staticConfig: IStaticConfig,
+		protected $errors: IErrors) {
+			super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors);
+	}
+
+	public makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T> {
+		return (() => {
+			try {
+				let user = this.$userDataStore.getUser().wait();
+				this.solutionSpaceName = user.tenant.id;
+				if(solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
+					return this.callWithoutSolutionSpaceHeader(call).wait();
+				} else {
+					return call().wait();
+				}
+			} finally {
+				this.solutionSpaceName = null;
+			}
+		}).future<T>()();
+	}
+
+	private callWithoutSolutionSpaceHeader(action: () => IFuture<any>): IFuture<any> {
+		return (() => {
+			let cachedUseSolutionSpaceNameValue = this.useSolutionSpaceNameHeader;
+			this.useSolutionSpaceNameHeader = false;
+			let result: any;
+			try {
+				result = action().wait();
+			} finally {
+				this.useSolutionSpaceNameHeader = cachedUseSolutionSpaceNameValue;
+			}
+
+			return result;
+		}).future<any>()();
+	}
+
+	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
+		return (() => {
+			path = `appbuilder/${path}`;
+			headers = headers || Object.create(null);
+			if(this.useSolutionSpaceNameHeader) {
+				headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
+			}
+			return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers).wait();
+		}).future<any>()();
+	}
+}
+$injector.register("serviceProxy", AppBuilderServiceProxy);
 
 class CodePrinter {
 	private indent = "";

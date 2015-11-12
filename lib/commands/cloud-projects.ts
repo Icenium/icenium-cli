@@ -10,8 +10,8 @@ class SolutionIdCommandParameter implements ICommandParameter {
 	validate(validationValue?: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				this.$remoteProjectService.getSolutionName(validationValue).wait();
-				return true;
+				let app = this.$remoteProjectService.getSolutionData(validationValue).wait();
+				return !!app;
 			}
 
 			return false;
@@ -28,13 +28,13 @@ export class CloudListProjectsCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [new SolutionIdCommandParameter(this.$remoteProjectService)];
 
-	private printList(names: string[], solutionName?: string): void {
-		let isProject = !!solutionName;
-		let headers =  ["#", `${isProject ? 'Project' : 'Solution'} name`];
+	private printList(names: string[], appName?: string): void {
+		let isProject = !!appName;
+		let headers =  ["#", `${isProject ? 'Project' : 'App'} name`];
 		let data = names.map((name: string, index: number) => [(++index).toString(), name]);
 		let table = commonHelpers.createTable(headers, data);
 		if (isProject) {
-			this.$logger.out(`Projects for ${solutionName} solution:`);
+			this.$logger.out(`Projects for ${appName} app:`);
 		}
 
 		this.$logger.out(table.toString());
@@ -42,16 +42,15 @@ export class CloudListProjectsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let slnName: string;
-			if(args[0]) {
-				slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
-			} else {
-				let solutions = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
-				if (this.$options.all || !commonHelpers.isInteractive()) {
-					this.printList(solutions);
+			let apps = this.$remoteProjectService.getAvailableAppsAndSolutions().wait();
+			let slnName = args[0];
+			if(!slnName) {
+				let appDisplayNames = apps.map(app => app.colorizedDisplayName);
+				if (this.$options.all || !commonHelpers.isInteractive() || appDisplayNames.length === 1) {
+					this.printList(appDisplayNames);
 					return;
 				} else {
-					slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", solutions).wait();
+					slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", appDisplayNames).wait();
 				}
 			}
 
@@ -73,12 +72,10 @@ export class CloudExportProjectsCommand implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let projectIdentifier = args[1];
-			let slnName: string;
-			if(args[0]) {
-				slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
-			} else {
-				let solutions = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
-				slnName = this.$prompter.promptForChoice("Select solution to export", solutions).wait();
+			let slnName = args[0];
+			if(!slnName) {
+				let all = this.$remoteProjectService.getAvailableAppsAndSolutions().wait().map(sln => sln.colorizedDisplayName) || [];
+				slnName = this.$prompter.promptForChoice("Select solution to export", all).wait();
 				let projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(proj => proj.Name);
 				let exportSolutionItem = "Export the whole solution";
 				projects.push(exportSolutionItem);
@@ -99,7 +96,7 @@ export class CloudExportProjectsCommand implements ICommand {
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
-			let solutionNames = this.$remoteProjectService.getSolutions().wait().map(sln => sln.name);
+			let solutionNames = this.$remoteProjectService.getAvailableAppsAndSolutions().wait().map(sln => sln.colorizedDisplayName);
 			if(!solutionNames || !solutionNames.length) {
 				this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
 			}
@@ -113,7 +110,7 @@ export class CloudExportProjectsCommand implements ICommand {
 					this.$errors.fail("This command accepts maximum two parameters - solution name and project name.");
 				}
 
-				let slnName = this.$remoteProjectService.getSolutionName(args[0]).wait();
+				let slnName = args[0];
 				if(args[1]){
 					this.$remoteProjectService.getProjectName(slnName, args[1]).wait();
 				} else {

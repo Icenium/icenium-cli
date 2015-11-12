@@ -85,38 +85,51 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
-		setSolutionSpaceName: (tenantId: string) => {/* mock */}
+		makeTapServiceCall: (call: () => IFuture<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
 	});
-	testInjector.register("server", {
-		tap: {
-			getExistingClientSolutions: () => {
-				return Future.fromResult(
+
+	testInjector.register("serviceProxyBase", {
+		call: (tenantId: string) => { return Future.fromResult(
 				[{
 					"id": "id2",
 					"name": "Sln2",
+					"type": "Hybrid",
 					"accountId": "accountId",
-					"workspaceId": "workspaceId2",
+					"settings": {},
+					"isMigrating": false,
 					"description": "AppBuilder cross platform project"
 				},
 				{
 					"id": "id1",
 					"name": "Sln1",
+					"type": "Hybrid",
 					"accountId": "accountId",
-					"workspaceId": "workspaceId1",
+					"settings": {},
+					"isMigrating": false,
 					"description": "AppBuilder cross platform project"
 				},
 				{
 					"id": "id3",
 					"name": "Sln3",
+					"type": "Hybrid",
 					"accountId": "accountId",
-					"workspaceId": "workspaceId3",
+					"settings": {},
+					"isMigrating": false,
 					"description": "AppBuilder cross platform project"
 				}]);
+			},
+		setShouldAuthenticate: (shouldAuthenticate: boolean) => false
+	});
+
+	testInjector.register("server", {
+		tap: {
+			getExistingClientSolutions: () => {
+				return Future.fromResult();
 			}
 		},
-		projects: {
-			getSolution: (slnName: string, checkUpgradability: boolean) => {
-				if(slnName === "Sln1") {
+		apps: {
+			getApplication: (slnName: string, checkUpgradability: boolean) => {
+				if(slnName === "id1") {
 					return Future.fromResult({
 						"Name": "Sln1",
 						"Items": [
@@ -156,13 +169,13 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 						],
 						"IsUpgradeable": false
 					});
-				} else if (slnName === "Sln2") {
+				} else if (slnName === "id2") {
 					return Future.fromResult({
 						"Name": "Sln1",
 						"Items": [],
 						"IsUpgradeable": false
 					});
-				} else if(slnName === "Sln3") {
+				} else if(slnName === "id3") {
 					return Future.fromResult({
 						"Name": "Sln1",
 						"Items": [
@@ -185,10 +198,12 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 					});
 				}
 			},
-			exportProject: (solutionSpaceName: string, solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
+			exportApplication: (solutionName: string, skipMetadata: boolean, $resultStream: any) => {
 				return Future.fromResult();
-			},
-			exportSolution: (solutionSpaceName: string, solutionName: string, skipMetadata: boolean, $resultStream: any) => {
+			}
+		},
+		appsProjects: {
+			exportProject: (solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
 				return Future.fromResult();
 			}
 		}

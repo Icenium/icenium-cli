@@ -77,7 +77,7 @@ let httpClient = new MockHttpClient();
 testInjector.register("httpClient", httpClient);
 
 function makeProxy(): Server.IServiceProxy {
-	return testInjector.resolve(ServiceUtil.ServiceProxy);
+	return testInjector.resolve(ServiceUtil.AppBuilderServiceProxy);
 }
 
 describe("ServiceProxy", () => {
