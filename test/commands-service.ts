@@ -22,6 +22,7 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 	fatal(formatStr: string, ...args: string[]): void { throw new Error();}
 	error(formatStr: string, ...args: string[]): void { }
 	warn(formatStr: string, ...args: string[]): void { }
+	warnWithLabel(formatStr: string, ...args: string[]): void { }
 	info(formatStr: string, ...args: string[]): void { }
 	debug(formatStr: string, ...args: string[]): void { }
 	trace(formatStr: string, ...args: string[]): void { }
