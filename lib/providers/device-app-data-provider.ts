@@ -81,7 +81,7 @@ export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBase
 	}
 
 	public get liveSyncFormat(): string {
-		return null;
+		return "%s/Mist/MobilePackage/nsredirect?token=%s";
 	}
 
 	public encodeLiveSyncHostUri(hostUri: string): string {
