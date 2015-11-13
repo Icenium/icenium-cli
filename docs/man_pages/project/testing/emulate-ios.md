@@ -3,7 +3,7 @@ emulate ios
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--available-devices] [--debug] [--release] [--timeout]`
+General | `$ appbuilder emulate ios [--path <Directory>] [–-certificate <Certificate ID>] [--provision <Provision ID>] [--device <Device Name>] [--available-devices] [--debug] [--release] [--timeout] [--justlaunch]`
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator. <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
 <% if(isConsole) { %>
@@ -33,6 +33,7 @@ Before running the iOS Simulator, verify that you have met the following require
 * `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name.<% if(isHtml) { %> You must specify a provisioning profile. The provisioning profile must match the certificate. <% } %>    
 * `--device` - Specifies the name of the iOS Simulator device on which you want to run your app. 
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start before quitting the operation and releasing the console. The value must be a positive integer. If not set, the default timeout is 90 seconds.
+* `--justlaunch` - If set, does not print the application output in the console.
 
 ### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
