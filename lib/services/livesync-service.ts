@@ -167,16 +167,11 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 
 			this.ensureFullAccessPermissions(liveSyncRoot).wait();
 
-			let commands: string[];
+			let commands = [ this.liveSyncCommands.SyncFilesCommand() ];
 			if(this.$options.watch || this.$options.file) {
-				commands = [ this.liveSyncCommands.SyncFilesCommand(), this.liveSyncCommands.RefreshCurrentViewCommand() ] ;
+				commands.push(this.liveSyncCommands.RefreshCurrentViewCommand());
 			} else {
-				let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
-
-				let liveSyncDeviceAppData = (<ILiveSyncDeviceAppData>deviceAppData);
-				let liveSyncUrl = liveSyncDeviceAppData.liveSyncFormat ? util.format(liveSyncDeviceAppData.liveSyncFormat, this.$config.AB_SERVER, liveSyncToken) : this.$project.getLiveSyncUrl();
-
-				commands = [ this.liveSyncCommands.DeployProjectCommand(liveSyncUrl), this.liveSyncCommands.ReloadStartViewCommand() ];
+				commands.push(this.liveSyncCommands.ReloadStartViewCommand());
 			}
 
 			this.createCommandsFileOnDevice(liveSyncRoot, commands).wait();
