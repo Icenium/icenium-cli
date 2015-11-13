@@ -73,11 +73,10 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 
 			let projectDir = this.$project.getProjectDir().wait();
 
-			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<boolean> => {
+			let notInstalledAppOnDeviceAction = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
 					this.$errors.failWithoutHelp(`Unable to find application with identifier ${this.$project.projectData.AppIdentifier} on device ${device.deviceInfo.identifier}.`);
-					return false;
-				}).future<boolean>()();
+				}).future<void>()();
 			};
 
 			let platformSpecificLiveSyncServices: IDictionary<any> = {
@@ -85,15 +84,18 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				"ios": IOSLiveSyncService
 			};
 
-			this.sync(platform,
-				this.$project.projectData.AppIdentifier,
-				projectDir,
-				this.excludedProjectDirsAndFiles,
-				projectDir,
-				platformSpecificLiveSyncServices,
-				notInstalledAppOnDeviceAction,
-				() => Future.fromResult(false)
-			).wait();
+			let livesyncData=  {
+				platform: platform,
+				appIdentifier: this.$project.projectData.AppIdentifier,
+				projectFilesPath: projectDir,
+				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
+				watchGlob: projectDir,
+				platformSpecificLiveSyncServices: platformSpecificLiveSyncServices,
+				notInstalledAppOnDeviceAction: notInstalledAppOnDeviceAction,
+				notRunningiOSSimulatorAction: () => Future.fromResult()
+			};
+
+			this.sync(livesyncData).wait();
 
 		}).future<void>()();
 	}
