@@ -1,7 +1,7 @@
 {
   "name": "appbuilder",
   "preferGlobal": true,
-  "version": "2.14.0",
+  "version": "3.0.0",
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
@@ -44,7 +44,7 @@
     "hex": "0.0.1",
     "iconv-lite": "0.4.3",
     "inquirer": "0.8.2",
-    "ios-sim-portable": "1.0.12-gamma",
+    "ios-sim-portable": "1.0.13-delta",
     "ip": "0.3.2",
     "lodash": "3.5.0",
     "log4js": "0.6.9",
