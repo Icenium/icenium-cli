@@ -35,8 +35,6 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			sendEmail: { type: OptionType.Boolean },
 			group: { type: OptionType.Array },
 			mandatory: { type: OptionType.Boolean},
-			default: {type: OptionType.Boolean},
-			var: {type: OptionType.Object},
 			answers: { type: OptionType.String },
 			simulator: { type: OptionType.Boolean, default: true},
 			icon: { type: OptionType.String},

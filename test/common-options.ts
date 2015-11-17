@@ -2,7 +2,7 @@
 "use strict";
 
 let optionsPath = require("../lib/common/options");
-import errorsLib = require("../lib/common/errors");
+import {Errors} from "../lib/common/errors";
 import yok = require("./../lib/common/yok");
 import {assert} from "chai";
 let optionType = optionsPath.OptionType;
@@ -41,7 +41,7 @@ describe("common options", () => {
 	beforeEach(() => {
 		testInjector = createTestInjector();
 
-		let errors = new errorsLib.Errors();
+		let errors = new Errors(testInjector);
 		errors.failWithoutHelp = (message: string, ...args: any[]): void => {
 			isExecutionStopped = true;
 		};

@@ -213,3 +213,4 @@ $injector.requireCommand("resource|create", "./commands/resource");
 $injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
 $injector.require("nativeScriptResources", "./nativescript-resources");
 $injector.require("sysInfo", "./sys-info");
+$injector.require("messages", "./messages");

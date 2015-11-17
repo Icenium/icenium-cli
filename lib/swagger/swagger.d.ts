@@ -2,49 +2,11 @@ declare module Swagger {
 
 	interface ISwaggerServiceContract {
 		apis: ISwaggerApi[];
-		models?: IDictionary<IModel>;
+		models?: IDictionary<CodeGeneration.IModel>;
 		apiVersion?: string;
 		basePath?: string;
 		resourcePath?: string;
 		swaggerVersion?: string;
-	}
-
-	interface IModel {
-		id: string;
-		properties: IDictionary<IModelProperty>;
-	}
-
-	interface IModelProperty {
-		type: string;
-		items: IModelPropertyItems;
-		allowableValues: IModelPropertyValue;
-	}
-
-	interface IModelPropertyItems {
-		$ref: string;
-	}
-
-	interface IModelPropertyValue {
-		valueType: string;
-		values: string[];
-	}
-
-	interface ICodeEntity {
-		opener?: string;
-		codeEntityType: any;
-	}
-
-	interface ILine extends ICodeEntity {
-		content: string;
-	}
-
-	interface IBlock extends ICodeEntity {
-		opener: string;
-		codeEntities: ICodeEntity[];
-		writeLine(content: string): void;
-		addLine(line: ILine): void;
-		addBlock(block: IBlock): void;
-		addBlocks(blocks: IBlock[]): void;
 	}
 
 	interface ISwaggerApi {
@@ -64,7 +26,7 @@ declare module Swagger {
 		name: string;
 		paramType: string;
 		dataType: string;
-		allowableValues: IModelPropertyValue;
+		allowableValues: CodeGeneration.IModelPropertyValue;
 	}
 
 	interface ITsTypeSystemHelpers {
@@ -78,16 +40,11 @@ declare module Swagger {
 		addModel(modelName: string): void;
 	}
 
-	interface IService {
-		serviceInterface: IBlock;
-		serviceImplementation: IBlock;
-	}
-
 	interface IServiceEndpoint {
 		operationContractName: string;
 		callResultType: string;
-		endpointInterface: ILine;
-		endpointImplementation: IBlock;
+		endpointInterface: CodeGeneration.ILine;
+		endpointImplementation: CodeGeneration.IBlock;
 		parameters: string[];
 	}
 }

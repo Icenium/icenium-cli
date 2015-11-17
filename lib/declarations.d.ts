@@ -15,15 +15,6 @@ declare module Server {
 		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T>
 	}
 
-	interface IServiceContractClientCode {
-		interfaceFile: string;
-		implementationFile: string;
-	}
-
-	interface IServiceContractGenerator {
-		generate(): IFuture<Server.IServiceContractClientCode>;
-	}
-
 	interface IServiceContractProvider {
 		getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract>;
 	}
@@ -916,8 +907,6 @@ interface IOptions extends ICommonOptions {
 	sendEmail: boolean;
 	group: string[];
 	mandatory: boolean;
-	default: boolean;
-	var: Object;
 	answers: string;
 	simulator: boolean;
 	icon: string;
