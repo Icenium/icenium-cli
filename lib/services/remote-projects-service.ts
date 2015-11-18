@@ -8,6 +8,15 @@ export class RemoteProjectService implements IRemoteProjectService {
 	private clientSolutions: ITapAppData[];
 	private clientProjectsPerSolution: IDictionary<Server.IWorkspaceItemData[]> = {};
 	private static NOT_MIGRATED_IDENTIFER = " (NOT MIGRATED)";
+	private static APP_FEATURE_TOGGLE_NAME = "projects-to-app";
+	private _isMigrationEnabledForUser: boolean = null;
+	private get isMigrationEnabledForUser(): boolean {
+		if(this._isMigrationEnabledForUser === null) {
+			let features = this.$server.tap.getFeatures(this.getUserTenantId().wait(), "tap").wait();
+			this._isMigrationEnabledForUser = features && features.length && _.contains(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
+		}
+		return this._isMigrationEnabledForUser;
+	}
 
 	constructor(private $server: Server.IServer,
 				private $userDataStore: IUserDataStore,
@@ -22,7 +31,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	public getAvailableAppsAndSolutions(): IFuture<ITapAppData[]> {
 		return ((): ITapAppData[] => {
 			if(!this.clientSolutions || !this.clientSolutions.length) {
-				let apps = this.getApps().wait();
+				let apps = this.isMigrationEnabledForUser ? this.getApps().wait() : [];
 				let solutions = this.getSolutions().wait();
 				this.clientSolutions = solutions.concat(apps);
 			}
@@ -142,8 +151,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	private getApps(): IFuture<ITapAppData[]> {
 		return ((): ITapAppData[] => {
-			let user = this.$userDataStore.getUser().wait();
-			let tenantId = user.tenant.id;
+			let tenantId = this.getUserTenantId().wait();
 			let existingClientApps = this.$serviceProxyBase.call<any>('', 'GET', ['api','accounts', tenantId, 'apps'].join('/'), 'application/json', null, null).wait();
 			return _.sortBy(existingClientApps, (clientSolution: ITapAppData) => clientSolution.name)
 					.map(app => {
@@ -167,8 +175,8 @@ export class RemoteProjectService implements IRemoteProjectService {
 							settings: null,
 							name: sln.name,
 							description: sln.description,
-							displayName: sln.name + RemoteProjectService.NOT_MIGRATED_IDENTIFER,
-							colorizedDisplayName: sln.name + `\x1B[31;1m${RemoteProjectService.NOT_MIGRATED_IDENTIFER}\x1B[0m`,
+							displayName: sln.name + (this.isMigrationEnabledForUser ? RemoteProjectService.NOT_MIGRATED_IDENTIFER : ""),
+							colorizedDisplayName: sln.name + (this.isMigrationEnabledForUser ? `\x1B[31;1m${RemoteProjectService.NOT_MIGRATED_IDENTIFER}\x1B[0m` : ""),
 							isApp: false
 						};
 					});
@@ -188,6 +196,13 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 			return matchingApp;
 		}).future<ITapAppData>()();
+	}
+
+	private getUserTenantId(): IFuture<string> {
+		return ((): string => {
+			let user = this.$userDataStore.getUser().wait();
+			return user.tenant.id;
+		}).future<string>()();
 	}
 }
 $injector.register("remoteProjectService", RemoteProjectService);

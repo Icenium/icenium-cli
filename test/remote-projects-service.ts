@@ -44,6 +44,10 @@ function createTestInjector(): IInjector {
 		tap: {
 			getExistingClientSolutions: () => {
 				return Future.fromResult();
+			},
+
+			getFeatures: (accountId: string, serviceType: string) => {
+				return Future.fromResult(["projects-to-app"]);
 			}
 		},
 		apps: {
