@@ -93,7 +93,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let projectsDirectories = this.$fs.readDirectory(solutionDir).wait();
 			projectsDirectories.forEach(projectName => this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName).wait());
 
-			this.$logger.info("%s has been successfully exported to %s", remoteSolutionName, solutionDir);
+			this.$logger.info("%s has been successfully exported to %s", slnName, solutionDir);
 		}).future<void>()();
 	}
 
@@ -185,10 +185,12 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	private getApp(key: string): IFuture<ITapAppData> {
 		return ((): ITapAppData => {
-			let matchingApp = helpers.findByNameOrIndex(key, this.getAvailableAppsAndSolutions().wait(), app => app.colorizedDisplayName) // from prompter we receive colorized message
-					|| helpers.findByNameOrIndex(key, this.getAvailableAppsAndSolutions().wait(), app => app.displayName) // in case the user writes the message on its own and adds '(NOT MIGRATED)'
-					|| helpers.findByNameOrIndex(key, this.getAvailableAppsAndSolutions().wait(), app => app.id)
-					|| helpers.findByNameOrIndex(key, this.getAvailableAppsAndSolutions().wait(), app => app.name);
+			let availableAppsAndSolutions = this.getAvailableAppsAndSolutions().wait();
+			let matchingApp = _.find(availableAppsAndSolutions, app => key === app.colorizedDisplayName) // from prompter we receive colorized message
+					|| _.find(availableAppsAndSolutions, app => key === app.displayName) // in case the user writes the message on its own and adds '(NOT MIGRATED)'
+					|| _.find(availableAppsAndSolutions, app => key === app.id)
+					|| _.find(availableAppsAndSolutions, app => key === app.name)
+					|| availableAppsAndSolutions[+key - 1];
 
 			if(!matchingApp) {
 				this.$errors.failWithoutHelp(`Unable to find app with identifier ${key}.`);
