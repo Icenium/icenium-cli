@@ -39,8 +39,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	public search(keywords: string[]): IBasicPluginInformation[] {
 		let future = new Future<IBasicPluginInformation[]>();
-		plugman.search(keywords, (result) => {
-			if (this.isError(result)) {
+		plugman.search(keywords, (err: Error, result: any) => {
+			if (err) {
 				future.throw(result);
 			} else {
 				future.return(result);
@@ -59,10 +59,9 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 				if (this.$fs.exists(pluginId).wait() && this.$fs.getFsStats(pluginId).wait().isFile()) {
 					pluginId = this.resolveLocalPluginDir(pluginId).wait();
 				}
-
-				plugman.fetch(pluginId, pluginDir, false, ".", "HEAD", (result) => {
-					if (this.isError(result)) {
-						future.throw(result);
+				plugman.fetch(pluginId, pluginDir, false, ".", "HEAD", (err: Error, result: any) => {
+					if (err) {
+						future.throw(err);
 					} else {
 						future.return("The plugin has been successfully fetched to " + result);
 					}
@@ -105,8 +104,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	public configure(): void {
 		let future = new Future();
 		let params = ["set", "registry", this.$config.CORDOVA_PLUGINS_REGISTRY];
-		plugman.config(params, (result) => {
-			if (this.isError(result)) {
+		plugman.config(params, (error: Error, result: any) => {
+			if (error) {
 				future.throw(result);
 			} else {
 				future.return(result);
@@ -137,10 +136,6 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		}
 
 		return pluginType;
-	}
-
-	private isError(object:any): boolean {
-		return object instanceof Error;
 	}
 
 	private getPluginsDir(): IFuture<string> {
