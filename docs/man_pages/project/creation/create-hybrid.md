@@ -16,7 +16,7 @@ WARNING: Always run this command in an empty directory or specify `--path` to an
 
 ### Attributes
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
-* `<Template>` is the source template that you want to use. The default value is `KendoUI.TabStrip`. You can use the following templates: <%=#{cordovaProject.projectTemplatesString}%>.
+* `<Template>` is the source template that you want to use. The default value is `KendoUI.Empty`. You can use the following templates: <%=#{cordovaProject.projectTemplatesString}%>.
 * `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. 
 <% if(isHtml) { %>
 ### Command Limitations
