@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 3.0 
-Release date: November 25, 2015
+Release date: November 26, 2015
 
 > For a complete list of the improvements and updates available in Telerik AppBuilder 3.0, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-0" target="_blank">Telerik AppBuilder 3.0 Release Notes</a>.
 
@@ -375,7 +375,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 3.0 
-Release date: November 25, 2015
+Release date: November 26, 2015
 
 > For a complete list of the improvements and updates available in Telerik AppBuilder 3.0, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-0" target="_blank">Telerik AppBuilder 3.0 Release Notes</a>.
 
