@@ -8,11 +8,12 @@ class DoctorService implements IDoctorService {
 	constructor(
 		private $hostInfo: IHostInfo,
 		private $sysInfo: ISysInfo,
-		private $logger: ILogger) {	}
+		private $logger: ILogger,
+		private $staticConfig: IStaticConfig) {	}
 
 	public printWarnings(): boolean {
 		let result = false;
-		let sysInfo = this.$sysInfo.getSysInfo().wait();
+		let sysInfo = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait();
 
 		if (!sysInfo.adbVer) {
 			this.$logger.warn("WARNING: adb from the Android SDK is not installed or is not configured properly. ");
