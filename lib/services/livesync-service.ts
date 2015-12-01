@@ -84,7 +84,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				"ios": IOSLiveSyncService
 			};
 
-			let livesyncData=  {
+			let livesyncData = {
 				platform: platform,
 				appIdentifier: this.$project.projectData.AppIdentifier,
 				projectFilesPath: projectDir,
@@ -92,7 +92,8 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				watchGlob: projectDir,
 				platformSpecificLiveSyncServices: platformSpecificLiveSyncServices,
 				notInstalledAppOnDeviceAction: notInstalledAppOnDeviceAction,
-				notRunningiOSSimulatorAction: () => Future.fromResult()
+				notRunningiOSSimulatorAction: () => Future.fromResult(),
+				getApplicationPathForiOSSimulatorAction:() => Future.fromResult("")
 			};
 
 			this.sync(livesyncData).wait();
