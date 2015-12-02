@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
 import * as helpers from "../common/helpers";
 
 export class DeployHelper implements IDeployHelper {
@@ -41,22 +40,27 @@ export class DeployHelper implements IDeployHelper {
 			this.$options.justlaunch = true;
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
-				let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
-				if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
-					let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
-					if (helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
-						this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
-						return Future.fromResult();
+				return (() => {
+					let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
+					if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
+						let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
+						if (helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
+							this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
+							return;
+						}
 					}
-				}
 
-				if (!packageFile) {
-					packageFile = this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
+					if (!packageFile) {
+						packageFile = this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
 
-					this.$logger.debug("Ready to deploy %s", packageFile);
-					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
-				}
-				return device.deploy(packageFile, packageName);
+						this.$logger.debug("Ready to deploy %s", packageFile);
+						this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
+					}
+					device.deploy(packageFile, packageName).wait();
+					if(device.applicationManager.canStartApplication()) {
+						device.applicationManager.startApplication(this.$project.projectData.AppIdentifier).wait();
+					}
+				}).future<void>()();
 			};
 
 			this.$devicesService.execute(action).wait();
