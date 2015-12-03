@@ -41,7 +41,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		let future = new Future<IBasicPluginInformation[]>();
 		plugman.search(keywords, (err: Error, result: any) => {
 			if (err) {
-				future.throw(result);
+				future.throw(err);
 			} else {
 				future.return(result);
 			}

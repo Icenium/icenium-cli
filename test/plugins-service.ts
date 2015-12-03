@@ -12,6 +12,7 @@ import {StaticConfig} from "../lib/config";
 import {ResourceLoader} from "../lib/common/resource-loader";
 import {assert} from "chai";
 import Future = require("fibers/future");
+import * as plugman from "plugman";
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	let testInjector = new Yok();
@@ -355,14 +356,107 @@ describe("plugins-service", () => {
 				]
 			}];
 
-			let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
+		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
-			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			service.addPlugin("Toast").wait();
-			let installedPlugins = service.getInstalledPlugins();
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
+		service.addPlugin("Toast").wait();
+		let installedPlugins = service.getInstalledPlugins();
 
-			assert.equal(4, installedPlugins.length);
-		});
+		assert.equal(4, installedPlugins.length);
+	});
+
+	it("fetches plugin when it is found from plugman", () => {
+		let cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			}
+		];
+
+		let testInjector = createTestInjector(cordovaPlugins, [], []);
+
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
+		let fs: IFileSystem = testInjector.resolve("fs");
+		fs.exists = (path: string) => Future.fromResult(false);
+		let originalPlugmanFetch = plugman.fetch;
+		let originalPlugmanSearch = plugman.search;
+		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
+			let result = { 'org.apache.cordova.battery-status': { someData: "data" }};
+			callback(null, result);
+		};
+		plugman.fetch = (plugin_dir:string, plugins_dir:string, link:boolean, subdir:string, git_ref:string, callback: (error: Error, result: any) => void) => {
+			callback(null, "Success");
+		};
+
+		service.fetch("org.apache.cordova.battery-status").wait();
+		plugman.fetch = originalPlugmanFetch;
+		plugman.search = originalPlugmanSearch;
+		let logger: stubs.LoggerStub = testInjector.resolve("logger");
+		assert.isTrue(logger.output.indexOf("Success") !== -1, "Success word should be in the output when plugman fetch succeeds.");
+	});
+
+	it("fetches plugin from url when plugman fails fetching by id", () => {
+		let cordovaPlugins = [
+			{
+				Identifier: "org.apache.cordova.battery-status",
+				Name: "BatteryStatus"
+			}
+		];
+		let availableMarketplacePlugins = [{
+			"Identifier": "com.telerik.dropbox",
+			"DefaultVersion": "1.0.2",
+			"Framework": "cordova",
+			"Versions": [
+				{
+					"Publisher": {
+						"Name": "Telerik plugins",
+						"Url": "http://www.telerik.com/"
+					},
+					"Authors": [
+						"Telerik"
+					],
+					"SupportedVersion": ">=3.5.0",
+					"Name": "Dropbox",
+					"Identifier": "com.telerik.dropbox",
+					"Version": "1.0.2",
+					"Description": "Cordova Sync SDK",
+					"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+					"Platforms": [
+						"Android",
+						"iOS"
+					],
+					"Variables": [
+						"APP_KEY",
+						"APP_SECRET"
+					]
+				}
+			]
+		}];
+		let testInjector = createTestInjector(cordovaPlugins, [], availableMarketplacePlugins);
+		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
+		let fs: IFileSystem = testInjector.resolve("fs");
+		fs.exists = (path: string) => Future.fromResult(false);
+		let originalPlugmanFetch = plugman.fetch;
+		let originalPlugmanSearch = plugman.search;
+		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
+			let result = { 'org.apache.cordova.battery-status': { someData: "data" }};
+			callback(null, result);
+		};
+		plugman.fetch = (plugId:string, plugins_dir:string, link:boolean, subdir:string, git_ref:string, callback: (error: Error, result: any) => void) => {
+			if(_.startsWith(plugId, "http")) {
+				callback(null, "Success");
+			} else {
+				callback(new Error("Error"), null);
+			}
+
+		};
+		service.fetch("com.telerik.dropbox").wait();
+		plugman.fetch = originalPlugmanFetch;
+		plugman.search = originalPlugmanSearch;
+		let logger: stubs.LoggerStub = testInjector.resolve("logger");
+		assert.isTrue(logger.output.indexOf("Success") !== -1, "Success word should be in the output when plugman fetch succeeds.");
+	});
+
 	it("decrement installed plugins count after remove plugin", () => {
 		let cordovaPlugins = [
 			{
