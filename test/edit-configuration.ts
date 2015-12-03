@@ -86,6 +86,28 @@ describe("edit-configuration", () => {
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
 
+	it("only creates file if correct configuration file is given that doesn't exist and --skipUi is passed", () => {
+		let testInjector = createTestInjector();
+		let tempDir = setTempDir(testInjector);
+		let template = testInjector.resolve("project").projectConfigFiles[0];
+		let openArgument: string;
+		let opener: IOpener = testInjector.resolve("opener");
+		opener.open = (filepath: string): void => {
+			openArgument = filepath;
+		};
+		let templateFilepath = path.join(tempDir, template.filepath);
+		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath)).wait();
+
+		let options: IOptions = testInjector.resolve("options");
+		options.skipUi = true;
+
+		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
+		command.execute([template.template]).wait();
+
+		assert.deepEqual(openArgument, undefined, "When skipUi option is passed, opener should not be called");
+		assert.isTrue(fs.existsSync(templateFilepath));
+	});
+
 	it("doesn't modify file if correct configuration file is given and it exists", () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
