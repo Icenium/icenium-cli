@@ -64,15 +64,35 @@ export class CordovaProjectPluginsService implements IPluginsService {
 				let result = this.$cordovaPluginsService.fetch(pluginIdentifier).wait();
 				this.$logger.out(result);
 			} else {
+				let identifier = this.getPluginBasicInformation(pluginIdentifier).name.toLowerCase();
+				let plugin = _.find(this.getAvailablePlugins(), pl => pl.data.Identifier.toLowerCase() === identifier || pl.data.Name.toLowerCase() === identifier);
+				let pluginUrl: string = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 				let plugins = this.$cordovaPluginsService.getPlugins([pluginIdentifier]);
 				let pluginKeys = Object.keys(plugins);
 				let pluginsCount = pluginKeys.length;
 				if (pluginsCount === 0) {
-					this.$logger.out("There are 0 matching plugins.");
-				} else if (pluginsCount > 1 && pluginKeys[0] !== pluginIdentifier) {
-					this.$logger.out("There are more then 1 matching plugins.");
-				} else {
+					if(pluginUrl) {
+						this.$logger.out(this.$cordovaPluginsService.fetch(pluginUrl).wait());
+					} else {
+						this.$logger.out("There are 0 matching plugins.");
+					}
+					return;
+				}
+
+				if (pluginsCount > 1 && pluginKeys[0] !== pluginIdentifier) {
+					this.$logger.out(`There are more then 1 matching plugins: ${pluginKeys.join(", ")}.`);
+					return;
+				}
+
+				try {
 					this.$logger.out(this.$cordovaPluginsService.fetch(pluginKeys[0]).wait());
+				} catch (err) {
+					if(pluginUrl) {
+						this.$logger.trace(`Error while trying to fetch plugin with id ${pluginIdentifier} via plugman. Error is: ${err.message}.`);
+						this.$logger.out(this.$cordovaPluginsService.fetch(pluginUrl).wait());
+					} else {
+						this.$errors.fail(err.message);
+					}
 				}
 			}
 		}).future<void>()();
