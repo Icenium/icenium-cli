@@ -175,9 +175,7 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 				commands.push(this.liveSyncCommands.ReloadStartViewCommand());
 			}
 
-			this.createCommandsFileOnDevice(liveSyncRoot, commands).wait();
-
-			this.device.adb.sendBroadcastToDevice("com.telerik.LiveSync", { "app-id": deviceAppData.appIdentifier }).wait();
+			this.livesync(deviceAppData.appIdentifier, liveSyncRoot, commands).wait();
 		}).future<void>()();
 	}
 
