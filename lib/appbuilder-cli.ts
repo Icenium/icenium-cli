@@ -6,6 +6,8 @@ require("./common/verify-node-version").verifyNodeVersion(require("../package.js
 
 require("./bootstrap");
 import fiberBootstrap = require("./common/fiber-bootstrap");
+import * as shelljs from "shelljs";
+shelljs.config.silent = true;
 import {installUncaughtExceptionListener} from "./common/errors";
 installUncaughtExceptionListener(process.exit);
 
