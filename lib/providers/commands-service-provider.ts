@@ -1,10 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import initCommandLib = require("../commands/project/init-project");
-import projectCommandLib = require("../commands/project/create-project");
-import samplesLib =require("../commands/samples");
-import * as util from "util";
+import * as initCommandLib from "../commands/project/init-project";
+import * as projectCommandLib from "../commands/project/create-project";
+import * as samplesLib from "../commands/samples";
 
 class CommandsServiceProvider implements ICommandsServiceProvider {
 	private commands: IDynamicSubCommandInfo[];
@@ -16,8 +15,7 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 
 		this.mapCommandNameToFramework = {
 			hybrid: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova,
-			native: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript,
-			website: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite
+			native: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript
 		};
 
 		this.commands = [
@@ -61,7 +59,7 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		let subCommands = _.keys(this.mapCommandNameToFramework);
 		_.each(subCommands, subCommand => {
 			let resolver = this.$injector.resolve(command.commandConstructor, { frameworkIdentifier: this.mapCommandNameToFramework[subCommand] });
-			let name = util.format("%s|%s", command.baseCommandName, subCommand);
+			let name = `${command.baseCommandName}|${subCommand}`;
 			this.$injector.requireCommand(name, command.filePath);
 			this.$injector.registerCommand(name, resolver);
 		});

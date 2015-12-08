@@ -7,9 +7,6 @@ General | `$ appbuilder resource [<Command>]`
 
 Lists information about the splash screens and icons for all mobile platforms.
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help resource`
-<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 
 ### Attributes
@@ -17,10 +14,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 * `create` - Creates icons or splash screens for all mobile platforms from a single high-resolution image.
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

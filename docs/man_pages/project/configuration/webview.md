@@ -11,9 +11,6 @@ Lists the available web views for iOS and Android. <% if(isHtml) { %>For more in
 <% if(isNativeScript)  { %>
 WARNING: This command and its extended commands are not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help webview`
 <% } %>
-<% if(isMobileWebsite)  { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help webview`
-<% } %>
 <% } %>
 <% if((isConsole && isCordova) || isHtml) { %>
 
@@ -26,7 +23,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
 * You cannot configure web views for Windows Phone.
 
 ### Related Commands

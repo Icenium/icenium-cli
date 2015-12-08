@@ -5,18 +5,11 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder plugin find [<Keyword> [<Keyword>]*>]`
 
-<% var plugins =""; if(isCordova || isMobileWebsite) { plugins+="Apache Cordova plugins" } if(isHtml || (isConsole && isMobileWebsite)) { plugins+=" or " } if(isNativeScript || isMobileWebsite) { plugins+="custom npm or NativeScript modules" } %>
+<% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
 
-Searches by one or more keywords for <%=plugins%> in <% if(isCordova || isMobileWebsite) { %>the Apache Cordova Plugin Registry<% } %><% if(isHtml || (isConsole && isMobileWebsite)) { %> or <% } %><% if(isNativeScript || isMobileWebsite) { %>the npm registry<% } %><% if(isHtml || (isConsole && isMobileWebsite)) { %>, respectively<% } %>.
+Searches by one or more keywords for <%=plugins%> in <% if(isCordova) { %>the Apache Cordova Plugin Registry<% } %><% if(isHtml) { %> or <% } %><% if(isNativeScript) { %>the npm registry<% } %><% if(isHtml) { %>, respectively<% } %>.
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin find`
-<% } %>
 <% if(isHtml) { %>
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

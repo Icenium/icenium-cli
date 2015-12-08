@@ -12,9 +12,6 @@ Sets the selected web view for the current project. <% if(isHtml) { %>Setting a 
 <% if(isNativeScript)  { %>
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help webview set`
 <% } %>
-<% if(isMobileWebsite)  { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help webview set`
-<% } %>
 <% } %>
 <% if(isHtml) { %>
 ### Prerequisites
@@ -35,7 +32,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
 * You cannot configure web views for Windows Phone.
 
 ### Related Commands

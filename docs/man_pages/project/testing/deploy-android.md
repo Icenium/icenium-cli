@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder deploy android [--device <Device ID>] [--certificate <Certificate ID>] [--debug] [--release]`
 
 Builds the project for Android and deploys it to connected physical devices. <% if(isHtml) { %>If `--device` is not specified, deploys the project on all connected physical devices and running Android virtual devices.<% } %> 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help deploy android`
-<% } %> 
 <% if(isHtml) { %>
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 <% } %> 
@@ -24,10 +21,6 @@ You can choose which files from your project to exclude or include in your appli
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 <% } %> 
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

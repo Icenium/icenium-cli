@@ -8,9 +8,6 @@ General | `$ appbuilder livesync android [--device <Device ID>] [--companion] [-
 Synchronizes the latest changes in your project to connected Android devices.
 
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync android`
-<% } %>
 <% if(isNativeScript) { %>
 WARNING: This command is applicable only to the NativeScript companion app. Make sure to run this command with the `--companion` switch.
 <% } %>
@@ -28,7 +25,6 @@ WARNING: This command is applicable only to the NativeScript companion app. Make
 ### Command Limitations
 
 * For NativeScript projects, you can LiveSync changes only to the companion app.
-* You cannot run this command on mobile website projects.
 
 ### Related Commands
 

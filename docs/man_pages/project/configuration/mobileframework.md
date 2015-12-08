@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder mobileframework [<Command>] [--path <Directory>]`
 
 <% if(isHtml) { %>Lists all supported versions of the current development framework.<% } %>
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework`
-<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
@@ -19,10 +16,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 * `set` - Sets the selected framework version for the project.
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

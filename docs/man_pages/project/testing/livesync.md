@@ -7,11 +7,6 @@ General | `$ appbuilder livesync <Command>`
 
 Synchronizes the latest changes in your project to devices. You must run the `livesync` command with a command extension.
 
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync`
-<% } %> 
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 `<Command>` extends the `livesync` command. You can set the following values for this attribute.
 * `cloud` - Synchronizes the project with the cloud to enable LiveSync for remote devices (using the three-finger tap and hold gesture).
@@ -22,7 +17,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 ### Command Limitations
 
 * You cannot LiveSync changes to connected Windows Phone devices.
-* You cannot run this command on mobile website projects.
 
 ### Related Commands
 

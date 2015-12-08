@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder build android [--download] [--companion] [--certificate <Certificate ID>] [--save-to <File Path>] [--debug] [--release]`
 
 Builds the project for Android and produces an application package or a QR code for deployment.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help build android`
-<% } %>
 <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
@@ -24,10 +21,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `<File Path>` is the complete file path to which you want to save your application package. The file path must be complete with file name and extension.
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

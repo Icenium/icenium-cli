@@ -14,9 +14,6 @@ To test your app on multiple Android virtual devices, run `$ appbuilder emulate 
 
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 <% } %> 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate android`
-<% } %>
 <% if(isHtml) { %>
 ### Prerequisites
 Before running your app in the **native Android emulator** from the Android SDK, verify that your system meets the following requirements.
@@ -47,10 +44,6 @@ Before running your app in the **Genymotion emulator**, verify that your system 
 * `<GenyName>` is the name of the Genymotion virtual device that you want to use as listed by `$ genyshell -c "devices list"`. You can specify only one name at a time.
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

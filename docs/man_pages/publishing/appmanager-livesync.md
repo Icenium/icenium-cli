@@ -10,7 +10,6 @@ Publishes a new Telerik AppManager LiveSync update of your published application
 For more information about AppManager LiveSync, see [Update Your Published App with AppManager LiveSync](http://docs.telerik.com/platform/appbuilder/publishing-your-app/update-appmanager-livesync#cli).<% } %>
 
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync`<% } %>
 <% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync` <% } %>
 <% } %>
 
@@ -35,7 +34,6 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You cannot run this command on NativeScript projects.
 
 ### Related Commands

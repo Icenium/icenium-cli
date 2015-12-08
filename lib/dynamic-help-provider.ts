@@ -20,7 +20,6 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		return ((): IDictionary<any> => {
 			let isHtml = options.isHtml;
 			let localVariables:IDictionary<any> = {};
-			localVariables["isMobileWebsite"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite]).wait();
 			localVariables["isCordova"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
 			localVariables["isNativeScript"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();
 

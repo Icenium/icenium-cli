@@ -7,9 +7,6 @@ General | `$ appbuilder resource create [--icon <File Path>] [--splash <File Pat
 
 Creates image resources for all mobile platforms from a single high-resolution image and saves them to the `App_Resources` folder of the current project. The image source must be a `PNG` image.
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help resource create`
-<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 <% if(isHtml) { %> 
 ### Prerequisites
@@ -28,10 +25,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 `<File Path>` is the complete file path to the high-resolution image that you want to use.
 <% } %>
 <% if(isHtml) { %> 
-
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
 
 ### Related Commands
 
