@@ -7,9 +7,6 @@ General | `$ appbuilder build wp8 [--download] [--companion] [--save-to <File Pa
 
 Builds the project for Windows Phone and produces an application package or a QR code for deployment.
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help build wp8`
-<% } %> 
 <% if(isNativeScript) { %>
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help build wp8`
 <% } %> 
@@ -43,7 +40,6 @@ When you build without the `--download` switch, you can deploy the app package o
 <% if(isHtml) { %>
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You cannot run this command on NativeScript projects.
 
 ### Related Commands

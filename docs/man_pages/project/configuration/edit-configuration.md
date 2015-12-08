@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder edit-configuration <ConfigurationFile>`
 
 Opens a configuration file for editing.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help edit-configuration`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 * `<ConfigurationFile>` is the configuration file that you want to open. The following values are valid for this attribute.
@@ -18,10 +15,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
     * `ios-config` - Opens config.xml for iOS for editing and creates it, if needed.
     * `wp8-manifest` - Opens WMAppManifest.xml for editing and creates it, if needed.
     * `wp8-config` - Opens config.xml for Windows Phone 8 for editing and creates it, if needed.
-
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
 
 ### Related Commands
 

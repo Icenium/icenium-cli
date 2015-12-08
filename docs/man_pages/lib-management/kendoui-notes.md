@@ -9,9 +9,6 @@ Only Kendo UI Professional versions | `$ appbuilder kendoui notes --professional
 
 Shows the release notes for a selected Kendo UI Core or Kendo UI Professional package.<% if(isHtml || isCordova) { %> The verified tag marks stable Kendo UI Service Pack releases.<% } %> 
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help kendoui notes`
-<% } %>
 <% if(isNativeScript) { %>
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help kendoui notes`
 <% } %>
@@ -31,7 +28,6 @@ WARNING: You cannot set `--core` and `--professional` simultaneously.
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
 * You cannot set `--core` and `--professional` simultaneously.
 
 ### Related Commands

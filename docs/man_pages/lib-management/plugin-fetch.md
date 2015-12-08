@@ -9,9 +9,9 @@ By path | `$ appbuilder plugin fetch <Path>`
 By URL | `$ appbuilder plugin fetch <URL>`
 By keyword(s) | `$ appbuilder plugin fetch [<Keyword> [<Keyword>]*>]`
 
-<% var plugins =""; if(isCordova || isMobileWebsite) { plugins+="Apache Cordova plugins" } if(isHtml || (isConsole && isMobileWebsite)) { plugins+=" or " } if(isNativeScript || isMobileWebsite) { plugins+="custom npm or NativeScript modules" } %>
+<% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
 
-<% var plugin =""; if(isCordova || isMobileWebsite) { plugin+="Apache Cordova plugin" } if(isHtml || (isConsole && isMobileWebsite)) { plugin+=" or " } if(isNativeScript || isMobileWebsite) { plugin+="custom npm or NativeScript module" } %>
+<% var plugin =""; if(isCordova) { plugin+="Apache Cordova plugin" } if(isHtml) { plugin+=" or " } if(isNativeScript) { plugin+="custom npm or NativeScript module" } %>
 
 Imports the selected <%=plugin%> into your project.<% if(isHtml) { %> You can specify an Apache Cordova plugin by local path, URL to a GitHub repository, name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry. You can specify a custom npm or NativeScript module by local path, URL to a GitHub repository, name, ID or keyword of a module published in the npm registry.
 
@@ -19,14 +19,10 @@ For Apache Cordova plugins, this operation copies the Apache Cordova plugin file
 For NativeScript projects, this operation copies the module files to the `plugins` directory and adds the module as a dependency in the `package.json` file of your project.
 <% } %>
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin fetch`
-<% } %>
 <% } %>
 <% if(isHtml) { %>
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You can fetch only Plugman-compatible Apache Cordova plugins.
 * You can fetch only custom modules which are valid npm packages.
 

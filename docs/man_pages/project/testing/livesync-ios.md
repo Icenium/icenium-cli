@@ -8,9 +8,6 @@ General | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--wat
 Synchronizes the latest changes in your project to connected iOS devices.
 
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help livesync ios`
-<% } %>
 <% if(isNativeScript) { %>
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help livesync ios`
 <% } %>
@@ -29,7 +26,6 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
 * You cannot run this command on Linux systems.
 
 ### Related Commands

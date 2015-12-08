@@ -11,9 +11,6 @@ Install latest Kendo UI Professional | `$ appbuilder kendoui install --professio
 
 Lists the available Kendo UI Core and Kendo UI Professional versions and downloads and extracts the selected package in the project directory.<% if(isHtml || isCordova) { %> The Verified tag marks stable Kendo UI Service Pack releases.<% } %> 
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help kendoui install`
-<% } %>
 <% if(isNativeScript) { %>
 WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help kendoui install`
 <% } %>
@@ -33,7 +30,6 @@ WARNING: You cannot set `--core` and `--professional` simultaneously.
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
-* You cannot run this command on mobile website projects.
 * You cannot set `--core` and `--professional` simultaneously.
 
 ### Related Commands

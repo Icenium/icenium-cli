@@ -39,8 +39,6 @@ export class Project implements Project.IProject {
 		private $server: Server.IServer,
 		private $staticConfig: IStaticConfig,
 		private $templatesService: ITemplatesService,
-		private $prompter: IPrompter,
-		private $mobileHelper: Mobile.IMobileHelper,
 		private $options: IOptions) {
 
 		this.configurationSpecificData = Object.create(null);

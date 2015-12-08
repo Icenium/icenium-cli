@@ -95,10 +95,3 @@ export class NativeScriptSimulatorService implements IProjectSimulatorService {
 	}
 }
 $injector.register("nativeScriptSimulatorService", NativeScriptSimulatorService);
-
-export class MobileWebSiteSimulatorService implements IProjectSimulatorService {
-	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
-		return (() => <string[]>[]).future<string[]>()();
-	}
-}
-$injector.register("mobileWebsiteSimulatorService", MobileWebSiteSimulatorService);

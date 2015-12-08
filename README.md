@@ -1,13 +1,13 @@
 Command-Line Interface for Telerik AppBuilder
 ===========
 
-*Build and publish cross-platform hybrid or native apps and mobile websites using a single pure HTML5, CSS, and JavaScript code base*
+*Build and publish cross-platform hybrid or native apps using a single pure HTML5, CSS, and JavaScript code base*
 
 [![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
 **Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
 
-The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybrid and native mobile apps for iOS, Android and Windows Phone, and mobile websites from your favorite IDE or code editor. You can develop your projects locally from the convenience of your preferred code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
+The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybrid and native mobile apps for iOS, Android and Windows Phone from your favorite IDE or code editor. You can develop your projects locally from the convenience of your preferred code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
 
 * [Installation](#installation "How to install the Telerik AppBuilder CLI")
 	* [System Requirements](#system-requirements)
@@ -209,7 +209,7 @@ To create a new project from the default template, navigate to an empty director
 $ appbuilder create <Type> MyApp
 ```
 
-You can set hybrid, native or website for `<Type>`.
+You can set hybrid or native for `<Type>`.
 
 The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current directory and places the project files inside it. 
 
@@ -262,7 +262,7 @@ The Telerik AppBuilder CLI creates a new subdirectory MyApp in the current direc
 
 <a name="simulator"><b>3. Run in simulator</b></a>
 
-> This operation is applicable to hybrid and mobile website projects.
+> This operation is applicable only to hybrid projects.
 
 To load your newly created project in the simulator, navigate to the folder containing your project files and run the following command.
 
@@ -383,7 +383,6 @@ Release date: November 26, 2015
 
 * You can develop, test, build and publish cross-platform hybrid mobile apps with Apache Cordova.
 * You can develop, test, build and publish cross-platform native mobile apps with the NativeScript framework.
-* You can develop, test and upload mobile websites.
 
 For a complete list of the features available in the Telerik AppBuilder CLI, click [here](http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/appbuilder-cli). 
 

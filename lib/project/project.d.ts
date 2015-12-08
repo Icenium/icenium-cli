@@ -150,7 +150,6 @@ declare module Project {
 	interface ITargetFrameworkIdentifiers {
 		Cordova: string;
 		NativeScript: string;
-		MobileWebsite: string;
 	}
 
 	interface IConfigurationFile {

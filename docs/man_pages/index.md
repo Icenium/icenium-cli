@@ -100,7 +100,6 @@ Command | Description
 [appmanager groups](publishing/appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
 [appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
 [appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
-[publish](publishing/publish.html) | Lets you manage your server connections or publishes your mobile website to a remote server.
 
 ## Global Options
 Option | Description

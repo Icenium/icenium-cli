@@ -6,9 +6,6 @@ Usage | Synopsis
 General |`$ appbuilder appmanager <Command>`
 
 Builds and uploads your application to Telerik AppManager<% if(isCordova) { %> or creates a Telerik AppManager LiveSync update for your published app<% } %>. You must run the `appmanager` command with a command extension.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 
@@ -20,10 +17,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `groups` - Lists all available user groups from Telerik AppManager.<% } %> 
 <% } %> 
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

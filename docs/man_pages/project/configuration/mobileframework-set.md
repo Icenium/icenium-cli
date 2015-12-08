@@ -9,9 +9,6 @@ General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
 <% if(isConsole) { %>
 <% if(isCordova) { %>Sets the selected Apache Cordova version for the project and updates the enabled core or integrated plugins to match it.<% } %>
 <% if(isNativeScript)  { %>Sets the selected NativeScript version for the project and updates the NativeScript modules to match it.<% } %>
-<% if(isMobileWebsite)  { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help mobileframework set`
-<% } %>
 <% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
@@ -21,10 +18,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 * `<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

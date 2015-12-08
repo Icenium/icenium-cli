@@ -15,7 +15,6 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 	ON_PREM: boolean;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
-	DEFAULT_WEBSITE_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
 	CI_LOGGER: boolean;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;

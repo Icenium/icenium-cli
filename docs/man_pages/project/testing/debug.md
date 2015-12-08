@@ -10,9 +10,6 @@ Shows the debug tools to let you debug applications on connected iOS or Android 
 <% } %> 
 <% if(isConsole) { %>
 WARNING: You can work only with connected iOS and Android devices.
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help debug`
-<% } %>
 <% if(isLinux) { %>
 WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %> 
@@ -25,7 +22,6 @@ WARNING: This command is not applicable to Linux systems. To view the complete h
 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You cannot run this command on Linux systems.
 * You cannot run this command on Windows Phone devices.
 

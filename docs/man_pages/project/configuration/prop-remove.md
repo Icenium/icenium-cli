@@ -9,9 +9,6 @@ Disable plugins for the Release build configuration | `$ appbuilder prop remove 
 
 Disables options for the selected project property, if the property accepts multiple values.
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop remove`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 <% if(isCordova) { %>### Options
 
@@ -25,7 +22,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You can set the `--debug` and `--release` switches only for the `CorePlugins` property for Apache Cordova projects.
 
 ### Related Commands

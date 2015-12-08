@@ -10,9 +10,6 @@ Prints information about the configuration of the project or the selected proper
 If `--valid-value` is set, prints the valid configuration values.  
 If not set, prints the current configuration. 
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop print`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--valid-value` - When set, prints the valid values for all valid project properties or for the selected property.
@@ -24,10 +21,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 <% } %>
 <% if(isHtml) { %> 
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

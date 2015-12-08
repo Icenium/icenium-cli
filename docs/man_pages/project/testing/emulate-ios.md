@@ -7,9 +7,6 @@ General | `$ appbuilder emulate ios [--path <Directory>] [–-certificate <Certi
 
 Builds the specified project in the cloud and runs it in the native iOS Simulator. <% if(isHtml) { %>You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).<% } %>
 <% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate ios`
-<% } %> 
 <% if(isWindows) { %>
 WARNING: You cannot run this command on Windows systems. To view the complete help for this command, run `$ appbuilder help emulate ios`
 <% } %> 
@@ -45,7 +42,6 @@ Before running the iOS Simulator, verify that you have met the following require
 
 * You cannot run this command on Windows systems.
 * You cannot run this command on Linux systems.
-* You cannot run this command on mobile website projects.
 
 ### Related Commands
 

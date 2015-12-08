@@ -34,16 +34,17 @@ export class CloneSampleCommand implements ICommand {
 		return this.$config.ON_PREM;
 	}
 
-	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$samplesService, this.$fs, this.$errors, this.$options)];
+	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$fs, this.$errors, this.$options)];
 }
 $injector.registerCommand("sample|clone", CloneSampleCommand);
 
 class CloneCommandParameter implements ICommandParameter {
-	constructor(private $samplesService: ISamplesService,
-		private $fs: IFileSystem,
+	constructor(private $fs: IFileSystem,
 		private $errors: IErrors,
 		private $options: IOptions) { }
+
 	mandatory = true;
+
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {

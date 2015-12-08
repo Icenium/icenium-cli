@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder emulate <Platform> [--debug] [--release] [--path]`
 
 Builds the specified project in the cloud and runs it in a native emulator. You must run the `emulate` command with a command extension.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help emulate`
-<% } %>
 <% if(isHtml) { %>
 You can choose which files from your project to exclude or include in your application package by maintaining an .abignore file. For more information about .abignore, see [abignore.md](https://github.com/Icenium/icenium-cli/blob/release/ABIGNORE.md).
 <% } %>
@@ -33,7 +30,6 @@ You can choose which files from your project to exclude or include in your appli
 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * On Windows systems, you can run this command for Android and Windows Phone.
 * On OS X systems, you can run this command for Android and iOS.
 * On Linux systems, you can run this command for Android.

@@ -80,7 +80,6 @@ $injector.require("frameworkSimulatorServiceResolver", "./project/resolvers/fram
 $injector.require("projectSimulatorService", "./services/project-simulator-service");
 $injector.require("cordovaSimulatorService", "./services/project-simulator-service");
 $injector.require("nativeScriptSimulatorService", "./services/project-simulator-service");
-$injector.require("mobileWebsiteSimulatorService", "./services/project-simulator-service");
 
 $injector.require("simulatorPlatformServices", "./services/simulatorPlatformServices");
 $injector.require("simulatorService", "./services/simulator-service");
@@ -88,7 +87,6 @@ $injector.require("simulatorService", "./services/simulator-service");
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
-$injector.require("mobileWebsiteProject", "./project/web-site-project");
 $injector.require("projectConstants", "./project/project-constants");
 $injector.require("projectFilesManager", "./project/project-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
@@ -113,12 +111,6 @@ $injector.requireCommand("deploy|*devices", "./commands/deploy");
 $injector.requireCommand("deploy|android", "./commands/deploy");
 $injector.requireCommand("deploy|ios", "./commands/deploy");
 $injector.requireCommand("deploy|wp8", "./commands/deploy");
-
-$injector.require("publishService", "./services/publish-service");
-
-$injector.requireCommand("publish|*list", "./commands/publish");
-$injector.requireCommand("publish|add", "./commands/publish");
-$injector.requireCommand("publish|remove", "./commands/publish");
 
 $injector.requireCommand(["livesync|*devices", "live-sync|*devices"], "./commands/live-sync");
 $injector.requireCommand(["livesync|cloud", "live-sync|cloud"], "./commands/livesync-cloud");

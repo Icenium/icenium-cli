@@ -9,9 +9,6 @@ Set plugins for the Release build configuration | `$ appbuilder prop set CorePlu
 
 Sets the selected project property and overwrites its current value.
 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop set`
-<% } %> 
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 <% if(isCordova) { %>### Options
 
@@ -25,7 +22,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * You can set the `--debug` and `--release` switches only for the `CorePlugins` property for Apache Cordova projects.
 
 ### Related Commands

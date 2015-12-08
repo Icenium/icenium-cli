@@ -6,9 +6,6 @@ Usage | Synopsis
 General | `$ appbuilder prop <Command>`
 
 This set of commands manages the properties for your project. You must run the `prop` command with a command extension.
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command and its extended commands are not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help prop`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Attributes
 `<Command>` extends the `prop` command. You can set the following values for this attribute.
@@ -18,10 +15,6 @@ WARNING: This command and its extended commands are not applicable to mobile web
 * `remove` - Disables options for the selected project property, if the property accepts multiple values.
 <% } %>
 <% if(isHtml) { %>
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

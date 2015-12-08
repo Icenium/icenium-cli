@@ -7,9 +7,6 @@ Upload your app without publishing | `$ appbuilder appmanager upload android [--
 Upload and publish your app | `$ appbuilder appmanager upload android [--certificate <Certificate ID>] [--download] --publish [--public] [--send-email] [--send-push] [--group <Group ID> [--group <Group ID>]*]`   
 
 Builds the project for Android and uploads the application to Telerik AppManager. <% if(isHtml) { %>If you have not set the `--publish` switch, after the upload completes, you need to go to your app in [Telerik AppManager](https://platform.telerik.com/appmanager), manually configure it for distribution and publish it.<% } %> 
-<% if(isConsole && isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help appmanager upload android`
-<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
@@ -27,7 +24,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* You cannot run this command on mobile website projects.
 * The `--send-email`, `--send-push` and `--group` options are applicable only when the `--publish` switch is set.
 
 ### Related Commands

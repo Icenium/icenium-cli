@@ -1,8 +1,8 @@
 plugin add
 ==========
 
-<% if((isConsole && isMobileWebsite) || isHtml) { %>## Apache Cordova Projects<% } %>
-<% if(isCordova || isMobileWebsite) { %>
+<% if(isHtml) { %>## Apache Cordova Projects<% } %>
+<% if(isCordova) { %>
 Usage | Synopsis
 ------|---------
 List Apache Cordova plugins | `$ appbuilder plugin add --available [--debug] [--release]`
@@ -19,8 +19,8 @@ Add the default version of an Apache Cordova plugin and set all variables from t
 \*\* If the Apache Cordova plugin has multiple variables, you can set `--var` for each variable.
 <% } %>
 
-<% if((isConsole && isMobileWebsite) || isHtml) { %>## NativeScript Projects<% } %>
-<% if(isNativeScript || isMobileWebsite) { %>
+<% if(isHtml) { %>## NativeScript Projects<% } %>
+<% if(isNativeScript) { %>
 Usage | Synopsis
 ------|---------
 List custom npm or NativeScript modules | `$ appbuilder plugin add --available [--count]`
@@ -30,16 +30,11 @@ Add a custom npm or NativeScript module from GitHub URL | `$ appbuilder plugin a
 Add a custom npm or NativeScript module from local path | `$ appbuilder plugin add <Path>` 
 <% } %>
 
-<% var plugins =""; if(isCordova || isMobileWebsite) { plugins+="Apache Cordova plugins" } if(isHtml || (isConsole && isMobileWebsite)) { plugins+=" or " } if(isNativeScript || isMobileWebsite) { plugins+="custom npm or NativeScript modules" } %>
+<% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
 
-<% var plugin =""; if(isCordova || isMobileWebsite) { plugin+="Apache Cordova plugin" } if(isHtml || (isConsole && isMobileWebsite)) { plugin+=" or " } if(isNativeScript || isMobileWebsite) { plugin+="custom npm or NativeScript module" } %>
+<% var plugin =""; if(isCordova) { plugin+="Apache Cordova plugin" } if(isHtml) { plugin+=" or " } if(isNativeScript) { plugin+="custom npm or NativeScript module" } %>
 
 Enables <%=plugins%> for your project. <% if(isHtml) { %>If the Apache Cordova plugin has plugin variables and you have not set one or more of them with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
-<% if(isConsole) { %>
-<% if(isMobileWebsite) { %>
-WARNING: This command is not applicable to mobile website projects. To view the complete help for this command, run `$ appbuilder help plugin add`
-<% } %>
-<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 * `--available` - Lists all <%=plugins%> that you can enable in your project.
@@ -61,10 +56,6 @@ WARNING: This command is not applicable to mobile website projects. To view the 
 <% } %>
 
 <% if(isHtml) { %>
-### Command Limitations
-
-* You cannot run this command on mobile website projects.
-
 ### Related Commands
 
 Command | Description

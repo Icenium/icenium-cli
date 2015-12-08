@@ -243,7 +243,6 @@ interface IServerConfigurationData {
 interface IConfiguration extends Config.IConfig {
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
-	DEFAULT_WEBSITE_PROJECT_TEMPLATE: string;
 	CORDOVA_PLUGINS_REGISTRY: string;
 	USE_CDN_FOR_EXTENSION_DOWNLOAD: boolean;
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
