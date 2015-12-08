@@ -1,9 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import codeEntityLib = require("./code-entity");
-import TSTypeSystemHelpersLib = require("./ts-type-system-helpers");
-import swaggerCodePrinterLib = require("./code-printer");
+import {Block, Line} from "../common/codeGeneration/code-entity";
+import {TSTypeSystemHelpers} from "./ts-type-system-helpers";
+import {CodePrinter} from "../common/codeGeneration/code-printer";
 
 enum ParamTypes {
 	Path,
@@ -12,20 +12,20 @@ enum ParamTypes {
 	Form
 }
 
-export class ServiceContractGenerator implements Server.IServiceContractGenerator {
+export class ServiceContractGenerator implements IServiceContractGenerator {
 	private tsTypeSystemHelpers: Swagger.ITsTypeSystemHelpers;
 	private pendingModels: any;
 
 	constructor(private $serviceContractProvider: Server.IServiceContractProvider) {
-		this.tsTypeSystemHelpers = new TSTypeSystemHelpersLib.TSTypeSystemHelpers();
+		this.tsTypeSystemHelpers = new TSTypeSystemHelpers();
 		this.pendingModels = {};
 	}
 
-	public generate(): IFuture<Server.IServiceContractClientCode> {
-		return ((): Server.IServiceContractClientCode => {
+	public generate(): IFuture<IServiceContractClientCode> {
+		return ((): IServiceContractClientCode => {
 			let swagger = this.$serviceContractProvider.getApi().wait();
-			let interfacesFile= new codeEntityLib.Block();
-			let implementationsFile = new codeEntityLib.Block();
+			let interfacesFile= new Block();
+			let implementationsFile = new Block();
 
 			implementationsFile.writeLine("///<reference path=\".d.ts\"/>");
 			implementationsFile.writeLine("//");
@@ -42,18 +42,18 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			interfacesFile.writeLine("///<reference path=\".d.ts\"/>");
 
 			let serverModuleName = "Server";
-			let serverModuleDeclaration = new codeEntityLib.Block("declare module " + serverModuleName);
+			let serverModuleDeclaration = new Block("declare module " + serverModuleName);
 			serverModuleDeclaration.toString();
 
-			let serverClass = new codeEntityLib.Block("export class ServiceContainer implements Server.IServer");
-			let serverInterface = new codeEntityLib.Block("interface IServer");
+			let serverClass = new Block("export class ServiceContainer implements Server.IServer");
+			let serverInterface = new Block("interface IServer");
 
 			serverClass.writeLine("constructor(private $injector: IInjector){ }");
 
 			_.each(swagger.apis, (apiPath: Swagger.ISwaggerApi) => {
 				let swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
 
-				let models: Swagger.IBlock[] = this.generateModels(swaggerService.models);
+				let models: CodeGeneration.IBlock[] = this.generateModels(swaggerService.models);
 				serverModuleDeclaration.addBlocks(models);
 
 				let service = this.generateService(swaggerService, serverModuleName);
@@ -82,18 +82,18 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 			implementationsFile.addBlock(serverClass);
 			implementationsFile.writeLine("$injector.register('server', ServiceContainer);");
 
-			let codePrinter = new swaggerCodePrinterLib.SwaggerCodePrinter();
+			let codePrinter = new CodePrinter();
 			return {
 				interfaceFile: codePrinter.composeBlock(interfacesFile),
 				implementationFile: codePrinter.composeBlock(implementationsFile)
 			};
 
-		}).future<Server.IServiceContractClientCode>()();
+		}).future<IServiceContractClientCode>()();
 	}
 
-	private generateModels(models: IDictionary<Swagger.IModel>): Swagger.IBlock[] {
-		let modelsBlocks: Swagger.IBlock[] = [];
-		_.each(models, (model: Swagger.IModel) => {
+	private generateModels(models: IDictionary<CodeGeneration.IModel>): CodeGeneration.IBlock[] {
+		let modelsBlocks: CodeGeneration.IBlock[] = [];
+		_.each(models, (model: CodeGeneration.IModel) => {
 			if(model.id.indexOf("`") < 0) {
 				let typeName = this.tsTypeSystemHelpers.translate(model.id);
 				if (!this.tsTypeSystemHelpers.isModel(typeName)) {
@@ -118,9 +118,9 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		return result;
 	}
 
-	private generateModel(model: Swagger.IModel): Swagger.IBlock {
+	private generateModel(model: CodeGeneration.IModel): CodeGeneration.IBlock {
 		let name = this.getNameWithoutSlash(model.id);
-		let modelBlock: Swagger.IBlock = new codeEntityLib.Block(`interface ${name}`);
+		let modelBlock: CodeGeneration.IBlock = new Block(`interface ${name}`);
 		let properties = _.keys(model.properties);
 		_.each(properties, (propertyName: string) => {
 			let typeName = this.getModelPropertyTypeName(model.properties[propertyName]);
@@ -133,23 +133,23 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		return modelBlock;
 	}
 
-	private visitModel(model: Swagger.IModel): void {
+	private visitModel(model: CodeGeneration.IModel): void {
 		if (!this.tsTypeSystemHelpers.isGeneric(model.id)) {
 			let modelName = this.tsTypeSystemHelpers.translate(model.id);
 			this.tsTypeSystemHelpers.addModel(modelName);
 		}
 
-		_.each(model.properties, (property: Swagger.IModelProperty) => this.visitModelProperty(property));
+		_.each(model.properties, (property: CodeGeneration.IModelProperty) => this.visitModelProperty(property));
 	}
 
-	private visitModelProperty(property: Swagger.IModelProperty) {
+	private visitModelProperty(property: CodeGeneration.IModelProperty) {
 		if (property.allowableValues) {
 			this.tsTypeSystemHelpers.addModel(property.allowableValues.valueType);
 			this.ensureEnumAdded(property.allowableValues);
 		}
 	}
 
-	private getModelPropertyTypeName(property: Swagger.IModelProperty): string {
+	private getModelPropertyTypeName(property: CodeGeneration.IModelProperty): string {
 		let typeName: string;
 		if (property.items) {
 			typeName = property.items.$ref + "[]";
@@ -159,20 +159,20 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		return typeName;
 	}
 
-	private ensureEnumAdded(allowableValues: Swagger.IModelPropertyValue) {
+	private ensureEnumAdded(allowableValues: CodeGeneration.IModelPropertyValue) {
 		let typeName = this.tsTypeSystemHelpers.translate(allowableValues.valueType);
 		if (!this.pendingModels[typeName]) {
-			let enumBlock = new codeEntityLib.Block(`const enum ${typeName}`);
+			let enumBlock = new Block(`const enum ${typeName}`);
 			_.each(allowableValues.values, (value: string) => enumBlock.writeLine(`${value},`));
 			this.pendingModels[typeName] = enumBlock;
 		}
 	}
 
-	private generateService(swaggerService: Swagger.ISwaggerServiceContract, serverModuleName: string): Swagger.IService {
+	private generateService(swaggerService: Swagger.ISwaggerServiceContract, serverModuleName: string): CodeGeneration.IService {
 		let swaggerServiceContractName = this.getSwaggerServiceContractName(swaggerService);
-		let serviceInterface = new codeEntityLib.Block(`interface ${swaggerServiceContractName}`);
-		let serviceImplementation = new codeEntityLib.Block(`export class ${this.getSwaggerServiceName(swaggerService)} implements ${serverModuleName}.${swaggerServiceContractName}`);
-		serviceImplementation.addBlock(new codeEntityLib.Block(`constructor(private $serviceProxy: ${serverModuleName}.IServiceProxy)`));
+		let serviceInterface = new Block(`interface ${swaggerServiceContractName}`);
+		let serviceImplementation = new Block(`export class ${this.getSwaggerServiceName(swaggerService)} implements ${serverModuleName}.${swaggerServiceContractName}`);
+		serviceImplementation.addBlock(new Block(`constructor(private $serviceProxy: ${serverModuleName}.IServiceProxy)`));
 
 		let map: IDictionary<Swagger.IServiceEndpoint[]> = Object.create(null);
 
@@ -202,10 +202,10 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 					let implementationOpener = `public ${endpoint.operationContractName + index}(${endpoint.parameters.join(", ")}): IFuture<${endpoint.callResultType}>`;
 					let interfaceOpener = `${endpoint.operationContractName + index}(${endpoint.parameters.join(", ")}): IFuture<${endpoint.callResultType}>;`;
 
-					let implementationBlock = new codeEntityLib.Block(implementationOpener);
-					implementationBlock.writeLine("\t" + _.map(endpoint.endpointImplementation.codeEntities, (codeEntity: Swagger.ILine) => codeEntity.content).join("\n"));
+					let implementationBlock = new Block(implementationOpener);
+					implementationBlock.writeLine("\t" + _.map(endpoint.endpointImplementation.codeEntities, (codeEntity: CodeGeneration.ILine) => codeEntity.content).join("\n"));
 
-					serviceInterface.addLine( codeEntityLib.Line.create(interfaceOpener));
+					serviceInterface.addLine( Line.create(interfaceOpener));
 					serviceImplementation.addBlock(implementationBlock);
 				}
 				index++;
@@ -339,8 +339,8 @@ export class ServiceContractGenerator implements Server.IServiceContractGenerato
 		}
 
 		let callResultType = this.tsTypeSystemHelpers.isStream(responseType) ? "void" : responseType;
-		let generatedContract = codeEntityLib.Line.create(`${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>;`);
-		let generatedOperation = new codeEntityLib.Block(`public ${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>`);
+		let generatedContract = Line.create(`${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>;`);
+		let generatedOperation = new Block(`public ${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>`);
 		generatedOperation.writeLine(`return this.$serviceProxy.call<${callResultType}>(${httpCallParameters.join(", ")});`);
 
 		return {

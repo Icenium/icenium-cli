@@ -25,7 +25,6 @@ export class SamplesService implements ISamplesService {
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
 	private static GITHUB_CORDOVA_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/sample-[\\w\\W]+[.]git$", "i");
-	private static GITHUB_MOBILE_WEBSITE_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/mobilewebsite-sample-[\\w\\W]+[.]git$", "i");
 	private static GITHUB_NS_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/nativescript-sample-[\\w\\W]+[.]git$", "i");
 	private sampleCategories = [
 		{ id: "demo-app", regEx: /(^|\s)demo($|\s)/i, name: "Demo Applications", order: 1, matchOrder: 2 },
@@ -148,8 +147,6 @@ export class SamplesService implements ISamplesService {
 				return SamplesService.GITHUB_NS_SAMPLES_REGEX;
 			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase():
 				return SamplesService.GITHUB_CORDOVA_SAMPLES_REGEX;
-			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.MobileWebsite.toLowerCase():
-				return SamplesService.GITHUB_MOBILE_WEBSITE_SAMPLES_REGEX;
 			default:
 				return SamplesService.GITHUB_REGEX;
 		}

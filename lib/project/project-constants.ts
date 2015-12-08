@@ -17,8 +17,7 @@ export class ProjectConstants implements Project.IProjectConstants {
 
 	public TARGET_FRAMEWORK_IDENTIFIERS = {
 		Cordova: "Cordova",
-		NativeScript: "NativeScript",
-		MobileWebsite: "MobileWebsite"
+		NativeScript: "NativeScript"
 	};
 }
 

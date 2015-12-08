@@ -36,7 +36,6 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 		getLocalVariables: (): IFuture<IDictionary<any>> => {
 			return (() => {
 				let localVariables: IDictionary<any> = {};
-				localVariables["isMobileWebsite"] = opts.isProjectTypeResult;
 				localVariables["isCordova"] = opts.isProjectTypeResult;
 				localVariables["isNativeScript"] = opts.isProjectTypeResult;
 				localVariables["isLinux"] = opts.isPlatformResult;
@@ -154,30 +153,29 @@ describe("help", () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%> <%if(isMobileWebsite) {%>isMobileWebsite<%}%>")
+			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>")
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
 		help.execute(["foo"]).wait();
 
 		let output = injector.resolve("logger").output;
-		assert.isTrue(output.indexOf("bla isCordova isNativeScript isMobileWebsite") >= 0);
+		assert.isTrue(output.indexOf("bla isCordova isNativeScript") >= 0);
 	});
 
 	it("process correctly is* projectType variables when they are false",() => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%> <%if(isMobileWebsite) {%>isMobileWebsite<%}%>")
+			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>")
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
 		help.execute(["foo"]).wait();
 		let output = injector.resolve("logger").output;
-		assert.isTrue(output.indexOf("bla isCordova isNativeScript isMobileWebsite") < 0);
+		assert.isTrue(output.indexOf("bla isCordova isNativeScript") < 0);
 		assert.isTrue(output.indexOf("isCordova") < 0);
 		assert.isTrue(output.indexOf("isNativeScript") < 0);
-		assert.isTrue(output.indexOf("isMobileWebsite") < 0);
 		assert.isTrue(output.indexOf("bla") >= 0);
 	});
 

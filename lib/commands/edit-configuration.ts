@@ -32,6 +32,7 @@ export class EditConfigurationCommand implements ICommand {
 		private $errors: IErrors,
 		private $hostInfo: IHostInfo,
 		private $opener: IOpener,
+		private $options: IOptions,
 		private $project: Project.IProject,
 		private $templatesService: ITemplatesService) {
 	}
@@ -64,8 +65,10 @@ export class EditConfigurationCommand implements ICommand {
 				}
 			}
 
-			this.$logger.info("Opening configuration file: " + filepath);
-			this.$opener.open(filepath);
+			if(!this.$options.skipUi) {
+				this.$logger.info("Opening configuration file: " + filepath);
+				this.$opener.open(filepath);
+			}
 		}).future<void>()();
 	}
 }

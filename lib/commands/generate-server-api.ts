@@ -3,7 +3,7 @@
 import * as path from "path";
 
 export class GenerateServerApiCommand implements ICommand {
-	constructor(private $serviceContractGenerator: Server.IServiceContractGenerator,
+	constructor(private $serviceContractGenerator: IServiceContractGenerator,
 				private $fs: IFileSystem) {
 	}
 

@@ -15,15 +15,6 @@ declare module Server {
 		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T>
 	}
 
-	interface IServiceContractClientCode {
-		interfaceFile: string;
-		implementationFile: string;
-	}
-
-	interface IServiceContractGenerator {
-		generate(): IFuture<Server.IServiceContractClientCode>;
-	}
-
 	interface IServiceContractProvider {
 		getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract>;
 	}
@@ -891,39 +882,42 @@ interface IPublishConnection extends IStringDictionary {
  * Represents all supported options.
  */
 interface IOptions extends ICommonOptions {
-	companion: boolean;
-	download: boolean;
+	all: boolean;
+	answers: string;
+	available: boolean;
 	certificate: string;
-	provision: string;
-	template: string;
+	companion: boolean;
+	core: boolean;
+	count: number;
+	debug: boolean;
 	deploy: string;
 	device: string;
-	saveTo: string;
-	available: boolean;
-	release: boolean;
-	debug: boolean;
-	screenBuilderCacheDir: string;
-	force: boolean;
-	validValue: boolean;
 	deviceType: string;
-	core: boolean;
-	professional: boolean;
-	verified: boolean;
-	latest: boolean;
-	publish: boolean;
-	public: boolean;
-	sendPush: boolean;
-	sendEmail: boolean;
+	download: boolean;
+	force: boolean;
 	group: string[];
-	mandatory: boolean;
-	default: boolean;
-	var: Object;
-	answers: string;
-	simulator: boolean;
 	icon: string;
+	latest: boolean;
+	mandatory: boolean;
+	professional: boolean;
+	provision: string;
+	public: boolean;
+	publish: boolean;
+	release: boolean;
+	saveTo: string;
+	screenBuilderCacheDir: string;
+	sendEmail: boolean;
+	sendPush: boolean;
+	simulator: boolean;
+	/**
+	 * Used in edit-configuration command. When passed, command will generate the file on the specified place, but will NOT open the default editor for this file.
+	 * Required for some automated tests.
+	 */
+	skipUi: boolean;
 	splash: string;
-	all: boolean;
-	count: number;
+	template: string;
+	validValue: boolean;
+	verified: boolean;
 }
 
 /**

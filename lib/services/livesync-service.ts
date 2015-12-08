@@ -84,7 +84,7 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				"ios": IOSLiveSyncService
 			};
 
-			let livesyncData=  {
+			let livesyncData = {
 				platform: platform,
 				appIdentifier: this.$project.projectData.AppIdentifier,
 				projectFilesPath: projectDir,
@@ -92,7 +92,8 @@ export class LiveSyncService extends usbLivesyncServiceBaseLib.UsbLiveSyncServic
 				watchGlob: projectDir,
 				platformSpecificLiveSyncServices: platformSpecificLiveSyncServices,
 				notInstalledAppOnDeviceAction: notInstalledAppOnDeviceAction,
-				notRunningiOSSimulatorAction: () => Future.fromResult()
+				notRunningiOSSimulatorAction: () => Future.fromResult(),
+				getApplicationPathForiOSSimulatorAction:() => Future.fromResult("")
 			};
 
 			this.sync(livesyncData).wait();
@@ -174,9 +175,7 @@ export class AndroidLiveSyncService extends androidLiveSyncServiceLib.AndroidLiv
 				commands.push(this.liveSyncCommands.ReloadStartViewCommand());
 			}
 
-			this.createCommandsFileOnDevice(liveSyncRoot, commands).wait();
-
-			this.device.adb.sendBroadcastToDevice("com.telerik.LiveSync", { "app-id": deviceAppData.appIdentifier }).wait();
+			this.livesync(deviceAppData.appIdentifier, liveSyncRoot, commands).wait();
 		}).future<void>()();
 	}
 
