@@ -303,7 +303,8 @@ describe("plugins-service", () => {
 			Versions: [{
 				Identifier: "com.telerik.stripe",
 				Name: "Stripe",
-				Version: "1.0.4"
+				Version: "1.0.4",
+				SupportedVersion: ">=3.5.0"
 			}]
 		}];
 
@@ -471,12 +472,14 @@ describe("plugins-service", () => {
 		let installedMarketplacePlugins = [{
 				Identifier: "com.telerik.stripe",
 				Name: "Stripe",
-				Version: "1.0.4"
+				Version: "1.0.4",
+				SupportedVersion: ">=3.5.0"
 			},
 			{
 				Identifier: "nl.x-services.plugins.toast",
 				Name: "Toast",
-				Version: "2.0.1"
+				Version: "2.0.1",
+				SupportedVersion: ">=3.5.0"
 			}
 		];
 		let availableMarketplacePlugins = [
@@ -486,7 +489,8 @@ describe("plugins-service", () => {
 				Versions: [{
 					Identifier: "com.telerik.stripe",
 					Name: "Stripe",
-					Version: "1.0.4"
+					Version: "1.0.4",
+					SupportedVersion: ">=3.5.0"
 				}]
 			},
 			{
@@ -495,7 +499,8 @@ describe("plugins-service", () => {
 				Versions: [{
 					Identifier: "nl.x-services.plugins.toast",
 					Name: "Toast",
-					Version: "2.0.1"
+					Version: "2.0.1",
+					SupportedVersion: ">=3.5.0"
 				}]
 			}
 		];
@@ -545,7 +550,8 @@ describe("plugins-service", () => {
 				Versions: [{
 					Identifier: "nl.x-services.plugins.toast",
 					Name: "Toast",
-					Version: "2.0.1"
+					Version: "2.0.1",
+					SupportedVersion: ">=3.5.0"
 				}]
 			},
 			{
@@ -554,7 +560,8 @@ describe("plugins-service", () => {
 				Versions: [{
 					Identifier: "com.telerik.stripe",
 					Name: "Stripe",
-					Version: "1.0.4"
+					Version: "1.0.4",
+					SupportedVersion: ">=3.5.0"
 				}]
 			}
 		];
@@ -587,7 +594,8 @@ describe("plugins-service", () => {
 				Versions: [{
 					Identifier: "com.telerik.stripe",
 					Name: "Stripe",
-					Version: "1.0.4"
+					Version: "1.0.4",
+					SupportedVersion: ">=3.5.0"
 				}]
 			}
 		];
