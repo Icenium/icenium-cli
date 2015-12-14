@@ -383,7 +383,7 @@ describe("project integration tests", () => {
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova Blank template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
 
@@ -394,7 +394,7 @@ describe("project integration tests", () => {
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova TypeScript.Blank template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova TypeScript.Blank template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
 
@@ -405,7 +405,18 @@ describe("project integration tests", () => {
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Drawer template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova KendoUI.Drawer template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
+				});
+			});
+
+			it("When KendoUI.Blank is specified use KendoUI.Empty", () => {
+				options.template = "KendoUI.Blank";
+				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				let projectDir = project.getProjectDir().wait();
+
+				_.forEach(mobileHelper.platformNames, platform => {
+					let cordovaFile =`cordova.${platform.toLowerCase()}.js`;
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova KendoUI.Blank template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
 
@@ -416,7 +427,7 @@ describe("project integration tests", () => {
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.Empty template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova KendoUI.Empty template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
 
@@ -427,7 +438,7 @@ describe("project integration tests", () => {
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
-					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), util.format("Cordova KendoUI.TabStrip template does not contain mandatory '%s' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.", cordovaFile));
+					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova KendoUI.TabStrip template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
 		});
