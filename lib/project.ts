@@ -15,6 +15,9 @@ export class Project implements Project.IProject {
 	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 	private static INDENTATION = "     ";
+	private static UI_TEMPLATE_NAMES:IStringDictionary = {
+		"kendoui.blank": "KendoUI.Empty"
+	};
 
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
@@ -744,7 +747,8 @@ export class Project implements Project.IProject {
 	private createFromTemplate(appname: string, projectDir: string): IFuture<void> {
 		return (() => {
 			let templatesDir = this.$templatesService.projectTemplatesDir;
-			let template = this.$options.template || this.frameworkProject.defaultProjectTemplate;
+			let selectedTemplate = this.$options.template || this.frameworkProject.defaultProjectTemplate;
+			let template = Project.UI_TEMPLATE_NAMES[selectedTemplate.toLowerCase()] || selectedTemplate;
 			let templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
 
 			this.$logger.trace("Using template '%s'", templateFileName);
