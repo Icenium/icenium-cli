@@ -26,8 +26,12 @@ Before running your app in the **Genymotion emulator**, verify that your system 
 * Verify that you have installed Genymotion and its dependencies.
 * On Windows and Linux systems, verify that you have added the Genymotion installation directory to the `PATH` environment variable.
 * On OS X systems, verify that you have added the following paths to the `PATH` environment variable.
-    * `/Applications/Genymotion.app/Contents/MacOS/`
-    * `/Applications/Genymotion Shell.app/Contents/MacOS/`<% } %> 
+    * For Genymotion earlier than 2.6:
+        * `/Applications/Genymotion.app/Contents/MacOS/`
+        * `/Applications/Genymotion Shell.app/Contents/MacOS/`
+    * For Genymotion 2.6:
+        * `/Applications/Genymotion.app/Contents/MacOS/player.app/Contents/MacOS`
+        * `/Applications/Genymotion Shell.app/Contents/MacOS/`<% } %>
 <% if((isConsole && (isNativeScript || isCordova)) || isHtml) { %>
 ### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
