@@ -97,7 +97,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			}
 
 			if (helpers.versionCompare(this.latestVersion, this.$staticConfig.version) > 0) {
-				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm update -g appbuilder'.", suppressCommandHelp: true });
+				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm install -g appbuilder'.", suppressCommandHelp: true });
 			}
 		}).future<void>()();
 	}
