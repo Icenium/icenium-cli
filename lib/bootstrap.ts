@@ -1,4 +1,5 @@
 require("./common/bootstrap");
+$injector.require("logger", "./common/logger");
 $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
 $injector.require("dependencyConfigService", "./services/dependency-config");
