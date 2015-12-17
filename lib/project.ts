@@ -227,14 +227,14 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public createNewProject(projectName: string, framework: string): IFuture<void> {
+	public createNewProject(projectName: string, framework: string, template?: string): IFuture<void> {
 		if(!projectName) {
 			this.$errors.fail("No project name specified.");
 		}
 
 		let projectDir = this.getNewProjectDir();
 		this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
-		return this.createFromTemplate(projectName, projectDir);
+		return this.createFromTemplate(projectName, projectDir, template);
 	}
 
 	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
@@ -744,11 +744,11 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private createFromTemplate(appname: string, projectDir: string): IFuture<void> {
+	private createFromTemplate(appname: string, projectDir: string, template?: string): IFuture<void> {
 		return (() => {
 			let templatesDir = this.$templatesService.projectTemplatesDir;
-			let selectedTemplate = this.$options.template || this.frameworkProject.defaultProjectTemplate;
-			let template = Project.UI_TEMPLATE_NAMES[selectedTemplate.toLowerCase()] || selectedTemplate;
+			let selectedTemplate = template || this.frameworkProject.defaultProjectTemplate;
+			template = Project.UI_TEMPLATE_NAMES[selectedTemplate.toLowerCase()] || selectedTemplate;
 			let templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
 
 			this.$logger.trace("Using template '%s'", templateFileName);

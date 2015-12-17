@@ -5,7 +5,8 @@ import * as path from "path";
 import ProjectCommandBaseLib = require("./project-command-base");
 
 export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
-	constructor(private $fs: IFileSystem,
+	constructor(private $config: IConfiguration,
+		private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $nameCommandParameter: ICommandParameter,
 		private $options: IOptions,
@@ -23,9 +24,11 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			this.validateProjectData();
 
 			let projectName = args[0];
-			let projectPath = path.resolve(this.$options.path ? this.$project.getNewProjectDir() : path.join(this.$project.getNewProjectDir(), projectName));
+			let newProjectDir = this.$project.getNewProjectDir();
+			let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
 
-			this.$project.createTemplateFolder(projectPath).wait();
+			this.$project.createNewProject(projectName, this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
+			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)).wait());
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				projectPath: projectPath,
@@ -35,10 +38,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			}).wait();
 
 			try {
-				this.$screenBuilderService.prepareAndGeneratePrompt(this.$screenBuilderService.generatorName, this.$options.path, screenBuilderOptions).wait();
-				this.$screenBuilderService.installAppDependencies(screenBuilderOptions, this.$options.path).wait();
 
-				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, projectPath, projectName).wait();
+				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();
 			} catch(err) {
 				this.$logger.trace(err);
 				this.$fs.deleteDirectory(projectPath).wait();
