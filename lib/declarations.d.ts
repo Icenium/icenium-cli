@@ -368,36 +368,49 @@ interface IServerExtensionsService extends IExtensionsServiceBase {
 	prepareExtension(packageName: string, beforeDownloadPackageAction: () => void): IFuture<void>;
 }
 
-interface IDependencyExtensionsServiceBase extends IExtensionsServiceBase {
-	prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction: () => IFuture<void>): IFuture<void>;
-}
-
-interface IGeneratorExtensionsService {
-	prepareGenerator(generatorName: string): IFuture<void>;
-}
-
 interface IAppScaffoldingExtensionsService {
 	appScaffoldingPath: string;
 	prepareAppScaffolding(afterPrepareAction?: () => void): IFuture<void>;
 }
 
 interface IScreenBuilderService {
-	generatorName: string;
+	generatorFullName: string;
 	commandsPrefix: string;
-	prepareAndGeneratePrompt(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
-	allSupportedCommands(generatorName?: string): IFuture<string[]>;
-	generateAllCommands(generatorName: string): IFuture<void>;
-	installAppDependencies(screenBuilderOptions: IScreenBuilderOptions, projectPath: string): IFuture<void>;
+	screenBuilderSpecificFiles: string[];
+	prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
+	allSupportedCommands(projectPath: string, generatorName?: string): IFuture<string[]>;
+	generateAllCommands(projectPath: string, generatorName?: string): IFuture<void>;
 	composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
-	ensureScreenBuilderProject(projectDir: string): IFuture<void>;
+	ensureScreenBuilderProject(projectPath: string): IFuture<void>;
 	shouldUpgrade(projectPath: string): IFuture<boolean>;
 	upgrade(projectPath: string): IFuture<void>;
+}
+
+/**
+ * Defines a DTO for migrating from older versions of Screen Builder to the newest one.
+ */
+interface IScreenBuilderMigrationData {
+	/**
+	 * States whether the app is already at the latest Screen Builder version.
+	 * @type {boolean}
+	 */
+	wasMigrated: boolean;
+	/**
+	 * States whether the user chose to upgrade the app to the latest Screen Builder version.
+	 * @type {boolean}
+	 */
+	didMigrate: boolean;
 }
 
 interface IScreenBuilderOptions {
 	type?: string;
 	answers?: IScreenBuilderAnswer;
 	projectPath?: string;
+	/**
+	 * States whether the ScreenBuilder command is synchronous. If it is then no callback will be passed to the app-scaffolder package.
+	 * @type {boolean}
+	 */
+	isSync?: boolean;
 }
 
 interface IScreenBuilderAnswer {

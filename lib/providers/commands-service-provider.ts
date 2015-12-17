@@ -42,11 +42,11 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 	}
 
 	public getDynamicCommands(): IFuture<string[]> {
-		return this.$screenBuilderService.allSupportedCommands(this.$screenBuilderService.generatorName);
+		return this.$screenBuilderService.allSupportedCommands(this.$injector.resolve("project").getProjectDir().wait(), this.$screenBuilderService.generatorFullName);
 	}
 
 	public generateDynamicCommands(): IFuture<void> {
-		return this.$screenBuilderService.generateAllCommands(this.$screenBuilderService.generatorName);
+		return this.$screenBuilderService.generateAllCommands(this.$injector.resolve("project").getProjectDir().wait(), this.$screenBuilderService.generatorFullName);
 	}
 
 	public registerDynamicSubCommands(): void {
