@@ -197,5 +197,6 @@ module.exports = function(grunt) {
 		"setPackageName"
 	]);
 	grunt.registerTask("lint", ["tslint:build"]);
+	grunt.registerTask("all", ["clean", "test", "lint"]);
 	grunt.registerTask("default", "ts:devlib");
 };
