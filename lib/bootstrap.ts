@@ -17,7 +17,6 @@ $injector.require("platformMigrator", "./services/platform-migration");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("appScaffoldingExtensionsService", "./services/app-scaffolding-extensions-service");
-$injector.require("generatorExtensionsService", "./services/generator-extensions-service");
 $injector.require("screenBuilderService", "./services/screen-builder-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");

@@ -1,22 +1,24 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import * as dependencyExtensionsServiceLib from "./dependency-extensions-service-base";
+import {ExtensionsServiceBase} from "./extensions-service-base";
 import * as path from "path";
 import Future = require("fibers/future");
 
-export class AppScaffoldingExtensionsService extends dependencyExtensionsServiceLib.DependencyExtensionsServiceBase implements IAppScaffoldingExtensionsService {
+export class AppScaffoldingExtensionsService extends ExtensionsServiceBase implements IAppScaffoldingExtensionsService {
 	private static APP_SCAFFOLDING_NAME = "app-scaffolding";
+	private static SCREEN_BUILDER_BUCKET_NAME = "http://s3.amazonaws.com/screenbuilder-cli";
+	private static DEFAULT_CACHED_VERSION = "0.0.0";
 
-	constructor($fs: IFileSystem,
-		$httpClient: Server.IHttpClient,
-		$logger: ILogger,
-		$progressIndicator: IProgressIndicator,
-		$config: IConfiguration,
-		protected $childProcess: IChildProcess,
-		protected $dependencyConfigService: IDependencyConfigService,
-		$options: IOptions) {
-		super($options.screenBuilderCacheDir, $fs, $httpClient, $logger, $options, $progressIndicator, $config); // We should pass here the correct profileDir
+	constructor(private $childProcess: IChildProcess,
+		private $config: IConfiguration,
+		private $dependencyConfigService: IDependencyConfigService,
+		private $progressIndicator: IProgressIndicator,
+		protected $fs: IFileSystem,
+		protected $httpClient: Server.IHttpClient,
+		protected $logger: ILogger,
+		protected $options: IOptions) {
+		super($options.screenBuilderCacheDir, $fs, $httpClient, $logger, $options);
 	}
 
 	public get appScaffoldingPath(): string {
@@ -29,7 +31,11 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
 				return (() => {
-					this.npmInstall("glob-watcher@0.0.8").wait(); // HACK: With this we are able to make paths shorter with 20 symbols.
+					// HACK: Some of screen builder's dependencies generate paths which are too long for Windows OS to handle
+					// this is why we pre-install them so that they're at the highest point in the dependency depth.
+					// This leads to shortening the paths just enough to be safe about it.
+					// Note that if one of these modules' versions is changed this needs to be reflected in the code too!
+					["vinyl-fs@2.2.1", "gulp-decompress@1.2.0"].forEach(dependency => { this.npmInstall(dependency).wait(); });
 
 					let generatorBaseDependencies = require(path.join(this.appScaffoldingPath, "node_modules", "screen-builder-base-generator", "package.json")).dependencies;
 					Future.wait(_.map(generatorBaseDependencies, (value, key) => this.npmInstall(`${key}@${value}`)));
@@ -38,6 +44,30 @@ export class AppScaffoldingExtensionsService extends dependencyExtensionsService
 				}).future<void>()();
 			};
 			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction).wait();
+		}).future<void>()();
+	}
+
+	public prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): IFuture<void> {
+		return (() => {
+			let extensionVersion = this.getExtensionVersion(dependencyExtensionName);
+			let cachedVersion = extensionVersion || AppScaffoldingExtensionsService.DEFAULT_CACHED_VERSION;
+			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb/generators/${dependencyExtensionName}/${dependencyConfig.version}` : `${AppScaffoldingExtensionsService.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;
+
+			this.$logger.trace("prepareDependencyExtension: Download url: %s, cached version: %s", downloadUrl, cachedVersion);
+
+			if (this.shouldUpdatePackage(cachedVersion, dependencyConfig.version)) {
+				this.$logger.out("Please, wait while Screen Builder and its dependencies are being configured.");
+				this.$logger.out("Preparing %s", dependencyExtensionName);
+
+				let dependencyExtensionData = {
+					packageName: dependencyExtensionName,
+					version: dependencyConfig.version,
+					downloadUri: downloadUrl,
+					pathToSave: dependencyConfig.pathToSave
+				};
+
+				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, {afterDownloadAction: () => this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100)}), 5000).wait();
+			}
 		}).future<void>()();
 	}
 

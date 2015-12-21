@@ -5,14 +5,14 @@ import * as path from "path";
 import * as util from "util";
 
 export class ScreenBuilderService implements IScreenBuilderService {
-	private static SCREEN_BUILDER_SPECIFIC_FILES = [".yo-rc.json", ".app.json", "app.js"];
-	private static UPGRADE_ERROR_MESSAGE = "Your app has been build with an obsolete version of Screen Builder. Please, migrate it to latest version and retry.";
-	// This constant is introduced due to the original message (the one above)
-	// not being descriptive enough.
-	// It should be removed once Screen Builder team fixes the message from their side in the next version.
+	private static UPGRADE_ERROR_MESSAGES = ["Your app has been build with an obsolete version of Screen Builder. Please, migrate it to latest version and retry.",
+	"Your app has been created with an obsolete version of Screen Builder. Upgrade your project to the latest version and try again."];
+
 	private static UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE = "Your app has been created with an obsolete version of Screen Builder. You need to upgrade your project to be able to run Screen Builder-related commands.";
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
 	private shouldUpgradeCached: boolean = null;
+	private allCommandsCache: string[] = null;
+	private scaffolder: any = null;
 
 	private static PREDEFINED_SCREENBUILDER_TYPES: IStringDictionary = {
 		dataprovider: "dataProvider"
@@ -20,90 +20,85 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
 		private $childProcess: IChildProcess,
-		private $errors: IErrors,
 		private $dependencyConfigService: IDependencyConfigService,
-		private $generatorExtensionsService: IGeneratorExtensionsService,
+		private $errors: IErrors,
+		private $fs: IFileSystem,
 		private $injector: IInjector,
 		private $logger: ILogger,
-		private $prompter: IPrompter,
-		private $fs: IFileSystem) { }
+		private $prompter: IPrompter) { }
+
+	public screenBuilderSpecificFiles = [".yo-rc.json", ".app.json", "app.js"];
+
+	public get generatorFullName(): string {
+		return "generator-" + this.generatorName;
+	}
 
 	public get generatorName(): string {
-		return "generator-kendo-ui-mobile";
+		return "kendo-ui-mobile";
 	}
 
 	public get commandsPrefix(): string {
 		return "add";
 	}
 
-	public prepareAndGeneratePrompt(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean> {
+	private promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderMigrationData> {
 		return (() => {
-			let scaffolderData = this.promptGenerate(generatorName, projectPath, screenBuilderOptions).wait(),
-				scaffolderFutureResult = scaffolderData.future.wait(),
-				disableCommandHelpSuggestion = false;
+			let wasMigrated = !this.shouldUpgrade(projectPath).wait(),
+				didMigrate = false;
 
-			if (scaffolderFutureResult === ScreenBuilderService.UPGRADE_ERROR_MESSAGE) {
+			if (!wasMigrated) {
 				this.$logger.error(ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE);
-				let shouldMigrate = this.$prompter.confirm('Do you want to upgrade your project now? Custom code changes might be lost.', () => false).wait();
+				didMigrate = this.$prompter.confirm('Do you want to upgrade your project now? Custom code changes might be lost.', () => false).wait();
 
-				if (shouldMigrate) {
-					let future = new Future<any>();
-					let callback = (err:Error, data:any) => {
-						if (err) {
-							let error = this.getErrorsRecursive(err).join('\n');
-							this.$logger.trace(`Screen Builder error: ${err.message}`);
-							future.throw(new Error(error));
-						} else {
-							future.return(data);
-						}
-					};
+				if (didMigrate) {
+					let scaffolderData = this.createScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
 
-					scaffolderData.scaffolder.upgrade(callback);
+					scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
-					future.wait();
-					this.promptGenerate(generatorName, projectPath, screenBuilderOptions).wait().future.wait();
+					scaffolderData.future.wait();
 				}
+			}
 
-				disableCommandHelpSuggestion = !shouldMigrate;
+			return { wasMigrated: wasMigrated, didMigrate: didMigrate };
+		}).future<IScreenBuilderMigrationData>()();
+	}
+
+	public prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean> {
+		return (() => {
+			generatorName = generatorName || this.generatorFullName;
+			let migrationData = this.promptForUpgrade(projectPath, generatorName, screenBuilderOptions).wait(),
+				disableCommandHelpSuggestion = !migrationData.didMigrate;
+
+			if (migrationData.wasMigrated || migrationData.didMigrate) {
+				this.promptGenerate(projectPath, generatorName, screenBuilderOptions).wait().future.wait();
 			}
 
 			return disableCommandHelpSuggestion;
 		}).future<boolean>()();
 	}
 
-	public allSupportedCommands(generatorName: string): IFuture<string[]> {
+	public allSupportedCommands(projectDir: string, generatorName?: string): IFuture<string[]> {
 		return (() => {
-			generatorName = generatorName || this.generatorName;
-			// We should use "scaffolderData.scaffolder.listGenerators(scaffolderData.callback);"" but this generates empty app.json and .rc files every time
-			// and decided to list manually supported commands from .schema.json file for specified generator
+			if (!this.allCommandsCache) {
+				generatorName = generatorName || this.generatorFullName;
+				let scaffolder = this.createScaffolder(projectDir, generatorName, { isSync: true }).wait().scaffolder;
+				let allSupportedCommands = scaffolder.listGenerators()
+											.map((command: string) => command.replace( new RegExp(this.generatorName + ":?"), ''))
+											.filter((command: string) => !!command);
 
-			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
-			let pathToGenerator = path.join(this.$appScaffoldingExtensionsService.appScaffoldingPath, generatorConfig.alias, generatorConfig.version, "node_modules", generatorName);
-			if (!this.$fs.exists(pathToGenerator).wait()) {
-				this.prepareScreenBuilder().wait();
+				this.allCommandsCache = _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 			}
 
-			let schema = require(path.join(pathToGenerator, ".schema.json"));
-			let allSupportedCommands = _.keys(schema);
-			return _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
+			return this.allCommandsCache;
 		}).future<string[]>()();
 	}
 
-	public generateAllCommands(generatorName: string): IFuture<void> {
+	public generateAllCommands(projectDir: string, generatorName?: string): IFuture<void> {
 		return (() => {
-			let commands = this.allSupportedCommands(generatorName).wait();
+			generatorName = generatorName || this.generatorFullName;
+			let commands = this.allSupportedCommands(projectDir, generatorName).wait();
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
 		}).future<void>()();
-	}
-
-	public installAppDependencies(screenBuilderOptions: IScreenBuilderOptions, projectPath: string): IFuture<void> {
-		this.$logger.trace("Installing project dependencies using bower");
-
-		let projectDirPath = path.resolve(projectPath || ".");
-		let bowerModuleFilePath = require.resolve("bower");
-		let bowerPath = path.join(bowerModuleFilePath, "../../", "bin", "bower");
-		let command = util.format("%s %s install", "node", bowerPath);
-		return this.$childProcess.exec(command, { cwd: projectDirPath });
 	}
 
 	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
@@ -118,9 +113,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<IScreenBuilderOptions>()();
 	}
 
-	public promptGenerate(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
+	public promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
 		return (() => {
-			let scaffolderData = this.createScaffolder(generatorName, projectPath, screenBuilderOptions).wait();
+			generatorName = generatorName || this.generatorFullName;
+			let scaffolderData = this.createScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
 			let scaffolder = scaffolderData.scaffolder;
 			let type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 			type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
@@ -137,7 +133,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public ensureScreenBuilderProject(projectDir: string): IFuture<void> {
 		return (() => {
-			if(!_.every(ScreenBuilderService.SCREEN_BUILDER_SPECIFIC_FILES, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
+			if(!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
 				this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
 			}
 		}).future<void>()();
@@ -146,11 +142,11 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public shouldUpgrade(projectPath: string): IFuture<boolean> {
 		return (() => {
 			if (!this.shouldUpgradeCached) {
-				let scaffolderData = this.createScaffolder(this.generatorName, projectPath).wait();
+				let scaffolderData = this.createScaffolder(projectPath, this.generatorFullName).wait();
 
 				scaffolderData.scaffolder.initContext({ collectMetadata: true }, scaffolderData.callback);
 
-				this.shouldUpgradeCached = scaffolderData.future.wait() === ScreenBuilderService.UPGRADE_ERROR_MESSAGE;
+				this.shouldUpgradeCached = scaffolderData.future.wait() === ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE;
 			}
 
 			return this.shouldUpgradeCached;
@@ -163,7 +159,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				return;
 			}
 
-			let scaffolderData = this.createScaffolder(this.generatorName, projectPath).wait();
+			let scaffolderData = this.createScaffolder(this.generatorFullName, projectPath).wait();
 
 			scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
@@ -171,52 +167,50 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	private prepareScreenBuilder(): IFuture<void> {
+	private getScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<any> {
 		return (() => {
-			this.$logger.out("Please, wait while Screen Builder and its dependencies are being configured.");
-			this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
+			if (!this.scaffolder) {
+				this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
 
-			let generators = this.$dependencyConfigService.getAllGenerators().wait();
-			_.each(generators, (generator: IGeneratorConfig) => this.$generatorExtensionsService.prepareGenerator(generator.name).wait());
-		}).future<void>()();
-	}
+				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
 
-	private getScaffolder(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<any> {
-		return (() => {
-			let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
+				let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
 
-			let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
+				let cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
+				let Scaffolder = require(cliServicePath);
+				let connector = {
+					generatorsCache: appScaffoldingPath,
+					path: screenBuilderOptions && screenBuilderOptions.projectPath || path.resolve(projectPath || "."),
+					dependencies: [util.format("%s@%s", generatorName, generatorConfig.version)],
+					connect: (done:Function) => {
+						done();
+					},
+					logger: this.$logger.trace.bind(this.$logger)
+				};
 
-			let cliServicePath = path.join(appScaffoldingPath, "lib/cliService");
-			let Scaffolder = require(cliServicePath);
-			let connector = {
-				generatorsCache: appScaffoldingPath,
-				generatorsAlias: [generatorConfig.alias],
-				path: screenBuilderOptions && screenBuilderOptions.projectPath || path.resolve(projectPath || "."),
-				dependencies: [util.format("%s@%s", generatorName, generatorConfig.version)],
-				connect: (done:Function) => {
-					done();
-				},
-				logger: this.$logger.trace.bind(this.$logger)
-			};
+				this.scaffolder = new Scaffolder(connector);
+			}
 
-			return new Scaffolder(connector);
+			return this.scaffolder;
 		}).future<IScaffolder>()();
 	}
 
-	private createScaffolder(generatorName: string, projectPath: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
+	private createScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
 		return (() => {
-			this.prepareScreenBuilder().wait();
 			screenBuilderOptions = screenBuilderOptions || {};
 
-			let scaffolder = this.getScaffolder(generatorName, projectPath, screenBuilderOptions).wait();
+			let scaffolder = this.getScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
+			if (screenBuilderOptions && screenBuilderOptions.isSync) {
+				return {scaffolder: scaffolder, future: null, callback: null};
+			}
+
 			let future = new Future<any>();
 			let callback = (err:Error, data:any) => {
 				if (err) {
 					let error = this.getErrorsRecursive(err).join('\n');
 					this.$logger.trace(`Screen Builder error while prompting: ${err.message}`);
-					if (err.message === ScreenBuilderService.UPGRADE_ERROR_MESSAGE) {
-						future.return(ScreenBuilderService.UPGRADE_ERROR_MESSAGE);
+					if (~ScreenBuilderService.UPGRADE_ERROR_MESSAGES.indexOf(err.message)) {
+						future.return(ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE);
 					} else {
 						future.throw(new Error(error));
 					}
@@ -270,7 +264,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 				type: this.command.substr(this.command.indexOf("-") + 1)
 			}).wait();
 
-			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(this.generatorName, this.$options.path, screenBuilderOptions).wait();
+			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions).wait();
 		}).future<void>()();
 	}
 
