@@ -9,7 +9,7 @@ export class DevConfigApplyCommand implements ICommand {
 	public disableAnalytics = true;
 
 	public execute(args: string[]): IFuture<void> {
-		return this.$config.apply(args[0]);
+		return this.$config.apply(args[0].toLowerCase());
 	}
 }
 $injector.registerCommand("dev-config-apply", DevConfigApplyCommand);
