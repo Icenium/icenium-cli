@@ -16,7 +16,7 @@ Prints information about the configuration of the AndroidVersionCode property.
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.

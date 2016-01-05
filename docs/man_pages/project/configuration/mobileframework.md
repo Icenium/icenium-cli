@@ -15,12 +15,12 @@ General | `$ appbuilder mobileframework [<Command>] [--path <Directory>]`
 `<Command>` extends the `mobileframework` command. You can set the following values for this attribute.
 * `set` - Sets the selected framework version for the project.
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.

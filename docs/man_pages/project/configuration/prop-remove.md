@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop remove <Property Name> <Value> [Value]*`
 <% if(isCordova) { %>Disable plugins for the Debug build configuration | `$ appbuilder prop remove CorePlugins <Value> [Value]* --debug`
-Disable plugins for the Release build configuration | `$ appbuilder prop remove CorePlugins <Value> [Value]* --release`<% } %> 
+Disable plugins for the Release build configuration | `$ appbuilder prop remove CorePlugins <Value> [Value]* --release`<% } %>
 
 Disables options for the selected project property, if the property accepts multiple values.
 
@@ -14,12 +14,12 @@ Disables options for the selected project property, if the property accepts mult
 
 * `--debug` - Removes the specified plugin(s) from the Debug build configuration only. This switch is applicable only to `$ appbuilder prop remove CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - Removes the specified plugin(s) from the Release build configuration only. This switch is applicable only to `$ appbuilder prop remove CorePlugins` commands.<% if(isHtml) { %> For more information about build configurations, see [Managing Build Configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
-<% } %> 
+<% } %>
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 * `<Value>` is a current value of the property as listed by `$ appbuilder prop print <Property Name>`. You can separate multiple values with a space.
-<% } %> 
-<% if(isHtml) { %> 
+<% } %>
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You can set the `--debug` and `--release` switches only for the `CorePlugins` property for Apache Cordova projects.
@@ -28,7 +28,7 @@ Disables options for the selected project property, if the property accepts mult
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.

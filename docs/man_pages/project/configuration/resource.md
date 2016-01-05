@@ -13,12 +13,12 @@ Lists information about the splash screens and icons for all mobile platforms.
 `<Command>` extends the `resource` command. You can set the following values for this attribute.
 * `create` - Creates icons or splash screens for all mobile platforms from a single high-resolution image.
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework&nbsp;set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.

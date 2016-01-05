@@ -6,7 +6,7 @@ Usage | Synopsis
 Android | $ appbuilder webview set android <Web View Name>
 iOS | $ appbuilder webview set ios <Web View Name>
 
-Sets the selected web view for the current project. <% if(isHtml) { %>Setting a pluggable web view also enables the respective Apache Cordova plugin for your project. For more information, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>  
+Sets the selected web view for the current project. <% if(isHtml) { %>Setting a pluggable web view also enables the respective Apache Cordova plugin for your project. For more information, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>
 
 <% if(isConsole)  { %>
 <% if(isNativeScript)  { %>
@@ -28,7 +28,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 * `<Web View Name>` is the web view name as listed by `$ appbuilder webview`
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You cannot run this command on NativeScript projects.
@@ -38,7 +38,7 @@ WARNING: This command is not applicable to NativeScript projects. To view the co
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.

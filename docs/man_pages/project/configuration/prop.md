@@ -19,7 +19,7 @@ This set of commands manages the properties for your project. You must run the `
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.

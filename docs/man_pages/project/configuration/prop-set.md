@@ -18,8 +18,8 @@ Sets the selected project property and overwrites its current value.
 ### Attributes
 * `<Property Name>` is the name of the project property as listed by `$ appbuilder prop print`
 * `<Value>` is a valid value as listed by `$ appbuilder prop print <Property Name> --valid-value`. You can separate multiple values with a space.
-<% } %> 
-<% if(isHtml) { %> 
+<% } %>
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You can set the `--debug` and `--release` switches only for the `CorePlugins` property for Apache Cordova projects.
@@ -28,7 +28,7 @@ Sets the selected project property and overwrites its current value.
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.
