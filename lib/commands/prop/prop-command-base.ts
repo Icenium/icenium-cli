@@ -29,7 +29,8 @@ export class ProjectPropertyCommandBase {
 					return range;
 				}
 			} else {
-				return _.keys(this.projectSchema);
+				let properties = _.keys(this.projectSchema);
+				return properties.concat(properties.map(k => k.toLowerCase()));
 			}
 		}
 
