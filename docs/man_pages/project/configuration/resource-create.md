@@ -8,7 +8,7 @@ General | `$ appbuilder resource create [--icon <File Path>] [--splash <File Pat
 Creates image resources for all mobile platforms from a single high-resolution image and saves them to the `App_Resources` folder of the current project. The image source must be a `PNG` image.
 
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Prerequisites
 
 * Verify that the image source for your icons is at least **768x768** pixels `PNG` image. The recommended dimensions are **1024x1024** pixels.
@@ -24,13 +24,13 @@ Creates image resources for all mobile platforms from a single high-resolution i
 ### Attributes
 `<File Path>` is the complete file path to the high-resolution image that you want to use.
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 
 ### Related Commands
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [mobileframework set](mobileframework-set.html) | Sets the selected development framework version for the project.
 [prop](prop.html) | Lets you manage the properties for your project.

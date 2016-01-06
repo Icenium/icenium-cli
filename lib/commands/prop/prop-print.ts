@@ -5,7 +5,7 @@ import * as projectPropertyCommandBaseLib from "./prop-command-base";
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
 	constructor($staticConfig: IStaticConfig,
 		$injector: IInjector,
-		private $options: IOptions) {
+		protected $options: IOptions) {
 		super($staticConfig, $injector);
 		if(!this.$options.validValue) {
 			this.$project.ensureProject();

@@ -17,12 +17,12 @@ General | `$ appbuilder mobileframework set <Version> [--path <Directory>]`
 ### Attributes
 * `<Version>` is the version of the framework as listed by `$ appbuilder mobileframework`
 <% } %>
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
-[edit-configuration](edit-configuration.html) | `<ConfigurationFile>` is the configuration file that you want to open.
+[edit-configuration](edit-configuration.html) | Opens a configuration file for editing.
 [mobileframework](mobileframework.html) | Lists all supported versions of the current development framework.
 [prop](prop.html) | Lets you manage the properties for your project.
 [prop print](prop-print.html) | Prints information about the configuration of the project or the selected property.

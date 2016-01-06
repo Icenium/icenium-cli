@@ -102,6 +102,8 @@ $injector.requireCommand("prop|remove", "./commands/prop/prop-remove");
 $injector.requireCommand("prop|print", "./commands/prop/prop-print");
 $injector.requireCommand("prop|print|frameworkversion", "./commands/framework-versions/print-versions");
 $injector.requireCommand("prop|set|frameworkversion", "./commands/framework-versions/set-version");
+$injector.requireCommand("prop|set|androidversioncode", "./commands/prop/prop-set-android-version-code");
+$injector.requireCommand("prop|print|androidversioncode", "./commands/prop/prop-print-android-version-code");
 
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
