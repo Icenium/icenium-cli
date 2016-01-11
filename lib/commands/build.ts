@@ -43,13 +43,14 @@ $injector.registerCommand("build|android", BuildAndroidCommand);
 export class BuildIosCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
 			super($project, $errors);
 		}
 
 	execute(args: string[]): IFuture<void> {
-		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS);
+		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS, { buildForiOSSimulator: this.$options.emulator });
 	}
 }
 $injector.registerCommand("build|ios", BuildIosCommand);

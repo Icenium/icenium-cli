@@ -15,7 +15,7 @@ import * as devicePlatformsLib from "../lib/common/mobile/device-platforms-const
 import * as optionsLib from "../lib/options";
 import * as cordovaProjectLib from "./../lib/project/cordova-project";
 import * as nativeScriptProjectLib from "./../lib/project/nativescript-project";
-import * as projectFilesManagerLib from "../lib/project/project-files-manager";
+import * as projectFilesManagerLib from "../lib/common/services/project-files-manager";
 import * as projectConstantsLib from "../lib/project/project-constants";
 import * as jsonSchemaLoaderLib from "../lib/json-schema/json-schema-loader";
 import * as jsonSchemaResolverLib from "../lib/json-schema/json-schema-resolver";
@@ -28,6 +28,11 @@ import * as projectPropertiesService from "../lib/services/project-properties-se
 import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
 import Future = require("fibers/future");
 import * as hostInfoLib from "../lib/common/host-info";
+import {DeviceAppDataProvider} from "../lib/providers/device-app-data-provider";
+import {ProjectFilesProvider} from "../lib/providers/project-files-provider";
+import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-app-data-factory";
+import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
+import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import {assert} from "chai";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
@@ -147,6 +152,12 @@ function createTestInjector(): IInjector {
 		minSupportedVersion: "4.0.0"
 	});
 	testInjector.register("serverConfiguration", {});
+
+	testInjector.register("deviceAppDataFactory", DeviceAppDataFactory);
+	testInjector.register("localToDevicePathDataFactory", LocalToDevicePathDataFactory);
+	testInjector.register("deviceAppDataProvider", DeviceAppDataProvider);
+	testInjector.register("projectFilesProvider", ProjectFilesProvider);
+	testInjector.register("configFilesManager", ConfigFilesManager);
 
 	return testInjector;
 }

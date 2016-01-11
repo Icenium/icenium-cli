@@ -8,6 +8,7 @@ import {EOL} from "os";
 import * as plist from "plist";
 import * as iOSDeploymentValidatorLib from "../validators/ios-deployment-validator";
 import * as constants from "../common/mobile/constants";
+import minimatch = require("minimatch");
 
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
@@ -30,7 +31,8 @@ export class BuildService implements Project.IBuildService {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions,
-		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory) { }
+		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
@@ -405,12 +407,22 @@ export class BuildService implements Project.IBuildService {
 				device: device
 			}).wait();
 
-			let result =  _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
+			let result = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
 			return result;
 		}).future<string>()();
 	}
 
-	public executeBuild(platform: string): IFuture<void> {
+	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
+		return (() => {
+			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait();
+			let tempDir = this.$project.getTempDir("emulatorFiles").wait();
+			this.$fs.unzip(packageFile, tempDir).wait();
+			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			return appFilePath;
+		}).future<string>()();
+	}
+
+	public executeBuild(platform: string, opts?: {buildForiOSSimulator?: boolean}): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
 
@@ -422,7 +434,7 @@ export class BuildService implements Project.IBuildService {
 		}).future<void>()();
 	}
 
-	private executeBuildCore(platform: string): IFuture<void> {
+	private executeBuildCore(platform: string, opts?: {buildForiOSSimulator?: boolean}): IFuture<void> {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 
@@ -451,7 +463,8 @@ export class BuildService implements Project.IBuildService {
 					configuration: this.$project.getBuildConfiguration(),
 					showQrCodes: !this.$options.download,
 					downloadFiles: this.$options.download,
-					downloadedFilePath: this.$options.saveTo
+					downloadedFilePath: this.$options.saveTo,
+					buildForiOSSimulator: opts && opts.buildForiOSSimulator
 				}).wait();
 			}
 		}).future<void>()();
@@ -468,7 +481,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.importProject().wait();
 
-			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.projectData.AppIdentifier, platform);
+			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.projectData.AppIdentifier, platform, null);
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);

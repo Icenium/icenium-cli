@@ -35,7 +35,6 @@ declare module Project {
 		ensureCordovaProject(): void;
 		ensureProject(): void;
 		ensureAllPlatformAssets(): IFuture<void>;
-		enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
 		getConfigurationsSpecifiedByUser(): string[];
 		/**
 		 * Checks wether compatible sdk versions for the given platform are used.
@@ -124,11 +123,8 @@ declare module Project {
 		hasBuildConfigurations: boolean;
 	}
 
-	interface IProjectFilesManager {
+	interface IConfigFilesManager {
 		availableConfigFiles: IDictionary<Project.IConfigurationFile>;
-		enumerateProjectFiles(projectDir: string, additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]>;
-		isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean;
-		excludeFile(projectDir: string, excludeFilePath: string) : void;
 	}
 
 	interface IProjectConstants {

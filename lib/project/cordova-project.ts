@@ -23,7 +23,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IProjectConstants,
-		private $projectFilesManager: Project.IProjectFilesManager,
+		private $configFilesManager: Project.IConfigFilesManager,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
@@ -68,7 +68,7 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public get configFiles(): Project.IConfigurationFile[] {
-		let allConfigFiles = this.$projectFilesManager.availableConfigFiles;
+		let allConfigFiles = this.$configFilesManager.availableConfigFiles;
 		let availableConfigFiles = [
 			allConfigFiles["cordova-android-manifest"],
 			allConfigFiles["android-config"],
