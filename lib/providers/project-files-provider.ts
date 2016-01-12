@@ -21,13 +21,9 @@ export class ProjectFilesProvider implements IProjectFilesProvider {
 		private $projectConstants: Project.IProjectConstants,
 		private $injector: IInjector) { }
 
-	public get excludedProjectDirsAndFiles(): string[] {
-		return ProjectFilesProvider.INTERNAL_NONPROJECT_FILES;
-	}
-
 	public isFileExcluded(filePath: string): boolean {
-		let x = this.$pathFilteringService.isFileExcluded(filePath, this.getIgnoreFilesRules(), this.projectDir);
-		return x;
+		let exclusionList = ProjectFilesProvider.INTERNAL_NONPROJECT_FILES.concat(this.getIgnoreFilesRules());
+		return this.$pathFilteringService.isFileExcluded(filePath, exclusionList, this.projectDir);
 	}
 
 	public mapFilePath(filePath: string, platform: string): string {

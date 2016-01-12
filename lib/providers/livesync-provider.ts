@@ -22,11 +22,8 @@ export class LiveSyncProvider implements ILiveSyncProvider {
 	}
 
 	public buildForDevice(device: Mobile.IDevice): IFuture<string> {
-		return this.$devicesService.isiOSSimulator(device) ?
-			Future.fromResult("//Users//havaluova//Work//icenium-cli//scratch//myiSimApp//Cordova370.app") :
-			Future.fromResult("//Users//havaluova//Work//icenium-cli//scratch//myiSimApp//app.ipa");
-		/* return this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device)
-			: this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device); */
+		return this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device)
+			: this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device);
 	}
 
 	public preparePlatformForSync(platform: string): IFuture<void> {

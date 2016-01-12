@@ -6,7 +6,7 @@ import assert = require("assert");
 
 class BuildCommandBase implements ICommand {
 	constructor(private $project: Project.IProject,
-		private $errors: IErrors) { }
+		protected $errors: IErrors) { }
 
 	allowedParameters: ICommandParameter[] = [];
 
@@ -30,7 +30,8 @@ export class BuildAndroidCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
-		$errors: IErrors) {
+		$errors: IErrors,
+		private $options: IOptions) {
 			super($project, $errors);
 		}
 
@@ -60,6 +61,7 @@ export class BuildWP8Command extends BuildCommandBase {
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
 		$errors: IErrors,
+		private $options: IOptions,
 		private $config: Config.IConfig) {
 			super($project, $errors);
 		}

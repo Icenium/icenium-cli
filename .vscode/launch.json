@@ -13,7 +13,7 @@
 			// Automatically stop program after launch.
 			"stopOnEntry": true,
 			// Command line arguments passed to the program.
-			"args": ["livesync", "ios", "--log", "trace", "--path", "/Users/havaluova/Work/icenium-cli/scratch/myiSimApp"],
+			"args": [],
 			// Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.
 			"cwd": ".",
 			// Workspace relative or absolute path to the runtime executable to be used. Default is the runtime executable on the PATH.

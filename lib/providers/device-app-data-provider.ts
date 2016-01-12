@@ -7,6 +7,7 @@ import querystring = require("querystring");
 import * as path from "path";
 import util = require("util");
 
+let ANDROID_PROJECT_PATH = "/mnt/sdcard/Icenium/";
 let DEVICE_TMP_DIR_FORMAT_V2 = "/data/local/tmp/12590FAA-5EDD-4B12-856D-F52A0A1599F2/%s";
 let DEVICE_TMP_DIR_FORMAT_V3 = "/mnt/sdcard/Android/data/%s/files/12590FAA-5EDD-4B12-856D-F52A0A1599F2";
 let CHECK_LIVESYNC_INTENT_NAME = "com.telerik.IsLiveSyncSupported";
@@ -59,8 +60,7 @@ export class AndroidAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase
 
 	public isLiveSyncSupported(): IFuture<boolean> {
 		return (() => {
-			let applications = this.device.applicationManager.getInstalledApplications().wait();
-			let isApplicationInstalled = _.contains(applications, this.appIdentifier);
+			let isApplicationInstalled = this.device.applicationManager.isApplicationInstalled(this.appIdentifier).wait();
 			if (!isApplicationInstalled) {
 				this.$deployHelper.deploy(this.$devicePlatformsConstants.Android.toLowerCase()).wait();
 			}
@@ -87,7 +87,7 @@ export class AndroidCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAp
 	}
 
 	public get deviceProjectRootPath(): string {
-		return this.getDeviceProjectRootPath(path.join("/mnt/sdcard/Icenium/", this.appIdentifier));
+		return this.getDeviceProjectRootPath(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
 	}
 
 	public get liveSyncFormat(): string {
@@ -103,10 +103,7 @@ export class AndroidCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAp
 	}
 
 	public isLiveSyncSupported(): IFuture<boolean> {
-		return (() => {
-			let applications = this.device.applicationManager.getInstalledApplications().wait();
-			return _.contains(applications, this.appIdentifier);
-		}).future<boolean>()();
+		return this.device.applicationManager.isApplicationInstalled(this.appIdentifier);
 	}
 }
 
@@ -134,10 +131,7 @@ export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBase
 	}
 
 	public isLiveSyncSupported(): IFuture<boolean> {
-		return (() => {
-			let applications = this.device.applicationManager.getInstalledApplications().wait();
-			return _.contains(applications, this.appIdentifier);
-		}).future<boolean>()();
+		return this.device.applicationManager.isApplicationInstalled(this.appIdentifier);
 	}
 }
 

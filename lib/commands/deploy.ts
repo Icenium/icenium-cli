@@ -2,7 +2,6 @@
 "use strict";
 
 import * as helpers from "../common/helpers";
-import * as constants from "../common/mobile/constants";
 
 export class DeployHelper implements IDeployHelper {
 	constructor(protected $devicesService: Mobile.IDevicesService,
@@ -14,10 +13,7 @@ export class DeployHelper implements IDeployHelper {
 		protected $errors: IErrors,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $options: IOptions,
-		private $hostInfo: IHostInfo,
-		private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
-		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-		private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices) { }
+		private $hostInfo: IHostInfo) { }
 
 	public deploy(platform?: string): IFuture<void> {
 		this.$project.ensureProject();
@@ -33,6 +29,11 @@ export class DeployHelper implements IDeployHelper {
 			return this.$liveSyncService.livesync(platform);
 		}
 
+		if (platform && !this.$mobileHelper.isiOSPlatform(platform) && this.$options.emulator) {
+			// TODO: Support this for Android and WP8 - start new emulator or reuse currently running emulator
+			this.$errors.failWithoutHelp(`--emulator option is not supported for ${platform} platform. It is only supported for iOS platform.`);
+		}
+
 		return this.deployCore(platform);
 	}
 
@@ -44,19 +45,6 @@ export class DeployHelper implements IDeployHelper {
 			let packageFile: string = null;
 
 			this.$options.justlaunch = true;
-
-			let devices = this.$devicesService.getDevicesForPlatform(platform);
-			if (devices.length === 0 || (this.$mobileHelper.isiOSPlatform(platform) && this.$options.emulator &&
-				!_.find(devices, d => d.isEmulator) && _.find(devices, d => !d.isEmulator))) { //has only device
-				if (this.$hostInfo.isWindows && this.$mobileHelper.isiOSPlatform(platform)) {
-					this.$errors.failWithoutHelp(constants.ERROR_NO_DEVICES);
-				}
-
-				let emulatorServices = this.resolveEmulatorServices(platform);
-				emulatorServices.startEmulator().wait();
-				this.$devicesService.reset();
- 				this.$devicesService.initialize({platform: platform, deviceId: this.$options.device}).wait();
-			}
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
@@ -86,24 +74,20 @@ export class DeployHelper implements IDeployHelper {
 			};
 
 			let canExecute = (device: Mobile.IDevice): boolean => {
-				let hasOnlySimulator = _.find(devices, d => d.isEmulator) && !_.find(devices, d => !d.isEmulator);
-				return (hasOnlySimulator || this.$options.emulator) ? this.$devicesService.isiOSSimulator(device) : this.$devicesService.isiOSDevice(device);
+				if (this.$options.device) {
+					return device.deviceInfo.identifier === this.$devicesService.getDeviceByDeviceOption().deviceInfo.identifier;
+				}
+
+				if (this.$mobileHelper.isiOSPlatform(platform) && this.$hostInfo.isDarwin) {
+					let isiOS = this.$options.emulator ? this.$devicesService.isiOSSimulator(device) : this.$devicesService.isiOSDevice(device);
+					return this.$devicesService.isOnlyiOSSimultorRunning() || isiOS;
+				}
+
+				return true;
 			};
 
 			this.$devicesService.execute(action, canExecute).wait();
 		}).future<void>()();
-	}
-
-	private resolveEmulatorServices(platform: string): Mobile.IEmulatorPlatformServices {
-		if (this.$mobileHelper.isAndroidPlatform(platform)) {
-			return this.$androidEmulatorServices;
-		} else if (this.$mobileHelper.isiOSPlatform(platform)) {
-			return this.$iOSEmulatorServices;
-		} else if (this.$mobileHelper.isWP8Platform(platform)) {
-			return this.$wp8EmulatorServices;
-		}
-
-		return null;
 	}
 }
 $injector.register("deployHelper", DeployHelper);

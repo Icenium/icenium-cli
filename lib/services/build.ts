@@ -430,7 +430,7 @@ export class BuildService implements Project.IBuildService {
 				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 			}
 
-			this.executeBuildCore(platform).wait();
+			this.executeBuildCore(platform, opts).wait();
 		}).future<void>()();
 	}
 

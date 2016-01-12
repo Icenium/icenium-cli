@@ -185,9 +185,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	console.log("BEFORE CREATE PROJECT!!!!!");
 	project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-	console.log("AFTER CREATE PROJECT!!!!!");
 
 	let availableMarketplacePlugins = [
 		{
@@ -218,7 +216,7 @@ describe("build-configurations-integration-tests", () => {
 	it("Asserts the count of installed plugins in debug configuration", () => {
 		assertCorePluginsCount("debug");
 	});
-	/* it("Asserts the count of installed plugins in release configuration", () => {
+	it("Asserts the count of installed plugins in release configuration", () => {
 		assertCorePluginsCount("release");
-	}); */
+	});
 });
