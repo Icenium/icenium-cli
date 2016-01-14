@@ -629,6 +629,13 @@ interface IPluginsService {
 	 * @return {IBasicPluginInformation[]} Array of information for all available plugins matching at least one of the specified keywords.
 	 */
 	findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]>;
+
+	/**
+	 * Filters plugin based on framework specific rules.
+	 * @param {IPlugin[]} plugins Array of plugins to be filtered.
+	 * @return {IPlugin[]} Plugins that pass the filter.
+	 */
+	filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]>;
 }
 
 interface IPlugin {

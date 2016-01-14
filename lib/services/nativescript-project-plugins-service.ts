@@ -204,6 +204,10 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
+	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
+		return Future.fromResult(plugins);
+	}
+
 	private marketplacePlugins: IPlugin[];
 	private getMarketplacePlugins(): IFuture<IPlugin[]> {
 		return ((): IPlugin[] => {
@@ -337,7 +341,8 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 	private getDataForNpmPackage(packageName: string, version?: string): IFuture<IPlugin> {
 		return ((): IPlugin => {
 			try {
-				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version || "latest");
+				version = version || "latest";
+				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version);
 
 				// This call will return error with message '{}' in case there's no such package.
 				let result = this.$httpClient.httpRequest(url).wait().body;

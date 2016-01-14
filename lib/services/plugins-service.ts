@@ -56,6 +56,10 @@ export class PluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
+	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
+		return this.getPluginsService().wait().filterPlugins(plugins);
+	}
+
 	private getPluginsService(): IFuture<IPluginsService> {
 		return ((): IPluginsService => {
 			if(!this.frameworkProject) {
