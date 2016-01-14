@@ -711,7 +711,7 @@ interface IBasicPluginInformation {
 	name: string;
 	/**
 	 * The plugin's description
-	 * @type {[type]}
+	 * @type {string}
 	 */
 	description?: string;
 	/**
@@ -719,6 +719,12 @@ interface IBasicPluginInformation {
 	 * @type {string}
 	 */
 	version: string;
+
+	/**
+	 * Variables used by the plugin.
+	 * @type {any[]}
+	 */
+	variables?: any[];
 }
 
 /**
