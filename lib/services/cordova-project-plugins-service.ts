@@ -377,7 +377,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let pluginData = <IMarketplacePluginData>plugin.data;
 			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 
-			let variables = pluginData.Variables;
+			let variables = <string[]>pluginData.Variables;
 			if(variables && variables.length > 0) {
 				if(!cordovaPluginVariables[pluginData.Identifier]) {
 					cordovaPluginVariables[pluginData.Identifier] = {};
@@ -422,7 +422,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
 
 			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
-				_.each(pluginData.Variables, variableName => {
+				_.each(pluginData.Variables, (variableName: string) => {
 					delete cordovaPluginVariables[pluginData.Identifier][variableName];
 				});
 			}

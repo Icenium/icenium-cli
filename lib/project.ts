@@ -70,6 +70,12 @@ export class Project implements Project.IProject {
 		return this.frameworkProject.startPackageActivity;
 	}
 
+	public getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>> {
+		return (() => {
+			return this.frameworkProject.getPluginVariablesInfo(this.projectInformation, this.getProjectDir().wait(), configuration).wait();
+		}).future<IDictionary<IStringDictionary>>()();
+	}
+
 	public getProjectTargets(): IFuture<string[]> {
 		return (() => {
 			let projectDir = this.getProjectDir().wait();

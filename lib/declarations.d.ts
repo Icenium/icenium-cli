@@ -648,6 +648,30 @@ interface IPlugin {
 }
 
 /**
+ * Describes information about one plugin variable.
+ * In NativeScript project the variable is described in plugin's package.json with name and object as value.
+ * @example
+ * {
+ *    "name": "my-plugin",
+ *    "version": "1.0.0",
+ *    "nativescript": {
+ *        "variables": {
+ *           "my-var": {
+ *              "default": "defaultValue"
+ *           }
+ *        }
+ *    }
+ * }
+ */
+interface INativeScriptPluginVariable {
+	/**
+	 * The default value of the variable that will be used in case user does not specify value for the variable.
+	 * @optional
+	 */
+	defaultValue?: string;
+}
+
+/**
  * Describes basic information for each plugin.
  */
 interface IPluginInfoBase {
@@ -690,6 +714,11 @@ interface IPluginInfoBase {
 	 * Plugin specific identifier. It can differ from plugin's name.
 	 */
 	Identifier: string;
+
+	/**
+	 * Variables that have to be set in the application in order to be able to use the plugin correctly.
+	 */
+	Variables?: string[]|IDictionary<INativeScriptPluginVariable>;
 }
 
 interface IPluginVersion {
@@ -802,11 +831,6 @@ interface IMarketplacePluginData extends IPluginInfoBase {
 	 * in order to use the plugin.
 	 */
 	AndroidRequiredPermissions?: string[];
-
-	/**
-	 * Variables, that have to be set in the application in order to be able to use the plugin correctly.
-	 */
-	Variables: string[];
 }
 
 interface IMarketplacePlugin extends IPlugin {

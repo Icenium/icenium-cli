@@ -54,7 +54,6 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 
 	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
 		let propertyValue: any = null;
-
 		let configData = projectInformation.configurationSpecificData[configuration];
 		if(configData && configData[propertyName]) {
 			propertyValue = configData[propertyName];

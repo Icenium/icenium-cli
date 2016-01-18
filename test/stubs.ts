@@ -375,6 +375,10 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	public completeProjectProperties(properties: any): boolean { return false; }
 
 	public pluginsService: IPluginsService;
+
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
+		return Future.fromResult(null);
+	}
 }
 
 export class ProjectFilesManager implements IProjectFilesManager {

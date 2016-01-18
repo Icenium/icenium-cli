@@ -96,6 +96,12 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
 	}
 
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
+		return (() => {
+			return this.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration, projectInformation);
+		}).future<IDictionary<IStringDictionary>>()();
+	}
+
 	public getProjectTargets(projectDir: string): IFuture<string[]> {
 		let fileMask = /^cordova\.(\w*)\.js$/i;
 		return this.getProjectTargetsBase(projectDir, fileMask);

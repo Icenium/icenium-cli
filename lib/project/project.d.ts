@@ -43,9 +43,9 @@ declare module Project {
 		 */
 		checkSdkVersions(platform: string): void;
 		/**
-		* Checks if the project language is TypeScript by enumerating all files and checking if there are at least one TypeScript file (.ts), that is not definition file(.d.ts)
-		* @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
-		*/
+		 * Checks if the project language is TypeScript by enumerating all files and checking if there are at least one TypeScript file (.ts), that is not definition file(.d.ts)
+		 * @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
+		 */
 		isTypeScriptProject(): IFuture<boolean>;
 
 		/**
@@ -58,6 +58,23 @@ declare module Project {
 		 * @return {IFuture<string>} The path to the App_Resources folder
 		 */
 		appResourcesPath(): IFuture<string>;
+
+		/**
+		 * Get information about plugin variables for current project.
+		 * @param {string} configuration Optional parameter that is specified the configuration for which plugin variables info will be returned.
+		 * @return {IFuture<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
+		 * @example
+		 * {
+		 *    "plugin1": {
+		 *       "variable1": "value1",
+		 *       "variable2": "value2",
+		 *    },
+		 *    "plugin2": {
+		 *       "variable3": "value3"
+		 *    }
+		 * }
+		 */
+		getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>>;
 	}
 
 	interface IFrameworkProject {
@@ -95,6 +112,25 @@ declare module Project {
 		 * @param {IProjectData} projectData The project's data, needed to check an SDK version
 		 */
 		checkSdkVersions(platform: string, projectData: IProjectData): void;
+		/**
+		 * Get information about plugin variables for current project.
+		 * @param {Project.IProjectInformation} projectInformation Information about the project - values of properties from .abproject and configuration specific .abproject.
+		 * @param {string} projectDir Optional parameter that specifies the project directory. Required for NativeScript projects.
+		 * @param {string} configuration Optional parameter that is specified the configuration for which plugin variables info will be returned. Required for Cordova projects.
+		 * @return {IFuture<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
+		 * For NativeScript projects the values are taken from package.json. For Cordova project the information is read from .abproject (configuration specific .abproject).
+		 * @example
+		 * {
+		 *    "plugin1": {
+		 *       "variable1": "value1",
+		 *       "variable2": "value2",
+		 *    },
+		 *    "plugin2": {
+		 *       "variable3": "value3"
+		 *    }
+		 * }
+		 */
+		getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>>;
 	}
 
 	interface IFrameworkProjectBase {
