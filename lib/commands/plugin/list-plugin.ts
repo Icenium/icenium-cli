@@ -8,7 +8,7 @@ export class ListPluginCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			let plugins = this.$options.available ? this.$pluginsService.getAvailablePlugins(this.$options.count) : this.$pluginsService.getInstalledPlugins();
-			this.$pluginsService.printPlugins(plugins);
+			this.$pluginsService.printPlugins(this.$pluginsService.filterPlugins(plugins).wait());
 		}).future<void>()();
 	}
 

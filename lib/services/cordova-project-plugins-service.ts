@@ -9,6 +9,7 @@ import * as helpers from "../common/helpers";
 import semver = require("semver");
 import {CordovaPluginsService} from "./cordova-plugins";
 import * as validUrl from "valid-url";
+import * as path from "path";
 
 export class CordovaProjectPluginsService implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
@@ -37,7 +38,8 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		private $options: IOptions,
 		private $project: Project.IProject,
 		private $projectConstants: Project.IProjectConstants,
-		private $prompter: IPrompter) { }
+		private $prompter: IPrompter,
+		private $resources: IResourceLoader) { }
 
 	private loadPluginsData(): IFuture<void> {
 		return (() => {
@@ -153,7 +155,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
-		let plugins = _.values(this.identifierToPlugin);
+		let plugins: IPlugin[] = _.values(this.identifierToPlugin);
 		if(this.$project.projectData) {
 			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
 		}
@@ -176,8 +178,9 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let version = pluginBasicInfo.version;
 
 			let pluginNameToLowerCase = pluginName.toLowerCase();
-			if(!_.any(this.getAvailablePlugins(),(pl) => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase)) {
-				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
+			let plInstances = this.getPluginInstancesByName(pluginName);
+			if (!plInstances || !plInstances.length) {
+			 	this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
 			}
 			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration();
 			let installedPluginInstances = installedPluginsForConfiguration
@@ -245,13 +248,28 @@ export class CordovaProjectPluginsService implements IPluginsService {
 				this.$errors.fail("Could not find plugin with name %s.", pluginName);
 			}
 
+			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait();
+			let obsoletingKey = this.getObsoletingPluginIdentifier(plugin.data.Identifier).wait();
+
 			if(this.$project.hasBuildConfigurations()) {
 				let configurations = this.$project.configurations;
 				_.each(configurations,(configuration: string) => {
 					this.removePluginCore(pluginName, plugin, configuration).wait();
+					if(obsoletedBy) {
+						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration).wait();
+					}
+					if(obsoletingKey) {
+						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration).wait();
+					}
 				});
 			} else {
 				this.removePluginCore(pluginName, plugin).wait();
+				if(obsoletedBy) {
+					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]).wait();
+				}
+				if(obsoletingKey) {
+					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]).wait();
+				}
 			}
 		}).future<void>()();
 	}
@@ -314,6 +332,13 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		});
 	}
 
+	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
+		return ((): IPlugin[] => {
+			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
+			return _.filter(plugins, pl => !_.any(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase()));
+		}).future<IPlugin[]>()();
+	}
+
 	private isPluginSupported(plugin: IPlugin, frameworkVersion: string, pluginVersion?: string): boolean {
 		if(!this.isMarketplacePlugin(plugin)) {
 			return true;
@@ -333,6 +358,14 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		if(!installedPluginInstances.length && pluginIdFromName) {
 			this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`);
 			installedPluginInstances = installedPlugins.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
+		}
+
+		if(!installedPluginInstances.length) {
+			this.$logger.trace("Check if the name is obsoleted one and the old plugin is no longer available, but the new one can be used.");
+			let obsoletedBy = this.getObsoletedByPluginIdentifier(pluginName).wait();
+			if(obsoletedBy) {
+				installedPluginInstances = _.filter(installedPlugins,(plugin: IPlugin) =>  plugin.data.Identifier.toLowerCase() === obsoletedBy.toLowerCase());
+			}
 		}
 
 		return installedPluginInstances;
@@ -360,6 +393,15 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
 			// remove all instances of the plugin from current configuration
 			newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(plugin.data.Identifier).map(plug => plug.toProjectDataRecord()));
+			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait(),
+				obsoletingKey = this.getObsoletingPluginIdentifier(plugin.data.Identifier).wait();
+			if(obsoletedBy) {
+				newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(obsoletedBy).map(plug => plug.toProjectDataRecord()));
+			}
+
+			if(obsoletingKey) {
+				newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(obsoletingKey).map(plug => plug.toProjectDataRecord()));
+			}
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
 			this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
@@ -457,19 +499,33 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	private getPluginInstancesByName(pluginName: string, version?: string): IPlugin[] {
 		let plugins = this.getAvailablePlugins();
 		let toLowerCasePluginName = pluginName.toLowerCase();
-		let matchingPlugins = _.filter(plugins, (_plugin: IPlugin) => {
-			let condition = _plugin.data.Name.toLowerCase() === toLowerCasePluginName || _plugin.data.Identifier.toLowerCase() === toLowerCasePluginName;
-			if(version) {
-				condition = condition && _plugin.data.Version === version;
-			}
+		let filterAction = (name: string) => {
+			let lowercasedValue = name.toLowerCase();
+			return _.filter(plugins, (_plugin: IPlugin) => {
+				let condition = _plugin.data.Name.toLowerCase() === lowercasedValue || _plugin.data.Identifier.toLowerCase() === lowercasedValue;
+				if(version) {
+					condition = condition && _plugin.data.Version === version;
+				}
 
-			return condition;
-		});
+				return condition;
+			});
+		};
+		let matchingPlugins = filterAction(toLowerCasePluginName);
+		let realIdentifier: string;
+		if(!matchingPlugins || !matchingPlugins.length) {
+			realIdentifier = pluginName;
+		}
+
+		realIdentifier = realIdentifier || matchingPlugins[0].data.Identifier;
+		let obsoletedBy = this.getObsoletedByPluginIdentifier(realIdentifier).wait();
+		if(obsoletedBy) {
+			let obsoletedByPlugins = filterAction(obsoletedBy);
+			matchingPlugins = matchingPlugins.concat(obsoletedByPlugins);
+		}
 
 		if(!matchingPlugins || !matchingPlugins.length) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}
-
 		return matchingPlugins;
 	}
 
@@ -707,5 +763,40 @@ export class CordovaProjectPluginsService implements IPluginsService {
 
 		return obj;
 	}
+
+	private _obsoletedIntegratedPlugins: any;
+	private getObsoletedIntegratedPlugins(): IFuture<any> {
+		return (() => {
+			if(!this._obsoletedIntegratedPlugins) {
+				let cordovaJsonContent = this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova.json")).wait();
+				this._obsoletedIntegratedPlugins = cordovaJsonContent && cordovaJsonContent.obsoletedIntegratedPlugins;
+			}
+
+			return this._obsoletedIntegratedPlugins;
+		}).future<any>()();
+	}
+
+	private getObsoletedByPluginIdentifier(pluginIdentifier: string): IFuture<string> {
+		return ((): string => {
+			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
+			return obsoletedByInfo.obsoletedBy;
+		}).future<string>()();
+	}
+
+	private getObsoletingPluginIdentifier(pluginIdentifier: string): IFuture<string> {
+		return ((): string => {
+			let obsoletingKey: string;
+
+			_.each(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => {
+				if(obsoletedPluginInfo.obsoletedBy.toLowerCase() === pluginIdentifier.toLowerCase()) {
+					obsoletingKey = key;
+					return false;
+				}
+			});
+
+			return obsoletingKey;
+		}).future<string>()();
+	}
+
 }
 $injector.register("cordovaProjectPluginsService", CordovaProjectPluginsService);
