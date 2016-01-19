@@ -6,21 +6,44 @@ import Future = require("fibers/future");
 import querystring = require("querystring");
 import * as path from "path";
 import util = require("util");
-import liveSyncConstants = require("../livesync-constants");
 
 let ANDROID_PROJECT_PATH = "/mnt/sdcard/Icenium/";
+let DEVICE_TMP_DIR_FORMAT_V2 = "/data/local/tmp/12590FAA-5EDD-4B12-856D-F52A0A1599F2/%s";
+let DEVICE_TMP_DIR_FORMAT_V3 = "/mnt/sdcard/Android/data/%s/files/12590FAA-5EDD-4B12-856D-F52A0A1599F2";
+let CHECK_LIVESYNC_INTENT_NAME = "com.telerik.IsLiveSyncSupported";
 let IOS_PROJECT_PATH = "/Documents";
 let NATIVESCRIPT_ION_APP_IDENTIFIER = "com.telerik.NativeScript";
 
 export class AndroidAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	private static ANDROID_CHECK_LIVE_SYNC_INTENT = "com.telerik.IsLiveSyncSupported";
+	private _deviceProjectRootPath: string = null;
+	private _liveSyncVersion: number;
 
-	constructor(_appIdentifier: string) {
+	constructor(_appIdentifier: string,
+		public device: Mobile.IDevice,
+		public platform: string,
+		private $errors: IErrors,
+		private $deployHelper: IDeployHelper,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
 		super(_appIdentifier);
 	}
 
 	public get deviceProjectRootPath(): string {
-		return this.getDeviceProjectRootPath(path.join(ANDROID_PROJECT_PATH, this.appIdentifier));
+		if (!this._deviceProjectRootPath) {
+			let deviceTmpDirFormat = "";
+
+			let version = this.getLiveSyncVersion().wait();
+			if (version === 2) {
+				deviceTmpDirFormat = DEVICE_TMP_DIR_FORMAT_V2;
+			} else if (version === 3) {
+				deviceTmpDirFormat = DEVICE_TMP_DIR_FORMAT_V3;
+			} else {
+				this.$errors.failWithoutHelp(`Unsupported LiveSync version: ${version}`);
+			}
+
+			this._deviceProjectRootPath = this.getDeviceProjectRootPath(util.format(deviceTmpDirFormat, this.appIdentifier));
+		}
+
+		return this._deviceProjectRootPath;
 	}
 
 	public get liveSyncFormat(): string {
@@ -31,19 +54,35 @@ export class AndroidAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase
 		return hostUri;
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
-		return `You can't LiveSync on device with id ${device.deviceInfo.identifier}! Deploy the app with LiveSync enabled and wait for the initial start up before LiveSyncing.`;
+	public getLiveSyncNotSupportedError(): string {
+		return `You can't LiveSync on device with id ${this.device.deviceInfo.identifier}! Deploy the app with LiveSync enabled and wait for the initial start up before LiveSyncing.`;
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
+	public isLiveSyncSupported(): IFuture<boolean> {
 		return (() => {
-		 	return (<Mobile.IAndroidDevice>device).adb.sendBroadcastToDevice(AndroidAppIdentifier.ANDROID_CHECK_LIVE_SYNC_INTENT, { "app-id": this.appIdentifier }).wait() !== 0;
+			let isApplicationInstalled = this.device.applicationManager.isApplicationInstalled(this.appIdentifier).wait();
+			if (!isApplicationInstalled) {
+				this.$deployHelper.deploy(this.$devicePlatformsConstants.Android.toLowerCase()).wait();
+			}
+
+		 	return this.getLiveSyncVersion().wait() !== 0;
 		}).future<boolean>()();
+	}
+
+	private getLiveSyncVersion(): IFuture<number> {
+		return (() => {
+			if (!this._liveSyncVersion) {
+				this._liveSyncVersion = (<Mobile.IAndroidDevice>this.device).adb.sendBroadcastToDevice(CHECK_LIVESYNC_INTENT_NAME, {"app-id": this.appIdentifier}).wait();
+			}
+			return this._liveSyncVersion;
+		}).future<number>()();
 	}
 }
 
 export class AndroidCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(_appIdentifier: string) {
+	constructor(_appIdentifier: string,
+		public device: Mobile.IDevice,
+		public platform: string) {
 		super("com.telerik.AppBuilder");
 	}
 
@@ -59,25 +98,24 @@ export class AndroidCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAp
 		return hostUri;
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
-		return `Cannot LiveSync changes to the companion app. The companion app is not installed on ${device.deviceInfo.identifier}.`;
+	public getLiveSyncNotSupportedError(): string {
+		return `Cannot LiveSync changes to the companion app. The companion app is not installed on ${this.device.deviceInfo.identifier}.`;
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
-		return (() => {
-			let applications = device.applicationManager.getInstalledApplications().wait();
-			return _.contains(applications, this.appIdentifier);
-		}).future<boolean>()();
+	public isLiveSyncSupported(): IFuture<boolean> {
+		return this.device.applicationManager.isApplicationInstalled(this.appIdentifier);
 	}
 }
 
 export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(_appIdentifier: string) {
+	constructor(_appIdentifier: string,
+		public device: Mobile.IDevice,
+		public platform: string) {
 		super(NATIVESCRIPT_ION_APP_IDENTIFIER);
 	}
 
 	public get deviceProjectRootPath(): string {
-		return util.format(liveSyncConstants.DEVICE_TMP_DIR_FORMAT_V3, this.appIdentifier);
+		return util.format(DEVICE_TMP_DIR_FORMAT_V3, this.appIdentifier);
 	}
 
 	public get liveSyncFormat(): string {
@@ -88,25 +126,36 @@ export class AndroidNativeScriptCompanionAppIdentifier extends deviceAppDataBase
 		return hostUri;
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
-		return `Cannot LiveSync changes to the NativeScript companion app. The NativeScript companion app is not installed on ${device.deviceInfo.identifier}.`;
+	public getLiveSyncNotSupportedError(): string {
+		return `Cannot LiveSync changes to the NativeScript companion app. The NativeScript companion app is not installed on ${this.device.deviceInfo.identifier}.`;
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
-		return (() => {
-			let applications = device.applicationManager.getInstalledApplications().wait();
-			return _.contains(applications, this.appIdentifier);
-		}).future<boolean>()();
+	public isLiveSyncSupported(): IFuture<boolean> {
+		return this.device.applicationManager.isApplicationInstalled(this.appIdentifier);
 	}
 }
 
 export class IOSAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(_appIdentifier: string) {
+	private _deviceProjectRootPath: string = null;
+
+	constructor(_appIdentifier: string,
+		public device: Mobile.IDevice,
+		public platform: string,
+		private $iOSSimResolver: Mobile.IiOSSimResolver) {
 		super(_appIdentifier);
 	}
 
 	public get deviceProjectRootPath(): string {
-		return IOS_PROJECT_PATH;
+		if (!this._deviceProjectRootPath) {
+			if (this.device.isEmulator) {
+				let applicationPath = this.$iOSSimResolver.iOSSim.getApplicationPath(this.device.deviceInfo.identifier, this.appIdentifier);
+				this._deviceProjectRootPath = path.join(applicationPath, "www");
+			} else {
+				this._deviceProjectRootPath = IOS_PROJECT_PATH;
+			}
+		}
+
+		return this._deviceProjectRootPath;
 	}
 
 	get liveSyncFormat(): string {
@@ -117,17 +166,19 @@ export class IOSAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase imp
 		return querystring.escape(hostUri);
 	}
 
-	getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
+	getLiveSyncNotSupportedError(): string {
 		return "";
 	}
 
-	isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
+	isLiveSyncSupported(): IFuture<boolean> {
 		return Future.fromResult(true);
 	}
 }
 
 export class IOSCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(private servedApp: string) {
+	constructor(private servedApp: string,
+		public device: Mobile.IDevice,
+		public platform: string) {
 		super("com.telerik.Icenium");
 	}
 
@@ -143,17 +194,19 @@ export class IOSCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDat
 		return querystring.escape(hostUri);
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
+	public getLiveSyncNotSupportedError(): string {
 		return "";
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
+	public isLiveSyncSupported(): IFuture<boolean> {
 		return Future.fromResult(true);
 	}
 }
 
 export class IOSNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(private servedApp: string) {
+	constructor(private servedApp: string,
+		public device: Mobile.IDevice,
+		public platform: string) {
 		super(NATIVESCRIPT_ION_APP_IDENTIFIER);
 	}
 
@@ -169,17 +222,18 @@ export class IOSNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.
 		return querystring.escape(hostUri);
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
+	public getLiveSyncNotSupportedError(): string {
 		return "";
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
+	public isLiveSyncSupported(): IFuture<boolean> {
 		return Future.fromResult(true);
 	}
 }
 
 export class WP8CompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor() {
+	constructor(public device: Mobile.IDevice,
+		public platform: string) {
 		super("{9155af5b-e7ed-486d-bc6b-35087fb59ecc}");
 	}
 
@@ -195,11 +249,11 @@ export class WP8CompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDat
 		return hostUri;
 	}
 
-	public isLiveSyncSupported(device: Mobile.IDevice): IFuture<boolean> {
+	public isLiveSyncSupported(): IFuture<boolean> {
 		return Future.fromResult(true);
 	}
 
-	public getLiveSyncNotSupportedError(device: Mobile.IDevice): string {
+	public getLiveSyncNotSupportedError(): string {
 		return "";
 	}
 }

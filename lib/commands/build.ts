@@ -6,7 +6,7 @@ import assert = require("assert");
 
 class BuildCommandBase implements ICommand {
 	constructor(private $project: Project.IProject,
-		private $errors: IErrors) { }
+		protected $errors: IErrors) { }
 
 	allowedParameters: ICommandParameter[] = [];
 
@@ -30,7 +30,8 @@ export class BuildAndroidCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
-		$errors: IErrors) {
+		$errors: IErrors,
+		private $options: IOptions) {
 			super($project, $errors);
 		}
 
@@ -43,13 +44,14 @@ $injector.registerCommand("build|android", BuildAndroidCommand);
 export class BuildIosCommand extends BuildCommandBase {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
 			super($project, $errors);
 		}
 
 	execute(args: string[]): IFuture<void> {
-		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS);
+		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS, { buildForiOSSimulator: this.$options.emulator });
 	}
 }
 $injector.registerCommand("build|ios", BuildIosCommand);
@@ -59,6 +61,7 @@ export class BuildWP8Command extends BuildCommandBase {
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
 		$errors: IErrors,
+		private $options: IOptions,
 		private $config: Config.IConfig) {
 			super($project, $errors);
 		}

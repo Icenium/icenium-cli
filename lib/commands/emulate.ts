@@ -2,7 +2,6 @@
 "use strict";
 
 import * as path from "path";
-import minimatch = require("minimatch");
 
 export class EmulateAndroidCommand implements ICommand {
 	constructor(private $project: Project.IProject,
@@ -26,7 +25,7 @@ export class EmulateAndroidCommand implements ICommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 			this.$options.justlaunch = true;
-			this.$androidEmulatorServices.startEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
+			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
 		}).future<void>()();
 	}
 
@@ -59,14 +58,12 @@ export class EmulateIosCommand implements ICommand {
 			this.$iOSEmulatorServices.checkAvailability().wait();
 			let app = "";
 
-			if(!this.$options.availableDevices) {
+			if (!this.$options.availableDevices) {
 				let tempDir = this.$project.getTempDir("emulatorfiles").wait();
-				let packageFile = this.$buildService.buildForDeploy(this.$devicePlatformsConstants.iOS, path.join(tempDir, "package.ipa"), true).wait();
-				this.$fs.unzip(packageFile, tempDir).wait();
-			 	app = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+				app = this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa")).wait();
 			}
 
-			this.$iOSEmulatorServices.startEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
+			this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
 
 		}).future<void>()();
 	}
@@ -107,7 +104,7 @@ export class EmulateWp8Command implements ICommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 
-			this.$wp8EmulatorServices.startEmulator(packageFilePath).wait();
+			this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath).wait();
 		}).future<void>()();
 	}
 

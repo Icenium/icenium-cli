@@ -67,7 +67,7 @@ export class RemoteService implements IRemoteService {
 
 			this.$iOSEmulatorServices.checkAvailability(false).wait();
 			let mappedDeviceName = RemoteService.AppBuilderClientToSimulatorDeviceNameMapping[deviceFamily] || deviceFamily;
-			this.$iOSEmulatorServices.startEmulator(appLocation, {deviceType: mappedDeviceName}).wait();
+			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, {deviceType: mappedDeviceName}).wait();
 
 			res.status(200).end();
 		}).future<void>()();

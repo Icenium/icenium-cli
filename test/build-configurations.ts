@@ -21,6 +21,7 @@ import hostInfoLib = require("../lib/common/host-info");
 import optionsLib = require("../lib/options");
 import assert = require("assert");
 import Future = require("fibers/future");
+import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import * as path from "path";
 import temp = require("temp");
 import * as util from "util";
@@ -118,6 +119,7 @@ function createTestInjector() {
 	});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("options", optionsLib.Options);
+	testInjector.register("configFilesManager", ConfigFilesManager);
 	return testInjector;
 }
 

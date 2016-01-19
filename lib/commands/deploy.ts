@@ -12,7 +12,8 @@ export class DeployHelper implements IDeployHelper {
 		protected $liveSyncService: ILiveSyncService,
 		protected $errors: IErrors,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		private $hostInfo: IHostInfo) { }
 
 	public deploy(platform?: string): IFuture<void> {
 		this.$project.ensureProject();
@@ -28,12 +29,18 @@ export class DeployHelper implements IDeployHelper {
 			return this.$liveSyncService.livesync(platform);
 		}
 
+		if (platform && !this.$mobileHelper.isiOSPlatform(platform) && this.$options.emulator) {
+			// TODO: Support this for Android and WP8 - start new emulator or reuse currently running emulator
+			this.$errors.failWithoutHelp(`--emulator option is not supported for ${platform} platform. It is only supported for iOS platform.`);
+		}
+
 		return this.deployCore(platform);
 	}
 
 	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
 			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device}).wait();
+			platform = platform || this.$devicesService.platform;
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
 
@@ -51,19 +58,35 @@ export class DeployHelper implements IDeployHelper {
 					}
 
 					if (!packageFile) {
-						packageFile = this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
+						packageFile = this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait() :
+							this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
 
 						this.$logger.debug("Ready to deploy %s", packageFile);
 						this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
 					}
-					device.deploy(packageFile, packageName).wait();
-					if(device.applicationManager.canStartApplication()) {
+
+					device.applicationManager.reinstallApplication(packageName, packageFile).wait();
+					this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);
+					if (device.applicationManager.canStartApplication()) {
 						device.applicationManager.startApplication(this.$project.projectData.AppIdentifier).wait();
 					}
 				}).future<void>()();
 			};
 
-			this.$devicesService.execute(action).wait();
+			let canExecute = (device: Mobile.IDevice): boolean => {
+				if (this.$options.device) {
+					return device.deviceInfo.identifier === this.$devicesService.getDeviceByDeviceOption().deviceInfo.identifier;
+				}
+
+				if (this.$mobileHelper.isiOSPlatform(platform) && this.$hostInfo.isDarwin) {
+					let isiOS = this.$options.emulator ? this.$devicesService.isiOSSimulator(device) : this.$devicesService.isiOSDevice(device);
+					return this.$devicesService.isOnlyiOSSimultorRunning() || isiOS;
+				}
+
+				return true;
+			};
+
+			this.$devicesService.execute(action, canExecute).wait();
 		}).future<void>()();
 	}
 }

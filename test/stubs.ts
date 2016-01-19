@@ -377,20 +377,20 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	public pluginsService: IPluginsService;
 }
 
-export class ProjectFilesManager implements Project.IProjectFilesManager {
-	public get availableConfigFiles(): IDictionary<Project.IConfigurationFile> {
+export class ProjectFilesManager implements IProjectFilesManager {
+	public getProjectFiles(projectFilesPath: string, additionalExcludedProjectDirsAndFiles?: string[], filter?: (filePath: string, stat: IFsStats) => IFuture<boolean>, opts?: any): string[] {
 		return undefined;
 	}
 
-	public enumerateProjectFiles(projectDir: string, additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
+	public isFileExcluded(filePath: string, additionalExcludedProjectDirsAndFiles?: string[]): boolean {
 		return undefined;
 	}
 
-	public isProjectFileExcluded(projectDir: string, filePath: string, additionalExcludedDirsAndFiles?: string[]): boolean {
+	public createLocalToDevicePaths(deviceAppData: Mobile.IDeviceAppData, projectFilesPath: string, projectFiles?: string[]): Mobile.ILocalToDevicePathData[] {
 		return undefined;
 	}
 
-	public excludeFile(projectDir: string, excludeFilePath: string) : void {
+	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): IFuture<void>{
 		return undefined;
 	}
 }

@@ -15,7 +15,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
 		private $projectConstants: Project.IProjectConstants,
-		private $projectFilesManager: Project.IProjectFilesManager,
+		private $configFilesManager: Project.IConfigFilesManager,
 		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
@@ -62,7 +62,7 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 	}
 
 	public get configFiles():  Project.IConfigurationFile[] {
-		let allConfigFiles = this.$projectFilesManager.availableConfigFiles;
+		let allConfigFiles = this.$configFilesManager.availableConfigFiles;
 		return [
 			allConfigFiles["nativescript-ios-info"],
 			allConfigFiles["nativescript-android-manifest"]

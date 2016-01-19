@@ -118,9 +118,10 @@ declare module Project {
 
 	interface IBuildService {
 		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
-		executeBuild(platform: string): IFuture<void>;
+		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string>;
+		buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string>;
 	}
 
 	interface IBuildSettings {
@@ -855,7 +856,7 @@ interface ILiveSyncService {
 interface ILiveSyncDeviceAppData extends Mobile.IDeviceAppData {
 	liveSyncFormat: string;
 	encodeLiveSyncHostUri(hostUri: string): string;
-	getLiveSyncNotSupportedError(device: Mobile.IDevice): string;
+	getLiveSyncNotSupportedError(): string;
 }
 
 interface IAppManagerService {

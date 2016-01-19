@@ -37,7 +37,7 @@ export class Project implements Project.IProject {
 		private $multipartUploadService: IMultipartUploadService,
 		private $progressIndicator: IProgressIndicator,
 		private $projectConstants: Project.IProjectConstants,
-		private $projectFilesManager: Project.IProjectFilesManager,
+		private $projectFilesManager: IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $server: Server.IServer,
 		private $staticConfig: IStaticConfig,
@@ -293,10 +293,16 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	public enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
+ 	private enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
 			let projectDir = this.getProjectDir().wait();
-			let projectFiles = this.$projectFilesManager.enumerateProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles).wait();
+			let filter = (filePath: string, stat: IFsStats) => {
+				return (() => {
+					let isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
+					return isSubprojectDir;
+				}).future<boolean>()();
+			};
+			let projectFiles = this.$projectFilesManager.getProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles, filter);
 			return projectFiles;
 		}).future<string[]>()();
 	}
