@@ -334,7 +334,13 @@ export class CordovaProjectPluginsService implements IPluginsService {
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
 		return ((): IPlugin[] => {
-			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
+			let obsoletedIntegratedPlugins: string[] = [];
+			_.each(this.getObsoletedIntegratedPlugins().wait(), (obsoletedInfo: any, key: string ) => {
+				if(obsoletedInfo.obsoletedBy !== key) {
+					obsoletedIntegratedPlugins.push(key.toLowerCase());
+				}
+			});
+
 			return _.filter(plugins, pl => !_.any(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase()));
 		}).future<IPlugin[]>()();
 	}
