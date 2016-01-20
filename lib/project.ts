@@ -648,7 +648,11 @@ export class Project implements Project.IProject {
 
 	public getTypeScriptFiles(): IFuture<Project.ITypeScriptFiles> {
 		return ((): Project.ITypeScriptFiles => {
-			let projectFiles = this.$fs.enumerateFilesInDirectorySync(this.getProjectDir().wait());
+			let projectDir = this.getProjectDir().wait();
+			// Skip root's node_modules
+			let rootNodeModules = path.join(projectDir, "node_modules");
+			let projectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir,
+																		(fileName: string, fstat: IFsStats) => fileName !== rootNodeModules);
 			let typeScriptFiles = _.filter(projectFiles, file => path.extname(file) === ".ts");
 			let definitionFiles = _.filter(typeScriptFiles, file => _.endsWith(file, ".d.ts"));
 			return { definitionFiles: definitionFiles, typeScriptFiles: typeScriptFiles };
