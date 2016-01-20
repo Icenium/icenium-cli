@@ -1,7 +1,7 @@
 .abignore
 =========
 
-To set exclude and include rules, you can create and manage an .abignore file in the root of your project.
+To set exclude and include rules, you can create and manage an `.abignore` file in the root of your project.
 
 * [Overview](#overview)
 * [Create .abignore](#create-abignore)
@@ -26,10 +26,6 @@ The AppBuilder CLI respects `.abignore` during the following operations.
 The AppBuilder CLI does not respect `.abignore` during the following operations.
 
 * Build and deploy in the device simulator.
-
-> **Do you develop your project in multiple AppBuilder clients?**
->
-> When you work with connected physical or virtual devices, the AppBuilder Windows client and the AppBuilder extension for Visual Studio respect `.abignore` during LiveSync operations to application packages and the companion app. 
 
 ## Create .abignore
 
