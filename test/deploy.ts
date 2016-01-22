@@ -238,32 +238,15 @@ describe("Deploy ios unit tests on windows", () => {
 	it("throws ERROR_NO_DEVICES when there is no connected devices", () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
-		let errorMessage: string = "";
 
-		try {
-			deployHelper.deploy("ios").wait();
-		} catch(e) {
-			errorMessage = e.message;
-		}
-
-		assert.isTrue(isErrorThrown);
-		assert.equal(constants.ERROR_NO_DEVICES, errorMessage);
+		assert.throws(() => deployHelper.deploy("ios").wait(), constants.ERROR_NO_DEVICES);
 	});
 	it("throws error when --emulator option is specified", () => { // appbuilder deploy ios --emulator
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
-		let errorMessage: string = null;
 
 		setEmulatorOption(testInjector);
-
-		try {
-			deployHelper.deploy("ios").wait();
-		} catch(e) {
-			errorMessage = e.message;
-		}
-
-		assert.isTrue(isErrorThrown);
-		assert.equal("You are not allowed to use iOS simulator on Windows.", errorMessage);
+		assert.throws(() => deployHelper.deploy("ios").wait(), "You can use iOS simulator only on OS X.");
 
 		unsetEmulatorOption(testInjector);
 	});
