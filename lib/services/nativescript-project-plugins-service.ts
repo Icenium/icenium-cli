@@ -405,7 +405,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 				Name: jsonResult.name,
 				Identifier: jsonResult.name,
 				Version: jsonResult.version,
-				Url: jsonResult.repository.url || jsonResult.homepage,
+				Url: (jsonResult.repository && jsonResult.repository.url) || jsonResult.homepage || '',
 				Platforms: platforms,
 				Description: jsonResult.description,
 				SupportedVersion: supportedVersion
