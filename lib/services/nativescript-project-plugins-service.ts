@@ -280,6 +280,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 								Description: this.getStringFromNpmSearchResult(pluginResult, "description"),
 								SupportedVersion: ""
 							};
+							pluginInfo.Variables = this.getPluginVariablesInfoFromNpm(pluginInfo.Name, pluginInfo.Version).wait() || [];
 
 							return new NativeScriptPluginData(pluginInfo, PluginType.NpmPlugin, this.$project);
 						}
@@ -408,7 +409,8 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 				Url: (jsonResult.repository && jsonResult.repository.url) || jsonResult.homepage || '',
 				Platforms: platforms,
 				Description: jsonResult.description,
-				SupportedVersion: supportedVersion
+				SupportedVersion: supportedVersion,
+				Variables: jsonResult.nativescript && jsonResult.nativescript.variables
 			};
 
 			return new NativeScriptPluginData(data, type, this.$project);
@@ -755,6 +757,19 @@ export class NativeScriptPluginData implements IPlugin {
 
 		if(this.configurations && this.configurations.length > 0) {
 			result.push(util.format("    Configuration: %s", this.configurations.join(", ")));
+		}
+
+		if(this.data.Variables && _.keys(this.data.Variables).length) {
+			let varInfo = this.$project.getPluginVariablesInfo().wait();
+			if(varInfo && varInfo[this.data.Identifier]) {
+				result.push("    Variables:");
+				_.each(varInfo[this.data.Identifier], (variableValue: any, variableName:string) => {
+					result.push(`        ${variableName}: ${variableValue}`);
+				});
+			} else {
+				let variables = _.keys(this.data.Variables).join(", ");
+				result.push(`    Variables: ${variables}`);
+			}
 		}
 
 		return result;
