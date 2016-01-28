@@ -27,22 +27,28 @@ List custom npm or NativeScript modules | `$ appbuilder plugin add --available [
 Add custom npm or NativeScript modules | `$ appbuilder plugin add <Name or ID>`
 Add a specific version of a custom npm or NativeScript module | `$ appbuilder plugin add <Name or ID>@<Version>`
 Add a custom npm or NativeScript module from GitHub URL | `$ appbuilder plugin add <URL>`
-Add a custom npm or NativeScript module from local path | `$ appbuilder plugin add <Path>` 
+Add a custom npm or NativeScript module from local path | `$ appbuilder plugin add <Path>`
+Add custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID or URL or Path> --var.<Variable ID> <Variable Value>`[\*\*](#note)
+Add a specific version of a custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID>@<Version> --var.<Variable ID> <Variable Value>`[\*\*](#note)
+
+<% if(isHtml) { %><a id="note"></a><% } %>
+\*\* If the NativeScript plugin has multiple variables, you can set `--var` for each variable.
 <% } %>
 
 <% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
 
 <% var plugin =""; if(isCordova) { plugin+="Apache Cordova plugin" } if(isHtml) { plugin+=" or " } if(isNativeScript) { plugin+="custom npm or NativeScript module" } %>
 
-Enables <%=plugins%> for your project. <% if(isHtml) { %>If the Apache Cordova plugin has plugin variables and you have not set one or more of them with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
+Enables <%=plugins%> for your project. <% if(isHtml) { %>If the plugin has plugin variables and you have not set one or more of them with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 * `--available` - Lists all <%=plugins%> that you can enable in your project.
+* `--var.<Variable ID>` - Sets the value for the specified plugin variable in all configurations.
+	<% if(isHtml) { %><br /><% } %><% if(isCordova) { %>(Apache Cordova-only) If `--debug` or `--release` is specified, sets the variable for the respective configuration of the hybrid project.<% } %>
 <% if(isCordova) {%>* `--latest` - Enables the latest version of the specified Apache Cordova plugin.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--default` - Enables the default version of the specified Apache Cordova plugin.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--debug` - Enables the specified Apache Cordova plugin for the Debug build configuration only. If `--available` is set, lists all plugins that you can enable for the Debug build configuration.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--release` - Enables the specified Apache Cordova plugin for the Release build configuration only. If `--available` is set, lists all plugins that you can enable for the Release build configuration.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
-* `--var.<Variable ID>` - Sets the value for the specified Apache Cordova plugin variable in all configurations. If `--debug` or `--release` is specified, sets the variable for the respective configuration only.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--var.debug.<Variable ID>` - Sets the value for the specified Apache Cordova plugin variable for the Debug configuration only.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--var.release.<Variable ID>` - Sets the value for the specified Apache Cordova plugin variable for the Release configuration only.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %><% } %>
 <% if(isNativeScript) { %>* `--count` - When set along with `--available`, specifies the number of npm and NativeScript modules that will be listed.<% if(isHtml) { %> This option is applicable only to NativeScript projects.<% } %><% } %>
