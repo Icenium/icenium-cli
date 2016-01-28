@@ -23,10 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 3.0 
-Release date: November 26, 2015
+Latest version: Telerik AppBuilder 3.1 
+Release date: January 28, 2016
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 3.0, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-0" target="_blank">Telerik AppBuilder 3.0 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
 
 ### System Requirements
 
@@ -42,11 +42,11 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 	* (Windows 7 systems): Any of the following Node.js versions:
 		* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
-		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)
+		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 	* (Windows 8 and later systems): Any of the following Node.js versions:
 		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
-		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)
+		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 * An Internet browser (latest official release) with enabled cookies
 * (Optional) git<br/>git is required for development with Screen Builder.
@@ -80,7 +80,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Any of the following Node.js versions:
 	* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
-	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)
+	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 * An Internet browser (latest official release) with enabled cookies
 * Mono 3.12 or later
@@ -112,7 +112,7 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * Any of the following Node.js versions:
 	* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
-	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)
+	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 
 	You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
@@ -374,10 +374,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 3.0 
-Release date: November 26, 2015
+Latest version: Telerik AppBuilder 3.1 
+Release date: January 28, 2016
 
-> For a complete list of the improvements and updates available in Telerik AppBuilder 3.0, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-0" target="_blank">Telerik AppBuilder 3.0 Release Notes</a>.
+> For a complete list of the improvements and updates available in Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
