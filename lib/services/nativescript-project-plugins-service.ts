@@ -549,7 +549,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 				if (selectedPlugin) {
 					basicInfo = {
-						name: selectedPlugin.data.Name,
+						name: selectedPlugin.data.Identifier,
 						version: selectedPlugin.data.Version
 					};
 
