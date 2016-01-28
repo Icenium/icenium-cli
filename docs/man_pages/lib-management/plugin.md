@@ -21,7 +21,7 @@ Lists all <%=plugins%> that are currently enabled for your project. <% if(isHtml
 ### Attributes
 `<Command>` extends the `plugin` command. You can set the following values for this attribute.
 * `add` - Enables <%=plugins%> for your project.
-<% if(isCordova) { %>* `configure` - Configures plugin variables for the selected plugin.<% if(isHtml) { %> This command is applicable only to Apache Cordova projects.<% } %><% } %>
+* `configure` - Configures plugin variables for the selected plugin.
 * `remove` - Disables <%=plugins%> for your project.
 * `find` - Searches by keyword for <%=plugins%>.
 * `fetch` - Imports the selected <%=plugins%> into your project.
