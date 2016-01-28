@@ -4,7 +4,8 @@
 export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	constructor(private $loginManager: ILoginManager,
 		private $userDataStore: IUserDataStore,
-		private $staticConfig: IStaticConfig) { }
+		private $staticConfig: IStaticConfig,
+		private $userSettingsService: IUserSettingsService) { }
 
 	public canDoRequest(): IFuture<boolean> {
 		return this.$loginManager.isLoggedIn();
@@ -22,6 +23,16 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 
 	public getPrivacyPolicyLink(): string {
 		return "http://www.telerik.com/company/privacy-policy";
+	}
+
+	public getUserSessionsCount(): IFuture<number> {
+		return (() => {
+			return this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED").wait() || 0;
+		}).future<number>()();
+	}
+
+	public setUserSessionsCount(count: number): IFuture<void> {
+		return this.$userSettingsService.saveSetting<number>("SESSIONS_STARTED", count);
 	}
 }
 $injector.register("analyticsSettingsService", AnalyticsSettingsService);
