@@ -613,9 +613,9 @@ interface IPluginsService {
 	/**
 	 * Returns basic information about the plugin - it's name, version and cordova version range
 	 * @param  {string}                  pluginName The name of the plugin
-	 * @return {IBasicPluginInformation}            Basic information about the plugin
+	 * @return {IFuture<IBasicPluginInformation>}            Basic information about the plugin
 	 */
-	getPluginBasicInformation(pluginName: string): IBasicPluginInformation;
+	getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation>;
 
 	/**
 	 * Copies the source code of a plugin inside the project and adds it as a reference, so it can be used within the application.

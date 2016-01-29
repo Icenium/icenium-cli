@@ -42,7 +42,7 @@ export class PluginsService implements IPluginsService {
 		return this.getPluginsService().wait().isPluginInstalled(pluginName);
 	}
 
-	public getPluginBasicInformation(pluginName: string): IBasicPluginInformation {
+	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return this.getPluginsService().wait().getPluginBasicInformation(pluginName);
 	}
 

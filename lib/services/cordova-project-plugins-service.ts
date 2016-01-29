@@ -66,7 +66,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 				let result = this.$cordovaPluginsService.fetch(pluginIdentifier).wait();
 				this.$logger.out(result);
 			} else {
-				let identifier = this.getPluginBasicInformation(pluginIdentifier).name.toLowerCase();
+				let identifier = this.getPluginBasicInformation(pluginIdentifier).wait().name.toLowerCase();
 				let plugin = _.find(this.getAvailablePlugins(), pl => pl.data.Identifier.toLowerCase() === identifier || pl.data.Name.toLowerCase() === identifier);
 				let pluginUrl: string = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 				let plugins = this.$cordovaPluginsService.getPlugins([pluginIdentifier]);
@@ -173,7 +173,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 				this.$errors.fail("No plugin name specified");
 			}
 
-			let pluginBasicInfo = this.getPluginBasicInformation(pluginName);
+			let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
 			pluginName = pluginBasicInfo.name;
 			let version = pluginBasicInfo.version;
 
@@ -314,9 +314,9 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		}).future<void>()();
 	}
 
-	public getPluginBasicInformation(pluginName: string): IBasicPluginInformation {
+	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		let [ name, version ] = pluginName.split("@");
-		return { name, version };
+		return Future.fromResult({ name, version });
 	}
 
 	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {

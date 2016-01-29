@@ -225,7 +225,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.flatten<string>()
 				.unique()
 				.filter((plugin: string) => {
-					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin);
+					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin).wait();
 					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version);
 				})
 				.value();
@@ -242,7 +242,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			_.each(this.invalidMarketplacePlugins, plugin => {
-				let {name} = this.$pluginsService.getPluginBasicInformation(plugin);
+				let {name} = this.$pluginsService.getPluginBasicInformation(plugin).wait();
 				this.$pluginsService.removePlugin(name).wait();
 			});
 
