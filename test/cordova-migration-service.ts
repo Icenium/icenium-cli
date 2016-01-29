@@ -12,12 +12,7 @@ testInjector.register("errors", {});
 testInjector.register("logger", {});
 testInjector.register("mobileHelper", {});
 testInjector.register("pluginsService", {
-	getPluginBasicInformation: (pluginName: string) => {
-		return {
-			name: 'Name',
-			version: '1.0.0'
-		};
-	},
+	getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
 	getPluginVersions: (plugin: IPlugin) => {
 		return [{
 			name: '1.0.0',

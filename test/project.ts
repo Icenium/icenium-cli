@@ -121,12 +121,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("progressIndicator", {});
 
 	testInjector.register("pluginsService", {
-		getPluginBasicInformation: (pluginName: string) => {
-			return {
-				name: 'Name',
-				version: '1.0.0'
-			};
-		},
+		getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
 		getPluginVersions: (plugin: IPlugin) => {
 			return [{
 				name: '1.0.0',
