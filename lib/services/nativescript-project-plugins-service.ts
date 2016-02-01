@@ -116,7 +116,9 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 				return;
 			}
 
-			if(this.checkIsValidLocalPlugin(pluginIdentifier).wait()) {
+			if (NativeScriptProjectPluginsService.hasTgzExtension(pluginIdentifier)) {
+				pluginBasicInfo = this.fetchPluginBasicInformation(path.resolve(pluginIdentifier), "add", { isTgz: true }).wait();
+			} else if(this.checkIsValidLocalPlugin(pluginIdentifier).wait()) {
 				pluginBasicInfo = this.installLocalPlugin(pluginIdentifier, {addPluginToPackageJson: true}).wait();
 			} else {
 				pluginBasicInfo = this.setPluginInPackageJson(pluginIdentifier, {addPluginToPackageJson: true}).wait();
@@ -188,24 +190,12 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 	public fetch(pluginIdentifier: string): IFuture<void> {
 		return (() => {
-			if(!pluginIdentifier) {
-				this.$errors.fail("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the NPM.");
-			}
+			let pluginLocalPath = path.resolve(pluginIdentifier),
+				pluginLocalPathExists = this.$fs.exists(pluginLocalPath).wait(),
+				suppressMessage = pluginLocalPathExists && (pluginLocalPath.indexOf(this.$project.getProjectDir().wait()) === -1 || pluginLocalPath.indexOf(NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME) !== -1);
 
-			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier).wait();
-			if(pathToInstalledPlugin) {
-				let pluginsPath = path.join(this.$project.getProjectDir().wait(), "plugins");
-				// use cp instead of mv, as it would fail if pathToInstalledPlugin is mounted
-				// on a different device from the pluginsPath with error:
-				// Error: EXDEV, cross-device link not permitted
-				shelljs.cp("-Rf", [pathToInstalledPlugin], pluginsPath);
-				let pluginBasicInfo = this.installLocalPlugin(path.join(pluginsPath, path.basename(pathToInstalledPlugin)), {addPluginToPackageJson: true}).wait();
-				this.$logger.printMarkdown(util.format("Successfully fetched plugin `%s`.", pluginBasicInfo.name));
-			} else {
-				let errorMessage =`Unable to add plugin ${pluginIdentifier}.` +
-					" Make sure this is a valid plugin name, path to existing directory or git URL.";
-				this.$errors.failWithoutHelp(errorMessage);
-			}
+			let pluginBasicInfo = this.fetchPluginBasicInformation(pluginLocalPathExists ? pluginLocalPath : pluginIdentifier, "fetch", { surpressMessage: !suppressMessage }).wait();
+			this.$logger.printMarkdown(util.format("Successfully fetched plugin `%s`.", pluginBasicInfo.name));
 		}).future<void>()();
 	}
 
@@ -234,6 +224,41 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 			return this.marketplacePlugins;
 		}).future<IPlugin[]>()();
+	}
+
+	private fetchPluginBasicInformation(pluginIdentifier: string, failMessageMethodName: string,  opts?: { isTgz?: boolean, surpressMessage?: boolean }): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			if(!pluginIdentifier) {
+				this.$errors.fail("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the NPM.");
+			}
+			let isTgz = opts && opts.isTgz || NativeScriptProjectPluginsService.hasTgzExtension(pluginIdentifier);
+
+			if (isTgz) {
+				pluginIdentifier = path.resolve(pluginIdentifier);
+			}
+
+			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier).wait(),
+				actualPlugin: string,
+				installLocalPluginOptions: any = {
+					addPluginToPackageJson: true,
+					surpressMessage: opts && opts.surpressMessage
+				};
+
+			if (pathToInstalledPlugin) {
+				if (isTgz || this.$fs.exists(pluginIdentifier).wait()) {
+					actualPlugin = pluginIdentifier;
+					installLocalPluginOptions["packageJsonContents"] = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+				} else {
+					actualPlugin = pathToInstalledPlugin;
+				}
+
+				return this.installLocalPlugin(actualPlugin, installLocalPluginOptions).wait();
+			} else {
+				let errorMessage =`Unable to ${failMessageMethodName} plugin ${pluginIdentifier}.` +
+					" Make sure this is a valid plugin name, path to existing directory or git URL.";
+				this.$errors.failWithoutHelp(errorMessage);
+			}
+		}).future<IBasicPluginInformation>()();
 	}
 
 	private getUniqueMarketplacePlugins(): IFuture<IPlugin[]> {
@@ -387,6 +412,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 				if(pathToInstalledPackage) {
 					let packageJsonContent = this.$fs.readText(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 					return this.constructNativeScriptPluginData(packageJsonContent).wait();
+
 				}
 			}
 
@@ -430,16 +456,21 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		}).future<boolean>()();
 	}
 
-	private installLocalPlugin(pluginPath: string, pluginOpts?: {addPluginToPackageJson: boolean}): IFuture<IBasicPluginInformation> {
+	private installLocalPlugin(pluginPath: string, pluginOpts?: {addPluginToPackageJson: boolean, packageJsonContents?: any, surpressMessage?: boolean}): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pathToPlugin = path.resolve(pluginPath);
-			let content = this.$fs.readJson(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
-			let name = content.name;
+			let pathToPlugin = path.resolve(pluginPath),
+				content = pluginOpts && pluginOpts.packageJsonContents || this.$fs.readJson(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait(),
+				name = content.name;
 
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
 			if(pathToPlugin.indexOf(this.$project.getProjectDir().wait()) === -1 || pathToPlugin.indexOf(NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME) !== -1) {
 				let pathToInstall = path.join(this.$project.getProjectDir().wait(), "plugins");
-				this.$logger.printMarkdown(util.format("Copying `%s` directory to `%s` in order to be able to use the plugin in your project.", pathToPlugin, pathToInstall));
+				if (!pluginOpts || !pluginOpts.surpressMessage) {
+					this.$logger.printMarkdown(util.format("Copying `%s` to `%s` in order to be able to use the plugin in your project.", pathToPlugin, pathToInstall));
+				}
+				// use cp instead of mv, as it would fail if pathToInstalledPlugin is mounted
+				// on a different device from the pluginsPath with error:
+				// Error: EXDEV, cross-device link not permitted
 				shelljs.cp("-Rf", pathToPlugin, pathToInstall);
 				pathToPlugin = path.join(pathToInstall, path.basename(pathToPlugin));
 			}
@@ -706,6 +737,11 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 
 	private static buildNpmRegistryUrl(packageName: string, version: string): string {
 		return `${NativeScriptProjectPluginsService.NPM_REGISTRY_URL}/${encodeURIComponent(packageName)}?version=${encodeURIComponent(version)}`;
+	}
+
+	private static hasTgzExtension(pluginidentifier: string): boolean {
+		let pluginIdentifierExtname = path.extname(pluginidentifier);
+		return pluginIdentifierExtname === ".tgz" || pluginIdentifierExtname === ".gz";
 	}
 }
 $injector.register("nativeScriptProjectPluginsService", NativeScriptProjectPluginsService);
