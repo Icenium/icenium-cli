@@ -69,6 +69,21 @@ export class InitProjectCommand implements ICommand {
 				});
 			}
 
+			// Ionic projects are special, they lack cordova.platform.js files and have package.json. Deal with them here
+			if (projectType === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova && !result) {
+				let ionicProject = path.join(this.projectDir, "ionic.project");
+				let hasIonicProject = this.$fs.exists(ionicProject).wait();
+				let hasPackageJson = this.$fs.exists(this.packageJson.path).wait();
+				if (hasIonicProject && hasPackageJson) {
+					try {
+						let content = this.$fs.readJson(ionicProject).wait();
+						result = _.has(content, "name") && _.has(content, "app_id");
+					} catch(e) {
+						// it is not valid Ionic project, leave the value of `result` as is
+					}
+				}
+			}
+
 			return result;
 		}).future<boolean>()();
 	}
