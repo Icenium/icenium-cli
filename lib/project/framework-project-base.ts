@@ -64,6 +64,28 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		return propertyValue;
 	}
 
+	public completeProjectProperties(properties: any): boolean {
+		let updated = false;
+
+		if (_.has(properties, "name")) {
+			properties.ProjectName = properties.name;
+			delete properties.name;
+			updated = true;
+		}
+
+		if (!properties.DisplayName) {
+			properties.DisplayName = properties.iOSDisplayName ? properties.iOSDisplayName : properties.ProjectName;
+			updated = true;
+		}
+
+		if (_.has(properties, "iOSDisplayName")) {
+			delete properties.iOSDisplayName;
+			updated = true;
+		}
+
+		return updated;
+	}
+
 	private generateDefaultAppId(appName: string): string {
 		let sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
 		if(sanitizedName) {

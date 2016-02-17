@@ -139,6 +139,12 @@ declare module Project {
 		getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]>;
 		printAssetUpdateMessage(): void;
 		getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any;
+		/**
+		 * Completes any mandatory project properties which have default values.
+		 * @param  {any}	properties	object containing already parsed properties
+		 * @return {boolean}			whether or not the initial properties have been updated
+		 */
+		completeProjectProperties(properties: any): boolean;
 	}
 
 	interface IFrameworkProjectResolverBase {

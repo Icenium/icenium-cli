@@ -3,11 +3,11 @@
 
 import * as path from "path";
 import * as util from "util";
-import frameworkProjectBaseLib = require("./framework-project-base");
+import {FrameworkProjectBase} from "./framework-project-base";
 import helpers = require("./../common/helpers");
 import semver = require("semver");
 
-export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
+export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
 	private static WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME = "CN=Telerik";
 
@@ -192,25 +192,8 @@ export class CordovaProject extends frameworkProjectBaseLib.FrameworkProjectBase
 	}
 
 	public completeProjectProperties(properties: any): boolean {
-		let updated = false;
-
-		if (_.has(properties, "name")) {
-			properties.ProjectName = properties.name;
-			delete properties.name;
-			updated = true;
-		}
-
-		if (_.has(properties, "iOSDisplayName")) {
-			properties.DisplayName = properties.iOSDisplayName;
-			delete properties.iOSDisplayName;
-			updated = true;
-		}
-		if (!properties.DisplayName) {
-			properties.DisplayName = properties.ProjectName;
-			updated = true;
-		}
-
-		["WP8PublisherID", "WP8ProductID"].forEach((wp8guid) => {
+		let updated = super.completeProjectProperties(properties);
+		["WP8PublisherID", "WP8ProductID"].forEach(wp8guid => {
 			if (!_.has(properties, wp8guid) || properties[wp8guid] === "") {
 				properties[wp8guid] = this.generateWP8GUID();
 				updated = true;
