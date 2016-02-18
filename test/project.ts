@@ -241,6 +241,7 @@ describe("project integration tests", () => {
 			project = testInjector.resolve("project");
 			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 			options.debug = options.release = false;
+			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 		});
 
 		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0",() => {
