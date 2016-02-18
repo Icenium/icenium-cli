@@ -4,10 +4,10 @@
 import * as path from "path";
 import * as util from "util";
 import Future = require("fibers/future");
-import frameworkProjectBaseLib = require("./framework-project-base");
+import {FrameworkProjectBase} from "./framework-project-base";
 import semver = require("semver");
 
-export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjectBase implements Project.IFrameworkProject {
+export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
 		$errors: IErrors,
 		$fs: IFileSystem,
@@ -136,28 +136,6 @@ export class NativeScriptProject extends frameworkProjectBaseLib.FrameworkProjec
 				}
 			});
 		}).future<void>()();
-	}
-
-	public completeProjectProperties(properties: any): boolean {
-		let updated = false;
-
-		if (_.has(properties, "name")) {
-			properties.ProjectName = properties.name;
-			delete properties.name;
-			updated = true;
-		}
-
-		if (_.has(properties, "iOSDisplayName")) {
-			properties.DisplayName = properties.iOSDisplayName;
-			delete properties.iOSDisplayName;
-			updated = true;
-		}
-		if (!properties.DisplayName) {
-			properties.DisplayName = properties.ProjectName;
-			updated = true;
-		}
-
-		return updated;
 	}
 
 	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
