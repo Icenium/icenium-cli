@@ -27,7 +27,7 @@
       "Portrait",
       "Landscape"
     ]
-    ,"AndroidHardwareAcceleration": "false"
+    ,"AndroidHardwareAcceleration": "true"
     ,"iOSStatusBarStyle": "Default"
     ,"WPSdk": "8.0"
     ,"WP8SupportedResolutions": [
