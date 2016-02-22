@@ -5,7 +5,6 @@ import * as path from "path";
 import * as util from "util";
 import {EOL} from "os";
 import temp = require("temp");
-import helpers = require("../helpers");
 
 class Sample {
 	constructor(public name: string,
@@ -20,8 +19,8 @@ class Sample {
 export class SamplesService implements ISamplesService {
 	private static GITHUB_ICENIUM_LOCATION_ENDPOINT = "https://api.github.com/orgs/Icenium/repos?per_page=100";
 	private static GITHUB_REGEX = /https:\/\/github[.]com\/Icenium\/(?!deprecated-)(sample-|.*?-sample-)[\w\W]+[.]git$/i;
-	private static NAME_FORMAT_REGEX = /(sample-|-)/gi;
-	private static NAME_PREFIX_REMOVAL_REGEX = /(sample-)/i;
+	private static NAME_FORMAT_REGEX = /(nativescript-)?(sample-|-)/gi;
+	private static NAME_PREFIX_REMOVAL_REGEX = /sample-/i;
 	private static REMOTE_LOCK_STATE_PRIVATE = "private";
 	private static SAMPLES_PULL_FAILED_MESSAGE = "Failed to retrieve samples list. Please try again a little bit later.";
 	private static GITHUB_CORDOVA_SAMPLES_REGEX = new RegExp("https:\/\/github[.]com\/Icenium\/sample-[\\w\\W]+[.]git$", "i");
@@ -159,7 +158,7 @@ export class SamplesService implements ISamplesService {
 			let samples = _.map(repos, (repo: any) => {
 				return new Sample(
 					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
-					helpers.capitalizeFirstLetter(repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim()),
+					repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim(),
 					repo.description,
 					repo.url + "/zipball/" + repo.default_branch,
 					repo.html_url,
