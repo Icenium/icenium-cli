@@ -22,7 +22,8 @@
     "cordova",
     "appbuilder",
     "telerik",
-    "mobile"
+    "mobile",
+    "nativescript"
   ],
   "dependencies": {
     "JSV": "4.0.2",
