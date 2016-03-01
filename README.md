@@ -23,10 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 3.1.1 
-Release date: February 16, 2016
+Latest version: Telerik AppBuilder 3.1.2 
+Release date: March 1, 2016
 
-> Telerik AppBuilder 3.1.1 is a maintenance release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1-1" target="_blank">Telerik AppBuilder 3.1.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
+> Telerik AppBuilder 3.1.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1-2" target="_blank">Telerik AppBuilder 3.1.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
 
 ### System Requirements
 
@@ -374,10 +374,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 3.1.1 
-Release date: February 16, 2016
+Latest version: Telerik AppBuilder 3.1.2 
+Release date: March 1, 2016
 
-> Telerik AppBuilder 3.1.1 is a maintenance release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1-1" target="_blank">Telerik AppBuilder 3.1.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
+> Telerik AppBuilder 3.1.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1-2" target="_blank">Telerik AppBuilder 3.1.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.1, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-1" target="_blank">Telerik AppBuilder 3.1 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
