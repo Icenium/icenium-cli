@@ -939,7 +939,6 @@ interface IOptions extends ICommonOptions {
 	provision: string;
 	public: boolean;
 	publish: boolean;
-	release: boolean;
 	saveTo: string;
 	screenBuilderCacheDir: string;
 	sendEmail: boolean;
