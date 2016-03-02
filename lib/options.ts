@@ -31,7 +31,6 @@ export class Options extends commonOptionsLibPath.OptionsBase {
 			provision: { type: OptionType.String  },
 			public: { type: OptionType.Boolean },
 			publish: { type: OptionType.Boolean },
-			release: { type: OptionType.Boolean, alias: "r" },
 			saveTo: { type: OptionType.String},
 			screenBuilderCacheDir: { type: OptionType.String },
 			sendEmail: { type: OptionType.Boolean },

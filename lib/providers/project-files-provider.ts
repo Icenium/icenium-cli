@@ -2,8 +2,9 @@
 "use strict";
 
 import * as path from "path";
+import { ProjectFilesProviderBase } from "../common/services/project-files-provider-base";
 
-export class ProjectFilesProvider implements IProjectFilesProvider {
+export class ProjectFilesProvider extends ProjectFilesProviderBase {
 	private static IGNORE_FILE = ".abignore";
 	private static INTERNAL_NONPROJECT_FILES = [".ab", ProjectFilesProvider.IGNORE_FILE, ".*" + ProjectFilesProvider.IGNORE_FILE, "**/*.ipa", "**/*.apk", "**/*.xap"];
 	private _projectDir: string = null;
@@ -17,9 +18,12 @@ export class ProjectFilesProvider implements IProjectFilesProvider {
 	}
 
 	constructor(private $pathFilteringService: IPathFilteringService,
-		private $options: IOptions,
 		private $projectConstants: Project.IProjectConstants,
-		private $injector: IInjector) { }
+		private $injector: IInjector,
+		$mobileHelper: Mobile.IMobileHelper,
+		$options: ICommonOptions) {
+			super($mobileHelper, $options);
+		 }
 
 	public isFileExcluded(filePath: string): boolean {
 		let exclusionList = ProjectFilesProvider.INTERNAL_NONPROJECT_FILES.concat(this.getIgnoreFilesRules());

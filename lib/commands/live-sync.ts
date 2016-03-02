@@ -1,12 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-interface IProjectFileInfo {
-	fileName: string;
-	onDeviceName: string;
-	shouldIncludeFile: boolean;
-}
-
 class LiveSyncDevicesCommand implements ICommand {
 	constructor(private $liveSyncService: ILiveSyncService) { }
 	execute(args: string[]): IFuture<void> {
