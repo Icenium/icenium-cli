@@ -92,6 +92,10 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return 'App_Resources';
 	}
 
+	public get projectSpecificFiles(): string[] {
+		return this.$mobileHelper.platformNames.map(platform => `cordova.${platform.toLowerCase()}.js`);
+	}
+
 	public getValidationSchemaId(): string {
 		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
 	}

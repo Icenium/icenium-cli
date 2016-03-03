@@ -40,6 +40,11 @@ class SampleProject implements Project.IFrameworkProject {
 	get relativeAppResourcesPath(): string {
 		return 'App_Resources';
 	}
+
+	get projectSpecificFiles(): string[] {
+		return [];
+	}
+
 	getTemplateFilename(name: string): string {
 		return "";
 	}

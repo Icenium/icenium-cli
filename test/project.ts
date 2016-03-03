@@ -317,11 +317,23 @@ describe("project integration tests", () => {
 		});
 
 		describe("NativeScript project", () => {
+			function assertProjectFilesExistAfterInit(projectDir: string): void {
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_FILE)), "After initialization, project does not have .abproject file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_IGNORE_FILE)), "After initialization, project does not have .abignore file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PACKAGE_JSON_NAME)), "After initialization, project does not have package.json file.");
+			};
+
+			function removeProjectFiles(projectDir: string): void {
+				fs.unlinkSync(path.join(projectDir, projectConstants.PROJECT_FILE));
+				fs.unlinkSync(path.join(projectDir, projectConstants.PROJECT_IGNORE_FILE));
+				fs.unlinkSync(path.join(projectDir, projectConstants.PACKAGE_JSON_NAME));
+			}
+
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let packageJson = path.join(projectDir, "package.json");
+				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
@@ -329,7 +341,7 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let packageJson = path.join(projectDir, "package.json");
+				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
@@ -337,50 +349,64 @@ describe("project integration tests", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let projectFile = path.join(projectDir, ".abproject");
-				let abignoreFile = path.join(projectDir, ".abignore");
-				fs.unlinkSync(projectFile);
-				fs.unlinkSync(abignoreFile);
+				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
-				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
+				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("existing project has .abproject and .abignore files after init",() => {
+			it("existing project has project files after init",() => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
-				let projectFile = path.join(projectDir, ".abproject");
-				let abignoreFile = path.join(projectDir, ".abignore");
-				fs.unlinkSync(projectFile);
-				fs.unlinkSync(abignoreFile);
+				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
-				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
+				assertProjectFilesExistAfterInit(projectDir);
+			});
+
+			it("empty directory has project files after init",() => {
+				options.path = tempFolder;
+				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				assertProjectFilesExistAfterInit(tempFolder);
 			});
 		});
 
 		describe("Cordova project",() => {
+			function assertProjectFilesExistAfterInit(projectDir: string): void {
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_FILE)), "After initialization, project does not have .abproject file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_IGNORE_FILE)), "After initialization, project does not have .abignore file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME)), "After initialization, project does not have .debug.abproject file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir,  projectConstants.RELEASE_PROJECT_FILE_NAME)), "After initialization, project does not have .release.abproject file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.android.js")), "After initialization, project does not have cordova.android.js file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.ios.js")), "After initialization, project does not have cordova.ios.js file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.wp8.js")), "After initialization, project does not have cordova.wp8.js file.");
+			};
+
+			function removeProjectFiles(projectDir: string): void {
+				fs.unlinkSync(path.join(projectDir, projectConstants.PROJECT_FILE));
+				fs.unlinkSync(path.join(projectDir, projectConstants.PROJECT_IGNORE_FILE));
+				fs.unlinkSync(path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME));
+				fs.unlinkSync(path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME));
+				mobileHelper.platformNames.forEach(platform => {
+					fs.unlinkSync(path.join(projectDir, `cordova.${platform.toLowerCase()}.js`));
+				});
+			}
+
 			it("existing project has configuration specific files and .abignore files after init",() => {
 				options.template = "Blank";
 				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
-				let projectFile = path.join(projectDir, projectConstants.PROJECT_FILE);
-				let releaseProjectFile = path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME);
-				let debugProjectFile = path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME);
-				let abignoreFile = path.join(projectDir, ".abignore");
-				fs.unlinkSync(projectFile);
-				fs.unlinkSync(releaseProjectFile);
-				fs.unlinkSync(debugProjectFile);
-				fs.unlinkSync(abignoreFile);
+				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				assert.isTrue(fs.existsSync(projectFile), "After initialization, project does not have .abproject file.");
-				assert.isTrue(fs.existsSync(abignoreFile), "After initialization, project does not have .abignore file.");
-				assert.isTrue(fs.existsSync(debugProjectFile), "After initialization, project does not have .debug.abproject file.");
-				assert.isTrue(fs.existsSync(releaseProjectFile), "After initialization, project does not have .release.abproject file.");
+				assertProjectFilesExistAfterInit(projectDir);
+			});
+
+			it("empty directory has project files after init",() => {
+				options.path = tempFolder;
+				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				assertProjectFilesExistAfterInit(tempFolder);
 			});
 
 			it("Blank template has all mandatory files", () => {

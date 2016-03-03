@@ -243,22 +243,26 @@ export class Project implements Project.IProject {
 		return this.createFromTemplate(projectName, projectDir, template);
 	}
 
+	private get projectFilePatterns(): string[] {
+		return [`*${this.$projectConstants.PROJECT_FILE}`, `*${this.$projectConstants.PROJECT_IGNORE_FILE}`];
+	}
+
 	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
 		return ((): void => {
 			projectDir = projectDir || this.getNewProjectDir();
 
 			if(!this.$fs.exists(projectDir).wait()) {
-				this.$errors.fail({ formatStr: util.format("The specified folder '%s' does not exist!", projectDir), suppressCommandHelp: true });
+				this.$errors.failWithoutHelp(`The specified folder '${projectDir}' does not exist!`);
 			}
 
 			let projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
 			if(this.$fs.exists(projectFile).wait()) {
-				this.$errors.fail({ formatStr: "The specified folder is already an AppBuilder command line project!", suppressCommandHelp: true });
+				this.$errors.failWithoutHelp("The specified folder is already an AppBuilder command line project!");
 			}
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 			let blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
-			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, ["*.abproject", ".abignore"]).wait();
+			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, this.projectFilePatterns.concat(this.frameworkProject.projectSpecificFiles)).wait();
 
 			this.createProjectFileFromExistingProject(projectDir, appName).wait();
 			this.$logger.info("Successfully initialized %s project.", framework);

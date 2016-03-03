@@ -348,6 +348,10 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public get relativeAppResourcesPath(): string { return ''; }
 
+	public get projectSpecificFiles(): string[] {
+		return [];
+	}
+
 	public getValidationSchemaId(): string { return ""; }
 
 	public getTemplateFilename(name: string): string {
