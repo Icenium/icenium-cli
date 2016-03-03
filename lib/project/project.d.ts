@@ -96,6 +96,11 @@ declare module Project {
 		 */
 		pluginsService: IPluginsService;
 
+		/**
+		 * Project specific files that should exist after init.
+		 */
+		projectSpecificFiles: string[]
+
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;
@@ -171,6 +176,7 @@ declare module Project {
 
 	interface IProjectConstants {
 		PROJECT_FILE: string;
+		PROJECT_IGNORE_FILE: string;
 		DEBUG_CONFIGURATION_NAME: string;
 		DEBUG_PROJECT_FILE_NAME: string;
 		RELEASE_CONFIGURATION_NAME: string;

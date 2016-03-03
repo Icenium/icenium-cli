@@ -77,6 +77,10 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return path.join('app', 'App_Resources');
 	}
 
+	public get projectSpecificFiles(): string[] {
+		return [ this.$projectConstants.PACKAGE_JSON_NAME ];
+	}
+
 	public getValidationSchemaId(): string {
 		return this.$jsonSchemaConstants.NATIVESCRIPT_SCHEMA_ID;
 	}

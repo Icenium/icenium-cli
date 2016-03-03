@@ -3,6 +3,7 @@
 
 export class ProjectConstants implements Project.IProjectConstants {
 	public PROJECT_FILE = ".abproject";
+	public PROJECT_IGNORE_FILE = ".abignore";
 	public DEBUG_CONFIGURATION_NAME = "debug";
 	public DEBUG_PROJECT_FILE_NAME = ".debug.abproject";
 	public RELEASE_CONFIGURATION_NAME = "release";
