@@ -176,8 +176,7 @@ export class IOSAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase imp
 }
 
 export class IOSCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(private servedApp: string,
-		public device: Mobile.IDevice,
+	constructor(public device: Mobile.IDevice,
 		public platform: string) {
 		super("com.telerik.Icenium");
 	}
@@ -204,8 +203,7 @@ export class IOSCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDat
 }
 
 export class IOSNativeScriptCompanionAppIdentifier extends deviceAppDataBaseLib.DeviceAppDataBase implements ILiveSyncDeviceAppData {
-	constructor(private servedApp: string,
-		public device: Mobile.IDevice,
+	constructor(public device: Mobile.IDevice,
 		public platform: string) {
 		super(NATIVESCRIPT_ION_APP_IDENTIFIER);
 	}
