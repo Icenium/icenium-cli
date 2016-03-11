@@ -88,6 +88,7 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
 	public ANALYTICS_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
+	public ANALYTICS_FEATURE_USAGE_TRACKING_API_KEY = "13eaa7db90224aa1861937fc71863ab8";
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ERROR_REPORT_SETTING_NAME = "AnalyticsSettings.TrackExceptions";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
