@@ -180,6 +180,8 @@ export class FileSystemStub implements IFileSystem {
 	readStdin(): IFuture<string> {
 		return undefined;
 	}
+
+    rm(options: string, ...files: string[]) {}
 }
 
 export class ErrorsStub implements IErrors {

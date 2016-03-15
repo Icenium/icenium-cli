@@ -8,6 +8,7 @@ declare module Project {
 		projectConfigFiles: Project.IConfigurationFile[];
 		startPackageActivity: string;
 
+		isIonicProject(projectDir: string): IFuture<boolean>;
 		createNewProject(projectName: string, framework: string, template?: string): IFuture<void>;
 		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
