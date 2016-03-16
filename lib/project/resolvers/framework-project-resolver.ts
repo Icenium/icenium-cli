@@ -5,7 +5,7 @@ import * as frameworkProjectResolverBaseLib from "./framework-project-resolver-b
 export class FrameworkProjectResolver extends frameworkProjectResolverBaseLib.FrameworkProjectResolverBase implements Project.IFrameworkProjectResolver {
 	constructor($errors: IErrors,
 		$injector: IInjector,
-		$projectConstants: Project.IProjectConstants) {
+		$projectConstants: IProjectConstants) {
 		super($errors, $injector, $projectConstants);
 	}
 

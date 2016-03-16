@@ -16,7 +16,7 @@ import * as optionsLib from "../lib/options";
 import * as cordovaProjectLib from "./../lib/project/cordova-project";
 import * as nativeScriptProjectLib from "./../lib/project/nativescript-project";
 import * as projectFilesManagerLib from "../lib/common/services/project-files-manager";
-import * as projectConstantsLib from "../lib/project/project-constants";
+import * as projectConstantsLib from "../lib/common/appbuilder/project-constants";
 import * as jsonSchemaLoaderLib from "../lib/json-schema/json-schema-loader";
 import * as jsonSchemaResolverLib from "../lib/json-schema/json-schema-resolver";
 import * as jsonSchemaValidatorLib from "../lib/json-schema/json-schema-validator";

@@ -14,7 +14,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,

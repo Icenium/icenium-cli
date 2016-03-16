@@ -16,7 +16,7 @@ export class CordovaPluginData implements IPlugin {
 	constructor(public data: IMarketplacePluginData,
 		public type: PluginType,
 		protected $project: Project.IProject,
-		protected $projectConstants: Project.IProjectConstants) {
+		protected $projectConstants: IProjectConstants) {
 		this.configurations = [];
 	}
 
@@ -110,7 +110,7 @@ export class MarketplacePluginData extends CordovaPluginData {
 	constructor(public pluginVersionsData: IMarketplacePluginVersionsDataBase,
 		public data: IMarketplacePluginData,
 		$project: Project.IProject,
-		$projectConstants: Project.IProjectConstants) {
+		$projectConstants: IProjectConstants) {
 		super(data, PluginType.MarketplacePlugin, $project, $projectConstants);
 		this.data.Identifier = (<any>this.pluginVersionsData).Identifier;
 	}

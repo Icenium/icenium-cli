@@ -36,7 +36,7 @@ export class SamplesService implements ISamplesService {
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
 		private $staticConfig: IStaticConfig,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $options: IOptions) {
 	}
 

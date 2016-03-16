@@ -9,7 +9,7 @@ import {assert} from "chai";
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
 let resourceLoaderFile = require("../lib/common/resource-loader");
-import projectConstantsLib = require("../lib/project/project-constants");
+import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 
 function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();

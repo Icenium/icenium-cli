@@ -7,7 +7,7 @@ export class PrintAndroidVersionCodeCommand extends PrintProjectCommand implemen
 		$injector: IInjector,
 		protected $options: IOptions,
 		private $logger: ILogger,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: IProjectConstants) {
 		super($staticConfig, $injector, $options);
 	}
 

@@ -22,7 +22,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		private $injector: IInjector,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService) {

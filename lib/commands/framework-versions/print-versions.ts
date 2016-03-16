@@ -7,7 +7,7 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 		private $project: Project.IProject,
 		private $logger: ILogger,
 		private $errors: IErrors,
-		private $projectConstants: Project.IProjectConstants) { }
+		private $projectConstants: IProjectConstants) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {

@@ -36,7 +36,7 @@ export class Project implements Project.IProject {
 		private $logger: ILogger,
 		private $multipartUploadService: IMultipartUploadService,
 		private $progressIndicator: IProgressIndicator,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $projectFilesManager: IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $server: Server.IServer,

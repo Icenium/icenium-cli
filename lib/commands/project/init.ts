@@ -19,7 +19,7 @@ export class InitProjectCommand implements ICommand {
 		private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: IProjectConstants) {
 
 		this.projectDir = $project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "app", "tns_modules"), "directory");

@@ -8,7 +8,7 @@ export class NativeScriptResources implements INativeScriptResources {
 	private _nativeScriptDefaultPackageJsonFile: string;
 	private _nativeScriptMigrationFile: string;
 
-	constructor(private $projectConstants: Project.IProjectConstants,
+	constructor(private $projectConstants: IProjectConstants,
 		private $resources: IResourceLoader) {}
 
 	public get nativeScriptResourcesDir(): string {

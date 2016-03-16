@@ -87,7 +87,7 @@ $injector.require("simulatorService", "./services/simulator-service");
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
-$injector.require("projectConstants", "./project/project-constants");
+$injector.require("projectConstants", "./common/appbuilder/project-constants");
 $injector.require("configFilesManager", "./project/config-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
@@ -178,7 +178,7 @@ $injector.require("jsonSchemaValidator", "./json-schema/json-schema-validator");
 $injector.require("jsonSchemaConstants", "./json-schema/json-schema-constants");
 
 $injector.require("liveSyncService", "./services/livesync/livesync-service");
-$injector.require("liveSyncProvider", "./common/appbuilder/providers/livesync-provider");
+$injector.require("liveSyncProvider", "./providers/livesync-provider");
 $injector.require("iosLiveSyncServiceLocator", "./common/appbuilder/services/livesync/ios-livesync-service");
 $injector.require("androidLiveSyncServiceLocator", "./common/appbuilder/services/livesync/android-livesync-service");
 $injector.require("appManagerService", "./services/appmanager-service");

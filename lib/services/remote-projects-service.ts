@@ -24,7 +24,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 				private $serviceProxyBase: Server.IServiceProxy,
 				private $errors: IErrors,
 				private $project: Project.IProject,
-				private $projectConstants: Project.IProjectConstants,
+				private $projectConstants: IProjectConstants,
 				private $fs: IFileSystem,
 				private $logger: ILogger) { }
 

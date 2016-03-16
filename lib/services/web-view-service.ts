@@ -6,7 +6,7 @@ export class WebViewService implements IWebViewService {
 	constructor(private $errors: IErrors,
 		private $pluginsService: IPluginsService,
 		private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $options: IOptions) { }
 
 	public get supportedWebViews(): IDictionary<IWebView[]> {

@@ -3,7 +3,7 @@
 
 export class DynamicHelpProvider implements IDynamicHelpProvider {
 	constructor(private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants) { }
+		private $projectConstants: IProjectConstants) { }
 
 	public isProjectType(args: string[]): IFuture<boolean> {
 		return ((): boolean => {

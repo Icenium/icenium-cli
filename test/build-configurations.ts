@@ -10,7 +10,7 @@ import fslib = require("./../lib/common/file-system");
 import marketplacePluginsService = require("./../lib/services/marketplace-plugins-service");
 import projectLib = require("./../lib/project");
 import projectPropertiesLib = require("../lib/services/project-properties-service");
-import projectConstantsLib = require("../lib/project/project-constants");
+import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 import jsonSchemaConstantsLib = require("../lib/json-schema/json-schema-constants");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
@@ -91,7 +91,7 @@ function createTestInjector() {
 	testInjector.register("frameworkProjectResolver", frameworkProjectResolverLib.FrameworkProjectResolver);
 	testInjector.register("cordovaProject", cordovaProjectLib.CordovaProject);
 	testInjector.register("serverExtensionsService", {});
-	testInjector.register("projectConstants", require("../lib/project/project-constants").ProjectConstants);
+	testInjector.register("projectConstants", require("../lib/common/appbuilder/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
 		validate: (data: IProjectData) => { /* mock */ },
@@ -165,7 +165,7 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
-	let projectConstants: Project.IProjectConstants = new projectConstantsLib.ProjectConstants();
+	let projectConstants: IProjectConstants = new projectConstantsLib.ProjectConstants();
 	let options = testInjector.resolve("options");
 	let project = testInjector.resolve("project");
 	let fs = testInjector.resolve("fs");

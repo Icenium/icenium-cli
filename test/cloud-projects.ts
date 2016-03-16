@@ -6,7 +6,7 @@ import helpers = require("../lib/common/helpers");
 import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
-import projectConstantsLib = require("../lib/project/project-constants");
+import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 import {EOL} from "os";
 
 let originalIsInteractiveMethod = helpers.isInteractive;

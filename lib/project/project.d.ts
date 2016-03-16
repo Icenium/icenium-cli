@@ -175,28 +175,6 @@ declare module Project {
 		availableConfigFiles: IDictionary<Project.IConfigurationFile>;
 	}
 
-	interface IProjectConstants {
-		PROJECT_FILE: string;
-		PROJECT_IGNORE_FILE: string;
-		DEBUG_CONFIGURATION_NAME: string;
-		DEBUG_PROJECT_FILE_NAME: string;
-		RELEASE_CONFIGURATION_NAME: string;
-		RELEASE_PROJECT_FILE_NAME: string;
-		CORE_PLUGINS_PROPERTY_NAME: string;
-		CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME: string;
-		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
-		APPIDENTIFIER_PROPERTY_NAME: string;
-		EXPERIMENTAL_TAG: string;
-		NATIVESCRIPT_APP_DIR_NAME: string;
-		IMAGE_DEFINITIONS_FILE_NAME: string;
-		PACKAGE_JSON_NAME: string;
-	}
-
-	interface ITargetFrameworkIdentifiers {
-		Cordova: string;
-		NativeScript: string;
-	}
-
 	interface IConfigurationFile {
 		template: string;
 		filepath: string;

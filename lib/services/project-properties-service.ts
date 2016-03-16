@@ -13,7 +13,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		private $errors: IErrors,
 		private $injector: IInjector,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $resources: IResourceLoader,
 		private $logger: ILogger) { }
 

@@ -426,12 +426,6 @@ interface IExtensionData {
 	forceDownload?: boolean;
 }
 
-interface IPathFilteringService {
-	getRulesFromFile(file: string) : string[];
-	filterIgnoredFiles(files: string[], rules: string[], rootDir: string) :string[];
-	isFileExcluded(file: string, rules: string[], rootDir: string): boolean
-}
-
 /**
  * Defines methods required for migrating Cordova or NativeScript projects.
  */
@@ -869,18 +863,8 @@ interface IProjectSimulatorService {
 	getSimulatorParams(simulatorPackageName: string): IFuture<string[]>;
 }
 
-interface IDeployHelper {
-	deploy(platform?: string): IFuture<void>;
-}
-
 interface ILiveSyncService {
 	livesync(platform?: string): IFuture<void>;
-}
-
-interface ILiveSyncDeviceAppData extends Mobile.IDeviceAppData {
-	liveSyncFormat: string;
-	encodeLiveSyncHostUri(hostUri: string): string;
-	getLiveSyncNotSupportedError(): string;
 }
 
 interface IAppManagerService {

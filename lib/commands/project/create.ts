@@ -10,7 +10,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		private $logger: ILogger,
 		private $nameCommandParameter: ICommandParameter,
 		private $options: IOptions,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: IProjectConstants,
 		private $screenBuilderService: IScreenBuilderService,
 		private $simulatorService: ISimulatorService,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
