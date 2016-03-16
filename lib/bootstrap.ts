@@ -163,7 +163,7 @@ $injector.require("sharedUserSettingsFileService", "./services/user-settings-ser
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
 $injector.require("analyticsSettingsService", "./services/analytics-settings-service");
 
-$injector.require("pathFilteringService", "./services/path-filtering");
+$injector.require("pathFilteringService", "./common/appbuilder/services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
@@ -178,9 +178,9 @@ $injector.require("jsonSchemaValidator", "./json-schema/json-schema-validator");
 $injector.require("jsonSchemaConstants", "./json-schema/json-schema-constants");
 
 $injector.require("liveSyncService", "./services/livesync/livesync-service");
-$injector.require("liveSyncProvider", "./providers/livesync-provider");
-$injector.require("iosLiveSyncServiceLocator", "./services/livesync/ios-livesync-service");
-$injector.require("androidLiveSyncServiceLocator", "./services/livesync/android-livesync-service");
+$injector.require("liveSyncProvider", "./common/appbuilder/providers/livesync-provider");
+$injector.require("iosLiveSyncServiceLocator", "./common/appbuilder/services/livesync/ios-livesync-service");
+$injector.require("androidLiveSyncServiceLocator", "./common/appbuilder/services/livesync/android-livesync-service");
 $injector.require("appManagerService", "./services/appmanager-service");
 $injector.requireCommand("appmanager|livesync", "./commands/appmanager-livesync");
 
@@ -206,9 +206,9 @@ $injector.require("imageService", "./services/image-service");
 $injector.requireCommand("resource|*list", "./commands/resource");
 $injector.requireCommand("resource|create", "./commands/resource");
 
-$injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
+$injector.require("deviceAppDataProvider", "./common/appbuilder/providers/device-app-data-provider");
 $injector.require("nativeScriptResources", "./nativescript-resources");
 $injector.require("sysInfo", "./sys-info");
 $injector.require("messages", "./messages");
 
-$injector.require("projectFilesProvider", "./providers/project-files-provider");
+$injector.require("projectFilesProvider", "./common/appbuilder/providers/project-files-provider");

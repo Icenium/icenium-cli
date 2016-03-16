@@ -28,8 +28,8 @@ import * as projectPropertiesService from "../lib/services/project-properties-se
 import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
 import Future = require("fibers/future");
 import * as hostInfoLib from "../lib/common/host-info";
-import {DeviceAppDataProvider} from "../lib/providers/device-app-data-provider";
-import {ProjectFilesProvider} from "../lib/providers/project-files-provider";
+import {DeviceAppDataProvider} from "../lib/common/appbuilder/providers/device-app-data-provider";
+import {ProjectFilesProvider} from "../lib/common/appbuilder/providers/project-files-provider";
 import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-app-data-factory";
 import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
 import {ConfigFilesManager} from "../lib/project/config-files-manager";

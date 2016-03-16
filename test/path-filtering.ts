@@ -4,7 +4,7 @@ import chai = require("chai");
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
 let assert:chai.Assert = chai.assert;
-let pfs = require("../lib/services/path-filtering");
+let pfs = require("../lib/common/appbuilder/services/path-filtering");
 
 let projectDir = "c:/projectDir/";
 let testInjector = new yok.Yok();
