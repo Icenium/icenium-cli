@@ -5,9 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder prop set AndroidVersionCode <Integer Value>`
 
-Sets the AndroidVersionCode project property and overwrites its current value.
+Sets the AndroidVersionCode project property and overwrites its current value. The version code must be an integer.<% if(isHtml) { %> This property sets the internal version of the application that is not visible to the user. For every new version of your app, you need to increase the version code by one. For more information about version code, see <a href="http://developer.android.com/guide/topics/manifest/manifest-element.html#vcode" target="_blank">versionCode in the Android Manifest API Guide</a>.<% } %>
 
-<% if(isHtml) { %>
+After you build your app for Android, the version code for the application package will differ from the version code you specified. The final version code will have an additional digit appended at the back: 2.<% if(isHtml) { %><br/>Apache Cordova automatically appends a specific number to the version code based on the target Android SDK and architecture. This is not controlled by AppBuilder and is an implementation decision made entirely by the Apache Cordova team. For more information, see <a href="https://issues.apache.org/jira/browse/CB-8976">https://issues.apache.org/jira/browse/CB-8976</a>.
+
 ### Related Commands
 
 Command | Description
