@@ -22,7 +22,7 @@ import * as jsonSchemaResolverLib from "../lib/json-schema/json-schema-resolver"
 import * as jsonSchemaValidatorLib from "../lib/json-schema/json-schema-validator";
 import * as jsonSchemaConstantsLib from "../lib/json-schema/json-schema-constants";
 import * as childProcessLib from "../lib/common/child-process";
-import * as mobilePlatformsCapabilitiesLib from "../lib/mobile-platforms-capabilities";
+import * as mobilePlatformsCapabilitiesLib from "../lib/common/appbuilder/mobile-platforms-capabilities";
 import * as cordovaResourcesLib from "../lib/cordova-resource-loader";
 import * as projectPropertiesService from "../lib/services/project-properties-service";
 import * as cordovaMigrationService from "../lib/services/cordova-migration-service";

@@ -185,7 +185,7 @@ $injector.require("appManagerService", "./services/appmanager-service");
 $injector.requireCommand("appmanager|livesync", "./commands/appmanager-livesync");
 
 $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
-$injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilities");
+$injector.require("mobilePlatformsCapabilities", "./common/appbuilder/mobile-platforms-capabilities");
 $injector.require("hostCapabilities", "./host-capabilities");
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");

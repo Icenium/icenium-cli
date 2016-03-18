@@ -1,7 +1,6 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
 import { AppBuilderLiveSyncProviderBase } from "../common/appbuilder/providers/appbuilder-livesync-provider-base";
 
 export class LiveSyncProvider extends AppBuilderLiveSyncProviderBase {
