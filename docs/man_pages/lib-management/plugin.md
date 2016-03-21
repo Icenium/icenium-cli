@@ -8,12 +8,12 @@ Manage | `$ appbuilder plugin <Command>`
 
 <% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
 
-Lists all <%=plugins%> that are currently enabled for your project. <% if(isHtml) { %>With the `--available` switch, lists all plugins or custom modules that are enabled in your project and that you can enable in your project.<% } %>
+Lists all <%=plugins%> that are currently enabled for your project and shows information about their variables, if any. <% if(isHtml) { %>With the `--available` switch, lists all plugins or custom modules that are enabled in your project and that you can enable in your project.<% } %>
 
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
 
-* `--available` - Lists all <%=plugins%> that are currently enabled in your project and all <%=plugins%> that you can enable in your project.
+* `--available` - Lists all <%=plugins%> that are currently enabled in your project and all <%=plugins%> that you can enable in your project. Shows information about the variables of the <%=plugins%>, if any. 
 <% if(isCordova) { %>* `--debug` - Lists all Apache Cordova plugins enabled for the Debug build configuration. If `--available` is set, also lists all Apache Cordova plugins that you can enable for the Debug build configuration.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--release` - Lists all Apache Cordova plugins enabled for the Release build configuration. If `--available` is set, also lists all Apache Cordova plugins that you can enable for the Release build configuration.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %><% } %>
 <% if(isNativeScript) { %>* `--count` - Lists the selected number of npm and NativeScript modules. The default value is 10.<% if(isHtml) { %> This option is applicable only to NativeScript projects.<% } %><% } %>
