@@ -248,32 +248,42 @@ export class Project implements Project.IProject {
 		return [`*${this.$projectConstants.PROJECT_FILE}`, `*${this.$projectConstants.PROJECT_IGNORE_FILE}`];
 	}
 
-    public isIonicProject(projectDir: string): IFuture<boolean> {
-        return (() => {
-            let result = false;
-            let ionicProject = path.join(projectDir, "ionic.project");
-            let packageJson = path.join(projectDir, "package.json");
-            let hasIonicProject = this.$fs.exists(ionicProject).wait();
-            let hasPackageJson = this.$fs.exists(packageJson).wait();
-            if (hasIonicProject && hasPackageJson) {
-                try {
-                    let content = this.$fs.readJson(ionicProject).wait();
-                    result = _.has(content, "name") && _.has(content, "app_id");
-                } catch(e) {
-                    // it is not valid Ionic project, leave the value of `result` as is
-                }
-            }
+	public isIonicProject(projectDir: string): IFuture<boolean> {
+		return (() => {
+			let result = false;
+			let ionicProject = path.join(projectDir, "ionic.project");
+			let packageJson = path.join(projectDir, "package.json");
+			let hasIonicProject = this.$fs.exists(ionicProject).wait();
+			let hasPackageJson = this.$fs.exists(packageJson).wait();
+			if (hasIonicProject && hasPackageJson) {
+				try {
+					let content = this.$fs.readJson(ionicProject).wait();
+					result = _.has(content, "name") && _.has(content, "app_id");
+				} catch(e) {
+					// it is not valid Ionic project, leave the value of `result` as is
+				}
+			}
 
-            return result;
-        }).future<boolean>()();
-    }
+			return result;
+		}).future<boolean>()();
+	}
 
 	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
 		return ((): void => {
+			const prompt = "CAUTION: This operation will modify your Ionic-based project to make it compatible with AppBuilder and cannot be undone. To avoid losing any work, make sure that you have a backup or that the project is under source control.";
+
 			projectDir = projectDir || this.getNewProjectDir();
 
 			if(!this.$fs.exists(projectDir).wait()) {
 				this.$errors.failWithoutHelp(`The specified folder '${projectDir}' does not exist!`);
+			}
+
+			let ionicProject = this.isIonicProject(projectDir).wait();
+			if (ionicProject && !this.$options.force) {
+				this.$logger.warn(prompt);
+				if (!this.$prompter.confirm("Do you want to continue?", () => true).wait()) {
+					return;
+				}
 			}
 
 			let projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
@@ -287,7 +297,7 @@ export class Project implements Project.IProject {
 
 			this.createProjectFileFromExistingProject(projectDir, appName).wait();
 
-			if (this.isIonicProject(projectDir).wait()) {
+			if (ionicProject) {
 				this.initializeFromIonicProject(projectDir).wait();
 			}
 
@@ -297,18 +307,10 @@ export class Project implements Project.IProject {
 
 	private initializeFromIonicProject(projectDir: string): IFuture<void> {
 		return (() => {
-			const prompt = "Updating an existing Ionic-based project will change it irrevocably. Make sure that you have a backup or the project is under source control. Do you want to continue?";
-			if(!(this.$options.force || this.$prompter.confirm(prompt, () => true).wait())) {
-				return;
-			}
-
 			// write a dummy index.html to re-route to the real one in www/
 			const indexHtmlContent = '<html><head><meta http-equiv="refresh" content="0; url=www/index.html" /></head></html>';
 			let indexHtml = path.join(projectDir, "index.html");
 			this.$fs.writeFile(indexHtml, indexHtmlContent).wait();
-
-			// Defaults in the 3.2 release are Cordova Android 4.x and iOS 3.8. Check if these are sufficient, or update the Cordova fx to the 5.x set
-			// nothing to do for now
 
 			// move platform resources around
 			// to do
@@ -327,7 +329,15 @@ export class Project implements Project.IProject {
 			});
 
 			// delete assorted files and dirs
-			this.$fs.rm("-rf", path.join(projectDir, "platforms", "hooks", "config.xml", "ionic.project", "package.json"));
+			this.$fs.rm("-rf",
+				path.join(projectDir, "platforms"),
+				path.join(projectDir, "hooks"),
+				path.join(projectDir, "config.xml"),
+				path.join(projectDir, "ionic.project"),
+				path.join(projectDir, "package.json")
+			);
+
+			return true;
 		}).future<void>()();
 	}
 
@@ -365,7 +375,7 @@ export class Project implements Project.IProject {
 		}
 	}
 
- 	private enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
+	private enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
 		return (() => {
 			let projectDir = this.getProjectDir().wait();
 			let filter = (filePath: string, stat: IFsStats) => {
