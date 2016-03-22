@@ -1,7 +1,5 @@
 declare module Project {
-	interface IProject {
-		projectData: IProjectData;
-		capabilities: IProjectCapabilities;
+	interface IProject extends IProjectBase {
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
 		requiredAndroidApiLevel: number;
@@ -18,7 +16,6 @@ declare module Project {
 		getNewProjectDir(): string;
 		getProjectSchema(): IFuture<any>;
 		getLiveSyncUrl(): string;
-		getProjectDir(): IFuture<string>;
 		getBuildConfiguration(): string;
 		getTempDir(extraSubdir?: string): IFuture<string>;
 		getProperty(propertyName: string, configuration: string): any;

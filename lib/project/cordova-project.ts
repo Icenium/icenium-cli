@@ -25,7 +25,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		private $projectConstants: IProjectConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		private $staticConfig: Config.IStaticConfig,
-		private $templatesService: ITemplatesService) {
+		private $templatesService: ITemplatesService,
+		private $cordovaProjectCapabilities: IProjectCapabilities) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
@@ -38,21 +39,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public get capabilities(): IProjectCapabilities {
-		return {
-			build: true,
-			buildCompanion: true,
-			deploy: true,
-			simulate: true,
-			livesync: true,
-			livesyncCompanion: true,
-			updateKendo: true,
-			emulate: true,
-			publish: false,
-			uploadToAppstore: true,
-			canChangeFrameworkVersion: true,
-			imageGeneration: true,
-			wp8Supported: true
-		};
+		return this.$cordovaProjectCapabilities;
 	}
 
 	public get defaultProjectTemplate(): string {

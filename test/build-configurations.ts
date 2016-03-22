@@ -120,6 +120,8 @@ function createTestInjector() {
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("options", optionsLib.Options);
 	testInjector.register("configFilesManager", ConfigFilesManager);
+	testInjector.register("nativeScriptProjectCapabilities", {});
+	testInjector.register("cordovaProjectCapabilities", {});
 	return testInjector;
 }
 

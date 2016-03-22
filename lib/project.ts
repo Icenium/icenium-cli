@@ -26,6 +26,9 @@ export class Project implements Project.IProject {
 	private frameworkProject: Project.IFrameworkProject;
 	public projectData: IProjectData;
 	public configurationSpecificData: IDictionary<IProjectData>;
+	public get projectDir(): string {
+		return this.getProjectDir().wait();
+	}
 
 	constructor(private $config: IConfiguration,
 		private $errors: IErrors,

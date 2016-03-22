@@ -20,6 +20,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $injector: IInjector,
+		private $nativeScriptProjectCapabilities: IProjectCapabilities,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
@@ -32,21 +33,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public get capabilities(): IProjectCapabilities {
-		return {
-			build: true,
-			buildCompanion: true,
-			deploy: true,
-			simulate: false,
-			livesync: false,
-			livesyncCompanion: true,
-			updateKendo: false,
-			emulate: true,
-			publish: false,
-			uploadToAppstore: true,
-			canChangeFrameworkVersion: true,
-			imageGeneration: true,
-			wp8Supported: false
-		};
+		return this.$nativeScriptProjectCapabilities;
 	}
 
 	public get defaultProjectTemplate(): string {

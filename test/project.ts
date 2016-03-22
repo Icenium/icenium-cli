@@ -34,6 +34,8 @@ import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-
 import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import {assert} from "chai";
+import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/project/nativescript-project-capabilities";
+import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
 
@@ -119,6 +121,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("httpClient", { /*intentionally empty body */ });
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
+	testInjector.register("nativeScriptProjectCapabilities", NativeScriptProjectCapabilities);
+	testInjector.register("cordovaProjectCapabilities", CordovaProjectCapabilities);
 
 	testInjector.register("pluginsService", {
 		getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
