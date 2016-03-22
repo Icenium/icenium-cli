@@ -42,7 +42,7 @@ Add a specific version of a custom npm or NativeScript module and set all variab
 Enables <%=plugins%> for your project. <% if(isHtml) { %>If the plugin has plugin variables and you have not set one or more of them with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
 <% if((isConsole && (isCordova || isNativeScript)) || isHtml) { %>
 ### Options
-* `--available` - Lists all <%=plugins%> that you can enable in your project.
+* `--available` - Lists all <%=plugins%> that you can enable in your project and shows information about their variables, if any. 
 * `--var.<Variable ID>` - Sets the value for the specified plugin variable in all configurations.
 	<% if(isHtml) { %><br /><% } %><% if(isCordova) { %>(Apache Cordova-only) If `--debug` or `--release` is specified, sets the variable for the respective configuration of the hybrid project.<% } %>
 <% if(isCordova) {%>* `--latest` - Enables the latest version of the specified Apache Cordova plugin.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
