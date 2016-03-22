@@ -12,7 +12,7 @@ class ResourceDownloader implements IResourceDownloader {
 		private $httpClient: Server.IHttpClient,
 		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $resources: IResourceLoader,
 		private $server: Server.IServer,
 		private $staticConfig: Config.IStaticConfig) {

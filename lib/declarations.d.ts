@@ -151,27 +151,27 @@ interface IProjectTypes {
 }
 
 interface IProjectPropertiesService {
-	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData>;
+	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<Project.IData>;
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
-	updateProjectProperty(projectData: any, configurationSpecificData: IProjectData, mode: string, property: string, newValue: any): IFuture<void>;
-	normalizePropertyName(property: string, projectData: IProjectData): string;
+	updateProjectProperty(projectData: any, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): IFuture<void>;
+	normalizePropertyName(property: string, projectData: Project.IData): string;
 	getValidValuesForProperty(propData: any): IFuture<string[]>;
 	getPropertiesForAllSupportedProjects(): IFuture<string>;
 	/**
 	 * Removes property from the project and validates the result data.  If it is configuration specific (commonly written in .debug.abproject or .release.abproject)
 	 * you have to pass the projectData as last parameter of the method.
-	 * @param {IProjectData} dataToBeUpdated The data from which to remove the property.
+	 * @param {IData} dataToBeUpdated The data from which to remove the property.
 	 * @param {string} propertyName The name of the property that should be removed from the data.
-	 * @param {IProjectData} projectData Optional parameter. The project data, commonly written in .abproject. Set this property whenever you want to remove property from configuration specific data.
-	 * @return {IProjectData} Modified data. In case configurationSpecificData exists, returns it, else returns projectData.
+	 * @param {IData} projectData Optional parameter. The project data, commonly written in .abproject. Set this property whenever you want to remove property from configuration specific data.
+	 * @return {IData} Modified data. In case configurationSpecificData exists, returns it, else returns projectData.
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
 	 */
-	removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData;
+	removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData) : Project.IData;
 
 	/**
 	 * Updates CorePlugins property value in all configurations.
-	 * @param {IProjectData} projectData The project data commonly written in .abproject.
-	 * @param {IDictionary<IProjectData>} configurationSpecificData Dictionary with all configuration specific data.
+	 * @param {IData} projectData The project data commonly written in .abproject.
+	 * @param {IDictionary<IData>} configurationSpecificData Dictionary with all configuration specific data.
 	 * @param {string} mode Type of operation which should be executed with the property.
 	 * @param {Array<any>} newValue The new value that should be used for CorePlugins modification.
 	 * @param {string[]} configurationsSpecifiedByUser The configurations which the user want to modify.
@@ -179,7 +179,7 @@ interface IProjectPropertiesService {
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
 	 * @throws Error when the different CorePlugins are enabled in projectData and any configuration specific data.
 	 */
-	updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
+	updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
 }
 
 interface IServerConfigurationData {

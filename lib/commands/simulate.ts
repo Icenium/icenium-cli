@@ -2,7 +2,7 @@
 "use strict";
 
 export class SimulateCommand implements ICommand {
-	private projectData: IProjectData;
+	private projectData: Project.IData;
 
 	constructor(private $errors: IErrors,
 		private $project: Project.IProject,

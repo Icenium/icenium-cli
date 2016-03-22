@@ -30,7 +30,7 @@ function createTestInjector(): IInjector {
 class SampleProject implements Project.IFrameworkProject {
 	public completeProjectePropertiesResult = false;
 	name: string;
-	capabilities: IProjectCapabilities;
+	capabilities: Project.ICapabilities;
 	defaultProjectTemplate: string;
 	liveSyncUrl: string;
 	requiredAndroidApiLevel: number;
@@ -61,7 +61,7 @@ class SampleProject implements Project.IFrameworkProject {
 		return null;
 	}
 	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */}
-	checkSdkVersions(platform: string, projectData: IProjectData): void {/* mock */ }
+	checkSdkVersions(platform: string, projectData: Project.IData): void {/* mock */ }
 	completeProjectProperties(properties: any): boolean {
 		return this.completeProjectePropertiesResult;
 	}

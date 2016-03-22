@@ -23,11 +23,11 @@ interface IJsonSchemaResolver {
 
 interface IJsonSchemaValidator {
 	getValidProperties(framework: string, frameworkVersion: string): IStringDictionary;
-	validate(data: IProjectData): void;
-	isValid(data: IProjectData): boolean;
+	validate(data: Project.IData): void;
+	isValid(data: Project.IData): boolean;
 	tryResolveValidationSchema(framework: string): IDictionary<any>;
 	getPropertyType(framework: string, propertyName: string): string;
-	validateWithBuildSchema(data: IProjectData, platformName: string): void;
+	validateWithBuildSchema(data: Project.IData, platformName: string): void;
 	validatePropertyUsingBuildSchema(propertyName: string, propertyValue: string): void
 }
 

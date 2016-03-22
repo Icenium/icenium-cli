@@ -513,7 +513,7 @@ describe("project integration tests", () => {
 	});
 });
 
-function getProjectData(): IProjectData {
+function getProjectData(): Project.IData {
 	return {
 		"ProjectName": "testDisplayName",
 		"ProjectGuid": "{9916af8d-64cf-4d4b-9ddd-850931624535}",
@@ -730,7 +730,7 @@ describe("project unit tests", () => {
 	});
 	describe("updateCorePlugins", () => {
 		describe("modifies CorePlugins in configuration specific data, when it is specified", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 
 			beforeEach(() => {
 				projectData = getProjectData();
@@ -850,7 +850,7 @@ describe("project unit tests", () => {
 		});
 
 		describe("moves CorePlugins to config specific data when it is modified", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 			beforeEach(() => {
 				projectData = getProjectData();
 				projectData.CorePlugins = ["org.apache.cordova.battery-status"];
@@ -886,7 +886,7 @@ describe("project unit tests", () => {
 		});
 
 		describe("modifies CorePlugins in configuration specific data, even if it is NOT specified when CorePlugins are different in the configurations", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 
 			beforeEach(() => {
 				projectData = getProjectData();

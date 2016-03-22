@@ -5,7 +5,7 @@ import * as helpers from "../../helpers";
 export class FrameworkProjectResolverBase implements Project.IFrameworkProjectResolverBase {
 	constructor(private $errors: IErrors,
 		private $injector: IInjector,
-		private $projectConstants: IProjectConstants) { }
+		private $projectConstants: Project.IConstants) { }
 
 	public resolveByName<T>(name: string, framework: string, ctorArguments?: IDictionary<any>): T {
 		let fr = framework.charAt(0).toLowerCase() + framework.slice(1);

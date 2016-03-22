@@ -31,7 +31,7 @@ class ImageService implements IImageService {
 		private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $progressIndicator: IProgressIndicator,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $project: Project.IProject,
 		private $prompter: IPrompter,
 		private $staticConfig: Config.IStaticConfig,

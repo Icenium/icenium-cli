@@ -14,13 +14,13 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $injector: IInjector,
-		private $nativeScriptProjectCapabilities: IProjectCapabilities,
+		private $nativeScriptProjectCapabilities: Project.ICapabilities,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
@@ -32,7 +32,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
 	}
 
-	public get capabilities(): IProjectCapabilities {
+	public get capabilities(): Project.ICapabilities {
 		return this.$nativeScriptProjectCapabilities;
 	}
 
@@ -80,7 +80,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 	}
 
-	public checkSdkVersions(platform: string, projectData: IProjectData): void { /* this method is not applicable to {N} projects */ }
+	public checkSdkVersions(platform: string, projectData: Project.IData): void { /* this method is not applicable to {N} projects */ }
 
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {

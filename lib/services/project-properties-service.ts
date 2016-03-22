@@ -13,11 +13,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		private $errors: IErrors,
 		private $injector: IInjector,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $resources: IResourceLoader,
 		private $logger: ILogger) { }
 
-	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<IProjectData> {
+	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<Project.IData> {
 		return ((): any => {
 			let properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
 				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject).wait();
@@ -27,7 +27,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			}
 
 			return properties;
-		}).future<IProjectData>()();
+		}).future<Project.IData>()();
 	}
 
 	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {
@@ -46,7 +46,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return updated;
 	}
 
-	public removeProjectProperty(dataToBeUpdated: IProjectData, property: string, projectData?: IProjectData) : IProjectData {
+	public removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData) : Project.IData {
 		let normalizedProperty = this.normalizePropertyName(property, projectData);
 		if(dataToBeUpdated) {
 			delete dataToBeUpdated[normalizedProperty];
@@ -59,7 +59,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return dataToBeUpdated;
 	}
 
-	public updateCorePlugins(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void> {
+	public updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void> {
 		return ((): void => {
 			this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
 
@@ -76,7 +76,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<void>()();
 	}
 
-	public updateProjectProperty(projectData: IProjectData, configurationSpecificData: IProjectData, mode: string, property: string, newValue: any) : IFuture<void> {
+	public updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any) : IFuture<void> {
 		return ((): void => {
 			let normalizedProperty = this.normalizePropertyName(property, projectData);
 			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
@@ -116,7 +116,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<void>()();
 	}
 
-	public normalizePropertyName(propertyName: string, projectData: IProjectData): string {
+	public normalizePropertyName(propertyName: string, projectData: Project.IData): string {
 		let validProperties = this.getValidProperties(projectData);
 		let normalizedPropertyName = validProperties[propertyName.toLowerCase()];
 
@@ -164,7 +164,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<string>()();
 	}
 
-	private getValidProperties(projectData: IProjectData): any {
+	private getValidProperties(projectData: Project.IData): any {
 		return this.$jsonSchemaValidator.getValidProperties(projectData.Framework, projectData.FrameworkVersion);
 	}
 
@@ -258,9 +258,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<void>()();
 	}
 
-	private moveCorePluginsToConfigurationSpecificData(projectData: IProjectData, configurationSpecificData:  IDictionary<IProjectData>): void {
+	private moveCorePluginsToConfigurationSpecificData(projectData: Project.IData, configurationSpecificData:  IDictionary<Project.IData>): void {
 		if(projectData.CorePlugins && projectData.CorePlugins.length > 0) {
-			_.each(configurationSpecificData, (configurationData: IProjectData, configuration: string) => {
+			_.each(configurationSpecificData, (configurationData: Project.IData, configuration: string) => {
 				this.$logger.trace(`Move CorePlugins from project data to '${configuration}' configuration.`);
 				if(configurationData.CorePlugins && configurationData.CorePlugins.length > 0 && _.difference(configurationData.CorePlugins, projectData.CorePlugins).length !== 0) {
 					this.$errors.failWithoutHelp(`CorePlugins are defined in both '${this.$projectConstants.PROJECT_FILE}' and '.${configuration}${this.$projectConstants.PROJECT_FILE}'. Remove them from one of the files and try again.`);
@@ -271,7 +271,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		delete projectData.CorePlugins;
 	}
 
-	private validateAllProjectData(projectData: IProjectData, configurationSpecificData:IDictionary<IProjectData>): void {
+	private validateAllProjectData(projectData: Project.IData, configurationSpecificData:IDictionary<Project.IData>): void {
 		let projectConfigurations = _.keys(configurationSpecificData);
 		_.each(projectConfigurations, configuration => {
 			this.validateProjectData(projectData, configurationSpecificData[configuration]);
@@ -280,7 +280,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		this.validateProjectData(projectData);
 	}
 
-	private validateProjectData(projectData: IProjectData, configurationSpecificData?: IProjectData): void {
+	private validateProjectData(projectData: Project.IData, configurationSpecificData?: Project.IData): void {
 		let dataToValidate = Object.create(null);
 		_.extend(dataToValidate, projectData);
 		if(configurationSpecificData) {
@@ -289,14 +289,14 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		this.$jsonSchemaValidator.validate(dataToValidate);
 	}
 
-	private tryMovingCorePluginsToProjectData(projectData: IProjectData, configurationSpecificData: IDictionary<IProjectData>): void {
+	private tryMovingCorePluginsToProjectData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {
 		if(this.shouldMoveCorePluginsToProjectData(configurationSpecificData)) {
 			this.$logger.trace("Moving CorePlugins from configuration specific data to project data.");
 			projectData.CorePlugins = _(configurationSpecificData)
 									.values()
 									.first()
 									.CorePlugins;
-			_.each(configurationSpecificData, (configurationData: IProjectData, configuration: string) => {
+			_.each(configurationSpecificData, (configurationData: Project.IData, configuration: string) => {
 				this.$logger.trace(`Removing property CorePlugins from '${configuration}' configuration.`);
 				delete configurationData.CorePlugins;
 			});
@@ -305,7 +305,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}
 	}
 
-	private shouldMoveCorePluginsToProjectData(configurationSpecificData: IDictionary<IProjectData>): boolean {
+	private shouldMoveCorePluginsToProjectData(configurationSpecificData: IDictionary<Project.IData>): boolean {
 		let corePluginsInConfigs = _.map(configurationSpecificData, configData => configData.CorePlugins);
 		let corePluginsLenghtsInConfigs = _(corePluginsInConfigs)
 					.map(c => c.length)

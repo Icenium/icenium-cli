@@ -77,7 +77,7 @@ declare module Project {
 
 	interface IFrameworkProject {
 		name: string;
-		capabilities: IProjectCapabilities;
+		capabilities: ICapabilities;
 		defaultProjectTemplate: string;
 		liveSyncUrl: string;
 		requiredAndroidApiLevel: number;
@@ -112,9 +112,9 @@ declare module Project {
 		 * Checks wether compatible sdk versions for the given platform are used.
 		 * Issues a warning if there are updated versions available.
 		 * @param {string}       platform    Android, iOS or WP8
-		 * @param {IProjectData} projectData The project's data, needed to check an SDK version
+		 * @param {Project.IData} projectData The project's data, needed to check an SDK version
 		 */
-		checkSdkVersions(platform: string, projectData: IProjectData): void;
+		checkSdkVersions(platform: string, projectData: Project.IData): void;
 		/**
 		 * Get information about plugin variables for current project.
 		 * @param {Project.IProjectInformation} projectInformation Information about the project - values of properties from .abproject and configuration specific .abproject.
@@ -163,7 +163,7 @@ declare module Project {
 	}
 
 	interface IProjectInformation {
-		projectData: IProjectData;
+		projectData: Project.IData;
 		configurationSpecificData: IDictionary<any>;
 		hasBuildConfigurations: boolean;
 	}

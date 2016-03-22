@@ -336,7 +336,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return this.framework;
 	}
 
-	public get capabilities(): IProjectCapabilities { return undefined; }
+	public get capabilities(): Project.ICapabilities { return undefined; }
 
 	public get defaultProjectTemplate(): string { return undefined; }
 
@@ -364,7 +364,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
 
-	public checkSdkVersions(platform: string, projectData: IProjectData): void { }
+	public checkSdkVersions(platform: string, projectData: Project.IData): void { }
 
 	public getProjectFileSchema(): IDictionary<any> { return undefined; }
 
@@ -376,7 +376,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
 
-	public getSimulatorParams(projectDir: string, projectData: IProjectData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
+	public getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
 
 	public completeProjectProperties(properties: any): boolean { return false; }
 
@@ -475,9 +475,9 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return null;
 	}
 
-	validate(data: IProjectData): void { }
+	validate(data: Project.IData): void { }
 
-	isValid(data: IProjectData): boolean {
+	isValid(data: Project.IData): boolean {
 		return true;
 	}
 
@@ -489,7 +489,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return "";
 	}
 
-	validateWithBuildSchema(data: IProjectData, platformName: string): void { }
+	validateWithBuildSchema(data: Project.IData, platformName: string): void { }
 
 	validatePropertyUsingBuildSchema(propertyName: string, propertyValue: string): void { }
 }

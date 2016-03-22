@@ -22,11 +22,11 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		private $injector: IInjector,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
-		private $cordovaProjectCapabilities: IProjectCapabilities) {
+		private $cordovaProjectCapabilities: Project.ICapabilities) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
@@ -38,7 +38,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
 	}
 
-	public get capabilities(): IProjectCapabilities {
+	public get capabilities(): Project.ICapabilities {
 		return this.$cordovaProjectCapabilities;
 	}
 
@@ -110,7 +110,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		properties.WP8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
 	}
 
-	public checkSdkVersions(platform: string, projectData: IProjectData): void {
+	public checkSdkVersions(platform: string, projectData: Project.IData): void {
 		if(this.$mobileHelper.isWP8Platform(platform) && projectData.WPSdk && projectData.WPSdk === "8.0" && semver.gte(projectData.FrameworkVersion,"3.7.0")) {
 			this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", projectData.FrameworkVersion);
 		}

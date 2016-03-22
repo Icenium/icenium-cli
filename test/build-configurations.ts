@@ -94,8 +94,8 @@ function createTestInjector() {
 	testInjector.register("projectConstants", require("../lib/common/appbuilder/project-constants").ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
-		validate: (data: IProjectData) => { /* mock */ },
-		validateWithBuildSchema: (data: IProjectData, platformName: string): void => {/* mock */},
+		validate: (data: Project.IData) => { /* mock */ },
+		validateWithBuildSchema: (data: Project.IData, platformName: string): void => {/* mock */},
 		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => {/* mock */}
 	});
 
@@ -167,7 +167,7 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
-	let projectConstants: IProjectConstants = new projectConstantsLib.ProjectConstants();
+	let projectConstants: Project.IConstants = new projectConstantsLib.ProjectConstants();
 	let options = testInjector.resolve("options");
 	let project = testInjector.resolve("project");
 	let fs = testInjector.resolve("fs");

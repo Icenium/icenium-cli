@@ -13,7 +13,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		private $fs: IFileSystem,
 		private $config: IConfiguration,
 		private $server: Server.IServer,
-		private $projectConstants: IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $resources: IResourceLoader) { }
 
 	public getPlugins(keywords: string[]): IBasicPluginInformation[] {
