@@ -39,7 +39,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $pluginsService: IPluginsService,
 		private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $prompter: IPrompter,
 		private $resources: IResourceLoader,

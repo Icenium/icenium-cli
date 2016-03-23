@@ -1,4 +1,4 @@
-require("./common/bootstrap");
+require("./common/appbuilder/appbuilder-bootstrap");
 $injector.require("logger", "./common/logger");
 $injector.require("staticConfig", "./config");
 $injector.require("config", "./config");
@@ -87,7 +87,6 @@ $injector.require("simulatorService", "./services/simulator-service");
 $injector.require("project", "./project");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
-$injector.require("projectConstants", "./project/project-constants");
 $injector.require("configFilesManager", "./project/config-files-manager");
 $injector.require("projectPropertiesService", "./services/project-properties-service");
 $injector.require("nameCommandParameter", "./commands/project/name-command-parameter");
@@ -163,7 +162,6 @@ $injector.require("sharedUserSettingsFileService", "./services/user-settings-ser
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
 $injector.require("analyticsSettingsService", "./services/analytics-settings-service");
 
-$injector.require("pathFilteringService", "./services/path-filtering");
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
 $injector.require("domainNameSystem", "./dns");
@@ -179,13 +177,10 @@ $injector.require("jsonSchemaConstants", "./json-schema/json-schema-constants");
 
 $injector.require("liveSyncService", "./services/livesync/livesync-service");
 $injector.require("liveSyncProvider", "./providers/livesync-provider");
-$injector.require("iosLiveSyncServiceLocator", "./services/livesync/ios-livesync-service");
-$injector.require("androidLiveSyncServiceLocator", "./services/livesync/android-livesync-service");
 $injector.require("appManagerService", "./services/appmanager-service");
 $injector.requireCommand("appmanager|livesync", "./commands/appmanager-livesync");
 
 $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
-$injector.require("mobilePlatformsCapabilities", "./mobile-platforms-capabilities");
 $injector.require("hostCapabilities", "./host-capabilities");
 
 $injector.require("commandsServiceProvider", "./providers/commands-service-provider");
@@ -206,9 +201,6 @@ $injector.require("imageService", "./services/image-service");
 $injector.requireCommand("resource|*list", "./commands/resource");
 $injector.requireCommand("resource|create", "./commands/resource");
 
-$injector.require("deviceAppDataProvider", "./providers/device-app-data-provider");
 $injector.require("nativeScriptResources", "./nativescript-resources");
 $injector.require("sysInfo", "./sys-info");
 $injector.require("messages", "./messages");
-
-$injector.require("projectFilesProvider", "./providers/project-files-provider");

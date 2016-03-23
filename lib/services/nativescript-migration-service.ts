@@ -63,7 +63,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $logger: ILogger,
 		private $nativeScriptResources: INativeScriptResources,
 		private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $prompter: IPrompter,
 		private $resourceDownloader: IResourceDownloader,
 		private $server: Server.IServer,

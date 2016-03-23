@@ -27,7 +27,7 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		private $logger: ILogger,
 		private $nativeScriptResources: INativeScriptResources,
 		private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $prompter: IPrompter,
 		private $server: Server.IServer) {

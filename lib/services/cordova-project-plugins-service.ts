@@ -37,7 +37,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		private $marketplacePluginsService: ICordovaPluginsService,
 		private $options: IOptions,
 		private $project: Project.IProject,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $prompter: IPrompter,
 		private $resources: IResourceLoader) { }
 

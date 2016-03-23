@@ -6,7 +6,7 @@ export class SetAndroidVersionCodeCommand extends SetProjectPropertyCommand impl
 	constructor($staticConfig: IStaticConfig,
 		$injector: IInjector,
 		private $logger: ILogger,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: Project.IConstants) {
 		super($staticConfig, $injector);
 	}
 

@@ -11,7 +11,7 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 
 	constructor(private $injector: IInjector,
 		private $screenBuilderService: IScreenBuilderService,
-		private $projectConstants: Project.IProjectConstants) {
+		private $projectConstants: Project.IConstants) {
 
 		this.mapCommandNameToFramework = {
 			hybrid: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova,

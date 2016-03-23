@@ -24,8 +24,11 @@ export class Project implements Project.IProject {
 	private cachedProjectDir: string = "";
 
 	private frameworkProject: Project.IFrameworkProject;
-	public projectData: IProjectData;
-	public configurationSpecificData: IDictionary<IProjectData>;
+	public projectData: Project.IData;
+	public configurationSpecificData: IDictionary<Project.IData>;
+	public get projectDir(): string {
+		return this.getProjectDir().wait();
+	}
 
 	constructor(private $config: IConfiguration,
 		private $errors: IErrors,
@@ -36,7 +39,7 @@ export class Project implements Project.IProject {
 		private $logger: ILogger,
 		private $multipartUploadService: IMultipartUploadService,
 		private $progressIndicator: IProgressIndicator,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $projectFilesManager: IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $server: Server.IServer,
@@ -55,7 +58,7 @@ export class Project implements Project.IProject {
 		}
 	}
 
-	public get capabilities(): IProjectCapabilities {
+	public get capabilities(): Project.ICapabilities {
 		return this.frameworkProject.capabilities;
 	}
 
@@ -868,7 +871,7 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private alterPropertiesForNewProject(properties: any, projectName: string): IProjectData {
+	private alterPropertiesForNewProject(properties: any, projectName: string): Project.IData {
 		properties.ProjectGuid = commonHelpers.createGUID();
 		properties.ProjectName = projectName;
 
@@ -884,7 +887,7 @@ export class Project implements Project.IProject {
 		}).future<void>()();
 	}
 
-	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<IProjectData> {
+	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<Project.IData> {
 		return ((): any => {
 			let projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
 				let extension = path.extname(file);
@@ -898,7 +901,7 @@ export class Project implements Project.IProject {
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");
 			return null;
-		}).future<IProjectData>()();
+		}).future<Project.IData>()();
 	}
 }
 $injector.register("project", Project);

@@ -4,7 +4,7 @@
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
-import projectConstantsLib = require("../lib/project/project-constants");
+import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 import {assert} from "chai";
 import Future = require("fibers/future");
 

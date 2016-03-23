@@ -46,12 +46,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return this._validPropertiesCache[key];
 	}
 
-	public validateWithBuildSchema(data: IProjectData, platformName: string): void {
+	public validateWithBuildSchema(data: Project.IData, platformName: string): void {
 		let buildSchemaName = this.getBuildSchemaName(platformName);
 		this.validate(data, { validationSchemaName: buildSchemaName, usePredefinedErrors: false });
 	}
 
-	public isValid(data: IProjectData): boolean {
+	public isValid(data: Project.IData): boolean {
 		let errors = this.getValidationErrors(data);
 		return _.keys(errors).length !== 0;
 	}
@@ -105,7 +105,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		_.each(invalidPlatforms, (error, platformName) => this.$logger.warn("The provided %s property is not valid for %s platform. %s", propertyName, platformName, error));
 	}
 
-	private getBuildSchemaValidationErrors(data: IProjectData, platformName: string): IStringDictionary {
+	private getBuildSchemaValidationErrors(data: Project.IData, platformName: string): IStringDictionary {
 		let buildSchemaName = this.getBuildSchemaName(platformName);
 		return this.getValidationErrors(data, {validationSchemaName: buildSchemaName, usePredefinedErrors: false});
 	}
@@ -114,7 +114,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		return util.format("%s%s", JsonSchemaValidator.BUILD_SCHEMA_ID_PREFIX, platformName);
 	}
 
-	public validate(data: IProjectData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}) {
+	public validate(data: Project.IData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}) {
 		let validationErrors = this.getValidationErrors(data, opts);
 		if(_.keys(validationErrors).length !== 0) {
 			let output = _.values(validationErrors).join("\n");
@@ -122,7 +122,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		}
 	}
 
-	private getValidationErrors(data: IProjectData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}): IStringDictionary {
+	private getValidationErrors(data: Project.IData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}): IStringDictionary {
 		opts = opts || {};
 		let validationSchema = this.tryResolveValidationSchemaCore(data.Framework, opts.validationSchemaName);
 		let schema = this.environment.createSchema(validationSchema);

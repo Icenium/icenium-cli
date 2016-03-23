@@ -16,24 +16,26 @@ import * as optionsLib from "../lib/options";
 import * as cordovaProjectLib from "./../lib/project/cordova-project";
 import * as nativeScriptProjectLib from "./../lib/project/nativescript-project";
 import * as projectFilesManagerLib from "../lib/common/services/project-files-manager";
-import * as projectConstantsLib from "../lib/project/project-constants";
+import * as projectConstantsLib from "../lib/common/appbuilder/project-constants";
 import * as jsonSchemaLoaderLib from "../lib/json-schema/json-schema-loader";
 import * as jsonSchemaResolverLib from "../lib/json-schema/json-schema-resolver";
 import * as jsonSchemaValidatorLib from "../lib/json-schema/json-schema-validator";
 import * as jsonSchemaConstantsLib from "../lib/json-schema/json-schema-constants";
 import * as childProcessLib from "../lib/common/child-process";
-import * as mobilePlatformsCapabilitiesLib from "../lib/mobile-platforms-capabilities";
+import * as mobilePlatformsCapabilitiesLib from "../lib/common/appbuilder/mobile-platforms-capabilities";
 import * as cordovaResourcesLib from "../lib/cordova-resource-loader";
 import * as projectPropertiesService from "../lib/services/project-properties-service";
 import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
 import Future = require("fibers/future");
 import * as hostInfoLib from "../lib/common/host-info";
-import {DeviceAppDataProvider} from "../lib/providers/device-app-data-provider";
-import {ProjectFilesProvider} from "../lib/providers/project-files-provider";
+import {DeviceAppDataProvider} from "../lib/common/appbuilder/providers/device-app-data-provider";
+import {ProjectFilesProvider} from "../lib/common/appbuilder/providers/project-files-provider";
 import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-app-data-factory";
 import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import {assert} from "chai";
+import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/project/nativescript-project-capabilities";
+import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
 
@@ -119,6 +121,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("httpClient", { /*intentionally empty body */ });
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
+	testInjector.register("nativeScriptProjectCapabilities", NativeScriptProjectCapabilities);
+	testInjector.register("cordovaProjectCapabilities", CordovaProjectCapabilities);
 
 	testInjector.register("pluginsService", {
 		getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
@@ -509,7 +513,7 @@ describe("project integration tests", () => {
 	});
 });
 
-function getProjectData(): IProjectData {
+function getProjectData(): Project.IData {
 	return {
 		"ProjectName": "testDisplayName",
 		"ProjectGuid": "{9916af8d-64cf-4d4b-9ddd-850931624535}",
@@ -726,7 +730,7 @@ describe("project unit tests", () => {
 	});
 	describe("updateCorePlugins", () => {
 		describe("modifies CorePlugins in configuration specific data, when it is specified", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 
 			beforeEach(() => {
 				projectData = getProjectData();
@@ -846,7 +850,7 @@ describe("project unit tests", () => {
 		});
 
 		describe("moves CorePlugins to config specific data when it is modified", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 			beforeEach(() => {
 				projectData = getProjectData();
 				projectData.CorePlugins = ["org.apache.cordova.battery-status"];
@@ -882,7 +886,7 @@ describe("project unit tests", () => {
 		});
 
 		describe("modifies CorePlugins in configuration specific data, even if it is NOT specified when CorePlugins are different in the configurations", () => {
-			let projectData: IProjectData;
+			let projectData: Project.IData;
 
 			beforeEach(() => {
 				projectData = getProjectData();

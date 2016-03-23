@@ -14,12 +14,13 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $jsonSchemaConstants: IJsonSchemaConstants,
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
-		private $projectConstants: Project.IProjectConstants,
+		private $projectConstants: Project.IConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
 		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $injector: IInjector,
+		private $nativeScriptProjectCapabilities: Project.ICapabilities,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
@@ -31,22 +32,8 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
 	}
 
-	public get capabilities(): IProjectCapabilities {
-		return {
-			build: true,
-			buildCompanion: true,
-			deploy: true,
-			simulate: false,
-			livesync: false,
-			livesyncCompanion: true,
-			updateKendo: false,
-			emulate: true,
-			publish: false,
-			uploadToAppstore: true,
-			canChangeFrameworkVersion: true,
-			imageGeneration: true,
-			wp8Supported: false
-		};
+	public get capabilities(): Project.ICapabilities {
+		return this.$nativeScriptProjectCapabilities;
 	}
 
 	public get defaultProjectTemplate(): string {
@@ -93,7 +80,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 	}
 
-	public checkSdkVersions(platform: string, projectData: IProjectData): void { /* this method is not applicable to {N} projects */ }
+	public checkSdkVersions(platform: string, projectData: Project.IData): void { /* this method is not applicable to {N} projects */ }
 
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {

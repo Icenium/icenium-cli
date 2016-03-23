@@ -13,7 +13,7 @@ import {DeviceDiscovery} from "../lib/common/mobile/mobile-core/device-discovery
 import {StaticConfig} from "../lib/config";
 import {Messages} from "../lib/common/messages/messages";
 import {MessagesService} from "../lib/common/services/messages-service";
-import {MobilePlatformsCapabilities} from "../lib/mobile-platforms-capabilities";
+import {MobilePlatformsCapabilities} from "../lib/common/appbuilder/mobile-platforms-capabilities";
 import {DevicePlatformsConstants} from "../lib/common/mobile/device-platforms-constants";
 import * as constants from "../lib/common/mobile/constants";
 import Future = require("fibers/future");

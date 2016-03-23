@@ -20,7 +20,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 		private $project: Project.IProject,
 		private $errors: IErrors,
 		private $nativeScriptMigrationService: IFrameworkMigrationService,
-		private $projectConstants: Project.IProjectConstants) { }
+		private $projectConstants: Project.IConstants) { }
 
 	public mandatory = true;
 

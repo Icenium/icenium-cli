@@ -9,7 +9,7 @@ import {assert} from "chai";
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
 let resourceLoaderFile = require("../lib/common/resource-loader");
-import projectConstantsLib = require("../lib/project/project-constants");
+import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 
 function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();
@@ -30,7 +30,7 @@ function createTestInjector(): IInjector {
 class SampleProject implements Project.IFrameworkProject {
 	public completeProjectePropertiesResult = false;
 	name: string;
-	capabilities: IProjectCapabilities;
+	capabilities: Project.ICapabilities;
 	defaultProjectTemplate: string;
 	liveSyncUrl: string;
 	requiredAndroidApiLevel: number;
@@ -61,7 +61,7 @@ class SampleProject implements Project.IFrameworkProject {
 		return null;
 	}
 	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */}
-	checkSdkVersions(platform: string, projectData: IProjectData): void {/* mock */ }
+	checkSdkVersions(platform: string, projectData: Project.IData): void {/* mock */ }
 	completeProjectProperties(properties: any): boolean {
 		return this.completeProjectePropertiesResult;
 	}

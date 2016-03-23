@@ -1,7 +1,5 @@
 declare module Project {
-	interface IProject {
-		projectData: IProjectData;
-		capabilities: IProjectCapabilities;
+	interface IProject extends IProjectBase {
 		configurationSpecificData: IDictionary<IDictionary<any>>;
 		configurations: string[];
 		requiredAndroidApiLevel: number;
@@ -18,7 +16,6 @@ declare module Project {
 		getNewProjectDir(): string;
 		getProjectSchema(): IFuture<any>;
 		getLiveSyncUrl(): string;
-		getProjectDir(): IFuture<string>;
 		getBuildConfiguration(): string;
 		getTempDir(extraSubdir?: string): IFuture<string>;
 		getProperty(propertyName: string, configuration: string): any;
@@ -80,7 +77,7 @@ declare module Project {
 
 	interface IFrameworkProject {
 		name: string;
-		capabilities: IProjectCapabilities;
+		capabilities: ICapabilities;
 		defaultProjectTemplate: string;
 		liveSyncUrl: string;
 		requiredAndroidApiLevel: number;
@@ -115,9 +112,9 @@ declare module Project {
 		 * Checks wether compatible sdk versions for the given platform are used.
 		 * Issues a warning if there are updated versions available.
 		 * @param {string}       platform    Android, iOS or WP8
-		 * @param {IProjectData} projectData The project's data, needed to check an SDK version
+		 * @param {Project.IData} projectData The project's data, needed to check an SDK version
 		 */
-		checkSdkVersions(platform: string, projectData: IProjectData): void;
+		checkSdkVersions(platform: string, projectData: Project.IData): void;
 		/**
 		 * Get information about plugin variables for current project.
 		 * @param {Project.IProjectInformation} projectInformation Information about the project - values of properties from .abproject and configuration specific .abproject.
@@ -166,35 +163,13 @@ declare module Project {
 	}
 
 	interface IProjectInformation {
-		projectData: IProjectData;
+		projectData: Project.IData;
 		configurationSpecificData: IDictionary<any>;
 		hasBuildConfigurations: boolean;
 	}
 
 	interface IConfigFilesManager {
 		availableConfigFiles: IDictionary<Project.IConfigurationFile>;
-	}
-
-	interface IProjectConstants {
-		PROJECT_FILE: string;
-		PROJECT_IGNORE_FILE: string;
-		DEBUG_CONFIGURATION_NAME: string;
-		DEBUG_PROJECT_FILE_NAME: string;
-		RELEASE_CONFIGURATION_NAME: string;
-		RELEASE_PROJECT_FILE_NAME: string;
-		CORE_PLUGINS_PROPERTY_NAME: string;
-		CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME: string;
-		TARGET_FRAMEWORK_IDENTIFIERS: ITargetFrameworkIdentifiers;
-		APPIDENTIFIER_PROPERTY_NAME: string;
-		EXPERIMENTAL_TAG: string;
-		NATIVESCRIPT_APP_DIR_NAME: string;
-		IMAGE_DEFINITIONS_FILE_NAME: string;
-		PACKAGE_JSON_NAME: string;
-	}
-
-	interface ITargetFrameworkIdentifiers {
-		Cordova: string;
-		NativeScript: string;
 	}
 
 	interface IConfigurationFile {
