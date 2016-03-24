@@ -1,23 +1,12 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import assert = require("assert");
+import { EnsureProjectCommand } from "./ensure-project-command";
 
-class BuildCommandBase implements ICommand {
-	constructor(private $project: Project.IProject,
-		protected $errors: IErrors) { }
-
-	allowedParameters: ICommandParameter[] = [];
-
-	execute(args: string[]): IFuture<void> {
-		assert.fail("","", "You should never get here. Please contact Telerik support and send the output of your command, executed with `--log trace`.");
-		return Future.fromResult();
-	}
-
+class BuildCommandBase extends EnsureProjectCommand {
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			this.$project.ensureProject();
+			super.canExecute(args).wait();
 			if(args.length) {
 				this.$errors.fail("This command doesn't accept parameters.");
 			}

@@ -2,6 +2,7 @@
 "use strict";
 
 import * as helpers from "../common/helpers";
+import { EnsureProjectCommand } from "./ensure-project-command";
 
 export class DeployHelper implements IDeployHelper {
 	constructor(protected $devicesService: Mobile.IDevicesService,
@@ -21,7 +22,7 @@ export class DeployHelper implements IDeployHelper {
 		if (!this.$project.capabilities.deploy) {
 			this.$errors.failWithoutHelp("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 		}
-		if(platform && !this.$mobileHelper.isPlatformSupported(platform)) {
+		if (platform && !this.$mobileHelper.isPlatformSupported(platform)) {
 			this.$errors.failWithoutHelp("On your current OS, you cannot deploy apps on connected %s devices.", this.$mobileHelper.normalizePlatformName(platform));
 		}
 
@@ -39,7 +40,7 @@ export class DeployHelper implements IDeployHelper {
 
 	private deployCore(platform: string): IFuture<void> {
 		return ((): void => {
-			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device}).wait();
+			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = platform || this.$devicesService.platform;
 			let packageName = this.$project.projectData.AppIdentifier;
 			let packageFile: string = null;
@@ -92,8 +93,12 @@ export class DeployHelper implements IDeployHelper {
 }
 $injector.register("deployHelper", DeployHelper);
 
-export class DeployCommand implements ICommand {
-	constructor(private $deployHelper: IDeployHelper) { }
+export class DeployCommand extends EnsureProjectCommand {
+	constructor(private $deployHelper: IDeployHelper,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -103,9 +108,13 @@ export class DeployCommand implements ICommand {
 }
 $injector.registerCommand("deploy|*devices", DeployCommand);
 
-export class DeployAndroidCommand implements ICommand {
+export class DeployAndroidCommand extends EnsureProjectCommand {
 	constructor(private $deployHelper: IDeployHelper,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -115,9 +124,13 @@ export class DeployAndroidCommand implements ICommand {
 }
 $injector.registerCommand("deploy|android", DeployAndroidCommand);
 
-export class DeployIosCommand implements ICommand {
+export class DeployIosCommand extends EnsureProjectCommand {
 	constructor(private $deployHelper: IDeployHelper,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {	}
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -127,10 +140,14 @@ export class DeployIosCommand implements ICommand {
 }
 $injector.registerCommand("deploy|ios", DeployIosCommand);
 
-export class DeployWP8Command implements ICommand {
+export class DeployWP8Command extends EnsureProjectCommand {
 	constructor(private $deployHelper: IDeployHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $config: Config.IConfig) { }
+		private $config: Config.IConfig,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
