@@ -710,9 +710,9 @@ export class Project implements Project.IProject {
 			if(fileSize > Project.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
 				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000, {surpressTrailingNewLine: true}).wait();
-				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey), 2000).wait();
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey, true), 2000).wait();
 			} else {
-				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName,
+				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName, true,
 					this.$fs.createReadStream(projectZipFile)), 2000).wait();
 			}
 

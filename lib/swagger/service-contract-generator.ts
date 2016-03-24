@@ -110,10 +110,13 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 
 	private getNameWithoutSlash(name: string) {
 		let result = name;
-		let index = name.indexOf("/");
-		if(index !== -1) {
-			result = name.substring(0, index) + name[index + 1].toUpperCase() + name.substr(index + 2);
-		}
+		let index: number;
+		do {
+			index = result.indexOf("/");
+			if(~index) {
+				result = result.substring(0, index) + result[index + 1].toUpperCase() + result.substr(index + 2);
+			}
+		} while(~index);
 
 		return result;
 	}
@@ -171,6 +174,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 	private generateService(swaggerService: Swagger.ISwaggerServiceContract, serverModuleName: string): CodeGeneration.IService {
 		let swaggerServiceContractName = this.getSwaggerServiceContractName(swaggerService);
 		let serviceInterface = new Block(`interface ${swaggerServiceContractName}`);
+
 		let serviceImplementation = new Block(`export class ${this.getSwaggerServiceName(swaggerService)} implements ${serverModuleName}.${swaggerServiceContractName}`);
 		serviceImplementation.addBlock(new Block(`constructor(private $serviceProxy: ${serverModuleName}.IServiceProxy)`));
 

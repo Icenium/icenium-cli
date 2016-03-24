@@ -77,7 +77,7 @@ class AppManagerService implements IAppManagerService {
 				this.$logger.warn("You have not set the --publish switch. Your users will not receive a push notification.");
 			}
 
-			let uploadedAppData: Server.UploadedAppData = this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait();
+			let uploadedAppData: Server.UploadedAppData = this.$server.tam.uploadApplication1(projectName, projectName, projectPath, publishSettings).wait();
 			this.$logger.info("Successfully uploaded package.");
 
 			if(this.$options.publish && this.$options.public){
