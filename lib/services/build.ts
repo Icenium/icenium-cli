@@ -32,12 +32,13 @@ export class BuildService implements Project.IBuildService {
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions,
 		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $projectConstants: Project.IConstants) { }
 
 	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
-			if(urlKind !== "manifest" && urlKind !== "package") {
+			if (urlKind !== "manifest" && urlKind !== "package") {
 				throw new Error("urlKind must be either 'manifest' or 'package'");
 			}
 
@@ -50,7 +51,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
 			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
-			if(urlKind === "manifest") {
+			if (urlKind === "manifest") {
 				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
 			}
 
@@ -65,7 +66,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 			this.$logger.printInfoMessageOnSameLine("Building...");
 
-			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration,{ AppIdentifier: buildProperties.AppIdentifier }).wait();
+			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier }).wait();
 
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
 			buildProperties.LiveSyncToken = liveSyncToken;
@@ -116,21 +117,21 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.adjustBuildProperties(buildProperties);
 
-			if(settings.platform === "Android") {
+			if (settings.platform === "Android") {
 				buildProperties.AndroidPermissions = projectData.AndroidPermissions;
 				buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
 				buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
 
 				let certificateData: ICryptographicIdentity;
-				if(this.$options.certificate) {
+				if (this.$options.certificate) {
 					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
-				} else if(settings.buildForTAM) {
+				} else if (settings.buildForTAM) {
 					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
 						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
-				} else if(settings.configuration === "Release" ) {
+				} else if (settings.configuration === "Release") {
 					certificateData = this.$identityManager.findReleaseCertificate().wait();
 
-					if(!certificateData) {
+					if (!certificateData) {
 						this.$logger.warn("Cannot find an applicable Google Play certificate to " +
 							"code sign this app. You will not be able to publish this app to " +
 							"Google Play. To create a Google Play certificate, run\n" +
@@ -138,7 +139,7 @@ export class BuildService implements Project.IBuildService {
 					}
 				}
 
-				if(certificateData) {
+				if (certificateData) {
 					if (certificateData.isiOS) {
 						this.$errors.failWithoutHelp("The certificate you have chosen is ineligible for the Android platform.");
 					}
@@ -151,14 +152,14 @@ export class BuildService implements Project.IBuildService {
 
 				let result = this.beginBuild(buildProperties).wait();
 				return result;
-			} else if(settings.platform === "iOS") {
+			} else if (settings.platform === "iOS") {
 				let appIdentifier = projectData.AppIdentifier;
 
 				let configFileContent = this.$project.getConfigFileContent("ios-info").wait();
-				if(configFileContent) {
+				if (configFileContent) {
 					let parsed = plist.parse(configFileContent);
 					let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
-					if(cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
+					if (cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
 						appIdentifier = cfBundleIdentifier;
 					}
 				}
@@ -171,13 +172,13 @@ export class BuildService implements Project.IBuildService {
 				let completeAutoselect = (!this.$options.provision && !this.$options.certificate);
 
 				let provisionData: IProvision;
-				if(this.$options.provision) {
+				if (this.$options.provision) {
 					provisionData = this.$identityManager.findProvision(this.$options.provision).wait();
-					if(settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
+					if (settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
 						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
 					}
-				} else if(!settings.buildForiOSSimulator) {
+				} else if (!settings.buildForiOSSimulator) {
 					let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
 					try {
 						provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
@@ -198,15 +199,15 @@ export class BuildService implements Project.IBuildService {
 				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
 
 				let certificateData: ICryptographicIdentity;
-				if(this.$options.certificate) {
+				if (this.$options.certificate) {
 					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
-				} else if(!settings.buildForiOSSimulator) {
+				} else if (!settings.buildForiOSSimulator) {
 					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
 					this.$options.certificate = certificateData.Alias;
 				}
 				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
 
-				if(!completeAutoselect) {
+				if (!completeAutoselect) {
 					let iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
 						appIdentifier: appIdentifier,
 						deviceIdentifier: settings.device ? settings.device.deviceInfo.identifier : null
@@ -215,29 +216,29 @@ export class BuildService implements Project.IBuildService {
 						{ provisionOption: this.$options.provision, certificateOption: this.$options.certificate }).wait();
 				}
 
-				if(provisionData) {
+				if (provisionData) {
 					buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
 				}
-				if(certificateData) {
+				if (certificateData) {
 					buildProperties.iOSCodesigningIdentity = certificateData.Alias;
 				}
 
 				let buildResult = this.beginBuild(buildProperties).wait();
-				if(provisionData) {
+				if (provisionData) {
 					buildResult.provisionType = provisionData.ProvisionType;
 				}
 				return buildResult;
-			} else if(settings.platform === "WP8") {
+			} else if (settings.platform === "WP8") {
 				let buildCompanyHubApp = !settings.downloadFiles;
-				if(this.$project.projectData.WPSdk === "8.1" && ((this.$options.release && settings.downloadFiles) || settings.buildForTAM)) {
+				if (this.$project.projectData.WPSdk === "8.1" && ((this.$options.release && settings.downloadFiles) || settings.buildForTAM)) {
 					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
 						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
-						"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
+							"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
 				}
 
-				if(buildCompanyHubApp) {
+				if (buildCompanyHubApp) {
 					buildProperties.WP8CompanyHubApp = true;
-					if(settings.showWp8SigningMessage === undefined) {
+					if (settings.showWp8SigningMessage === undefined) {
 						this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
 							" deployed using a QR code. Use the --download switch if you want to cable deploy" +
 							" or publish the built app package.");
@@ -255,18 +256,18 @@ export class BuildService implements Project.IBuildService {
 	private beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
 			Object.keys(buildProperties).forEach((prop) => {
-				if(buildProperties[prop] === undefined) {
+				if (buildProperties[prop] === undefined) {
 					this.$logger.warn(`Build property '${prop}' is undefined. The property is optional, but you can set it by running '${this.$staticConfig.CLIENT_NAME.toLowerCase()} prop set ${prop} <value>'.`);
 				}
 
-				if(_.isArray(buildProperties[prop])) {
+				if (_.isArray(buildProperties[prop])) {
 					buildProperties[prop] = buildProperties[prop].join(";");
 				}
 			});
 
 			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
-			if(result.output) {
+			if (result.output) {
 				let buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
 				this.$fs.writeFile(buildLogFilePath, result.output).wait();
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
@@ -274,7 +275,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.debug(result.buildResults);
 
-			if(result.errors.length) {
+			if (result.errors.length) {
 				this.$logger.error("Build errors: %s", util.inspect(result.errors));
 			}
 
@@ -287,7 +288,7 @@ export class BuildService implements Project.IBuildService {
 
 	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): IFuture<void> {
 		return (() => {
-			if(!packageDefs.length) {
+			if (!packageDefs.length) {
 				return;
 			}
 
@@ -313,7 +314,7 @@ export class BuildService implements Project.IBuildService {
 	}
 
 	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
-		return ((): Server.IPackageDef[]=> {
+		return ((): Server.IPackageDef[] => {
 			this.$project.ensureProject();
 
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
@@ -328,21 +329,21 @@ export class BuildService implements Project.IBuildService {
 			let buildResult = this.requestCloudBuild(settings).wait();
 			let packageDefs = buildResult.packageDefs;
 
-			if((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
+			if ((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
 				this.$logger.info("Package built with '%s' provision type. Downloading package, instead of generating QR code.", buildResult.provisionType);
 				this.$logger.info("Deploy manually to your device using iTunes.");
 				settings.showQrCodes = false;
 				settings.downloadFiles = true;
 			}
 
-			if(!packageDefs.length) {
+			if (!packageDefs.length) {
 				this.$errors.fail("Build failed. For more information read the build log.");
 			}
 
-			if(settings.showQrCodes) {
+			if (settings.showQrCodes) {
 				let urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
 				let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
-				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) =>  !def.disposition || def.disposition === "BuildResult");
+				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
 				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
 					let liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
@@ -363,7 +364,7 @@ export class BuildService implements Project.IBuildService {
 					};
 				});
 
-				if(settings.platform === "WP8") {
+				if (settings.platform === "WP8") {
 					let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
 					let aetDef: IPackageDownloadViewModel = {
 						qrUrl: aetUrl,
@@ -377,10 +378,15 @@ export class BuildService implements Project.IBuildService {
 				this.showQRCodes(packageDownloadViewModels).wait();
 			}
 
-			if(settings.downloadFiles) {
+			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					let targetFileName = settings.downloadedFilePath
-						|| path.join(this.$project.getProjectDir().wait(), path.basename(pkg.solutionPath));
+					let targetFileName: string;
+					if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
+						targetFileName = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, path.basename(pkg.solutionPath));
+					} else {
+						targetFileName = settings.downloadedFilePath
+							|| path.join(this.$project.getProjectDir().wait(), path.basename(pkg.solutionPath));
+					}
 
 					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
 					let targetFile = this.$fs.createWriteStream(targetFileName);
@@ -422,11 +428,11 @@ export class BuildService implements Project.IBuildService {
 		}).future<string>()();
 	}
 
-	public executeBuild(platform: string, opts?: {buildForiOSSimulator?: boolean}): IFuture<void> {
+	public executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
 
-			if(!this.$project.capabilities.build) {
+			if (!this.$project.capabilities.build) {
 				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 			}
 
@@ -434,15 +440,15 @@ export class BuildService implements Project.IBuildService {
 		}).future<void>()();
 	}
 
-	private executeBuildCore(platform: string, opts?: {buildForiOSSimulator?: boolean}): IFuture<void> {
+	private executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 
-			if(this.$options.saveTo) {
+			if (this.$options.saveTo) {
 				this.$options.download = true;
 			}
 
-			if(this.$options.download && this.$options.companion) {
+			if (this.$options.download && this.$options.companion) {
 				this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
 			}
 
@@ -450,10 +456,10 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.checkSdkVersions(platform);
 
-			if(this.$options.companion) {
+			if (this.$options.companion) {
 				this.deployToIon(platform).wait();
 			} else {
-				if(!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
+				if (!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
 					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
 					this.$options.download = true;
 				}
@@ -473,7 +479,7 @@ export class BuildService implements Project.IBuildService {
 	private deployToIon(platform: string): IFuture<void> {
 		return (() => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
-			if(!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
+			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
 				this.$errors.fail("The companion app is not available on %s.", platform);
 			}
 
