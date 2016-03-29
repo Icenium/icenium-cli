@@ -2,13 +2,17 @@
 "use strict";
 
 import * as path from "path";
+import { EnsureProjectCommand } from "./ensure-project-command";
 
-export class EmulateAndroidCommand implements ICommand {
-	constructor(private $project: Project.IProject,
-				private $buildService: Project.IBuildService,
-				private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-				private $options: IOptions) { }
+export class EmulateAndroidCommand extends EnsureProjectCommand {
+	constructor(private $buildService: Project.IBuildService,
+		private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $options: IOptions,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
@@ -31,7 +35,7 @@ export class EmulateAndroidCommand implements ICommand {
 
 	public canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
-			this.$project.ensureProject();
+			super.canExecute(args).wait();
 			this.$androidEmulatorServices.checkDependencies().wait();
 			return true;
 		}).future<boolean>()();
@@ -39,14 +43,16 @@ export class EmulateAndroidCommand implements ICommand {
 }
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
 
-export class EmulateIosCommand implements ICommand {
+export class EmulateIosCommand extends EnsureProjectCommand {
 	constructor(private $fs: IFileSystem,
-				private $project: Project.IProject,
-				private $buildService: Project.IBuildService,
-				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-				private $options: IOptions) {
-		this.$project.ensureProject();
+		private $buildService: Project.IBuildService,
+		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $options: IOptions,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -67,23 +73,17 @@ export class EmulateIosCommand implements ICommand {
 
 		}).future<void>()();
 	}
-
-	public canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
-			this.$project.ensureProject();
-			return true;
-		}).future<boolean>()();
-	}
 }
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
 
-export class EmulateWp8Command implements ICommand {
-	constructor(private $project: Project.IProject,
-		private $buildService: Project.IBuildService,
+export class EmulateWp8Command extends EnsureProjectCommand {
+	constructor(private $buildService: Project.IBuildService,
 		private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $config: Config.IConfig) {
-		this.$project.ensureProject();
+		private $config: Config.IConfig,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -106,13 +106,6 @@ export class EmulateWp8Command implements ICommand {
 
 			this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath).wait();
 		}).future<void>()();
-	}
-
-	public canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
-			this.$project.ensureProject();
-			return true;
-		}).future<boolean>()();
 	}
 
 	public isDisabled = this.$config.ON_PREM;

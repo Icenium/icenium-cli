@@ -1,8 +1,14 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-class LiveSyncDevicesCommand implements ICommand {
-	constructor(private $liveSyncService: ILiveSyncService) { }
+import { EnsureProjectCommand } from "./ensure-project-command";
+
+class LiveSyncDevicesCommand extends EnsureProjectCommand {
+	constructor(private $liveSyncService: ILiveSyncService,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 	execute(args: string[]): IFuture<void> {
 		return this.$liveSyncService.livesync();
 	}
@@ -11,9 +17,13 @@ class LiveSyncDevicesCommand implements ICommand {
 }
 $injector.registerCommand(["livesync|*devices", "live-sync|*devices"], LiveSyncDevicesCommand);
 
-class LiveSyncAndroidCommand implements ICommand {
+class LiveSyncAndroidCommand extends EnsureProjectCommand {
 	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 	execute(args: string[]): IFuture<void> {
 		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
 	}
@@ -22,9 +32,13 @@ class LiveSyncAndroidCommand implements ICommand {
 }
 $injector.registerCommand(["livesync|android", "live-sync|android"], LiveSyncAndroidCommand);
 
-class LiveSyncIosCommand implements ICommand {
+class LiveSyncIosCommand extends EnsureProjectCommand {
 	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 	execute(args: string[]): IFuture<void> {
 		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
 	}
@@ -33,10 +47,14 @@ class LiveSyncIosCommand implements ICommand {
 }
 $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand);
 
-class LiveSyncWP8Command implements ICommand {
+class LiveSyncWP8Command extends EnsureProjectCommand {
 	constructor(private $liveSyncService: ILiveSyncService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $config: Config.IConfig) { }
+		private $config: Config.IConfig,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 	execute(args: string[]): IFuture<void> {
 		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
 	}

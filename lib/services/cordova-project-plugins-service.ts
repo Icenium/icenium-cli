@@ -375,7 +375,8 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		return (() => {
 			let plugin = this.getBestMatchingPlugin(pluginName, version);
 			let pluginData = <IMarketplacePluginData>plugin.data;
-			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+			let cordovaPluginVariables: any = JSON.parse(JSON.stringify(originalPluginVariables));
 
 			let variables = <string[]>pluginData.Variables;
 			if(variables && variables.length > 0) {
@@ -456,7 +457,6 @@ export class CordovaProjectPluginsService implements IPluginsService {
 						if (pluginData && pluginData.data) {
 							let projectDataRecord = pluginData.toProjectDataRecord();
 							let configurations = this.$project.configurationSpecificData;
-
 							_.each(configurations, (configData: IDictionary<any>, configuration:string) => {
 								if (configData) {
 									let corePlugins = configData[CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME];
@@ -694,7 +694,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	 */
 	private getPluginVariableFromVarOption(variableName: string, configuration: string): any {
 		let varOption = this.$options.var;
-		configuration = configuration.toLowerCase();
+		configuration = configuration && configuration.toLowerCase();
 		let lowerCasedVariableName = variableName.toLowerCase();
 		if(varOption) {
 			let configVariableValue: string;

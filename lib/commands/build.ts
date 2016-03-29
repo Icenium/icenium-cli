@@ -1,32 +1,9 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-import Future = require("fibers/future");
-import assert = require("assert");
+import { EnsureProjectCommand } from "./ensure-project-command";
 
-class BuildCommandBase implements ICommand {
-	constructor(private $project: Project.IProject,
-		protected $errors: IErrors) { }
-
-	allowedParameters: ICommandParameter[] = [];
-
-	execute(args: string[]): IFuture<void> {
-		assert.fail("","", "You should never get here. Please contact Telerik support and send the output of your command, executed with `--log trace`.");
-		return Future.fromResult();
-	}
-
-	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
-			this.$project.ensureProject();
-			if(args.length) {
-				this.$errors.fail("This command doesn't accept parameters.");
-			}
-			return true;
-		}).future<boolean>()();
-	}
-}
-
-export class BuildAndroidCommand extends BuildCommandBase {
+export class BuildAndroidCommand extends EnsureProjectCommand {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
@@ -41,7 +18,7 @@ export class BuildAndroidCommand extends BuildCommandBase {
 }
 $injector.registerCommand("build|android", BuildAndroidCommand);
 
-export class BuildIosCommand extends BuildCommandBase {
+export class BuildIosCommand extends EnsureProjectCommand {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $options: IOptions,
@@ -56,7 +33,7 @@ export class BuildIosCommand extends BuildCommandBase {
 }
 $injector.registerCommand("build|ios", BuildIosCommand);
 
-export class BuildWP8Command extends BuildCommandBase {
+export class BuildWP8Command extends EnsureProjectCommand {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
