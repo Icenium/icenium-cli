@@ -1,8 +1,13 @@
 ///<reference path="../.d.ts"/>
 "use strict";
 
-export class ImportProjectCommand implements ICommand {
-	constructor(private $project: Project.IProject) { }
+import { EnsureProjectCommand } from "./ensure-project-command";
+
+export class ImportProjectCommand extends EnsureProjectCommand {
+	constructor($project: Project.IProject,
+		$errors: IErrors) {
+		super($project, $errors);
+	}
 
 	allowedParameters: ICommandParameter[] = [];
 
