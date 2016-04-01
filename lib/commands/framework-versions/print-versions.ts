@@ -14,7 +14,9 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 			let migrationService = this.$project.projectData.Framework === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
 			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks().wait();
 			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion).wait();
-			this.$logger.info(`Your project is using version ${projectFrameworkVersion}`);
+			if (projectFrameworkVersion) {
+				this.$logger.info(`Your project is using version ${projectFrameworkVersion}`);
+			}
 
 			this.$logger.info("Supported versions are: ");
 			_.each(supportedVersions, (sv: IFrameworkVersion) => {
@@ -27,12 +29,12 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 
 	public canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			if(args && args.length > 0) {
+			if (args && args.length > 0) {
 				this.$errors.fail("This command does not accept parameters.");
 			}
 
 			this.$project.ensureProject();
-			if(!this.$project.capabilities.canChangeFrameworkVersion) {
+			if (!this.$project.capabilities.canChangeFrameworkVersion) {
 				this.$errors.failWithoutHelp(`This command is not applicable to ${this.$project.projectData.Framework} projects.`);
 			}
 
