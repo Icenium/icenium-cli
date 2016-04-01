@@ -35,7 +35,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
 		private $logger: ILogger,
-		private $loginManager:ILoginManager,
+		private $loginManager: ILoginManager,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $pluginsService: IPluginsService,
 		private $project: Project.IProject,
@@ -49,7 +49,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	private get migrationData(): IFuture<MigrationData> {
 		return (() => {
-			if(!this._migrationData) {
+			if (!this._migrationData) {
 				this._migrationData = this.$fs.readJson(this.cordovaMigrationFile).wait();
 			}
 
@@ -63,12 +63,14 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public getDisplayNameForVersion(version: string): IFuture<string> {
 		return ((): string => {
-			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: IFrameworkVersion) => fw.version === version);
-			if(framework) {
+			let supportedFrameworks: IFrameworkVersion[] = this.getSupportedFrameworks().wait();
+			let framework = _.find(supportedFrameworks, (fw: IFrameworkVersion) => fw.version === version);
+			if (framework) {
 				return framework.displayName;
 			}
 
-			this.$errors.fail("Cannot find version %s in the supported versions.", version);
+			this.$logger.error(`Version ${version} in not supported.`);
+			return null;
 		}).future<string>()();
 	}
 
@@ -115,9 +117,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let defaultEnabledPluginsIncludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsIncludeRegex);
 			let defaultEnabledPluginsExcludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsExcludeRegex);
 			let newEnabledPlugins = _(supportedPlugins)
-					.filter(p => p.match(defaultEnabledPluginsIncludeRegex) && !p.match(defaultEnabledPluginsExcludeRegex))
-					.difference(sourceSupportedPluginsRenamed)
-					.value();
+				.filter(p => p.match(defaultEnabledPluginsIncludeRegex) && !p.match(defaultEnabledPluginsExcludeRegex))
+				.difference(sourceSupportedPluginsRenamed)
+				.value();
 
 			return _.union(plugins, newEnabledPlugins);
 		}).future<string[]>()();
@@ -139,7 +141,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				integratedPlugins[version] = json.IntegratedPlugins[version];
 			});
 			let supportedFrameworkVersion: IFrameworkVersion[] = _(json.SupportedFrameworkVersions)
-				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version)}; })
+				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version) }; })
 				.filter(fv => _.contains(cliSupportedVersions, fv.version))
 				.value();
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
@@ -155,38 +157,38 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
 			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
-			this.$httpClient.httpRequest({ url: cordovaJsonPath, pipeTo: file}).wait();
+			this.$httpClient.httpRequest({ url: cordovaJsonPath, pipeTo: file }).wait();
 			fileEnd.wait();
 		}).future<void>()();
 	}
 
 	public onWPSdkVersionChanging(newVersion: string): IFuture<void> {
 		return ((): void => {
-			if(newVersion === this.$project.projectData["WPSdk"]) {
+			if (newVersion === this.$project.projectData["WPSdk"]) {
 				return;
 			}
 
 			let validWPSdks = this.getSupportedWPFrameworks().wait();
-			if(!_.contains(validWPSdks, newVersion)) {
+			if (!_.contains(validWPSdks, newVersion)) {
 				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
 			}
 
 			this.$logger.info("Migrating to WPSdk version %s", newVersion);
-			if(helpers.versionCompare(newVersion, "8.0") > 0) {
+			if (helpers.versionCompare(newVersion, "8.0") > 0) {
 				// at least Cordova 3.7 is required
-				if(helpers.versionCompare(this.$project.projectData.FrameworkVersion, "3.7.0") < 0) {
+				if (helpers.versionCompare(this.$project.projectData.FrameworkVersion, "3.7.0") < 0) {
 					let cordovaVersions = this.getSupportedFrameworks().wait();
 
 					// Find last framework which is not experimental.
 					let selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
-					if(helpers.versionCompare(selectedFramework.version, "3.7.0") < 0) {
+					if (helpers.versionCompare(selectedFramework.version, "3.7.0") < 0) {
 						// if latest stable framework version is below 3.7.0, find last 'Experimental'.
 						selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.version) <= 0);
 					}
 
 					let promptStr = `You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`;
 					let shouldUpdateFramework = this.$prompter.confirm(promptStr).wait();
-					if(shouldUpdateFramework) {
+					if (shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.version).wait();
 						this.$project.projectData.FrameworkVersion = selectedFramework.version;
 					} else {
@@ -199,16 +201,16 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
 		return ((): void => {
-			if(newVersion === this.$project.projectData.FrameworkVersion) {
+			if (newVersion === this.$project.projectData.FrameworkVersion) {
 				return;
 			}
 
 			let versionDisplayName = this.getDisplayNameForVersion(newVersion).wait();
 			this.$project.ensureAllPlatformAssets().wait();
 
-			if(this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
+			if (this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
 				let shouldUpdateWPSdk = this.$prompter.confirm(`You cannot build with the Windows Phone ${this.$project.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`).wait();
-				if(shouldUpdateWPSdk) {
+				if (shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
 					this.$project.projectData.WPSdk = "8.0";
 				} else {
@@ -236,7 +238,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			let cordovaJsonData = this.getCordovaJsonData().wait();
 
-			if(semver.gte(newVersion, cordovaJsonData.forceHardwareAccelerationAfter)) {
+			if (semver.gte(newVersion, cordovaJsonData.forceHardwareAccelerationAfter)) {
 				this.$project.projectData.AndroidHardwareAcceleration = "true";
 				this.$project.saveProject().wait();
 			}
@@ -262,7 +264,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	public getSupportedPlugins(): IFuture<string[]> {
 		return (() => {
 			let version: string;
-			if(this.$project.projectData) {
+			if (this.$project.projectData) {
 				version = this.$project.projectData.FrameworkVersion;
 			} else {
 				let selectedFramework = _.findLast(this.getSupportedFrameworks().wait(), (sv: IFrameworkVersion) => sv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
@@ -290,7 +292,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					backedUpFiles.push(cordovaJsFileName);
 					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
 				});
-			} catch(error) {
+			} catch (error) {
 				_.each(backedUpFiles, file => {
 					this.$logger.trace("Reverting %s", file);
 					this.$fs.copyFile(file + backupSuffix, file).wait();
@@ -318,11 +320,11 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}).future<void>()();
 	}
 
-	private getSupportedWPFrameworks(): IFuture<string[]>{
-		return ((): string[]=> {
+	private getSupportedWPFrameworks(): IFuture<string[]> {
+		return ((): string[] => {
 			let validValues: string[] = [];
 			let projectSchema = this.$project.getProjectSchema().wait();
-			if(projectSchema) {
+			if (projectSchema) {
 				validValues = this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]).wait();
 			}
 
@@ -337,7 +339,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	private applyTransitions(plugins: string[], transitions: any[]): string[] {
 		return _.map(plugins, plugin => {
 			_.each(transitions, transition => {
-				if(transition.from === plugin) {
+				if (transition.from === plugin) {
 					plugin = transition.to;
 				}
 			});
