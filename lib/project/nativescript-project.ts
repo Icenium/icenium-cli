@@ -84,7 +84,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 
 	public projectTemplatesString(): IFuture<string> {
 		return ((): string => {
-			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/).wait();
+			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/, { "blank": "JavaScript.Blank" }).wait();
 			return templateStrings.replace(/TS[.]/g, "TypeScript.");
 		}).future<string>()();
 	}

@@ -297,7 +297,7 @@ export class TemplateServiceStub implements ITemplatesService {
 		return path.join(__dirname, "../resources/ItemTemplates");
 	}
 
-	getTemplatesString(regexp: RegExp): IFuture<string> {
+	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
 		return undefined;
 	}
 

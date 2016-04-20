@@ -27,12 +27,15 @@ export class TemplatesService implements ITemplatesService {
 		return this.$resources.resolvePath("ItemTemplates");
 	}
 
-	public getTemplatesString(regexp: RegExp): IFuture<string> {
+	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
 		return (() => {
 			let templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
 				.map((file) => {
-					let match = file.match(regexp);
-					return match && match[1];
+					let match = file.match(regexp),
+						templateName = match && match[1],
+						replacementName = replacementNames[templateName.toLowerCase()];
+
+					return replacementName ? replacementName : templateName;
 				})
 				.filter((file: string) => file !== null)
 				.value();

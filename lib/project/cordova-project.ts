@@ -122,7 +122,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public projectTemplatesString(): IFuture<string> {
-		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/);
+		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/, { "blank": "JavaScript.Blank", "kendoui.empty": "KendoUI.Blank" });
 	}
 
 	public getProjectFileSchema(): IDictionary<any> {

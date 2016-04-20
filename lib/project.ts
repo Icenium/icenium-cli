@@ -16,7 +16,8 @@ export class Project implements Project.IProject {
 	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 	private static INDENTATION = "     ";
 	private static UI_TEMPLATE_NAMES:IStringDictionary = {
-		"kendoui.blank": "KendoUI.Empty"
+		"kendoui.blank": "KendoUI.Empty",
+		"javascript.blank": "Blank"
 	};
 
 	private _hasBuildConfigurations: boolean = false;
@@ -871,12 +872,7 @@ export class Project implements Project.IProject {
 				}
 			} else {
 				let templates = this.frameworkProject.projectTemplatesString().wait();
-
-				let message = util.format("The specified template %s does not exist. You can use any of the following templates: %s",
-					this.$options.template,
-					EOL,
-					templates);
-				this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
+				this.$errors.failWithoutHelp(`The specified template ${this.$options.template} does not exist. You can use any of the following templates:${EOL}${templates}`);
 			}
 		}).future<void>()();
 	}
