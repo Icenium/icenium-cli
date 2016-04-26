@@ -85,6 +85,7 @@ function createTestInjector(): IInjector {
 	});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
+	testInjector.register("ionicProjectTransformator", {});
 	testInjector.register("projectNameValidator", mockProjectNameValidator);
 	testInjector.register("loginManager", stubs.LoginManager);
 	testInjector.register("templatesService", stubs.TemplateServiceStub);

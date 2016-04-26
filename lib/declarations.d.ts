@@ -12,7 +12,7 @@ declare module Server {
 	}
 
 	interface IAppBuilderServiceProxy extends IServiceProxy {
-		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T>
+		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T>
 	}
 
 	interface IServiceContractProvider {
@@ -166,7 +166,7 @@ interface IProjectPropertiesService {
 	 * @return {IData} Modified data. In case configurationSpecificData exists, returns it, else returns projectData.
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
 	 */
-	removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData) : Project.IData;
+	removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData): Project.IData;
 
 	/**
 	 * Updates CorePlugins property value in all configurations.
@@ -229,7 +229,7 @@ interface IServerConfiguration {
 }
 
 interface IExtensionPlatformServices extends IRunValidator {
-	packageName : string;
+	packageName: string;
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
 }
@@ -658,7 +658,7 @@ interface IPluginInfoBase {
 	/**
 	 * Variables that have to be set in the application in order to be able to use the plugin correctly.
 	 */
-	Variables?: string[]|IDictionary<INativeScriptPluginVariable>;
+	Variables?: string[] | IDictionary<INativeScriptPluginVariable>;
 }
 
 interface IPluginVersion {
@@ -900,7 +900,7 @@ interface IKendoUIFilterOptions {
  * Describes the migration data for NativeScript project.
  * This data is written in resource file.
  */
-interface INativeScriptMigrationData{
+interface INativeScriptMigrationData {
 	/**
 	 * Versions that cannot be used for building the project and cannot be migrated to other ones.
 	 */
@@ -1120,4 +1120,47 @@ interface ITapAppData {
 	 * This property is set client side, it does not exist in TAP.
 	 */
 	isApp: boolean;
+}
+
+/**
+ * Describes mothods for transforming Ionic projects.
+ */
+interface IIonicProjectTransformator {
+	transformToAppBuilderProject(createBackup: boolean): IFuture<void>
+}
+
+declare module ConfigXmlFile {
+	interface IResource {
+		src: string;
+		density?: string;
+		width?: string;
+		height?: string;
+	}
+
+	interface IPlatform {
+		name: string;
+		icon: IResource | IResource[];
+		splash: IResource | IResource[];
+	}
+
+	interface IPreference {
+		name: string;
+		value: string;
+	}
+
+	interface IAuthor {
+		id: string;
+		version: string;
+		xmlns: string;
+		email: string;
+	}
+
+	interface IWidget {
+		preference: IPreference | IPreference[];
+		platform: IPlatform | IPlatform[]
+	}
+
+	interface IConfigXmlFile {
+		widget?: IWidget;
+	}
 }
