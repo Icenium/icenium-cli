@@ -38,6 +38,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	};
 
 	public search(keywords: string[]): IBasicPluginInformation[] {
+		keywords.unshift("ecosystem:cordova");
 		let future = new Future<IBasicPluginInformation[]>();
 		plugman.search(keywords, (err: Error, result: any) => {
 			if (err) {
@@ -50,7 +51,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	public fetch(pluginId: string): IFuture<string> {
-		return(() => {
+		return (() => {
 			this.$project.ensureProject();
 			let future = new Future<string>();
 			let pluginDir = this.getPluginsDir().wait();
@@ -66,7 +67,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 						future.return("The plugin has been successfully fetched to " + result);
 					}
 				});
-			} catch(e) {
+			} catch (e) {
 				future.throw(e);
 			}
 			return future.wait();
@@ -103,6 +104,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	public configure(): void {
 		let future = new Future();
+
+		// Need to set plugman's registry to use npm registry to avoid problems with cordova registry availability.
 		let params = ["set", "registry", this.$config.CORDOVA_PLUGINS_REGISTRY];
 		plugman.config(params, (error: Error, result: any) => {
 			if (error) {
@@ -139,7 +142,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	}
 
 	private getPluginsDir(): IFuture<string> {
-		return(() => {
+		return (() => {
 			return path.join(this.$project.getProjectDir().wait(), "plugins");
 		}).future<string>()();
 	}
