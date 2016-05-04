@@ -16,7 +16,9 @@ export class RemoteService implements IRemoteService {
 				private $express: IExpress,
 				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
 				private $domainNameSystem: IDomainNameSystem,
-				private $options: IOptions) {
+				private $options: IOptions,
+				private $sysInfo: ISysInfo,
+				private $staticConfig: IStaticConfig) {
 		this.appBuilderDir = path.join(os.tmpdir(), 'AppBuilder');
 		this.packageLocation = path.join(this.appBuilderDir, 'package.zip');
 	}
@@ -66,16 +68,33 @@ export class RemoteService implements IRemoteService {
 			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
 
 			this.$iOSEmulatorServices.checkAvailability(false).wait();
-			let mappedDeviceName = RemoteService.AppBuilderClientToSimulatorDeviceNameMapping[deviceFamily] || deviceFamily;
+			let xcodeVersion = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait().xcodeVer,
+				xcodeVersionMatch = xcodeVersion.match(/Xcode (.*)/),
+				splittedVersion = xcodeVersionMatch && xcodeVersionMatch[1] && xcodeVersionMatch[1].split("."),
+				xcodeMajorVersion = splittedVersion && splittedVersion[0],
+				mappedDeviceName: string;
+
+			if (xcodeMajorVersion) {
+				mappedDeviceName = RemoteService.AppBuilderClientToSimulatorDeviceNameMapping[xcodeMajorVersion] && RemoteService.AppBuilderClientToSimulatorDeviceNameMapping[xcodeMajorVersion][deviceFamily];
+			}
+
+			mappedDeviceName = mappedDeviceName || deviceFamily;
 			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, {deviceType: mappedDeviceName}).wait();
 
 			res.status(200).end();
 		}).future<void>()();
 	}
 
-	private static AppBuilderClientToSimulatorDeviceNameMapping: IStringDictionary = {
-		"iphoneandipod"	: "iPhone-4s",
-		"ipad": "iPad-2"
+	private static AppBuilderClientToSimulatorDeviceNameMapping: IDictionary<IStringDictionary> = {
+		"6": {
+			"iphoneandipod"	: "iPhone-4s",
+			"ipad": "iPad-2"
+		},
+
+		"7": {
+			"iphoneandipod"	: "iPhone 6",
+			"ipad": "iPad 2"
+		}
 	};
 }
 
