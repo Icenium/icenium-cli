@@ -450,9 +450,6 @@ interface INativeScriptMigrationConfiguration {
 	appResourcesRequiredPath: string;
 	appResourcesObsoletePath: string;
 
-	valuesStylesXmlPath: string;
-	valuesV21StylesXmlPath: string;
-
 	shouldRollBackAppResources: boolean;
 }
 
@@ -910,9 +907,9 @@ interface INativeScriptMigrationData{
 	 */
 	supportedVersions: IFrameworkVersion[];
 	/**
-	 * From this version onwards tns_modules are included as an npm dependency rather than physical files.
+	 * Versions that are obsolete.
 	 */
-	modulesNpmMinimumVersion: string;
+	obsoleteVersions: IFrameworkVersion[];
 }
 
 /**
