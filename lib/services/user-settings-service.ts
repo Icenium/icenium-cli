@@ -4,7 +4,7 @@
 import * as xmlMapping from "xml-mapping";
 import * as path from "path";
 import * as helpers from "../helpers";
-import * as userSettingsServiceBaseLib from "../common/services/user-settings-service";
+import {UserSettingsServiceBase} from "../common/services/user-settings-service";
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
@@ -24,7 +24,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 }
 $injector.register("clientUserSettingsFileService", ClientUserSettingsFileService);
 
-export class ClientSpecificUserSettingsService extends userSettingsServiceBaseLib.UserSettingsServiceBase {
+export class ClientSpecificUserSettingsService extends UserSettingsServiceBase {
 	constructor($fs: IFileSystem,
 		$clientUserSettingsFileService: IUserSettingsFileService) {
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
@@ -51,16 +51,17 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 }
 $injector.register("sharedUserSettingsFileService", SharedUserSettingsFileService);
 
-export  class SharedUserSettingsService implements IUserSettingsService {
-	private userSettingsData: any = null;
-
+export  class SharedUserSettingsService extends UserSettingsServiceBase implements IUserSettingsService {
 	private static SETTINGS_ROOT_TAG = "JustDevelopSettings";
 
-	constructor(private $fs: IFileSystem,
-		private $server: Server.IServer,
+	constructor(private $server: Server.IServer,
 		private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $loginManager: ILoginManager,
-		private $options: IOptions) { }
+		private $options: IOptions,
+		$fs: IFileSystem,
+		$clientUserSettingsFileService: IUserSettingsFileService) {
+			super($clientUserSettingsFileService.userSettingsFilePath, $fs);
+		 }
 
 	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
@@ -171,11 +172,15 @@ export  class SharedUserSettingsService implements IUserSettingsService {
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);
 
-export class UserSettingsService implements UserSettings.IUserSettingsService {
+export class UserSettingsService extends UserSettingsServiceBase implements UserSettings.IUserSettingsService {
 	private static 	ANALYTICS_INSTALLATION_ID_PROPERTY_NAME = "AnalyticsInstallationID";
 
 	constructor(private $sharedUserSettingsService: IUserSettingsService,
-		private $clientSpecificUserSettingsService: IUserSettingsService) { }
+		private $clientSpecificUserSettingsService: IUserSettingsService,
+		$fs: IFileSystem,
+		$clientUserSettingsFileService: IUserSettingsFileService) {
+			super($clientUserSettingsFileService.userSettingsFilePath, $fs);
+		 }
 
 	public getSettingValue<T>(settingName: string): IFuture<any> {
 		if(settingName === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {

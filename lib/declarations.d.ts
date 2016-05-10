@@ -291,11 +291,6 @@ interface IUserSettingsFileService {
 	userSettingsFilePath: string;
 }
 
-interface IUserSettingsService extends UserSettings.IUserSettingsService {
-	loadUserSettingsFile(): IFuture<void>;
-	saveSettings(data: IDictionary<{}>): IFuture<void>;
-}
-
 interface IDependencyConfig {
 	name: string;
 	version: string;
