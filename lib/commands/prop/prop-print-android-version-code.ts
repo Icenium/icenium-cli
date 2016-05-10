@@ -1,5 +1,5 @@
 import {PrintProjectCommand} from "./prop-print";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/constants";
 
 export class PrintAndroidVersionCodeCommand extends PrintProjectCommand implements ICommand {
 	constructor($staticConfig: IStaticConfig,

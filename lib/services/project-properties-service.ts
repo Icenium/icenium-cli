@@ -1,7 +1,7 @@
 import {EOL} from "os";
 import xmlMapping = require("xml-mapping");
 import * as util from "util";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	private static PROJECT_VERSION_DEFAULT_VALUE = 1;

@@ -1,4 +1,4 @@
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/constants";
 
 export class DynamicHelpProvider implements IDynamicHelpProvider {
 	constructor(private $project: Project.IProject,

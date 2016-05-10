@@ -1,5 +1,6 @@
 import * as path from "path";
 import { EnsureProjectCommand } from "./ensure-project-command";
+import {Configurations} from "../common/constants";
 
 export class EmulateAndroidCommand extends EnsureProjectCommand {
 	constructor(private $buildService: Project.IBuildService,
@@ -19,7 +20,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 			this.$androidEmulatorServices.checkAvailability().wait();
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.apk");
-			this.$buildService.build(<Project.IBuildSettings>{
+			this.$buildService.build({
 				platform: this.$devicePlatformsConstants.Android,
 				showQrCodes: false,
 				downloadFiles: true,
@@ -93,9 +94,10 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 
 			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
 			let packageFilePath = path.join(tempDir, "package.xap");
-			this.$buildService.build(<Project.IBuildSettings>{
+			this.$buildService.build({
 				platform: this.$devicePlatformsConstants.WP8,
-				configuration: "Debug",
+				projectConfiguration: Configurations.Debug,
+				buildConfiguration: Configurations.Debug,
 				showQrCodes: false,
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath

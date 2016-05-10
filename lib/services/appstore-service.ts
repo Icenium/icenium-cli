@@ -1,4 +1,4 @@
-import * as constants from "../common/mobile/constants";
+import * as constants from "../common/constants";
 
 export class AppStoreService implements IAppStoreService {
 	constructor(public $logger: ILogger,
@@ -20,7 +20,8 @@ export class AppStoreService implements IAppStoreService {
 			this.$logger.info("Building release package.");
 			let buildResult = this.$buildService.build({
 				platform: "iOS",
-				configuration: "Release",
+				projectConfiguration: constants.Configurations.Release,
+				buildConfiguration: constants.Configurations.Release,
 				provisionTypes: [constants.ProvisionType.AppStore]
 			}).wait();
 			buildResult = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");

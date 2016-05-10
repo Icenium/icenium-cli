@@ -208,7 +208,8 @@ declare module Project {
 
 	interface IBuildSettings {
 		platform: string;
-		configuration?: string;
+		projectConfiguration?: string;
+		buildConfiguration?: string;
 		showQrCodes?: boolean;
 		downloadFiles?: boolean;
 		downloadedFilePath?: string;
@@ -939,7 +940,6 @@ interface IOptions extends ICommonOptions {
 	companion: boolean;
 	core: boolean;
 	count: number;
-	debug: boolean;
 	deploy: string;
 	device: string;
 	deviceType: string;

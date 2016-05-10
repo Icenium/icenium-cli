@@ -2,54 +2,50 @@ import {EOL} from "os";
 import * as path from "path";
 import * as util from "util";
 import * as commonHelpers from "./common/helpers";
+import {Configurations} from "./common/constants";
+import {ProjectBase} from "./common/appbuilder/project/project-base";
 import Future = require("fibers/future");
 import * as helpers from "./helpers";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/constants";
 
-export class Project implements Project.IProject {
-	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
+export class Project extends ProjectBase implements Project.IProject {
 	private static CHUNK_UPLOAD_MIN_FILE_SIZE = 1024 * 1024 * 50;
-	private static CONFIGURATION_FILE_SEARCH_PATTERN: RegExp = new RegExp(".*.abproject$", "i");
-	private static VALID_CONFIGURATION_CHARACTERS_REGEX = "[-_A-Za-z0-9]";
-	private static CONFIGURATION_FROM_FILE_NAME_REGEX = new RegExp("^[.](" + Project.VALID_CONFIGURATION_CHARACTERS_REGEX + "+?)" + Project.JSON_PROJECT_FILE_NAME_REGEX + "$", "i");
 	private static INDENTATION = "     ";
 	private static UI_TEMPLATE_NAMES: IStringDictionary = {
 		"kendoui.blank": "KendoUI.Empty",
 		"javascript.blank": "Blank"
 	};
 
-	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
 	private cachedProjectDir: string = "";
 
 	private frameworkProject: Project.IFrameworkProject;
-	public projectData: Project.IData;
-	public configurationSpecificData: IDictionary<Project.IData>;
 	public get projectDir(): string {
 		return this.getProjectDir().wait();
 	}
 
 	constructor(private $config: IConfiguration,
-		private $errors: IErrors,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
-		private $fs: IFileSystem,
+		private $ionicProjectTransformator: IIonicProjectTransformator,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $loginManager: ILoginManager,
-		private $logger: ILogger,
 		private $multipartUploadService: IMultipartUploadService,
 		private $progressIndicator: IProgressIndicator,
-		private $projectConstants: Project.IConstants,
 		private $projectFilesManager: IProjectFilesManager,
 		private $projectPropertiesService: IProjectPropertiesService,
 		private $server: Server.IServer,
-		private $staticConfig: IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $prompter: IPrompter,
-		private $options: IOptions,
-		private $ionicProjectTransformator: IIonicProjectTransformator) {
-
+		protected $cordovaProjectCapabilities: Project.ICapabilities,
+		protected $errors: IErrors,
+		protected $fs: IFileSystem,
+		protected $logger: ILogger,
+		protected $nativeScriptProjectCapabilities: Project.ICapabilities,
+		protected $options: IOptions,
+		protected $projectConstants: Project.IConstants,
+		protected $staticConfig: IStaticConfig) {
+		super($cordovaProjectCapabilities, $errors, $fs, $logger, $nativeScriptProjectCapabilities, $options, $projectConstants, $staticConfig);
 		this.configurationSpecificData = Object.create(null);
-		this.readProjectData().wait();
 
 		if (this.projectData && this.projectData["TemplateAppName"]) {
 			this.$errors.failWithoutHelp("This hybrid project targets Apache Cordova 2.x. " +
@@ -70,8 +66,22 @@ export class Project implements Project.IProject {
 		return this.frameworkProject.configFiles;
 	}
 
-	public get startPackageActivity(): string {
-		return this.frameworkProject && this.frameworkProject.startPackageActivity;
+	public get projectData(): Project.IData {
+		if (!this._projectData) {
+			this.readProjectData().wait();
+		}
+
+		return this._projectData;
+	}
+
+	public set projectData(projectData: Project.IData) {
+		this._projectData = projectData;
+	}
+
+	// overriden
+	protected getShouldSaveProject(): boolean {
+		this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
+		return this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || super.getShouldSaveProject();
 	}
 
 	public getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>> {
@@ -148,13 +158,8 @@ export class Project implements Project.IProject {
 		return configurations;
 	}
 
-	public hasBuildConfigurations(): boolean {
-		return this._hasBuildConfigurations;
-	}
-
 	public getBuildConfiguration(): string {
-		let configuration = this.$options.release ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
-		return configuration.charAt(0).toUpperCase() + configuration.slice(1);
+		return this.$options.release ? Configurations.Release : Configurations.Debug;
 	}
 
 	public getProperty(propertyName: string, configuration: string): any {
@@ -162,8 +167,8 @@ export class Project implements Project.IProject {
 	}
 
 	public setProperty(propertyName: string, value: any, configuration: string): void {
-		if (this._hasBuildConfigurations) {
-			let configData = this.configurationSpecificData[configuration];
+		if (this.hasBuildConfigurations) {
+			let configData = this.configurationSpecificData[configuration.toLowerCase()];
 			if (!configData) {
 				configData = Object.create(null);
 				this.configurationSpecificData[configuration] = configData;
@@ -368,22 +373,27 @@ export class Project implements Project.IProject {
 	}
 
 	public getConfigurationsSpecifiedByUser(): string[] {
-		let configurations: string[] = [];
-		if (this.$options.debug) {
-			configurations.push(this.$projectConstants.DEBUG_CONFIGURATION_NAME);
+		let validConfigurations = _.keys(this.configurationSpecificData),
+			userConfigurations = _.map(this.$options.config, c => c.toLowerCase());
+		if (this.$options.config && this.$options.config.length && !_.intersection(validConfigurations, userConfigurations).length) {
+			this.$errors.failWithoutHelp("Operation cannot be completed because configurations %s are invalid.", this.$options.config);
 		}
 
-		if (this.$options.release) {
-			configurations.push(this.$projectConstants.RELEASE_CONFIGURATION_NAME);
-		}
+		return userConfigurations.filter(c => {
+			let configName = c.toLowerCase();
+			if (~validConfigurations.indexOf(configName)) {
+				return true;
+			}
 
-		return configurations;
+			this.$logger.warn("Configuration %s is invalid", c);
+			return false;
+		});
 	}
 
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
-			let projectConfigurations = _.keys(this.configurationSpecificData);
+			let projectConfigurations = this.getConfigurationsSpecifiedByUser();
 			let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
 			if (normalizedPropertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
 				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(normalizedPropertyName, propertyValues[0]);
@@ -392,12 +402,23 @@ export class Project implements Project.IProject {
 			if (normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
 				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, this.getConfigurationsSpecifiedByUser()).wait();
 			} else {
-				this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
-				_.each(this.configurationSpecificData, configSpecificData => this.$projectPropertiesService.removeProjectProperty(configSpecificData, normalizedPropertyName, this.projectData));
+				if (projectConfigurations.length) {
+					_.each(projectConfigurations, configuration => {
+						this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues).wait();
+					});
+				} else {
+					this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
+				}
 			}
 
 			this.saveProject(this.getProjectDir().wait(), projectConfigurations).wait();
-			this.printProjectProperty(normalizedPropertyName).wait();
+			projectConfigurations.forEach(configuration => {
+				this.printProjectProperty(normalizedPropertyName, configuration).wait();
+			});
+
+			if (!projectConfigurations || !projectConfigurations.length) {
+				this.printProjectProperty(normalizedPropertyName).wait();
+			}
 		}).future<void>()();
 	}
 
@@ -421,7 +442,8 @@ export class Project implements Project.IProject {
 					} else {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if (_.has(mergedProjectData, normalizedPropertyName)) {
-							this.$logger.write(`The value of ${normalizedPropertyName} is: `);
+							let additionalMessage = configuration ? ` for configuration ${configuration}` : "";
+							this.$logger.write(`The value of ${normalizedPropertyName}${additionalMessage} is: `);
 							this.$logger.out(mergedProjectData[normalizedPropertyName]);
 						} else if (this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
 							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);
@@ -628,7 +650,9 @@ export class Project implements Project.IProject {
 		return (() => {
 			let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
 			projectDir = projectDir || this.getProjectDir().wait();
-			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
+			if (!configurations || !configurations.length) {
+				this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
+			}
 
 			_.each(configs, (configuration: string) => {
 				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
@@ -706,6 +730,18 @@ export class Project implements Project.IProject {
 		}).future<Project.ITypeScriptFiles>()();
 	}
 
+	protected validate(): void {
+		if (this.$staticConfig.triggerJsonSchemaValidation) {
+			this.$jsonSchemaValidator.validate(this.projectData);
+		}
+	}
+
+	protected saveProjectIfNeeded(): void {
+		if (this.getShouldSaveProject() && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
+			this.saveProject(this.projectDir).wait();
+		}
+	}
+
 	private getProjectRelativePath(fullPath: string, projectDir: string): string {
 		projectDir = path.join(projectDir, path.sep);
 		if (!_.startsWith(fullPath, projectDir)) {
@@ -713,92 +749,6 @@ export class Project implements Project.IProject {
 		}
 
 		return fullPath.substring(projectDir.length);
-	}
-
-	private get projectInformation(): Project.IProjectInformation {
-		return {
-			projectData: this.projectData,
-			configurationSpecificData: this.configurationSpecificData,
-			hasBuildConfigurations: this._hasBuildConfigurations
-		};
-	}
-
-	private readProjectData(): IFuture<void> {
-		return (() => {
-			let projectDir = this.getProjectDir().wait();
-			let shouldSaveProject = false;
-			if (projectDir) {
-				let projectFilePath = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
-				try {
-					let data = this.$fs.readJson(projectFilePath).wait();
-					if (data.projectVersion && data.projectVersion.toString() !== "1") {
-						this.$errors.fail("FUTURE_PROJECT_VER");
-					}
-
-					if (!_.has(data, "Framework")) {
-						if (_.has(data, "projectType")) {
-							data["Framework"] = data["projectType"];
-							delete data["projectType"];
-						} else {
-							data["Framework"] = TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
-						}
-
-						shouldSaveProject = true;
-					}
-
-					this.projectData = data;
-					this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
-					shouldSaveProject = this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || shouldSaveProject;
-
-					if (this.$staticConfig.triggerJsonSchemaValidation) {
-						this.$jsonSchemaValidator.validate(this.projectData);
-					}
-
-					let debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
-					if (this.$options.debug && !this.$fs.exists(debugProjectFile).wait()) {
-						this.$fs.writeJson(debugProjectFile, {}).wait();
-					}
-
-					let releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
-					if (this.$options.release && !this.$fs.exists(releaseProjectFile).wait()) {
-						this.$fs.writeJson(releaseProjectFile, {}).wait();
-					}
-
-					let allProjectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir, (file: string, stat: IFsStats) => {
-						return Project.CONFIGURATION_FILE_SEARCH_PATTERN.test(file);
-					});
-
-					_.each(allProjectFiles, (configProjectFile: string) => {
-						let configMatch = path.basename(configProjectFile).match(Project.CONFIGURATION_FROM_FILE_NAME_REGEX);
-						if (configMatch && configMatch.length > 1) {
-							let configurationName = configMatch[1];
-							let configProjectContent = this.$fs.readJson(configProjectFile).wait();
-							this.configurationSpecificData[configurationName.toLowerCase()] = configProjectContent;
-							this._hasBuildConfigurations = true;
-						}
-					});
-				} catch (err) {
-					if (err === "FUTURE_PROJECT_VER") {
-						this.$errors.fail({
-							formatStr: "This project is created by a newer version of AppBuilder. Upgrade AppBuilder CLI to work with it.",
-							suppressCommandHelp: true
-						});
-					}
-					this.$errors.fail({
-						formatStr: "The project file %s is corrupted." + EOL +
-						"Consider restoring an earlier version from your source control or backup." + EOL +
-						"To create a new one with the default settings, delete this file and run $ appbuilder init hybrid." + EOL +
-						"Additional technical information: %s",
-						suppressCommandHelp: true
-					},
-						projectFilePath, err.toString());
-				}
-
-				if (shouldSaveProject && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
-					this.saveProject(projectDir).wait();
-				}
-			}
-		}).future<void>()();
 	}
 
 	private createFromTemplate(appname: string, projectDir: string, template?: string): IFuture<void> {

@@ -1,5 +1,5 @@
 import {SetProjectPropertyCommand} from "./prop-set";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/constants";
 
 export class SetAndroidVersionCodeCommand extends SetProjectPropertyCommand implements ICommand {
 	constructor($staticConfig: IStaticConfig,

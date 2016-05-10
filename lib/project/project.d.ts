@@ -10,7 +10,6 @@ declare module Project {
 		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
 		createTemplateFolder(projectDir: string): IFuture<void>;
-		hasBuildConfigurations(): boolean;
 
 		getNewProjectDir(): string;
 		getProjectSchema(): IFuture<any>;
@@ -81,7 +80,6 @@ declare module Project {
 		liveSyncUrl: string;
 		requiredAndroidApiLevel: number;
 		configFiles: IConfigurationFile[];
-		startPackageActivity: string;
 		/**
 		 * The path to the App_Resources folder relative to the project's root
 		 * @type {string}
@@ -159,12 +157,6 @@ declare module Project {
 
 	interface IFrameworkSimulatorServiceResolver {
 		resolve(framework: string): IProjectSimulatorService;
-	}
-
-	interface IProjectInformation {
-		projectData: Project.IData;
-		configurationSpecificData: IDictionary<any>;
-		hasBuildConfigurations: boolean;
 	}
 
 	interface IConfigFilesManager {

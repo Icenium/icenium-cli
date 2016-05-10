@@ -1,5 +1,5 @@
 import * as path from "path";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/constants";
 import ProjectCommandBaseLib = require("./project-command-base");
 
 export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {

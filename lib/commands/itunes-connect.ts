@@ -1,4 +1,4 @@
-import * as constants from "../common/mobile/constants";
+import * as constants from "../common/constants";
 import * as commandParams from "../common/command-params";
 let Table = require("cli-table");
 
