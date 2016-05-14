@@ -33,9 +33,9 @@ export class TemplatesService implements ITemplatesService {
 				.map((file) => {
 					let match = file.match(regexp),
 						templateName = match && match[1],
-						replacementName = replacementNames[templateName.toLowerCase()];
+						replacementName = templateName && replacementNames[templateName.toLowerCase()];
 
-					return replacementName ? replacementName : templateName;
+					return replacementName || templateName;
 				})
 				.filter((file: string) => file !== null)
 				.value();
