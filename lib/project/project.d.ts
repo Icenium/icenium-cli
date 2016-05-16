@@ -4,7 +4,6 @@ declare module Project {
 		configurations: string[];
 		requiredAndroidApiLevel: number;
 		projectConfigFiles: Project.IConfigurationFile[];
-		startPackageActivity: string;
 
 		isIonicProject(projectDir: string): IFuture<boolean>;
 		createNewProject(projectName: string, framework: string, template?: string): IFuture<void>;
