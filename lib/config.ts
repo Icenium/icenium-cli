@@ -1,7 +1,7 @@
 ///<reference path=".d.ts"/>
 "use strict";
 import * as path from "path";
-import {StaticConfigBase} from "./common/static-config-base";
+import {AppBuilderStaticConfigBase} from "./common/appbuilder/appbuilder-static-config-base";
 import {ConfigBase} from "./common/config-base";
 import * as osenv from "osenv";
 
@@ -77,13 +77,12 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 }
 $injector.register("config", Configuration);
 
-export class StaticConfig extends StaticConfigBase implements IStaticConfig {
+export class StaticConfig extends AppBuilderStaticConfigBase implements IStaticConfig {
 	constructor($injector: IInjector) {
 		super($injector);
 		this.RESOURCE_DIR_PATH = path.join(this.RESOURCE_DIR_PATH, "../../resources");
 	}
 
-	private startPackageActivityName: string;
 	private static TOKEN_FILENAME = ".abgithub";
 	public PROJECT_FILE_NAME = ".abproject";
 	public CLIENT_NAME = "AppBuilder";
@@ -92,20 +91,6 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ERROR_REPORT_SETTING_NAME = "AnalyticsSettings.TrackExceptions";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
-
-	public get START_PACKAGE_ACTIVITY_NAME(): string {
-		if(!this.startPackageActivityName) {
-			let project: Project.IProject = $injector.resolve("project");
-			this.startPackageActivityName = project.startPackageActivity;
-		}
-
-		return this.startPackageActivityName;
-	}
-
-	public set START_PACKAGE_ACTIVITY_NAME(value: string) {
-		this.startPackageActivityName = value;
-	}
-
 	public SYS_REQUIREMENTS_LINK = "http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/system-requirements-cli";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public QR_SIZE = 300;

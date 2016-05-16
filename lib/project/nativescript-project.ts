@@ -6,6 +6,7 @@ import * as util from "util";
 import Future = require("fibers/future");
 import {FrameworkProjectBase} from "./framework-project-base";
 import semver = require("semver");
+import  { StartPackageActivityNames } from "../common/mobile/constants";
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -57,7 +58,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public get startPackageActivity(): string {
-		return "com.tns.NativeScriptActivity";
+		return StartPackageActivityNames.NATIVESCRIPT;
 	}
 
 	public get relativeAppResourcesPath(): string {
