@@ -1,41 +1,26 @@
-debug
+debug android
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder debug <Platform>`
+General | `$ appbuilder debug android`
 
-Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %> For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
-
-<% } %>
 <% if(isConsole) { %>
-WARNING: You can work only with connected iOS and Android devices.
-<% if(isLinux) { %>
-WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
-<% } %>
+<% if(isWindows) { %> Shows the debug tools to let you debug applications on connected Android devices. <% } %>
+<% if(isMacOS) { %> Allows you to debug your Cordova applications in Google Chrome, by opening device port and copying the required link to your clipboard. You have to paste it manually in your browser. <% } %>
 <% } %>
 <% if(isHtml) { %>
-### Attributes
-* `<Platform>` is the target mobile platform on which you want to debug your project. You can set the following target platforms.
-	* `android` - Debug your project on Android.
-	* `ios` - Debug your project on iOS.
+On Windows shows the debug tools to let you debug applications on connected Android devices. On OS X you can debug your Cordova applications in Google Chrome. The command will open device port and copy the required link to your clipboard. You have to paste it manually in your browser.
+<% } %>
 
-### Prerequisites
-
-* [Requirements for debugging on Android devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#android-requirements)
-* [Requirements for debugging on iOS devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#ios-requirements)
-
-### Command Limitations
-
-* You cannot run this command on Linux systems.
-* You cannot run this command on Windows Phone devices.
-
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
+[debug](debug.html) | Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %> For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
+<% } %>
 [debug ios](debug-ios.html) | Opens up ios-webkit-debug-proxy in Safari on specific port and lets you debug your application.
-[debug android](debug-android.html) | Opens up Google Chrome's inspector on specific port and lets you debug your application.
 [build](build.html) | Builds the project for the target platform and produces an application package or a QR code for deployment.
 [build android](build-android.html) | Builds the project for Android platform and produces an application package or a QR code for deployment.
 [build ios](build-ios.html) | Builds the project for iOS platform and produces an application package or a QR code for deployment.

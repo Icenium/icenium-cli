@@ -36,6 +36,7 @@
     "cli-table": "https://github.com/telerik/cli-table/tarball/v0.3.1.1",
     "colors": "0.6.2",
     "cookie": "0.1.0",
+    "copy-paste": "1.2.0",
     "express": "4.8.5",
     "ffi": "https://github.com/icenium/node-ffi/tarball/v2.0.0.1",
     "fibers": "https://github.com/Icenium/node-fibers/tarball/v1.0.6.3",
