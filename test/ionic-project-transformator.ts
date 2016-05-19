@@ -5,7 +5,6 @@ import * as path from "path";
 import * as temp from "temp";
 import * as shelljs from "shelljs";
 import * as xmlMapping from "xml-mapping";
-import * as fiberBootstrap from "../lib/common/fiber-bootstrap";
 import {Project} from "../lib/project";
 import {CordovaProject} from "./../lib/project/cordova-project";
 import {Yok} from "../lib/common/yok";
@@ -159,7 +158,7 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 			splash: ionicSplashScreenResources
 		};
 
-		context.clonedConfigXmlDirectory = path.join(appResourcesDirectory, androidPlatformName, "xml", configXmlName);
+		context.clonedConfigXmlDirectory = path.join(appResourcesDirectory, "Android", "xml", configXmlName);
 
 		context.expectedIconResource = {
 			src: `..${pathSeparator}${drawableFolderName}${pathSeparator}icon.png`
@@ -252,18 +251,15 @@ describe("Ionic project transformator", () => {
 	let createBackup: boolean;
 
 	describe("integration tests", () => {
-		beforeEach((done: mocha.Done) => {
-			fiberBootstrap.run(() => {
-				testInjector = createTestInjector();
+		beforeEach(() => {
+			testInjector = createTestInjector();
 
-				fs = testInjector.resolve("fs");
-				projectDirectory = createIonicProject(testInjector, fs).wait();
+			fs = testInjector.resolve("fs");
+			projectDirectory = createIonicProject(testInjector, fs).wait();
 
-				ionicProjectTransformator = testInjector.resolve("ionicProjectTransformator");
+			ionicProjectTransformator = testInjector.resolve("ionicProjectTransformator");
 
-				createBackup = false;
-				done();
-			});
+			createBackup = false;
 		});
 
 		it("should create backup if createBackup is true", () => {
@@ -309,14 +305,10 @@ describe("Ionic project transformator", () => {
 			let ionicConfiXml: ConfigXmlFile.IConfigXmlFile;
 			let context: IConfigXmlFileTestContext;
 
-			beforeEach((done: mocha.Done) => {
-				fiberBootstrap.run(() => {
-					ionicConfigXmlDirectory = path.join(projectDirectory, configXmlName);
-					ionicConfiXml = fs.exists(ionicConfigXmlDirectory).wait() && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory).wait());
-					appResourcesDirectory = path.join(projectDirectory, appResourcesFolderName);
-
-					done();
-				});
+			beforeEach(() => {
+				ionicConfigXmlDirectory = path.join(projectDirectory, configXmlName);
+				ionicConfiXml = fs.exists(ionicConfigXmlDirectory).wait() && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory).wait());
+				appResourcesDirectory = path.join(projectDirectory, appResourcesFolderName);
 			});
 
 			_.each([androidPlatformName, iosPlatformName, wp8PlatformName], (platform: string) => {
@@ -415,7 +407,7 @@ describe("Ionic project transformator", () => {
 				let resourceName = "test-resource";
 				let resourceFileName = `${resourceName}.png`;
 				let appbuilderAndroidResourcesDirectory = path.join(projectDirectory, appResourcesFolderName, "Android");
-				let ionicAndroidResourcesDirectory = path.join(projectDirectory, "resources", "Android");
+				let ionicAndroidResourcesDirectory = path.join(projectDirectory, "resources", androidPlatformName);
 
 				// Clear the Android resources from the template.
 				fs.deleteDirectory(ionicAndroidResourcesDirectory).wait();
@@ -430,8 +422,8 @@ describe("Ionic project transformator", () => {
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name.");
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name.");
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name for landscape orientation.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name for landscape orientation.");
 			});
 
