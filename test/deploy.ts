@@ -89,7 +89,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("iOSDeviceDiscovery", IOSDeviceDiscoveryMock);
 	testInjector.register("iOSSimulatorDiscovery", IOSSimulatorDiscoveryMock);
 	testInjector.register("androidDeviceDiscovery", AndroidDeviceDiscoveryMock);
-
+	testInjector.register("androidProcessService", {});
 	return testInjector;
 }
 
