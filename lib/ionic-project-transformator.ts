@@ -21,12 +21,13 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private supportedScreensFolderNames: string[];
 	private _project: Project.IProject;
 	private _ionicResourcesDirectory: string;
-	private _ionicConfigXml: ConfigXmlFile.IConfigXmlFile;
+	private _ionicConfigXml: IonicConfigXmlFile.IConfigXmlFile;
 	private _pluginsService: IPluginsService;
 
 	constructor(private $fs: IFileSystem,
 		private $projectConstants: Project.IConstants,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		private $analyticsService: IAnalyticsService,
 		private $logger: ILogger,
 		private $injector: IInjector) {
 		this.supportedScreensFolderNames = this.createSupportedScreensFoldernames();
@@ -62,9 +63,9 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	/**
 	 * Gets the Cordova config.xml of the Ionic project as JavaScript object.
 	 */
-	private get ionicConfigXml(): ConfigXmlFile.IConfigXmlFile {
+	private get ionicConfigXml(): IonicConfigXmlFile.IConfigXmlFile {
 		if (!this._ionicConfigXml) {
-			this._ionicConfigXml = <ConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(path.join(this.$project.getProjectDir().wait(), IonicProjectTransformator.CONFIG_XML_FILE_NAME)).wait());
+			this._ionicConfigXml = <IonicConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(path.join(this.$project.getProjectDir().wait(), IonicProjectTransformator.CONFIG_XML_FILE_NAME)).wait());
 		}
 
 		return this._ionicConfigXml;
@@ -72,6 +73,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 	public transformToAppBuilderProject(createBackup: boolean): IFuture<void> {
 		return (() => {
+			this.$analyticsService.track("Migrate from Ionic", "true").wait();
+
 			if (createBackup) {
 				this.backupCurrentProject().wait();
 			}
@@ -117,17 +120,17 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return (() => {
 			//  When creating JavaScript object from xml file some properties can be created as property with single value or property with array of values thats why wee need to check if is array.
 			if (_.isArray(this.ionicConfigXml.widget.platform)) {
-				_.each(this.ionicConfigXml.widget.platform, (platform: ConfigXmlFile.IPlatform) => {
+				_.each(this.ionicConfigXml.widget.platform, (platform: IonicConfigXmlFile.IPlatform) => {
 					this.cloneConfigXmlCore(appBuilderResourcesDirectory, platform).wait();
 				});
 			} else {
-				this.cloneConfigXmlCore(appBuilderResourcesDirectory, <ConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).wait();
+				this.cloneConfigXmlCore(appBuilderResourcesDirectory, <IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).wait();
 			}
 
 		}).future<void>()();
 	}
 
-	private cloneConfigXmlCore(appBuilderResourcesDirectory: string, platform: ConfigXmlFile.IPlatform): IFuture<void> {
+	private cloneConfigXmlCore(appBuilderResourcesDirectory: string, platform: IonicConfigXmlFile.IPlatform): IFuture<void> {
 		return (() => {
 			if (!platform) {
 				// There are no platform specific resources in the Ionic config.xml.
@@ -135,17 +138,17 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			}
 
 			let appBuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, this.$projectConstants.APPBUILDER_PROJECT_PLATFORMS_NAMES[platform.name]);
-			let platformConfigXml: ConfigXmlFile.IConfigXmlFile = {};
+			let platformConfigXml: IonicConfigXmlFile.IConfigXmlFile = {};
 			platformConfigXml.widget = this.ionicConfigXml.widget;
 			// The platform property should be set to empty object to remove the data for the other platforms.
-			platformConfigXml.widget.platform = <ConfigXmlFile.IPlatform>{};
-			(<ConfigXmlFile.IPlatform>platformConfigXml.widget.platform).name = platform.name;
+			platformConfigXml.widget.platform = <IonicConfigXmlFile.IPlatform>{};
+			(<IonicConfigXmlFile.IPlatform>platformConfigXml.widget.platform).name = platform.name;
 
 			// AppBuilder config.xml for Android must be placed in the xml folder.
 			let platformConfigXmlDestinationDirectory = platform.name === this.$devicePlatformsConstants.Android.toLowerCase() ? path.join(appBuilderPlatformResourcesDirectory, IonicProjectTransformator.ANDROID_XML_FOLDER_NAME) : appBuilderPlatformResourcesDirectory;
 
-			(<ConfigXmlFile.IPlatform>platformConfigXml.widget.platform).icon = this.changeXmlResourcesSources("icon", platform, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory).wait();
-			(<ConfigXmlFile.IPlatform>platformConfigXml.widget.platform).splash = this.changeXmlResourcesSources("splash", platform, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory).wait();
+			(<IonicConfigXmlFile.IPlatform>platformConfigXml.widget.platform).icon = this.changeXmlResourcesSources("icon", platform, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory).wait();
+			(<IonicConfigXmlFile.IPlatform>platformConfigXml.widget.platform).splash = this.changeXmlResourcesSources("splash", platform, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory).wait();
 
 			this.$fs.writeFile(path.join(platformConfigXmlDestinationDirectory, IonicProjectTransformator.CONFIG_XML_FILE_NAME), xmlMapping.toxml(platformConfigXml)).wait();
 		}).future<void>()();
@@ -155,18 +158,18 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	 * Changes the src property of the resource item for platform to be relative to the AppBuilder platform specific config.xml.
 	 */
 	private changeXmlResourcesSources(resourceType: string,
-		platform: ConfigXmlFile.IPlatform,
+		platform: IonicConfigXmlFile.IPlatform,
 		appBuilderResourcesDirectory: string,
 		platformConfigXmlDestinationDirectory: string,
-		appBuilderPlatformResourcesDirectory: string): IFuture<ConfigXmlFile.IResource[]> {
+		appBuilderPlatformResourcesDirectory: string): IFuture<IonicConfigXmlFile.IResource[]> {
 		return (() => {
-			let result: ConfigXmlFile.IResource[] = [];
+			let result: IonicConfigXmlFile.IResource[] = [];
 
 			// Platform should be cast to any because the linter fails with "Index signature of object type implicitly has an 'any' type".
-			let platformResource: ConfigXmlFile.IResource = (<any>platform)[resourceType];
+			let platformResource: IonicConfigXmlFile.IResource = (<any>platform)[resourceType];
 
 			if (_.isArray(platformResource)) {
-				_.each(platformResource, (resourceTypeItem: ConfigXmlFile.IResource) => {
+				_.each(platformResource, (resourceTypeItem: IonicConfigXmlFile.IResource) => {
 					let appBuilderResource = this.createNewResourceItem(resourceType, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory, resourceTypeItem, platform.name).wait();
 					result.push(appBuilderResource);
 				});
@@ -176,15 +179,15 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			}
 
 			return result;
-		}).future<ConfigXmlFile.IResource[]>()();
+		}).future<IonicConfigXmlFile.IResource[]>()();
 	}
 
 	private createNewResourceItem(resourceType: string,
 		appBuilderResourcesDirectory: string,
 		platformConfigXmlDestinationDirectory: string,
 		appBuilderPlatformResourcesDirectory: string,
-		resource: ConfigXmlFile.IResource,
-		platformName: string): IFuture<ConfigXmlFile.IResource> {
+		resource: IonicConfigXmlFile.IResource,
+		platformName: string): IFuture<IonicConfigXmlFile.IResource> {
 		return (() => {
 			let iconSourceFolder = <string>resource.src;
 
@@ -210,7 +213,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			}
 
 			return resource;
-		}).future<ConfigXmlFile.IResource>()();
+		}).future<IonicConfigXmlFile.IResource>()();
 	}
 
 	private cloneResourcesCore(projectDir: string, appBuilderResourcesDirectory: string, platformKeyName: string, cloneFunction: Function): IFuture<void> {
@@ -245,12 +248,12 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private copyWindowsPhoneResources(resourceDirectory: string, appBuilderWindowsPhoneResourcesDirectory: string): IFuture<void> {
 		return (() => {
 			let allResources = this.$fs.readDirectory(resourceDirectory).wait();
-			let ionicWindowsPhoneConfig: ConfigXmlFile.IPlatform;
+			let ionicWindowsPhoneConfig: IonicConfigXmlFile.IPlatform;
 
 			if (_.isArray(this.ionicConfigXml.widget.platform)) {
-				ionicWindowsPhoneConfig = _.filter(<ConfigXmlFile.IPlatform[]>this.ionicConfigXml.widget.platform, (platform: ConfigXmlFile.IPlatform) => platform.name === this.$devicePlatformsConstants.WP8.toLowerCase())[0];
+				ionicWindowsPhoneConfig = _.filter(<IonicConfigXmlFile.IPlatform[]>this.ionicConfigXml.widget.platform, (platform: IonicConfigXmlFile.IPlatform) => platform.name === this.$devicePlatformsConstants.WP8.toLowerCase())[0];
 			} else {
-				ionicWindowsPhoneConfig = (<ConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).name === this.$devicePlatformsConstants.WP8.toLowerCase() ? <ConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform : null;
+				ionicWindowsPhoneConfig = (<IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).name === this.$devicePlatformsConstants.WP8.toLowerCase() ? <IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform : null;
 			}
 
 			// Windows Phone 8 supports only JPG splash screens and Ionic projects provides PNG splash screens.
@@ -261,11 +264,11 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 					if (this.$fs.getFsStats(resourceItemSourceDirectory).wait().isFile()) {
 						let itemNameWithoutExtension = item.substring(0, item.lastIndexOf("."));
 						if (_.isArray(ionicWindowsPhoneConfig.splash)) {
-							if (_.any(ionicWindowsPhoneConfig.splash, (splash: ConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
+							if (_.any(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
 								resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
 							}
 						} else {
-							if ((<ConfigXmlFile.IResource>ionicWindowsPhoneConfig.splash).src.indexOf(itemNameWithoutExtension) >= 0) {
+							if ((<IonicConfigXmlFile.IResource>ionicWindowsPhoneConfig.splash).src.indexOf(itemNameWithoutExtension) >= 0) {
 								resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
 							}
 						}

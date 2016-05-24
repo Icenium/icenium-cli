@@ -1123,44 +1123,11 @@ interface ITapAppData {
 }
 
 /**
- * Describes mothods for transforming Ionic projects.
+ * Describes methods for transforming Ionic projects.
  */
 interface IIonicProjectTransformator {
+	/**
+	 * Creates AppBuilder project from Ionic project by removing unnecesary files, copying the resources and parsing the Ionic config.xml file.
+	 */
 	transformToAppBuilderProject(createBackup: boolean): IFuture<void>
-}
-
-declare module ConfigXmlFile {
-	interface IResource {
-		src: string;
-		density?: string;
-		width?: string;
-		height?: string;
-	}
-
-	interface IPlatform {
-		name: string;
-		icon: IResource | IResource[];
-		splash: IResource | IResource[];
-	}
-
-	interface IPreference {
-		name: string;
-		value: string;
-	}
-
-	interface IAuthor {
-		id: string;
-		version: string;
-		xmlns: string;
-		email: string;
-	}
-
-	interface IWidget {
-		preference: IPreference | IPreference[];
-		platform: IPlatform | IPlatform[]
-	}
-
-	interface IConfigXmlFile {
-		widget?: IWidget;
-	}
 }

@@ -35,11 +35,11 @@ let pathSeparator = path.sep;
 interface IConfigXmlFileTestContext {
 	platformName: string;
 	platformKeyName: string;
-	platformDataWithSingleResources: ConfigXmlFile.IPlatform;
-	platformDataWithMultipleResources: ConfigXmlFile.IPlatform;
+	platformDataWithSingleResources: IonicConfigXmlFile.IPlatform;
+	platformDataWithMultipleResources: IonicConfigXmlFile.IPlatform;
 	clonedConfigXmlDirectory: string;
-	expectedIconResource: ConfigXmlFile.IResource;
-	expectedSplashScreenResource: ConfigXmlFile.IResource;
+	expectedIconResource: IonicConfigXmlFile.IResource;
+	expectedSplashScreenResource: IonicConfigXmlFile.IResource;
 }
 
 function createTestInjector(): IInjector {
@@ -90,6 +90,9 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectFilesManager", {});
 	testInjector.register("templatesService", {});
 	testInjector.register("options", {});
+	testInjector.register("analyticsService", {
+		track: () => Future.fromResult()
+	});
 
 	return testInjector;
 }
@@ -126,11 +129,11 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 		let drawableFolderName = `drawable-${resourceDensity}`;
 		context.platformDataWithSingleResources = {
 			name: androidPlatformName,
-			icon: <ConfigXmlFile.IResource>{
+			icon: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}android${pathSeparator}icon${pathSeparator}${drawableFolderName}-icon.png`,
 				density: resourceDensity
 			},
-			splash: <ConfigXmlFile.IResource>{
+			splash: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}android${pathSeparator}splash${pathSeparator}${drawableFolderName}-screen.png`,
 				density: resourceDensity
 			}
@@ -172,10 +175,10 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 
 		context.platformDataWithSingleResources = {
 			name: iosPlatformName,
-			icon: <ConfigXmlFile.IResource>{
+			icon: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}ios${pathSeparator}icon${pathSeparator}icon.png`
 			},
-			splash: <ConfigXmlFile.IResource>{
+			splash: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}ios${pathSeparator}splash${pathSeparator}Default-568h@2x~iphone.png`
 			}
 		};
@@ -208,10 +211,10 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 
 		context.platformDataWithSingleResources = {
 			name: wp8PlatformName,
-			icon: <ConfigXmlFile.IResource>{
+			icon: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}wp8${pathSeparator}icon${pathSeparator}ApplicationIcon.png`
 			},
-			splash: <ConfigXmlFile.IResource>{
+			splash: <IonicConfigXmlFile.IResource>{
 				src: `resources${pathSeparator}wp8${pathSeparator}splash${pathSeparator}SplashScreenImage.png`
 			}
 		};
@@ -302,7 +305,7 @@ describe("Ionic project transformator", () => {
 		describe("config.xml cloning", () => {
 			let ionicConfigXmlDirectory: string;
 			let appResourcesDirectory: string;
-			let ionicConfiXml: ConfigXmlFile.IConfigXmlFile;
+			let ionicConfiXml: IonicConfigXmlFile.IConfigXmlFile;
 			let context: IConfigXmlFileTestContext;
 
 			beforeEach(() => {
@@ -332,19 +335,19 @@ describe("Ionic project transformator", () => {
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
-					let appBuilderConfigXml: ConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
+					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
 
-					let expectedIconResource: ConfigXmlFile.IResource = context.expectedIconResource;
+					let expectedIconResource: IonicConfigXmlFile.IResource = context.expectedIconResource;
 
-					let expectedSplashScreenResource: ConfigXmlFile.IResource = context.expectedSplashScreenResource;
+					let expectedSplashScreenResource: IonicConfigXmlFile.IResource = context.expectedSplashScreenResource;
 
-					let appBuilderPlatformData = (<ConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
+					let appBuilderPlatformData = (<IonicConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
 
 					assert.isFalse(_.isArray(appBuilderConfigXml.widget.platform), `Expected ${context.platformName} config.xml to have only the ${context.platformName} configuration.`);
 					assert.isFalse(_.isArray(appBuilderPlatformData.icon), `Expected ${context.platformName} config.xml to have only one icon when the Ionic config.xml contains only one icon.`);
 					assert.isFalse(_.isArray(appBuilderPlatformData.splash), `Expected ${context.platformName} config.xml to have only one splash screen when the Ionic config.xml contains only one splash screen.`);
-					assert.deepEqual((<ConfigXmlFile.IResource>appBuilderPlatformData.icon).src, expectedIconResource.src, "Expected the moved icon resource to have correct src.");
-					assert.deepEqual((<ConfigXmlFile.IResource>appBuilderPlatformData.splash).src, expectedSplashScreenResource.src, "Expected the moved splash screen resource to have correct src.");
+					assert.deepEqual((<IonicConfigXmlFile.IResource>appBuilderPlatformData.icon).src, expectedIconResource.src, "Expected the moved icon resource to have correct src.");
+					assert.deepEqual((<IonicConfigXmlFile.IResource>appBuilderPlatformData.splash).src, expectedSplashScreenResource.src, "Expected the moved splash screen resource to have correct src.");
 				});
 
 				it(`should clone correctly for ${platform} when more than one resource is added to icon and slpash`, () => {
@@ -358,24 +361,24 @@ describe("Ionic project transformator", () => {
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
-					let appBuilderConfigXml: ConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
+					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
 
-					let appBuilderPlatformData = (<ConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
+					let appBuilderPlatformData = (<IonicConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
 
 					assert.isTrue(_.isArray(appBuilderPlatformData.icon), `Expected ${context.platformName} config.xml to have more than one icon when the Ionic config.xml contains more than one icon.`);
 					assert.isTrue(_.isArray(appBuilderPlatformData.splash), `Expected ${context.platformName} config.xml to have more than one splash screen when the Ionic config.xml contains more than one splash screen.`);
 
-					assert.deepEqual((<ConfigXmlFile.IResource[]>appBuilderPlatformData.icon).length,
-						(<ConfigXmlFile.IResource[]>context.platformDataWithMultipleResources.icon).length,
+					assert.deepEqual((<IonicConfigXmlFile.IResource[]>appBuilderPlatformData.icon).length,
+						(<IonicConfigXmlFile.IResource[]>context.platformDataWithMultipleResources.icon).length,
 						`Expected ${context.platformName} config.xml to have icon resources equal to the icon resources of the Ionic config.xml file for ${context.platformName}.`);
-					assert.deepEqual((<ConfigXmlFile.IResource[]>appBuilderPlatformData.splash).length,
-						(<ConfigXmlFile.IResource[]>context.platformDataWithMultipleResources.splash).length,
+					assert.deepEqual((<IonicConfigXmlFile.IResource[]>appBuilderPlatformData.splash).length,
+						(<IonicConfigXmlFile.IResource[]>context.platformDataWithMultipleResources.splash).length,
 						`Expected ${context.platformName} config.xml to have splash screen resources equal to the splash screen resources of the Ionic config.xml file for ${context.platformName}.`);
 				});
 			});
 
 			it(`should clone correctly when more than platform configurations are added to the Ionic config.xml file.`, () => {
-				let platformConfigXmlItem: ConfigXmlFile.IPlatform[] = [];
+				let platformConfigXmlItem: IonicConfigXmlFile.IPlatform[] = [];
 				let androidTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(androidPlatformName, appResourcesDirectory);
 				let iosTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(iosPlatformName, appResourcesDirectory);
 				let wp8TestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(wp8PlatformName, appResourcesDirectory);
