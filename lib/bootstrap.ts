@@ -85,6 +85,7 @@ $injector.require("simulatorPlatformServices", "./services/simulatorPlatformServ
 $injector.require("simulatorService", "./services/simulator-service");
 
 $injector.require("project", "./project");
+$injector.require("ionicProjectTransformator", "./ionic-project-transformator");
 $injector.require("cordovaProject", "./project/cordova-project");
 $injector.require("nativeScriptProject", "./project/nativescript-project");
 $injector.require("configFilesManager", "./project/config-files-manager");

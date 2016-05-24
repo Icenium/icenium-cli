@@ -246,7 +246,6 @@
     <TypeScriptCompile Include="lib\definitions\valid-url.d.ts" />
     <TypeScriptCompile Include="lib\definitions\validator.d.ts" />
     <TypeScriptCompile Include="lib\definitions\xml-mapping.d.ts" />
-    <TypeScriptCompile Include="lib\definitions\xml2js.d.ts" />
     <TypeScriptCompile Include="lib\hooks\before-build.ts" />
     <TypeScriptCompile Include="lib\hooks\before-deploy.ts" />
     <TypeScriptCompile Include="lib\hooks\before-livesync.ts" />

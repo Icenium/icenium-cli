@@ -77,6 +77,7 @@ function createTestInjector() {
 	testInjector.register("config", require("../lib/config").Configuration);
 	testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 	testInjector.register("server", {});
+	testInjector.register("ionicProjectTransformator", {});
 	testInjector.register("cordovaResources", {});
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
