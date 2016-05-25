@@ -31,9 +31,9 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $prompter: IPrompter,
 		private $server: Server.IServer) {
-			let npmVersions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().npmVersions).map(npmVersion => npmVersion.version);
+			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().versions).map(version => version.version);
 			let frameworkVersion = this.$project.projectData.FrameworkVersion;
-			if(!_.contains(npmVersions, frameworkVersion)) {
+			if(!_.contains(versions, frameworkVersion)) {
 				this.$errors.failWithoutHelp(`Your project targets NativeScript version '${frameworkVersion}' which does not support plugins.`);
 			}
 		}
