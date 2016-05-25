@@ -14,10 +14,14 @@ $injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
 $injector.require("cordovaResources", "./cordova-resource-loader");
 $injector.require("resourceDownloader", "./resource-downloader");
 $injector.require("platformMigrator", "./services/platform-migration");
+$injector.require("clipboardService", "./services/clipboard-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("appScaffoldingExtensionsService", "./services/app-scaffolding-extensions-service");
 $injector.require("screenBuilderService", "./services/screen-builder-service");
+
+$injector.require("darwinDebuggerService", "./services/debug/darwin-debugger-service");
+$injector.require("winDebuggerService", "./services/debug/win-debugger-service");
 
 $injector.require("cordovaPluginsService", "./services/cordova-plugins");
 $injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
@@ -46,7 +50,8 @@ $injector.require("emulate", "./commands/emulate");
 $injector.requireCommand("emulate|android", "./commands/emulate");
 $injector.requireCommand("emulate|ios", "./commands/emulate");
 $injector.requireCommand("emulate|wp8", "./commands/emulate");
-$injector.requireCommand("debug", "./commands/debug");
+$injector.requireCommand("debug|android", "./commands/debug");
+$injector.requireCommand("debug|ios", "./commands/debug");
 
 $injector.require("server", "./server-api");
 $injector.require("httpServer", "./http-server");

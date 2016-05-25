@@ -233,6 +233,12 @@ interface IExtensionPlatformServices extends IRunValidator {
 	executableName: string;
 	runApplication(applicationPath: string, applicationParams: string[]): void;
 }
+
+interface IDebuggerService {
+	debugAndroidApplication(applicationId: string): IFuture<void>;
+	debugIosApplication(applicationId: string): void;
+}
+
 interface IRunValidator {
 	canRunApplication(): IFuture<boolean>;
 }
@@ -1130,4 +1136,22 @@ interface IIonicProjectTransformator {
 	 * Creates AppBuilder project from Ionic project by removing unnecesary files, copying the resources and parsing the Ionic config.xml file.
 	 */
 	transformToAppBuilderProject(createBackup: boolean): IFuture<void>
+}
+
+/**
+ * Describes methods for working with the clipboard.
+ */
+interface IClipboardService {
+	/**
+	 * Replaces the current contents of the clipboard.
+	 * @param {string} text to place in the clipboard.
+	 * @return {string} the same value passed in.
+	 */
+	copy(text: string): IFuture<string>;
+
+	/**
+	 * Returns the current contents of the system clipboard.
+	 * @return {string} the current contents of the system clipboard.
+	 */
+	paste(): IFuture<string>;
 }
