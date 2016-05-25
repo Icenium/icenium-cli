@@ -4,6 +4,7 @@
 import * as path from "path";
 import * as shelljs from "shelljs";
 import * as xmlMapping from "xml-mapping";
+import {EOL} from "os";
 
 export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private static IONIC_PROJECT_BACKUP_FOLDER_NAME = "Ionic_Backup";
@@ -23,6 +24,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private _ionicResourcesDirectory: string;
 	private _ionicConfigXml: IonicConfigXmlFile.IConfigXmlFile;
 	private _pluginsService: IPluginsService;
+	private _appbuilderProjectFiles: string[];
 
 	constructor(private $fs: IFileSystem,
 		private $projectConstants: Project.IConstants,
@@ -47,6 +49,25 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		}
 
 		return this._pluginsService;
+	}
+
+	private get appbuilderProjectFiles(): string[] {
+		if (!this._appbuilderProjectFiles) {
+			this._appbuilderProjectFiles = [
+				this.$projectConstants.PROJECT_FILE,
+				this.$projectConstants.PROJECT_IGNORE_FILE,
+				this.$projectConstants.RELEASE_PROJECT_FILE_NAME,
+				this.$projectConstants.DEBUG_PROJECT_FILE_NAME
+			];
+
+			_.each([this.$devicePlatformsConstants.Android.toLowerCase(),
+				this.$devicePlatformsConstants.iOS.toLowerCase(),
+				this.$devicePlatformsConstants.WP8.toLowerCase()], (platformName: string) => {
+					this._appbuilderProjectFiles.push(`cordova.${platformName}.js`);
+				});
+		}
+
+		return this._appbuilderProjectFiles;
 	}
 
 	/**
@@ -77,6 +98,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			if (createBackup) {
 				this.backupCurrentProject().wait();
+				this.addIonicBackupFolderToAbIgnoreFile().wait();
 			}
 
 			this.createReroutingIndexHtml().wait();
@@ -336,7 +358,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 					let itemDestinationDirectory = path.join(ionicProjectBackupDir, item);
 					if (this.$fs.getFsStats(itemSourceDirectory).wait().isDirectory()) {
 						shelljs.cp("-R", `${itemSourceDirectory}/`, `${itemDestinationDirectory}`);
-					} else {
+					} else if (!this.isAppBuilderProjectFile(itemSourceDirectory)) {
 						this.$fs.copyFile(itemSourceDirectory, itemDestinationDirectory).wait();
 					}
 				}
@@ -415,6 +437,28 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			});
 		});
 		return folderNames;
+	}
+
+	private isAppBuilderProjectFile(file: string): boolean {
+		let isAppBuilderFile = false;
+		_.each(this.appbuilderProjectFiles, (appBuilderFileName: string) => {
+			if (file.indexOf(appBuilderFileName) >= 0) {
+				isAppBuilderFile = true;
+				return false;
+			}
+		});
+
+		return isAppBuilderFile;
+	}
+
+	private addIonicBackupFolderToAbIgnoreFile(): IFuture<void> {
+		return (() => {
+			let abIgnoreFilePath = path.join(this.$project.projectDir, this.$projectConstants.PROJECT_IGNORE_FILE);
+
+			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}/`;
+
+			this.$fs.appendFile(abIgnoreFilePath, ignoreText).wait();
+		}).future<void>()();
 	}
 }
 
