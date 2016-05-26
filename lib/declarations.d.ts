@@ -454,7 +454,6 @@ interface INativeScriptMigrationConfiguration {
 	pathToPackageJson: string;
 	projectDir: string;
 	appResourcesRequiredPath: string;
-	appResourcesObsoletePath: string;
 
 	shouldRollBackAppResources: boolean;
 }
@@ -913,9 +912,9 @@ interface INativeScriptMigrationData {
 	 */
 	supportedVersions: IFrameworkVersion[];
 	/**
-	 * Versions that are obsolete.
+	 * Versions that are deprecated.
 	 */
-	obsoleteVersions: IFrameworkVersion[];
+	deprecatedVersions: IFrameworkVersion[];
 }
 
 /**
