@@ -15,17 +15,16 @@ Creates a project for hybrid or native development. If `screenbuilder` and `<Typ
 * `--no-simulator` - If set, the Telerik AppBuilder CLI does not launch the device simulator after the project is created successfully. This option is applicable only to Screen Builder projects.
 
 ### Attributes
-* `<Type>` extends the `create` command. You can set the following values for this attribute. 
+* `<Type>` extends the `create` command. You can set the following values for this attribute.
 	* `hybrid` - Creates a new project from an **Apache Cordova** template.
 	* `native` - Creates a new project from a **NativeScript** template.
 	* `screenbuilder` - Creates a new project for hybrid development with Screen Builder and launches the device simulator afterwards. You can later run the Screen Builder commands for project development on this project.
 * `<App name>` is the name of the application. The maximum length is 30 characters. You can use only the following characters: A-Z, a-z, 0-9, underscore (_), dot (.), hyphen (-) and space ( ).
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#create).<% } %> 
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#create).<% } %>
 
 <% if(isHtml) { %>
 ### Prerequisites
 
-* Verify that you have installed git on your system.
 * The `--answers` option is applicable only to Screen Builder projects.
 * The `--no-simulator` option is applicable only to Screen Builder projects.
 

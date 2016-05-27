@@ -1,11 +1,11 @@
-add-about
+add-editablelistformfield
 ==========
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder add-about` [--answers <File Path>]
+General | `$ appbuilder add-editablelistformfield` [--answers <File Path>]
 
-Inserts an about form in an existing application view. <% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
+Inserts an editable field in an existing editable form. <% if(isHtml) { %>An interactive prompt guides you through the setup process.<% } %>
 <% if(isConsole) { %>WARNING: This command is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
 
 ### Options
@@ -14,12 +14,12 @@ Inserts an about form in an existing application view. <% if(isHtml) { %>An inte
 
 ### Attributes
 
-* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-about).<% } %>
+* `<File Path>` is the absolute or relative file path to a `JSON` file which contains configuration information about your project.<% if(isHtml) { %> The file must comply with the JSON specification described in detail [here](http://docs.telerik.com/platform/appbuilder/creating-your-project/screen-builder-automation#add-editablelistformfield).<% } %>
 
 <% if(isHtml) { %>
 ### Prerequisites
 
-* The existing application view must be added with `$ appbuilder add-view` or must be the default `home` view.
+* You must have at least one editable form configured with `$ appbuilder add-editablelistform`
 
 ### Command Limitations
 
@@ -32,13 +32,12 @@ Command | Description
 [create screenbuilder](../project/creation/create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder.html) | Shows all commands for project development with Screen Builder.
 [upgrade-screenbuilder](upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
+[add-about](add-about.html) | Inserts an about form in an existing application view.
 [add-authentication](add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 [add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
 [add-field](add-field.html) | Inserts an input field in an existing form.
-[add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
 [add-editablelist](add-editablelist.html) | Inserts an editable list in an existing application view.
 [add-editablelistform](add-editablelistform.html) | Inserts an editable form in an existing editable list.
-[add-editablelistformfield](add-editablelistformfield.html) | Inserts an editable field in an existing editable form.
 <% } %>

@@ -26,4 +26,7 @@ Command | Description
 [add-field](add-field.html) | Inserts an input field in an existing form.
 [add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
+[add-editablelist](add-editablelist.html) | Inserts an editable list in an existing application view.
+[add-editablelistform](add-editablelistform.html) | Inserts an editable form in an existing editable list.
+[add-editablelistformfield](add-editablelistformfield.html) | Inserts an editable field in an existing editable form.
 <% } %>
