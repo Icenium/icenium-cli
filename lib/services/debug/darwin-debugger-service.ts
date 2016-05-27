@@ -2,6 +2,7 @@
 "use strict";
 
 import * as shelljs from "shelljs";
+import {EOL} from "os";
 
 export class DarwinDebuggerService implements IDebuggerService {
 	constructor(private $childProcess: IChildProcess,
@@ -42,6 +43,14 @@ export class DarwinDebuggerService implements IDebuggerService {
 		}
 
 		let devToolsPort = devToolsPortMatches[1];
+
+		process.on("SIGINT", () => {
+			this.killIosWebkitDebugProxyProcesses();
+		});
+
+		process.on("SIGTERM", () => {
+			this.killIosWebkitDebugProxyProcesses();
+		});
 
 		this.$opener.open(`http://localhost:${devToolsPort}`, "safari");
 		this.$logger.out("To stop the debugger press Ctrl + C");
@@ -85,6 +94,22 @@ export class DarwinDebuggerService implements IDebuggerService {
 			this.$logger.out(`Your application is available for debugging on port: ${tcpPort}.`);
 			this.$logger.out(`Open Google Chrome and in the address bar enter ${inspectorAddress}. You can just paste it, it is already copied to your clipboard.`);
 		}).future<void>()();
+	}
+
+	private killIosWebkitDebugProxyProcesses(): void {
+		// The output will look like this:
+		// UID   PID   PPID   C  STIME   TTY           TIME CMD
+		// 501   9225     1   0  5:54PM  ttys002       0:00.03 ios_webkit_debug_proxy
+		let processes = shelljs.exec("ps -ef | grep ios_webkit_debug_proxy").output.split(EOL) || [];
+		let processIdRegExp = /\d+\s+(\d+)\s+/;
+
+		_.each(processes, (processInfo: string) => {
+			let processIdMatches = processIdRegExp.exec(processInfo);
+
+			if (processIdMatches && processIdMatches[1]) {
+				shelljs.exec(`kill -9 ${processIdMatches[1]}`);
+			}
+		});
 	}
 }
 
