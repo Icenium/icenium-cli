@@ -34,7 +34,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				pathToPackageJson: this.getPathToProjectPackageJson().wait(),
 				projectDir: projectDir,
 				appResourcesRequiredPath: path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$staticConfig.APP_RESOURCES_DIR_NAME),
-				appResourcesObsoletePath: path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME),
 				shouldRollBackAppResources: false
 			};
 		}
@@ -89,13 +88,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}).future<string[]>()();
 	}
 
-	public getObsoleteVersions(): IFuture<string[]> {
-		return ((): string[] => {
-			let migrationData = this.nativeScriptMigrationData.wait();
-			return _.map(migrationData.obsoleteVersions, obsoleteVersion => obsoleteVersion.version);
-		}).future<string[]>()();
-	}
-
 	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
 		return ((): IFrameworkVersion[] => {
 			let migrationData = this.nativeScriptMigrationData.wait();
@@ -106,11 +98,10 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	public getDisplayNameForVersion(version: string): IFuture<string> {
 		return ((): string => {
 			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: IFrameworkVersion) => fw.version === version);
-			this.warnIfVersionObsolete(version).wait();
+			this.warnIfVersionDeprecated(version).wait();
 			if (framework) {
 				return framework.displayName;
 			} else {
-				this.throwIfVersionDeleted(version).wait();
 				return version;
 			}
 		}).future<string>()();
@@ -184,38 +175,24 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return `${version}${NativeScriptMigrationService.TNS_CORE_MODULES}.zip`;
 	}
 
-	private getDeletedVersions(): IFuture<string[]> {
+	private getDeprecatedVersions(): IFuture<string[]> {
 		return ((): string[] => {
 			let migrationData = this.nativeScriptMigrationData.wait();
-			return _.map(migrationData.deletedVersions, deletedVersion => deletedVersion.version);
+			return _.map(migrationData.deprecatedVersions, deprecatedVersion => deprecatedVersion.version);
 		}).future<string[]>()();
 	}
 
-	private warnIfVersionObsolete(version: string): IFuture<void> {
+	private warnIfVersionDeprecated(version: string): IFuture<void> {
 		return (() => {
-			if (_.contains(this.getObsoleteVersions().wait(), version)) {
-				this.$logger.warn(`Your project targets NativeScript ${version}. This version is deprecated and will become obsolete in a future release. You can still develop and build your project but it is recommended that you commit all changes to version control and migrate to a newer version of NativeScript.`);
+			if (_.contains(this.getDeprecatedVersions().wait(), version)) {
+				this.$logger.warn(`Your project targets NativeScript ${version}. This version is deprecated and will not be available in a future release. You can still develop and build your project but it is recommended that you commit all changes to version control and migrate to a newer version of NativeScript.`);
 			}
 		}).future<void>()();
-	}
-
-	private throwIfVersionDeleted(version: string): IFuture<void> {
-		return (() => {
-			if (this.isDeleted(version).wait()) {
-				this.$errors.failWithoutHelp(`Your project targets NativeScript ${version}. This version is obsolete. You can no longer develop, build or migrate your project from the command line. If you want to migrate your project, create a new project and copy over your code and resources.`);
-			}
-		}).future<void>()();
-	}
-
-	private isDeleted(version: string): IFuture<boolean> {
-		return (() => {
-			return _.contains(this.getDeletedVersions().wait(), version);
-		}).future<boolean>()();
 	}
 
 	private ensurePackageJsonExists(newVersion: string): IFuture<void> {
 		return (() => {
-			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().versions).map(version => version.version);
+			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 			if (_.contains(versions, newVersion)
 				&& !this.$fs.exists(path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
 				// From version 1.1.2 we need package.json file at the root of the project.

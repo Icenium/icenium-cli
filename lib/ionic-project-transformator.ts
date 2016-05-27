@@ -455,7 +455,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return (() => {
 			let abIgnoreFilePath = path.join(this.$project.projectDir, this.$projectConstants.PROJECT_IGNORE_FILE);
 
-			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}/`;
+			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}/${EOL}`;
 
 			this.$fs.appendFile(abIgnoreFilePath, ignoreText).wait();
 		}).future<void>()();
