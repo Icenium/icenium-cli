@@ -1,9 +1,9 @@
 {
 	"appScaffolding": {
-		"version": "0.0.12"
+		"version": "0.0.17"
 	},
 	"generators": [{
 		"name": "generator-kendo-ui-mobile",
-		"version": "0.0.12"
+		"version": "0.0.17"
 	}]
 }
