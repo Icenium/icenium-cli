@@ -50,6 +50,8 @@ Command | Description
 [build android](build-android.html) | Builds the project for Android platform and produces an application package or a QR code for deployment.
 [build ios](build-ios.html) | Builds the project for iOS platform and produces an application package or a QR code for deployment.
 [debug](debug.html) | Shows the debug tools to let you debug applications on connected devices.
+[debug ios](debug-ios.html) | Lets you debug applications on connected iOS devices.
+[debug android](debug-android.html) | Lets you debug applications on connected Android devices.
 [deploy](deploy.html) | Builds the project for the selected platform and deploys it to connected physical devices.
 [deploy android](deploy-android.html) | Builds the project for android platform and deploys it to connected physical devices.
 [deploy ios](deploy-ios.html) | Builds the project for ios platform and deploys it to connected physical devices.
