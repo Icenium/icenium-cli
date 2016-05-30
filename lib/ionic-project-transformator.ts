@@ -192,12 +192,18 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			if (_.isArray(platformResource)) {
 				_.each(platformResource, (resourceTypeItem: IonicConfigXmlFile.IResource) => {
-					let appBuilderResource = this.createNewResourceItem(resourceType, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory, resourceTypeItem, platform.name).wait();
-					result.push(appBuilderResource);
+					// Some projects may not have splash screen or icon resources in their Ionic config.xml file.
+					if (resourceTypeItem) {
+						let appBuilderResource = this.createNewResourceItem(resourceType, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory, resourceTypeItem, platform.name).wait();
+						result.push(appBuilderResource);
+					}
 				});
 			} else {
-				let appBuilderResource = this.createNewResourceItem(resourceType, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory, platformResource, platform.name).wait();
-				result.push(appBuilderResource);
+				// Some projects may not have splash screen or icon resources in their Ionic config.xml file.
+				if (platformResource) {
+					let appBuilderResource = this.createNewResourceItem(resourceType, appBuilderResourcesDirectory, platformConfigXmlDestinationDirectory, appBuilderPlatformResourcesDirectory, platformResource, platform.name).wait();
+					result.push(appBuilderResource);
+				}
 			}
 
 			return result;
@@ -245,7 +251,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			let ionicPlatformResourcesDirectory = path.join(this.ionicResourcesDirectory, ionicPlatformName);
 
-			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName).wait()) {
+			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName).wait() ||
+				!this.$fs.getFsStats(ionicPlatformResourcesDirectory).wait().isDirectory()) {
 				return;
 			}
 
@@ -258,6 +265,10 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			_.each(ionicPlatformResources, (resourceName: string) => {
 				let resourceDirectory = path.join(ionicPlatformResourcesDirectory, resourceName);
+				if (!this.$fs.getFsStats(resourceDirectory).wait().isDirectory()) {
+					return;
+				}
+
 				let resources = this.$fs.readDirectory(resourceDirectory).wait();
 
 				_.each(resources, (ionicResourceName: string) => {
@@ -269,6 +280,10 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 	private copyWindowsPhoneResources(resourceDirectory: string, appBuilderWindowsPhoneResourcesDirectory: string): IFuture<void> {
 		return (() => {
+			if (!this.$fs.getFsStats(resourceDirectory).wait().isDirectory()) {
+				return;
+			}
+
 			let allResources = this.$fs.readDirectory(resourceDirectory).wait();
 			let ionicWindowsPhoneConfig: IonicConfigXmlFile.IPlatform;
 
