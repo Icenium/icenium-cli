@@ -49,3 +49,4 @@ docs/html
 **/.ntvs_analysis.dat
 !lib/hooks/before-*.js
 !lib/hooks/after-*.js
+.DS_Store
