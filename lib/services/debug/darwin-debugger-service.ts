@@ -1,11 +1,10 @@
 ///<reference path="../../.d.ts"/>
 "use strict";
 
-import * as shelljs from "shelljs";
+import * as path from "path";
 
 export class DarwinDebuggerService implements IDebuggerService {
-	constructor(private $childProcess: IChildProcess,
-		private $devicesService: Mobile.IDevicesService,
+	constructor(private $devicesService: Mobile.IDevicesService,
 		private $androidEmulatorServices: Mobile.IAndroidEmulatorServices,
 		private $androidProcessService: Mobile.IAndroidProcessService,
 		private $androidDeviceDiscovery: Mobile.IAndroidDeviceDiscovery,
@@ -16,35 +15,9 @@ export class DarwinDebuggerService implements IDebuggerService {
 		private $prompter: IPrompter) { }
 
 	public debugIosApplication(applicationId: string): void {
-		// Check if the proxy is installed.
-		try {
-			this.$childProcess.spawnFromEvent("ios_webkit_debug_proxy", ["--help"], "close").wait();
-		} catch (err) {
-			this.$errors.failWithoutHelp("If you want to debug for iOS you need to install ios-webkit-debug-proxy using 'brew install ios-webkit-debug-proxy'.");
-		}
+		let pathToDebuggingGuideHtml = path.join(__dirname, "..", "..", "..", "resources", "debugging", "ios-debug-guide.html");
 
-		// Start devtools server.
-		this.$childProcess.spawn("ios_webkit_debug_proxy");
-
-		// The child_process does not receive "data" event when using this plugin. That's why we need to check for the devtools port manually.
-
-		// The grep must be ios_webki.
-		// The output will look like this:
-		// ios_webki 26903 blackdragon    3u  IPv4 0x5377cd482a2d40e3      0t0  TCP *:9221 (LISTEN)
-		// ios_webki 26903 blackdragon    5u  IPv4 0x5377cd4846656da3      0t0  TCP *:teamcoherence (LISTEN)
-		let lsofResult = shelljs.exec("lsof -i | grep ios_webki").output;
-		let portRegExp = /TCP \*:(\d+)/g;
-
-		let devToolsPortMatches = portRegExp.exec(lsofResult);
-
-		if (!devToolsPortMatches) {
-			this.$errors.failWithoutHelp("Devtools failed to run. Please run the command again and if the problem exists reinstall ios-webkit-debug-proxy and try again.");
-		}
-
-		let devToolsPort = devToolsPortMatches[1];
-
-		this.$opener.open(`http://localhost:${devToolsPort}`, "safari");
-		this.$logger.out("To stop the debugger press Ctrl + C");
+		this.$opener.open(`${pathToDebuggingGuideHtml}`, "Safari");
 	}
 
 	public debugAndroidApplication(applicationId: string): IFuture<void> {
