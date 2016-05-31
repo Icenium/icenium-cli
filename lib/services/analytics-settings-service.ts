@@ -13,7 +13,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 
 	public getUserId(): IFuture<string> {
 		return (() => {
-			return this.$userDataStore.getUser().wait().id;
+			return this.$userDataStore.getUser().wait().uid;
 		}).future<string>()();
 	}
 

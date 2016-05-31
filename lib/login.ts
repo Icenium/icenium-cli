@@ -10,7 +10,7 @@ import * as cookielib from "cookie";
 
 export class UserDataStore implements IUserDataStore {
 	private cookies: IStringDictionary;
-	private user: any;
+	private user: IUser;
 
 	constructor(private $fs: IFileSystem,
 		private $config: Config.IConfig,
@@ -35,7 +35,7 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.cookies = JSON.parse(value));
 	}
 
-	public getUser(): IFuture<any> {
+	public getUser(): IFuture<IUser> {
 		return this.readAndCache(this.getUserStateFilePath(),
 			() => this.user,
 			(value: string) => this.user = JSON.parse(value));
@@ -63,7 +63,7 @@ export class UserDataStore implements IUserDataStore {
 		return this.setCookies(cookies);
 	}
 
-	public setUser(user?: any): IFuture<void> {
+	public setUser(user?: IUser): IFuture<void> {
 		return (() => {
 			this.user = user;
 			if(user) {
@@ -263,7 +263,7 @@ export class LoginManager implements ILoginManager {
 			this.$userDataStore.setCookies(cookies).wait();
 
 			let userData = this.$server.authentication.getLoggedInUser().wait();
-			this.$userDataStore.setUser(userData).wait();
+			this.$userDataStore.setUser(<any>userData).wait();
 
 			return userData;
 		}).future()();
@@ -285,7 +285,7 @@ export class LoginManager implements ILoginManager {
 				this.$userDataStore.parseAndSetCookies(cookies).wait();
 
 				let userData = this.$server.authentication.getLoggedInUser().wait();
-				this.$userDataStore.setUser(userData).wait();
+				this.$userDataStore.setUser(<any>userData).wait();
 			}
 		}).future<void>()();
 	}
