@@ -59,13 +59,95 @@ declare module Server {
 	}
 }
 
+/**
+ * Describes tenant information for a user.
+ */
+interface ITenant {
+	/**
+	 * Unique identifier of the tenant.
+	 */
+	id: string;
+
+	/**
+	 * Name of the tenant.
+	 */
+	name: string;
+
+	/**
+	 * ExpirationUtcSoft. It's written as string, but in fact it's DateTime.
+	 * @example "2115-08-26T23:59:59.9999999Z"
+	 */
+	expSoft: string;
+
+	/**
+	 * ExpirationUtcStrict. It's written as string, but in fact it's DateTime.
+	 * @example "2115-08-26T23:59:59.9999999Z"
+	 */
+	expStrict: string;
+
+	/**
+	 * Edition of the subscription.
+	 */
+	editionType: string;
+
+	/**
+	 * Is the tenant Active.
+	 */
+	status: string;
+
+	/**
+	 * Available project slots.
+	 */
+	projectSlots: number;
+
+	/**
+	 * License
+	 */
+	license: string;
+
+	/**
+	 * Available features. The value for each of them shows if user can use them.
+	 */
+	features: IDictionary<boolean>;
+}
+
+/**
+ * Describes AppBuilder User.
+ */
+interface IUser {
+	/**
+	 * Email of the user.
+	 */
+	email: string;
+
+	/**
+	 * Unique identifier of the user.
+	 */
+	uid: string;
+
+	/**
+	 * Name of the user.
+	 */
+	name: string;
+
+	/**
+	 * Has agreed to eula.
+	 */
+	eula: boolean;
+
+	/**
+	 * Tenant information.
+	 */
+	tenant: ITenant;
+}
+
 interface IUserDataStore {
 	hasCookie(): IFuture<boolean>;
 	getCookies(): IFuture<IStringDictionary>;
-	getUser(): IFuture<any>;
+	getUser(): IFuture<IUser>;
 	setCookies(cookies?: IStringDictionary): IFuture<void>;
 	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void>;
-	setUser(user?: any): IFuture<void>;
+	setUser(user?: IUser): IFuture<void>;
 	clearLoginData(): IFuture<void>;
 }
 
