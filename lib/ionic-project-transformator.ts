@@ -404,14 +404,11 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 	private deleteAssortedFilesAndDirectories() {
 		let projectDir = this.$project.getProjectDir().wait();
+		let assortedFilesAndDirectories = ["platforms", "hooks", "resources", ".editorconfig", "ionic.project", "package.json"];
+		let itemsToRemove = _.map(assortedFilesAndDirectories, (item: string) => path.join(projectDir, item));
+
 		try {
-			this.$fs.rm("-rf",
-				path.join(projectDir, "platforms"),
-				path.join(projectDir, "hooks"),
-				path.join(projectDir, ".editorconfig"),
-				path.join(projectDir, "ionic.project"),
-				path.join(projectDir, "package.json")
-			);
+			this.$fs.rm("-rf", ...itemsToRemove);
 		} catch (e) {
 			// Some files do not exist in older ionic projects, ignore the error.
 			this.$logger.trace(`Deleting unexisting file from Ionic project: ${e}`);
@@ -470,7 +467,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return (() => {
 			let abIgnoreFilePath = path.join(this.$project.projectDir, this.$projectConstants.PROJECT_IGNORE_FILE);
 
-			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}/${EOL}`;
+			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}${EOL}`;
 
 			this.$fs.appendFile(abIgnoreFilePath, ignoreText).wait();
 		}).future<void>()();
