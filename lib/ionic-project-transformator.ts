@@ -97,17 +97,25 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			this.$analyticsService.track("Migrate from Ionic", "true").wait();
 
 			if (createBackup) {
+				console.log(`-------Backup of project started at ${new Date()}`);
 				this.backupCurrentProject().wait();
+				console.log(`-------Backup of project ended at ${new Date()}`);
 				this.addIonicBackupFolderToAbIgnoreFile().wait();
 			}
 
 			this.createReroutingIndexHtml().wait();
 
+			console.log(`-------Cloning resources started at ${new Date()}`);
 			this.cloneResources().wait();
+			console.log(`-------Cloning resources ended at ${new Date()}`);
 
+			console.log(`-------Deleting plugins started at ${new Date()}`);
 			this.deleteEnabledPlugins().wait();
+			console.log(`-------Deleting plugins ended at ${new Date()}`);
 
+			console.log(`-------Deleting Ionic files started at ${new Date()}`);
 			this.deleteAssortedFilesAndDirectories();
+			console.log(`-------Deleting Ionic files ended at ${new Date()}`);
 		}).future<void>()();
 	}
 
