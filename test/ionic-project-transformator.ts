@@ -458,7 +458,7 @@ describe("Ionic project transformator", () => {
 
 		describe("project cleanup", () => {
 			it("should delete the Ionic project specific files and folders.", () => {
-				let ionicProjectSpecificFilesAndFolders = ["package.json", "ionic.project", ".editorconfig", "hooks", "platforms"];
+				let ionicProjectSpecificFilesAndFolders = ["package.json", "ionic.project", ".editorconfig", "hooks", "platforms", "resources"];
 				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
 				_.each(ionicProjectSpecificFilesAndFolders, (item: string) => {
