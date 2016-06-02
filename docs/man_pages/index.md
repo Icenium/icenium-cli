@@ -29,7 +29,7 @@ Command | Description
 [deploy `<Platform>`](project/testing/deploy.html) | Builds and deploys the project to a connected device.
 [livesync&nbsp;cloud](project/testing/livesync-cloud.html) | Synchronizes the project with the cloud to enable LiveSync for remote devices.
 [livesync&nbsp;`<Platform>`](project/testing/livesync.html) | Synchronizes the latest changes in your project to connected devices.
-[debug](project/testing/debug.html) | Shows the debug tools to let you debug applications on connected devices.
+[debug `<Platform>`](project/testing/debug.html) | Shows the debug tools to let you debug applications on connected devices.
 [simulate](project/testing/simulate.html) | Runs the current project in the device simulator.
 [emulate `<Platform>`](project/testing/emulate.html) | Runs the current project in the selected platform emulator.
 [remote](project/testing/remote.html) | Starts a remote server to let you run your app in the iOS Simulator from a Windows system.

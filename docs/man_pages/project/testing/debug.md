@@ -34,8 +34,8 @@ WARNING: This command is not applicable to Linux systems. To view the complete h
 
 Command | Description
 ----------|----------
-[debug ios](debug-ios.html) | Opens up ios-webkit-debug-proxy in Safari on specific port and lets you debug your application.
-[debug android](debug-android.html) | Opens up Google Chrome's inspector on specific port and lets you debug your application.
+[debug ios](debug-ios.html) | Lets you debug applications on connected iOS devices.
+[debug android](debug-android.html) | Lets you debug applications on connected Android devices.
 [build](build.html) | Builds the project for the target platform and produces an application package or a QR code for deployment.
 [build android](build-android.html) | Builds the project for Android platform and produces an application package or a QR code for deployment.
 [build ios](build-ios.html) | Builds the project for iOS platform and produces an application package or a QR code for deployment.

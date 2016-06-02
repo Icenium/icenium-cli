@@ -435,13 +435,16 @@ describe("Ionic project transformator", () => {
 					let appbuilderResourcesDirectory = path.join(projectDirectory, appResourcesFolderName, appbuilderPlatformName);
 					let ionicResourcesDirectory = path.join(projectDirectory, "resources", appbuilderPlatformName.toLocaleLowerCase());
 
+					// Need to get the list of the resources before the resources folder is deleted.
+					let ionicResources = shelljs.ls("-R", path.join(ionicResourcesDirectory, "icon"), path.join(ionicResourcesDirectory, "splash"));
+
 					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
 					// Need to remove the config.xml file from the AppBuilder folder to compare only the resources.
 					fs.deleteFile(path.join(appbuilderResourcesDirectory, configXmlName)).wait();
 
 					let differentResources = _.difference(shelljs.ls("-R", appbuilderResourcesDirectory),
-						shelljs.ls("-R", path.join(ionicResourcesDirectory, "icon"), path.join(ionicResourcesDirectory, "splash")));
+						ionicResources);
 
 					if (appbuilderPlatformName === "WP8" && differentResources.length > 0) {
 						// Need to check if the splashscreen for WP8 is the difference and exclude it because only the file extension will be different and it is expected.

@@ -6,21 +6,18 @@ Usage | Synopsis
 General | `$ appbuilder debug ios`
 
 <% if(isConsole) { %>
-<% if(isWindows) { %> Shows the debug tools to let you debug applications on connected Android devices. <% } %>
-<% if(isMacOS) { %> Allows you to debug your Cordova applications in Safari, by starting ios-webkit-debug-proxy on specific port and opens Safari on this port. <% } %>
+<% if(isWindows) { %>Shows the AppBuilder debug tools to let you debug applications on connected iOS devices. <% } %>
+<% if(isMacOS) { %>For Apache Cordova applications, you can use Safari to debug your apps. For more information about debugging with Safari, see https://developer.apple.com/library/mac/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW2<% } %>
 <% } %>
 <% if(isHtml) { %>
-On Windows shows the debug tools to let you debug applications on connected Android devices. On OS X you can debug your Cordova applications in Google Chrome. The command will open device port and copy the required link to your clipboard. You have to paste it manually in your browser.
-<% } %>
+On Windows systems, shows the AppBuilder debug tools to let you debug applications on connected Android devices. On OS X systems, you need to manually launch Safari and debug your app using the Safari Web Inspector. For more information about debugging on OS X, see [Safari Web Inspector Guide](https://developer.apple.com/library/mac/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40007874-CH1-SW1) 
 
-<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
-[debug](debug.html) | Shows the debug tools to let you debug applications on connected iOS or Android devices.<% if(isHtml) { %> For more information about debugging on device, see [Debugging on Device](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/debugging-on-device).
-<% } %>
-[debug android](debug-android.html) | Opens up Google Chrome's inspector on specific port and lets you debug your application.
+[debug](debug.html) | Shows the debug tools to let you debug applications on connected iOS or Android devices.
+[debug android](debug-android.html) | Lets you debug applications on connected Android devices.
 [build](build.html) | Builds the project for the target platform and produces an application package or a QR code for deployment.
 [build android](build-android.html) | Builds the project for Android platform and produces an application package or a QR code for deployment.
 [build ios](build-ios.html) | Builds the project for iOS platform and produces an application package or a QR code for deployment.
