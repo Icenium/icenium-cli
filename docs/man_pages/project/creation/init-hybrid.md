@@ -5,7 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder init hybrid [--appid <App ID>]`
 
-Initializes an existing Apache Cordova project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains any existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device.  
+Initializes an existing Apache Cordova project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio, synchronized from GitHub or exported from the cloud), the project retains any existing project configuration. In this case, you might want to manually set new unique values for the WP8ProductID and WP8PublisherID properties to avoid issues when running your app on device.
+
+If the directory contains an existing Ionic project, you will be prompted to create a backup so that you can restore your work. The project retains its plugins, name and app ID, if not specified otherwise. The AppBuilder CLI configures the remaining project properties and provides the missing application icons and splash screens. You might want to manually set new unique values for your project properties and to update the application assets.
+
 For more information about how to configure your project properties, see [appbuilder prop](../configuration/prop.html)<% } %> 
 
 ### Options
