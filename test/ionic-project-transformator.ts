@@ -107,18 +107,14 @@ function createIonicProject(testInjector: IInjector, fs: IFileSystem): IFuture<s
 	return ((): string => {
 		if (!hasUnzippedProject) {
 			hasUnzippedProject = true;
-			console.log(`-------Unzipping Ionic project started at ${new Date()}`);
 			fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true }).wait();
-			console.log(`-------Unzipping Ionic project ended at ${new Date()}`);
 		}
 
 		let options = testInjector.resolve("options");
 		let projectDirectory = temp.mkdirSync("ionic-transform-test");
 		options.path = projectDirectory;
 
-		console.log(`-------Copying Ionic project started at ${new Date()}`);
 		shelljs.cp("-Rf", [unzippedProjectDirectory + `${pathSeparator}.*`, unzippedProjectDirectory + `${pathSeparator}*`], projectDirectory);
-		console.log(`-------Copying Ionic project ended at ${new Date()}`);
 
 		return projectDirectory;
 	}).future<string>()();
@@ -290,17 +286,15 @@ describe("Ionic project transformator", () => {
 		it("should create full backup of the project", () => {
 			createBackup = true;
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
-			console.log(`-------Listing current dir started at ${new Date()}`);
 			let projectDirectoryContent = shelljs.ls("-R", projectDirectory);
-			console.log(`-------Listing current dir ended at ${new Date()}`);
 
 			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
-			console.log(`-------Listing backup dir started at ${new Date()}`);
 			let projectBackupDirectoryContent = shelljs.ls("-R", backupDirectory);
-			console.log(`-------Listing backup dir ended at ${new Date()}`);
 
-			assert.deepEqual(projectDirectoryContent, projectBackupDirectoryContent);
+			let differences = _.difference(projectDirectoryContent, projectBackupDirectoryContent);
+
+			assert.deepEqual(differences.length, 0);
 		});
 
 		it("should create rerouting index.html", () => {
@@ -386,7 +380,7 @@ describe("Ionic project transformator", () => {
 				});
 			});
 
-			it(`should clone correctly when more than platform configurations are added to the Ionic config.xml file.`, () => {
+			it(`should clone correctly when more than one platform configurations are added to the Ionic config.xml file.`, () => {
 				let platformConfigXmlItem: IonicConfigXmlFile.IPlatform[] = [];
 				let androidTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(androidPlatformName, appResourcesDirectory);
 				let iosTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(iosPlatformName, appResourcesDirectory);
