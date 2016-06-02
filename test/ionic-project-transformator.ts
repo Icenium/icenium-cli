@@ -113,6 +113,7 @@ function createIonicProject(testInjector: IInjector, fs: IFileSystem): IFuture<s
 		let options = testInjector.resolve("options");
 		let projectDirectory = temp.mkdirSync("ionic-transform-test");
 		options.path = projectDirectory;
+
 		shelljs.cp("-Rf", [unzippedProjectDirectory + `${pathSeparator}.*`, unzippedProjectDirectory + `${pathSeparator}*`], projectDirectory);
 
 		return projectDirectory;
@@ -291,7 +292,9 @@ describe("Ionic project transformator", () => {
 
 			let projectBackupDirectoryContent = shelljs.ls("-R", backupDirectory);
 
-			assert.deepEqual(projectDirectoryContent, projectBackupDirectoryContent);
+			let differences = _.difference(projectDirectoryContent, projectBackupDirectoryContent);
+
+			assert.deepEqual(differences.length, 0);
 		});
 
 		it("should create rerouting index.html", () => {
@@ -377,7 +380,7 @@ describe("Ionic project transformator", () => {
 				});
 			});
 
-			it(`should clone correctly when more than platform configurations are added to the Ionic config.xml file.`, () => {
+			it(`should clone correctly when more than one platform configurations are added to the Ionic config.xml file.`, () => {
 				let platformConfigXmlItem: IonicConfigXmlFile.IPlatform[] = [];
 				let androidTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(androidPlatformName, appResourcesDirectory);
 				let iosTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(iosPlatformName, appResourcesDirectory);

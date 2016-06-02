@@ -129,9 +129,15 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			this.cloneConfigXml(appBuilderResourcesDirectory).wait();
 
+			console.log(`-------Cloning Android resources started at ${new Date()}`);
 			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.Android.toLowerCase(), this.copyAndroidResources).wait();
+			console.log(`-------Cloning Android resources ended at ${new Date()}`);
+			console.log(`-------Cloning iOS resources started at ${new Date()}`);
 			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.iOS.toLowerCase(), this.copyResources).wait();
+			console.log(`-------Cloning iOS resources ended at ${new Date()}`);
+			console.log(`-------Cloning WP8 resources started at ${new Date()}`);
 			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.WP8.toLowerCase(), this.copyWindowsPhoneResources).wait();
+			console.log(`-------Cloning WP8 resources started at ${new Date()}`);
 		}).future<void>()();
 	}
 
@@ -312,7 +318,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 						this.$fs.copyFile(path.join(resourceDirectory, item), resourceDestinationDirectory).wait();
 					} else {
-						shelljs.cp("-R", resourceItemSourceDirectory, resourceDestinationDirectory);
+						this.$fs.copyDirRecursive(resourceItemSourceDirectory, resourceDestinationDirectory).wait();
+						// shelljs.cp("-R", resourceItemSourceDirectory, resourceDestinationDirectory);
 					}
 				});
 			} else {
@@ -327,7 +334,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			// Need to add / at the end of resourceDirectory to copy the content of the directory directly to appBuilderPlatformResourcesDirectory not in subfolder.
 			let resourceDirectoryContentPath = `${resourceDirectory}/`;
 
-			shelljs.cp("-rf", resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory);
+			this.$fs.copyDirRecursive(resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory).wait();
+			// shelljs.cp("-r", resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory);
 		}).future<void>()();
 	}
 

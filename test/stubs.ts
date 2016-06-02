@@ -111,6 +111,10 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
+	copyDirRecursive(sourceDirName:string, destinationDirName:string):IFuture<void> {
+		return undefined;
+	}
+
 	openFile(filename: string): void { }
 
 	createReadStream(path:string, options?:{flags?: string; encoding?: string; fd?: string; mode?: number; bufferSize?: number}): any {
