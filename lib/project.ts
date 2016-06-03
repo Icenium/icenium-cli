@@ -20,6 +20,9 @@ export class Project implements Project.IProject {
 		"javascript.blank": "Blank"
 	};
 
+	// The json schema on the server has wrong description for the Hidden property of the iOS Status Bar Style.
+	private static HIDDEN_IOS_STATUS_BAR_DESCRIPTION = "Hidden";
+
 	private _hasBuildConfigurations: boolean = false;
 	private _projectSchema: any;
 	private cachedProjectDir: string = "";
@@ -394,6 +397,12 @@ export class Project implements Project.IProject {
 			if (normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
 				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, this.getConfigurationsSpecifiedByUser()).wait();
 			} else {
+				// If the user wants to set the iOS Status Bar Style to "Hidden" and enters "Hidden (iOS 6.1 and earlier)" like it is displayed with the --valid-value flag, we need to change it to the correct value - "Hidden".
+				let indexOfHiddenIosStatusBarStyleDescription = propertyValues.indexOf(this.getCorrectHiddenStatusBarStyleDescription());
+				if (indexOfHiddenIosStatusBarStyleDescription >= 0) {
+					propertyValues[indexOfHiddenIosStatusBarStyleDescription] = Project.HIDDEN_IOS_STATUS_BAR_DESCRIPTION;
+				}
+
 				this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
 				_.each(this.configurationSpecificData, configSpecificData => this.$projectPropertiesService.removeProjectProperty(configSpecificData, normalizedPropertyName, this.projectData));
 			}
@@ -424,7 +433,11 @@ export class Project implements Project.IProject {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if (_.has(mergedProjectData, normalizedPropertyName)) {
 							this.$logger.write(`The value of ${normalizedPropertyName} is: `);
-							this.$logger.out(mergedProjectData[normalizedPropertyName]);
+							if (normalizedPropertyName === "iOSStatusBarStyle" && mergedProjectData[normalizedPropertyName] === Project.HIDDEN_IOS_STATUS_BAR_DESCRIPTION) {
+								this.$logger.out(this.getCorrectHiddenStatusBarStyleDescription());
+							} else {
+								this.$logger.out(mergedProjectData[normalizedPropertyName]);
+							}
 						} else if (this.hasConfigurationSpecificDataForProperty(normalizedPropertyName)) {
 							this.printConfigurationSpecificDataForProperty(normalizedPropertyName);
 						} else {
@@ -486,10 +499,21 @@ export class Project implements Project.IProject {
 			if (validValues) {
 				this.$logger.out("%sValid values:", Project.INDENTATION);
 				_.forEach(validValues, value => {
+					if (property.description === "iOS status bar style" && value === Project.HIDDEN_IOS_STATUS_BAR_DESCRIPTION) {
+						value = this.getCorrectHiddenStatusBarStyleDescription();
+					}
+
 					this.$logger.out("%s  %s", Project.INDENTATION, value);
 				});
 			}
 		}).future<void>()();
+	}
+
+	/**
+	 * Returns the correct description of the Hidden iOS Status Bar Style property because the description from the server is wrong.
+	 */
+	private getCorrectHiddenStatusBarStyleDescription(): string {
+		return `${Project.HIDDEN_IOS_STATUS_BAR_DESCRIPTION} (iOS 6.1 and earlier)`;
 	}
 
 	private hasConfigurationSpecificDataForProperty(normalizedPropertyName: string): boolean {
