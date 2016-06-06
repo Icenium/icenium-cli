@@ -8,18 +8,18 @@ import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
-		$errors: IErrors,
-		$fs: IFileSystem,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
-		$jsonSchemaValidator: IJsonSchemaValidator,
-		$logger: ILogger,
 		private $projectConstants: Project.IConstants,
 		private $configFilesManager: Project.IConfigFilesManager,
-		$resources: IResourceLoader,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
 		private $injector: IInjector,
 		private $nativeScriptProjectCapabilities: Project.ICapabilities,
+		$errors: IErrors,
+		$fs: IFileSystem,
+		$jsonSchemaValidator: IJsonSchemaValidator,
+		$logger: ILogger,
+		$resources: IResourceLoader,
 		$options: IOptions) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
@@ -47,7 +47,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return 17; // 4.2 JellyBean
 	}
 
-	public get configFiles():  Project.IConfigurationFile[] {
+	public get configFiles(): Project.IConfigurationFile[] {
 		let allConfigFiles = this.$configFilesManager.availableConfigFiles;
 		return [
 			allConfigFiles["nativescript-ios-info"],
@@ -64,7 +64,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public get projectSpecificFiles(): string[] {
-		return [ this.$projectConstants.PACKAGE_JSON_NAME ];
+		return [this.$projectConstants.PACKAGE_JSON_NAME];
 	}
 
 	public getValidationSchemaId(): string {
@@ -97,7 +97,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
-		if(buildProperties.Platform === "WP8") {
+		if (buildProperties.Platform === "WP8") {
 			this.$errors.fail("You will be able to build NativeScript based applications for WP8 platform in a future release of the Telerik AppBuilder CLI.");
 		}
 
@@ -110,14 +110,14 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			// In 0.10.0 original template, App_Resources directory is not included in app directory.
 			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
-			if(semver.eq(frameworkVersion, "0.9.0")
+			if (semver.eq(frameworkVersion, "0.9.0")
 				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait()
-				&& this.$fs.exists(path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait())) {
+					&& this.$fs.exists(path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait())) {
 				appResourcesHolderDirectory = projectDir;
 			}
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(appResourcesHolderDirectory,this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
+				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
 				if (!this.$fs.exists(targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
@@ -133,12 +133,12 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			let packageJsonContent = this.$fs.readJson(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 			let nativescript = packageJsonContent && packageJsonContent.nativescript;
 			let dependencies = packageJsonContent && packageJsonContent.dependencies;
-			if(nativescript && dependencies) {
+			if (nativescript && dependencies) {
 				let pluginsVariables: IStringDictionary = {};
 				_.keys(dependencies).forEach(dependency => {
 					let variablesKey = `${dependency}-variables`;
 					let variables = nativescript[variablesKey];
-					if(variables) {
+					if (variables) {
 						pluginsVariables[dependency] = variables;
 					}
 				});

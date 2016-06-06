@@ -71,7 +71,7 @@ export class Project implements Project.IProject {
 	}
 
 	public get startPackageActivity(): string {
-		return this.frameworkProject.startPackageActivity;
+		return this.frameworkProject && this.frameworkProject.startPackageActivity;
 	}
 
 	public getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>> {
