@@ -12,13 +12,13 @@ To get the latest changes on device, tap and hold with three fingers on the devi
 <% } %>
 <% if(isConsole) { %>
 <% if(isNativeScript) { %>
-WARNING: You can LiveSync changes only to the NativeScript companion app. To LiveSync changes to an application package, re-build and re-deploy your NativeScript app.
+WARNING: You can LiveSync changes only to the NativeScript developer app. To LiveSync changes to an application package, re-build and re-deploy your NativeScript app.
 <% } %>
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* For NativeScript projects, you can LiveSync changes only to the NativeScript companion app.
+* For NativeScript projects, you can LiveSync changes only to the NativeScript developer app.
 
 ### Related Commands
 
