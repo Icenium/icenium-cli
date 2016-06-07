@@ -3,7 +3,7 @@ import * as path from "path";
 import * as util from "util";
 import Future = require("fibers/future");
 import temp = require("temp");
-import PluginsDataLib = require("./../plugins-data");
+import PluginsDataLib = require("./../../plugins-data");
 
 export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,

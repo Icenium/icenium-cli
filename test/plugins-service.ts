@@ -1,6 +1,6 @@
-import {CordovaPluginsService} from "./../lib/services/cordova-plugins";
-import {MarketplacePluginsService} from "./../lib/services/marketplace-plugins-service";
-import {CordovaProjectPluginsService} from "./../lib/services/cordova-project-plugins-service";
+import {CordovaPluginsService} from "./../lib/services/plugins/cordova-plugins";
+import {MarketplacePluginsService} from "./../lib/services/plugins/marketplace-plugins-service";
+import {CordovaProjectPluginsService} from "./../lib/services/plugins/cordova-project-plugins-service";
 import * as stubs from "./stubs";
 import {Yok} from "../lib/common/yok";
 import {Options} from "../lib/options";
@@ -30,17 +30,17 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 			Framework: "Cordova"
 		},
 		hasBuildConfigurations: () => false,
-		getProperty(propertyName:string, configuration: string):any {
+		getProperty(propertyName: string, configuration: string): any {
 			return this.projectData[propertyName];
 		},
-		setProperty(propertyName:string, value:any, configuration: string): void {
+		setProperty(propertyName: string, value: any, configuration: string): void {
 			this.projectData[propertyName] = value;
 		},
 		saveProject: () => Future.fromResult(),
 		getProjectDir: () => Future.fromResult(""),
-		ensureProject: () => { /*mock*/},
-		ensureCordovaProject: () => {/*mock*/},
-		configurations:  ["debug"]
+		ensureProject: () => { /*mock*/ },
+		ensureCordovaProject: () => {/*mock*/ },
+		configurations: ["debug"]
 	});
 
 	testInjector.register("server", {
@@ -69,25 +69,25 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 }
 
 class PrompterStub implements IPrompter {
-	constructor(public choiceIndex: number, public versionIndex?: number, public pluginVariableResult?: any) {}
+	constructor(public choiceIndex: number, public versionIndex?: number, public pluginVariableResult?: any) { }
 	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(this.pluginVariableResult); }
-	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
-	getString(prompt: string): IFuture<string> { return Future.fromResult("");}
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
+	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
 	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> {
 		let selectedChoice = choices[this.choiceIndex];
 
-		if(promptMessage.toLowerCase().indexOf("plugin version do you want to use") !== -1) {
+		if (promptMessage.toLowerCase().indexOf("plugin version do you want to use") !== -1) {
 			selectedChoice = choices[this.versionIndex];
 		}
 
-		if(typeof(selectedChoice) !== "string") {
+		if (typeof (selectedChoice) !== "string") {
 			selectedChoice = selectedChoice.value;
 		}
 
 		return Future.fromResult(selectedChoice);
 	}
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean>{ return Future.fromResult(true);}
-	dispose(): void  {/*mock*/}
+	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> { return Future.fromResult(true); }
+	dispose(): void {/*mock*/ }
 }
 
 class ProjectStub {
@@ -110,12 +110,12 @@ class ProjectStub {
 
 	hasBuildConfigurations = () => true;
 
-	getProperty(propertyName:string, configuration: string): any {
+	getProperty(propertyName: string, configuration: string): any {
 		return this.projectData[propertyName] || this.configurationSpecificData[configuration][propertyName];
 	}
 
-	setProperty(propertyName:string, value:any, configuration: string): void {
-		if((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
+	setProperty(propertyName: string, value: any, configuration: string): void {
+		if ((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
 			this.configurationSpecificData[configuration][propertyName] = value;
 		} else {
 			this.projectData[propertyName] = value;
@@ -127,15 +127,15 @@ class ProjectStub {
 	getProjectDir = () => Future.fromResult("");
 
 	ensureProject = () => {/*mock*/ };
-	ensureCordovaProject = () => {/*mock*/};
+	ensureCordovaProject = () => {/*mock*/ };
 	get configurations(): string[] {
 		let configs: string[] = [];
 		let options = this.testInjector.resolve("options");
-		if(options.debug) {
+		if (options.debug) {
 			configs.push("debug");
 		}
 
-		if(options.release) {
+		if (options.release) {
 			configs.push("release");
 		}
 
@@ -171,18 +171,18 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 				Version: "2.0.1",
 				SupportedVersion: ">=3.5.0"
 			},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				Name: "Toast",
-				Version: "2.0.4",
-				SupportedVersion: ">=3.5.0"
-			},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				Name: "Toast",
-				Version: "2.0.5",
-				SupportedVersion: ">=3.5.0"
-			}]
+				{
+					Identifier: "nl.x-services.plugins.toast",
+					Name: "Toast",
+					Version: "2.0.4",
+					SupportedVersion: ">=3.5.0"
+				},
+				{
+					Identifier: "nl.x-services.plugins.toast",
+					Name: "Toast",
+					Version: "2.0.5",
+					SupportedVersion: ">=3.5.0"
+				}]
 		}
 	];
 
@@ -244,7 +244,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	});
 
 	// Register mocked project
-	testInjector.register("project", new ProjectStub([],[], testInjector));
+	testInjector.register("project", new ProjectStub([], [], testInjector));
 
 	testInjector.register("server", {
 		cordova: {
@@ -327,7 +327,8 @@ describe("plugins-service", () => {
 		let installedMarketplacePlugins = [{
 			Identifier: "com.telerik.stripe",
 			Name: "Stripe",
-			Version: "1.0.4" }];
+			Version: "1.0.4"
+		}];
 		let availableMarketplacePlugins = [
 			{
 				Identifier: "nl.x-services.plugins.toast",
@@ -379,10 +380,10 @@ describe("plugins-service", () => {
 		let originalPlugmanFetch = plugman.fetch;
 		let originalPlugmanSearch = plugman.search;
 		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
-			let result = { 'org.apache.cordova.battery-status': { someData: "data" }};
+			let result = { 'org.apache.cordova.battery-status': { someData: "data" } };
 			callback(null, result);
 		};
-		plugman.fetch = (plugin_dir:string, plugins_dir:string, link:boolean, subdir:string, git_ref:string, callback: (error: Error, result: any) => void) => {
+		plugman.fetch = (plugin_dir: string, plugins_dir: string, link: boolean, subdir: string, git_ref: string, callback: (error: Error, result: any) => void) => {
 			callback(null, "Success");
 		};
 
@@ -437,11 +438,11 @@ describe("plugins-service", () => {
 		let originalPlugmanFetch = plugman.fetch;
 		let originalPlugmanSearch = plugman.search;
 		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
-			let result = { 'org.apache.cordova.battery-status': { someData: "data" }};
+			let result = { 'org.apache.cordova.battery-status': { someData: "data" } };
 			callback(null, result);
 		};
-		plugman.fetch = (plugId:string, plugins_dir:string, link:boolean, subdir:string, git_ref:string, callback: (error: Error, result: any) => void) => {
-			if(_.startsWith(plugId, "http")) {
+		plugman.fetch = (plugId: string, plugins_dir: string, link: boolean, subdir: string, git_ref: string, callback: (error: Error, result: any) => void) => {
+			if (_.startsWith(plugId, "http")) {
 				callback(null, "Success");
 			} else {
 				callback(new Error("Error"), null);
@@ -467,11 +468,11 @@ describe("plugins-service", () => {
 			}
 		];
 		let installedMarketplacePlugins = [{
-				Identifier: "com.telerik.stripe",
-				Name: "Stripe",
-				Version: "1.0.4",
-				SupportedVersion: ">=3.5.0"
-			},
+			Identifier: "com.telerik.stripe",
+			Name: "Stripe",
+			Version: "1.0.4",
+			SupportedVersion: ">=3.5.0"
+		},
 			{
 				Identifier: "nl.x-services.plugins.toast",
 				Name: "Toast",
@@ -511,10 +512,10 @@ describe("plugins-service", () => {
 	});
 	it("throw if installed plugin is not available", () => {
 		let installedMarketplacePlugins = [{
-				Identifier: "com.telerik.Invalid",
-				Name: "Stripe",
-				Version: "1.0.4"
-			}
+			Identifier: "com.telerik.Invalid",
+			Name: "Stripe",
+			Version: "1.0.4"
+		}
 		];
 
 		let testInjector = createTestInjector([], installedMarketplacePlugins, []);
@@ -579,11 +580,11 @@ describe("plugins-service", () => {
 	});
 	describe("isPluginInstalled returns correct results", () => {
 		let installedMarketplacePlugins = [{
-					Identifier: "com.telerik.stripe",
-					Name: "Stripe",
-					Version: "1.0.4"
-				}
-			];
+			Identifier: "com.telerik.stripe",
+			Name: "Stripe",
+			Version: "1.0.4"
+		}
+		];
 		let availableMarketplacePlugins = [
 			{
 				Identifier: "com.telerik.stripe",
@@ -621,7 +622,7 @@ describe("plugins-service", () => {
 			assert.isFalse(service.isPluginInstalled("com.telerik.stripe"));
 		});
 	});
-	describe("adding marketplace plugin works correctly",() => {
+	describe("adding marketplace plugin works correctly", () => {
 		let service: IPluginsService,
 			versionToSet = "2.0.5",
 			testInjector: IInjector,
@@ -636,7 +637,7 @@ describe("plugins-service", () => {
 			};
 		};
 
-		describe("modifies marketplace plugin version in both configurations when different versions are used",() => {
+		describe("modifies marketplace plugin version in both configurations when different versions are used", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 
@@ -660,16 +661,16 @@ describe("plugins-service", () => {
 				assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 			});
 
-			it("when console is interactive",() => {
+			it("when console is interactive", () => {
 				testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 			});
 
-			it("when console is not interactive",() => {
+			it("when console is not interactive", () => {
 				testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
 			});
 		});
 
-		it("modifies marketplace plugin version in both configurations when it is enabled in one only and user selects to update both configs",() => {
+		it("modifies marketplace plugin version in both configurations when it is enabled in one only and user selects to update both configs", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true, "release");
 			testInjector.register("prompter", new PrompterStub(1));
@@ -688,7 +689,7 @@ describe("plugins-service", () => {
 			assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 		});
 
-		it("removes marketplace plugin from one config and adds it to specified one when user selects this action",() => {
+		it("removes marketplace plugin from one config and adds it to specified one when user selects this action", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true, "release");
 			testInjector.register("prompter", new PrompterStub(0));
@@ -698,17 +699,17 @@ describe("plugins-service", () => {
 			options.release = true;
 			service.addPlugin(`Toast@${versionToSet}`).wait();
 
-			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(),(pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
+			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), (pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(1, toastInReleaseConfig.length, "Plugin toast MUST be enabled in release configuration.");
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 
 			options.debug = true;
 			options.release = false;
-			let toastInDebugConfig = _.filter(service.getInstalledPlugins(),(pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
+			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), (pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(0, toastInDebugConfig.length, "Plugin toast should not be enabled in debug configuration.");
 		});
 
-		describe("modifies only version of the plugin when it is enabled in one config and user wants to modify this config only",() => {
+		describe("modifies only version of the plugin when it is enabled in one config and user wants to modify this config only", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
@@ -729,16 +730,16 @@ describe("plugins-service", () => {
 				assert.equal(toastInReleaseConfig.length, 0);
 			});
 
-			it("when console is interactive",() => {
+			it("when console is interactive", () => {
 				testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 			});
 
-			it("when console is not interactive",() => {
+			it("when console is not interactive", () => {
 				testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], false);
 			});
 		});
 
-		describe("updates plugin version when it is enabled in at least one config and user tries to add it to both configs",() => {
+		describe("updates plugin version when it is enabled in at least one config and user tries to add it to both configs", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
 				testInjector.register("prompter", new PrompterStub(1));
@@ -760,28 +761,28 @@ describe("plugins-service", () => {
 				assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 			});
 
-			describe("when console is interactive",() => {
-				it("when plugin is enabled in one config only",() => {
+			describe("when console is interactive", () => {
+				it("when plugin is enabled in one config only", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 				});
 
-				it("when plugin is enabled in both configs with same version",() => {
+				it("when plugin is enabled in both configs with same version", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInDebug, true);
 				});
 			});
 
-			describe("when console is not interactive",() => {
-				it("when plugin is enabled in one config only",() => {
+			describe("when console is not interactive", () => {
+				it("when plugin is enabled in one config only", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], false);
 				});
 
-				it("when plugin is enabled in both configs with same version",() => {
+				it("when plugin is enabled in both configs with same version", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInDebug, false);
 				});
 			});
 		});
 
-		it("updates plugin version when it is enabled in both configs and user tries to add it to both configs",() => {
+		it("updates plugin version when it is enabled in both configs and user tries to add it to both configs", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
 			testInjector.register("prompter", new PrompterStub(1));
@@ -803,7 +804,7 @@ describe("plugins-service", () => {
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		});
 
-		it("updates plugin version in both configs when plugin is enabled in both configs and user tries to add it to one config only",() => {
+		it("updates plugin version in both configs when plugin is enabled in both configs and user tries to add it to one config only", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
 			testInjector.register("prompter", new PrompterStub(1));
@@ -825,7 +826,7 @@ describe("plugins-service", () => {
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		});
 
-		it("throws error when plugin is enabled in both configs and user tries to add it to one config only in non interactive terminal",() => {
+		it("throws error when plugin is enabled in both configs and user tries to add it to one config only in non interactive terminal", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, false);
 			testInjector.register("prompter", new PrompterStub(1));
@@ -837,7 +838,7 @@ describe("plugins-service", () => {
 			assert.throws(() => service.addPlugin(`Toast@${versionToSet}`).wait());
 		});
 
-		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal",() => {
+		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			let installedMarketplacePluginsInRelease: any[] = [];
 
@@ -850,7 +851,7 @@ describe("plugins-service", () => {
 			assert.throws(() => service.addPlugin("Toast@2.0.5").wait());
 		});
 
-		it("updates plugin version in both configs when plugin is enabled in both configs with different versions and user tries to add it to one config only",() => {
+		it("updates plugin version in both configs when plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
@@ -873,7 +874,7 @@ describe("plugins-service", () => {
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		});
 
-		it("throws error when plugin is enabled in both configs with different versions and user tries to add it to one config only",() => {
+		it("throws error when plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
@@ -886,7 +887,7 @@ describe("plugins-service", () => {
 			assert.throws(() => service.addPlugin(`Toast@${versionToSet}`).wait());
 		});
 
-		it("throws error when console is non-interactive and user had not specified version for plugin",() => {
+		it("throws error when console is non-interactive and user had not specified version for plugin", () => {
 			testInjector = createTestInjectorForProjectWithBothConfigurations([], [], false);
 			testInjector.register("prompter", new PrompterStub(1));
 			service = testInjector.resolve(CordovaProjectPluginsService);
@@ -896,7 +897,7 @@ describe("plugins-service", () => {
 			assert.throws(() => service.addPlugin("Toast").wait());
 		});
 
-		describe("throws error when specified version is not valid",() => {
+		describe("throws error when specified version is not valid", () => {
 			let invalidVersionToSet = "2.0.8";
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
@@ -907,32 +908,32 @@ describe("plugins-service", () => {
 				options.debug = options.release = false;
 				assert.throws(() => service.addPlugin(`Toast@${invalidVersionToSet}`).wait());
 			});
-			describe("when plugin is not installed at all",() => {
-				it("when console is interactive",() => {
+			describe("when plugin is not installed at all", () => {
+				it("when console is interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations([], [], true);
 				});
 
-				it("when console is not interactive",() => {
+				it("when console is not interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations([], [], false);
 				});
 			});
 
-			describe("when plugin is installed in one config only",() => {
-				it("when console is interactive",() => {
+			describe("when plugin is installed in one config only", () => {
+				it("when console is interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, [], true);
 				});
 
-				it("when console is not interactive",() => {
+				it("when console is not interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, [], false);
 				});
 			});
 
-			describe("when plugin is installed in all configs",() => {
-				it("when console is interactive",() => {
+			describe("when plugin is installed in all configs", () => {
+				it("when console is interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
 				});
 
-				it("when console is not interactive",() => {
+				it("when console is not interactive", () => {
 					testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, false);
 				});
 			});
@@ -943,7 +944,7 @@ describe("plugins-service", () => {
 				describe("when plugin is enabled in all configs with same version", () => {
 					let selectedVersionFromPrompt = "2.0.1";
 					let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.4")],
-							installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4")];
+						installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4")];
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
@@ -967,13 +968,13 @@ describe("plugins-service", () => {
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
 					});
 
-					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", ()=> {
+					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
 						options.debug = true;
 						options.release = false;
 
 					});
-					it("when user does not specify configuration", ()=> {
-						options.debug= options.release = false;
+					it("when user does not specify configuration", () => {
+						options.debug = options.release = false;
 					});
 				});
 
@@ -987,7 +988,7 @@ describe("plugins-service", () => {
 						options = testInjector.resolve("options");
 					});
 
-					it("when user wants to update same configuration only", ()=> {
+					it("when user wants to update same configuration only", () => {
 						options.debug = true;
 						options.release = false;
 						service.addPlugin("Toast").wait();
@@ -1002,7 +1003,7 @@ describe("plugins-service", () => {
 						assert.equal(toastInReleaseConfig.length, 0);
 					});
 
-					it("when user does not specify configuration and selects to update both config from first prompt", ()=> {
+					it("when user does not specify configuration and selects to update both config from first prompt", () => {
 						options.debug = options.release = false;
 						service.addPlugin("Toast").wait();
 
@@ -1019,7 +1020,7 @@ describe("plugins-service", () => {
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
 					});
 
-					it("when user wants to update the other configuration, but selects to update both configs from first prompt", ()=> {
+					it("when user wants to update the other configuration, but selects to update both configs from first prompt", () => {
 						options.debug = false;
 						options.release = true;
 						service.addPlugin("Toast").wait();
@@ -1039,7 +1040,7 @@ describe("plugins-service", () => {
 				describe("when plugin is enabled in all configs with different version", () => {
 					let selectedVersionFromPrompt = "2.0.1";
 					let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.4")],
-							installedMarketplacePluginsInRelease = [getToastPlugin("2.0.5")];
+						installedMarketplacePluginsInRelease = [getToastPlugin("2.0.5")];
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
@@ -1062,19 +1063,19 @@ describe("plugins-service", () => {
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
 					});
 
-					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", ()=> {
+					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
 						options.debug = true;
 						options.release = false;
 
 					});
-					it("when user does not specify configuration", ()=> {
-						options.debug= options.release = false;
+					it("when user does not specify configuration", () => {
+						options.debug = options.release = false;
 					});
 				});
 			});
 		});
 
-		it("does not modify anything and cancels operation when user selects to keep current configurations",() => {
+		it("does not modify anything and cancels operation when user selects to keep current configurations", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 			testInjector.register("prompter", new PrompterStub(2));
@@ -1127,8 +1128,8 @@ describe("plugins-service", () => {
 		it("throws exception when trying to add it to debug config", () => {
 			options.debug = true;
 			options.release = false;
-			assert.throws( () => service.addPlugin(livePatchId).wait());
-			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl =>pl.data.Identifier === livePatchId);
+			assert.throws(() => service.addPlugin(livePatchId).wait());
+			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
 			options.debug = false;
 			options.release = true;
@@ -1153,26 +1154,26 @@ describe("plugins-service", () => {
 	describe("availableMarketplacePlugins are correct", () => {
 		it("getAvailablePlugins returns correct plugins when their versions are supported", () => {
 			let availableMarketplacePlugins = [
-			{
-				Identifier: "com.telerik.stripe",
-				DefaultVersion: "1.0.4",
-				Versions: [{
+				{
 					Identifier: "com.telerik.stripe",
-					Name: "Stripe",
-					Version: "1.0.4",
-					SupportedVersion: ">=3.5.0"
-				}]
-			},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				DefaultVersion: "2.0.1",
-				Versions: [{
+					DefaultVersion: "1.0.4",
+					Versions: [{
+						Identifier: "com.telerik.stripe",
+						Name: "Stripe",
+						Version: "1.0.4",
+						SupportedVersion: ">=3.5.0"
+					}]
+				},
+				{
+					Identifier: "nl.x-services.plugins.toast",
+					DefaultVersion: "2.0.1",
+					Versions: [{
 						Identifier: "nl.x-services.plugins.toast",
 						Name: "Toast",
 						Version: "2.0.1",
 						SupportedVersion: ">=3.5.0"
 					}]
-			}];
+				}];
 
 			let testInjector: IInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
 
@@ -1189,38 +1190,38 @@ describe("plugins-service", () => {
 
 		it("getAvailablePlugins returns correct plugins when at least one of the versions is supported", () => {
 			let availableMarketplacePlugins = [
-			{
-				Identifier: "com.telerik.stripe",
-				DefaultVersion: "1.0.4",
-				Versions: [{
+				{
 					Identifier: "com.telerik.stripe",
-					Name: "Stripe",
-					Version: "1.0.4",
-					SupportedVersion: ">=3.5.0"
-				}]
-			},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				DefaultVersion: "2.0.1",
-				Versions: [{
+					DefaultVersion: "1.0.4",
+					Versions: [{
+						Identifier: "com.telerik.stripe",
+						Name: "Stripe",
+						Version: "1.0.4",
+						SupportedVersion: ">=3.5.0"
+					}]
+				},
+				{
+					Identifier: "nl.x-services.plugins.toast",
+					DefaultVersion: "2.0.1",
+					Versions: [{
 						Identifier: "nl.x-services.plugins.toast",
 						Name: "Toast",
 						Version: "2.0.1",
 						SupportedVersion: ">=3.7.0"
 					},
-					{
-						Identifier: "nl.x-services.plugins.toast",
-						Name: "Toast",
-						Version: "2.0.4",
-						SupportedVersion: ">=3.5.0"
-					},
-					{
-						Identifier: "nl.x-services.plugins.toast",
-						Name: "Toast",
-						Version: "2.0.5",
-						SupportedVersion: ">=3.7.0"
-					}]
-			}];
+						{
+							Identifier: "nl.x-services.plugins.toast",
+							Name: "Toast",
+							Version: "2.0.4",
+							SupportedVersion: ">=3.5.0"
+						},
+						{
+							Identifier: "nl.x-services.plugins.toast",
+							Name: "Toast",
+							Version: "2.0.5",
+							SupportedVersion: ">=3.7.0"
+						}]
+				}];
 
 			let testInjector: IInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
 
@@ -1237,38 +1238,38 @@ describe("plugins-service", () => {
 
 		it("getAvailablePlugins returns correct plugins when none of the versions are supported", () => {
 			let availableMarketplacePlugins = [
-			{
-				Identifier: "com.telerik.stripe",
-				DefaultVersion: "1.0.4",
-				Versions: [{
+				{
 					Identifier: "com.telerik.stripe",
-					Name: "Stripe",
-					Version: "1.0.4",
-					SupportedVersion: ">=3.5.0"
-				}]
-			},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				DefaultVersion: "2.0.1",
-				Versions: [{
+					DefaultVersion: "1.0.4",
+					Versions: [{
+						Identifier: "com.telerik.stripe",
+						Name: "Stripe",
+						Version: "1.0.4",
+						SupportedVersion: ">=3.5.0"
+					}]
+				},
+				{
+					Identifier: "nl.x-services.plugins.toast",
+					DefaultVersion: "2.0.1",
+					Versions: [{
 						Identifier: "nl.x-services.plugins.toast",
 						Name: "Toast",
 						Version: "2.0.1",
 						SupportedVersion: ">=3.7.0"
 					},
-					{
-						Identifier: "nl.x-services.plugins.toast",
-						Name: "Toast",
-						Version: "2.0.4",
-						SupportedVersion: ">=3.5.0"
-					},
-					{
-						Identifier: "nl.x-services.plugins.toast",
-						Name: "Toast",
-						Version: "2.0.5",
-						SupportedVersion: ">=3.7.0"
-					}]
-			}];
+						{
+							Identifier: "nl.x-services.plugins.toast",
+							Name: "Toast",
+							Version: "2.0.4",
+							SupportedVersion: ">=3.5.0"
+						},
+						{
+							Identifier: "nl.x-services.plugins.toast",
+							Name: "Toast",
+							Version: "2.0.5",
+							SupportedVersion: ">=3.7.0"
+						}]
+				}];
 
 			let testInjector: IInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
 
@@ -1284,7 +1285,7 @@ describe("plugins-service", () => {
 		});
 	});
 
-	describe("plugins with variables are added correctly",() => {
+	describe("plugins with variables are added correctly", () => {
 		let testInjector: IInjector,
 			options: IOptions,
 			project: Project.IProject,
@@ -1319,66 +1320,66 @@ describe("plugins-service", () => {
 					}
 				]
 			},
-			{
-				"Identifier": "com.telerik.fakeDropBox",
-				"DefaultVersion": "1.0.2",
-				"Framework": "cordova",
-				"Versions": [
-					{
-						"Publisher": {
-							"Name": "Telerik plugins",
-							"Url": "http://www.telerik.com/"
-						},
-						"Authors": [
-							"Telerik"
-						],
-						"SupportedVersion": ">=3.5.0",
-						"Name": "Dropbox",
-						"Identifier": "com.telerik.dropbox",
-						"Version": "1.0.2",
-						"Description": "Cordova Sync SDK",
-						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
-						"Platforms": [
-							"Android",
-							"iOS"
-						],
-						"Variables": [
-							"APP.KEY.VAR.DATA",
-							"APP1.SECRET.SAMPLE.MSG"
-						]
-					}
-				]
-			},
-			{
-				"Identifier": "com.telerik.fakeDropBox2",
-				"DefaultVersion": "1.0.2",
-				"Framework": "cordova",
-				"Versions": [
-					{
-						"Publisher": {
-							"Name": "Telerik plugins",
-							"Url": "http://www.telerik.com/"
-						},
-						"Authors": [
-							"Telerik"
-						],
-						"SupportedVersion": ">=3.5.0",
-						"Name": "Dropbox",
-						"Identifier": "com.telerik.dropbox",
-						"Version": "1.0.2",
-						"Description": "Cordova Sync SDK",
-						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
-						"Platforms": [
-							"Android",
-							"iOS"
-						],
-						"Variables": [
-							"APP.KEY.VAR.DATA",
-							"APP.KEY.SAME.MSG"
-						]
-					}
-				]
-			}];
+				{
+					"Identifier": "com.telerik.fakeDropBox",
+					"DefaultVersion": "1.0.2",
+					"Framework": "cordova",
+					"Versions": [
+						{
+							"Publisher": {
+								"Name": "Telerik plugins",
+								"Url": "http://www.telerik.com/"
+							},
+							"Authors": [
+								"Telerik"
+							],
+							"SupportedVersion": ">=3.5.0",
+							"Name": "Dropbox",
+							"Identifier": "com.telerik.dropbox",
+							"Version": "1.0.2",
+							"Description": "Cordova Sync SDK",
+							"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+							"Platforms": [
+								"Android",
+								"iOS"
+							],
+							"Variables": [
+								"APP.KEY.VAR.DATA",
+								"APP1.SECRET.SAMPLE.MSG"
+							]
+						}
+					]
+				},
+				{
+					"Identifier": "com.telerik.fakeDropBox2",
+					"DefaultVersion": "1.0.2",
+					"Framework": "cordova",
+					"Versions": [
+						{
+							"Publisher": {
+								"Name": "Telerik plugins",
+								"Url": "http://www.telerik.com/"
+							},
+							"Authors": [
+								"Telerik"
+							],
+							"SupportedVersion": ">=3.5.0",
+							"Name": "Dropbox",
+							"Identifier": "com.telerik.dropbox",
+							"Version": "1.0.2",
+							"Description": "Cordova Sync SDK",
+							"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+							"Platforms": [
+								"Android",
+								"iOS"
+							],
+							"Variables": [
+								"APP.KEY.VAR.DATA",
+								"APP.KEY.SAME.MSG"
+							]
+						}
+					]
+				}];
 
 		beforeEach(() => {
 			testInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
@@ -1503,8 +1504,8 @@ describe("plugins-service", () => {
 		it("when plugin variables have dots, yargs object is correctly converted and correct value is used", () => {
 			let expectedCordovaPluginVariables = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '2' } };
 			options.var = {
-				APP: {KEY: {VAR: {DATA: "1"}}},
-				APP1: {SECRET: {SAMPLE: {MSG: "2"}}}
+				APP: { KEY: { VAR: { DATA: "1" } } },
+				APP1: { SECRET: { SAMPLE: { MSG: "2" } } }
 			};
 
 			service.addPlugin("com.telerik.fakeDropBox").wait();
@@ -1515,15 +1516,15 @@ describe("plugins-service", () => {
 
 		it("when plugin variables have dots and user pass configuration specific values, yargs object is correctly converted and correct values are used", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '2' } };
-			let expectedCordovaPluginVariablesInRelease =  { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '3', "APP1.SECRET.SAMPLE.MSG": '4' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '3', "APP1.SECRET.SAMPLE.MSG": '4' } };
 			options.var = {
 				debug: {
-					APP: {KEY: {VAR: {DATA: "1"}}},
-					APP1: {SECRET: {SAMPLE: {MSG: "2"}}}
+					APP: { KEY: { VAR: { DATA: "1" } } },
+					APP1: { SECRET: { SAMPLE: { MSG: "2" } } }
 				},
 				release: {
-					APP: {KEY: {VAR: {DATA: "3"}}},
-					APP1: {SECRET: {SAMPLE: {MSG: "4"}}}
+					APP: { KEY: { VAR: { DATA: "3" } } },
+					APP1: { SECRET: { SAMPLE: { MSG: "4" } } }
 				}
 			};
 
@@ -1535,13 +1536,13 @@ describe("plugins-service", () => {
 
 		it("when plugin variables have dots and user pass configuration specific values and non-config ones correct ones are used after yargs convertion", () => {
 			let expectedCordovaPluginVariablesInDebug = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '1', "APP1.SECRET.SAMPLE.MSG": '3' } };
-			let expectedCordovaPluginVariablesInRelease =  { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '2', "APP1.SECRET.SAMPLE.MSG": '3' } };
+			let expectedCordovaPluginVariablesInRelease = { 'com.telerik.fakeDropBox': { "APP.KEY.VAR.DATA": '2', "APP1.SECRET.SAMPLE.MSG": '3' } };
 			options.var = {
 				debug: {
-					APP: {KEY: {VAR: {DATA: "1"}}}
+					APP: { KEY: { VAR: { DATA: "1" } } }
 				},
-				APP: {KEY: {VAR: {DATA: "2"}}},
-				APP1: {SECRET: {SAMPLE: {MSG: "3"}}}
+				APP: { KEY: { VAR: { DATA: "2" } } },
+				APP1: { SECRET: { SAMPLE: { MSG: "3" } } }
 			};
 
 			service.addPlugin("com.telerik.fakeDropBox").wait();
@@ -1555,8 +1556,8 @@ describe("plugins-service", () => {
 			options.var = {
 				APP: {
 					KEY: {
-						VAR: {DATA: "1"},
-						SAME: {MSG: "2"}
+						VAR: { DATA: "1" },
+						SAME: { MSG: "2" }
 					}
 				}
 			};

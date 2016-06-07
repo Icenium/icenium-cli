@@ -23,11 +23,11 @@ $injector.require("screenBuilderService", "./services/screen-builder-service");
 $injector.require("darwinDebuggerService", "./services/debug/darwin-debugger-service");
 $injector.require("winDebuggerService", "./services/debug/win-debugger-service");
 
-$injector.require("cordovaPluginsService", "./services/cordova-plugins");
-$injector.require("marketplacePluginsService", "./services/marketplace-plugins-service");
-$injector.require("cordovaProjectPluginsService", "./services/cordova-project-plugins-service");
-$injector.require("nativeScriptProjectPluginsService", "./services/nativescript-project-plugins-service");
-$injector.require("pluginsService", "./services/plugins-service");
+$injector.require("cordovaPluginsService", "./services/plugins/cordova-plugins");
+$injector.require("marketplacePluginsService", "./services/plugins/marketplace-plugins-service");
+$injector.require("cordovaProjectPluginsService", "./services/plugins/cordova-project-plugins-service");
+$injector.require("nativeScriptProjectPluginsService", "./services/plugins/nativescript-project-plugins-service");
+$injector.require("pluginsService", "./services/plugins/plugins-service");
 
 $injector.require("cordovaMigrationService", "./services/cordova-migration-service");
 $injector.require("nativeScriptMigrationService", "./services/nativescript-migration-service");

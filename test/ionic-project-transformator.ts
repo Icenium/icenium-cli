@@ -7,7 +7,7 @@ import {CordovaProject} from "./../lib/project/cordova-project";
 import {Yok} from "../lib/common/yok";
 import {ProjectConstants} from "../lib/common/appbuilder/project-constants";
 import {ResourceLoader} from "../lib/common/resource-loader";
-import {PluginsService} from "../lib/services/plugins-service";
+import {PluginsService} from "../lib/services/plugins/plugins-service";
 import {FrameworkProjectResolver} from "../lib/project/resolvers/framework-project-resolver";
 import {IonicProjectTransformator} from "../lib/ionic-project-transformator";
 import {ErrorsStub, LoggerStub, PrompterStub} from "./stubs";

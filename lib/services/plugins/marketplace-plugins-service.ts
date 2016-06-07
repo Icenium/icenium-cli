@@ -1,4 +1,4 @@
-import * as PluginsDataLib from "../plugins-data";
+import * as PluginsDataLib from "../../plugins-data";
 
 export class MarketplacePluginsService implements ICordovaPluginsService {
 

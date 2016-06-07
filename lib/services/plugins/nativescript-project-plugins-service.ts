@@ -3,10 +3,10 @@ import * as util from "util";
 import {EOL} from "os";
 import * as shelljs from "shelljs";
 import * as semver from "semver";
-import {getFuturesResults} from "../common/helpers";
-import {MarketplacePluginData} from "../plugins-data";
+import {getFuturesResults} from "../../common/helpers";
+import {MarketplacePluginData} from "../../plugins-data";
 import Future = require("fibers/future");
-import { isInteractive } from "../common/helpers";
+import { isInteractive } from "../../common/helpers";
 import temp = require("temp");
 temp.track();
 
