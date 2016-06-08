@@ -1,33 +1,35 @@
 import * as path from "path";
 import * as util from "util";
-import {EOL} from "os";
 import * as shelljs from "shelljs";
 import * as semver from "semver";
+import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
+import {isInteractive} from "../../common/helpers";
+import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
 import Future = require("fibers/future");
-import { isInteractive } from "../../common/helpers";
 import temp = require("temp");
 temp.track();
 
-export class NativeScriptProjectPluginsService implements IPluginsService {
+export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
 	private static NPM_REGISTRY_URL = "https://registry.npmjs.org";
-	private static NPM_SEARCH_URL = "http://npmsearch.com";
 	private static NODE_MODULES_DIR_NAME = "node_modules";
 
-	constructor(private $childProcess: IChildProcess,
-		private $errors: IErrors,
-		private $fs: IFileSystem,
-		private $httpClient: Server.IHttpClient,
+	constructor(private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $nativeScriptResources: INativeScriptResources,
 		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $prompter: IPrompter,
-		private $server: Server.IServer) {
+		private $server: Server.IServer,
+		private $httpClient: Server.IHttpClient,
+		$errors: IErrors,
+		$childProcess: IChildProcess) {
+		super($errors, $childProcess);
+
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
@@ -44,25 +46,6 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		];
 
 		return getFuturesResults<IPlugin>(futures, res => !!res);
-	}
-
-	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		return ((): IBasicPluginInformation[] => {
-			let findPluginByNameFutures = _.map(keywords, keyword => this.findPluginsByName(keyword));
-			Future.wait(findPluginByNameFutures);
-			let findPluginsResults: IBasicPluginInformation[][] = findPluginByNameFutures.map(f => f.get()).filter(plugins => !!plugins && !!plugins.length);
-
-			let pluginsNamesInGroups = findPluginsResults.map(res => _.map(res, r => r.name));
-			let matchingNames = _.intersection.apply(this, pluginsNamesInGroups);
-			let pluginsFound: IBasicPluginInformation[] = [];
-			_.each(_.flatten<IBasicPluginInformation>(findPluginsResults), basicInfo => {
-				if (!_.some(pluginsFound, pl => pl.name === basicInfo.name) && _.includes(matchingNames, basicInfo.name)) {
-					pluginsFound.push(basicInfo);
-				}
-			});
-
-			return pluginsFound;
-		}).future<IBasicPluginInformation[]>()();
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
@@ -324,17 +307,6 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 		}).future<IPlugin[]>()();
 	}
 
-	private getStringFromNpmSearchResult(pluginResult: any, propertyName: string): string {
-		if (pluginResult && pluginResult[propertyName] && pluginResult[propertyName].length) {
-			let item = _.first(pluginResult[propertyName]);
-			if (item) {
-				return item.toString();
-			}
-		}
-
-		return "";
-	}
-
 	private getTopNativeScriptNpmPackages(count: number): IFuture<IPlugin[]> {
 		return (() => {
 			let currentPage = 0;
@@ -489,27 +461,6 @@ export class NativeScriptProjectPluginsService implements IPluginsService {
 			this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
 			return basicPluginInfo;
 		}).future<IBasicPluginInformation>()();
-	}
-
-	private findPluginsByName(name: string): IFuture<IBasicPluginInformation[]> {
-		return (() => {
-			let nativescriptUrl = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,description&sort=rating+desc&q=name:"${encodeURIComponent(name)}"&start=0&size=10000`;
-			let result = this.$httpClient.httpRequest(nativescriptUrl).wait().body;
-			if (result) {
-				let npmSearchResult: any[] = JSON.parse(result).results;
-				let plugins = _.map(npmSearchResult, pluginResult => {
-					let pluginInfo: IBasicPluginInformation = {
-						name: this.getStringFromNpmSearchResult(pluginResult, "name"),
-						version: this.getStringFromNpmSearchResult(pluginResult, "version"),
-						description: this.getStringFromNpmSearchResult(pluginResult, "description")
-					};
-					return pluginInfo;
-				});
-
-				return plugins;
-			}
-			return null;
-		}).future<IBasicPluginInformation[]>()();
 	}
 
 	private installPackageToTempDir(identifier: string): IFuture<string> {

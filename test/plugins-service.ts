@@ -64,6 +64,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("staticConfig", StaticConfig);
 	testInjector.register("options", Options);
 	testInjector.register("resources", ResourceLoader);
+	testInjector.register("childProcess", {});
 
 	return testInjector;
 }
@@ -191,6 +192,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
+	testInjector.register("childProcess", {});
 	testInjector.register("config", {});
 
 	testInjector.register("projectConstants", {
@@ -236,6 +238,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
+	testInjector.register("childProcess", {});
 	testInjector.register("config", {});
 
 	testInjector.register("projectConstants", {

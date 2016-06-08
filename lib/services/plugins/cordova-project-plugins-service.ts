@@ -1,14 +1,15 @@
-import {EOL} from "os";
 import * as util from "util";
-import {PluginType} from "../../plugins-data";
-import Future = require("fibers/future");
 import * as helpers from "../../common/helpers";
-import semver = require("semver");
-import {CordovaPluginsService} from "./cordova-plugins";
+import * as semver from "semver";
 import * as validUrl from "valid-url";
 import * as path from "path";
+import {EOL} from "os";
+import {PluginType} from "../../plugins-data";
+import {CordovaPluginsService} from "./cordova-plugins";
+import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
+import Future = require("fibers/future");
 
-export class CordovaProjectPluginsService implements IPluginsService {
+export class CordovaProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
 	private static CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
 	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
@@ -27,7 +28,6 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	};
 
 	constructor(private $cordovaPluginsService: CordovaPluginsService,
-		private $errors: IErrors,
 		private $fs: IFileSystem,
 		private $logger: ILogger,
 		private $loginManager: ILoginManager,
@@ -36,7 +36,11 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants,
 		private $prompter: IPrompter,
-		private $resources: IResourceLoader) { }
+		private $resources: IResourceLoader,
+		$errors: IErrors,
+		$childProcess: IChildProcess) {
+		super($errors, $childProcess);
+	}
 
 	private loadPluginsData(): IFuture<void> {
 		return (() => {
@@ -50,9 +54,8 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	}
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		return (() => {
-			return this.$cordovaPluginsService.getPlugins(keywords);
-		}).future<IBasicPluginInformation[]>()();
+		keywords.unshift("cordova");
+		return super.findPlugins(keywords);
 	}
 
 	public fetch(pluginIdentifier: string): IFuture<void> {
