@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import * as projectPropertyCommandBaseLib from "./prop-command-base";
 
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {

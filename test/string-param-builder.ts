@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import yok = require("../lib/common/yok");
 let testInjector = new yok.Yok();
 import * as stubs from "./stubs";

@@ -1,5 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
 import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");

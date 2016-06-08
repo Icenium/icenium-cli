@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class ProjectPropertyCommandBase {
 	protected projectSchema: any;
 	public $project: Project.IProject;

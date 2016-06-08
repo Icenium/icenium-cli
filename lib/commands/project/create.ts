@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import * as path from "path";
 
 import ProjectCommandBaseLib = require("./project-command-base");

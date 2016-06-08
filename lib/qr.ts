@@ -1,5 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
 let qrcode = require("qrcode-generator");
 
 export class QrCodeGenerator implements IQrCodeGenerator {

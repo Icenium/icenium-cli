@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class DevConfigCommand implements ICommand {
 	allowedParameters: ICommandParameter[];
 

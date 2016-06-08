@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import * as path from "path";
 import yok = require("../lib/common/yok");
 import helpCommand = require("../lib/common/commands/help");

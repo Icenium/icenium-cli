@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class ConfigurationFile implements Project.IConfigurationFile {
 	constructor(public template: string,
 		public filepath: string,

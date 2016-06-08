@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import stubs = require("./stubs");
 import helpers = require("../lib/common/helpers");
 import yok = require("../lib/common/yok");

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class KendoUIService implements IKendoUIService {
 	private static VERIFIED_TAG = "verified";
 	private static KENDO_CORE = "Kendo UI Core";

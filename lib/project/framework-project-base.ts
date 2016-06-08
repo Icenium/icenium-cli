@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	private assetUpdateMessagePrinted = false;
 

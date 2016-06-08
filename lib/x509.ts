@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import moment = require("moment");
 
 class X509Certificate implements IX509Certificate {

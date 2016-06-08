@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import {SetProjectPropertyCommand} from "./prop-set";
 
 export class SetAndroidVersionCodeCommand extends SetProjectPropertyCommand implements ICommand {

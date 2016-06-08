@@ -1,9 +1,6 @@
-///<reference path=".d.ts"/>
 //
 // automatically generated code; do not edit manually!
 //
-"use strict";
-
 import querystring = require('querystring');
 
 export class AuthenticationService implements Server.IAuthenticationServiceContract{

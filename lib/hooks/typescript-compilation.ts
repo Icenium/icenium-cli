@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 require("./../bootstrap");
 import * as path from "path";
 import fiberBootstrap = require("./../common/fiber-bootstrap");

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as initCommandLib from "../commands/project/init-project";
 import * as projectCommandLib from "../commands/project/create-project";
 import * as samplesLib from "../commands/samples";

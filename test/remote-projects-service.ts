@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");

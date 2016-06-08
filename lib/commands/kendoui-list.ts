@@ -1,5 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
 import {KendoUIBaseCommand} from "./kendoui-base";
 
 class KendoUIListCommand extends KendoUIBaseCommand implements ICommand {

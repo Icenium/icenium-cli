@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import validator = require("validator");
 import commonHelpers = require("../common/helpers");
 import helpers = require("../helpers");

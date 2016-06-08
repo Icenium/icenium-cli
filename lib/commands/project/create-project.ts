@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import * as ProjectCommandBaseLib from "./project-command-base";
 
 export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBase {

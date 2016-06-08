@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as xmlMapping from "xml-mapping";
 import * as path from "path";
 import * as helpers from "../helpers";

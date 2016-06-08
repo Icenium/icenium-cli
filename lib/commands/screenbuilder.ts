@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class ScreenBuilderCommand implements ICommand {
 
 	constructor(private $logger: ILogger,

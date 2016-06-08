@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class PrintFrameworkVersionsCommand implements ICommand {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
 		private $nativeScriptMigrationService: IFrameworkMigrationService,

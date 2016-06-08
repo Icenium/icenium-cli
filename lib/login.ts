@@ -1,5 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
 import * as http from "http";
 import * as path from "path";
 import * as url from "url";

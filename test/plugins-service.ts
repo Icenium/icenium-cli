@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import {CordovaPluginsService} from "./../lib/services/cordova-plugins";
 import {MarketplacePluginsService} from "./../lib/services/marketplace-plugins-service";
 import {CordovaProjectPluginsService} from "./../lib/services/cordova-project-plugins-service";

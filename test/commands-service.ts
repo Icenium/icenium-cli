@@ -1,7 +1,4 @@
-///<reference path=".d.ts"/>
 /* tslint:disable:no-empty */
-"use strict";
-
 import {Yok} from "../lib/common/yok";
 import future = require("fibers/future");
 import * as stubs from "./stubs";

@@ -1,4 +1,3 @@
-"use strict";
 import * as constants from "../common/mobile/constants";
 
 export class AppStoreService implements IAppStoreService {

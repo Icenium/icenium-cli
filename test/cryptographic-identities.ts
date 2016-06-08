@@ -1,6 +1,3 @@
-///<reference path="./.d.ts"/>
-"use strict";
-
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
 import * as util from "util";

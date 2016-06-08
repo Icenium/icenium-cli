@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 class AppManagerUploadAndroidCommand implements ICommand {
 	constructor(private $appManagerService: IAppManagerService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }

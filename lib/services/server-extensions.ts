@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as serverExtensionsBaseLib from "./extensions-service-base";
 import * as path from "path";
 

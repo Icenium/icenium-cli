@@ -1,5 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
 import Future = require("fibers/future");
 import * as assert from "assert";
 import * as helpers from "../common/helpers";

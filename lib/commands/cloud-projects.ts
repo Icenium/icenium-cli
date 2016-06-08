@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import commonHelpers = require("../common/helpers");
 
 class SolutionIdCommandParameter implements ICommandParameter {

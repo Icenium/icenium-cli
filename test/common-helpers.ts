@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import helpers = require("../lib/common/helpers");
 let assert = require("chai").assert;
 

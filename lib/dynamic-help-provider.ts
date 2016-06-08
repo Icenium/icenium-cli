@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 export class DynamicHelpProvider implements IDynamicHelpProvider {
 	constructor(private $project: Project.IProject,
 		private $projectConstants: Project.IConstants) { }

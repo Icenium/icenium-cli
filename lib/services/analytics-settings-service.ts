@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	constructor(private $loginManager: ILoginManager,
 		private $userDataStore: IUserDataStore,

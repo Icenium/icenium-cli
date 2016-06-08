@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 // this call must be first to avoid requiring c++ dependencies
 let node = require("../package.json").engines.node;
 require("./common/verify-node-version").verifyNodeVersion(node, "AppBuilder", "3.4");

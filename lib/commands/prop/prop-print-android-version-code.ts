@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import {PrintProjectCommand} from "./prop-print";
 
 export class PrintAndroidVersionCodeCommand extends PrintProjectCommand implements ICommand {

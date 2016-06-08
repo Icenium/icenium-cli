@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $injector: IInjector,
 		private $project: Project.IProject) { }

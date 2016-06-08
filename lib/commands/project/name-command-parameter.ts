@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class NameParameter implements ICommandParameter {
 	constructor(private $projectNameValidator: IProjectNameValidator) { }
 	mandatory = true;

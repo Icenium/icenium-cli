@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class LoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }
 

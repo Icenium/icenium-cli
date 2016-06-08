@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as helpers from "../common/helpers";
 import * as path from "path";
 import temp = require("temp");

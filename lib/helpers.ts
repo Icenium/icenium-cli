@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");
 }

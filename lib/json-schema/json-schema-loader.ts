@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as path from "path";
 import temp = require("temp");
 import jsonSchemaResolverPath = require("./json-schema-resolver");

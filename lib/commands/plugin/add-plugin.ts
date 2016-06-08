@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 import pluginsDataLib = require("./../../plugins-data");
 
 export class AddPluginCommand implements ICommand {

@@ -1,6 +1,3 @@
-////<reference path="../.d.ts"/>
-"use strict";
-
 import ValidationResult = require("../common/validators/validation-result");
 
 export class BaseValidator<Input> implements IValidator<Input> {

@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import * as child_process from "child_process";
 import * as path from "path";
 import * as helpers from "../../helpers";

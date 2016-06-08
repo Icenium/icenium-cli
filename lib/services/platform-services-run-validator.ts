@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class PlatformServicesRunValidator implements IRunValidator {
 	constructor(protected $errors: IErrors,
 		protected $hostCapabilities: IHostCapabilities,

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as constants from "../common/mobile/constants";
 import * as commandParams from "../common/command-params";
 let Table = require("cli-table");

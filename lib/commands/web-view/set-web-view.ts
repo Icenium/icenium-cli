@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import semver = require("semver");
 
 export class SetWebViewCommand implements ICommand {
