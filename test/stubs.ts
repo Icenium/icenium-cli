@@ -1,7 +1,4 @@
-///<reference path=".d.ts"/>
 /* tslint:disable:no-empty */
-"use strict";
-
 import Future = require("fibers/future");
 import * as util from "util";
 import * as path from "path";

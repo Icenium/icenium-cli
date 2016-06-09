@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 export class HostCapabilities implements IHostCapabilities {
 
 	public get capabilities(): IDictionary<IHostCapability> {

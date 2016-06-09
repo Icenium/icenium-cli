@@ -1,4 +1,3 @@
-"use strict";
 import * as path from "path";
 import platformServicesRunValidatorLib = require("./platform-services-run-validator");
 

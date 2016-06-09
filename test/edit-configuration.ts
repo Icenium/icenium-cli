@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import chai = require("chai");
 import fs = require("fs");
 import * as path from "path";

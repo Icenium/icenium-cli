@@ -1,5 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
 import * as path from "path";
 import {AppBuilderStaticConfigBase} from "./common/appbuilder/appbuilder-static-config-base";
 import {ConfigBase} from "./common/config-base";

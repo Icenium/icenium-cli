@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class PluginConfigureCommandParameter implements ICommandParameter {
 	constructor(private $pluginsService: IPluginsService,
 				private $errors: IErrors) { }

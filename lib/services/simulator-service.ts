@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import {EOL} from "os";
 
 export class SimulatorService implements ISimulatorService {

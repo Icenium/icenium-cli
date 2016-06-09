@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class FetchPluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
 				private $stringParameter: ICommandParameter) {}

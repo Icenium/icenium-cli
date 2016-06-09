@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 class UpgradeScreenBuilder implements ICommand {
 
 	constructor(private $logger: ILogger,

@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import dns = require("dns");
 import Future = require("fibers/future");
 import ip = require("ip");

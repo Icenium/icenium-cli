@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class InitProjectCommand implements ICommand {
 	constructor(private frameworkIdentifier: string,
 		private $project: Project.IProject,

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as util from "util";
 import * as querystring from "querystring";
 import * as path from "path";

@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import pluginConfigureCommandParameterLib = require("./plugin-configure-command-parameter");
 
 export class RemovePluginCommand implements ICommand {

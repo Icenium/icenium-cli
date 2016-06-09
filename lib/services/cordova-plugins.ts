@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import plugman = require("plugman");
 import * as path from "path";
 import * as util from "util";

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import {Block, Line} from "../common/codeGeneration/code-entity";
 import {TSTypeSystemHelpers} from "./ts-type-system-helpers";
 import {CodePrinter} from "../common/codeGeneration/code-printer";
@@ -27,8 +24,6 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 			let interfacesFile= new Block();
 			let implementationsFile = new Block();
 
-			implementationsFile.writeLine("///<reference path=\".d.ts\"/>");
-			implementationsFile.writeLine("//");
 			implementationsFile.writeLine("// automatically generated code; do not edit manually!");
 			implementationsFile.writeLine("//");
 			implementationsFile.writeLine("\"use strict\";");
@@ -39,8 +34,6 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 			interfacesFile.writeLine("//");
 			interfacesFile.writeLine("// automatically generated code; do not edit manually!");
 			interfacesFile.writeLine("//");
-			interfacesFile.writeLine("///<reference path=\".d.ts\"/>");
-
 			let serverModuleName = "Server";
 			let serverModuleDeclaration = new Block("declare module " + serverModuleName);
 			serverModuleDeclaration.toString();

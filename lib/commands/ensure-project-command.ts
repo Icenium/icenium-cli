@@ -1,5 +1,3 @@
-"use strict";
-
 import Future = require("fibers/future");
 import assert = require("assert");
 

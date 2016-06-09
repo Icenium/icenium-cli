@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class ServiceContractProvider implements Server.IServiceContractProvider {
 	constructor(private $httpClient: Server.IHttpClient,
 				private $config: IConfiguration) {

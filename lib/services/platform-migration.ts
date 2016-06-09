@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class PlatformMigrationService implements Project.IPlatformMigrator {
 	constructor(private $project: Project.IProject) { }
 

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import { EnsureProjectCommand } from "./ensure-project-command";
 
 class LiveSyncDevicesCommand extends EnsureProjectCommand {

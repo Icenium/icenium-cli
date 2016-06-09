@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService {
 	constructor(private $project: Project.IProject,
 		private $errors: IErrors) { }

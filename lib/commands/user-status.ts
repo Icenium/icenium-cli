@@ -1,6 +1,4 @@
-///<reference path="../.d.ts"/>
 
-"use strict";
 import * as util from "util";
 
 export class UserStatusCommand implements ICommand {

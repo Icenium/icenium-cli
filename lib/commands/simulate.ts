@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class SimulateCommand implements ICommand {
 	private projectData: Project.IData;
 

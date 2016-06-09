@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class PluginsService implements IPluginsService {
 	private frameworkProject: Project.IFrameworkProject;
 

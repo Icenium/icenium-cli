@@ -1,6 +1,3 @@
-///<reference path="./.d.ts"/>
-"use strict";
-
 import yok = require("../lib/common/yok");
 import {DevicesService} from "../lib/common/mobile/mobile-core/devices-service";
 import {Logger} from "../lib/common/logger";

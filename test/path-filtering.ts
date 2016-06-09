@@ -1,4 +1,3 @@
-///<reference path=".d.ts"/>
 
 import chai = require("chai");
 import yok = require("../lib/common/yok");

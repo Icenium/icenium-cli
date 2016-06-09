@@ -1,7 +1,4 @@
-﻿///<reference path="../.d.ts"/>
-"use strict";
-
-export class AppManagerLiveSyncCommand implements ICommand {
+﻿export class AppManagerLiveSyncCommand implements ICommand {
 	private static ALL_PLATFORMS_OPTION = "All platforms";
 
 	constructor(private $prompter: IPrompter,

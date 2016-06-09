@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class ListPluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
 		private $options: IOptions) { }

@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import * as projectlib from "../lib/project";
 import * as fslib from "../lib/common/file-system";
 import * as projectPropertiesLib from "../lib/services/project-properties-service";

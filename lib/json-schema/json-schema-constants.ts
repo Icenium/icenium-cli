@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class JsonSchemaConstants implements IJsonSchemaConstants {
 	public BASE_VALIDATION_SCHEMA_ID = "Base";
 	public BASE_CORDOVA_SCHEMA_ID = "Cordova*";

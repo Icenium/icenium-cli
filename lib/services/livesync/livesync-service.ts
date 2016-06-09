@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 import constants = require("../../common/mobile/constants");
 
 export class LiveSyncService implements ILiveSyncService {

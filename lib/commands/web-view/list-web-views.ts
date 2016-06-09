@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import helpers = require("../../common/helpers");
 import semver = require("semver");
 

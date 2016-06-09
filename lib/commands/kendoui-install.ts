@@ -1,5 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
 import temp = require("temp");
 import * as path from "path";
 import * as util from "util";

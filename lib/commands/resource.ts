@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as helpers from "../common/helpers";
 
 class Resource implements ICommand {

@@ -1,5 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
 import projectPropertyCommandBaseLib = require("./prop-command-base");
 
 export class SetProjectPropertyCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {

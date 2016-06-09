@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class ProjectCommandBase {
 	constructor(protected $errors: IErrors,
 		protected $project: Project.IProject) { }

@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as constants from "../common/mobile/constants";
 import {EOL} from "os";
 import * as helpers from "../helpers";

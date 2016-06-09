@@ -1,6 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
-
 import cordovaPluginsService = require("./../lib/services/cordova-plugins");
 import cordovaProjectLib = require("./../lib/project/cordova-project");
 import cordovaProjectPluginsService = require("../lib/services/cordova-project-plugins-service");

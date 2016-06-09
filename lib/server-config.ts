@@ -1,5 +1,3 @@
-///<reference path=".d.ts"/>
-"use strict";
 export class ServerConfiguration implements IServerConfiguration {
 	private cachedServerConfiguration: any = null;
 

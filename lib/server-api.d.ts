@@ -1,7 +1,6 @@
 //
 // automatically generated code; do not edit manually!
 //
-///<reference path=".d.ts"/>
 declare module Server{
 	interface Tenant{
 		id: string;

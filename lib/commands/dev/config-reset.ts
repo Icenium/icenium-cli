@@ -1,6 +1,3 @@
-///<reference path="../../.d.ts"/>
-"use strict";
-
 export class DevConfigResetCommand implements ICommand {
 	constructor(private $config: IConfiguration) { }
 

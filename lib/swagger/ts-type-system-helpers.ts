@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	private static ARRAY_START_CHAR = "[";
 	private static ARRAY_END_CHAR = "]";

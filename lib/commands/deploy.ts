@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import * as helpers from "../common/helpers";
 import { EnsureProjectCommand } from "./ensure-project-command";
 

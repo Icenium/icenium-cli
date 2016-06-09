@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import { Request, Response } from "express";
 import * as path from "path";
 import * as os from "os";

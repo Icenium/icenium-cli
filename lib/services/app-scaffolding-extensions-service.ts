@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import {ExtensionsServiceBase} from "./extensions-service-base";
 import * as path from "path";
 import Future = require("fibers/future");

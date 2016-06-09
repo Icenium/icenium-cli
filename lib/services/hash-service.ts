@@ -1,6 +1,3 @@
-///<reference path="../.d.ts"/>
-"use strict";
-
 import Future = require("fibers/future");
 let crypto = require("crypto");
 import * as util from "util";
