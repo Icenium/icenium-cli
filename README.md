@@ -280,37 +280,37 @@ For more information about the Telerik AppBuilder device simulator, see <a href=
 
 > This operation is applicable to hybrid and native projects.
 
-To run your app on an Android device, install a QR code reader on the device, install the Telerik AppBuilder companion app for hybrid apps or the Telerik NativeScript companion app for native projects, navigate to the folder containing your project files and run the following command in the command line.
+To run your app on an Android device, install the Telerik Platform companion app, install the Cordova developer app for hybrid apps or the NativeScript developer app for native projects, navigate to the folder containing your project files and run the following command in the command line.
 
 ```bash
 $ appbuilder build android --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the developer app. On the device, use the built-in QR code scanner in the Telerik Platform companion app to scan the QR code and load the project in the respective framework-specific developer app. To toggle the built-in QR code scanner, run the Telerik Platform companion app, complete the tutorial and tap **QR Scanner**.
 
-With the companion app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik AppBuilder companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>. You can get the Telerik NativeScript companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.NativeScript" target="_blank">Google Play</a>.
+With the developer app, you can deploy and test your Android apps without the need to configure any device drivers on your system, to configure your device for deployment, and to build an application package. You can get the Telerik Platform companion app from <a href="https://play.google.com/store/apps/details?id=com.telerik.PlatformCompanion" target="_blank">Google Play</a>. You can get the Cordova developer app from <a href="https://play.google.com/store/apps/details?id=com.telerik.AppBuilder" target="_blank">Google Play</a>. You can get the NativeScript developer app from <a href="https://play.google.com/store/apps/details?id=com.telerik.NativeScript" target="_blank">Google Play</a>.
 
-To run your app on an iOS device, install the Telerik AppBuilder companion app for hybrid apps or the Telerik NativeScript companion app for native projects, run it, and navigate to the folder containing your project files and run the following command in the command line.
+To run your app on an iOS device, install the Telerik Platform companion app, install the Cordova developer app for hybrid apps or the NativeScript developer app for native projects, navigate to the folder containing your project files and run the following command in the command line.
 
 ```bash
 $ appbuilder build ios --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app and complete the tutorial. With two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the developer app. On the device, use the built-in QR code scanner in the Telerik Platform companion app to scan the QR code and load the project in the respective framework-specific developer app. To toggle the built-in QR code scanner, run the Telerik Platform companion app, complete the tutorial and tap **QR Scanner**.
 
-With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. You can get the Telerik NativeScript companion app from <a href="https://itunes.apple.com/bg/app/nativescript/id882561588?mt=8" target="_blank">App Store</a>.
+With the developer app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik Platform companion app from the <a href="https://itunes.apple.com/bg/app/platform-companion/id1083895251" target="_blank">App Store</a>. You can get the Cordova developer app from the <a href="https://itunes.apple.com/bg/app/telerik-appbuilder/id527547398?mt=8" target="_blank">App Store</a>. You can get the NativeScript developer app from <a href="https://itunes.apple.com/bg/app/nativescript/id882561588?mt=8" target="_blank">App Store</a>.
 
 > For Windows Phone, you can develop only hybrid apps.
 
-To run your app on a Windows Phone device, install a QR code reader on the device, navigate to the folder containing your project files and run the following command in the command line.
+To run your app on a Windows Phone device, install the Cordova developer app on the device, navigate to the folder containing your project files and run the following command in the command line.
 
 ```bash
 $ appbuilder build wp8 --companion
 ```
 
-After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the companion app. On the device, use the built-in QR code scanner in the companion app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the companion app, with two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
+After the operation completes, the Telerik AppBuilder CLI opens a new tab in your browser and shows a QR code for deployment in the developer app. On the device, use the built-in QR code scanner in the developer app to scan the QR code and load the project. To toggle the built-in QR code scanner, run the developer app, with two fingers, tap and swipe the left edge of the screen to the right and tap **QR Scanner**.
 
-With the Telerik AppBuilder companion app, you can deploy and test your iOS apps without the need to provision them first. You can get the Telerik AppBuilder companion app from the <a href="http://www.windowsphone.com/en-us/store/app/appbuilder/0171d46b-b5f2-43d9-a36b-0a78c9692aab" target="_blank">Windows Phone Store</a>.
+With the developer app, you can deploy and test your iOS apps without the need to provision them first. You can get the Cordova developer app from the <a href="http://www.windowsphone.com/en-us/store/app/appbuilder/0171d46b-b5f2-43d9-a36b-0a78c9692aab" target="_blank">Windows Phone Store</a>.
 
 <a name="code"><b>5. Modify your code</b></a>
 
@@ -408,7 +408,7 @@ More Telerik AppBuilder Tools and Resources
 * [Telerik AppBuilder in-browser client](http://www.telerik.com/appbuilder/in-browser-client "The AppBuilder In-Browser Client"): Browser-based IDE that is compatible with most modern web and mobile browsers.
 * [Telerik AppBuilder extension for Visual Studio](http://www.telerik.com/appbuilder/visual-studio-extension "The AppBuilder Extension for Visual Studio"): Extension for the popular Microsoft IDE.
 * [Telerik AppBuilder package for Sublime Text](http://www.telerik.com/appbuilder/sublime-text-package "The AppBuilder package for Sublime Text"): A package for the popular text editor.
-* [Telerik AppBuilder companion app](http://www.telerik.com/appbuilder/companion-app "The AppBuilder Companion App"): iOS testing utility <a href="https://itunes.apple.com/bg/app/icenium-ion/id527547398" target="_blank">available for free on the App Store</a>.
+* [Telerik AppBuilder companion apps](http://www.telerik.com/appbuilder/companion-app "The AppBuilder Companion App"): mobile testing utility <a href="https://itunes.apple.com/bg/app/icenium-ion/id527547398" target="_blank">available for free on the App Store</a>.
 * [Telerik AppBuilder documentation](http://docs.telerik.com/platform/appbuilder "The documentation resources for Telerik AppBuilder"): Learn more about what you can do with Telerik AppBuilder.
 * [Telerik AppBuilder web page](http://www.telerik.com/appbuilder "The Telerik AppBuilder web page"): Visit the Telerik AppBuilder web site.
 
