@@ -23,10 +23,10 @@ The Telerik AppBuilder CLI lets you build, test, deploy, and publish cross-platf
 Installation
 ===
 
-Latest version: Telerik AppBuilder 3.2.4
-Release date: May 05, 2016
+Latest version: Telerik AppBuilder 3.3
+Release date: June 9, 2016
 
-> Telerik AppBuilder 3.2.4 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-2-4" target="_blank">Telerik AppBuilder 3.2.4 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-2" target="_blank">Telerik AppBuilder 3.2 Release Notes</a>.
+> For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">Telerik AppBuilder 3.3 Release Notes</a>.
 
 ### System Requirements
 
@@ -40,7 +40,6 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 * .NET 4.5 or later
 * Node.js
 	* (Windows 7 systems): Any of the following Node.js versions:
-		* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
@@ -78,7 +77,6 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * OS X Mavericks
 * Any of the following Node.js versions:
-	* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
@@ -110,7 +108,6 @@ Before installing the Telerik AppBuilder CLI, verify that your system meets the 
 
 * Ubuntu 14.04 LTS<br/>The Telerik AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the Telerik AppBuilder CLI on other Linux distributions.
 * Any of the following Node.js versions:
-	* The latest stable official Node.js [0.10.x](https://nodejs.org/dist/latest-v0.10.x/)
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
@@ -374,17 +371,17 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: Telerik AppBuilder 3.2.4
-Release date: May 05, 2016
+Latest version: Telerik AppBuilder 3.3
+Release date: June 9, 2016
 
-> Telerik AppBuilder 3.2.4 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-2-4" target="_blank">Telerik AppBuilder 3.2.4 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, Telerik AppBuilder 3.2, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-2" target="_blank">Telerik AppBuilder 3.2 Release Notes</a>.
+> For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">Telerik AppBuilder 3.3 Release Notes</a>.
 
 #### What you can do with this version of the Telerik AppBuilder CLI
 
 * You can develop, test, build and publish cross-platform hybrid mobile apps with Apache Cordova.
 * You can develop, test, build and publish cross-platform native mobile apps with the NativeScript framework.
 
-For a complete list of the features available in the Telerik AppBuilder CLI, click [here](http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/appbuilder-cli).
+For a complete list of the features available in the Telerik AppBuilder CLI, click [here](http://docs.telerik.com/platform/appbuilder/development-tools/running-appbuilder/running-the-cli/appbuilder-cli).
 
 To see a complete list of the available commands, click <a href="https://github.com/Icenium/icenium-cli/blob/release/docs/man_pages/index.md" target="_blank">here</a> or run `$ appbuilder help` in the command prompt.
 
