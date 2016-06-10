@@ -19,7 +19,7 @@ import optionsLib = require("../lib/options");
 import assert = require("assert");
 import Future = require("fibers/future");
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
 import * as path from "path";
 import temp = require("temp");
 import * as util from "util";
