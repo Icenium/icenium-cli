@@ -4,6 +4,7 @@ import {FrameworkProjectBase} from "./framework-project-base";
 import helpers = require("./../common/helpers");
 import semver = require("semver");
 import  { startPackageActivityNames } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
@@ -33,7 +34,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public get name(): string {
-		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
+		return TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
 	}
 
 	public get capabilities(): Project.ICapabilities {
@@ -70,7 +71,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public get startPackageActivity(): string {
-		return startPackageActivityNames[this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase()];
+		return startPackageActivityNames[TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase()];
 	}
 
 	public get relativeAppResourcesPath(): string {
@@ -153,7 +154,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 			let platforms = this.$mobileHelper.platformNames;
 			_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion).wait());
 
-			let appResourcesDir = this.$resources.getPathToAppResources(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
+			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);

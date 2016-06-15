@@ -19,6 +19,7 @@ import optionsLib = require("../lib/options");
 import assert = require("assert");
 import Future = require("fibers/future");
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/mobile/constants";
 import * as path from "path";
 import temp = require("temp");
 import * as util from "util";
@@ -89,7 +90,7 @@ function createTestInjector() {
 	testInjector.register("frameworkProjectResolver", frameworkProjectResolverLib.FrameworkProjectResolver);
 	testInjector.register("cordovaProject", cordovaProjectLib.CordovaProject);
 	testInjector.register("serverExtensionsService", {});
-	testInjector.register("projectConstants", require("../lib/common/appbuilder/project-constants").ProjectConstants);
+	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
 		validate: (data: Project.IData) => { /* mock */ },
@@ -165,7 +166,6 @@ function getProjectFileName(configuration: string) {
 
 function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
-	let projectConstants: Project.IConstants = new projectConstantsLib.ProjectConstants();
 	let options = testInjector.resolve("options");
 	let project = testInjector.resolve("project");
 	let fs = testInjector.resolve("fs");
@@ -185,7 +185,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+	project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 	let availableMarketplacePlugins = [
 		{

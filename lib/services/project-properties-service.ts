@@ -1,6 +1,7 @@
 import {EOL} from "os";
 import xmlMapping = require("xml-mapping");
 import * as util from "util";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 export class ProjectPropertiesService implements IProjectPropertiesService {
 	private static PROJECT_VERSION_DEFAULT_VALUE = 1;
@@ -130,7 +131,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			let result: string[] = [];
 			let schemas: IDictionary<IDictionary<any>> = Object.create(null);
 
-			let targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+			let targetFrameworkIdentifiers = _.values(TARGET_FRAMEWORK_IDENTIFIERS);
 			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
 				let projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
 				schemas[targetFrameworkIdentifier] = projectSchema;

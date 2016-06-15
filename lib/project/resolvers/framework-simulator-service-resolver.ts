@@ -2,9 +2,8 @@ import frameworkProjectResolverBaseLib = require("./framework-project-resolver-b
 
 export class FrameworkSimulatorServiceResolver extends frameworkProjectResolverBaseLib.FrameworkProjectResolverBase implements Project.IFrameworkSimulatorServiceResolver {
 	constructor($errors: IErrors,
-				$injector: IInjector,
-				$projectConstants: Project.IConstants) {
-		super($errors, $injector, $projectConstants);
+				$injector: IInjector) {
+		super($errors, $injector);
 	}
 
 	public resolve(framework: string): IProjectSimulatorService {

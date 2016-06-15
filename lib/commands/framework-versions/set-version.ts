@@ -1,3 +1,5 @@
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+
 export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $injector: IInjector,
 		private $project: Project.IProject) { }
@@ -16,8 +18,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
 		private $project: Project.IProject,
 		private $errors: IErrors,
-		private $nativeScriptMigrationService: IFrameworkMigrationService,
-		private $projectConstants: Project.IConstants) { }
+		private $nativeScriptMigrationService: IFrameworkMigrationService) { }
 
 	public mandatory = true;
 
@@ -30,7 +31,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 
 			if(value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {
 				let supportedVersions: string[];
-				let migrationService = this.$project.projectData.Framework === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
+				let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
 				supportedVersions = migrationService.getSupportedVersions().wait();
 
 				if(_.contains(supportedVersions, value)) {
