@@ -17,7 +17,7 @@ You can choose which files from your project to exclude or include in your appli
 * `--certificate` - Sets the certificate that you want to use for code signing your Android app. You can set a certificate by index or name. <% if(isHtml) { %>To list available certificates, run `$ appbuilder certificate`<% } %> 
 
 ### Attributes
-* `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+* `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 <% } %> 
 <% if(isHtml) { %> 
