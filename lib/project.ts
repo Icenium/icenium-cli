@@ -4,6 +4,7 @@ import * as util from "util";
 import * as commonHelpers from "./common/helpers";
 import Future = require("fibers/future");
 import * as helpers from "./helpers";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/mobile/constants";
 
 export class Project implements Project.IProject {
 	private static JSON_PROJECT_FILE_NAME_REGEX = "[.]abproject";
@@ -107,7 +108,7 @@ export class Project implements Project.IProject {
 		if (!this.frameworkProject) {
 			let result: string[] = [];
 
-			_.each(_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
+			_.each(_.values(TARGET_FRAMEWORK_IDENTIFIERS), (framework: string) => {
 				let frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 				let configFiles = frameworkProject.configFiles;
 				if (configFiles && configFiles.length > 0) {
@@ -335,7 +336,7 @@ export class Project implements Project.IProject {
 	public ensureCordovaProject() {
 		this.ensureProject();
 
-		if (this.projectData.Framework !== this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova) {
+		if (this.projectData.Framework !== TARGET_FRAMEWORK_IDENTIFIERS.Cordova) {
 			this.$errors.fail("This command is applicable only to Cordova projects.");
 		}
 	}
@@ -449,7 +450,7 @@ export class Project implements Project.IProject {
 			} else {
 				// We'll get here only when command is called outside of project directory and --validValue is specified
 				if (property) {
-					let targetFrameworkIdentifiers = _.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS);
+					let targetFrameworkIdentifiers = _.values(TARGET_FRAMEWORK_IDENTIFIERS);
 					_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
 						let projectSchema: IDictionary<any> = this.$jsonSchemaValidator.tryResolveValidationSchema(targetFrameworkIdentifier);
 						let currentProp = _.find(_.keys(projectSchema), key => key === property);
@@ -740,7 +741,7 @@ export class Project implements Project.IProject {
 							data["Framework"] = data["projectType"];
 							delete data["projectType"];
 						} else {
-							data["Framework"] = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
+							data["Framework"] = TARGET_FRAMEWORK_IDENTIFIERS.Cordova;
 						}
 
 						shouldSaveProject = true;

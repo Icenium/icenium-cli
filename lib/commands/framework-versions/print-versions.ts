@@ -1,14 +1,15 @@
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+
 export class PrintFrameworkVersionsCommand implements ICommand {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
 		private $nativeScriptMigrationService: IFrameworkMigrationService,
 		private $project: Project.IProject,
 		private $logger: ILogger,
-		private $errors: IErrors,
-		private $projectConstants: Project.IConstants) { }
+		private $errors: IErrors) { }
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			let migrationService = this.$project.projectData.Framework === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
+			let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
 			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks().wait();
 			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion).wait();
 			if (projectFrameworkVersion) {

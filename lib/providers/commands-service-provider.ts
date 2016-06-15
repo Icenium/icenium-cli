@@ -1,18 +1,18 @@
 import * as initCommandLib from "../commands/project/init-project";
 import * as projectCommandLib from "../commands/project/create-project";
 import * as samplesLib from "../commands/samples";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 class CommandsServiceProvider implements ICommandsServiceProvider {
 	private commands: IDynamicSubCommandInfo[];
 	private mapCommandNameToFramework: IStringDictionary;
 
 	constructor(private $injector: IInjector,
-		private $screenBuilderService: IScreenBuilderService,
-		private $projectConstants: Project.IConstants) {
+		private $screenBuilderService: IScreenBuilderService) {
 
 		this.mapCommandNameToFramework = {
-			hybrid: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova,
-			native: this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript
+			hybrid: TARGET_FRAMEWORK_IDENTIFIERS.Cordova,
+			native: TARGET_FRAMEWORK_IDENTIFIERS.NativeScript
 		};
 
 		this.commands = [

@@ -2,9 +2,8 @@ import * as frameworkProjectResolverBaseLib from "./framework-project-resolver-b
 
 export class FrameworkProjectResolver extends frameworkProjectResolverBaseLib.FrameworkProjectResolverBase implements Project.IFrameworkProjectResolver {
 	constructor($errors: IErrors,
-		$injector: IInjector,
-		$projectConstants: Project.IConstants) {
-		super($errors, $injector, $projectConstants);
+		$injector: IInjector) {
+		super($errors, $injector);
 	}
 
 	public resolve(framework: string): Project.IFrameworkProject {

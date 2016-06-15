@@ -2,6 +2,7 @@ import * as path from "path";
 import * as util from "util";
 import {EOL} from "os";
 import temp = require("temp");
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 class Sample {
 	constructor(public name: string,
@@ -33,7 +34,6 @@ export class SamplesService implements ISamplesService {
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
 		private $staticConfig: IStaticConfig,
-		private $projectConstants: Project.IConstants,
 		private $options: IOptions) {
 	}
 
@@ -43,7 +43,7 @@ export class SamplesService implements ISamplesService {
 			if(framework) {
 				this.printSamplesInformationForFramework(framework).wait();
 			} else {
-				_.values(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
+				_.values(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
 			}
 		}).future<void>()();
 	}
@@ -139,9 +139,9 @@ export class SamplesService implements ISamplesService {
 	private getRegExpForFramework(framework?: string): RegExp {
 		framework = framework || "";
 		switch(framework.toLowerCase()) {
-			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase():
+			case TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase():
 				return SamplesService.GITHUB_NS_SAMPLES_REGEX;
-			case this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase():
+			case TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase():
 				return SamplesService.GITHUB_CORDOVA_SAMPLES_REGEX;
 			default:
 				return SamplesService.GITHUB_REGEX;

@@ -35,6 +35,7 @@ import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/projec
 import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/mobile/constants";
 
 class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
@@ -178,7 +179,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 
 			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
@@ -210,7 +211,7 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			let testProperties = JSON.parse(abProject.toString());
@@ -241,7 +242,7 @@ describe("project integration tests", () => {
 			options.appid = "com.telerik.Test";
 			let projectName = "Test";
 			project = testInjector.resolve("project");
-			project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 			options.debug = options.release = false;
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 		});
@@ -333,7 +334,7 @@ describe("project integration tests", () => {
 
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -341,7 +342,7 @@ describe("project integration tests", () => {
 
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
@@ -349,27 +350,27 @@ describe("project integration tests", () => {
 
 			it("existing TypeScript.Blank project has project files after init",() => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
 			it("existing project has project files after init",() => {
 				options.template = "Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
 			it("empty directory has project files after init",() => {
 				options.path = tempFolder;
-				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				assertProjectFilesExistAfterInit(tempFolder);
 			});
 		});
@@ -397,23 +398,23 @@ describe("project integration tests", () => {
 
 			it("existing project has configuration specific files and .abignore files after init",() => {
 				options.template = "Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
 			it("empty directory has project files after init",() => {
 				options.path = tempFolder;
-				project.initializeProjectFromExistingFiles(projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				assertProjectFilesExistAfterInit(tempFolder);
 			});
 
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -424,7 +425,7 @@ describe("project integration tests", () => {
 
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -435,7 +436,7 @@ describe("project integration tests", () => {
 
 			it("KendoUI.Drawer template has mandatory files", () => {
 				options.template = "KendoUI.Drawer";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -446,7 +447,7 @@ describe("project integration tests", () => {
 
 			it("When KendoUI.Blank is specified use KendoUI.Empty", () => {
 				options.template = "KendoUI.Blank";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -457,7 +458,7 @@ describe("project integration tests", () => {
 
 			it("KendoUI.Empty template has mandatory files", () => {
 				options.template = "KendoUI.Empty";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -468,7 +469,7 @@ describe("project integration tests", () => {
 
 			it("KendoUI.TabStrip template has mandatory files", () => {
 				options.template = "KendoUI.TabStrip";
-				project.createNewProject(projectName, projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {

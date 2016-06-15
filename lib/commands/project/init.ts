@@ -1,4 +1,5 @@
 import * as path from "path";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
 
 class FileDescriptor {
 	constructor(public path: string, public type: string) { }
@@ -30,12 +31,12 @@ export class InitProjectCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			if(this.isProjectType(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait()) {
+			if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait()) {
 				this.$logger.info("Attempting to initialize Cordova project.");
-				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-			} else if(this.isProjectType(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait()) {
+				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			} else if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait()) {
 				this.$logger.info("Attempting to initialize NativeScript project.");
-				this.$project.initializeProjectFromExistingFiles(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}
@@ -68,7 +69,7 @@ export class InitProjectCommand implements ICommand {
 			}
 
 			// Ionic projects are special, they lack cordova.platform.js files and have package.json. Deal with them here
-			if (projectType === this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova && !result) {
+			if (projectType === TARGET_FRAMEWORK_IDENTIFIERS.Cordova && !result) {
 				result = this.$project.isIonicProject(this.projectDir).wait();
 			}
 
@@ -79,8 +80,8 @@ export class InitProjectCommand implements ICommand {
 	private generateMandatoryAndForbiddenFiles() {
 		this.projectFilesDescriptors = Object.create(null);
 
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.cordovaFiles, [this.tnsModulesDir]);
-		this.generateMandatoryAndForbiddenFilesCore(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.packageJson], this.cordovaFiles.concat([this.indexHtml]));
+		this.generateMandatoryAndForbiddenFilesCore(TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.cordovaFiles, [this.tnsModulesDir]);
+		this.generateMandatoryAndForbiddenFilesCore(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript, [this.packageJson], this.cordovaFiles.concat([this.indexHtml]));
 	}
 
 	private generateMandatoryAndForbiddenFilesCore(frameworkIdentifer: string, mandatoryFiles: FileDescriptor[], forbiddenFiles: FileDescriptor[]): void {

@@ -1,3 +1,5 @@
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/mobile/constants";
+
 export class DynamicHelpProvider implements IDynamicHelpProvider {
 	constructor(private $project: Project.IProject,
 		private $projectConstants: Project.IConstants) { }
@@ -17,8 +19,8 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		return ((): IDictionary<any> => {
 			let isHtml = options.isHtml;
 			let localVariables:IDictionary<any> = {};
-			localVariables["isCordova"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
-			localVariables["isNativeScript"] = isHtml || this.isProjectType([this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();
+			localVariables["isCordova"] = isHtml || this.isProjectType([TARGET_FRAMEWORK_IDENTIFIERS.Cordova]).wait();
+			localVariables["isNativeScript"] = isHtml || this.isProjectType([TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]).wait();
 
 			return localVariables;
 		}).future<IDictionary<any>>()();

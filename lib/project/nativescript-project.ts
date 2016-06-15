@@ -4,6 +4,7 @@ import Future = require("fibers/future");
 import {FrameworkProjectBase} from "./framework-project-base";
 import semver = require("semver");
 import  { startPackageActivityNames } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -27,7 +28,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return this.$injector.resolve("nativeScriptProjectPluginsService");
 	}
 	public get name(): string {
-		return this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
+		return TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
 	}
 
 	public get capabilities(): Project.ICapabilities {
@@ -55,7 +56,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public get startPackageActivity(): string {
-		return startPackageActivityNames[this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()];
+		return startPackageActivityNames[TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()];
 	}
 
 	public get relativeAppResourcesPath(): string {
@@ -105,7 +106,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			let appResourcesDir = this.$resources.getPathToAppResources(this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
 			// In 0.10.0 original template, App_Resources directory is not included in app directory.
 			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);

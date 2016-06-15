@@ -1,5 +1,5 @@
 import * as path from "path";
-
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
 import ProjectCommandBaseLib = require("./project-command-base");
 
 export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
@@ -8,7 +8,6 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		private $logger: ILogger,
 		private $nameCommandParameter: ICommandParameter,
 		private $options: IOptions,
-		private $projectConstants: Project.IConstants,
 		private $screenBuilderService: IScreenBuilderService,
 		private $simulatorService: ISimulatorService,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
@@ -25,7 +24,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			let newProjectDir = this.$project.getNewProjectDir();
 			let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
 
-			this.$project.createNewProject(projectName, this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
+			this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
 			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)).wait());
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
