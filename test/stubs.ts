@@ -85,7 +85,7 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	readText(filename:string, encoding?:string):IFuture<string> {
-		return undefined;
+		return Future.fromResult("");
 	}
 
 	readJson(filename:string, encoding?:string):IFuture<any> {
@@ -101,7 +101,7 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	writeJson(filename:string, data:any, space?:string, encoding?:string):IFuture<void> {
-		return undefined;
+		return Future.fromResult();
 	}
 
 	copyFile(sourceFileName:string, destinationFileName:string):IFuture<void> {

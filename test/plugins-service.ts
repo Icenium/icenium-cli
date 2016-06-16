@@ -9,7 +9,6 @@ import {StaticConfig} from "../lib/config";
 import {ResourceLoader} from "../lib/common/resource-loader";
 import {assert} from "chai";
 import Future = require("fibers/future");
-import * as plugman from "plugman";
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	let testInjector = new Yok();
@@ -20,7 +19,13 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
 	testInjector.register("prompter", {});
-	testInjector.register("projectConstants", {});
+	testInjector.register("projectConstants", {
+		PACKAGE_JSON_NAME: "package.json"
+	});
+
+	testInjector.register("childProcess", {
+		spawnFromEvent: () => Future.fromResult({ stdout: "" })
+	});
 
 	// Register mocked project
 	testInjector.register("project", {
@@ -64,7 +69,6 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("staticConfig", StaticConfig);
 	testInjector.register("options", Options);
 	testInjector.register("resources", ResourceLoader);
-	testInjector.register("childProcess", {});
 
 	return testInjector;
 }
@@ -367,7 +371,7 @@ describe("plugins-service", () => {
 		assert.equal(4, installedPlugins.length);
 	});
 
-	it("fetches plugin when it is found from plugman", () => {
+	it("fetches plugin when it is found in npm", () => {
 		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
@@ -376,28 +380,30 @@ describe("plugins-service", () => {
 		];
 
 		let testInjector = createTestInjector(cordovaPlugins, [], []);
+		let childProcess = testInjector.resolve("childProcess");
+
+		childProcess.spawnFromEvent = (): Future<any> => {
+			return ((): any => {
+				return {
+					stdout: `NAME                    		   DESCRIPTION             AUTHOR        DATE       VERSION  KEYWORDS
+							 org.apache.cordova.battery-status Cordova Plugin 		   =csantanapr…  2016-04-20 1.0.3    ecosystem:cordova`
+				};
+			}).future<any>()();
+		};
+
+		childProcess.exec = () => Future.fromResult("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (path: string) => Future.fromResult(false);
-		let originalPlugmanFetch = plugman.fetch;
-		let originalPlugmanSearch = plugman.search;
-		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
-			let result = { 'org.apache.cordova.battery-status': { someData: "data" } };
-			callback(null, result);
-		};
-		plugman.fetch = (plugin_dir: string, plugins_dir: string, link: boolean, subdir: string, git_ref: string, callback: (error: Error, result: any) => void) => {
-			callback(null, "Success");
-		};
+		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>Battery</name> <description>Cordova Battery Plugin</description></plugin>`);
 
 		service.fetch("org.apache.cordova.battery-status").wait();
-		plugman.fetch = originalPlugmanFetch;
-		plugman.search = originalPlugmanSearch;
 		let logger: stubs.LoggerStub = testInjector.resolve("logger");
 		assert.isTrue(logger.output.indexOf("Success") !== -1, "Success word should be in the output when plugman fetch succeeds.");
 	});
 
-	it("fetches plugin from url when plugman fails fetching by id", () => {
+	it("fetches plugin from url when npm fails fetching by id", () => {
 		let cordovaPlugins = [
 			{
 				Identifier: "org.apache.cordova.battery-status",
@@ -435,26 +441,16 @@ describe("plugins-service", () => {
 			]
 		}];
 		let testInjector = createTestInjector(cordovaPlugins, [], availableMarketplacePlugins);
+		let childProcess = testInjector.resolve("childProcess");
+
+		childProcess.exec = () => Future.fromResult("com.telerik.dropbox@0.1.18 node_modules\\com.telerik.dropbox\n");
+
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (path: string) => Future.fromResult(false);
-		let originalPlugmanFetch = plugman.fetch;
-		let originalPlugmanSearch = plugman.search;
-		plugman.search = (keywords: string[], callback: (error: Error, result: any) => void) => {
-			let result = { 'org.apache.cordova.battery-status': { someData: "data" } };
-			callback(null, result);
-		};
-		plugman.fetch = (plugId: string, plugins_dir: string, link: boolean, subdir: string, git_ref: string, callback: (error: Error, result: any) => void) => {
-			if (_.startsWith(plugId, "http")) {
-				callback(null, "Success");
-			} else {
-				callback(new Error("Error"), null);
-			}
+		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>Dropbox</name> <description>Telerik Dropbox</description></plugin>`);
 
-		};
 		service.fetch("com.telerik.dropbox").wait();
-		plugman.fetch = originalPlugmanFetch;
-		plugman.search = originalPlugmanSearch;
 		let logger: stubs.LoggerStub = testInjector.resolve("logger");
 		assert.isTrue(logger.output.indexOf("Success") !== -1, "Success word should be in the output when plugman fetch succeeds.");
 	});

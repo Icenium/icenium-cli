@@ -60,7 +60,6 @@
     "osenv": "0.1.0",
     "plist": "1.1.0",
     "plistlib": "0.2.1",
-    "plugman": "1.3.0",
     "progress-stream": "0.5.0",
     "properties-parser": "0.2.3",
     "pullstream": "https://github.com/icenium/node-pullstream/tarball/master",

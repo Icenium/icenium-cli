@@ -789,4 +789,5 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	}
 
 }
+
 $injector.register("cordovaProjectPluginsService", CordovaProjectPluginsService);
