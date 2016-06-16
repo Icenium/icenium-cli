@@ -1241,3 +1241,33 @@ interface IClipboardService {
 	 */
 	paste(): IFuture<string>;
 }
+
+/**
+ * Plugin options required when installing local plugin to project.
+ */
+interface ILocalPluginData {
+	/**
+	 * The actual directory that user has entered.
+	 */
+	actualName: string;
+
+	/**
+	 * Is the plugin a tgz file.
+	 */
+	isTgz: boolean;
+
+	/**
+	 * If true the plugin will be added to the configuration file of the project.
+	 */
+	addPluginToConfigFile: boolean;
+
+	/**
+	 * Custom properties to be added to the configuration file of the project.
+	 */
+	configFileContents?: any;
+
+	/**
+	 * If true the message where the plugin is installed will not be displayed.
+	 */
+	suppressMessage?: boolean;
+}

@@ -1,8 +1,8 @@
 import * as util from "util";
 import * as helpers from "../../common/helpers";
 import * as semver from "semver";
-import * as validUrl from "valid-url";
 import * as path from "path";
+import * as xmlMapping from "xml-mapping";
 import {EOL} from "os";
 import {PluginType} from "../../plugins-data";
 import {CordovaPluginsService} from "./cordova-plugins";
@@ -28,18 +28,18 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	};
 
 	constructor(private $cordovaPluginsService: CordovaPluginsService,
-		private $fs: IFileSystem,
-		private $logger: ILogger,
 		private $loginManager: ILoginManager,
 		private $marketplacePluginsService: ICordovaPluginsService,
 		private $options: IOptions,
-		private $project: Project.IProject,
-		private $projectConstants: Project.IConstants,
-		private $prompter: IPrompter,
 		private $resources: IResourceLoader,
 		$errors: IErrors,
+		$logger: ILogger,
+		$prompter: IPrompter,
+		$fs: IFileSystem,
+		$project: Project.IProject,
+		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess) {
-		super($errors, $childProcess);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess);
 	}
 
 	private loadPluginsData(): IFuture<void> {
@@ -54,58 +54,8 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	}
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		keywords.unshift("cordova");
+		keywords.unshift("ecosystem:cordova");
 		return super.findPlugins(keywords);
-	}
-
-	public fetch(pluginIdentifier: string): IFuture<void> {
-		return (() => {
-			if (!pluginIdentifier) {
-				this.$logger.error("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the Cordova Plugin Registry.");
-			} else if (this.isLocalPath(pluginIdentifier).wait() || this.isUrlToRepository(pluginIdentifier)) {
-				let result = this.$cordovaPluginsService.fetch(pluginIdentifier).wait();
-				this.$logger.out(result);
-			} else {
-				let identifier = this.getPluginBasicInformation(pluginIdentifier).wait().name.toLowerCase();
-				let plugin = _.find(this.getAvailablePlugins(), pl => pl.data.Identifier.toLowerCase() === identifier || pl.data.Name.toLowerCase() === identifier);
-				let pluginUrl: string = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
-				let plugins = this.$cordovaPluginsService.getPlugins([pluginIdentifier]);
-				let pluginKeys = Object.keys(plugins);
-				let pluginsCount = pluginKeys.length;
-				if (pluginsCount === 0) {
-					if (pluginUrl) {
-						this.$logger.out(this.$cordovaPluginsService.fetch(pluginUrl).wait());
-					} else {
-						this.$logger.out("There are 0 matching plugins.");
-					}
-					return;
-				}
-
-				if (pluginsCount > 1 && pluginKeys[0] !== pluginIdentifier) {
-					this.$logger.out(`There are more then 1 matching plugins: ${pluginKeys.join(", ")}.`);
-					return;
-				}
-
-				try {
-					this.$logger.out(this.$cordovaPluginsService.fetch(pluginKeys[0]).wait());
-				} catch (err) {
-					if (pluginUrl) {
-						this.$logger.trace(`Error while trying to fetch plugin with id ${pluginIdentifier} via plugman. Error is: ${err.message}.`);
-						this.$logger.out(this.$cordovaPluginsService.fetch(pluginUrl).wait());
-					} else {
-						this.$errors.fail(err.message);
-					}
-				}
-			}
-		}).future<void>()();
-	}
-
-	private isLocalPath(pluginId: string): IFuture<boolean> {
-		return this.$fs.exists(pluginId);
-	}
-
-	private isUrlToRepository(pluginId: string): boolean {
-		return validUrl.isUri(pluginId);
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
@@ -337,6 +287,46 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
 			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 		}).future<IPlugin[]>()();
+	}
+
+	protected getPluginsDirName(): string {
+		return "plugins";
+	}
+
+	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+			let pluginXml: any = xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
+
+			// Need to add $t because of the xmlMapping library.
+			let basicPluginInformation: IBasicPluginInformation = {
+				name: pluginXml.plugin.name.$t,
+				description: pluginXml.plugin.description.$t,
+				version: pluginXml.plugin.version
+			};
+
+			let pluginVariables: any[] = [];
+			if (pluginXml.plugin.preference) {
+				// Need to chack if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
+				if (_.isArray(pluginXml.plugin.preference)) {
+					_.each(pluginXml.plugin.preference, function (preference) {
+						pluginVariables.push(preference);
+					});
+				} else {
+					pluginVariables.push(pluginXml.plugin.preference);
+				}
+			}
+
+			basicPluginInformation.variables = pluginVariables;
+			return basicPluginInformation;
+		}).future<IBasicPluginInformation>()();
+	}
+
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation> {
+		// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
+		pluginData.addPluginToConfigFile = false;
+
+		return super.installLocalPlugin(pathToInstalledPlugin, pluginData);
 	}
 
 	private isPluginSupported(plugin: IPlugin, frameworkVersion: string, pluginVersion?: string): boolean {
