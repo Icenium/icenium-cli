@@ -11,6 +11,21 @@ General | `$ appbuilder debug ios`
 <% } %>
 <% if(isHtml) { %>
 On Windows systems, shows the AppBuilder debug tools to let you debug applications on connected Android devices. On OS X systems, you need to manually launch Safari and debug your app using the Safari Web Inspector. For more information about debugging on OS X, see [Safari Web Inspector Guide](https://developer.apple.com/library/mac/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40007874-CH1-SW1) 
+<% } %>
+
+<% if(isConsole) { %>
+<% if(isLinux) { %>
+WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
+<% } %>
+<% if(isMacOS && isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript apps on OS X systems. To view the complete help for this command, run `$ appbuilder help debug`
+<% } %>
+<% } %>
+
+<% if(isHtml) { %>
+### Command Limitations
+
+* On OS X systems, you cannot run this command for NativeScript apps.
 
 ### Related Commands
 

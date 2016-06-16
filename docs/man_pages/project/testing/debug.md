@@ -13,13 +13,17 @@ WARNING: You can work only with connected iOS and Android devices.
 <% if(isLinux) { %>
 WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
+<% if(isMacOS && isNativeScript) { %>
+WARNING: This command is not applicable to NativeScript apps on OS X systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
-<% if(isHtml) { %>
+<% } %>
+<% if((isConsole && isWindows && (isNativeScript || isCordova)) || (isConsole && isMacOS && isCordova) || isHtml) { %>
 ### Attributes
 * `<Platform>` is the target mobile platform on which you want to debug your project. You can set the following target platforms.
 	* `android` - Debug your project on Android.
 	* `ios` - Debug your project on iOS.
-
+<% } %>
+<% if(isHtml) { %>
 ### Prerequisites
 
 * [Requirements for debugging on Android devices](http://docs.telerik.com/platform/appbuilder/debugging-your-code/debugging-on-device/prerequisites-for-debugging#android-requirements)
@@ -29,6 +33,7 @@ WARNING: This command is not applicable to Linux systems. To view the complete h
 
 * You cannot run this command on Linux systems.
 * You cannot run this command on Windows Phone devices.
+* On OS X systems, you cannot run this command for NativeScript apps.
 
 ### Related Commands
 
