@@ -143,6 +143,20 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 	public abstract filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]>;
 
+	protected isPluginFetched(pluginName: string): IFuture<boolean> {
+		return ((): boolean => {
+			// Fetched plugins are in the "plugins" directory both for Cordova and NativeScript projects.
+			let projectPluginsDirectory = path.join(this.$project.projectDir, "plugins");
+			let filterOptions = { enumerateDirectories: true, includeEmptyDirectories: false };
+			let fetchedPlugins = this.$fs.enumerateFilesInDirectorySync(projectPluginsDirectory, (item: string) => {
+				let itemBaseName = path.basename(item);
+				return this.hasTgzExtension(itemBaseName) ? itemBaseName.indexOf(pluginName) >= 0 : itemBaseName === pluginName;
+			}, filterOptions);
+
+			return !!(fetchedPlugins && fetchedPlugins.length);
+		}).future<boolean>()();
+	}
+
 	protected hasTgzExtension(pluginidentifier: string): boolean {
 		let pluginIdentifierExtname = path.extname(pluginidentifier);
 		return this.isLocalPath(pluginidentifier).wait() && (pluginIdentifierExtname === ".tgz" || pluginIdentifierExtname === ".gz");

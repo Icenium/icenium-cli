@@ -45,7 +45,8 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		getProjectDir: () => Future.fromResult(""),
 		ensureProject: () => { /*mock*/ },
 		ensureCordovaProject: () => {/*mock*/ },
-		configurations: ["debug"]
+		configurations: ["debug"],
+		projectDir: ""
 	});
 
 	testInjector.register("server", {

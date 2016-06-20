@@ -195,7 +195,14 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			let installedPlugins = this.getInstalledPluginByName(pluginName);
 			let plugin = installedPlugins[0];
 			if (!plugin) {
-				this.$errors.fail("Could not find plugin with name %s.", pluginName);
+				// Need to check the plugins directory because the plugin can be fetched, not added.
+				if (this.isPluginFetched(pluginName).wait()) {
+					this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName)).wait();
+					this.$logger.out("Plugin %s was successfully removed.", pluginName);
+					return;
+				} else {
+					this.$errors.fail("Could not find plugin with name %s.", pluginName);
+				}
 			}
 
 			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait();
@@ -248,7 +255,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 
 	public isPluginInstalled(pluginName: string): boolean {
 		let installedPluginInstances = this.getInstalledPluginByName(pluginName);
-		return installedPluginInstances && installedPluginInstances.length > 0;
+		return (installedPluginInstances && installedPluginInstances.length > 0) || this.isPluginFetched(pluginName).wait();
 	}
 
 	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {

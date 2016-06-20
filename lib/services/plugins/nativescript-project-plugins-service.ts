@@ -5,6 +5,7 @@ import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
 import {isInteractive} from "../../common/helpers";
+import {TARGET_FRAMEWORK_IDENTIFIERS} from "../../common/mobile/constants";
 import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
@@ -40,7 +41,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	}
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		let nativeScriptKeyword = this.$projectConstants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
+		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
 		let hasNativeScriptKeyword = _.any(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
 
 		if (!hasNativeScriptKeyword) {
@@ -168,9 +169,9 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	public isPluginInstalled(pluginName: string): boolean {
 		let packageJsonContent = this.getProjectPackageJsonContent().wait();
 		let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
-		return packageJsonContent
+		return (packageJsonContent
 			&& !!packageJsonContent.dependencies && !!packageJsonContent.dependencies[pluginBasicInfo.name]
-			&& (!pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version);
+			&& (!pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName).wait());
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
