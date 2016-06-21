@@ -18,7 +18,7 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 * `--mandatory` - If set, the app users will have to install the required update first in order to continue utilizing the app. Use this option to provide critical bug fixes to your published app.
 
 ### Attributes
-`<Platforms>` is one or more target platforms, separated by a space, for which you want to create a Telerik AppManager LiveSync update. You can set the following target platforms.
+`<Platforms>` is one or more target platforms, separated by a space, for which you want to create a AppManager LiveSync update. You can set the following target platforms.
 * `android` - Publishes an update for your Android application.
 * `ios` - Publishes an update for your iOS application.
 * `wp8` - Publishes an update for your Windows Phone application.
@@ -27,9 +27,9 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 <% if(isHtml) { %>
 ### Prerequisites
 
-* You must have a published version of your app, enabled for AppManager LiveSync, in Telerik AppManager, Google Play, Apple App Store or Windows Phone Store. To create a new version enabled for AppManager LiveSync, complete the following steps.
+* You must have a published version of your app, enabled for AppManager LiveSync, in AppManager, Google Play, Apple App Store or Windows Phone Store. To create a new version enabled for AppManager LiveSync, complete the following steps.
 	1. Enable your project for AppManager LiveSync by running `$ appbuilder plugin add com.telerik.LivePatch --release`
-	1. Publish your app to [Telerik AppManager](http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#cli), [Google Play](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-android#cli), [Apple App Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-ios#cli) or [Windows Phone Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#cli).
+	1. Publish your app to [AppManager](http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#cli), [Google Play](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-android#cli), [Apple App Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-ios#cli) or [Windows Phone Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#cli).
 * Your project must target Apache Cordova 3.5.0 or later. To check the target Apache Cordova version of your project, run `$ appbuilder mobileframework`
 
 ### Command Limitations

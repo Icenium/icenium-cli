@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder appmanager groups`
 
-Lists the distribution groups configured in your Telerik AppManager portal. If you have not configured any distribution groups in <% if(isHtml) { %>[<% } %>Telerik AppManager<% if(isHtml) { %>](https://platform.telerik.com/appmanager)<% } %>, this command returns `Default Group`.<% if(isHtml) { %> This group is created by default for all Telerik AppManager accounts.
+Lists the distribution groups configured in your Telerik AppManager portal. If you have not configured any distribution groups in <% if(isHtml) { %>[<% } %>Telerik AppManager<% if(isHtml) { %>](https://platform.telerik.com/appmanager)<% } %>, this command returns `Default Group`.<% if(isHtml) { %> This group is created by default for all AppManager accounts.
 
 For more information about AppManager distribution groups, see [Adding Distribution Groups](http://docs.telerik.com/platform/appmanager/appmanager-portal/managing-groups/adding-distribution-group).
 

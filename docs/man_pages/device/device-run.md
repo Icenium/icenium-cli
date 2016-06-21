@@ -11,14 +11,14 @@ Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <
 * `--device` - If multiple devices are connected, sets the device on which you want to run the app.
 
 ### Attributes
-* `<Application ID>` is the application identifier as listed by `$ appbuilder device list-applications` 
+* `<Application ID>` is the application identifier as listed by `$ appbuilder device list-applications`
 * `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 
 <% if(isHtml) { %>
 ### Prerequisites
 Before running your app on an iOS device, verify that your system and app meet the following requirements.
 
-* You are running the Telerik AppBuilder CLI on an OS X system.
+* You are running the AppBuilder CLI on an OS X system.
 * You have installed Xcode 5 or later.
 * You have built your app with the debug build configuration.
 

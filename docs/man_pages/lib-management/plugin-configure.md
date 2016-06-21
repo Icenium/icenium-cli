@@ -16,7 +16,7 @@ Set one value for all applicable configurations | `$ appbuilder plugin configure
 \*\*\* This command is available only for Apache Cordova plugins. If the plugin has multiple variables, you can set `--var` for each variable.
 <% } %>
 
-Configures plugin variables for the selected plugin.<% if(isHtml) { %>If you have not set one or more of the plugin variables with `--var`, the Telerik AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
+Configures plugin variables for the selected plugin.<% if(isHtml) { %>If you have not set one or more of the plugin variables with `--var`, the AppBuilder CLI shows an interactive prompt to let you set their values.<% } %>
 
 
 ### Options

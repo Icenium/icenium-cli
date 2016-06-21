@@ -18,7 +18,7 @@ Prints your current command-line completion settings. If disabled, prompts you t
 * `enable` - Enables command-line completion. You need to restart the shell to complete the operation.
 * `disable` - Disables command-line completion. You need to restart the shell to complete the operation.
 
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
@@ -26,7 +26,7 @@ Command | Description
 [autocomplete-status](autocomplete-status.html) | Prints the current status of your command-line completion settings.
 [autocomplete-enable](autocomplete-enable.html) | Enables command-line completion for bash and zsh shells.
 [autocomplete-disable](autocomplete-disable.html) | Disables command-line completion for bash and zsh shells.
-[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the Telerik AppBuilder CLI.
-[error-reporting](error-reporting.html) | Configures anonymous error reporting for the Telerik AppBuilder CLI.
-[doctor](doctor.html) | Checks your system for configuration problems which might prevent the Telerik AppBuilder CLI from working properly.
+[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the AppBuilder CLI.
+[error-reporting](error-reporting.html) | Configures anonymous error reporting for the AppBuilder CLI.
+[doctor](doctor.html) | Checks your system for configuration problems which might prevent the AppBuilder CLI from working properly.
 <% } %>

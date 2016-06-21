@@ -9,10 +9,10 @@ Initializes an existing Apache Cordova project for development in the current di
 
 If the directory contains an existing Ionic project, you will be prompted to create a backup so that you can restore your work. The project retains its plugins, name and app ID, if not specified otherwise. The AppBuilder CLI configures the remaining project properties and provides the missing application icons and splash screens. You might want to manually set new unique values for your project properties and to update the application assets.
 
-For more information about how to configure your project properties, see [appbuilder prop](../configuration/prop.html)<% } %> 
+For more information about how to configure your project properties, see [appbuilder prop](../configuration/prop.html)<% } %>
 
 ### Options
-* `--appid` - Sets the application identifier for your app. 
+* `--appid` - Sets the application identifier for your app.
 
 ### Attributes
 * `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.

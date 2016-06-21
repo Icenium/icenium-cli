@@ -11,7 +11,7 @@ To set exclude and include rules, you can create and manage an `.abignore` file 
 
 ## Overview
 
-When you develop apps with the Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
+When you develop apps with the Telerik AppBuilder Command-Line Interface by Progress (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
 
 The AppBuilder CLI respects `.abignore` during the following operations.
 
@@ -82,8 +82,8 @@ For more information about working with build configurations in the AppBuilder C
 > When you edit `.abignore`, make sure that your exclude and include rules comply with the glob syntax and any syntax specifics of the minimatch matching library.<br/>For more information about glob syntax, see <a href="http://man7.org/linux/man-pages/man7/glob.7.html" target="_blank">Glob in the Linux Programmer's Manual</a>.<br/>For more information about minimatch syntax, see <a href="https://github.com/isaacs/minimatch#comparisons-to-other-fnmatchglob-implementations" target="_blank">Comparisons to other fnmatch/glob implementations</a>.
 
 When you create and modify your `.abignore` file, keep in mind the following specifics.
-   
-* Each rule must start on a new line. 
+
+* Each rule must start on a new line.
 * Empty lines are ignored.
 * By default, all rules are exclude rules.
 * Starting with [AppBuilder 2.6\*](#troubleshooting), newly created projects contain a default `.abignore` file. This file excludes the following files and subdirectories from your application package.
@@ -94,27 +94,27 @@ When you create and modify your `.abignore` file, keep in mind the following spe
    * The `obj` directory and its contents: A subdirectory in projects created with Visual Studio. It contains the archived project files that AppBuilder sends to the build server.
    * The `.vs` directory and its contents: A subdirectory in projects created with Visual Studio 2015. It contains information, related specifically to your project in Visual Studio.
    * `.gitignore`: A file that Git uses to determine which files and directories to ignore when you are making a commit.
-   * The `.git` directory and its contents: A subdirectory in which Git stores your version control history and other relevant version control data. 
+   * The `.git` directory and its contents: A subdirectory in which Git stores your version control history and other relevant version control data.
    * `.abignore`: This file contains exclude and include rules for your application package.
    * The `.ab` directory and its contents: The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
    * `.app.json`: This file contains configuration information about projects created with Screen Builder.
-   * Files associated with popular development environments. 
+   * Files associated with popular development environments.
 * For projects created with AppBuilder 2.5.2 or earlier, you need to manually create `.abignore`. For such projects, by default, the AppBuilder CLI excludes the following files and subdirectories. You do not need to manually list these files in your `.abignore` file.
    * `.ab:` The AppBuilder CLI creates and manages this subdirectory. It contains temporary working files which the AppBuilder CLI uses.
    * `.abignore:` This file contains exclude and include rules for your application package.
    * `IPA, APK, and XAP:` The application packages for iOS, Android, and Windows Phone 8, respectively.
-* To introduce a comment, place a hash (`#`) before the text.<br/>For example: 
-      
+* To introduce a comment, place a hash (`#`) before the text.<br/>For example:
+
    ```
    # This file contains exclude and include rules for my application package.
-   ``` 
+   ```
 * Each rule must be a glob that complies with the minimatch syntax.<br/>For example:
 
    ```
    # The following rule excludes all HTML files from the root.
    *.html
 
-   # The following rule excludes all files whose names consist of six characters, starting with index, and that are located in the root. 
+   # The following rule excludes all files whose names consist of six characters, starting with index, and that are located in the root.
    # For example: index1.html, index2.js, etc.
    index?.*
    ```
@@ -138,7 +138,7 @@ When you create and modify your `.abignore` file, keep in mind the following spe
 
    For more information about configuration-specific files in AppBuilder, see [Managing Configuration-Specific Files](http://docs.telerik.com/platform/appbuilder/build-configurations/configuration-specific-files).
 * Preserve the casing of file paths to ensure that your `.abignore` file works across Windows, OS X, and Linux.
-* To introduce an include rule, place an exclamation mark (`!`) before the rule.<br/>For example: 
+* To introduce an include rule, place an exclamation mark (`!`) before the rule.<br/>For example:
 
    ```
    # The following rule excludes all HTML files located in the root except for index.html.
@@ -173,7 +173,7 @@ This is the markup of a sample `.abignore` file. This sample is based on the def
 .git/**/*
 .gitignore
 
-# The following rule excludes the bin and obj subdirectories. This rule is useful for projects developed with or migrated from Microsoft Visual Studio. 
+# The following rule excludes the bin and obj subdirectories. This rule is useful for projects developed with or migrated from Microsoft Visual Studio.
 bin/**/*
 obj/**/*
 
@@ -197,7 +197,7 @@ Between AppBuilder 2.6 and 2.7.3, the default `.abignore` file contained exclude
 
 ```
 # .abignore lets you configure which of your files and folders should be excluded from your application package during the build process.
-# Each project created with AppBuilder 2.6 or later contains a default .abignore which lists a number of system files and folders that might affect the size of your app or might prevent build operations from completing successfully. 
+# Each project created with AppBuilder 2.6 or later contains a default .abignore which lists a number of system files and folders that might affect the size of your app or might prevent build operations from completing successfully.
 #
 # For more information about .abignore and how to write exclude and include rules for your projects, see http://docs.telerik.com/platform/appbuilder/testing-your-app/abignore
 

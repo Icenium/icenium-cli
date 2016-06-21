@@ -8,13 +8,13 @@ General | `$ appbuilder <Command> [Parameters] [--options <Values>]`
 Command | Description
 -------|----------
 [help `<Command>`](general/help.html) | Shows additional information about the commands in this list in the browser.
-[login](general/login.html) | Logs you in the Telerik Platform.
-[logout](general/logout.html) | Logs you out from the Telerik Platform.
+[login](general/login.html) | Logs you in the Telerik Platform by Progress.
+[logout](general/logout.html) | Logs you out from the Telerik Platform by Progress.
 [user](general/user.html) | Prints information about the currently logged in user.
 [usage-reporting](general/usage-reporting.html) | Configures anonymous usage reporting.
 [error-reporting](general/error-reporting.html) | Configures anonymous error reporting.
 [autocomplete](general/autocomplete.html) | Manages your command-line completion settings.
-[doctor](general/doctor.html) | Checks your system for configuration problems which might prevent the Telerik AppBuilder CLI from working properly.
+[doctor](general/doctor.html) | Checks your system for configuration problems which might prevent the AppBuilder CLI from working properly.
 
 ## Project Development Commands
 Command | Description
