@@ -38,8 +38,9 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$fs: IFileSystem,
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
-		$childProcess: IChildProcess) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess);
+		$childProcess: IChildProcess,
+		$hostInfo: IHostInfo) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo);
 	}
 
 	private loadPluginsData(): IFuture<void> {
@@ -197,11 +198,22 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			if (!plugin) {
 				// Need to check the plugins directory because the plugin can be fetched, not added.
 				if (this.isPluginFetched(pluginName).wait()) {
-					this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName)).wait();
-					this.$logger.out("Plugin %s was successfully removed.", pluginName);
+					let shouldDeleteFetchedPlugin = true;
+
+					if (helpers.isInteractive()) {
+						shouldDeleteFetchedPlugin = this.$prompter.confirm(`The plugin ${pluginName} will be deleted from the plugins folder. Are you sure you want to remove it?`, () => true).wait();
+					}
+
+					if (shouldDeleteFetchedPlugin) {
+						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName)).wait();
+						this.$logger.out(`Plugin ${pluginName} was successfully removed.`);
+					} else {
+						this.$logger.out(`Plugin ${pluginName} was not removed.`);
+					}
+
 					return;
 				} else {
-					this.$errors.fail("Could not find plugin with name %s.", pluginName);
+					this.$errors.failWithoutHelp("Could not find plugin with name %s.", pluginName);
 				}
 			}
 
@@ -316,7 +328,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			if (pluginXml.plugin.preference) {
 				// Need to chack if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
 				if (_.isArray(pluginXml.plugin.preference)) {
-					_.each(pluginXml.plugin.preference, function (preference) {
+					_.each(pluginXml.plugin.preference, (preference: any) => {
 						pluginVariables.push(preference);
 					});
 				} else {

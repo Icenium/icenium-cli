@@ -30,8 +30,9 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$fs: IFileSystem,
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
-		$childProcess: IChildProcess) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess);
+		$childProcess: IChildProcess,
+		$hostInfo: IHostInfo) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo);
 
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
@@ -42,7 +43,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
 		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
-		let hasNativeScriptKeyword = _.any(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
+		let hasNativeScriptKeyword = _.some(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
 
 		if (!hasNativeScriptKeyword) {
 			keywords.unshift(nativeScriptKeyword);
@@ -129,13 +130,18 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
 			if (packageJsonContent.dependencies[pluginBasicInfo.name]) {
 				let pathToPlugin = packageJsonContent.dependencies[pluginBasicInfo.name].toString().replace("file:", "");
-				if (this.checkIsValidLocalPlugin(pathToPlugin).wait()) {
-					this.$fs.deleteDirectory(path.resolve(pathToPlugin)).wait();
+
+				let fullPluginPath = path.join(this.$project.projectDir, pathToPlugin);
+
+				if (this.checkIsValidLocalPlugin(pathToPlugin).wait() || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath).wait())) {
+					this.$fs.deleteDirectory(fullPluginPath).wait();
 				}
+
 				delete packageJsonContent.dependencies[pluginBasicInfo.name];
 				if (packageJsonContent.nativescript) {
 					delete packageJsonContent.nativescript[`${pluginBasicInfo.name}-variables`];
 				}
+
 				this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
 
 				this.$logger.printMarkdown(util.format("Successfully removed plugin `%s`.", pluginBasicInfo.name));
@@ -188,7 +194,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	protected getPluginsDirName(): string {
 		return NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME;
-	};
+	}
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginData: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
@@ -211,15 +217,25 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 			return basicPluginInfo;
 		}).future<IBasicPluginInformation>()();
-	};
+	}
 
 	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation> {
+		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName).wait()) {
+			pluginData.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+		}
+
 		// Need to set addPluginToConfigFile to true when fetching NativeScript plugins.
 		pluginData.addPluginToConfigFile = true;
 
 		// Pass the actual plugin name because we do not need to add the extracted plugin if it is tgz file.
 		return super.installLocalPlugin(pluginData.actualName, pluginData);
-	};
+	}
+
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
+		return ((): boolean => {
+			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(this.getPluginsDirName()) !== -1;
+		}).future<boolean>()();
+	}
 
 	private getMarketplacePlugins(): IFuture<IPlugin[]> {
 		return ((): IPlugin[] => {

@@ -3,6 +3,7 @@
 import * as path from "path";
 import * as util from "util";
 import * as shelljs from "shelljs";
+import * as semver from "semver";
 import * as validUrl from "valid-url";
 import * as commonHelpers from "../../common/helpers";
 import temp = require("temp");
@@ -15,7 +16,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $fs: IFileSystem,
 		protected $project: Project.IProject,
 		protected $projectConstants: Project.IConstants,
-		protected $childProcess: IChildProcess) { }
+		protected $childProcess: IChildProcess,
+		private $hostInfo: IHostInfo) { }
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
 		return ((): IBasicPluginInformation[] => {
@@ -23,7 +25,9 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			let searchParams = ["search"].concat(keywords);
 
-			let npmSearchResult = this.$childProcess.spawnFromEvent("npm.cmd", searchParams, "close").wait();
+			let npmCommand = this.$hostInfo.isWindows ? "npm.cmd" : "npm";
+
+			let npmSearchResult = this.$childProcess.spawnFromEvent(npmCommand, searchParams, "close").wait();
 
 			if (npmSearchResult.stderr) {
 				this.$errors.failWithoutHelp(npmSearchResult.stderr);
@@ -106,7 +110,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 					let selectedPlugin = this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys).wait();
 					this.fetchPluginCore(selectedPlugin).wait();
 				} else {
-					this.$logger.out("There are more then 1 matching plugins: " + pluginKeys.join(", ") + ".");
+					this.$errors.failWithoutHelp("There are more then 1 matching plugins: " + pluginKeys.join(", ") + ".");
 				}
 
 				return;
@@ -119,7 +123,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 					this.$logger.trace("Error while trying to fetch plugin with id " + pluginIdentifier + " via npm. Error is: " + err.message + ".");
 					this.fetchPluginCore(pluginUrl).wait();
 				} else {
-					this.$errors.fail(err.message);
+					this.$errors.failWithoutHelp(err.message);
 				}
 			}
 		}).future<void>()();
@@ -150,7 +154,17 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			let filterOptions = { enumerateDirectories: true, includeEmptyDirectories: false };
 			let fetchedPlugins = this.$fs.enumerateFilesInDirectorySync(projectPluginsDirectory, (item: string) => {
 				let itemBaseName = path.basename(item);
-				return this.hasTgzExtension(itemBaseName) ? itemBaseName.indexOf(pluginName) >= 0 : itemBaseName === pluginName;
+
+				if (this.hasTgzExtension(item)) {
+					itemBaseName = itemBaseName.replace(path.extname(itemBaseName), "");
+
+					if (semver.valid(itemBaseName.substr(itemBaseName.lastIndexOf("-") + 1))) {
+						// The plugin tgz has the version in its name.
+						itemBaseName = itemBaseName.substring(0, itemBaseName.lastIndexOf("-"));
+					}
+				}
+
+				return itemBaseName === pluginName;
 			}, filterOptions);
 
 			return !!(fetchedPlugins && fetchedPlugins.length);
@@ -169,14 +183,11 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				actualName: pluginData && pluginData.actualName,
 				isTgz: pluginData && pluginData.isTgz,
 				addPluginToConfigFile: false,
-				suppressMessage: pluginData && pluginData.suppressMessage
+				suppressMessage: pluginData && pluginData.suppressMessage,
+				configFileContents: pluginData.configFileContents
 			};
 
 			if (pathToInstalledPlugin) {
-				if (pluginData && pluginData.isTgz || this.$fs.exists(pluginIdentifier).wait()) {
-					installLocalPluginOptions.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
-				}
-
 				return this.fetchPluginBasicInformationCore(pathToInstalledPlugin, installLocalPluginOptions).wait();
 			} else {
 				let errorMessage = ("Unable to " + failMessageMethodName + " plugin " + pluginIdentifier + ".") +
@@ -236,7 +247,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			let pathToPlugin = path.resolve(pluginPath);
 
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
-			if (pathToPlugin.indexOf(this.$project.getProjectDir().wait()) === -1 || pathToPlugin.indexOf(this.getPluginsDirName()) !== -1) {
+			if (this.shouldCopyToPluginsDirectory(pathToPlugin).wait()) {
 				let pathToInstall = path.join(this.$project.getProjectDir().wait(), "plugins");
 				if (!pluginData || !pluginData.suppressMessage) {
 					let actualPlugin = pluginData ? path.resolve(pluginData.actualName) : pluginPath;
@@ -252,6 +263,18 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			return this.installLocalPluginCore(pathToPlugin, pluginData).wait();
 		}).future<IBasicPluginInformation>()();
+	}
+
+	protected isPluginPartOfTheProject(pathToPlugin: string): IFuture<boolean> {
+		return ((): boolean => {
+			return pathToPlugin.indexOf(this.$project.getProjectDir().wait()) !== -1;
+		}).future<boolean>()();
+	}
+
+	protected shouldCopyToPluginsDirectory(pluginPath: string): IFuture<boolean> {
+		return ((): boolean => {
+			return !this.isPluginPartOfTheProject(pluginPath).wait();
+		}).future<boolean>()();
 	}
 
 	protected abstract fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation>;

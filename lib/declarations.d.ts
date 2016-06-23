@@ -1103,9 +1103,15 @@ interface ICordovaResourceLoader {
 	 * Builds the absolute path to a Cordova javascript file.
 	 * @param  {string} version  The Cordova version
 	 * @param  {string} platform The Platform - Android, iOS or WP8
-	 * @return {string}          Absolute path to Cordova javascript file
+	 * @return {string} Absolute path to Cordova javascript file
 	 */
 	buildCordovaJsFilePath(version: string, platform: string): string;
+
+	/**
+	 * Reads the content of cordova-migration-data.json and returns it as JavaScript object.
+	 * @return {IFuture<ICordovaJsonData>} The content of cordova-migration-data.json parsed as JavaScript object.
+	 */
+	getCordovaMigrationData(): IFuture<ICordovaJsonData>;
 }
 
 /**

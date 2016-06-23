@@ -20,6 +20,7 @@ import assert = require("assert");
 import Future = require("fibers/future");
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
+import {CordovaResourceLoader} from "../lib/cordova-resource-loader";
 import * as path from "path";
 import temp = require("temp");
 import * as util from "util";
@@ -54,7 +55,7 @@ function createMarketplacePluginsData(marketplacePlugins: any[]) {
 		let title = _.last(uniqueId.split("."));
 		let obj = util.format('{"title": "%s", "uniqueId": "%s", "pluginVersion": "%s","downloadsCount": "24","Url": "","demoAppRepositoryLink": ""}',
 			title, uniqueId, version);
-		if(++index !== marketplacePlugins.length) {
+		if (++index !== marketplacePlugins.length) {
 			json += obj + ",";
 		} else {
 			json += obj;
@@ -76,7 +77,7 @@ function createTestInjector() {
 	testInjector.register("staticConfig", require("../lib/config").StaticConfig);
 	testInjector.register("server", {});
 	testInjector.register("ionicProjectTransformator", {});
-	testInjector.register("cordovaResources", {});
+	testInjector.register("cordovaResources", CordovaResourceLoader);
 	testInjector.register("identityManager", {});
 	testInjector.register("buildService", {});
 	testInjector.register("projectNameValidator", mockProjectNameValidator);
@@ -94,11 +95,11 @@ function createTestInjector() {
 	testInjector.register("projectFilesManager", stubs.ProjectFilesManager);
 	testInjector.register("jsonSchemaValidator", {
 		validate: (data: Project.IData) => { /* mock */ },
-		validateWithBuildSchema: (data: Project.IData, platformName: string): void => {/* mock */},
-		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => {/* mock */}
+		validateWithBuildSchema: (data: Project.IData, platformName: string): void => {/* mock */ },
+		validatePropertyUsingBuildSchema: (propertyName: string, propertyValue: string): void => {/* mock */ }
 	});
 
-	testInjector.register("cordovaPluginsService",  cordovaPluginsService.CordovaPluginsService);
+	testInjector.register("cordovaPluginsService", cordovaPluginsService.CordovaPluginsService);
 	testInjector.register("cordovaProjectPluginsService", cordovaProjectPluginsService.CordovaProjectPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("prompter", {});
@@ -180,7 +181,7 @@ function assertCorePluginsCount(configuration?: string) {
 	if (configuration === "debug") {
 		options.release = false;
 		options.debug = true;
-	} else if(configuration === "release") {
+	} else if (configuration === "release") {
 		options.debug = false;
 		options.release = true;
 	}

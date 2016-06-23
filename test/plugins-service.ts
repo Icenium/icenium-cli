@@ -1,19 +1,30 @@
 import {CordovaPluginsService} from "./../lib/services/plugins/cordova-plugins";
 import {MarketplacePluginsService} from "./../lib/services/plugins/marketplace-plugins-service";
 import {CordovaProjectPluginsService} from "./../lib/services/plugins/cordova-project-plugins-service";
-import * as stubs from "./stubs";
+import {NativeScriptProjectPluginsService} from "./../lib/services/plugins/nativescript-project-plugins-service";
 import {Yok} from "../lib/common/yok";
 import {Options} from "../lib/options";
+import {CordovaResourceLoader} from "../lib/cordova-resource-loader";
+import {NativeScriptResources} from "../lib/nativescript-resources";
+import {PluginVariablesHelper} from "../lib/common/plugin-variables-helper";
 import {HostInfo} from "../lib/common/host-info";
 import {StaticConfig} from "../lib/config";
 import {ResourceLoader} from "../lib/common/resource-loader";
+import {FileSystem} from "../lib/common/file-system";
+import {ChildProcess} from "../lib/common/child-process";
 import {assert} from "chai";
+import * as stubs from "./stubs";
+import * as path from "path";
+import * as temp from "temp";
+import * as shelljs from "shelljs";
 import Future = require("fibers/future");
+temp.track();
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	let testInjector = new Yok();
 	testInjector.register("cordovaPluginsService", CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", MarketplacePluginsService);
+	testInjector.register("cordovaResources", CordovaResourceLoader);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
@@ -72,6 +83,17 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("resources", ResourceLoader);
 
 	return testInjector;
+}
+
+function unzipPluginsFolder(fs: IFileSystem): IFuture<string> {
+	return ((): string => {
+		let pathToPluginsZip = path.join("test", "resources", "test-plugins.zip");
+		let unzippedPluginsDirectory = temp.mkdirSync("local-plugins");
+
+		fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true }).wait();
+
+		return path.join(unzippedPluginsDirectory, "test-plugins");
+	}).future<string>()();
 }
 
 class PrompterStub implements IPrompter {
@@ -194,6 +216,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 
 	testInjector.register("cordovaPluginsService", CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", MarketplacePluginsService);
+	testInjector.register("cordovaResources", CordovaResourceLoader);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
@@ -240,6 +263,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 
 	testInjector.register("cordovaPluginsService", CordovaPluginsService);
 	testInjector.register("marketplacePluginsService", MarketplacePluginsService);
+	testInjector.register("cordovaResources", CordovaResourceLoader);
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
@@ -279,6 +303,21 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	return testInjector;
 }
 
+function createTestInjectorForLocalPluginsFetch(): IInjector {
+	let testInjector = createTestInjector([], [], []);
+
+	testInjector.register("fs", FileSystem);
+	// Need to unregister the child process then register it again in order to work with the original one.
+	testInjector.register("childProcess", null);
+	testInjector.register("childProcess", ChildProcess);
+
+	testInjector.register("nativeScriptResources", NativeScriptResources);
+	testInjector.register("pluginVariablesHelper", PluginVariablesHelper);
+	testInjector.register("httpClient", {});
+
+	return testInjector;
+}
+
 describe("plugins-service", () => {
 	afterEach(() => {
 		// reset options.debug and options.release
@@ -286,6 +325,7 @@ describe("plugins-service", () => {
 		let options = testInjector.resolve("options");
 		options.release = options.debug = false;
 	});
+
 	it("return count of installed plugins", () => {
 		let cordovaPlugins = [
 			{
@@ -402,6 +442,104 @@ describe("plugins-service", () => {
 		service.fetch("org.apache.cordova.battery-status").wait();
 		let logger: stubs.LoggerStub = testInjector.resolve("logger");
 		assert.isTrue(logger.output.indexOf("Success") !== -1, "Success word should be in the output when plugman fetch succeeds.");
+	});
+
+	describe("fetches local plugin", () => {
+		let testPluginName = "test-plugin";
+		let testPluginTgzName = "test-plugin-1.0.1.tgz";
+		let testInjector: IInjector;
+		let fs: IFileSystem;
+		let project: Project.IProject;
+		let cordovaLocalPluginsDirectory: string;
+		let nativescriptLocalPluginsDirectory: string;
+		let projectDir: string;
+
+		before(() => {
+			testInjector = createTestInjectorForLocalPluginsFetch();
+			fs = testInjector.resolve("fs");
+
+			let unzippedPluginsDirectory = unzipPluginsFolder(fs).wait();
+
+			cordovaLocalPluginsDirectory = path.join(unzippedPluginsDirectory, "cordova");
+			nativescriptLocalPluginsDirectory = path.join(unzippedPluginsDirectory, "nativescript");
+		});
+
+		beforeEach(() => {
+			project = testInjector.resolve("project");
+			projectDir = temp.mkdirSync("test-project");
+
+			project.getProjectDir = () => Future.fromResult(projectDir);
+			project.projectDir = projectDir;
+		});
+
+		it("for Cordova project.", () => {
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
+
+			service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginName)).wait();
+
+			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+
+			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local Cordova plugin should be fetched.");
+		});
+
+		it("for Cordova project from tgz and extracts it.", () => {
+			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
+
+			service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginTgzName)).wait();
+
+			let installedPluginsDirectory = path.join(projectDir, "plugins");
+
+			let installedPlugins = shelljs.ls(installedPluginsDirectory);
+
+			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local Cordova plugin should be fetched.");
+
+			let expectedPluginContent = shelljs.ls(path.join(cordovaLocalPluginsDirectory, testPluginName));
+			let actualPluginContent = shelljs.ls(path.join(installedPluginsDirectory, testPluginName));
+			assert.isTrue(_.difference(expectedPluginContent, actualPluginContent).length === 0, "The local Cordova plugin should be extracted.");
+		});
+
+		it("for NativeScript project and ask for plugin variables.", () => {
+			let helpers = require("../lib/common/helpers");
+			let originalIsInteractive = helpers.isInteractive;
+			helpers.isInteractive = () => { return true; };
+			let originalFrameworkVersion = project.projectData.FrameworkVersion;
+			project.projectData.FrameworkVersion = "2.0.0";
+
+			let prompter: IPrompter = testInjector.resolve("prompter");
+			let promptsCount = 0;
+			prompter.get = () => {
+				promptsCount++;
+				return Future.fromResult("testvalue");
+			};
+
+			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
+
+			service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginName)).wait();
+			project.projectData.FrameworkVersion = originalFrameworkVersion;
+			helpers.isInteractive = originalIsInteractive;
+
+			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+
+			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local NativeScript plugin should be fetched.");
+			assert.equal(promptsCount, 2, "Should prompt for al plugin variables.");
+		});
+
+		it("for NativeScript project from tgz.", () => {
+			let originalFrameworkVersion = project.projectData.FrameworkVersion;
+			project.projectData.FrameworkVersion = "2.0.0";
+
+			let prompter: IPrompter = testInjector.resolve("prompter");
+			prompter.get = () => Future.fromResult("testvalue");
+
+			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
+
+			service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginTgzName)).wait();
+			project.projectData.FrameworkVersion = originalFrameworkVersion;
+
+			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+
+			assert.isTrue(_.includes(installedPlugins, testPluginTgzName), "The local NativeScript plugin should be fetched.");
+		});
 	});
 
 	it("fetches plugin from url when npm fails fetching by id", () => {

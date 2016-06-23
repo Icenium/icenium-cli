@@ -1,4 +1,3 @@
-import * as path from "path";
 import PluginsDataLib = require("./../../plugins-data");
 
 export class CordovaPluginsService implements ICordovaPluginsService {
@@ -7,7 +6,8 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		private $config: IConfiguration,
 		private $server: Server.IServer,
 		private $projectConstants: Project.IConstants,
-		private $resources: IResourceLoader) { }
+		private $resources: IResourceLoader,
+		private $cordovaResources: ICordovaResourceLoader) { }
 
 	// HACK: Information for this plugin is never returned from the server, so keep it here.
 	// TODO: Remove the LivePatch HACK when the server returns correct results.
@@ -40,7 +40,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
 		let pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
-		let corePluginRegex = require(path.join(this.$resources.resolvePath("Cordova"), "cordova-migration-data.json")).corePluginRegex;
+		let corePluginRegex = this.$cordovaResources.getCordovaMigrationData().wait().corePluginRegex;
 		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier);
 		if (isCorePlugin) {
 			pluginType = PluginsDataLib.PluginType.CorePlugin;
