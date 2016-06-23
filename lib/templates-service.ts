@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as helpers from "./helpers";
-import Future = require("fibers/future");
-import * as unzip from "unzip";
+import * as temp from "temp";
+import * as shelljs from "shelljs";
 
 export class ConfigurationFile {
 	constructor(public template: string,
@@ -77,34 +77,20 @@ export class TemplatesService implements ITemplatesService {
 
 	private unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): IFuture<void> {
 		return (() => {
-			let unzipOps:IFuture<any>[] = [];
-			let unzipStream = this.$fs.createReadStream(assetsZipFileName)
-				.pipe(unzip.Parse())
-				.on("entry", (entry: ZipEntry) => {
-					let indexOfAppResources = entry.path.toLowerCase().indexOf("app_resources/");
-					if (entry.type !== "File" || indexOfAppResources === -1) {
-						entry.autodrain();
-						return;
-					}
+			temp.track();
+			let extractionDir = temp.mkdirSync("appResourcesTemp");
 
-					let entryPath = entry.path.substr(indexOfAppResources);
-					let assetTargetFileName = path.join(appResourcesDir, entryPath);
-					let mkdirFuture = this.$fs.createDirectory(path.dirname(assetTargetFileName));
-					mkdirFuture.resolve((err) => {
-						if (err) {
-							let errFuture = new Future();
-							errFuture.throw(err);
-							unzipOps.push(errFuture);
-							entry.autodrain();
-						} else {
-							let assetTargetFile = this.$fs.createWriteStream(assetTargetFileName);
-							unzipOps.push(this.$fs.futureFromEvent(assetTargetFile, "finish"));
-							entry.pipe(assetTargetFile);
-						}
-					});
-				});
-			this.$fs.futureFromEvent(unzipStream, "close").wait();
-			Future.wait(unzipOps); //SAFE: no FiberFuture's created here
+			// In NativeScript templates App_Resources are under app/App_Resources.
+			// In Cordova templates App_Resources are at the root.
+			// So extract all *App_Resources and filter them after that, so we'll copy the real App_Resources directory to the destination appResourcesDir.
+			this.$fs.unzip(assetsZipFileName, extractionDir, { caseSensitive: false, overwriteExisitingFiles: true }, ["*App_Resources/**"]).wait();
+
+			let appResourcesDirInTemp = _(this.$fs.enumerateFilesInDirectorySync(extractionDir, null, {enumerateDirectories: true}))
+				.filter(file => path.basename(file) === "App_Resources")
+				.first();
+			if (appResourcesDirInTemp) {
+				shelljs.cp("-rf", `${appResourcesDirInTemp}`, appResourcesDir);
+			}
 		}).future<void>()();
 	}
 
