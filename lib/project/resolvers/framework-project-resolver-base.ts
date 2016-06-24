@@ -11,8 +11,8 @@ export class FrameworkProjectResolverBase implements Project.IFrameworkProjectRe
 		try {
 			let frameworkObject = this.$injector.resolve(frameworkName, ctorArguments);
 			return frameworkObject;
-		} catch(err) {
-			this.$errors.fail("Unable to resolve framework %s. Valid frameworks are: %s", frameworkName, helpers.formatListOfNames(_.values(TARGET_FRAMEWORK_IDENTIFIERS)));
+		} catch (err) {
+			this.$errors.fail("Unable to resolve framework %s. Valid frameworks are: %s", frameworkName, helpers.formatListOfNames(_.values<string>(TARGET_FRAMEWORK_IDENTIFIERS)));
 		}
 	}
 }

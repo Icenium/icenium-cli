@@ -66,11 +66,11 @@ export class PrompterStub {
 	promptForChoice(promptMessage: string, choices: any[]): IFuture<any> {
 		this.isPrompterCalled = true;
 		if(promptMessage.indexOf("solution") === -1) {
-			assert.isTrue(_.contains(choices, this.promptPrjName));
+			assert.isTrue(_.includes(choices, this.promptPrjName));
 			return Future.fromResult(this.promptPrjName);
 		}
 
-		assert.isTrue(_.contains(choices, this.promptSlnName));
+		assert.isTrue(_.includes(choices, this.promptSlnName));
 		return Future.fromResult(this.promptSlnName);
 	}
 }

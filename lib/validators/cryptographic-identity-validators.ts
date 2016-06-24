@@ -79,7 +79,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 		if(commonHelpers.isNullOrWhitespace(country)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		}
-		if (_.contains(helpers.getCountries(), country)) {
+		if (_.includes(helpers.getCountries(), country)) {
 			return ValidationResult.ValidationResult.Successful;
 		} else {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.INVALID_FIELD_ERROR_MESSAGE_PATTERN, "Country"));

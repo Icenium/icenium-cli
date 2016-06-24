@@ -7,7 +7,7 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 			this.$project.ensureProject();
 
 			if(this.$project.capabilities.emulate) {
-				return _.contains(this.$project.getProjectTargets().wait(), platform.toLowerCase());
+				return _.includes(this.$project.getProjectTargets().wait(), platform.toLowerCase());
 			}
 
 			this.$errors.fail("The operation is not supported for %s projects.", this.$project.projectData.Framework);

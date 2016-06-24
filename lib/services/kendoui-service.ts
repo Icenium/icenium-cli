@@ -13,7 +13,7 @@ export class KendoUIService implements IKendoUIService {
 			if (!this._packages) {
 				let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 				if (options.verified) {
-					packages = _.filter(packages, pack => _.any(pack.VersionTags, tag => tag.toLowerCase() === KendoUIService.VERIFIED_TAG));
+					packages = _.filter(packages, pack => _.some(pack.VersionTags, tag => tag.toLowerCase() === KendoUIService.VERIFIED_TAG));
 				}
 
 				if (options.core) {

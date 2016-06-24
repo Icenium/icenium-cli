@@ -97,7 +97,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let smallerVersion = isUpgrade ? fromVersion : toVersion;
 			let biggerVersion = isUpgrade ? toVersion : fromVersion;
 
-			let renames = _.select(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
+			let renames = _.filter(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
 				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0;
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
@@ -106,7 +106,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			plugins = this.applyTransitions(plugins, transitions);
 
 			let supportedPlugins = this.pluginsForVersion(toVersion).wait();
-			plugins = _.filter(plugins, plugin => _.contains(supportedPlugins, plugin) || (_.contains(plugin, '@') && !_.contains(this.invalidMarketplacePlugins, plugin)));
+			plugins = _.filter(plugins, plugin => _.includes(supportedPlugins, plugin) || (_.includes(plugin, '@') && !_.includes(this.invalidMarketplacePlugins, plugin)));
 
 			let cordovaJsonData = this.getCordovaJsonData().wait();
 			let sourceSupportedPlugins = this.pluginsForVersion(fromVersion).wait();
@@ -131,7 +131,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				plugin.NewName));
 
 			let supportedVersions = _.map(json.SupportedVersions, plugin => this.parseMscorlibVersion(plugin));
-			let cliSupportedVersions = _.select(supportedVersions, (version: string) => helpers.versionCompare(version, this.minSupportedVersion) >= 0);
+			let cliSupportedVersions = _.filter(supportedVersions, (version: string) => helpers.versionCompare(version, this.minSupportedVersion) >= 0);
 
 			let integratedPlugins: { [version: string]: string[] } = {};
 			_.each(cliSupportedVersions, version => {
@@ -139,7 +139,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			});
 			let supportedFrameworkVersion: IFrameworkVersion[] = _(json.SupportedFrameworkVersions)
 				.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version) }; })
-				.filter(fv => _.contains(cliSupportedVersions, fv.version))
+				.filter(fv => _.includes(cliSupportedVersions, fv.version))
 				.value();
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
@@ -166,7 +166,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			let validWPSdks = this.getSupportedWPFrameworks().wait();
-			if (!_.contains(validWPSdks, newVersion)) {
+			if (!_.includes(validWPSdks, newVersion)) {
 				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
 			}
 
@@ -222,10 +222,10 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.map(configuration => <string[]>this.$project.getProperty("CorePlugins", configuration))
 				.union()
 				.flatten<string>()
-				.unique()
+				.uniq()
 				.filter((plugin: string) => {
 					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin).wait();
-					return _.contains(plugin, '@') && !_.any(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version);
+					return _.includes(plugin, '@') && !_.some(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version);
 				})
 				.value();
 

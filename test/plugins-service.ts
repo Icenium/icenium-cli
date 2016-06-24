@@ -1180,8 +1180,8 @@ describe("plugins-service", () => {
 			project.projectData.FrameworkVersion = "3.5.0";
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
-			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
-			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
+			assert.isTrue(_.some(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
+			assert.isTrue(_.some(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
 			// assert.equal(2, availablePlugins.length);
 			// HACK - when LivePatch plugin is working correctly, remove the line below and use the assert above.
 			assert.equal(3, availablePlugins.length);
@@ -1228,8 +1228,8 @@ describe("plugins-service", () => {
 			project.projectData.FrameworkVersion = "3.5.0";
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
-			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
-			assert.isTrue(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
+			assert.isTrue(_.some(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
+			assert.isTrue(_.some(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
 			// assert.equal(2, availablePlugins.length);
 			// HACK - when LivePatch plugin is working correctly, remove the line below and use the assert above.
 			assert.equal(3, availablePlugins.length);
@@ -1276,8 +1276,8 @@ describe("plugins-service", () => {
 			project.projectData.FrameworkVersion = "3.2.0";
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			let availablePlugins = service.getAvailablePlugins();
-			assert.isFalse(_.any(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
-			assert.isFalse(_.any(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
+			assert.isFalse(_.some(availablePlugins, pl => pl.data.Identifier === "com.telerik.stripe"));
+			assert.isFalse(_.some(availablePlugins, pl => pl.data.Identifier === "nl.x-services.plugins.toast"));
 			// assert.equal(0, availablePlugins.length);
 			// HACK - when LivePatch plugin is working correctly, remove the line below and use the assert above.
 			assert.equal(1, availablePlugins.length);

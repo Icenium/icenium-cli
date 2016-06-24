@@ -11,7 +11,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	private get isMigrationEnabledForUser(): boolean {
 		if(this._isMigrationEnabledForUser === null) {
 			let features = this.$server.tap.getFeatures(this.getUserTenantId().wait(), "tap").wait();
-			this._isMigrationEnabledForUser = features && features.length && _.contains(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
+			this._isMigrationEnabledForUser = features && features.length && _.includes(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
 		}
 		return this._isMigrationEnabledForUser;
 	}

@@ -151,7 +151,7 @@ class AppManagerService implements IAppManagerService {
 			// Resolve pluginsService here as in its constructor it fails when project is not Cordova.
 			let $pluginsService: IPluginsService = this.$injector.resolve("pluginsService");
 			let plugins = $pluginsService.getInstalledPlugins();
-			if(!_.any(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
+			if(!_.some(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
 				this.$logger.warn("The AppManager LiveSync plugin is not enabled for your project. Enabling it now for the release build configuration...");
 				$pluginsService.addPlugin(AppManagerService.LIVEPATCH_PLUGIN_ID).wait();
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");

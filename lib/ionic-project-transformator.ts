@@ -298,7 +298,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 					if (this.$fs.getFsStats(resourceItemSourceDirectory).wait().isFile()) {
 						let itemNameWithoutExtension = item.substring(0, item.lastIndexOf("."));
 						if (_.isArray(ionicWindowsPhoneConfig.splash)) {
-							if (_.any(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
+							if (_.some(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
 								resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
 							}
 						} else {
@@ -394,7 +394,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
 			let pluginsDir = path.join(this.$project.getProjectDir().wait(), "plugins");
 			(this.$fs.readDirectory(pluginsDir).wait() || [])
-				.filter(pl => _.contains(corePlugins, pl))
+				.filter(pl => _.includes(corePlugins, pl))
 				.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)).wait());
 		}).future<void>()();
 	}

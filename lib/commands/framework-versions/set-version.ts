@@ -34,7 +34,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 				let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
 				supportedVersions = migrationService.getSupportedVersions().wait();
 
-				if(_.contains(supportedVersions, value)) {
+				if(_.includes(supportedVersions, value)) {
 					return true;
 				}
 

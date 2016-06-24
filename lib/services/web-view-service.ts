@@ -65,8 +65,7 @@ export class WebViewService implements IWebViewService {
 		return (() => {
 			_(this.getWebViews(platform))
 			.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
-			.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait())
-			.value();
+			.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait());
 		}).future<void>()();
 	}
 }

@@ -4,7 +4,7 @@ import * as util from "util";
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	private static UPGRADE_ERROR_MESSAGES = ["Your app has been build with an obsolete version of Screen Builder. Please, migrate it to latest version and retry.",
-	"Your app has been created with an obsolete version of Screen Builder. Upgrade your project to the latest version and try again."];
+		"Your app has been created with an obsolete version of Screen Builder. Upgrade your project to the latest version and try again."];
 
 	private static UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE = "Your app has been created with an obsolete version of Screen Builder. You need to upgrade your project to be able to run Screen Builder-related commands.";
 	public static DEFAULT_SCREENBUILDER_TYPE = "application";
@@ -81,10 +81,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				generatorName = generatorName || this.generatorFullName;
 				let scaffolder = this.createScaffolder(projectDir, generatorName, { isSync: true }).wait().scaffolder;
 				let allSupportedCommands = scaffolder.listGenerators()
-											.map((command: string) => command.replace( new RegExp(this.generatorName + ":?"), ''))
-											.filter((command: string) => !!command);
+					.map((command: string) => command.replace(new RegExp(this.generatorName + ":?"), ''))
+					.filter((command: string) => !!command);
 
-				this.allCommandsCache = _.map(allSupportedCommands, (command:string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
+				this.allCommandsCache = _.map(allSupportedCommands, (command: string) => util.format("%s-%s", this.commandsPrefix, command.toLowerCase()));
 			}
 
 			return this.allCommandsCache;
@@ -103,7 +103,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return (() => {
 			let screenBuilderOptions = bacisSceenBuilderOptions || {};
 
-			if(answers) {
+			if (answers) {
 				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers)).wait();
 			}
 
@@ -120,9 +120,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
 
 			if (type === ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE || screenBuilderOptions.answers) {
-					scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
+				scaffolder.promptGenerate(type, screenBuilderOptions.answers, scaffolderData.callback);
 			} else {
-					scaffolder.promptGenerate(type, scaffolderData.callback);
+				scaffolder.promptGenerate(type, scaffolderData.callback);
 			}
 
 			return scaffolderData;
@@ -131,7 +131,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public ensureScreenBuilderProject(projectDir: string): IFuture<void> {
 		return (() => {
-			if(!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
+			if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
 				this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
 			}
 		}).future<void>()();
@@ -180,7 +180,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 					generatorsCache: appScaffoldingPath,
 					path: screenBuilderOptions && screenBuilderOptions.projectPath || path.resolve(projectPath || "."),
 					dependencies: [util.format("%s@%s", generatorName, generatorConfig.version)],
-					connect: (done:Function) => {
+					connect: (done: Function) => {
 						done();
 					},
 					logger: this.$logger.trace.bind(this.$logger)
@@ -199,11 +199,11 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 			let scaffolder = this.getScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
 			if (screenBuilderOptions && screenBuilderOptions.isSync) {
-				return {scaffolder: scaffolder, future: null, callback: null};
+				return { scaffolder: scaffolder, future: null, callback: null };
 			}
 
 			let future = new Future<any>();
-			let callback = (err:Error, data:any) => {
+			let callback = (err: Error, data: any) => {
 				if (err) {
 					let error = this.getErrorsRecursive(err).join('\n');
 					this.$logger.trace(`Screen Builder error while prompting: ${err.message}`);
@@ -217,27 +217,27 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				}
 			};
 
-			return {scaffolder: scaffolder, future: future, callback: callback};
+			return { scaffolder: scaffolder, future: future, callback: callback };
 		}).future<IScaffolder>()();
 	}
 
 	private getErrorsRecursive(errorObject: any): string[] {
 		let errorMessage = errorObject.message,
-			childErrors = _(errorObject.errors)
-							.map(errObj => this.getErrorsRecursive(errObj))
-							.flatten<string>()
-							.value();
+			childErrors = _(<any[]>errorObject.errors)
+				.map(errObj => this.getErrorsRecursive(errObj))
+				.flatten<string>()
+				.value();
 
 		return _.union([errorMessage], childErrors);
 	}
 
 	private registerCommand(command: string, generatorName: string): void {
-		this.$injector.requireCommand(command,  "./commands/user-status");
+		this.$injector.requireCommand(command, "./commands/user-status");
 		this.$injector.registerCommand(command, this.createResolver(command, generatorName));
 	}
 
 	private createResolver(command: string, generatorName: string): void {
-		return this.$injector.resolve(ScreenBuilderDynamicCommand, {command: command, generatorName: generatorName});
+		return this.$injector.resolve(ScreenBuilderDynamicCommand, { command: command, generatorName: generatorName });
 	}
 }
 $injector.register("screenBuilderService", ScreenBuilderService);

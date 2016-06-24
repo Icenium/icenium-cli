@@ -297,7 +297,7 @@ export class BuildService implements Project.IBuildService {
 				let targetFile = zipped[1];
 				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
 				this.$fs.copyFile(srcFile, targetFile).wait();
-			}).value();
+			});
 
 			let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
 			let htmlTemplateContents = this.$fs.readText(scanFile).wait();

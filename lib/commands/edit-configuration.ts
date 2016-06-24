@@ -9,7 +9,7 @@ export class EditConfigurationCommandParameter implements ICommandParameter {
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			let template = _.findWhere(this.$project.projectConfigFiles, { template: validationValue });
+			let template = _.find(this.$project.projectConfigFiles, { template: validationValue });
 			if(!template) {
 				if(validationValue) {
 					this.$errors.fail("There is no matching configuration file for: %s", validationValue);
@@ -38,7 +38,7 @@ export class EditConfigurationCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		let file = args[0];
-		let template = _.findWhere(this.$project.projectConfigFiles, { template: file });
+		let template = _.find(this.$project.projectConfigFiles, { template: file });
 		return this.executeImplementation(template);
 	}
 

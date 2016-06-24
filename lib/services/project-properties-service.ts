@@ -31,24 +31,24 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {
 		let updated = false;
 
-		if(!_.has(properties, "projectVersion")) {
+		if (!_.has(properties, "projectVersion")) {
 			this.$logger.warn("Missing 'projectVersion' property in .abproject. Default value '1' will be used.");
 			properties.projectVersion = ProjectPropertiesService.PROJECT_VERSION_DEFAULT_VALUE;
 			updated = true;
 		}
 
-		if(frameworkProject.completeProjectProperties(properties)) {
+		if (frameworkProject.completeProjectProperties(properties)) {
 			updated = true;
 		}
 
 		return updated;
 	}
 
-	public removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData) : Project.IData {
+	public removeProjectProperty(dataToBeUpdated: Project.IData, property: string, projectData?: Project.IData): Project.IData {
 		let normalizedProperty = this.normalizePropertyName(property, projectData);
-		if(dataToBeUpdated) {
+		if (dataToBeUpdated) {
 			delete dataToBeUpdated[normalizedProperty];
-			if(projectData) {
+			if (projectData) {
 				this.validateProjectData(projectData, dataToBeUpdated);
 			} else {
 				this.validateProjectData(dataToBeUpdated);
@@ -61,7 +61,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return ((): void => {
 			this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
 
-			if(configurationsSpecifiedByUser.length === 0) {
+			if (configurationsSpecifiedByUser.length === 0) {
 				configurationsSpecifiedByUser = _.keys(configurationSpecificData);
 			}
 
@@ -74,11 +74,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		}).future<void>()();
 	}
 
-	public updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any) : IFuture<void> {
+	public updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): IFuture<void> {
 		return ((): void => {
 			let normalizedProperty = this.normalizePropertyName(property, projectData);
 			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
-			if(isString) {
+			if (isString) {
 				if (newValue.length > 1) {
 					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 				}
@@ -89,12 +89,12 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			if (mode === "set") {
 				propertyValue = isString ? newValue[0] : newValue;
 			} else if (mode === "del") {
-				if(!(propertyValue instanceof Array)) {
+				if (!(propertyValue instanceof Array)) {
 					this.$errors.fail("Unable to remove value to non-flags property");
 				}
 				propertyValue = _.difference(propertyValue, newValue);
 			} else if (mode === "add") {
-				if(!(propertyValue instanceof Array)) {
+				if (!(propertyValue instanceof Array)) {
 					this.$errors.fail("Unable to add value to non-flags property");
 				}
 				propertyValue = _.union(propertyValue, newValue);
@@ -104,10 +104,10 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 			this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue).wait();
 
-			if(configurationSpecificData) {
+			if (configurationSpecificData) {
 				configurationSpecificData[normalizedProperty] = propertyValue;
 			} else {
-				projectData[normalizedProperty] =  propertyValue;
+				projectData[normalizedProperty] = propertyValue;
 			}
 
 			this.validateProjectData(projectData, configurationSpecificData);
@@ -118,7 +118,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		let validProperties = this.getValidProperties(projectData);
 		let normalizedPropertyName = validProperties[propertyName.toLowerCase()];
 
-		if(!normalizedPropertyName) {
+		if (!normalizedPropertyName) {
 			let message = util.format("Unrecognized project property '%s'. Use 'appbuilder prop print' command to lists all available property names.", propertyName);
 			this.$errors.fail({ formatStr: message, suppressCommandHelp: true });
 		}
@@ -141,7 +141,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			let schemaValues = _.values(schemas);
 			let firstArray = _.first(schemaValues);
 			let commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
-				return _.all(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
+				return _.every(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
 			});
 
 			_.each(_.keys(schemas), (targetFrameworkIdentifier: string) => {
@@ -166,16 +166,16 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return this.$jsonSchemaValidator.getValidProperties(projectData.Framework, projectData.FrameworkVersion);
 	}
 
-	private getPropRange(propData: any): IFuture<string[]>{
+	private getPropRange(propData: any): IFuture<string[]> {
 		return (() => {
 			if (propData.dynamicRange) {
 				return this.$injector.dynamicCall(propData.dynamicRange).wait();
 			}
-			if(propData.enum) {
+			if (propData.enum) {
 				return propData.enum;
 			}
-			if(propData.items) {
-				if(propData.items.enum) {
+			if (propData.items) {
+				if (propData.items.enum) {
 					return propData.items.enum;
 				}
 			}
@@ -186,8 +186,8 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public getValidValuesForProperty(propData: any): IFuture<string[]> {
 		return ((): string[] => {
 			let range = this.getPropRange(propData).wait();
-			if(range) {
-				return _.sortBy(_.values(range), (val: string) => {
+			if (range) {
+				return _.sortBy(_.values<string>(range), (val: string) => {
 					return val.toUpperCase();
 				});
 			}
@@ -204,7 +204,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			let range = this.getPropRange(value).wait();
 			if (range) {
 				help.push("    Valid values:");
-				_.each(range, (rangeDesc:any, rangeKey:any) => {
+				_.each(range, (rangeDesc: any, rangeKey: any) => {
 					let desc = "      " + (_.isArray(range) ? rangeDesc : rangeDesc.input || rangeKey);
 					if (rangeDesc.description) {
 						desc += " - " + rangeDesc.description;
@@ -250,17 +250,17 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return ((): void => {
 			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
 			let propData = projectSchema[propertyName];
-			if(propData && propData.onChanging) {
+			if (propData && propData.onChanging) {
 				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
 		}).future<void>()();
 	}
 
-	private moveCorePluginsToConfigurationSpecificData(projectData: Project.IData, configurationSpecificData:  IDictionary<Project.IData>): void {
-		if(projectData.CorePlugins && projectData.CorePlugins.length > 0) {
+	private moveCorePluginsToConfigurationSpecificData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {
+		if (projectData.CorePlugins && projectData.CorePlugins.length > 0) {
 			_.each(configurationSpecificData, (configurationData: Project.IData, configuration: string) => {
 				this.$logger.trace(`Move CorePlugins from project data to '${configuration}' configuration.`);
-				if(configurationData.CorePlugins && configurationData.CorePlugins.length > 0 && _.difference(configurationData.CorePlugins, projectData.CorePlugins).length !== 0) {
+				if (configurationData.CorePlugins && configurationData.CorePlugins.length > 0 && _.difference(configurationData.CorePlugins, projectData.CorePlugins).length !== 0) {
 					this.$errors.failWithoutHelp(`CorePlugins are defined in both '${this.$projectConstants.PROJECT_FILE}' and '.${configuration}${this.$projectConstants.PROJECT_FILE}'. Remove them from one of the files and try again.`);
 				}
 				configurationData.CorePlugins = projectData.CorePlugins;
@@ -269,7 +269,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		delete projectData.CorePlugins;
 	}
 
-	private validateAllProjectData(projectData: Project.IData, configurationSpecificData:IDictionary<Project.IData>): void {
+	private validateAllProjectData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {
 		let projectConfigurations = _.keys(configurationSpecificData);
 		_.each(projectConfigurations, configuration => {
 			this.validateProjectData(projectData, configurationSpecificData[configuration]);
@@ -281,19 +281,19 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	private validateProjectData(projectData: Project.IData, configurationSpecificData?: Project.IData): void {
 		let dataToValidate = Object.create(null);
 		_.extend(dataToValidate, projectData);
-		if(configurationSpecificData) {
+		if (configurationSpecificData) {
 			_.extend(dataToValidate, configurationSpecificData);
 		}
 		this.$jsonSchemaValidator.validate(dataToValidate);
 	}
 
 	private tryMovingCorePluginsToProjectData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {
-		if(this.shouldMoveCorePluginsToProjectData(configurationSpecificData)) {
+		if (this.shouldMoveCorePluginsToProjectData(configurationSpecificData)) {
 			this.$logger.trace("Moving CorePlugins from configuration specific data to project data.");
 			projectData.CorePlugins = _(configurationSpecificData)
-									.values()
-									.first()
-									.CorePlugins;
+				.values<Project.IData>()
+				.first()
+				.CorePlugins;
 			_.each(configurationSpecificData, (configurationData: Project.IData, configuration: string) => {
 				this.$logger.trace(`Removing property CorePlugins from '${configuration}' configuration.`);
 				delete configurationData.CorePlugins;
@@ -306,12 +306,12 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	private shouldMoveCorePluginsToProjectData(configurationSpecificData: IDictionary<Project.IData>): boolean {
 		let corePluginsInConfigs = _.map(configurationSpecificData, configData => configData.CorePlugins);
 		let corePluginsLenghtsInConfigs = _(corePluginsInConfigs)
-					.map(c => c.length)
-					.uniq()
-					.value();
+			.map(c => c.length)
+			.uniq()
+			.value();
 		let differencesBetweenPluginsInConfigs = _.difference.apply(null, corePluginsInConfigs);
 		// Check if the lengths of core plugins in all configuration files are the same.
-		if(corePluginsLenghtsInConfigs.length === 1 && differencesBetweenPluginsInConfigs.length === 0) {
+		if (corePluginsLenghtsInConfigs.length === 1 && differencesBetweenPluginsInConfigs.length === 0) {
 			this.$logger.trace("No difference between CorePlugins in each configuration detected. CorePlugins should be moved to project data.");
 			return true;
 		}

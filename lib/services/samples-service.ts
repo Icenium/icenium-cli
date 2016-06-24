@@ -40,10 +40,10 @@ export class SamplesService implements ISamplesService {
 	public printSamplesInformation(framework?: string): IFuture<void> {
 		return (() => {
 			this.$logger.info("You can choose a sample from the following: %s", EOL);
-			if(framework) {
+			if (framework) {
 				this.printSamplesInformationForFramework(framework).wait();
 			} else {
-				_.values(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
+				_.values<string>(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
 			}
 		}).future<void>()();
 	}
@@ -138,7 +138,7 @@ export class SamplesService implements ISamplesService {
 
 	private getRegExpForFramework(framework?: string): RegExp {
 		framework = framework || "";
-		switch(framework.toLowerCase()) {
+		switch (framework.toLowerCase()) {
 			case TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase():
 				return SamplesService.GITHUB_NS_SAMPLES_REGEX;
 			case TARGET_FRAMEWORK_IDENTIFIERS.Cordova.toLowerCase():
@@ -151,7 +151,7 @@ export class SamplesService implements ISamplesService {
 	private getSamples(framework?: string): IFuture<Sample[]> {
 		return (() => {
 			let regex = this.getRegExpForFramework(framework);
-			let repos = _.select(this.getIceniumRepositories().wait(),(repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
+			let repos = _.filter(this.getIceniumRepositories().wait(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
 			let samples = _.map(repos, (repo: any) => {
 				return new Sample(
 					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
@@ -187,13 +187,13 @@ export class SamplesService implements ISamplesService {
 
 	private getIceniumRepositories(): IFuture<string[]> {
 		return ((): string[] => {
-			if(!this._repos) {
+			if (!this._repos) {
 				let gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
 				this._repos = [];
 
-				for(let page = 1; ; ++page) {
+				for (let page = 1; ; ++page) {
 					let pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
-					if(_.isEmpty(pagedResult)) {
+					if (_.isEmpty(pagedResult)) {
 						break;
 					}
 					Array.prototype.push.apply(this._repos, pagedResult);
@@ -217,11 +217,11 @@ export class SamplesService implements ISamplesService {
 			let tokenFile = this.$staticConfig.GITHUB_ACCESS_TOKEN_FILEPATH;
 			try {
 				let content = this.$fs.readFile(tokenFile).wait();
-				if(content) {
+				if (content) {
 					accessToken = `${queryToken}access_token=${content}`;
 				}
-			} catch(err) {
-				if(err.code !== "ENOENT") {
+			} catch (err) {
+				if (err.code !== "ENOENT") {
 					this.$logger.trace(`Error happened while trying to open '${tokenFile}'. Error is: ${err}`);
 				} else {
 					this.$logger.trace(`File '${tokenFile}' does not exist. GitHub api calls will be executed without access_token.`);

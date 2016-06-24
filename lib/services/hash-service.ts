@@ -44,13 +44,13 @@ export class HashService implements IHashService {
 				this.$errors.fail(util.format("Specified file %s does not exist.", filePath));
 			}
 
-			if(!_.contains(HashService.validInputEncodings, inputEncoding)) {
+			if(!_.includes(HashService.validInputEncodings, inputEncoding)) {
 				this.$errors.fail(util.format("Specified input file encoding %s is not valid. Valid values are %s", inputEncoding, HashService.validInputEncodings));
 			}
 
 			this.validateHashAlgorithm(hashAlgorithm);
 
-			if(!_.contains(HashService.validHashEncodings, hashEncoding)) {
+			if(!_.includes(HashService.validHashEncodings, hashEncoding)) {
 				this.$errors.fail(util.format("Specified hash encoding %s is not valid. Valid values are %s", hashEncoding, HashService.validHashEncodings));
 			}
 		}).future<void>()();
@@ -58,7 +58,7 @@ export class HashService implements IHashService {
 
 	private validateHashAlgorithm(hashAlgorithm: string): void {
 		let hashes = crypto.getHashes();
-		if(!_.contains(hashes, hashAlgorithm)) {
+		if(!_.includes(hashes, hashAlgorithm)) {
 			this.$errors.fail(util.format("Specified hash algorithm %s is not valid. Valid algorithms are %s", hashAlgorithm, hashes));
 		}
 	}

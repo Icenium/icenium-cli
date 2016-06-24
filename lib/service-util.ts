@@ -14,7 +14,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
-		return(() => {
+		return (() => {
 			this.ensureUpToDate().wait();
 			headers = headers || Object.create(null);
 
@@ -22,7 +22,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			if (this.shouldAuthenticate) {
 				cookies = this.$userDataStore.getCookies().wait();
 				if (cookies) {
-					let cookieValues = _.map(_.pairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
+					let cookieValues = _.map(_.toPairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
 					headers.Cookie = cookieValues.join("; ");
 				}
 			}
@@ -34,7 +34,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			let requestOpts: any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
-				path:  `/${path}`,
+				path: `/${path}`,
 				method: method,
 				headers: headers,
 				pipeTo: resultStream
@@ -53,11 +53,11 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			let response: Server.IResponse;
 			try {
 				response = this.$httpClient.httpRequest(requestOpts).wait();
-			} catch(err) {
+			} catch (err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
 				} else if (err.response && err.response.statusCode === 402) {
-					this.$errors.fail({formatStr: "%s", suppressCommandHelp: true}, JSON.parse(err.body).Message);
+					this.$errors.fail({ formatStr: "%s", suppressCommandHelp: true }, JSON.parse(err.body).Message);
 				}
 				throw err;
 			}
@@ -80,7 +80,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 	private ensureUpToDate(): IFuture<void> {
 		return (() => {
-			if(this.$config.ON_PREM) {
+			if (this.$config.ON_PREM) {
 				return;
 			}
 
@@ -111,15 +111,15 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		protected $config: IConfiguration,
 		protected $staticConfig: IStaticConfig,
 		protected $errors: IErrors) {
-			super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors);
+		super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors);
 	}
 
-	public makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}): IFuture<T> {
+	public makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T> {
 		return (() => {
 			try {
 				let user = this.$userDataStore.getUser().wait();
 				this.solutionSpaceName = user.tenant.id;
-				if(solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
+				if (solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
 					return this.callWithoutSolutionSpaceHeader(call).wait();
 				} else {
 					return call().wait();
@@ -149,7 +149,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		return (() => {
 			path = `appbuilder/${path}`;
 			headers = headers || Object.create(null);
-			if(this.useSolutionSpaceNameHeader) {
+			if (this.useSolutionSpaceNameHeader) {
 				headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 			}
 			return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers).wait();

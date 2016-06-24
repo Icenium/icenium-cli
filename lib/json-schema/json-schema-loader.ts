@@ -63,7 +63,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 	private isSchemaLoaded(schemaId: string): boolean {
 		let schemaIds = _.keys(this.loadedSchemas);
-		return _.contains(schemaIds, schemaId);
+		return _.includes(schemaIds, schemaId);
 	}
 
 	private loadSchema(schema: ISchema): IFuture<void> {

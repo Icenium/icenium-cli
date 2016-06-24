@@ -223,7 +223,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let configurations = this.$project.configurations;
 			if(_(this.pluginsForbiddenConfigurations).keys().find(key => key === pluginToAdd.data.Identifier)) {
 				let forbiddenConfig = this.pluginsForbiddenConfigurations[pluginToAdd.data.Identifier];
-				if(this.$project.configurations.length === 1 && _.contains(this.$project.configurations, forbiddenConfig)) {
+				if(this.$project.configurations.length === 1 && _.includes(this.$project.configurations, forbiddenConfig)) {
 					this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
 				}
 				configurations = _.without(this.$project.configurations, forbiddenConfig);
@@ -332,7 +332,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
 		return ((): IPlugin[] => {
 			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
-			return _.filter(plugins, pl => !_.any(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
+			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 		}).future<IPlugin[]>()();
 	}
 
@@ -457,7 +457,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 							_.each(configurations, (configData: IDictionary<any>, configuration:string) => {
 								if (configData) {
 									let corePlugins = configData[CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME];
-									if (corePlugins && (_.contains(corePlugins, projectDataRecord) || _.contains(corePlugins, pluginData.data.Identifier))) {
+									if (corePlugins && (_.includes(corePlugins, projectDataRecord) || _.includes(corePlugins, pluginData.data.Identifier))) {
 										pluginData.configurations.push(configuration);
 									}
 								}
@@ -628,7 +628,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let pluginName = plugin.data.Name;
 			let versions = this.getPluginVersions(plugin);
 			if(version) {
-				if(!_.any(versions, v => v.value === version)) {
+				if(!_.some(versions, v => v.value === version)) {
 					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
 				}
 			} else if(this.$options.latest) {
@@ -660,7 +660,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 		let matchingPluginIds = _(this.getAvailablePlugins())
 			.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase)
 			.map(pl => pl.data.Identifier)
-			.unique()
+			.uniq()
 			.value();
 		if(matchingPluginIds.length === 1) {
 			return matchingPluginIds[0];
