@@ -23,7 +23,7 @@ You can choose which files from your project to exclude or include in your appli
 * `--provision` - Sets the provisioning profile that you want to use for code signing your iOS app. You can set a provisioning profile by index or name. <% if(isHtml) { %>You must specify a provisioning profile. The provisioning profile must match the certificate. To list available provisioning profiles, run `$ appbuilder provision`<% } %> 
 
 ### Attributes
-* `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+* `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`
 <% } %> 

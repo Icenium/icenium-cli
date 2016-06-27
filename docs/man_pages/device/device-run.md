@@ -12,7 +12,7 @@ Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <
 
 ### Attributes
 * `<Application ID>` is the application identifier as listed by `$ appbuilder device list-applications` 
-* `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+* `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 
 <% if(isHtml) { %>
 ### Prerequisites

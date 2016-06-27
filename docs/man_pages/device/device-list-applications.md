@@ -11,7 +11,7 @@ Lists the installed applications on all connected Android <% if(isWindows || isM
 * `--device` - If multiple devices are connected, sets the device for which you want to list all currently installed applications.
 
 ### Attributes
-* `<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
+* `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 
 <% if(isHtml) { %> 
 ### Command Limitations

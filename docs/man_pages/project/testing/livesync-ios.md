@@ -3,30 +3,26 @@ livesync ios
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder livesync ios [--device <Device ID>] [--companion] [--watch]`
+General | `$ appbuilder livesync ios [--device <Device ID>] <% if(isCordova) { %>[--companion] <% } %>[--watch]`
 
 Synchronizes the latest changes in your project to connected iOS devices.
 
-<% if(isConsole) { %>
-<% if(isNativeScript) { %>
-WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help livesync ios`
-<% } %>
-<% if(isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help livesync ios`<% } %>
-<% } %>
+<% if(isConsole && isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help livesync ios`<% } %>
 
-<% if((isConsole && (isWindows || isMacOS) && isCordova) || isHtml) { %>
-`<Device ID>` is the device index or identifier as listed by run `$ appbuilder device`
-
+<% if((isConsole && (isWindows || isMacOS)) || isHtml) { %>
 ### Options
 * `--watch` - If set, when you save changes to the project, changes are automatically synchronized to the connected device.
 * `--device` - Specifies the serial number or the index of the connected device to which you want to synchronize changes. To list all connected devices, grouped by platform, run `$ appbuilder device`
-* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the developer app.
+<% if(isCordova) { %>* `--companion` - If set, when you save changes to the project, changes are automatically synchronized to the Cordova developer app.<% } %>
+
+### Attributes
+* `<Device ID>` is the device index or identifier as listed by `$ appbuilder device`
 <% } %>
 <% if(isHtml) { %> 
 ### Command Limitations
 
-* You cannot run this command on NativeScript projects.
 * You cannot run this command on Linux systems.
+* You cannot LiveSync changes to the NativeScript developer app for iOS over cable.
 
 ### Related Commands
 
