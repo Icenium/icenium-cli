@@ -64,7 +64,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		}
 
 		if(this.deviceIdentifier) {
-			let isInProvisionedDevices = provision.ProvisionedDevices && _.contains(provision.ProvisionedDevices, this.deviceIdentifier);
+			let isInProvisionedDevices = provision.ProvisionedDevices && _.includes(provision.ProvisionedDevices, this.deviceIdentifier);
 			if(!isInProvisionedDevices) {
 				return new ValidationResult.ValidationResult(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Use `$ appbuilder provision -v` to list all devices included in provision", this.deviceIdentifier));
 			}

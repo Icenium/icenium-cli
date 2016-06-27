@@ -53,7 +53,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 
 				_.each(_.keys(this.pendingModels), (modelName: string) => {
 					let model = this.pendingModels[modelName];
-					let modelBlockAdded = _.any(serverModuleDeclaration.codeEntities, ce => ce.opener === model.opener);
+					let modelBlockAdded = _.some(serverModuleDeclaration.codeEntities, ce => ce.opener === model.opener);
 					if(model && !modelBlockAdded) {
 						serverModuleDeclaration.addBlock(model);
 					}

@@ -8,7 +8,7 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		return ((): boolean => {
 			if(this.$project.getProjectDir().wait()) {
 				let framework = this.$project.projectData.Framework.toLowerCase();
-				return _.any(args, arg => arg.toLowerCase() === framework);
+				return _.some(args, arg => arg.toLowerCase() === framework);
 			}
 
 			return true;

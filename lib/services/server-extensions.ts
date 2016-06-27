@@ -7,8 +7,8 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 		$fs: IFileSystem,
 		private $config: IConfiguration,
 		private $serverConfiguration: IServerConfiguration,
-		$options: IOptions){
-			super(path.join($options.profileDir, "Cache"), $fs, $httpClient, $logger, $options);
+		$options: IOptions) {
+		super(path.join($options.profileDir, "Cache"), $fs, $httpClient, $logger, $options);
 	}
 
 	public prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): IFuture<void> {
@@ -35,7 +35,7 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 
 				let extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body);
-				downloadUri = (<any>_.findWhere(extensions["$values"],
+				downloadUri = (<any>_.find(extensions["$values"],
 					{ Identifier: packageName })).DownloadUri;
 			} else {
 				downloadUri = serverUri + "/appbuilder/ClientBin/" + packageName + '.xap';

@@ -65,7 +65,7 @@ export class IdentityManager implements Server.IIdentityManager {
 				this.$logger.out("%s: '%s', expires on %s, issued by %s", (index + 1).toString(), identity.Alias,
 					cert.expiresOn.toDateString(), cert.issuerData["CN"]);
 			});
-			if(!identities.length) {
+			if (!identities.length) {
 				this.$logger.info("No certificates found. To add a certificate, run `certificate import` " +
 					"to import an existing certificate or `certificate create-self-signed` to create a new one.");
 			}
@@ -77,7 +77,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			provision.ApplicationIdentifierPrefix, provision.ApplicationIdentifier);
 		if (this.$options.verbose) {
 			let devices = provision.ProvisionedDevices;
-			if(devices && devices.length) {
+			if (devices && devices.length) {
 				this.$logger.out("  Provisioned device identifiers:");
 				devices.sort();
 				_.forEach(devices, (device, deviceIndex) => {
@@ -91,7 +91,7 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public listProvisions(provisionStr?: string): IFuture<void> {
 		return (() => {
-			if(provisionStr) {
+			if (provisionStr) {
 				let provision = this.findProvision(provisionStr).wait();
 				this.printProvisionData(provision, 0);
 				return;
@@ -104,7 +104,7 @@ export class IdentityManager implements Server.IIdentityManager {
 				this.printProvisionData(provision, provisionIndex);
 			});
 
-			if(!provisions.length) {
+			if (!provisions.length) {
 				this.$logger.info("No provisioning profiles found. To add a provisioning profile, run `provision import`.");
 			}
 		}).future<void>()();
@@ -115,7 +115,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
 			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 			let result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
-			if(!result) {
+			if (!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
 					"a valid index. List registered certificates with 'certificate' command.", identityStr);
 			} else {
@@ -130,7 +130,7 @@ export class IdentityManager implements Server.IIdentityManager {
 			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 			let result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
-			if(!result) {
+			if (!result) {
 				this.$errors.fail("Could not find provision named '%s' or was not given a valid index. List registered provisions with 'provision' command.", provisionStr);
 			}
 
@@ -144,8 +144,8 @@ export class IdentityManager implements Server.IIdentityManager {
 			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
 			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
 
-			provisions = _.filter(provisions, (prov) => _.contains(provisionTypes, prov.ProvisionType));
-			if(provisions.length === 0) {
+			provisions = _.filter(provisions, (prov) => _.includes(provisionTypes, prov.ProvisionType));
+			if (provisions.length === 0) {
 				this.$errors.fail("No provision of type %s found.", helpers.formatListOfNames(provisionTypes));
 			}
 
@@ -159,14 +159,14 @@ export class IdentityManager implements Server.IIdentityManager {
 				let validationResult = validator.validateProvision(prov);
 				let hasCompatibleCertificate = false;
 				let error = validationResult.error;
-				if(validationResult.isSuccessful) {
-					hasCompatibleCertificate = _.any(identities, identity => validator.validateCertificate(identity, prov).wait().isSuccessful);
-					if(!hasCompatibleCertificate) {
+				if (validationResult.isSuccessful) {
+					hasCompatibleCertificate = _.some(identities, (identity: ICryptographicIdentity) => validator.validateCertificate(identity, prov).wait().isSuccessful);
+					if (!hasCompatibleCertificate) {
 						error = `Unable to find applicable certificate for provision ${prov.Name}.`;
 					}
 				}
 
-				if(validationResult.isSuccessful && hasCompatibleCertificate) {
+				if (validationResult.isSuccessful && hasCompatibleCertificate) {
 					passedProvisions.push(prov);
 				} else {
 					failedProvisions.push({ provision: prov, error: error });
@@ -177,7 +177,7 @@ export class IdentityManager implements Server.IIdentityManager {
 				.map((type) => _.find(passedProvisions, (prov) => prov.ProvisionType === type))
 				.find((prov) => Boolean(prov));
 
-			if(provision) {
+			if (provision) {
 				return provision;
 			} else {
 				let composedError = util.format("Cannot find applicable provisioning profiles. %s", os.EOL);
@@ -204,7 +204,7 @@ export class IdentityManager implements Server.IIdentityManager {
 
 			let identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().isSuccessful);
 
-			if(identity) {
+			if (identity) {
 				return identity;
 			} else {
 				this.$errors.fail("No certificate compatible with provision '%s' found.", provisionData.Name);
@@ -236,7 +236,7 @@ class IdentityGenerationDataFactory {
 	};
 
 	public static create(identityModel: ISelfSignedIdentityModel): Server.IdentityGenerationData {
-		let identityGenerationData = <Server.IdentityGenerationData> {
+		let identityGenerationData = <Server.IdentityGenerationData>{
 			StartDate: new Date(identityModel.StartDate),
 			Attributes: {},
 			EndDate: new Date(identityModel.EndDate),
@@ -276,7 +276,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
 		return (() => {
 			let myCountry = model.Country;
-			if(!myCountry) {
+			if (!myCountry) {
 				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
 				myCountry = this.getDefaultCountry().wait();
 			}
@@ -284,16 +284,16 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 			let user = this.$userDataStore.getUser().wait();
 			let schema: any = [];
 
-			if(!model.Name) {
+			if (!model.Name) {
 				schema.push({
-						type: "input",
-						name: "Name",
-						message: "Name",
-						default: () => user.name
+					type: "input",
+					name: "Name",
+					message: "Name",
+					default: () => user.name
 				});
 			}
 
-			if(!model.Email) {
+			if (!model.Email) {
 				schema.push({
 					type: "input",
 					name: "Email",
@@ -306,18 +306,18 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 				});
 			}
 
-			if(!model.Country) {
+			if (!model.Country) {
 				schema.push({
-						type: "input",
-						name: "Country",
-						message: "Country",
-						default: () => myCountry,
-						validate: (value: string) => {
-							let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
-							let message = [validationResult.error, "Valid countries are:"];
-							message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
-							return validationResult.isSuccessful ? true : message.join("\n");
-						}
+					type: "input",
+					name: "Country",
+					message: "Country",
+					default: () => myCountry,
+					validate: (value: string) => {
+						let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ Country: value }, "Country");
+						let message = [validationResult.error, "Valid countries are:"];
+						message.push(helpers.formatListForDisplayInMultipleColumns(helpers.getCountries()));
+						return validationResult.isSuccessful ? true : message.join("\n");
+					}
 				});
 			}
 
@@ -329,10 +329,10 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 	private getDefaultCountry(): IFuture<string> {
 		return (() => {
 			try {
-				let locationResponse:Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
-				let location:any = JSON.parse(locationResponse.body);
+				let locationResponse: Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
+				let location: any = JSON.parse(locationResponse.body);
 				return location.country_name;
-			} catch(err) {
+			} catch (err) {
 				return "";
 			}
 		}).future<string>()();
@@ -354,7 +354,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let type = args[3];
-			if(type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
+			if (type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
 				this.$errors.fail("Certificate type must be either 'Generic' or 'GooglePlay'");
 			}
 
@@ -373,13 +373,13 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 			let promptSchema = this.getPromptSchema(this.model);
 
-			if(promptSchema.length > 0) {
+			if (promptSchema.length > 0) {
 				this.model = this.$prompter.get(promptSchema).wait();
 				_.extend(this.model, identityInfo);
 			}
 
 			let endDate = this.model.EndDate;
-			if(!endDate) {
+			if (!endDate) {
 				endDate = this.$prompter.get([{
 					message: "Valid until (yyyy-mm-dd)",
 					type: "input",
@@ -411,26 +411,26 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 	private getPromptSchema(defaults: any): IPromptSchema[] {
 		let promptSchema: any = [];
-		if(!defaults.ForGooglePlayPublishing) {
+		if (!defaults.ForGooglePlayPublishing) {
 			promptSchema.push({
-					message: "Is for Google Play publishing?",
-					type: "confirm",
-					name: "ForGooglePlayPublishing",
-					default: () => false
-				});
+				message: "Is for Google Play publishing?",
+				type: "confirm",
+				name: "ForGooglePlayPublishing",
+				default: () => false
+			});
 		}
 
-		if(!defaults.StartDate) {
+		if (!defaults.StartDate) {
 			promptSchema.push({
-					message: "Valid from (yyyy-mm-dd)",
-					type: "input",
-					name: "StartDate",
-					default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
-					validate: (value:string) => {
-						let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{StartDate: value}, "StartDate");
-						return validationResult.isSuccessful ? true : validationResult.error;
-					}
-				});
+				message: "Valid from (yyyy-mm-dd)",
+				type: "input",
+				name: "StartDate",
+				default: () => moment(new Date()).format(validators.SelfSignedIdentityValidator.DATE_FORMAT),
+				validate: (value: string) => {
+					let validationResult = this.$selfSignedIdentityValidator.validateProperty(<ISelfSignedIdentityModel>{ StartDate: value }, "StartDate");
+					return validationResult.isSuccessful ? true : validationResult.error;
+				}
+			});
 		}
 
 		return promptSchema;
@@ -445,7 +445,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 	}
 
 	private getDefaultEndDate(forGooglePlayPublishing: boolean): string {
-		if(forGooglePlayPublishing) {
+		if (forGooglePlayPublishing) {
 			return moment(validators.SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE)
 				.format(validators.SelfSignedIdentityValidator.DATE_FORMAT);
 		}
@@ -469,7 +469,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 		private $prompter: IPrompter,
 		private $options: IOptions,
 		private $identityManager: Server.IIdentityManager,
-		private $stringParameterBuilder : IStringParameterBuilder) { }
+		private $stringParameterBuilder: IStringParameterBuilder) { }
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index.")];
 
@@ -478,7 +478,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 			let nameOrIndex = args[0];
 			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
 
-			if(this.$options.force || this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
+			if (this.$options.force || this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
 			}
 		}).future<void>()();
@@ -509,7 +509,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			let name = identity.Alias;
 			let sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
 
-			if(sanitizedName.length === 0) {
+			if (sanitizedName.length === 0) {
 				sanitizedName = "exported_certificate";
 				this.$logger.warn("Certificate name contains only invalid characters: Defaulting to %s!", sanitizedName);
 			} else {
@@ -519,11 +519,11 @@ export class ExportCryptographicIdentity implements ICommand {
 			let targetFileName = path.join(this.getPath(), util.format("%s.%s", sanitizedName,
 				CryptographicIdentityConstants.PKCS12_EXTENSION));
 
-			if(this.$fs.exists(targetFileName).wait()) {
+			if (this.$fs.exists(targetFileName).wait()) {
 				this.$errors.fail("The target file '%s' already exists.", targetFileName);
 			}
 
-			if(!password) {
+			if (!password) {
 				password = this.$prompter.getPassword("Exported file password").wait();
 			}
 
@@ -538,9 +538,9 @@ export class ExportCryptographicIdentity implements ICommand {
 		let path: string = this.$options.path;
 		delete this.$options.path;
 
-		if(!path) {
+		if (!path) {
 			path = process.cwd();
-		} else if(!this.$fs.exists(path).wait()) {
+		} else if (!this.$fs.exists(path).wait()) {
 			this.$errors.fail("The path '%s' does not exist.", path);
 		}
 		return path;
@@ -567,7 +567,7 @@ export class ImportCryptographicIdentity implements ICommand {
 				password = args[1],
 				extension = path.extname(certificateFile).toLowerCase();
 
-			if(extension !== ".p12" && extension !== ".cer") {
+			if (extension !== ".p12" && extension !== ".cer") {
 				this.$errors.fail("To add a cryptographic identity to the list, import a P12 file " +
 					"that contains an existing cryptographic identity or a CER file that contains the " +
 					"certificate generated from a certificate signing request.");
@@ -575,13 +575,13 @@ export class ImportCryptographicIdentity implements ICommand {
 
 			let importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
 
-			if(!this.$fs.exists(certificateFile).wait()) {
+			if (!this.$fs.exists(certificateFile).wait()) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
 
 			let result = importType === CryptographicIdentityConstants.PKCS12CERTIFICATE ?
-						this.importCertificateWithPassword(importType, password, certificateFile).wait() :
-						this.importCertificateWithoutPassword(importType, certificateFile).wait();
+				this.importCertificateWithPassword(importType, password, certificateFile).wait() :
+				this.importCertificateWithoutPassword(importType, certificateFile).wait();
 
 			_.each(result, identity => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
@@ -680,7 +680,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 			_.forEach(requests, (req, i, list) => {
 				this.$logger.out("%s: %s", (i + 1).toString(), req.Subject);
 			});
-			if(!requests.length) {
+			if (!requests.length) {
 				this.$logger.info("No certificate signing requests.");
 			}
 		}).future<void>()();
@@ -699,7 +699,7 @@ function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Serv
 		requests = _.sortBy(requests, (req) => req.UniqueName);
 
 		let index = parseInt(indexStr, 10) - 1;
-		if(index < 0 || index >= requests.length) {
+		if (index < 0 || index >= requests.length) {
 			$errors.fail("No certificate with number '%s' exists", indexStr);
 		}
 		let req = requests[index];
@@ -723,7 +723,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 
 			let req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
 
-			if(this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
+			if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
 				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
 				this.$logger.info("Removed certificate request '%s'", req.Subject);
 			}
@@ -750,7 +750,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let indexStr = args[0];
-			if(!indexStr) {
+			if (!indexStr) {
 				this.$errors.fail("Specify certificate signing request index to download.");
 			}
 
@@ -762,8 +762,8 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 	public downloadCertificate(uniqueName: string): IFuture<void> {
 		return ((): void => {
 			let targetFileName = this.$options.saveTo;
-			if(targetFileName) {
-				if(this.$fs.exists(targetFileName).wait()) {
+			if (targetFileName) {
+				if (this.$fs.exists(targetFileName).wait()) {
 					this.$errors.fail("The output file already exists.");
 				}
 			} else {
@@ -787,11 +787,11 @@ class FileNameCommandParameter implements ICommandParameter {
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
 			let fileName = validationValue;
-			if(!fileName) {
+			if (!fileName) {
 				this.$errors.fail("No file specified.");
 			}
 
-			if(!this.$fs.exists(fileName).wait()) {
+			if (!this.$fs.exists(fileName).wait()) {
 				this.$errors.fail({ formatStr: "File '%s' does not exist.", suppressCommandHelp: true }, fileName);
 			}
 
@@ -825,11 +825,11 @@ class ImportProvisionCommand implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let fileName = args[0];
-			if(!fileName) {
+			if (!fileName) {
 				this.$errors.fail("No file specified.");
 			}
 
-			if(!this.$fs.exists(fileName).wait()) {
+			if (!this.$fs.exists(fileName).wait()) {
 				this.$errors.fail({ formatStr: "File '%s' does not exist.", suppressCommandHelp: true }, fileName);
 			}
 

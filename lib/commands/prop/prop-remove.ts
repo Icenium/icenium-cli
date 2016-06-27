@@ -9,7 +9,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			if(this.$project.validateProjectProperty(args[0], _.rest(args, 1), "del").wait()) {
+			if(this.$project.validateProjectProperty(args[0], _.tail(args), "del").wait()) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
 					return true;
@@ -20,7 +20,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 	}
 
 	execute(args: string[]): IFuture<void> {
-		return this.$project.updateProjectPropertyAndSave("del", args[0], _.rest(args, 1));
+		return this.$project.updateProjectPropertyAndSave("del", args[0], _.tail(args));
 	}
 
 	allowedParameters: ICommandParameter[] = [];

@@ -83,10 +83,10 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 	let columnList = new Array<Array<string>>();
 	for (let i = 0; i < columns; ++i) {
 		columnList.push(_.take(list, rows));
-		list = _.rest(list, rows);
+		list = _.dropRight(list, rows);
 	}
 
-	let extents = _.map(columnList, (sublist) => _.max(sublist, (element: string) => element.length).length);
+	let extents = _.map(columnList, (sublist) => _.maxBy(sublist, (element: string) => element.length).length);
 
 	let formattedRows: string[] = [];
 	let width: number;

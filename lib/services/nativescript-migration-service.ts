@@ -181,7 +181,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 	private warnIfVersionDeprecated(version: string): IFuture<void> {
 		return (() => {
-			if (_.contains(this.getDeprecatedVersions().wait(), version)) {
+			if (_.includes(this.getDeprecatedVersions().wait(), version)) {
 				this.$logger.warn(`Your project targets NativeScript ${version}. This version is deprecated and will not be available in a future release. You can still develop and build your project but it is recommended that you commit all changes to version control and migrate to a newer version of NativeScript.`);
 			}
 		}).future<void>()();
@@ -190,7 +190,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private ensurePackageJsonExists(newVersion: string): IFuture<void> {
 		return (() => {
 			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
-			if (_.contains(versions, newVersion)
+			if (_.includes(versions, newVersion)
 				&& !this.$fs.exists(path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
 				// From version 1.1.2 we need package.json file at the root of the project.
 				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();

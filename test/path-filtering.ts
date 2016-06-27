@@ -25,7 +25,7 @@ describe("PathFilteringService", () => {
 	it("test ** rule", () => {
 		let projectFiles = prefixWithProjectDir([".DS_Store", "allow", "x/.DS_Store", "x/.DS_Storez", "x/z.DS_Store", "x/.DS_Store/z"]);
 		let actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["**/.DS_Store"], projectDir);
-		let expected = _.reject(projectFiles, file => _.contains([".DS_Store", "x/.DS_Store"], file.replace(projectDir, "")));
+		let expected = _.reject(projectFiles, file => _.includes([".DS_Store", "x/.DS_Store"], file.replace(projectDir, "")));
 		assert.deepEqual(actual, expected);
 	});
 

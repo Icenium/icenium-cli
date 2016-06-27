@@ -517,14 +517,13 @@ export class Project implements Project.IProject {
 			this.getPropertyValueAsArray(this.configurationSpecificData[configuration][normalizedPropertyName], '') :
 			_(this.configurationSpecificData)
 				.values()
-				.map(config => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
+				.map((config: IDictionary<string>) => _.flatten(this.getPropertyValueAsArray(config[normalizedPropertyName], '')))
 				.value();
 		let sharedValues: string[] = _.intersection.apply(null, configsDataForProperty);
 		let valuesInAllConfigs = _.map(sharedValues, value => helpers.fill(value, numberOfConfigs));
 		let configSpecificValues = _.map(configsDataForProperty, config => _.difference(config, sharedValues));
 
 		let maxLength = _(configSpecificValues)
-			.values()
 			.map(value => value.length)
 			.max();
 
@@ -570,7 +569,7 @@ export class Project implements Project.IProject {
 			}
 
 			let validProperties = this.$jsonSchemaValidator.getValidProperties(this.projectData.Framework, this.projectData.FrameworkVersion);
-			if (_.contains(validProperties, property)) {
+			if (_.includes(validProperties, property)) {
 				let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(property, this.projectData);
 				let isArray = this.$jsonSchemaValidator.getPropertyType(this.projectData.Framework, normalizedPropertyName) === "array";
 				if (!isArray) {

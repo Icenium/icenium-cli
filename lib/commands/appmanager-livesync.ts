@@ -23,7 +23,7 @@
 			} else {
 				// make sure each platform is specified only once
 				let platforms = _.keys(_.groupBy(args, arg => this.$mobileHelper.normalizePlatformName(arg)));
-				if(this.$config.ON_PREM && _.contains(platforms, windowsPhonePlatformName)) {
+				if(this.$config.ON_PREM && _.includes(platforms, windowsPhonePlatformName)) {
 					this.$errors.failWithoutHelp(`You cannot upload updates for Windows Phone.`);
 				}
 				this.$appManagerService.publishLivePatch(platforms).wait();
