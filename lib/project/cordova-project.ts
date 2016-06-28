@@ -10,13 +10,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
 	private static WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME = "CN=Telerik";
 
-	constructor($errors: IErrors,
-		$fs: IFileSystem,
-		$jsonSchemaValidator: IJsonSchemaValidator,
-		$logger: ILogger,
-		$options: IOptions,
-		$resources: IResourceLoader,
-		private $cordovaResources: ICordovaResourceLoader,
+	constructor(private $cordovaResources: ICordovaResourceLoader,
 		private $config: IConfiguration,
 		private $injector: IInjector,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
@@ -25,7 +19,13 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		private $configFilesManager: Project.IConfigFilesManager,
 		private $staticConfig: Config.IStaticConfig,
 		private $templatesService: ITemplatesService,
-		private $cordovaProjectCapabilities: Project.ICapabilities) {
+		private $cordovaProjectCapabilities: Project.ICapabilities,
+		$errors: IErrors,
+		$fs: IFileSystem,
+		$jsonSchemaValidator: IJsonSchemaValidator,
+		$logger: ILogger,
+		$options: IOptions,
+		$resources: IResourceLoader) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
@@ -62,7 +62,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 			allConfigFiles["ios-config"]
 		];
 
-		if(!this.$config.ON_PREM) {
+		if (!this.$config.ON_PREM) {
 			availableConfigFiles.push(allConfigFiles["wp8-manifest"]);
 			availableConfigFiles.push(allConfigFiles["wp8-config"]);
 		}
@@ -110,13 +110,13 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public checkSdkVersions(platform: string, projectData: Project.IData): void {
-		if(this.$mobileHelper.isWP8Platform(platform) && projectData.WPSdk && projectData.WPSdk === "8.0" && semver.gte(projectData.FrameworkVersion,"3.7.0")) {
+		if (this.$mobileHelper.isWP8Platform(platform) && projectData.WPSdk && projectData.WPSdk === "8.0" && semver.gte(projectData.FrameworkVersion, "3.7.0")) {
 			this.$logger.warn("Your project targets Apache Cordova %s which lets you use the Windows Phone 8.1 SDK when building your apps. You can change your target Windows Phone SDK by running $ appbuilder prop set WPSdk 8.1", projectData.FrameworkVersion);
 		}
 	}
 
 	private getCorrectWP8PackageIdentityName(appIdentifier: string) {
-		let sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""),(c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
+		let sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""), (c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
 		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
@@ -134,7 +134,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 
 		buildProperties.CorePlugins = this.getProperty("CorePlugins", configurationName, projectInformation);
 
-		if(buildProperties.Platform === "WP8") {
+		if (buildProperties.Platform === "WP8") {
 			buildProperties.WP8ProductID = projectData.WP8ProductID || this.generateWP8GUID();
 			buildProperties.WP8PublisherID = projectData.WP8PublisherID;
 			buildProperties.WP8Publisher = projectData.WP8Publisher;
@@ -190,14 +190,14 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 			}
 		});
 
-		if(!_.has(properties, "WP8PackageIdentityName")) {
+		if (!_.has(properties, "WP8PackageIdentityName")) {
 			let wp8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
 			this.$logger.warn("Missing 'WP8PackageIdentityName' property in .abproject. Default value '%s' will be used.", wp8PackageIdentityName);
 			properties.WP8PackageIdentityName = wp8PackageIdentityName;
 			updated = true;
 		}
 
-		if(!_.has(properties, "WP8WindowsPublisherName")) {
+		if (!_.has(properties, "WP8WindowsPublisherName")) {
 			let wp8WindowsPublisherName = CordovaProject.WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME;
 			this.$logger.warn("Missing 'WP8WindowsPublisherName' property in .abproject. Default value '%s' will be used.", wp8WindowsPublisherName);
 			properties.WP8WindowsPublisherName = wp8WindowsPublisherName;
