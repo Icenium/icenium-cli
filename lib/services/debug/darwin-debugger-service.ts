@@ -37,7 +37,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 			let applicationsAvailableForDebugging = this.$androidProcessService.getDebuggableApps(deviceIdentifier).wait();
 			let applicationNotStartedErrorMessage = `Application with identifier ${applicationId} is not started on device ${deviceIdentifier}. Please open the application on the device to debug it.`;
 
-			if (!_.find(applicationsAvailableForDebugging, app => app.packageId === applicationId)) {
+			if (!_.find(applicationsAvailableForDebugging, app => app.appIdentifier === applicationId)) {
 				this.$errors.failWithoutHelp(applicationNotStartedErrorMessage);
 			}
 
