@@ -2,7 +2,7 @@ import * as path from "path";
 import * as util from "util";
 import {EOL} from "os";
 import temp = require("temp");
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
 class Sample {
 	constructor(public name: string,

@@ -1,7 +1,7 @@
 import * as initCommandLib from "../commands/project/init-project";
 import * as projectCommandLib from "../commands/project/create-project";
 import * as samplesLib from "../commands/samples";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
 class CommandsServiceProvider implements ICommandsServiceProvider {
 	private commands: IDynamicSubCommandInfo[];

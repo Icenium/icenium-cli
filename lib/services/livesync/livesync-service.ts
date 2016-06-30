@@ -1,11 +1,15 @@
-import constants = require("../../common/mobile/constants");
+import constants = require("../../common/constants");
+import {EOL} from "os";
 
 export class LiveSyncService implements ILiveSyncService {
 	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".*.tmp", ".ab"];
+	private deviceConfigurationInfos: Mobile.IApplicationInfo[] = [];
 
 	constructor(private $devicesService: Mobile.IDevicesService,
 		private $errors: IErrors,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $project: Project.IProject,
+		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $options: IOptions,
 		private $injector: IInjector) { }
@@ -34,17 +38,61 @@ export class LiveSyncService implements ILiveSyncService {
 
 			let projectDir = this.$project.getProjectDir().wait();
 
-			let livesyncData = {
+			let livesyncData: ILiveSyncData = {
 				platform: platform,
 				appIdentifier: this.$project.projectData.AppIdentifier,
 				projectFilesPath: projectDir,
 				syncWorkingDirectory: projectDir,
-				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles
+				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
+				additionalConfigurations: this.$project.projectInformation.configurations
 			};
 
-			$liveSyncServiceBase.sync(livesyncData).wait();
+			this.deviceConfigurationInfos = [];
 
+			let configurations = this.$project.getConfigurationsSpecifiedByUser();
+
+			if (!configurations.length) {
+				this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
+				let deviceConfigurations = _.reduce(this.deviceConfigurationInfos, (result, dci) => result + `${EOL}device: ${dci.applicationIdentifier} has "${dci.configuration}" configuration`, "");
+				if (deviceConfigurations && _.uniqBy(this.deviceConfigurationInfos, dci => dci.configuration).length !== 1) {
+					this.$errors.failWithoutHelp("Cannot LiveSync because application is deployed with different configurations across the devices.", deviceConfigurations);
+				}
+
+				livesyncData.configuration = this.deviceConfigurationInfos && this.deviceConfigurationInfos[0] && this.deviceConfigurationInfos[0].configuration;
+				if (livesyncData.configuration) {
+					this.$options.config = [livesyncData.configuration];
+				}
+
+				$liveSyncServiceBase.sync(livesyncData).wait();
+			} else {
+				configurations.forEach(configuration => {
+					livesyncData.configuration = configuration;
+					livesyncData.appIdentifier = this.$project.projectInformation.configurationSpecificData[configuration.toLowerCase()].AppIdentifier;
+					this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
+
+					livesyncData.canExecute = (device: Mobile.IDevice): boolean => {
+						let deviceConfigurationInfo = _.find(this.deviceConfigurationInfos, dci => dci.deviceIdentifier === device.deviceInfo.identifier);
+						if (deviceConfigurationInfo && deviceConfigurationInfo.configuration && deviceConfigurationInfo.configuration.toLowerCase() !== configuration.toLowerCase() && !this.$options.companion) {
+							this.$logger.warn(`Cannot LiveSync to device with identifier ${device.deviceInfo.identifier}. You are trying to synchronize changes for the ${configuration} configuration but the device expects changes for the ${deviceConfigurationInfo.configuration} configuration. Change the target configuration for the LiveSync operation or re-build and re-deploy your app in another configuration.`);
+							return false;
+						}
+
+						return true;
+					};
+
+					$liveSyncServiceBase.sync(livesyncData).wait();
+				});
+			}
 		}).future<void>()();
+	}
+
+	private fillDeviceConfigurationInfos(appIdentifier: string): IFuture<void> {
+		return this.$devicesService.execute(device => (() => {
+			let configInfo = device.getApplicationInfo(appIdentifier).wait();
+			if (configInfo) {
+				this.deviceConfigurationInfos.push(configInfo);
+			}
+		}).future<void>()());
 	}
 }
 $injector.register("liveSyncService", LiveSyncService);

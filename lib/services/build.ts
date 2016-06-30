@@ -4,7 +4,7 @@ import * as path from "path";
 import {EOL} from "os";
 import * as plist from "plist";
 import * as iOSDeploymentValidatorLib from "../validators/ios-deployment-validator";
-import * as constants from "../common/mobile/constants";
+import * as constants from "../common/constants";
 import minimatch = require("minimatch");
 
 export class BuildService implements Project.IBuildService {
@@ -97,10 +97,11 @@ export class BuildService implements Project.IBuildService {
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
 			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
-			let projectData = this.$project.projectData;
+			let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()];
 
 			let buildProperties: any = {
-				Configuration: settings.configuration,
+				ProjectConfiguration: settings.projectConfiguration,
+				BuildConfiguration: settings.buildConfiguration,
 				Platform: settings.platform,
 				AppIdentifier: projectData.AppIdentifier,
 				ProjectName: projectData.ProjectName,
@@ -125,7 +126,7 @@ export class BuildService implements Project.IBuildService {
 				} else if (settings.buildForTAM) {
 					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
 						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
-				} else if (settings.configuration === "Release") {
+				} else if (settings.buildConfiguration === constants.Configurations.Release ) {
 					certificateData = this.$identityManager.findReleaseCertificate().wait();
 
 					if (!certificateData) {
@@ -317,8 +318,11 @@ export class BuildService implements Project.IBuildService {
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
-			settings.configuration = settings.configuration || (this.$options.release ? "Release" : "Debug");
-			this.$logger.info("Building project for platform '%s', configuration '%s'", settings.platform, settings.configuration);
+			settings.projectConfiguration = settings.projectConfiguration || this.$project.getConfigurationsSpecifiedByUser()[0] || constants.Configurations.Debug;
+			settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
+
+			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
+				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
 			this.$platformMigrator.ensureAllPlatformAssets().wait();
 			this.$project.importProject().wait();
@@ -403,7 +407,6 @@ export class BuildService implements Project.IBuildService {
 			this.$project.ensureProject();
 			let buildResult = this.build({
 				platform: platform,
-				configuration: this.$project.getBuildConfiguration(),
 				downloadFiles: true,
 				downloadedFilePath: downloadedFilePath,
 				buildForiOSSimulator: buildForiOSSimulator,
@@ -463,7 +466,6 @@ export class BuildService implements Project.IBuildService {
 
 				this.build({
 					platform: platform,
-					configuration: this.$project.getBuildConfiguration(),
 					showQrCodes: !this.$options.download,
 					downloadFiles: this.$options.download,
 					downloadedFilePath: this.$options.saveTo,
@@ -488,7 +490,7 @@ export class BuildService implements Project.IBuildService {
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			let configuration = this.$options.release ? this.$projectConstants.RELEASE_CONFIGURATION_NAME : this.$projectConstants.DEBUG_CONFIGURATION_NAME;
+			let configuration = this.$project.getConfigurationsSpecifiedByUser()[0] || this.$projectConstants.DEBUG_CONFIGURATION_NAME;
 			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,
 												appIdentifier.encodeLiveSyncHostUri(hostPart),
 												querystring.escape(liveSyncToken),

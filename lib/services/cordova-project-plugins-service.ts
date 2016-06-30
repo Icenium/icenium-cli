@@ -248,7 +248,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait();
 			let obsoletingKey = this.getObsoletingPluginIdentifier(plugin.data.Identifier).wait();
 
-			if(this.$project.hasBuildConfigurations()) {
+			if(this.$project.hasBuildConfigurations) {
 				let configurations = this.$project.configurations;
 				_.each(configurations,(configuration: string) => {
 					this.removePluginCore(pluginName, plugin, configuration).wait();
@@ -300,7 +300,7 @@ export class CordovaProjectPluginsService implements IPluginsService {
 
 	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {
 		return (() => {
-			if(this.$project.hasBuildConfigurations()) {
+			if(this.$project.hasBuildConfigurations) {
 				let configs = configurations || this.$project.configurations;
 				_.each(configs,(configuration: string) => {
 					this.configurePluginCore(pluginName, configuration, version).wait();

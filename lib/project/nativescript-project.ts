@@ -3,8 +3,7 @@ import * as util from "util";
 import Future = require("fibers/future");
 import {FrameworkProjectBase} from "./framework-project-base";
 import semver = require("semver");
-import  { startPackageActivityNames } from "../common/mobile/constants";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -53,10 +52,6 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			allConfigFiles["nativescript-ios-info"],
 			allConfigFiles["nativescript-android-manifest"]
 		];
-	}
-
-	public get startPackageActivity(): string {
-		return startPackageActivityNames[TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()];
 	}
 
 	public get relativeAppResourcesPath(): string {

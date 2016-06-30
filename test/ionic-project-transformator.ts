@@ -77,6 +77,7 @@ function createTestInjector(): IInjector {
 		}
 	});
 	testInjector.register("cordovaProjectCapabilities", {});
+	testInjector.register("nativeScriptProjectCapabilities", {});
 	testInjector.register("marketplacePluginsService", {});
 	testInjector.register("httpClient", {});
 	testInjector.register("mobileHelper", {});

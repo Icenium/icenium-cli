@@ -1,4 +1,4 @@
-import * as constants from "../common/mobile/constants";
+import * as constants from "../common/constants";
 import {EOL} from "os";
 import * as helpers from "../helpers";
 let Table = require("cli-table");
@@ -33,7 +33,8 @@ class AppManagerService implements IAppManagerService {
 			this.$logger.info("Building release package.");
 			let buildResult = this.$buildService.build({
 				platform: mobilePlatform,
-				configuration: "Release",
+				buildConfiguration: constants.Configurations.Release,
+				projectConfiguration: constants.Configurations.Release,
 				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
 				showWp8SigningMessage: false,
 				buildForTAM: true,

@@ -1,5 +1,5 @@
 import * as helpers from "../../helpers";
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/constants";
 
 export class FrameworkProjectResolverBase implements Project.IFrameworkProjectResolverBase {
 	constructor(private $errors: IErrors,

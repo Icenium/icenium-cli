@@ -35,7 +35,7 @@ import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/projec
 import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
 
 class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;

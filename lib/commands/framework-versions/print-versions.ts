@@ -1,4 +1,4 @@
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/mobile/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../../common/constants";
 
 export class PrintFrameworkVersionsCommand implements ICommand {
 	constructor(private $cordovaMigrationService: IFrameworkMigrationService,
