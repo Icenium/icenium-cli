@@ -45,7 +45,6 @@ export class Project extends ProjectBase implements Project.IProject {
 		protected $projectConstants: Project.IConstants,
 		protected $staticConfig: IStaticConfig) {
 		super($cordovaProjectCapabilities, $errors, $fs, $logger, $nativeScriptProjectCapabilities, $options, $projectConstants, $staticConfig);
-		this.configurationSpecificData = Object.create(null);
 
 		if (this.projectData && this.projectData["TemplateAppName"]) {
 			this.$errors.failWithoutHelp("This hybrid project targets Apache Cordova 2.x. " +
@@ -658,7 +657,7 @@ export class Project extends ProjectBase implements Project.IProject {
 				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
 				if (this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
-					this.$fs.writeJson(configFilePath, this.configurationSpecificData[configuration]).wait();
+					this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], this.configurationSpecificKeys[configuration])).wait();
 				}
 			});
 		}).future<void>()();
