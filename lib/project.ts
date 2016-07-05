@@ -18,11 +18,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	private _projectSchema: any;
 	private cachedProjectDir: string = "";
-
 	private frameworkProject: Project.IFrameworkProject;
-	public get projectDir(): string {
-		return this.getProjectDir().wait();
-	}
 
 	constructor(private $config: IConfiguration,
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
@@ -51,6 +47,15 @@ export class Project extends ProjectBase implements Project.IProject {
 				"The AppBuilder CLI lets you target only Apache Cordova 3.0.0 or later. " +
 				"To develop your projects with Apache Cordova 2.x, run the AppBuilder Windows client or the in-browser client.");
 		}
+
+		if (this.projectData && this.projectData.Framework) {
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
+			this.frameworkProject.updateMigrationConfigFile().wait();
+		}
+	}
+
+	public get projectDir(): string {
+		return this.getProjectDir().wait();
 	}
 
 	public get capabilities(): Project.ICapabilities {

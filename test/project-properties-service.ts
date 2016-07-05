@@ -72,6 +72,9 @@ class SampleProject implements Project.IFrameworkProject {
 	getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
 		return Future.fromResult(null);
 	}
+	updateMigrationConfigFile(): IFuture<void> {
+		return Future.fromResult(null);
+	}
 }
 
 describe("projectPropertiesService", () => {

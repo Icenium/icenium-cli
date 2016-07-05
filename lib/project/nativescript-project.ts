@@ -1,9 +1,11 @@
 import * as path from "path";
 import * as util from "util";
-import Future = require("fibers/future");
+import * as temp from "temp";
+import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
 import {FrameworkProjectBase} from "./framework-project-base";
+import Future = require("fibers/future");
 import semver = require("semver");
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
+temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	constructor(private $config: IConfiguration,
@@ -60,6 +62,14 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 
 	public get projectSpecificFiles(): string[] {
 		return [this.$projectConstants.PACKAGE_JSON_NAME];
+	}
+
+	private get $nativeScriptMigrationService(): IFrameworkMigrationService {
+		return this.$injector.resolve("nativeScriptMigrationService");
+	}
+
+	private get $nativeScriptResources(): INativeScriptResources {
+		return this.$injector.resolve("nativeScriptResources");
 	}
 
 	public getValidationSchemaId(): string {
@@ -144,5 +154,39 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			return null;
 		}).future<IDictionary<IStringDictionary>>()();
 	}
+
+	public updateMigrationConfigFile(): IFuture<void> {
+		return (() => {
+			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
+			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName).wait();
+			let currentTime = new Date();
+
+			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
+				// We do not need to update the migration file if it has been modified in the past 2 hours.
+				this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
+				return;
+			}
+
+			let downloadDestinationDirectory = temp.mkdirSync("nativescript-migration");
+			let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
+
+			try {
+				this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath).wait();
+			} catch (err) {
+				// This exception is caused probably by issue with the internet connection of the user.
+				this.$logger.trace("Failed to download the NativeScript migration file.");
+				return;
+			}
+
+			let newMigrationFileContent = this.$fs.readText(downloadedFilePath).wait();
+			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName).wait();
+
+			if (currentMigrationFileContent !== newMigrationFileContent) {
+				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent).wait();
+				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
+			}
+		}).future<void>()();
+	}
 }
+
 $injector.register("nativeScriptProject", NativeScriptProject);

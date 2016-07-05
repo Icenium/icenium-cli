@@ -4,7 +4,6 @@ class ResourceDownloader implements IResourceDownloader {
 	private imageDefinitionsResourcesPath: string;
 
 	constructor(private $config: IConfiguration,
-		private $cordovaMigrationService: IFrameworkMigrationService,
 		private $cordovaResources: ICordovaResourceLoader,
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
@@ -13,10 +12,14 @@ class ResourceDownloader implements IResourceDownloader {
 		private $projectConstants: Project.IConstants,
 		private $resources: IResourceLoader,
 		private $server: Server.IServer,
+		private $injector: IInjector,
 		private $staticConfig: Config.IStaticConfig) {
+		this.imageDefinitionsResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/${this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME}`;
+	}
 
-			this.imageDefinitionsResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/${this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME}`;
-		}
+	private get $cordovaMigrationService(): IFrameworkMigrationService {
+		return this.$injector.resolve("cordovaMigrationService");
+	}
 
 	public downloadCordovaJsFiles(): IFuture<void> {
 		return (() => {
@@ -39,7 +42,7 @@ class ResourceDownloader implements IResourceDownloader {
 			let file = this.$fs.createWriteStream(targetPath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. Target path is: '${targetPath}'.`);
-			this.$httpClient.httpRequest({ url:remotePath, pipeTo: file}).wait();
+			this.$httpClient.httpRequest({ url: remotePath, pipeTo: file }).wait();
 			fileEnd.wait();
 		}).future<void>()();
 	}
