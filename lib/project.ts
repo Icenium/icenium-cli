@@ -407,6 +407,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					});
 				} else {
 					this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
+					_.each(this.configurationSpecificData, data => this.$projectPropertiesService.updateProjectProperty(data, undefined, mode, normalizedPropertyName, propertyValues).wait());
 				}
 			}
 
@@ -657,7 +658,8 @@ export class Project extends ProjectBase implements Project.IProject {
 				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
 				if (this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
-					this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], this.configurationSpecificKeys[configuration])).wait();
+					let configurationSpecificKeys = _.reduce(this.configurationSpecificData[configuration], (result, value, key) => _.isEqual(value, this.projectData[key]) ? result : result.concat(key), []);
+					this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], configurationSpecificKeys)).wait();
 				}
 			});
 		}).future<void>()();
