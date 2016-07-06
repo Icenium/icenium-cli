@@ -15,14 +15,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
 
 	private _identifierToPlugin: IDictionary<IPlugin>;
-	private get identifierToPlugin(): IDictionary<IPlugin> {
-		if (!this._identifierToPlugin) {
-			this.loadPluginsData().wait();
-		}
-
-		return this._identifierToPlugin;
-	}
-
+	private _obsoletedIntegratedPlugins: any;
 	private pluginsForbiddenConfigurations: IStringDictionary = {
 		"com.telerik.LivePatch": this.$projectConstants.DEBUG_CONFIGURATION_NAME
 	};
@@ -43,15 +36,16 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo);
 	}
 
-	private loadPluginsData(): IFuture<void> {
-		return (() => {
-			// Cordova plugin commands are only applicable to Cordova projects
-			this.$project.ensureCordovaProject();
-			this.$loginManager.ensureLoggedIn().wait();
-			this._identifierToPlugin = Object.create(null);
-			Future.wait([this.createPluginsData(this.$cordovaPluginsService),
-				this.createPluginsData(this.$marketplacePluginsService)]);
-		}).future<void>()();
+	private get identifierToPlugin(): IDictionary<IPlugin> {
+		if (!this._identifierToPlugin) {
+			this.loadPluginsData().wait();
+		}
+
+		return this._identifierToPlugin;
+	}
+
+	private get configurations(): string[] {
+		return [this.$projectConstants.DEBUG_CONFIGURATION_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME];
 	}
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
@@ -76,35 +70,6 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		return corePlugins;
 	}
 
-	private getInstalledPluginsForConfiguration(config?: string): IPlugin[] {
-		let corePlugins: string[] = [];
-		if (config) {
-			corePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, config);
-		} else {
-			corePlugins = _.union<string>(this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME),
-				this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
-		}
-
-		return _.map(corePlugins, pluginIdentifier => {
-			let [name, version] = pluginIdentifier.split("@");
-			let plugin = this.getBestMatchingPlugin(name, version);
-
-			if (!plugin) {
-				let failMessage = config ?
-					`You have enabled an invalid plugin: ${pluginIdentifier} for the ${config} build configuration. Check your .${config}.abproject file in the project root and correct or remove the invalid plugin entry.` :
-					`You have enabled an invalid plugin: ${pluginIdentifier}. Check your ${this.$projectConstants.DEBUG_PROJECT_FILE_NAME} and ${this.$projectConstants.RELEASE_PROJECT_FILE_NAME} files in the project root and correct or remove the invalid plugin entry.`;
-				this.$errors.failWithoutHelp(failMessage);
-			}
-
-			return plugin;
-		});
-	}
-
-	private getBestMatchingPlugin(name: string, version: string): IPlugin {
-		let plugins = this.getPluginInstancesByName(name, version);
-		return _.find(plugins, pl => pl.type === PluginType.MarketplacePlugin) || plugins[0];
-	}
-
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
 		let plugins: IPlugin[] = _.values(this.identifierToPlugin);
 		if (this.$project.projectData) {
@@ -112,10 +77,6 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		}
 
 		return plugins;
-	}
-
-	private get configurations(): string[] {
-		return [this.$projectConstants.DEBUG_CONFIGURATION_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME];
 	}
 
 	public addPlugin(pluginName: string): IFuture<void> {
@@ -346,6 +307,46 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		pluginData.addPluginToConfigFile = false;
 
 		return super.installLocalPlugin(pathToInstalledPlugin, pluginData);
+	}
+
+	private loadPluginsData(): IFuture<void> {
+		return (() => {
+			// Cordova plugin commands are only applicable to Cordova projects
+			this.$project.ensureCordovaProject();
+			this.$loginManager.ensureLoggedIn().wait();
+			this._identifierToPlugin = Object.create(null);
+			Future.wait([this.createPluginsData(this.$cordovaPluginsService),
+				this.createPluginsData(this.$marketplacePluginsService)]);
+		}).future<void>()();
+	}
+
+	private getInstalledPluginsForConfiguration(config?: string): IPlugin[] {
+		let corePlugins: string[] = [];
+		if (config) {
+			corePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, config);
+		} else {
+			corePlugins = _.union<string>(this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME),
+				this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+		}
+
+		return _.map(corePlugins, pluginIdentifier => {
+			let [name, version] = pluginIdentifier.split("@");
+			let plugin = this.getBestMatchingPlugin(name, version);
+
+			if (!plugin) {
+				let failMessage = config ?
+					`You have enabled an invalid plugin: ${pluginIdentifier} for the ${config} build configuration. Check your .${config}.abproject file in the project root and correct or remove the invalid plugin entry.` :
+					`You have enabled an invalid plugin: ${pluginIdentifier}. Check your ${this.$projectConstants.DEBUG_PROJECT_FILE_NAME} and ${this.$projectConstants.RELEASE_PROJECT_FILE_NAME} files in the project root and correct or remove the invalid plugin entry.`;
+				this.$errors.failWithoutHelp(failMessage);
+			}
+
+			return plugin;
+		});
+	}
+
+	private getBestMatchingPlugin(name: string, version: string): IPlugin {
+		let plugins = this.getPluginInstancesByName(name, version);
+		return _.find(plugins, pl => pl.type === PluginType.MarketplacePlugin) || plugins[0];
 	}
 
 	private isPluginSupported(plugin: IPlugin, frameworkVersion: string, pluginVersion?: string): boolean {
@@ -773,7 +774,6 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		return obj;
 	}
 
-	private _obsoletedIntegratedPlugins: any;
 	private getObsoletedIntegratedPlugins(): IFuture<any> {
 		return (() => {
 			if (!this._obsoletedIntegratedPlugins) {

@@ -4,7 +4,7 @@ import {FrameworkProjectBase} from "./framework-project-base";
 import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
 import helpers = require("./../common/helpers");
 import semver = require("semver");
-import { TARGET_FRAMEWORK_IDENTIFIERS, startPackageActivityNames } from "../common/constants";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import Future = require("fibers/future");
 
 export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {

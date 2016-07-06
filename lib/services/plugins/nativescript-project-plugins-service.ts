@@ -5,7 +5,7 @@ import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
 import {isInteractive} from "../../common/helpers";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../../common/mobile/constants";
+import {TARGET_FRAMEWORK_IDENTIFIERS} from "../../common/constants";
 import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
