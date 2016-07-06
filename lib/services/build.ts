@@ -97,7 +97,7 @@ export class BuildService implements Project.IBuildService {
 	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
 		return ((): Project.IBuildResult => {
 			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
-			let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()];
+			let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()] || this.$project.projectData;
 
 			let buildProperties: any = {
 				ProjectConfiguration: settings.projectConfiguration,
