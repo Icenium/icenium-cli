@@ -17,7 +17,7 @@ export class LiveSyncService implements ILiveSyncService {
 	public livesync(platform?: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			let $liveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
+			let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
 			platform = $liveSyncServiceBase.getPlatform(platform).wait();
 
 			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
@@ -63,7 +63,7 @@ export class LiveSyncService implements ILiveSyncService {
 					this.$options.config = [livesyncData.configuration];
 				}
 
-				$liveSyncServiceBase.sync(livesyncData).wait();
+				$liveSyncServiceBase.sync([livesyncData]).wait();
 			} else {
 				configurations.forEach(configuration => {
 					livesyncData.configuration = configuration;
@@ -80,7 +80,7 @@ export class LiveSyncService implements ILiveSyncService {
 						return true;
 					};
 
-					$liveSyncServiceBase.sync(livesyncData).wait();
+					$liveSyncServiceBase.sync([livesyncData]).wait();
 				});
 			}
 		}).future<void>()();
