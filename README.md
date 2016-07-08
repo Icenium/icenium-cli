@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: Telerik AppBuilder 3.3.2
-<br/>Release date: July 7, 2016
+<br/>Release date: July 8, 2016
 
 > Telerik AppBuilder 3.3.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3-2" target="_blank">Telerik AppBuilder 3.3.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">Telerik AppBuilder 3.3 Release Notes</a>.
 
@@ -372,7 +372,7 @@ Features
 ===
 
 Latest version: Telerik AppBuilder 3.3.2
-<br/>Release date: July 7, 2016
+<br/>Release date: July 8, 2016
 
 > Telerik AppBuilder 3.3.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3-2" target="_blank">Telerik AppBuilder 3.3.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">Telerik AppBuilder 3.3 Release Notes</a>.
 
