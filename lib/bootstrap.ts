@@ -167,6 +167,7 @@ $injector.require("clientSpecificUserSettingsService", "./services/user-settings
 $injector.require("sharedUserSettingsFileService", "./services/user-settings-service");
 $injector.require("sharedUserSettingsService", "./services/user-settings-service");
 $injector.require("analyticsSettingsService", "./services/analytics-settings-service");
+$injector.require("analyticsService", "./services/analytics-service");
 
 $injector.require("emulatorSettingsService", "./services/emulator-settings-service");
 $injector.require("express", "./express");
