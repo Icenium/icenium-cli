@@ -472,6 +472,13 @@ interface IFrameworkMigrationService {
 	downloadMigrationData(): IFuture<void>;
 
 	/**
+	 * Downloads the configuration file which contains information about migrating project.
+	 * @param  {string} the directory in which to save the file.
+	 * @return {IFuture<void>}
+	 */
+	downloadMigrationConfigFile(targetPath?: string): IFuture<void>;
+
+	/**
 	 * Gives a list of all supported versions. Each version is a string in the following format <Major>.<Minor>.<Patch>
 	 * @return {IFuture<string[]>} List of all supported versions.
 	 */
@@ -489,6 +496,7 @@ interface IFrameworkMigrationService {
 	 * @return {IFuture<string>} User-friendly name of the specified version.
 	 */
 	getDisplayNameForVersion(version: string): IFuture<string>;
+
 	/**
 	 * Hook which is dynamically called when a project's framework version is changing
 	 * @param  {string} newVersion The version to upgrade/downgrade to

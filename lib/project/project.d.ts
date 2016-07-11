@@ -131,6 +131,10 @@ declare module Project {
 		 * }
 		 */
 		getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>>;
+		/**
+		 * Updates the json file which contains the migration information. If the user is not connectet to the internet the file will not be updated and the CLI will use the one which is downloaded when the CLI is installed or updated.
+		 */
+		updateMigrationConfigFile(): IFuture<void>;
 	}
 
 	interface IFrameworkProjectBase {

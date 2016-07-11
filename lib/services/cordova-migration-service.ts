@@ -1,7 +1,6 @@
 import * as path from "path";
 import semver = require("semver");
 import * as helpers from "../helpers";
-
 class RenamedPlugin {
 	constructor(public version: string,
 		public oldName: string,
@@ -23,6 +22,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	private static CORDOVA_FOLDER_NAME = "Cordova";
 
 	private _migrationData: MigrationData;
+	private _resourceDownloader: IResourceDownloader;
 	private minSupportedVersion: string = "3.0.0";
 	private invalidMarketplacePlugins: string[] = [];
 	private cordovaMigrationFile: string = path.join(__dirname, "../../resources/Cordova", "cordova-migration-data.json");
@@ -34,7 +34,6 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $logger: ILogger,
 		private $loginManager: ILoginManager,
 		private $mobileHelper: Mobile.IMobileHelper,
-		private $pluginsService: IPluginsService,
 		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants,
 		private $projectPropertiesService: IProjectPropertiesService,
@@ -42,7 +41,12 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		private $resources: IResourceLoader,
 		private $server: Server.IServer,
 		private $serverConfiguration: IServerConfiguration,
-		private $webViewService: IWebViewService) { }
+		private $webViewService: IWebViewService,
+		private $injector: IInjector) { }
+
+	private get $pluginsService(): IPluginsService {
+		return this.$injector.resolve("pluginsService");
+	}
 
 	private get migrationData(): IFuture<MigrationData> {
 		return (() => {
@@ -52,6 +56,14 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			return this._migrationData;
 		}).future<MigrationData>()();
+	}
+
+	private get $resourceDownloader(): IResourceDownloader {
+		if (!this._resourceDownloader) {
+			this._resourceDownloader = this.$injector.resolve("resourceDownloader");
+		}
+
+		return this._resourceDownloader;
 	}
 
 	public getCordovaJsonData(): IFuture<ICordovaJsonData> {
@@ -144,18 +156,14 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
 
-			this.downloadCordovaJsonFile().wait();
+			this.downloadMigrationConfigFile().wait();
 		}).future<void>()();
 	}
 
-	private downloadCordovaJsonFile(): IFuture<void> {
+	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
 		return (() => {
-			let file = this.$fs.createWriteStream(this.cordovaJsonFilePath);
-			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-
 			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
-			this.$httpClient.httpRequest({ url: cordovaJsonPath, pipeTo: file }).wait();
-			fileEnd.wait();
+			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath);
 		}).future<void>()();
 	}
 

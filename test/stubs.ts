@@ -382,6 +382,10 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
 		return Future.fromResult(null);
 	}
+
+	public updateMigrationConfigFile(): IFuture<void> {
+		return Future.fromResult(null);
+	}
 }
 
 export class ProjectFilesManager implements IProjectFilesManager {

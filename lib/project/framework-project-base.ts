@@ -1,4 +1,5 @@
-export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
+export abstract class FrameworkProjectBase implements Project.IFrameworkProjectBase {
+	protected static MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE = 60 * 60 * 1000 * 2;
 	private assetUpdateMessagePrinted = false;
 
 	constructor(protected $logger: ILogger,
@@ -12,7 +13,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		properties.DisplayName = projectName;
 		properties.Description = projectName;
 		let appid = this.$options.appid;
-		if(!this.$options.appid) {
+		if (!this.$options.appid) {
 			appid = this.generateDefaultAppId(projectName);
 			this.$logger.warn("--appid was not specified. Defaulting to " + appid);
 		}
@@ -32,7 +33,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 				let files = this.$fs.readDirectory(dir).wait();
 				_.each(files, (file) => {
 					let matches = file.match(fileMask);
-					if(matches) {
+					if (matches) {
 						result.push(matches[1].toLowerCase());
 					}
 				});
@@ -52,7 +53,7 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
 		let propertyValue: any = null;
 		let configData = projectInformation.configurationSpecificData[configuration];
-		if(configData && configData[propertyName]) {
+		if (configData && configData[propertyName]) {
 			propertyValue = configData[propertyName];
 		} else {
 			propertyValue = projectInformation.projectData[propertyName];
@@ -83,10 +84,12 @@ export class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 		return updated;
 	}
 
+	public abstract updateMigrationConfigFile(): IFuture<void>;
+
 	private generateDefaultAppId(appName: string): string {
 		let sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
-		if(sanitizedName) {
-			if(/^\d.*$/.test(sanitizedName)) {
+		if (sanitizedName) {
+			if (/^\d.*$/.test(sanitizedName)) {
 				sanitizedName = "the" + sanitizedName;
 			}
 			return "com.telerik." + sanitizedName;

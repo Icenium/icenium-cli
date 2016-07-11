@@ -38,6 +38,10 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return this._nativeScriptMigrationConfiguration;
 	};
 
+	private get $project(): Project.IProject {
+		return this.$injector.resolve("project");
+	}
+
 	private _nativeScriptMigrationData: INativeScriptMigrationData;
 	private get nativeScriptMigrationData(): IFuture<INativeScriptMigrationData> {
 		return ((): INativeScriptMigrationData => {
@@ -50,12 +54,12 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $errors: IErrors,
 		private $fs: IFileSystem,
 		private $logger: ILogger,
-		private $nativeScriptResources: INativeScriptResources,
-		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants,
 		private $prompter: IPrompter,
-		private $resourceDownloader: IResourceDownloader,
 		private $server: Server.IServer,
+		private $resourceDownloader: IResourceDownloader,
+		private $nativeScriptResources: INativeScriptResources,
+		private $injector: IInjector,
 		private $staticConfig: Config.IStaticConfig) {
 		this.tnsModulesDirectoryPath = path.join(this.$nativeScriptResources.nativeScriptResourcesDir, NativeScriptMigrationService.TNS_MODULES);
 		this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
@@ -67,7 +71,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir).wait();
 
 			// Make sure to download this file first, as data from it is used for fileDownloadFutures
-			this.downloadNativeScriptMigrationFile().wait();
+			this.downloadMigrationConfigFile().wait();
 
 			let fileDownloadFutures = _(this.nativeScriptMigrationData.wait().supportedVersions)
 				.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
@@ -118,6 +122,11 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}).future<void>()();
 	}
 
+	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
+		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
+		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, targetPath || this.$nativeScriptResources.nativeScriptMigrationFile);
+	}
+
 	private migrateByModifyingPackageJson(currentVersion: string, newVersion: string): IFuture<void> {
 		return (() => {
 			try {
@@ -150,11 +159,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
 		}).future<void>()();
-	}
-
-	private downloadNativeScriptMigrationFile(): IFuture<void> {
-		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
-		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.$nativeScriptResources.nativeScriptMigrationFile);
 	}
 
 	private downloadTnsPackage(language: string, version: string): IFuture<void> {
