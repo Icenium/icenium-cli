@@ -44,8 +44,15 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		return this._identifierToPlugin;
 	}
 
-	private get configurations(): string[] {
-		return [this.$projectConstants.DEBUG_CONFIGURATION_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME];
+	/**
+	 * Gets all configurations splecified by the user - options.debug, options.release and options.config.
+	 */
+	private get specifiedConfigurations(): string[] {
+		// If the user has specified options.debug or options.release the length of this.$project.configurations will be 1 and we need to count this option for specified. If non of them is specified the length will be 2 and we do not need to count both release and debug for specified.
+		return _(this.$project.configurations.length > 1 ? [] : this.$project.configurations)
+			.concat(this.$project.getConfigurationsSpecifiedByUser())
+			.uniq()
+			.value();
 	}
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
@@ -55,15 +62,12 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 
 	public getInstalledPlugins(): IPlugin[] {
 		let corePlugins: IPlugin[] = [];
-		if (this.$options.debug) {
-			corePlugins = corePlugins.concat(this.getInstalledPluginsForConfiguration(this.$projectConstants.DEBUG_CONFIGURATION_NAME));
-		}
-
-		if (this.$options.release) {
-			corePlugins = corePlugins.concat(this.getInstalledPluginsForConfiguration(this.$projectConstants.RELEASE_CONFIGURATION_NAME));
-		}
-
-		if (!this.$options.debug && !this.$options.release) {
+		if (this.specifiedConfigurations.length) {
+			corePlugins = _(this.specifiedConfigurations)
+				.map((configuration: string) => this.getInstalledPluginsForConfiguration(configuration))
+				.flatten<IPlugin>()
+				.value();
+		} else {
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
@@ -94,6 +98,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			if (!plInstances || !plInstances.length) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
 			}
+
 			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration();
 			let installedPluginInstances = installedPluginsForConfiguration
 				.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase);
@@ -135,13 +140,15 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				}
 			}
 
-			let configurations = this.$project.configurations;
+			// If there are no configurations specified by the user we need to add the plugin in all configurations.
+			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 			if (_(this.pluginsForbiddenConfigurations).keys().find(key => key === pluginToAdd.data.Identifier)) {
 				let forbiddenConfig = this.pluginsForbiddenConfigurations[pluginToAdd.data.Identifier];
-				if(this.$project.configurations.length === 1 && _.includes(this.$project.configurations, forbiddenConfig)) {
+				if (configurations.length === 1 && _.includes(this.specifiedConfigurations, forbiddenConfig)) {
 					this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
 				}
-				configurations = _.without(this.$project.configurations, forbiddenConfig);
+
+				configurations = _.without(configurations, forbiddenConfig);
 			}
 
 			this.configurePlugin(pluginName, version, configurations).wait();
@@ -181,8 +188,9 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait();
 			let obsoletingKey = this.getObsoletingPluginIdentifier(plugin.data.Identifier).wait();
 
-			if(this.$project.hasBuildConfigurations) {
-				let configurations = this.$project.configurations;
+			if (this.$project.hasBuildConfigurations) {
+				// If there are no configurations specified by the user we need to remove the plugin from all configurations.
+				let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 				_.each(configurations, (configuration: string) => {
 					this.removePluginCore(pluginName, plugin, configuration).wait();
 					if (obsoletedBy) {
@@ -233,8 +241,8 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 
 	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {
 		return (() => {
-			if(this.$project.hasBuildConfigurations) {
-				let configs = configurations || this.$project.configurations;
+			if (this.$project.hasBuildConfigurations) {
+				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
 				_.each(configs, (configuration: string) => {
 					this.configurePluginCore(pluginName, configuration, version).wait();
 				});
@@ -325,8 +333,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		if (config) {
 			corePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, config);
 		} else {
-			corePlugins = _.union<string>(this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.DEBUG_CONFIGURATION_NAME),
-				this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, this.$projectConstants.RELEASE_CONFIGURATION_NAME));
+			corePlugins = _(this.$project.getAllConfigurationsNames())
+				.map((configurationName: string) => this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configurationName))
+				.flatten<string>()
+				.filter((pluginName: string) => !!pluginName)
+				.value();
 		}
 
 		return _.map(corePlugins, pluginIdentifier => {
@@ -336,7 +347,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			if (!plugin) {
 				let failMessage = config ?
 					`You have enabled an invalid plugin: ${pluginIdentifier} for the ${config} build configuration. Check your .${config}.abproject file in the project root and correct or remove the invalid plugin entry.` :
-					`You have enabled an invalid plugin: ${pluginIdentifier}. Check your ${this.$projectConstants.DEBUG_PROJECT_FILE_NAME} and ${this.$projectConstants.RELEASE_PROJECT_FILE_NAME} files in the project root and correct or remove the invalid plugin entry.`;
+					`You have enabled an invalid plugin: ${pluginIdentifier}. Check your ${_.map(this.$project.getAllConfigurationsNames(), (configuration: string) => `.${configuration}.abproject`).join(", ")} files in the project root and correct or remove the invalid plugin entry.`;
 				this.$errors.failWithoutHelp(failMessage);
 			}
 
@@ -591,27 +602,39 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			});
 
 			let installedPlugin = installedPluginInstances[0];
-			// in case options.debug and options.release are not specified, let's just update both configurations without asking for prompt.
-			if (this.$project.configurations.length > 1) {
+			// in case options.debug, options.release and options.config  are not specified, let's just update all configurations without asking for prompt.
+			if (!this.specifiedConfigurations.length) {
 				selectedVersion = this.selectPluginVersion(version, installedPlugin).wait();
-				this.configurePlugin(pluginName, selectedVersion, this.configurations).wait();
+				this.configurePlugin(pluginName, selectedVersion, this.$project.getAllConfigurationsNames()).wait();
 				return;
 			}
 
-			// We'll get here in case there's only one configuration specified by user
-			let selectedConfiguration = this.$project.configurations[0];
-			let configurationToRemove = _(this.configurations)
-				.filter(config => config !== selectedConfiguration)
-				.first();
-			let removeItemChoice = `Remove plugin from '${configurationToRemove}' configuration and add it to '${selectedConfiguration}' configuration only.`;
-			let modifyBothConfigs = "Enable plugin in both configurations with same version.";
-			let cancelOperation = "Cancel operation.";
-			let choices = [removeItemChoice, modifyBothConfigs, cancelOperation];
+			let configurationsToRemove = _.difference(installedPlugin.configurations, this.specifiedConfigurations);
 
-			if (installedPluginInstances.length === 1 && installedPlugin.configurations.length === 1 && selectedConfiguration === installedPlugin.configurations[0]) {
-				// in case one of the config is specified and plugin is enabled in this config only, just update the version
+			// If we have plugins with different version in different configurations there will be more than one pluginInstance in the installedPluginInstances and we need to get their configurations too.
+			let configurationsToEdit = _(installedPluginInstances)
+				.map((pluginInstance: IPlugin) => pluginInstance.configurations)
+				.flatten()
+				.concat(this.specifiedConfigurations)
+				.uniq()
+				.value();
+
+			let removeItemChoice = `Remove plugin from [${configurationsToRemove.join(", ")}] configuration and add it to [${this.specifiedConfigurations.join(", ")}] configuration only.`;
+			let modifyAllConfigs = `Enable plugin in [${configurationsToEdit.join(", ")}] configurations with same version.`;
+			let cancelOperation = "Cancel operation.";
+			let choices = [modifyAllConfigs, cancelOperation];
+
+			if (configurationsToRemove.length) {
+				choices.unshift(removeItemChoice);
+			}
+
+			if (!configurationsToRemove.length && installedPlugin.configurations.length === this.specifiedConfigurations.length) {
+				if (installedPluginInstances.length > 1 && !helpers.isInteractive()) {
+					this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
+				}
+
 				selectedVersion = this.selectPluginVersion(version, installedPlugin, { excludeCurrentVersion: true }).wait();
-				this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait();
+				_.each(configurationsToEdit, (selectedConfiguration: string) => this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait());
 				return;
 			}
 
@@ -620,18 +643,18 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				switch (selectedItem) {
 					case removeItemChoice:
 						selectedVersion = this.selectPluginVersion(version, installedPlugin).wait();
-						this.removePluginCore(pluginName, installedPlugin, configurationToRemove).wait();
-						this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait();
+						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove).wait());
+						_.each(this.specifiedConfigurations, (selectedConfiguration: string) => this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait());
 						break;
-					case modifyBothConfigs:
+					case modifyAllConfigs:
 						selectedVersion = this.selectPluginVersion(version, installedPlugin).wait();
-						this.configurePlugin(pluginName, selectedVersion, this.configurations).wait();
+						this.configurePlugin(pluginName, selectedVersion, configurationsToEdit).wait();
 						break;
 					default:
 						this.$errors.failWithoutHelp("The operation will not be completed.");
 				}
 			} else {
-				this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in both configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
+				this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
 			}
 		}).future<void>()();
 	}
@@ -640,8 +663,8 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		return ((): string => {
 			let pluginName = plugin.data.Name;
 			let versions = this.getPluginVersions(plugin);
-			if(version) {
-				if(!_.some(versions, v => v.value === version)) {
+			if (version) {
+				if (!_.some(versions, v => v.value === version)) {
 					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
 				}
 			} else if (this.$options.latest) {

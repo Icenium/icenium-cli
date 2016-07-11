@@ -57,7 +57,13 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		ensureProject: () => { /*mock*/ },
 		ensureCordovaProject: () => {/*mock*/ },
 		configurations: ["debug"],
-		projectDir: ""
+		projectDir: "",
+		getAllConfigurationsNames: (): string[] => {
+			return ["debug", "release"];
+		},
+		getConfigurationsSpecifiedByUser: (): string[] => {
+			return [];
+		}
 	});
 
 	testInjector.register("server", {
@@ -148,6 +154,14 @@ class ProjectStub {
 		} else {
 			this.projectData[propertyName] = value;
 		}
+	}
+
+	getConfigurationsSpecifiedByUser(): string[] {
+		return [];
+	}
+
+	getAllConfigurationsNames(): string[] {
+		return ["debug", "release"];
 	}
 
 	saveProject = () => Future.fromResult();
@@ -780,20 +794,18 @@ describe("plugins-service", () => {
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 
 			afterEach(() => {
+				let project: Project.IProject = testInjector.resolve("project");
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
 
-				options.debug = options.release = false;
 				service.addPlugin(`Toast@${versionToSet}`).wait();
 
-				options.debug = true;
-				options.release = false;
+				project.getConfigurationsSpecifiedByUser = () => ["debug"];
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInDebugConfig.length, 1);
 				assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-				options.debug = false;
-				options.release = true;
+				project.getConfigurationsSpecifiedByUser = () => ["release"];
 				let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInReleaseConfig.length, 1);
 				assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
@@ -850,20 +862,19 @@ describe("plugins-service", () => {
 		describe("modifies only version of the plugin when it is enabled in one config and user wants to modify this config only", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
+				let project: Project.IProject = testInjector.resolve("project");
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
 				options = testInjector.resolve("options");
 
-				options.debug = true;
-				options.release = false;
+				project.getConfigurationsSpecifiedByUser = () => ["debug"];
 				service.addPlugin(`Toast@${versionToSet}`).wait();
 
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInDebugConfig.length, 1);
 				assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-				options.debug = false;
-				options.release = true;
+				project.getConfigurationsSpecifiedByUser = () => ["release"];
 				let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInReleaseConfig.length, 0);
 			});
@@ -880,20 +891,18 @@ describe("plugins-service", () => {
 		describe("updates plugin version when it is enabled in at least one config and user tries to add it to both configs", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			afterEach(() => {
+				let project: Project.IProject = testInjector.resolve("project");
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
-				options = testInjector.resolve("options");
 
-				options.debug = false;
-				options.release = false;
 				service.addPlugin(`Toast@${versionToSet}`).wait();
 
+				project.getConfigurationsSpecifiedByUser = () => ["debug"];
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInDebugConfig.length, 1);
 				assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-				options.debug = false;
-				options.release = true;
+				project.getConfigurationsSpecifiedByUser = () => ["release"];
 				let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInReleaseConfig.length, 1);
 				assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
@@ -923,46 +932,49 @@ describe("plugins-service", () => {
 		it("updates plugin version when it is enabled in both configs and user tries to add it to both configs", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
+			let project: Project.IProject = testInjector.resolve("project");
 			testInjector.register("prompter", new PrompterStub(1));
 			service = testInjector.resolve(CordovaProjectPluginsService);
-			options = testInjector.resolve("options");
 
-			options.debug = false;
-			options.release = false;
+			project.getConfigurationsSpecifiedByUser = () => [];
 			service.addPlugin(`Toast@${versionToSet}`).wait();
 
+			project.getConfigurationsSpecifiedByUser = () => ["debug"];
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(toastInDebugConfig.length, 1);
 			assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-			options.debug = false;
-			options.release = true;
+			project.getConfigurationsSpecifiedByUser = () => ["release"];
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(toastInReleaseConfig.length, 1);
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		});
 
-		it("updates plugin version in both configs when plugin is enabled in both configs and user tries to add it to one config only", () => {
-			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
-			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
-			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(CordovaProjectPluginsService);
-			options = testInjector.resolve("options");
+		// Uncomment this when we know that all clients support different versions for different configurations.
+		// it("updates plugin version in both configs when plugin is enabled in both configs and user tries to add it to one config only", () => {
+		// 	let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
+		// 	testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, true);
+		// 	let project: Project.IProject = testInjector.resolve("project");
+		// 	testInjector.register("prompter", new PrompterStub(1));
+		// 	service = testInjector.resolve(CordovaProjectPluginsService);
+		// 	options = testInjector.resolve("options");
 
-			options.debug = true;
-			options.release = false;
-			service.addPlugin(`Toast@${versionToSet}`).wait();
+		// 	options.debug = true;
+		// 	options.release = false;
+		// 	project.getConfigurationsSpecifiedByUser = () => ["debug"];
+		// 	service.addPlugin(`Toast@${versionToSet}`).wait();
 
-			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
-			assert.equal(toastInDebugConfig.length, 1);
-			assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
+		// 	let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
+		// 	assert.equal(toastInDebugConfig.length, 1);
+		// 	assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-			options.debug = false;
-			options.release = true;
-			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
-			assert.equal(toastInReleaseConfig.length, 1);
-			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
-		});
+		// 	options.debug = false;
+		// 	options.release = true;
+		// 	project.getConfigurationsSpecifiedByUser = () => ["release"];
+		// 	let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
+		// 	assert.equal(toastInReleaseConfig.length, 1);
+		// 	assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
+		// });
 
 		it("throws error when plugin is enabled in both configs and user tries to add it to one config only in non interactive terminal", () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1")];
@@ -989,49 +1001,49 @@ describe("plugins-service", () => {
 			assert.throws(() => service.addPlugin("Toast@2.0.5").wait());
 		});
 
-		it("updates plugin version in both configs when plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
-			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
-				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
-			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
-			testInjector.register("prompter", new PrompterStub(1));
-			service = testInjector.resolve(CordovaProjectPluginsService);
-			options = testInjector.resolve("options");
+		// Uncomment this when we know that all clients support different versions for different configurations.
+		// it("updates plugin version in both configs when plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
+		// 	let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
+		// 		installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
+		// 	testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
+		// 	testInjector.register("prompter", new PrompterStub(1));
+		// 	service = testInjector.resolve(CordovaProjectPluginsService);
+		// 	options = testInjector.resolve("options");
 
-			options.debug = true;
-			options.release = false;
-			service.addPlugin(`Toast@${versionToSet}`).wait();
+		// 	options.debug = true;
+		// 	options.release = false;
+		// 	service.addPlugin(`Toast@${versionToSet}`).wait();
 
-			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
-			assert.equal(toastInDebugConfig.length, 1);
-			assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
+		// 	let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
+		// 	assert.equal(toastInDebugConfig.length, 1);
+		// 	assert.deepEqual(_.first(toastInDebugConfig).data.Version, versionToSet);
 
-			options.debug = false;
-			options.release = true;
-			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
-			assert.equal(toastInReleaseConfig.length, 1);
-			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
-		});
+		// 	options.debug = false;
+		// 	options.release = true;
+		// 	let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
+		// 	assert.equal(toastInReleaseConfig.length, 1);
+		// 	assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
+		// });
 
-		it("throws error when plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
+		it("throws error when console is non-interactive and plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
+			let project: Project.IProject = testInjector.resolve("project");
 			testInjector.register("prompter", new PrompterStub(1));
 			service = testInjector.resolve(CordovaProjectPluginsService);
-			options = testInjector.resolve("options");
 
-			options.debug = true;
-			options.release = false;
+			project.getConfigurationsSpecifiedByUser = () => ["debug"];
 			assert.throws(() => service.addPlugin(`Toast@${versionToSet}`).wait());
 		});
 
 		it("throws error when console is non-interactive and user had not specified version for plugin", () => {
 			testInjector = createTestInjectorForProjectWithBothConfigurations([], [], false);
+			let project: Project.IProject = testInjector.resolve("project");
 			testInjector.register("prompter", new PrompterStub(1));
 			service = testInjector.resolve(CordovaProjectPluginsService);
-			options = testInjector.resolve("options");
-			options.debug = false;
-			options.release = true;
+
+			project.getConfigurationsSpecifiedByUser = () => ["debug"];
 			assert.throws(() => service.addPlugin("Toast").wait());
 		});
 
@@ -1083,36 +1095,33 @@ describe("plugins-service", () => {
 					let selectedVersionFromPrompt = "2.0.1";
 					let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.4")],
 						installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4")];
+					let project: Project.IProject;
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
+						project = testInjector.resolve("project");
 						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
 						service = testInjector.resolve(CordovaProjectPluginsService);
-						options = testInjector.resolve("options");
 					});
 
 					afterEach(() => {
 						service.addPlugin("Toast").wait();
 
-						options.debug = true;
-						options.release = false;
+						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 						let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInDebugConfig.length, 1);
 						assert.deepEqual(_.first(toastInDebugConfig).data.Version, selectedVersionFromPrompt);
 
-						options.debug = false;
-						options.release = true;
+						project.getConfigurationsSpecifiedByUser = () => ["release"];
 						let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInReleaseConfig.length, 1);
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
 					});
 
 					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
-						options.debug = true;
-						options.release = false;
-
+						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 					});
 					it("when user does not specify configuration", () => {
-						options.debug = options.release = false;
+						project.getConfigurationsSpecifiedByUser = () => [];
 					});
 				});
 
@@ -1179,35 +1188,35 @@ describe("plugins-service", () => {
 					let selectedVersionFromPrompt = "2.0.1";
 					let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.4")],
 						installedMarketplacePluginsInRelease = [getToastPlugin("2.0.5")];
+					let project: Project.IProject;
+
 					beforeEach(() => {
 						testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, true);
-						testInjector.register("prompter", new PrompterStub(1, 0)); // 0 is for version 2.0.1
+						project = testInjector.resolve("project");
+						// Since we do not have configurations to remove there is no option ffor removing in the prompter.
+						testInjector.register("prompter", new PrompterStub(0, 0)); // 0 is for version 2.0.1
 						service = testInjector.resolve(CordovaProjectPluginsService);
 					});
 
 					afterEach(() => {
 						service.addPlugin("Toast").wait();
 
-						options.debug = true;
-						options.release = false;
+						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 						let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInDebugConfig.length, 1);
 						assert.deepEqual(_.first(toastInDebugConfig).data.Version, selectedVersionFromPrompt);
 
-						options.debug = false;
-						options.release = true;
+						project.getConfigurationsSpecifiedByUser = () => ["release"];
 						let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInReleaseConfig.length, 1);
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
 					});
 
 					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
-						options.debug = true;
-						options.release = false;
-
+						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 					});
 					it("when user does not specify configuration", () => {
-						options.debug = options.release = false;
+						project.getConfigurationsSpecifiedByUser = () => [];
 					});
 				});
 			});
@@ -1240,13 +1249,14 @@ describe("plugins-service", () => {
 		});
 
 		it("is added to release config by default", () => {
+			let project: Project.IProject = testInjector.resolve("project");
 			service.addPlugin(livePatchId).wait();
-			options.debug = false;
-			options.release = true;
+
+			project.getConfigurationsSpecifiedByUser = () => ["release"];
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInReleaseConfig.length, 1);
-			options.debug = true;
-			options.release = false;
+
+			project.getConfigurationsSpecifiedByUser = () => ["debug"];
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
 		});

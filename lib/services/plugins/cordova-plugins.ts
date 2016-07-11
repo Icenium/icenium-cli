@@ -1,4 +1,4 @@
-import PluginsDataLib = require("./../../plugins-data");
+import { CordovaPluginData, PluginType } from "./../../plugins-data";
 
 export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,
@@ -35,15 +35,15 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	public createPluginData(plugin: IMarketplacePluginData): IPlugin[] {
 		this.$project.ensureCordovaProject();
-		return [new PluginsDataLib.CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants)];
+		return [new CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants)];
 	}
 
-	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginsDataLib.PluginType {
-		let pluginType = PluginsDataLib.PluginType.AdvancedPlugin;
+	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginType {
+		let pluginType = PluginType.AdvancedPlugin;
 		let corePluginRegex = this.$cordovaResources.getCordovaMigrationData().wait().corePluginRegex;
 		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier);
 		if (isCorePlugin) {
-			pluginType = PluginsDataLib.PluginType.CorePlugin;
+			pluginType = PluginType.CorePlugin;
 		}
 
 		return pluginType;

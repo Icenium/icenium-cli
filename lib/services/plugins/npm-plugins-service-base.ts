@@ -152,6 +152,11 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			// Fetched plugins are in the "plugins" directory both for Cordova and NativeScript projects.
 			let projectPluginsDirectory = path.join(this.$project.projectDir, "plugins");
 			let filterOptions = { enumerateDirectories: true, includeEmptyDirectories: false };
+
+			if (!this.$fs.exists(projectPluginsDirectory).wait()) {
+				return false;
+			}
+
 			let fetchedPlugins = this.$fs.enumerateFilesInDirectorySync(projectPluginsDirectory, (item: string) => {
 				let itemBaseName = path.basename(item);
 

@@ -377,7 +377,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	public getConfigurationsSpecifiedByUser(): string[] {
-		let validConfigurations = _.keys(this.configurationSpecificData),
+		let validConfigurations = this.getAllConfigurationsNames(),
 			userConfigurations = _.map(this.$options.config, c => c.toLowerCase());
 		if (this.$options.config && this.$options.config.length && !_.intersection(validConfigurations, userConfigurations).length) {
 			this.$errors.failWithoutHelp("Operation cannot be completed because configurations %s are invalid.", this.$options.config);
@@ -392,6 +392,10 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.$logger.warn("Configuration %s is invalid", c);
 			return false;
 		});
+	}
+
+	public getAllConfigurationsNames(): string[] {
+		return _.keys(this.configurationSpecificData);
 	}
 
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
@@ -539,7 +543,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	private getConfigurationSpecificDataForProperty(normalizedPropertyName: string, configuration?: string): any[] {
-		let numberOfConfigs = configuration ? 1 : _.keys(this.configurationSpecificData).length;
+		let numberOfConfigs = configuration ? 1 : this.getAllConfigurationsNames().length;
 		let configsDataForProperty: any[] = configuration ?
 			this.getPropertyValueAsArray(this.configurationSpecificData[configuration][normalizedPropertyName], '') :
 			_(this.configurationSpecificData)
@@ -583,7 +587,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	private printConfigurationSpecificDataForProperty(property: string, configuration?: string): void {
 		let data = this.getConfigurationSpecificDataForProperty(property, configuration);
 		if (data && data.length) {
-			let headers = configuration ? [configuration] : _.keys(this.configurationSpecificData);
+			let headers = configuration ? [configuration] : this.getAllConfigurationsNames();
 			let table = commonHelpers.createTable(headers, data);
 			this.$logger.out("%s:%s%s", property, EOL, table.toString());
 		}
