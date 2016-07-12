@@ -31,8 +31,9 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
-		$hostInfo: IHostInfo) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo);
+		$hostInfo: IHostInfo,
+		$progressIndicator: IProgressIndicator) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo, $progressIndicator);
 
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
@@ -228,7 +229,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		pluginData.addPluginToConfigFile = true;
 
 		// Pass the actual plugin name because we do not need to add the extracted plugin if it is tgz file.
-		return super.installLocalPlugin(pluginData.actualName, pluginData);
+		return super.installLocalPlugin(pluginData && pluginData.isTgz ? pluginData.actualName : pathToInstalledPlugin, pluginData);
 	}
 
 	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {

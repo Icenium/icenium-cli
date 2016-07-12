@@ -32,8 +32,9 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
-		$hostInfo: IHostInfo) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo);
+		$hostInfo: IHostInfo,
+		$progressIndicator: IProgressIndicator) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo, $progressIndicator);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -94,7 +95,17 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			let version = pluginBasicInfo.version;
 
 			let pluginNameToLowerCase = pluginName.toLowerCase();
-			let plInstances = this.getPluginInstancesByName(pluginName);
+			let plInstances: IPlugin[];
+
+			try {
+				plInstances = this.getPluginInstancesByName(pluginName);
+			} catch (err) {
+				// If the user tries to add npm plugin we should fetch it.
+				this.$logger.info(`The plugin '${pluginName}' was not found in our list of verified Cordova plugins. We will try to find it in npm and it will be fetched instead of added.`);
+				this.fetch(pluginName).wait();
+				return;
+			}
+
 			if (!plInstances || !plInstances.length) {
 				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
 			}
@@ -547,6 +558,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		if (!matchingPlugins || !matchingPlugins.length) {
 			this.$errors.fail("Invalid plugin name: %s", pluginName);
 		}
+
 		return matchingPlugins;
 	}
 

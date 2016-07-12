@@ -30,6 +30,9 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
 	testInjector.register("prompter", {});
+	testInjector.register("progressIndicator", {
+		showProgressIndicator: () => Future.fromResult()
+	});
 	testInjector.register("projectConstants", {
 		PACKAGE_JSON_NAME: "package.json"
 	});
@@ -235,6 +238,9 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
+	testInjector.register("progressIndicator", {
+		showProgressIndicator: () => Future.fromResult()
+	});
 	testInjector.register("config", {});
 
 	testInjector.register("projectConstants", {
@@ -282,6 +288,9 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
+	testInjector.register("progressIndicator", {
+		showProgressIndicator: () => Future.fromResult()
+	});
 	testInjector.register("config", {});
 
 	testInjector.register("projectConstants", {
@@ -444,6 +453,13 @@ describe("plugins-service", () => {
 							 org.apache.cordova.battery-status Cordova Plugin 		   =csantanapr…  2016-04-20 1.0.3    ecosystem:cordova`
 				};
 			}).future<any>()();
+		};
+
+		let progressIndicator: IProgressIndicator = testInjector.resolve("progressIndicator");
+		progressIndicator.showProgressIndicator = (future: IFuture<any>, timeout: number): IFuture<void> => {
+			return (() => {
+				future.wait();
+			}).future<void>()();
 		};
 
 		childProcess.exec = () => Future.fromResult("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");

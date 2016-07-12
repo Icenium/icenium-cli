@@ -17,7 +17,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $project: Project.IProject,
 		protected $projectConstants: Project.IConstants,
 		protected $childProcess: IChildProcess,
-		private $hostInfo: IHostInfo) { }
+		private $hostInfo: IHostInfo,
+		private $progressIndicator: IProgressIndicator) { }
 
 	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
 		return ((): IBasicPluginInformation[] => {
@@ -27,7 +28,12 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			let npmCommand = this.$hostInfo.isWindows ? "npm.cmd" : "npm";
 
-			let npmSearchResult = this.$childProcess.spawnFromEvent(npmCommand, searchParams, "close").wait();
+			let npmFuture = this.$childProcess.spawnFromEvent(npmCommand, searchParams, "close");
+
+			this.$logger.printInfoMessageOnSameLine("Searching for plugins in npm, please wait.");
+			this.$progressIndicator.showProgressIndicator(npmFuture, 2000).wait();
+
+			let npmSearchResult = npmFuture.get();
 
 			if (npmSearchResult.stderr) {
 				this.$errors.failWithoutHelp(npmSearchResult.stderr);
@@ -42,13 +48,13 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			// Remove the table headers row.
 			pluginsRows.shift();
 
-			let npmNameGroup = "(\\S+)\\s+";
+			let npmNameGroup = "(\\S+)";
 			let npmDateGroup = "(\\d+\\-\\d+\\-\\d+)\\s";
 			let npmFreeTextGroup = "([^=]+)";
 			let npmAuthorsGroup = "((?:=\\S+\\s?)+)\\s+";
 
-			// Should look like this /(\S+)\s+([^=]+)((?:=\S+\s?)+)\s+(\d+\-\d+\-\d+)\s(\S+)\s+([^=]+)/
-			let pluginRowRegExp = new RegExp(`${npmNameGroup}${npmFreeTextGroup}${npmAuthorsGroup}${npmDateGroup}${npmNameGroup}${npmFreeTextGroup}`);
+			// Should look like this /(\S+)\s+([^=]+)((?:=\S+\s?)+)\s+(\d+\-\d+\-\d+)\s(\S+)(\s+([^=]+))?/
+			let pluginRowRegExp = new RegExp(`${npmNameGroup}\\s+${npmFreeTextGroup}${npmAuthorsGroup}${npmDateGroup}${npmNameGroup}(\\s+${npmFreeTextGroup})?`);
 
 			_.each(pluginsRows, (pluginRow: string) => {
 				let matches = pluginRowRegExp.exec(pluginRow.trim());
@@ -250,7 +256,6 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 	protected installLocalPlugin(pluginPath: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToPlugin = path.resolve(pluginPath);
-
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
 			if (this.shouldCopyToPluginsDirectory(pathToPlugin).wait()) {
 				let pathToInstall = path.join(this.$project.getProjectDir().wait(), "plugins");
