@@ -20,12 +20,10 @@ Inserts an input field of a selected type with a label and placeholder text in a
 ### Prerequisites
 
 * The existing form must be added with `$ appbuilder add-form`
-* Verify that you have installed git on your system.
 
 ### Command Limitations
 
 * You can run this command only on projects created with Screen Builder.
-* You cannot use this command to modify projects created with earlier versions of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
 
 ### Related Commands
 
@@ -40,4 +38,7 @@ Command | Description
 [add-form](add-form.html) | Inserts a generic input form in an existing application view.
 [add-list](add-list.html) | Inserts a list in an existing application view.
 [add-view](add-view.html) | Adds a new application view to your project.
+[add-editablelist](add-editablelist.html) | Inserts an editable list in an existing application view.
+[add-editablelistform](add-editablelistform.html) | Inserts an editable form in an existing editable list.
+[add-editablelistformfield](add-editablelistformfield.html) | Inserts an editable field in an existing editable form.
 <% } %>

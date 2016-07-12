@@ -28,6 +28,14 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
 				return (() => {
+					let scaffoldingNodeModulesPath = path.join(this.appScaffoldingPath, "node_modules");
+					if (this.$fs.exists(scaffoldingNodeModulesPath).wait()) {
+						// Call npm install for each dependency that ships with the scaffolding package itself
+						// this is done because calling npm install inside the scaffolding directory doesn't install dependencies' dependencies on some versions of npm
+						_.each(this.$fs.readDirectory(scaffoldingNodeModulesPath).wait(), dir => {
+							this.npmInstall(null, path.join(scaffoldingNodeModulesPath, dir)).wait();
+						});
+					}
 					// HACK: Some of screen builder's dependencies generate paths which are too long for Windows OS to handle
 					// this is why we pre-install them so that they're at the highest point in the dependency depth.
 					// This leads to shortening the paths just enough to be safe about it.
@@ -68,10 +76,10 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 		}).future<void>()();
 	}
 
-	protected npmInstall(packageToInstall?: string): IFuture<void> {
+	protected npmInstall(packageToInstall?: string, cwd?: string): IFuture<void> {
 		packageToInstall = packageToInstall || "";
 		let command = `npm install ${packageToInstall} --production`;
-		return this.$childProcess.exec(command, {cwd: this.appScaffoldingPath });
+		return this.$childProcess.exec(command, {cwd: cwd || this.appScaffoldingPath });
 	}
 
 	protected npmDedupe(): IFuture<void> {
