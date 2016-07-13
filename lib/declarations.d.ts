@@ -1103,9 +1103,15 @@ interface ICordovaResourceLoader {
 	 * Builds the absolute path to a Cordova javascript file.
 	 * @param  {string} version  The Cordova version
 	 * @param  {string} platform The Platform - Android, iOS or WP8
-	 * @return {string}          Absolute path to Cordova javascript file
+	 * @return {string} Absolute path to Cordova javascript file
 	 */
 	buildCordovaJsFilePath(version: string, platform: string): string;
+
+	/**
+	 * Reads the content of cordova-migration-data.json and returns it as JavaScript object.
+	 * @return {IFuture<ICordovaJsonData>} The content of cordova-migration-data.json parsed as JavaScript object.
+	 */
+	getCordovaMigrationData(): IFuture<ICordovaJsonData>;
 }
 
 /**
@@ -1240,4 +1246,34 @@ interface IClipboardService {
 	 * @return {string} the current contents of the system clipboard.
 	 */
 	paste(): IFuture<string>;
+}
+
+/**
+ * Plugin options required when installing local plugin to project.
+ */
+interface ILocalPluginData {
+	/**
+	 * The actual directory that user has entered.
+	 */
+	actualName: string;
+
+	/**
+	 * Is the plugin a tgz file.
+	 */
+	isTgz: boolean;
+
+	/**
+	 * If true the plugin will be added to the configuration file of the project.
+	 */
+	addPluginToConfigFile: boolean;
+
+	/**
+	 * Custom properties to be added to the configuration file of the project.
+	 */
+	configFileContents?: any;
+
+	/**
+	 * If true the message where the plugin is installed will not be displayed.
+	 */
+	suppressMessage?: boolean;
 }

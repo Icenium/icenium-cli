@@ -32,12 +32,20 @@ declare module Project {
 		ensureProject(): void;
 		ensureAllPlatformAssets(): IFuture<void>;
 		getConfigurationsSpecifiedByUser(): string[];
+
+		/**
+		 * Returns the names of all configurations in the current project.
+		 * @return {string[]} the names of all configurations in the project.
+		 */
+		getAllConfigurationsNames(): string[];
+
 		/**
 		 * Checks wether compatible sdk versions for the given platform are used.
 		 * Issues a warning if there are updated versions available.
 		 * @param {string} platform Android, iOS or WP8
 		 */
 		checkSdkVersions(platform: string): void;
+
 		/**
 		 * Checks if the project language is TypeScript by enumerating all files and checking if there are at least one TypeScript file (.ts), that is not definition file(.d.ts)
 		 * @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
@@ -49,6 +57,7 @@ declare module Project {
 		 * @return {IFuture<ITypeScriptFiles>} all typeScript and all TypeScript definition files.
 		 */
 		getTypeScriptFiles(): IFuture<ITypeScriptFiles>
+
 		/**
 		 * Gets the path to the project's App_Resources folder
 		 * @return {IFuture<string>} The path to the App_Resources folder

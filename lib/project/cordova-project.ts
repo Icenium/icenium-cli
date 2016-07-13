@@ -112,7 +112,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	private getCorrectWP8PackageIdentityName(appIdentifier: string) {
-		let sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""), (c) => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
+		let sanitizedName = appIdentifier ? _.filter(appIdentifier.split(""), c => /[a-zA-Z0-9.-]/.test(c)).join("") : "";
 		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
