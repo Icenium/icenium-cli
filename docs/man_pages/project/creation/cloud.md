@@ -14,11 +14,11 @@ Lists all solutions and projects associated with your Telerik Platform account.
 
 ### Attributes
 
-* `export` - Extends the `cloud` command. Exports a selected project from the cloud and initializes it for development in the Telerik AppBuilder CLI. You must run this command in a directory that does not contain a project.
-* `<Solution Name or Index>` is the name of the solution as listed by `$ appbuilder cloud --all` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client. You need to set a solution if you are running a non-interactive console.
-* `<Project Name or Index>` is the name or the index of project, relative to its parent solution, as listed by `$ appbuilder cloud` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client.
+* `export` - Extends the `cloud` command. Exports a selected project from the cloud and initializes it for development in the AppBuilder CLI. You must run this command in a directory that does not contain a project.
+* `<Solution Name or Index>` is the name of the solution as listed by `$ appbuilder cloud --all` or as it appears in the AppBuilder in-browser client or the AppBuilder Windows client. You need to set a solution if you are running a non-interactive console.
+* `<Project Name or Index>` is the name or the index of project, relative to its parent solution, as listed by `$ appbuilder cloud` or as it appears in the AppBuilder in-browser client or the AppBuilder Windows client.
 
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description

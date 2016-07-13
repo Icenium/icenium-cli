@@ -10,25 +10,25 @@ Builds the specified project in the cloud and runs it in the native emulator fro
 <% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
 <% if(isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
 <% if(isMacOS) { %>WARNING: You cannot run this command on OS X systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
-<% } %> 
+<% } %>
 <% if(isHtml) { %>
 ### Prerequisites
 Before running the Windows Phone 8.0 or the Windows Phone 8.1 emulator, verify that your system meets the following requirements.
-* You are running the Telerik AppBuilder CLI on Windows 8 Professional or later.
+* You are running the AppBuilder CLI on Windows 8 Professional or later.
 * You have installed the Windows Phone 8.0 SDK or the Windows Phone 8.1 SDK.
 * If you want to re-deploy an already deployed Windows Phone 8.1 application, verify that you have updated the **BundleVersion** property in the project properties. Otherwise, your changes will not be updated on the device.<br/>To update the version property, run the following command.
 
 	```Shell
 	appbuilder prop set BundleVersion <Value>
 	```
-<% } %> 
+<% } %>
 <% if((isConsole && isWindows && isCordova) || isHtml) { %>
 ### Options
 * `--debug` - If set, applies the Debug build configuration. <% if(isHtml) { %> For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--release` - If set, applies the Release build configuration. <% if(isHtml) { %>For more information about build configurations, see [build configurations](http://docs.telerik.com/platform/appbuilder/build-configurations/overview).<% } %>
 * `--path` - Specifies the directory that contains the project. If not specified, the project is searched for in the current directory and all directories above it.
-<% } %> 
-<% if(isHtml) { %> 
+<% } %>
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You cannot run this command on OS X systems.

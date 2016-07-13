@@ -8,15 +8,15 @@ Export all projects from solution | `$ appbuilder cloud export <Solution Name or
 
 Exports one or all projects from a selected solution in the cloud and initializes it for development. The current directory must be empty.
 
-<% if(isConsole) { %>WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.<% } %> 
+<% if(isConsole) { %>WARNING: Always run this command in an empty directory or specify `--path` to an empty directory.<% } %>
 
 ### Options
 * `--path` - Specifies the directory where to export the selected project on your file system. The directory must be empty. If not set, exports the project in the current directory.
 
 ### Attributes
-* `<Solution Name or Index>` is the name of the solution as listed by `$ appbuilder cloud --all` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client. You need to set a solution if you are running a non-interactive console. <% if(isHtml) { %>When you do not specify a project, the Telerik AppBuilder CLI creates a new directory named after the solution and as many sub-directories named after the projects as needed inside the solution-named directory. The sub-directories contain all your project files. If the solution contains one project, this operation creates one sub-directory in the new solution-named directory.<% } %>
-* `<Project Name or Index>` is the name or the index of project, relative to its parent solution, as listed by `appbuilder cloud` or as it appears in the Telerik AppBuilder in-browser client or the Telerik AppBuilder Windows client. <% if(isHtml) { %>When you specify a project, the Telerik AppBuilder CLI creates a new directory named after the project. The sub-directory contains all your project files.<% } %> 
-<% if(isHtml) { %> 
+* `<Solution Name or Index>` is the name of the solution as listed by `$ appbuilder cloud --all` or as it appears in the AppBuilder in-browser client or the AppBuilder Windows client. You need to set a solution if you are running a non-interactive console. <% if(isHtml) { %>When you do not specify a project, the AppBuilder CLI creates a new directory named after the solution and as many sub-directories named after the projects as needed inside the solution-named directory. The sub-directories contain all your project files. If the solution contains one project, this operation creates one sub-directory in the new solution-named directory.<% } %>
+* `<Project Name or Index>` is the name or the index of project, relative to its parent solution, as listed by `appbuilder cloud` or as it appears in the AppBuilder in-browser client or the AppBuilder Windows client. <% if(isHtml) { %>When you specify a project, the AppBuilder CLI creates a new directory named after the project. The sub-directory contains all your project files.<% } %>
+<% if(isHtml) { %>
 ### Command Limitations
 
 * You must run this command in an empty directory or specify `--path` to an empty directory.

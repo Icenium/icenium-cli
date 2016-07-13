@@ -1,11 +1,11 @@
-Contribute to the Telerik AppBuilder Command-Line Interface
+Contribute to the Telerik AppBuilder Command-Line Interface by Progress
 ===
 
-*Help us improve the Telerik AppBuilder CLI* 
+*Help us improve the AppBuilder CLI*
 
 [![Telerik AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "Telerik AppBuilder")](http://www.telerik.com/appbuilder "The Telerik AppBuilder web site")
 
-The Telerik AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store or Google Play.
+The AppBuilder CLI lets you build, test, deploy, and publish hybrid mobile apps for iOS, Android, and Windows Phone 8 from your favorite IDE or code editor. You can develop your projects locally from the convenience of your favorite code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store or Google Play.
 
 * [Report an Issue](#bug "Learn how to report an issue")
 * [Request a Feature](#request "Learn how to submit a feature or improvement request")

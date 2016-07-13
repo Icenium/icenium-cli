@@ -5,14 +5,14 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder certificate export <Certificate ID> [<Password>] [--path <Directory>]`
 
-Exports a selected certificate from the server as a P12 file.   
+Exports a selected certificate from the server as a P12 file.
 
 ### Options
 * `--path` - Specifies the directory where to store the exported certificate. If not specified, stores the exported certificate in the current directory.
 
 ### Attributes
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
-* `<Password>` is the password for the exported file. <% if(isHtml) { %>You must set a password for the exported file. If you do not set a password, the Telerik AppBuilder CLI will prompt you to provide a password.
+* `<Password>` is the password for the exported file. <% if(isHtml) { %>You must set a password for the exported file. If you do not set a password, the AppBuilder CLI will prompt you to provide a password.
 
 ### Related Commands
 

@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder webview [<Command>]`
 
-Lists the available web views for iOS and Android. <% if(isHtml) { %>For more information about working with web views in Telerik AppBuilder, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>
+Lists the available web views for iOS and Android. <% if(isHtml) { %>For more information about working with web views in AppBuilder, see [Configure the Web View for Your Project](http://docs.telerik.com/platform/appbuilder/configuring-your-project/configure-web-views).<% } %>
 
 <% if(isConsole) { %>
 <% if(isNativeScript)  { %>

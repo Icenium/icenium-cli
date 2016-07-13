@@ -7,13 +7,13 @@ General | `$ appbuilder user`
 
 Prints information about the currently logged in user, including name, email address, subscription plan and license expiration date.
 
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
 ----------|----------
-[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the Telerik AppBuilder CLI.
-[error-reporting](error-reporting.html) | Configures anonymous error reporting for the Telerik AppBuilder CLI.
-[login](login.html) | Opens a new browser window in which you can provide your login credentials for the Telerik Platform.
-[logout](logout.html) | Logs you out from the Telerik Platform.
+[usage-reporting](usage-reporting.html) | Configures anonymous usage reporting for the AppBuilder CLI.
+[error-reporting](error-reporting.html) | Configures anonymous error reporting for the AppBuilder CLI.
+[login](login.html) | Opens a new browser window in which you can provide your login credentials for the Telerik Platform by Progress.
+[logout](logout.html) | Logs you out from the Telerik Platform by Progress.
 <% } %>
