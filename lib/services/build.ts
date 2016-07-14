@@ -318,7 +318,7 @@ export class BuildService implements Project.IBuildService {
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
-			settings.projectConfiguration = settings.projectConfiguration || this.$project.getConfigurationsSpecifiedByUser()[0] || constants.Configurations.Debug;
+			settings.projectConfiguration = settings.projectConfiguration || this.$project.getConfigurationsSpecifiedByUser()[0] || _.first(this.$project.getAllConfigurationsNames().sort()) || constants.Configurations.Debug;
 			settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
 
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
