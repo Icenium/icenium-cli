@@ -220,7 +220,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation> {
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName).wait()) {
 			pluginData.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 		}
@@ -229,7 +229,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		pluginData.addPluginToConfigFile = true;
 
 		// Pass the actual plugin name because we do not need to add the extracted plugin if it is tgz file.
-		return super.installLocalPlugin(pluginData && pluginData.isTgz ? pluginData.actualName : pathToInstalledPlugin, pluginData);
+		return super.installLocalPlugin(pluginData && pluginData.isTgz ? pluginData.actualName : pathToInstalledPlugin, pluginData, options);
 	}
 
 	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {

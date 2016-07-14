@@ -321,11 +321,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData): IFuture<IBasicPluginInformation> {
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
 		pluginData.addPluginToConfigFile = false;
 
-		return super.installLocalPlugin(pathToInstalledPlugin, pluginData);
+		return super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
 	}
 
 	private loadPluginsData(): IFuture<void> {
