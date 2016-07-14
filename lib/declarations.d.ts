@@ -1277,3 +1277,20 @@ interface ILocalPluginData {
 	 */
 	suppressMessage?: boolean;
 }
+
+declare module NpmPlugins {
+	/**
+	 * Describes options for fetching local plugin.
+	 */
+	interface IFetchLocalPluginOptions {
+		/**
+		 * Use the original plugin directory instead of the one in Temp.
+		 */
+		useOriginalPluginDirectory: boolean;
+
+		/**
+		 * The original directory of the local plugin.
+		 */
+		originalPluginDirectory?: string;
+	}
+}
