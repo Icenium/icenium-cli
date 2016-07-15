@@ -61,6 +61,9 @@ Command | Description
 [add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
 [add-form](screenbuilder/add-form.html) | Inserts a new form in an existing application view.
 [add-field](screenbuilder/add-field.html) | Inserts a new input field in an existing form.
+[add-editablelist](add-editablelist.html) | Inserts an editable list in an existing application view.
+[add-editablelistform](add-editablelistform.html) | Inserts an editable form in an existing editable list.
+[add-editablelistformfield](add-editablelistformfield.html) | Inserts an editable field in an existing editable form.
 
 ## Apache Cordova Plugin and NativeScript Module Management Commands
 Command | Description
