@@ -30,6 +30,9 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
 	testInjector.register("prompter", {});
+	testInjector.register("httpClient", {
+		httpRequest: (): IFuture<Server.IResponse> => Future.fromResult(null)
+	});
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
 	});
@@ -238,6 +241,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
+	testInjector.register("httpClient", {});
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
 	});
@@ -288,6 +292,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
+	testInjector.register("httpClient", {});
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
 	});
@@ -336,7 +341,6 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 
 	testInjector.register("nativeScriptResources", NativeScriptResources);
 	testInjector.register("pluginVariablesHelper", PluginVariablesHelper);
-	testInjector.register("httpClient", {});
 
 	return testInjector;
 }

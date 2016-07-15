@@ -10,6 +10,8 @@ import temp = require("temp");
 temp.track();
 
 export abstract class NpmPluginsServiceBase implements IPluginsService {
+	private static NPM_REGISTRY_ADDRESS = "http://registry.npmjs.org";
+
 	constructor(protected $errors: IErrors,
 		protected $logger: ILogger,
 		protected $prompter: IPrompter,
@@ -17,6 +19,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $project: Project.IProject,
 		protected $projectConstants: Project.IConstants,
 		protected $childProcess: IChildProcess,
+		protected $httpClient: Server.IHttpClient,
 		private $hostInfo: IHostInfo,
 		private $progressIndicator: IProgressIndicator) { }
 
@@ -24,19 +27,26 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		return ((): IBasicPluginInformation[] => {
 			let pluginsFound: IBasicPluginInformation[] = [];
 
-			let searchParams = ["search"].concat(keywords);
+			let query = this.composeSearchQuery(keywords);
+
+			let searchParams = ["search"].concat(query);
 
 			let npmCommand = this.$hostInfo.isWindows ? "npm.cmd" : "npm";
 
 			let npmFuture = this.$childProcess.spawnFromEvent(npmCommand, searchParams, "close");
 
 			this.$logger.printInfoMessageOnSameLine("Searching for plugins in npm, please wait.");
+
 			this.$progressIndicator.showProgressIndicator(npmFuture, 2000).wait();
 
 			let npmSearchResult = npmFuture.get();
 
 			if (npmSearchResult.stderr) {
-				this.$errors.failWithoutHelp(npmSearchResult.stderr);
+				// npm will write "npm WARN Building the local index for the first time, please be patient" to the stderr and if it is the only message on the stderr we should ignore it.
+				let splitError = npmSearchResult.stderr.split("\n");
+				if (splitError.length > 2 || splitError[0].indexOf("Building the local index for the first time") === -1) {
+					this.$errors.failWithoutHelp(npmSearchResult.stderr);
+				}
 			}
 
 			// Need to split the result only by \n because the npm result contains only \n and on Windows it will not split correctly when using EOL.
@@ -97,7 +107,10 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
 			let pluginUrl = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
-			let plugins = this.findPlugins([pluginIdentifier]).wait();
+
+			let npmRegistryResult = this.searchNpmRegistry(pluginIdentifier).wait();
+			let plugins = npmRegistryResult ? [npmRegistryResult] : this.findPlugins([pluginIdentifier]).wait();
+
 			let pluginKeys = _.map(plugins, (pluginInfo: IBasicPluginInformation) => pluginInfo.name);
 			let pluginsCount = pluginKeys.length;
 
@@ -302,6 +315,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 	protected abstract getPluginsDirName(): string;
 
+	protected abstract composeSearchQuery(keywords: string[]): string[];
+
 	private fetchPluginCore(pluginIdentifier: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<void> {
 		return (() => {
 			let pluginBasicInfo: IBasicPluginInformation;
@@ -330,5 +345,38 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 	private isUrlToRepository(pluginId: string): boolean {
 		return validUrl.isUri(pluginId);
+	}
+
+	private searchNpmRegistry(pluginIdentifier: string): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			let npmRegistryRequestFuture = this.$httpClient.httpRequest(`${NpmPluginsServiceBase.NPM_REGISTRY_ADDRESS}/${pluginIdentifier}`);
+
+			this.$logger.printInfoMessageOnSameLine(`Searching for '${pluginIdentifier}' in ${NpmPluginsServiceBase.NPM_REGISTRY_ADDRESS}, please wait.`);
+			try {
+				this.$progressIndicator.showProgressIndicator(npmRegistryRequestFuture, 2000).wait();
+			} catch (err) {
+				if (err.response.statusCode === 404) {
+					return null;
+				} else {
+					throw err;
+				}
+			}
+
+			let response = npmRegistryRequestFuture.get();
+			let responseBody = response && response.body;
+
+			if (!responseBody) {
+				return null;
+			}
+
+			let pluginInfo: NpmPlugins.INpmRegistryResult = JSON.parse(responseBody);
+
+			let latestVersion = _(pluginInfo.versions)
+				.keys()
+				.sort()
+				.last();
+
+			return pluginInfo.versions[latestVersion];
+		}).future<IBasicPluginInformation>()();
 	}
 }
