@@ -32,7 +32,11 @@ declare module Project {
 		ensureProject(): void;
 		ensureAllPlatformAssets(): IFuture<void>;
 		getConfigurationsSpecifiedByUser(): string[];
-
+		/**
+		 * Returns a project configuration. Defaults to the lexicographically first project configuration. If no configurations present returns `debug`.
+		 * @return {string} the project configuration.
+		 */
+		getProjectConfiguration(): string;
 		/**
 		 * Returns the names of all configurations in the current project.
 		 * @return {string[]} the names of all configurations in the project.

@@ -318,7 +318,7 @@ export class BuildService implements Project.IBuildService {
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
-			settings.projectConfiguration = settings.projectConfiguration || this.$project.getConfigurationsSpecifiedByUser()[0] || _.first(this.$project.getAllConfigurationsNames().sort()) || constants.Configurations.Debug;
+			settings.projectConfiguration = settings.projectConfiguration || this.$project.getProjectConfiguration();
 			settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
 
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
@@ -490,12 +490,11 @@ export class BuildService implements Project.IBuildService {
 			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			let configuration = this.$project.getConfigurationsSpecifiedByUser()[0] || this.$projectConstants.DEBUG_CONFIGURATION_NAME;
 			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,
 												appIdentifier.encodeLiveSyncHostUri(hostPart),
 												querystring.escape(liveSyncToken),
 												querystring.escape(this.$project.projectData.ProjectName),
-												configuration);
+												this.$project.getProjectConfiguration());
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 

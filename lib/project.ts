@@ -398,6 +398,10 @@ export class Project extends ProjectBase implements Project.IProject {
 		return _.keys(this.configurationSpecificData);
 	}
 
+	public getProjectConfiguration(): string {
+		return this.getConfigurationsSpecifiedByUser()[0] || _.first(this.getAllConfigurationsNames().sort()) || Configurations.Debug;
+	}
+
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
 		return (() => {
 			this.ensureProject();
