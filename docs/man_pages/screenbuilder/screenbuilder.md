@@ -26,7 +26,7 @@ Command | Description
 
 ### Command Limitations
 
-* You cannot add components to projects created with earlier version of the Telerik AppBuilder CLI. This behavior will be fixed in an upcoming release.
+* You cannot add components to projects created with earlier version of the AppBuilder CLI. This behavior will be fixed in an upcoming release.
 
 ### Related Commands
 Command | Description
