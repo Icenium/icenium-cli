@@ -58,7 +58,7 @@
     "mute-stream": "0.0.4",
     "node-uuid": "1.4.1",
     "open": "0.0.4",
-    "osenv": "0.1.0",
+    "osenv": "0.1.3",
     "plist": "1.1.0",
     "plistlib": "0.2.1",
     "progress-stream": "0.5.0",
@@ -79,7 +79,7 @@
     "winreg": "0.0.12",
     "xml-mapping": "1.5.2",
     "xmlhttprequest": "https://github.com/telerik/node-XMLHttpRequest/tarball/master",
-    "yargs": "3.12.0",
+    "yargs": "4.8.1",
     "zipstream": "https://github.com/Icenium/node-zipstream/tarball/master"
   },
   "analyze": true,
@@ -94,7 +94,7 @@
     "grunt-tslint": "3.1.0",
     "istanbul": "0.3.19",
     "mocha": "2.5.3",
-    "mocha-fibers": "https://github.com/Icenium/mocha-fibers/tarball/master",
+    "mocha-fibers": "1.1.1",
     "spec-xunit-file": "0.0.1-3",
     "tslint": "3.11.0"
   },
