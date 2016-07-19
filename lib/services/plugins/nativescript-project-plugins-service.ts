@@ -16,7 +16,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
 	private static NPM_REGISTRY_URL = "https://registry.npmjs.org";
-	private static NODE_MODULES_DIR_NAME = "node_modules";
 
 	private marketplacePlugins: IPlugin[];
 
@@ -183,7 +182,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	}
 
 	protected getPluginsDirName(): string {
-		return NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME;
+		return NpmPluginsServiceBase.NODE_MODULES_DIR_NAME;
 	}
 
 	protected composeSearchQuery(keywords: string[]): string[] {
