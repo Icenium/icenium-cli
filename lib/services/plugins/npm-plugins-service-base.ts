@@ -224,7 +224,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				};
 				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
 
-				let npmInstallOutput = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
+				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
 				let pathToPackage = path.join(tempInstallDir, this.getPluginsDirName());
 
 				if (this.$fs.exists(pathToPackage).wait()) {
@@ -244,9 +244,20 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				}
 
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
-				let npmOutputMatch = npmInstallOutput.match(/.*?@.*?\s+?(.*?node_modules.*?)\r?\n?$/m);
-				if (npmOutputMatch) {
-					return path.join(tempInstallDir, npmOutputMatch[1]);
+				// If the plugin has dependencies the plugin name will be the last row of the output.
+				let npmOutputMatchRegExp = /.*?@.*?\s+?(.*?node_modules.*?)\r?\n?$/;
+				let pluginDirectory = _(npmInstallOutput)
+					.split("\n")
+					.map((row: string) => {
+						row = row && row.trim();
+						let matches = npmOutputMatchRegExp.exec(row);
+						return matches && matches.length ? matches[1] : undefined;
+					})
+					.filter((row: string) => !!row)
+					.last();
+
+				if (pluginDirectory) {
+					return path.join(tempInstallDir, pluginDirectory);
 				}
 			} catch (err) {
 				// Uncomment when all of our marketplace plugins have package.json
