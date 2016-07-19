@@ -155,7 +155,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 				delete data[property];
 			});
 
-			let convertedData = require("string-to-json").convert(data);
+			let convertedData = helpers.convertDottedStringToObject(data);
 			helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
 
 			let xml = xmlMapping.toxml(this.userSettingsData);
