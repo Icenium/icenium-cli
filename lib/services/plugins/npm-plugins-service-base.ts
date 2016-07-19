@@ -10,6 +10,8 @@ import temp = require("temp");
 temp.track();
 
 export abstract class NpmPluginsServiceBase implements IPluginsService {
+	protected static NODE_MODULES_DIR_NAME = "node_modules";
+
 	private static NPM_REGISTRY_ADDRESS = "http://registry.npmjs.org";
 
 	constructor(protected $errors: IErrors,
@@ -238,7 +240,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
 
 				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
-				let pathToPackage = path.join(tempInstallDir, this.getPluginsDirName());
+				let pathToPackage = path.join(tempInstallDir, NpmPluginsServiceBase.NODE_MODULES_DIR_NAME);
 
 				if (this.$fs.exists(pathToPackage).wait()) {
 					// Most probably the package is installed inside node_modules dir in temp folder.
@@ -253,7 +255,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				//                           └── plugin-var-plugin@1.0.0  extraneous
 				let npm2OutputMatch = npmInstallOutput.match(/.*?tempPackage@1\.0\.0.*?\r?\n.*?\s+?(.*?)@.*?\s+?/m);
 				if (npm2OutputMatch) {
-					return path.join(tempInstallDir, this.getPluginsDirName(), npm2OutputMatch[1]);
+					return path.join(tempInstallDir, NpmPluginsServiceBase.NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
 				}
 
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
