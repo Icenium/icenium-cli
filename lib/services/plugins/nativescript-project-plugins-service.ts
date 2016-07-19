@@ -16,14 +16,12 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
 	private static NPM_REGISTRY_URL = "https://registry.npmjs.org";
-	private static NODE_MODULES_DIR_NAME = "node_modules";
 
 	private marketplacePlugins: IPlugin[];
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $server: Server.IServer,
-		private $httpClient: Server.IHttpClient,
 		$errors: IErrors,
 		$logger: ILogger,
 		$prompter: IPrompter,
@@ -31,26 +29,16 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
+		$httpClient: Server.IHttpClient,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo, $progressIndicator);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $hostInfo, $progressIndicator);
 
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
 			this.$errors.failWithoutHelp(`Your project targets NativeScript version '${frameworkVersion}' which does not support plugins.`);
 		}
-	}
-
-	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
-		let hasNativeScriptKeyword = _.some(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
-
-		if (!hasNativeScriptKeyword) {
-			keywords.unshift(nativeScriptKeyword);
-		}
-
-		return super.findPlugins(keywords);
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
@@ -194,7 +182,18 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	}
 
 	protected getPluginsDirName(): string {
-		return NativeScriptProjectPluginsService.NODE_MODULES_DIR_NAME;
+		return NpmPluginsServiceBase.NODE_MODULES_DIR_NAME;
+	}
+
+	protected composeSearchQuery(keywords: string[]): string[] {
+		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
+		let hasNativeScriptKeyword = _.some(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
+
+		if (!hasNativeScriptKeyword) {
+			keywords.unshift(nativeScriptKeyword);
+		}
+
+		return keywords;
 	}
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginData: ILocalPluginData): IFuture<IBasicPluginInformation> {

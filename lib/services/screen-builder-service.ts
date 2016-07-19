@@ -13,10 +13,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	private scaffolder: any = null;
 
 	private static PREDEFINED_SCREENBUILDER_TYPES: IStringDictionary = {
-		dataprovider: "dataProvider",
-		editablelist: "editableList",
-		editablelistform: "editableListForm",
-		editablelistformfield: "editableListFormField"
+		dataprovider: "dataProvider"
 	};
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,

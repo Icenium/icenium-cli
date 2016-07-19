@@ -11,7 +11,7 @@ Creates a project for hybrid or native development. If `screenbuilder` and `<Typ
 
 ### Options
 
-* `--answers` - If set, the AppBuilder CLI looks for the specified `JSON` file and tries to pull the configuration data required by the command. If one or more required properties are not specified, the Telerik AppBuilder CLI will prompt you to provide the missing values. This option is applicable only to Screen Builder projects.
+* `--answers` - If set, the AppBuilder CLI looks for the specified `JSON` file and tries to pull the configuration data required by the command. If one or more required properties are not specified, the AppBuilder CLI will prompt you to provide the missing values. This option is applicable only to Screen Builder projects.
 * `--no-simulator` - If set, the AppBuilder CLI does not launch the device simulator after the project is created successfully. This option is applicable only to Screen Builder projects.
 
 ### Attributes
@@ -25,6 +25,7 @@ Creates a project for hybrid or native development. If `screenbuilder` and `<Typ
 <% if(isHtml) { %>
 ### Prerequisites
 
+* Verify that you have installed git on your system.
 * The `--answers` option is applicable only to Screen Builder projects.
 * The `--no-simulator` option is applicable only to Screen Builder projects.
 

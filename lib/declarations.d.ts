@@ -1293,4 +1293,14 @@ declare module NpmPlugins {
 		 */
 		originalPluginDirectory?: string;
 	}
+
+	/**
+	 * Describes the format of the result returned from http://registry.npmjs.org/[plugin-name].
+	 */
+	interface INpmRegistryResult {
+		_id: string;
+		name: string;
+		description: string;
+		versions: IDictionary<IBasicPluginInformation>;
+	}
 }
