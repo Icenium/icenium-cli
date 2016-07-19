@@ -32,9 +32,10 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$project: Project.IProject,
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
+		$httpClient: Server.IHttpClient,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $hostInfo, $progressIndicator);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $hostInfo, $progressIndicator);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -54,11 +55,6 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			.concat(this.$project.getConfigurationsSpecifiedByUser())
 			.uniq()
 			.value();
-	}
-
-	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		keywords.unshift("ecosystem:cordova");
-		return super.findPlugins(keywords);
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
@@ -290,6 +286,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 
 	protected getPluginsDirName(): string {
 		return "plugins";
+	}
+
+	protected composeSearchQuery(keywords: string[]): string[] {
+		keywords.unshift("ecosystem:cordova");
+		return keywords;
 	}
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
@@ -602,7 +603,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			pluginName = pluginName.toLowerCase();
 			let isConsoleInteractive = helpers.isInteractive();
 			let allInstalledPlugins = this.getInstalledPluginsForConfiguration();
-			let installedPluginInstances = _.filter(allInstalledPlugins, (plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName);
+			let installedPluginInstances = _(allInstalledPlugins)
+				.filter((plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName)
+				.uniqBy((plugin: IPlugin) => plugin.data.Version)
+				.value();
+
 			let selectedVersion: string;
 			if (installedPluginInstances.length > 1) {
 				this.$logger.warn(`Plugin '${pluginName}' is enabled with different versions in your project configurations. You must use the same version in all configurations.`);
