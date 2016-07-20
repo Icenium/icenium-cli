@@ -22,6 +22,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $projectConstants: Project.IConstants,
 		protected $childProcess: IChildProcess,
 		protected $httpClient: Server.IHttpClient,
+		protected $options: IOptions,
 		private $hostInfo: IHostInfo,
 		private $progressIndicator: IProgressIndicator) { }
 
@@ -320,6 +321,10 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		return ((): boolean => {
 			return !this.isPluginPartOfTheProject(pluginPath).wait();
 		}).future<boolean>()();
+	}
+
+	protected getDefaultPluginVersion(plugin: IPlugin): string {
+		return (<IMarketplacePlugin>plugin).pluginVersionsData.DefaultVersion;
 	}
 
 	protected abstract fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation>;

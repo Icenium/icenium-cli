@@ -30,9 +30,10 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
+		$options: IOptions,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $hostInfo, $progressIndicator);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
 
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
@@ -172,7 +173,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let [name, version] = pluginName.split("@");
-			version = version || "latest";
 			return this.getBasicPluginInfoFromMarketplace(name, version).wait() || { name, version };
 		}).future<IBasicPluginInformation>()();
 	}
@@ -477,8 +477,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			let allMarketplacePlugins = this.getMarketplacePlugins().wait();
 			let marketPlacePlugins: IPlugin[] = _.filter(allMarketplacePlugins, pl => pl.data.Identifier.toLowerCase() === pluginName.toLowerCase());
 			if (marketPlacePlugins && marketPlacePlugins.length) {
-				let selectedPlugin = version === "latest" ? _.last(_.sortBy(marketPlacePlugins, pl => pl.data.Version)) :
-					_.find(marketPlacePlugins, pl => version.toLowerCase() === pl.data.Version.toLowerCase());
+				let selectedPlugin = this.selectMarketplacePlugin(marketPlacePlugins, version);
 
 				if (selectedPlugin) {
 					basicInfo = {
@@ -496,6 +495,27 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 			return basicInfo;
 		}).future<IBasicPluginInformation>()();
+	}
+
+	private selectMarketplacePlugin(marketPlacePlugins: IPlugin[], version: string): IPlugin {
+		let plugin: IPlugin;
+
+		if (this.$options.default && marketPlacePlugins.length) {
+			version = this.getDefaultPluginVersion(marketPlacePlugins[0]);
+		}
+
+		if (!version || version === "latest") {
+			version = _(marketPlacePlugins)
+				.map((marketplacePlugin: IPlugin) => marketplacePlugin.data.Version)
+				.sort((firstVersion: string, secondVersion: string) => semver.gt(firstVersion, secondVersion) ? -1 : 1)
+				.first();
+		}
+
+		if (version && semver.valid(version)) {
+			plugin = _.find(marketPlacePlugins, (marketPlacePlugin: IPlugin) => marketPlacePlugin.data.Version === version);
+		}
+
+		return plugin;
 	}
 
 	private getBasicPluginInfoFromNpm(name: string, version: string): IFuture<IBasicPluginInformation> {
