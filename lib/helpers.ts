@@ -210,3 +210,37 @@ export function fill(value: string, times: number): string[]{
 
 	return repeatedValues;
 }
+
+function getDottedStringObjectRecursive(arr: string[], val: any): any {
+	if (arr.length <= 0) {
+		return val;
+	}
+
+	let first = _.head(arr),
+		rest = _.tail(arr),
+		result: any = {};
+
+	if (_.isUndefined(result[first]) ) {
+		result[first] = {};
+	}
+
+	result[first] = getDottedStringObjectRecursive(rest, val);
+	return result;
+}
+
+export function convertDottedStringToObject(data: any): any {
+	let output: any = {};
+
+	if (_.isObject(data) && !_.isArray(data)) {
+		_(data).keys().each(key => {
+			if (data.hasOwnProperty(key)) {
+				let dotSplit = key.split("."),
+					value = data[key];
+
+				_.extend(output, getDottedStringObjectRecursive(dotSplit, value));
+			}
+		});
+	}
+
+	return output;
+}
