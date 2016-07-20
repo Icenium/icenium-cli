@@ -1,6 +1,7 @@
 import {ExtensionsServiceBase} from "./extensions-service-base";
 import * as path from "path";
 import Future = require("fibers/future");
+import * as semver from "semver";
 
 export class AppScaffoldingExtensionsService extends ExtensionsServiceBase implements IAppScaffoldingExtensionsService {
 	private static APP_SCAFFOLDING_NAME = "app-scaffolding";
@@ -11,6 +12,8 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 		private $config: IConfiguration,
 		private $dependencyConfigService: IDependencyConfigService,
 		private $progressIndicator: IProgressIndicator,
+		private $staticConfig: IStaticConfig,
+		private $sysInfo: ISysInfo,
 		protected $fs: IFileSystem,
 		protected $httpClient: Server.IHttpClient,
 		protected $logger: ILogger,
@@ -45,7 +48,12 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 					let generatorBaseDependencies = require(path.join(this.appScaffoldingPath, "node_modules", "screen-builder-base-generator", "package.json")).dependencies;
 					Future.wait(_.map(generatorBaseDependencies, (value, key) => this.npmInstall(`${key}@${value}`)));
 					this.npmInstall().wait();
-					this.npmDedupe().wait();
+					let userNpmVersion = this.$sysInfo.getNpmVersion();
+					// If the user machine has npm 3 we don't need to run `$ npm dedupe` because npm itself dedupes dependencies while installing them.
+					if (!userNpmVersion || !semver.valid(userNpmVersion) || semver.major(userNpmVersion) !== 3) {
+						this.npmDedupe().wait();
+					}
+
 				}).future<void>()();
 			};
 			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction).wait();

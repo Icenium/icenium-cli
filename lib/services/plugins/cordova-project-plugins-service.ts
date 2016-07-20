@@ -23,7 +23,6 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	constructor(private $cordovaPluginsService: CordovaPluginsService,
 		private $loginManager: ILoginManager,
 		private $marketplacePluginsService: ICordovaPluginsService,
-		private $options: IOptions,
 		private $resources: IResourceLoader,
 		$errors: IErrors,
 		$logger: ILogger,
@@ -33,9 +32,10 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$projectConstants: Project.IConstants,
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
+		$options: IOptions,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $hostInfo, $progressIndicator);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -688,7 +688,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				// server returns the versions in descending order
 				version = _.first(versions).value;
 			} else if (this.$options.default) {
-				version = (<IMarketplacePlugin>plugin).pluginVersionsData.DefaultVersion;
+				version = this.getDefaultPluginVersion(plugin);
 			} else {
 				if (options && options.excludeCurrentVersion) {
 					let currentVersionIndex = _.findIndex(versions, (v) => v.value === plugin.data.Version);
