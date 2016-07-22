@@ -1,6 +1,6 @@
 declare module Project {
 	interface IProject extends IProjectBase {
-		configurationSpecificData: IDictionary<IDictionary<any>>;
+		configurationSpecificData: IDictionary<IData>;
 		configurations: string[];
 		requiredAndroidApiLevel: number;
 		projectConfigFiles: Project.IConfigurationFile[];
@@ -19,7 +19,8 @@ declare module Project {
 		getProperty(propertyName: string, configuration: string): any;
 		getProjectTargets(): IFuture<string[]>;
 		getConfigFileContent(template: string): IFuture<any>;
-		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void>;
+		updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
+		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
 		printProjectProperty(property: string, configuration?: string): IFuture<void>;
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
