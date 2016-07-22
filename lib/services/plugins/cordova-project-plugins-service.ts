@@ -349,6 +349,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				.map((configurationName: string) => this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configurationName))
 				.flatten<string>()
 				.filter((pluginName: string) => !!pluginName)
+				.uniq()
 				.value();
 		}
 
@@ -438,15 +439,20 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			}
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
-			this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
-			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version}` : "";
+
+			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version}` : "",
+				successMessageForConfigSuffix = ` for ${configuration} configuration${versionString}`,
+				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
+
 			if (configuration) {
-				this.$project.saveProject(this.$project.getProjectDir().wait(), [configuration]).wait();
-				this.$logger.out(`Plugin ${pluginName} was successfully added for ${configuration} configuration${versionString}.`);
+				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [ configuration ]).wait();
 			} else {
-				this.$project.saveProject().wait();
-				this.$logger.out(`Plugin ${pluginName} was successfully added${versionString}.`);
+				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
 			}
+
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
+
+			this.$logger.out(successMessage);
 		}).future<void>()();
 	}
 

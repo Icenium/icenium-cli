@@ -69,7 +69,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue).wait();
 			});
 
-			// check if CorePlugins in both configurations are the same
+			// check if CorePlugins in all configurations are the same
 			this.tryMovingCorePluginsToProjectData(projectData, configurationSpecificData);
 		}).future<void>()();
 	}

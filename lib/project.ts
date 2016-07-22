@@ -402,17 +402,12 @@ export class Project extends ProjectBase implements Project.IProject {
 		return this.getConfigurationsSpecifiedByUser()[0] || _.first(this.getAllConfigurationsNames().sort()) || Configurations.Debug;
 	}
 
-	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[]): IFuture<void> {
+	public updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void> {
 		return (() => {
-			this.ensureProject();
-			let projectConfigurations = this.getConfigurationsSpecifiedByUser();
-			let normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
-			if (normalizedPropertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
-				this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(normalizedPropertyName, propertyValues[0]);
-			}
+			let { normalizedPropertyName, projectConfigurations } = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations);
 
 			if (normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
-				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, this.getConfigurationsSpecifiedByUser()).wait();
+				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations).wait();
 			} else {
 				if (projectConfigurations.length) {
 					_.each(projectConfigurations, configuration => {
@@ -423,8 +418,16 @@ export class Project extends ProjectBase implements Project.IProject {
 					_.each(this.configurationSpecificData, data => this.$projectPropertiesService.updateProjectProperty(data, undefined, mode, normalizedPropertyName, propertyValues).wait());
 				}
 			}
+		}).future<void>()();
+	}
 
-			this.saveProject(this.getProjectDir().wait(), projectConfigurations).wait();
+	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void> {
+		return (() => {
+			let { normalizedPropertyName, projectConfigurations } = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations);
+
+			this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations).wait();
+
+			this.saveProject(this.getProjectDir().wait(), this.getAllConfigurationsNames()).wait();
 			projectConfigurations.forEach(configuration => {
 				this.printProjectProperty(normalizedPropertyName, configuration).wait();
 			});
@@ -663,9 +666,7 @@ export class Project extends ProjectBase implements Project.IProject {
 		return (() => {
 			let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
 			projectDir = projectDir || this.getProjectDir().wait();
-			if (!configurations || !configurations.length) {
-				this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
-			}
+			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
 
 			_.each(configs, (configuration: string) => {
 				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
@@ -834,5 +835,23 @@ export class Project extends ProjectBase implements Project.IProject {
 			return null;
 		}).future<Project.IData>()();
 	}
+
+	private validateUpdatePropertyInfo(propertyName: string, propertyValues: string[], configurations: string[]): IUpdatePropertyInfo {
+		this.ensureProject();
+
+		let projectConfigurations = (configurations && configurations.length) ? configurations : this.getConfigurationsSpecifiedByUser(),
+			normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
+
+		if (normalizedPropertyName === this.$projectConstants.APPIDENTIFIER_PROPERTY_NAME) {
+			this.$jsonSchemaValidator.validatePropertyUsingBuildSchema(normalizedPropertyName, propertyValues[0]);
+		}
+
+		return { normalizedPropertyName, projectConfigurations };
+	}
 }
 $injector.register("project", Project);
+
+interface IUpdatePropertyInfo {
+	normalizedPropertyName: string;
+	projectConfigurations: string[];
+}

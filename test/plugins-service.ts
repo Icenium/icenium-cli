@@ -62,13 +62,18 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		getProjectDir: () => Future.fromResult(""),
 		ensureProject: () => { /*mock*/ },
 		ensureCordovaProject: () => {/*mock*/ },
-		configurations: ["debug"],
+		configurations: [],
 		projectDir: "",
 		getAllConfigurationsNames: (): string[] => {
 			return ["debug", "release"];
 		},
 		getConfigurationsSpecifiedByUser: (): string[] => {
 			return [];
+		},
+		updateProjectProperty(mode: string, property: string, newValue: any): IFuture<void> {
+			return (() => {
+				this.projectData.CorePlugins = newValue;
+			}).future<void>()();
 		}
 	});
 
@@ -93,6 +98,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("staticConfig", StaticConfig);
 	testInjector.register("options", Options);
 	testInjector.register("resources", ResourceLoader);
+	testInjector.resolve("staticConfig").disableAnalytics = true;
 
 	return testInjector;
 }
@@ -192,6 +198,19 @@ class ProjectStub {
 		}
 
 		return configs;
+	};
+
+	updateProjectProperty(mode: string, propertyName: string, newValue: any, configs?: string[]): IFuture<void> {
+		return (() => {
+			let configurations = configs && configs.length ? configs : this.configurations;
+			_.each(configurations, configuration => {
+				if ((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
+					this.configurationSpecificData[configuration][propertyName] = newValue;
+				} else {
+					this.projectData[propertyName] = newValue;
+				}
+			});
+		}).future<void>()();
 	}
 }
 
@@ -277,6 +296,8 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("hostInfo", HostInfo);
 	testInjector.register("resources", ResourceLoader);
 
+	testInjector.resolve("staticConfig").disableAnalytics = true;
+
 	return testInjector;
 }
 
@@ -325,6 +346,8 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 
 	testInjector.register("options", Options);
 	testInjector.register("staticConfig", StaticConfig);
+	testInjector.resolve("staticConfig").disableAnalytics = true;
+
 	testInjector.register("hostInfo", HostInfo);
 	testInjector.register("resources", ResourceLoader);
 	testInjector.register("prompter", new PrompterStub(2, 0, pluginVariableResult));
