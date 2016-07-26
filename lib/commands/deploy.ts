@@ -39,9 +39,6 @@ export class DeployHelper implements IDeployHelper {
 		return ((): void => {
 			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = platform || this.$devicesService.platform;
-			let packageName = this.$project.projectData.AppIdentifier;
-			let packageFile: string = null;
-
 			this.$options.justlaunch = true;
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
@@ -55,18 +52,15 @@ export class DeployHelper implements IDeployHelper {
 						}
 					}
 
-					if (!packageFile) {
-						packageFile = this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait() :
-							this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
+					let appInfo = this.getAppInfoFromBuildResult(device).wait();
 
-						this.$logger.debug("Ready to deploy %s", packageFile);
-						this.$logger.debug("File is %d bytes", this.$fs.getFileSize(packageFile).wait().toString());
-					}
+					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
+					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).wait().toString());
 
-					device.applicationManager.reinstallApplication(packageName, packageFile).wait();
+					device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName).wait();
 					this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);
 					if (device.applicationManager.canStartApplication()) {
-						device.applicationManager.startApplication(this.$project.projectData.AppIdentifier).wait();
+						device.applicationManager.startApplication(appInfo.appIdentifier).wait();
 					}
 				}).future<void>()();
 			};
@@ -86,6 +80,16 @@ export class DeployHelper implements IDeployHelper {
 
 			this.$devicesService.execute(action, canExecute).wait();
 		}).future<void>()();
+	}
+
+	private getAppInfoFromBuildResult(device: Mobile.IDevice): IFuture<IApplicationInformation> {
+		return ((): IApplicationInformation => {
+			if (this.$devicesService.isiOSSimulator(device)) {
+				return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait(), appIdentifier: this.$project.projectData.AppIdentifier };
+			} else {
+				return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
+			}
+		}).future<IApplicationInformation>()();
 	}
 }
 $injector.register("deployHelper", DeployHelper);

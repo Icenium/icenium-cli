@@ -82,7 +82,10 @@ export class BuildService implements Project.IBuildService {
 					solutionPath: solutionPath,
 					relativePath: buildResult.FullPath,
 					disposition: buildResult.Disposition,
-					format: buildResult.Format
+					format: buildResult.Format,
+					key: buildResult.Key,
+					value: buildResult.Value,
+					architecture: buildResult.Architecture
 				};
 			});
 
@@ -401,8 +404,8 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IPackageDef[]>()();
 	}
 
-	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string> {
-		return (() => {
+	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation> {
+		return ((): IApplicationInformation => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			let buildResult = this.build({
@@ -413,14 +416,19 @@ export class BuildService implements Project.IBuildService {
 				device: device
 			}).wait();
 
-			let result = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
-			return result;
-		}).future<string>()();
+			let packageName = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
+			let metadata = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || (def.disposition === "BuildResultMetadata" && def.key === "AppIdentifier"))[0];
+			let appIdentifier = metadata ? metadata.value : this.$project.projectData.AppIdentifier;
+			return {
+				packageName,
+				appIdentifier
+			};
+		}).future<IApplicationInformation>()();
 	}
 
 	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
 		return (() => {
-			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait();
+			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles").wait();
 			this.$fs.unzip(packageFile, tempDir).wait();
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
