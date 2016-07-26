@@ -10,6 +10,8 @@ import minimatch = require("minimatch");
 export class BuildService implements Project.IBuildService {
 	private static WinPhoneAetPath = "appbuilder/install/WinPhoneAet";
 	private static APPIDENTIFIER_PLACE_HOLDER = "$AppIdentifier$";
+	private static ACCEPT_RESULT_URL = "Url";
+	private static ACCEPT_RESULT_LOCAL_PATH = "LocalPath";
 
 	constructor(private $config: IConfiguration,
 		private $staticConfig: IStaticConfig,
@@ -23,28 +25,35 @@ export class BuildService implements Project.IBuildService {
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
-		private $platformMigrator: Project.IPlatformMigrator,
+		private $projectMigrationService: Project.IProjectMigrationService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $progressIndicator: IProgressIndicator,
 		private $options: IOptions,
 		private $deviceAppDataFactory: Mobile.IDeviceAppDataFactory,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $projectConstants: Project.IConstants) { }
+		private $projectConstants: Project.IConstants,
+		private $httpClient: Server.IHttpClient) { }
 
-	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
+	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
 			if (urlKind !== "manifest" && urlKind !== "package") {
 				throw new Error("urlKind must be either 'manifest' or 'package'");
 			}
 
-			// escape URLs twice to work around a bug in bit.ly
-			let fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
-				this.$config.AB_SERVER_PROTO,
-				this.$config.AB_SERVER, urlKind,
-				querystring.escape(querystring.escape(filesystemPath)),
-				querystring.escape(querystring.escape(liveSyncToken)));
+			let fullDownloadPath: string;
+			if (packageDef.format === BuildService.ACCEPT_RESULT_URL) {
+				fullDownloadPath = packageDef.url;
+			} else {
+				// escape URLs twice to work around a bug in bit.ly
+				fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+					this.$config.AB_SERVER_PROTO,
+					this.$config.AB_SERVER, urlKind,
+					querystring.escape(querystring.escape(packageDef.relativePath)),
+					querystring.escape(querystring.escape(liveSyncToken)));
+			}
+
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
 			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
@@ -76,13 +85,27 @@ export class BuildService implements Project.IBuildService {
 				let fullPath = buildResult.FullPath.replace(/\\/g, "/");
 				let solutionPath = util.format("%s/%s", projectName, fullPath);
 
+				let fileExtension: string = buildResult.Extension;
+
+				// Since the server can return in the Extension property string which is the file extension followed by query string we need to remove the query string.
+				let indexOfQueryString = fileExtension.indexOf("?");
+				if (indexOfQueryString >= 0) {
+					fileExtension = fileExtension.substring(0, indexOfQueryString);
+				}
+
+				let fullFileName = `${buildResult.Filename}${fileExtension}`;
 				return {
 					platform: buildResult.Platform,
 					solution: solutionName,
 					solutionPath: solutionPath,
 					relativePath: buildResult.FullPath,
 					disposition: buildResult.Disposition,
-					format: buildResult.Format
+					format: buildResult.Format,
+					url: buildResult.FullPath,
+					fileName: fullFileName,
+					key: buildResult.Key,
+					value: buildResult.Value,
+					architecture: buildResult.Architecture
 				};
 			});
 
@@ -110,7 +133,8 @@ export class BuildService implements Project.IBuildService {
 				FrameworkVersion: projectData.FrameworkVersion,
 				BundleVersion: projectData.BundleVersion,
 				DeviceOrientations: projectData.DeviceOrientations,
-				BuildForiOSSimulator: settings.buildForiOSSimulator || false
+				BuildForiOSSimulator: settings.buildForiOSSimulator || false,
+				AcceptResults: `${BuildService.ACCEPT_RESULT_URL};${BuildService.ACCEPT_RESULT_LOCAL_PATH}`
 			};
 
 			this.$project.adjustBuildProperties(buildProperties);
@@ -126,7 +150,7 @@ export class BuildService implements Project.IBuildService {
 				} else if (settings.buildForTAM) {
 					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
 						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
-				} else if (settings.buildConfiguration === constants.Configurations.Release ) {
+				} else if (settings.buildConfiguration === constants.Configurations.Release) {
 					certificateData = this.$identityManager.findReleaseCertificate().wait();
 
 					if (!certificateData) {
@@ -324,7 +348,8 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
 				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
-			this.$platformMigrator.ensureAllPlatformAssets().wait();
+			this.$projectMigrationService.ensureAllPlatformAssets().wait();
+			this.$projectMigrationService.migrateTypeScriptProject().wait();
 			this.$project.importProject().wait();
 
 			let buildResult = this.requestCloudBuild(settings).wait();
@@ -347,16 +372,16 @@ export class BuildService implements Project.IBuildService {
 				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
 				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					let liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
+					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def).wait();
 
 					let packageUrl = (urlKind !== "package")
-						? this.getLiveSyncUrl("package", def.relativePath, liveSyncToken).wait()
-						: liveSyncUrl;
+						? this.getDownloadUrl("package", liveSyncToken, def).wait()
+						: downloadUrl;
 					this.$logger.debug("Download URL is '%s'", packageUrl);
 
 					return {
-						qrUrl: liveSyncUrl,
-						qrImageData: this.$qr.generateDataUri(liveSyncUrl),
+						qrUrl: downloadUrl,
+						qrImageData: this.$qr.generateDataUri(downloadUrl),
 						packageUrls: [{
 							packageUrl: packageUrl,
 							downloadText: "Download"
@@ -383,15 +408,24 @@ export class BuildService implements Project.IBuildService {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
 					let targetFileName: string;
 					if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
-						targetFileName = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, path.basename(pkg.solutionPath));
+						targetFileName = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
 					} else {
 						targetFileName = settings.downloadedFilePath
-							|| path.join(this.$project.getProjectDir().wait(), path.basename(pkg.solutionPath));
+							|| path.join(this.$project.getProjectDir().wait(), pkg.fileName);
 					}
 
-					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.solutionPath, targetFileName);
+					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.fileName, targetFileName);
 					let targetFile = this.$fs.createWriteStream(targetFileName);
-					this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
+
+					if (pkg.format === BuildService.ACCEPT_RESULT_URL) {
+						this.$httpClient.httpRequest({
+							url: pkg.url,
+							pipeTo: targetFile
+						}).wait();
+					} else {
+						this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
+					}
+
 					this.$logger.info("Download completed: %s", targetFileName);
 					pkg.localFile = targetFileName;
 				});
@@ -401,8 +435,8 @@ export class BuildService implements Project.IBuildService {
 		}).future<Server.IPackageDef[]>()();
 	}
 
-	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string> {
-		return (() => {
+	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation> {
+		return ((): IApplicationInformation => {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			let buildResult = this.build({
@@ -413,14 +447,19 @@ export class BuildService implements Project.IBuildService {
 				device: device
 			}).wait();
 
-			let result = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
-			return result;
-		}).future<string>()();
+			let packageName = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
+			let metadata = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || (def.disposition === "BuildResultMetadata" && def.key === "AppIdentifier"))[0];
+			let appIdentifier = metadata ? metadata.value : this.$project.projectData.AppIdentifier;
+			return {
+				packageName,
+				appIdentifier
+			};
+		}).future<IApplicationInformation>()();
 	}
 
 	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
 		return (() => {
-			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait();
+			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles").wait();
 			this.$fs.unzip(packageFile, tempDir).wait();
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
@@ -491,10 +530,10 @@ export class BuildService implements Project.IBuildService {
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,
-												appIdentifier.encodeLiveSyncHostUri(hostPart),
-												querystring.escape(liveSyncToken),
-												querystring.escape(this.$project.projectData.ProjectName),
-												this.$project.getProjectConfiguration());
+				appIdentifier.encodeLiveSyncHostUri(hostPart),
+				querystring.escape(liveSyncToken),
+				querystring.escape(this.$project.projectData.ProjectName),
+				this.$project.getProjectConfiguration());
 
 			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
@@ -505,4 +544,5 @@ export class BuildService implements Project.IBuildService {
 		}).future<void>()();
 	}
 }
+
 $injector.register("buildService", BuildService);

@@ -38,6 +38,11 @@ declare module Server {
 		localFile?: string;
 		disposition: string;
 		format: string;
+		url: string;
+		fileName: string;
+		key?: string;
+		value?: string;
+		architecture?: string;
 	}
 
 	interface IBuildResult {
@@ -199,10 +204,10 @@ declare module Project {
 	}
 
 	interface IBuildService {
-		getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string>;
+		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string>;
 		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string>;
+		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation>;
 		buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string>;
 	}
 
@@ -222,8 +227,9 @@ declare module Project {
 		buildForTAM?: boolean;
 	}
 
-	interface IPlatformMigrator {
+	interface IProjectMigrationService {
 		ensureAllPlatformAssets(): IFuture<void>;
+		migrateTypeScriptProject(): IFuture<void>;
 	}
 }
 
@@ -318,7 +324,7 @@ interface IExtensionPlatformServices extends IRunValidator {
 }
 
 interface IDebuggerService {
-	debugAndroidApplication(applicationId: string): IFuture<void>;
+	debugAndroidApplication(applicationId: string, framework: string): IFuture<void>;
 	debugIosApplication(applicationId: string): void;
 }
 
@@ -973,6 +979,7 @@ interface IOptions extends ICommonOptions {
 	skipUi: boolean;
 	splash: string;
 	template: string;
+	types: boolean;
 	validValue: boolean;
 	verified: boolean;
 }
@@ -1303,4 +1310,13 @@ declare module NpmPlugins {
 		description: string;
 		versions: IDictionary<IBasicPluginInformation>;
 	}
+}
+
+interface IDateProvider {
+	getCurrentDate(): Date;
+}
+
+interface IApplicationInformation {
+	packageName: string;
+	appIdentifier: string;
 }
