@@ -23,10 +23,10 @@ The AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybr
 Installation
 ===
 
-Latest version: AppBuilder 3.3.2
-<br/>Release date: July 8, 2016
+Latest version: AppBuilder 3.4
+<br/>Release date: July 27, 2016
 
-> AppBuilder 3.3.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3-2" target="_blank">AppBuilder 3.3.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">AppBuilder 3.3 Release Notes</a>.
+> For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
 ### System Requirements
 
@@ -371,10 +371,10 @@ If addressing the configuration issues does not resolve your problem, you can [r
 Features
 ===
 
-Latest version: AppBuilder 3.3.2
-<br/>Release date: July 8, 2016
+Latest version: AppBuilder 3.4
+<br/>Release date: July 27, 2016
 
-> AppBuilder 3.3.2 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3-2" target="_blank">Telerik AppBuilder 3.3.2 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">AppBuilder 3.3 Release Notes</a>.
+> For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-3" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
 #### What you can do with this version of the AppBuilder CLI
 
