@@ -318,7 +318,7 @@ interface IExtensionPlatformServices extends IRunValidator {
 }
 
 interface IDebuggerService {
-	debugAndroidApplication(applicationId: string): IFuture<void>;
+	debugAndroidApplication(applicationId: string, framework: string): IFuture<void>;
 	debugIosApplication(applicationId: string): void;
 }
 
