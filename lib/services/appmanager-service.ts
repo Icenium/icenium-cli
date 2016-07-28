@@ -19,6 +19,7 @@ class AppManagerService implements IAppManagerService {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $options: IOptions,
+		private $userDataStore: IUserDataStore,
 		private $injector: IInjector) { }
 
 	public upload(platform: string): IFuture<void> {
@@ -114,7 +115,8 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	public openAppManagerStore(): void {
-		let tamUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Services/tam`;
+		this.$loginManager.ensureLoggedIn().wait();
+		let tamUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appmanager/${this.$userDataStore.getUser().wait().tenant.id}`;
 		this.$logger.info("Go to %s to manage your apps.", tamUrl);
 		this.$opener.open(tamUrl);
 	}
