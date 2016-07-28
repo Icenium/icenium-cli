@@ -4,7 +4,8 @@ import * as helpers from "../helpers";
 let Table = require("cli-table");
 
 class AppManagerService implements IAppManagerService {
-	private static LIVEPATCH_PLUGIN_ID = "com.telerik.LivePatch";
+	private static CORDOVA_LIVEPATCH_PLUGIN_ID = "com.telerik.LivePatch";
+	private static NATIVESCRIPT_LIVEPATCH_PLUGIN_ID = "nativescript-plugin-livepatch";
 
 	constructor(
 		private $config: IConfiguration,
@@ -121,7 +122,7 @@ class AppManagerService implements IAppManagerService {
 
 	public publishLivePatch(platforms: string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureCordovaProject();
+			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
@@ -152,9 +153,12 @@ class AppManagerService implements IAppManagerService {
 			// Resolve pluginsService here as in its constructor it fails when project is not Cordova.
 			let $pluginsService: IPluginsService = this.$injector.resolve("pluginsService");
 			let plugins = $pluginsService.getInstalledPlugins();
-			if(!_.some(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === AppManagerService.LIVEPATCH_PLUGIN_ID)) {
+			let isNativeScript = this.$project.projectData.Framework === constants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
+			let livePatchPluginId = isNativeScript ? AppManagerService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID : AppManagerService.CORDOVA_LIVEPATCH_PLUGIN_ID;
+
+			if(!_.some(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === livePatchPluginId)) {
 				this.$logger.warn("The AppManager LiveSync plugin is not enabled for your project. Enabling it now for the release build configuration...");
-				$pluginsService.addPlugin(AppManagerService.LIVEPATCH_PLUGIN_ID).wait();
+				$pluginsService.addPlugin(livePatchPluginId).wait();
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");
 			}
 		}).future<void>()();

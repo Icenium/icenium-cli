@@ -13,10 +13,12 @@ temp.track();
 
 export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
 	private static NPM_SEARCH_URL = "http://npmsearch.com";
-	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins"];
+	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins", "Advanced Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
 	private static NPM_REGISTRY_URL = "https://registry.npmjs.org";
+	private static NATIVESCRIPT_LIVEPATCH_PLUGIN_ID = "nativescript-plugin-livepatch";
 
+	private featuredNpmPackages = [NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID];
 	private marketplacePlugins: IPlugin[];
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
@@ -47,7 +49,8 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		let futures = [
 			this.getUniqueMarketplacePlugins(),
 			this.getTopNpmPackages(count),
-			this.getTopNativeScriptNpmPackages(count)
+			this.getTopNativeScriptNpmPackages(count),
+			this.getFeaturedNpmPackages()
 		];
 
 		return getFuturesResults<IPlugin>(futures, res => !!res);
@@ -212,7 +215,11 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 				packageJsonContent.dependencies[name] = "file:" + path.relative(this.$project.getProjectDir().wait(), pathToPlugin);
 			}
 
-			packageJsonContent = this.setPluginVariables(packageJsonContent, basicPluginInfo).wait();
+			// Skip variables configuration for AppManager LiveSync Plugin.
+			if (name !== NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID) {
+				packageJsonContent = this.setPluginVariables(packageJsonContent, basicPluginInfo).wait();
+			}
+
 			this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
 
 			return basicPluginInfo;
@@ -334,6 +341,34 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		}
 
 		return "";
+	}
+
+	private getFeaturedNpmPackages(): IFuture<IPlugin[]> {
+		return (() => {
+			let plugins: IPlugin[] = [];
+			try {
+				if (this.featuredNpmPackages && this.featuredNpmPackages.length) {
+					let pluginFutures = _.map(this.featuredNpmPackages, packageId => this.getDataForNpmPackage(packageId));
+					plugins = getFuturesResults<IPlugin>(pluginFutures, pl => !!pl && !!pl.data);
+
+					_.each(plugins, featuredPackage => {
+						featuredPackage.type = PluginType.FeaturedPlugin;
+
+						// Hide Variables and Url properties for the AppManager LiveSync Plugin. 
+						if (featuredPackage.data.Identifier === NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID) {
+							featuredPackage.data.Variables = [];
+							featuredPackage.data.Url = "";
+						}
+					});
+				}
+			} catch (err) {
+				this.$logger.trace("Unable to get advanced NPM packages.");
+				this.$logger.trace(err);
+				plugins = null;
+			}
+
+			return plugins;
+		}).future<IPlugin[]>()();
 	}
 
 	private getTopNativeScriptNpmPackages(count: number): IFuture<IPlugin[]> {
@@ -589,7 +624,9 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			if (pluginOpts && pluginOpts.addPluginToPackageJson) {
 				packageJsonContent.dependencies[basicPlugin.name] = basicPlugin.version;
 			}
-			if (basicPlugin.variables) {
+
+			// Skip variables configuration for AppManager LiveSync Plugin.
+			if (basicPlugin.variables && pluginIdentifier !== NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID) {
 				packageJsonContent = this.setPluginVariables(packageJsonContent, basicPlugin).wait();
 			}
 
@@ -661,7 +698,8 @@ $injector.register("nativeScriptProjectPluginsService", NativeScriptProjectPlugi
 export enum PluginType {
 	NpmPlugin = 0,
 	NpmNativeScriptPlugin = 1,
-	MarketplacePlugin = 2
+	MarketplacePlugin = 2,
+	FeaturedPlugin = 3
 }
 
 export class NativeScriptPluginData implements IPlugin {
