@@ -1304,3 +1304,7 @@ declare module NpmPlugins {
 		versions: IDictionary<IBasicPluginInformation>;
 	}
 }
+
+interface IDateProvider {
+	getCurrentDate(): Date;
+}
