@@ -12,7 +12,7 @@ git fetch
 git tag -a v%2 -m "Telerik AppBuilder %2" remotes/origin/release
 git push origin v%2
 
-npm publish "%1" --ignore-scripts
+npm publish "%1"
 @goto :EOF
 
 :error
