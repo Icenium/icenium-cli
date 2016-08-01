@@ -163,7 +163,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
 		return (() => {
 			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
-			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath);
+			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath).wait();
 		}).future<void>()();
 	}
 
