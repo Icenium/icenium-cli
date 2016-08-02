@@ -38,6 +38,8 @@ declare module Server {
 		localFile?: string;
 		disposition: string;
 		format: string;
+		url: string;
+		fileName: string;
 	}
 
 	interface IBuildResult {
