@@ -4,7 +4,6 @@ import * as temp from "temp";
 import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
 import {FrameworkProjectBase} from "./framework-project-base";
 import Future = require("fibers/future");
-import semver = require("semver");
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -16,6 +15,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $templatesService: ITemplatesService,
 		private $injector: IInjector,
 		private $nativeScriptProjectCapabilities: Project.ICapabilities,
+		private $dateProvider: IDateProvider,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$jsonSchemaValidator: IJsonSchemaValidator,
@@ -113,13 +113,8 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return (() => {
 			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
-			// In 0.10.0 original template, App_Resources directory is not included in app directory.
 			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
-			if (semver.eq(frameworkVersion, "0.9.0")
-				|| (!this.$fs.exists(path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait()
-					&& this.$fs.exists(path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME)).wait())) {
-				appResourcesHolderDirectory = projectDir;
-			}
+
 			appResourceFiles.forEach((appResourceFile) => {
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
 				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
@@ -159,7 +154,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return (() => {
 			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
 			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName).wait();
-			let currentTime = new Date();
+			let currentTime = this.$dateProvider.getCurrentDate();
 
 			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
 				// We do not need to update the migration file if it has been modified in the past 2 hours.

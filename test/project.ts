@@ -31,20 +31,21 @@ import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-
 import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
 import {ConfigFilesManager} from "../lib/project/config-files-manager";
 import {assert} from "chai";
-import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/project/nativescript-project-capabilities";
-import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
+import {NativeScriptProjectCapabilities} from "../lib/common/appbuilder/project/nativescript-project-capabilities";
+import {CordovaProjectCapabilities} from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
-import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
+import {TARGET_FRAMEWORK_IDENTIFIERS} from "../lib/common/constants";
+import {DateProvider} from "../lib/providers/date-provider";
 
 class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
 	public confirmCalled: boolean = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult("");}
-	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
-	getString(prompt: string): IFuture<string>{ return Future.fromResult("");}
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string>{ return Future.fromResult("");}
+	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
+	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
+	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
 	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
 		this.confirmCalled = true;
 		return Future.fromResult(this.confirmResult);
@@ -75,8 +76,8 @@ function createTestInjector(): IInjector {
 		cordova: {
 			getCordovaFrameworkVersions: () => {
 				return Future.fromResult([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
-				{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
-				{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
+					{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
+					{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
 			}
 		}
 
@@ -103,7 +104,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("frameworkProjectResolver", {
 		resolve: (framework: string) => {
-			if(!framework || framework === "Cordova") {
+			if (!framework || framework === "Cordova") {
 				return testInjector.resolve("cordovaProject");
 			}
 			return testInjector.resolve("nativeScriptProject");
@@ -136,8 +137,8 @@ function createTestInjector(): IInjector {
 			return [
 				{
 					data: {
-					Identifier: "Name",
-					Version: '1.0.0'
+						Identifier: "Name",
+						Version: '1.0.0'
 					}
 				}
 			];
@@ -156,6 +157,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("deviceAppDataProvider", DeviceAppDataProvider);
 	testInjector.register("projectFilesProvider", ProjectFilesProvider);
 	testInjector.register("configFilesManager", ConfigFilesManager);
+	testInjector.register("dateProvider", DateProvider);
 
 	return testInjector;
 }
@@ -197,7 +199,7 @@ describe("project integration tests", () => {
 			delete testProperties.WP8PublisherID;
 
 			assert.deepEqual(Object.keys(testProperties).sort(), Object.keys(correctProperties).sort());
-			for(let key in testProperties) {
+			for (let key in testProperties) {
 				assert.deepEqual(testProperties[key], correctProperties[key]);
 			}
 		});
@@ -230,7 +232,7 @@ describe("project integration tests", () => {
 		});
 	});
 
-	describe("updateProjectPropertiesAndSave",() => {
+	describe("updateProjectPropertiesAndSave", () => {
 		let prompter: PrompterStub;
 		beforeEach(() => {
 			prompter = testInjector.resolve("prompter");
@@ -247,7 +249,7 @@ describe("project integration tests", () => {
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 		});
 
-		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0",() => {
+		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", () => {
 			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk must be 8.1");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
@@ -258,13 +260,13 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
 		});
 
-		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1",() => {
+		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", () => {
 			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be updated to 3.7.0 when WPSdk is updated to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk should have been updated to 8.1");
 		});
 
-		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses",() => {
+		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", () => {
 			prompter.confirmResult = false;
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
 			assert.throws(() => project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait());
@@ -272,7 +274,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
 		});
 
-		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses",() => {
+		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses", () => {
 			// First set WPSdk to 8.1 and FrameworkVersion to 3.7.0
 			prompter.confirmResult = true;
 			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
@@ -284,7 +286,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
 		});
 
-		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0",() => {
+		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", () => {
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 			prompter.confirmCalled = false;
@@ -293,7 +295,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.5.0");
 		});
 
-		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0",() => {
+		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", () => {
 			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 
@@ -306,7 +308,7 @@ describe("project integration tests", () => {
 		});
 	});
 
-	describe("Init command tests",() => {
+	describe("Init command tests", () => {
 		let tempFolder: string;
 		let projectName = "Test";
 		let mobileHelper: Mobile.IMobileHelper;
@@ -348,7 +350,7 @@ describe("project integration tests", () => {
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
-			it("existing TypeScript.Blank project has project files after init",() => {
+			it("existing TypeScript.Blank project has project files after init", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
@@ -358,7 +360,7 @@ describe("project integration tests", () => {
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("existing project has project files after init",() => {
+			it("existing project has project files after init", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				let projectDir = project.getProjectDir().wait();
@@ -368,19 +370,19 @@ describe("project integration tests", () => {
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("empty directory has project files after init",() => {
+			it("empty directory has project files after init", () => {
 				options.path = tempFolder;
 				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
 				assertProjectFilesExistAfterInit(tempFolder);
 			});
 		});
 
-		describe("Cordova project",() => {
+		describe("Cordova project", () => {
 			function assertProjectFilesExistAfterInit(projectDir: string): void {
 				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_FILE)), "After initialization, project does not have .abproject file.");
 				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.PROJECT_IGNORE_FILE)), "After initialization, project does not have .abignore file.");
 				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.DEBUG_PROJECT_FILE_NAME)), "After initialization, project does not have .debug.abproject file.");
-				assert.isTrue(fs.existsSync(path.join(projectDir,  projectConstants.RELEASE_PROJECT_FILE_NAME)), "After initialization, project does not have .release.abproject file.");
+				assert.isTrue(fs.existsSync(path.join(projectDir, projectConstants.RELEASE_PROJECT_FILE_NAME)), "After initialization, project does not have .release.abproject file.");
 				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.android.js")), "After initialization, project does not have cordova.android.js file.");
 				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.ios.js")), "After initialization, project does not have cordova.ios.js file.");
 				assert.isTrue(fs.existsSync(path.join(projectDir, "cordova.wp8.js")), "After initialization, project does not have cordova.wp8.js file.");
@@ -396,7 +398,7 @@ describe("project integration tests", () => {
 				});
 			}
 
-			it("existing project has configuration specific files and .abignore files after init",() => {
+			it("existing project has configuration specific files and .abignore files after init", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				let projectDir = project.getProjectDir().wait();
@@ -406,7 +408,7 @@ describe("project integration tests", () => {
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("empty directory has project files after init",() => {
+			it("empty directory has project files after init", () => {
 				options.path = tempFolder;
 				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
 				assertProjectFilesExistAfterInit(tempFolder);
@@ -451,7 +453,7 @@ describe("project integration tests", () => {
 				let projectDir = project.getProjectDir().wait();
 
 				_.forEach(mobileHelper.platformNames, platform => {
-					let cordovaFile =`cordova.${platform.toLowerCase()}.js`;
+					let cordovaFile = `cordova.${platform.toLowerCase()}.js`;
 					assert.isTrue(fs.existsSync(path.join(projectDir, cordovaFile)), `Cordova KendoUI.Blank template does not contain mandatory '${cordovaFile}' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.`);
 				});
 			});
@@ -543,7 +545,7 @@ function getProjectData(): Project.IData {
 			"ID_RESOLUTION_WXGA",
 			"ID_RESOLUTION_HD720P"
 		],
-		"CorePlugins": [ ],
+		"CorePlugins": [],
 		"CordovaPluginVariables": {},
 		"WPSdk": "8.0",
 		"iOSDeploymentTarget": "8.0"
@@ -680,17 +682,17 @@ describe("project unit tests", () => {
 			let projectData = getProjectData();
 			configSpecificData = {
 				"CorePlugins": ["org.apache.cordova.battery-status",
- 								"org.apache.cordova.camera",
- 								"org.apache.cordova.contacts"]
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts"]
 			};
 
 			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "CorePlugins", ["org.apache.cordova.file"]).wait();
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.battery-status",
- 								"org.apache.cordova.camera",
- 								"org.apache.cordova.contacts",
-								"org.apache.cordova.file"]
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts",
+					"org.apache.cordova.file"]
 			}, configSpecificData);
 		});
 
@@ -699,14 +701,14 @@ describe("project unit tests", () => {
 			let projectData = getProjectData();
 			configSpecificData = {
 				"CorePlugins": ["org.apache.cordova.battery-status",
- 								"org.apache.cordova.camera",
- 								"org.apache.cordova.contacts"]
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts"]
 			};
 			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "CorePlugins", ["org.apache.cordova.contacts"]).wait();
 			assert.deepEqual([], projectData.CorePlugins, "CorePlugins in project data should not be modified.");
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.battery-status",
- 								"org.apache.cordova.camera"]
+					"org.apache.cordova.camera"]
 			}, configSpecificData, "CorePlugins in configuration specific data should be modified.");
 		});
 
@@ -715,15 +717,15 @@ describe("project unit tests", () => {
 			let projectData = getProjectData();
 			configSpecificData = {
 				"CorePlugins": ["org.apache.cordova.battery-status",
- 								"org.apache.cordova.camera",
- 								"org.apache.cordova.contacts"]
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts"]
 			};
 
 			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "CorePlugins", ["org.apache.cordova.file", "org.apache.cordova.camera"]).wait();
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.file",
- 								"org.apache.cordova.camera"]
+					"org.apache.cordova.camera"]
 			}, configSpecificData);
 		});
 	});
@@ -736,13 +738,13 @@ describe("project unit tests", () => {
 				configSpecificData = {
 					debug: {
 						CorePlugins: ["org.apache.cordova.battery-status",
-										"org.apache.cordova.camera",
-										"org.apache.cordova.contacts"]
+							"org.apache.cordova.camera",
+							"org.apache.cordova.contacts"]
 					},
 					release: {
 						CorePlugins: ["org.apache.cordova.battery-status",
-										"org.apache.cordova.camera",
-										"org.apache.cordova.geolocation"]
+							"org.apache.cordova.camera",
+							"org.apache.cordova.geolocation"]
 					}
 				};
 			});
@@ -752,15 +754,15 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.contacts",
-									"org.apache.cordova.file"],
-								configSpecificData["debug"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts",
+					"org.apache.cordova.file"],
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.geolocation"],
-								configSpecificData["release"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.geolocation"],
+					configSpecificData["release"].CorePlugins);
 			});
 
 			it("removes CorePlugin from debug configuration data when it is specified", () => {
@@ -768,13 +770,13 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.contacts"],
-								configSpecificData["debug"].CorePlugins);
+					"org.apache.cordova.contacts"],
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.geolocation"],
-								configSpecificData["release"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.geolocation"],
+					configSpecificData["release"].CorePlugins);
 			});
 
 			it("sets CorePlugins to debug configuration when it is specified", () => {
@@ -782,31 +784,31 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.file"],
-								configSpecificData["debug"].CorePlugins);
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.geolocation"],
-								configSpecificData["release"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.geolocation"],
+					configSpecificData["release"].CorePlugins);
 			});
 		});
 
 		describe("moves CorePlugins to projectData when they are the same in config files", () => {
 			it("after prop add", () => {
 				configSpecificData = {
-						debug: {
-							CorePlugins: ["org.apache.cordova.battery-status"]
-						},
-						release: {
-							CorePlugins: ["org.apache.cordova.battery-status",
-											"org.apache.cordova.geolocation"]
-						}
+					debug: {
+						CorePlugins: ["org.apache.cordova.battery-status"]
+					},
+					release: {
+						CorePlugins: ["org.apache.cordova.battery-status",
+							"org.apache.cordova.geolocation"]
+					}
 				};
 				let projectData = getProjectData();
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
 				assert.deepEqual(["org.apache.cordova.battery-status",
-									"org.apache.cordova.geolocation"],
-								projectData.CorePlugins);
+					"org.apache.cordova.geolocation"],
+					projectData.CorePlugins);
 
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
@@ -814,12 +816,12 @@ describe("project unit tests", () => {
 
 			it("after prop set", () => {
 				configSpecificData = {
-						debug: {
-							CorePlugins: ["org.apache.cordova.battery-status"]
-						},
-						release: {
-							CorePlugins: ["org.apache.cordova.geolocation"]
-						}
+					debug: {
+						CorePlugins: ["org.apache.cordova.battery-status"]
+					},
+					release: {
+						CorePlugins: ["org.apache.cordova.geolocation"]
+					}
 				};
 				let projectData = getProjectData();
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
@@ -831,13 +833,13 @@ describe("project unit tests", () => {
 
 			it("after prop rm", () => {
 				configSpecificData = {
-						debug: {
-							CorePlugins: ["org.apache.cordova.battery-status",
-											"org.apache.cordova.geolocation"]
-						},
-						release: {
-							CorePlugins: ["org.apache.cordova.geolocation"]
-						}
+					debug: {
+						CorePlugins: ["org.apache.cordova.battery-status",
+							"org.apache.cordova.geolocation"]
+					},
+					release: {
+						CorePlugins: ["org.apache.cordova.geolocation"]
+					}
 				};
 				let projectData = getProjectData();
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
@@ -861,9 +863,9 @@ describe("project unit tests", () => {
 
 			it("after prop add", () => {
 				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
-				assert.deepEqual(undefined,	projectData.CorePlugins);
+				assert.deepEqual(undefined, projectData.CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status",
-									"org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
+					"org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 
@@ -892,13 +894,13 @@ describe("project unit tests", () => {
 				configSpecificData = {
 					debug: {
 						CorePlugins: ["org.apache.cordova.battery-status",
-										"org.apache.cordova.camera",
-										"org.apache.cordova.contacts"]
+							"org.apache.cordova.camera",
+							"org.apache.cordova.contacts"]
 					},
 					release: {
 						CorePlugins: ["org.apache.cordova.battery-status",
-										"org.apache.cordova.camera",
-										"org.apache.cordova.geolocation"]
+							"org.apache.cordova.camera",
+							"org.apache.cordova.geolocation"]
 					}
 				};
 			});
@@ -908,16 +910,16 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.contacts",
-									"org.apache.cordova.file"],
-								configSpecificData["debug"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.contacts",
+					"org.apache.cordova.file"],
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.camera",
-	 								"org.apache.cordova.geolocation",
-									"org.apache.cordova.file"],
-								configSpecificData["release"].CorePlugins);
+					"org.apache.cordova.camera",
+					"org.apache.cordova.geolocation",
+					"org.apache.cordova.file"],
+					configSpecificData["release"].CorePlugins);
 			});
 
 			it("removes CorePlugin from all configurations", () => {
@@ -925,12 +927,12 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.contacts"],
-								configSpecificData["debug"].CorePlugins);
+					"org.apache.cordova.contacts"],
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
-	 								"org.apache.cordova.geolocation"],
-								configSpecificData["release"].CorePlugins);
+					"org.apache.cordova.geolocation"],
+					configSpecificData["release"].CorePlugins);
 			});
 
 			it("sets CorePlugins to both configurations when it is specified", () => {
@@ -938,10 +940,10 @@ describe("project unit tests", () => {
 				assert.deepEqual(["org.apache.cordova.file"], projectData.CorePlugins);
 
 				assert.deepEqual(undefined,
-								configSpecificData["debug"].CorePlugins);
+					configSpecificData["debug"].CorePlugins);
 
 				assert.deepEqual(undefined,
-								configSpecificData["release"].CorePlugins);
+					configSpecificData["release"].CorePlugins);
 			});
 		});
 
@@ -975,8 +977,8 @@ describe("project unit tests", () => {
 			};
 			projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []).wait();
 			assert.deepEqual(["org.apache.cordova.battery-status",
-								"org.apache.cordova.file"],
-							projectData.CorePlugins);
+				"org.apache.cordova.file"],
+				projectData.CorePlugins);
 			assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 			assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 		});
@@ -1028,7 +1030,7 @@ describe("project unit tests (canonical paths)", () => {
 	});
 });
 
-describe("cordovaProject unit tests",() => {
+describe("cordovaProject unit tests", () => {
 	let projectProperties: IProjectPropertiesService, testInjector: IInjector, options: IOptions;
 
 	beforeEach(() => {
@@ -1046,8 +1048,8 @@ describe("cordovaProject unit tests",() => {
 		projectProperties = testInjector.resolve(projectPropertiesLib.ProjectPropertiesService);
 	});
 
-	describe("alterPropertiesForNewProject",() => {
-		it("sets correct WP8PackageIdentityName when appid is short",() => {
+	describe("alterPropertiesForNewProject", () => {
+		it("sets correct WP8PackageIdentityName when appid is short", () => {
 			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
 			let props: any = {};
 			options.appid = "appId";
@@ -1055,7 +1057,7 @@ describe("cordovaProject unit tests",() => {
 			assert.equal(props["WP8PackageIdentityName"], "1234Telerik.appId");
 		});
 
-		it("sets correct WP8PackageIdentityName when appid combined with default prefix has 50 symbols length",() => {
+		it("sets correct WP8PackageIdentityName when appid combined with default prefix has 50 symbols length", () => {
 			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
 			let props: any = {};
 			let defaultPrefix = "1234Telerik.";
@@ -1066,7 +1068,7 @@ describe("cordovaProject unit tests",() => {
 			assert.equal(props["WP8PackageIdentityName"], defaultPrefix + value);
 		});
 
-		it("sets correct WP8PackageIdentityName when appid combined with default prefix has more than 50 symbols length",() => {
+		it("sets correct WP8PackageIdentityName when appid combined with default prefix has more than 50 symbols length", () => {
 			let cordovaProject: Project.IFrameworkProject = testInjector.resolve("cordovaProject");
 			let props: any = {};
 			let defaultPrefix = "1234Telerik.";
