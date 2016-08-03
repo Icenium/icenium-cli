@@ -35,19 +35,25 @@ export class BuildService implements Project.IBuildService {
 		private $projectConstants: Project.IConstants,
 		private $httpClient: Server.IHttpClient) { }
 
-	public getLiveSyncUrl(urlKind: string, filesystemPath: string, liveSyncToken: string): IFuture<string> {
+	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
 			if (urlKind !== "manifest" && urlKind !== "package") {
 				throw new Error("urlKind must be either 'manifest' or 'package'");
 			}
 
-			// escape URLs twice to work around a bug in bit.ly
-			let fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
-				this.$config.AB_SERVER_PROTO,
-				this.$config.AB_SERVER, urlKind,
-				querystring.escape(querystring.escape(filesystemPath)),
-				querystring.escape(querystring.escape(liveSyncToken)));
+			let fullDownloadPath: string;
+			if (packageDef.format === BuildService.ACCEPT_RESULT_URL) {
+				fullDownloadPath = packageDef.url;
+			} else {
+				// escape URLs twice to work around a bug in bit.ly
+				fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+					this.$config.AB_SERVER_PROTO,
+					this.$config.AB_SERVER, urlKind,
+					querystring.escape(querystring.escape(packageDef.relativePath)),
+					querystring.escape(querystring.escape(liveSyncToken)));
+			}
+
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
 			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
@@ -362,16 +368,16 @@ export class BuildService implements Project.IBuildService {
 				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
 				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					let liveSyncUrl = this.getLiveSyncUrl(urlKind, def.relativePath, liveSyncToken).wait();
+					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def).wait();
 
 					let packageUrl = (urlKind !== "package")
-						? this.getLiveSyncUrl("package", def.relativePath, liveSyncToken).wait()
-						: liveSyncUrl;
+						? this.getDownloadUrl("package", liveSyncToken, def).wait()
+						: downloadUrl;
 					this.$logger.debug("Download URL is '%s'", packageUrl);
 
 					return {
-						qrUrl: liveSyncUrl,
-						qrImageData: this.$qr.generateDataUri(liveSyncUrl),
+						qrUrl: downloadUrl,
+						qrImageData: this.$qr.generateDataUri(downloadUrl),
 						packageUrls: [{
 							packageUrl: packageUrl,
 							downloadText: "Download"
@@ -529,4 +535,5 @@ export class BuildService implements Project.IBuildService {
 		}).future<void>()();
 	}
 }
+
 $injector.register("buildService", BuildService);
