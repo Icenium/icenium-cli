@@ -34,6 +34,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("messages", Messages);
 	testInjector.register("messagesService", MessagesService);
 	testInjector.register("fs", FileSystem);
+	testInjector.register("processService", { });
 	testInjector.register("project", {
 		ensureProject: () => { /* */ },
 		capabilities: {
