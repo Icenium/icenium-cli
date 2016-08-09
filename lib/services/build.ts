@@ -25,7 +25,7 @@ export class BuildService implements Project.IBuildService {
 		private $loginManager: ILoginManager,
 		private $opener: IOpener,
 		private $qr: IQrCodeGenerator,
-		private $platformMigrator: Project.IPlatformMigrator,
+		private $projectMigrationService: Project.IProjectMigrationService,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $progressIndicator: IProgressIndicator,
@@ -345,7 +345,8 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
 				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
-			this.$platformMigrator.ensureAllPlatformAssets().wait();
+			this.$projectMigrationService.ensureAllPlatformAssets().wait();
+			this.$projectMigrationService.migrateTypeScriptProject().wait();
 			this.$project.importProject().wait();
 
 			let buildResult = this.requestCloudBuild(settings).wait();

@@ -13,7 +13,7 @@ $injector.requireCommand("dev-config-apply", "./commands/dev/config-apply");
 $injector.requireCommand("dev-config-reset", "./commands/dev/config-reset");
 $injector.require("cordovaResources", "./cordova-resource-loader");
 $injector.require("resourceDownloader", "./resource-downloader");
-$injector.require("platformMigrator", "./services/platform-migration");
+$injector.require("projectMigrationService", "./services/project-migration-service");
 $injector.require("clipboardService", "./services/clipboard-service");
 $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");

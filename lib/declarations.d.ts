@@ -224,8 +224,9 @@ declare module Project {
 		buildForTAM?: boolean;
 	}
 
-	interface IPlatformMigrator {
+	interface IProjectMigrationService {
 		ensureAllPlatformAssets(): IFuture<void>;
+		migrateTypeScriptProject(): IFuture<void>;
 	}
 }
 
@@ -975,6 +976,7 @@ interface IOptions extends ICommonOptions {
 	skipUi: boolean;
 	splash: string;
 	template: string;
+	types: boolean;
 	validValue: boolean;
 	verified: boolean;
 }

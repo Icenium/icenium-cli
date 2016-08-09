@@ -15,14 +15,15 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private static NPM_SEARCH_URL = "http://npmsearch.com";
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins", "Advanced Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
-	private static NPM_REGISTRY_URL = "https://registry.npmjs.org";
 	private static NATIVESCRIPT_LIVEPATCH_PLUGIN_ID = "nativescript-plugin-livepatch";
 
 	private featuredNpmPackages = [NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID];
 	private marketplacePlugins: IPlugin[];
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
+		private $npmService: INpmService,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
+		private $projectMigrationService: Project.IProjectMigrationService,
 		private $server: Server.IServer,
 		$errors: IErrors,
 		$logger: ILogger,
@@ -36,12 +37,13 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator) {
 		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
-
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
 			this.$errors.failWithoutHelp(`Your project targets NativeScript version '${frameworkVersion}' which does not support plugins.`);
 		}
+
+		this.$projectMigrationService.migrateTypeScriptProject().wait();
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
@@ -112,6 +114,14 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 				pluginBasicInfo = this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true }).wait();
 			}
 
+			if (this.$project.isTypeScriptProject().wait()) {
+				// Do not pass version here, we've already added the entry in package.json, so the correct version will be installed anyway.
+				let installResult = this.$npmService.install(this.$project.projectDir, { installTypes: this.$options.types, name: pluginBasicInfo.name }).wait();
+				if (installResult.error) {
+					this.$errors.failWithoutHelp(`Error while installing dependency: ${installResult.error.message}.`);
+				}
+			}
+
 			this.$logger.printMarkdown(util.format("Successfully added plugin `%s`.", pluginBasicInfo.name));
 		}).future<void>()();
 	}
@@ -136,6 +146,10 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 				}
 
 				this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
+
+				if (this.$project.isTypeScriptProject().wait()) {
+					this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name).wait();
+				}
 
 				this.$logger.printMarkdown(util.format("Successfully removed plugin `%s`.", pluginBasicInfo.name));
 			} else {
@@ -175,7 +189,15 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let [name, version] = pluginName.split("@");
+			let name: string, version: string;
+			let scopedDependencyRegex = /^(@.+?)(?:@(.+?))?$/;
+			let scopedDependencyMatch = pluginName.match(scopedDependencyRegex);
+			if (!!scopedDependencyMatch) {
+				name = scopedDependencyMatch[1];
+				version = scopedDependencyMatch[2];
+			} else {
+				[name, version] = pluginName.split("@");
+			}
 			return this.getBasicPluginInfoFromMarketplace(name, version).wait() || { name, version };
 		}).future<IBasicPluginInformation>()();
 	}
@@ -354,7 +376,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 					_.each(plugins, featuredPackage => {
 						featuredPackage.type = PluginType.FeaturedPlugin;
 
-						// Hide Variables and Url properties for the AppManager LiveSync Plugin. 
+						// Hide Variables and Url properties for the AppManager LiveSync Plugin.
 						if (featuredPackage.data.Identifier === NativeScriptProjectPluginsService.NATIVESCRIPT_LIVEPATCH_PLUGIN_ID) {
 							featuredPackage.data.Variables = [];
 							featuredPackage.data.Url = "";
@@ -404,15 +426,10 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	private getDataForNpmPackage(packageName: string, version?: string): IFuture<IPlugin> {
 		return ((): IPlugin => {
-			try {
-				version = version || "latest";
-				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version);
-
-				// This call will return error with message '{}' in case there's no such package.
-				let result = this.$httpClient.httpRequest(url).wait().body;
+			version = version || "latest";
+			let result = this.$npmService.getPackageJsonFromNpmRegistry(packageName, version).wait();
+			if (result) {
 				return this.constructNativeScriptPluginData(result).wait();
-			} catch (err) {
-				this.$logger.trace(`Unable to get data for npm package ${packageName} with version ${version}`, err);
 			}
 
 			return null;
@@ -489,23 +506,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		}).future<boolean>()();
 	}
 
-	private getPackageJsonFromNpmRegistry(packageName: string, version: string): IFuture<any> {
-		return (() => {
-			let packageJsonContent: any;
-			try {
-				let url = NativeScriptProjectPluginsService.buildNpmRegistryUrl(packageName, version);
-				// This call will return error with message '{}' in case there's no such package.
-				let result = this.$httpClient.httpRequest(url).wait().body;
-				packageJsonContent = JSON.parse(result);
-			} catch (err) {
-				this.$logger.trace("Error caught while checking the NPM Registry for plugin with id: %s", packageName);
-				this.$logger.trace(err.message);
-			}
-
-			return packageJsonContent;
-		}).future<any>()();
-	}
-
 	private getBasicPluginInfoFromMarketplace(pluginName: string, version: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let basicInfo: IBasicPluginInformation;
@@ -556,7 +556,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private getBasicPluginInfoFromNpm(name: string, version: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let basicInfo: IBasicPluginInformation;
-			let jsonInfo = this.getPackageJsonFromNpmRegistry(name, version).wait();
+			let jsonInfo = this.$npmService.getPackageJsonFromNpmRegistry(name, version).wait();
 			if (jsonInfo) {
 				basicInfo = {
 					name: jsonInfo.name,
@@ -578,7 +578,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	private getPluginVariablesInfoFromNpm(name: string, version: string): IFuture<any> {
 		return ((): any => {
-			let jsonInfo = this.getPackageJsonFromNpmRegistry(name, version).wait();
+			let jsonInfo = this.$npmService.getPackageJsonFromNpmRegistry(name, version).wait();
 			return jsonInfo && jsonInfo.nativescript && jsonInfo.nativescript.variables;
 		}).future<any>()();
 	}
@@ -686,10 +686,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 			return fromVarOpion || this.$prompter.get([schema]).wait();
 		}).future<any>()();
-	}
-
-	private static buildNpmRegistryUrl(packageName: string, version: string): string {
-		return `${NativeScriptProjectPluginsService.NPM_REGISTRY_URL}/${encodeURIComponent(packageName)}?version=${encodeURIComponent(version)}`;
 	}
 }
 

@@ -364,6 +364,10 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 
 	testInjector.register("nativeScriptResources", NativeScriptResources);
 	testInjector.register("pluginVariablesHelper", PluginVariablesHelper);
+	testInjector.register("npmService", {});
+	testInjector.register("projectMigrationService", {
+		migrateTypeScriptProject: () => Future.fromResult()
+	});
 
 	return testInjector;
 }
