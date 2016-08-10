@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: AppBuilder 3.4.1
-<br/>Release date: Aug 09, 2016
+<br/>Release date: Aug 10, 2016
 
 > AppBuilder 3.4.1 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4-1" target="_blank">AppBuilder 3.4.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
@@ -43,10 +43,12 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
+		* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
 	* (Windows 8 and later systems): Any of the following Node.js versions:
 		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
+		* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
 * An Internet browser (latest official release) with enabled cookies
 * (Optional) git<br/>git is required for development with Screen Builder.
 
@@ -80,6 +82,7 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
+	* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
 * An Internet browser (latest official release) with enabled cookies
 * Mono 3.12 or later
 * (Optional) git<br/>git is required for development with Screen Builder.
@@ -111,6 +114,7 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
 	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
+	* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
 
 	You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
 * An Internet browser (latest official release) with enabled cookies
@@ -372,7 +376,7 @@ Features
 ===
 
 Latest version: AppBuilder 3.4.1
-<br/>Release date: Aug 09, 2016
+<br/>Release date: Aug 10, 2016
 
 > AppBuilder 3.4.1 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4-1" target="_blank">AppBuilder 3.4.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
