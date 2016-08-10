@@ -17,7 +17,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 		this.$opener.open(`${pathToDebuggingGuideHtml}`, "Safari");
 	}
 
-	public debugAndroidApplication(applicationId: string): IFuture<void> {
+	public debugAndroidApplication(applicationId: string, framework: string): IFuture<void> {
 		return (() => {
 			let deviceIdentifier: string;
 			this.$devicesService.detectCurrentlyAttachedDevices().wait();
@@ -44,7 +44,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 			let tcpPort: string;
 
 			try {
-				tcpPort = this.$androidProcessService.mapAbstractToTcpPort(deviceIdentifier, applicationId).wait();
+				tcpPort = this.$androidProcessService.mapAbstractToTcpPort(deviceIdentifier, applicationId, framework).wait();
 			} catch (err) {
 				this.$errors.failWithoutHelp("Your device has no open ports. Please close programs that are using device's ports to listen on them and try again.");
 			}

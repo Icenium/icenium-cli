@@ -187,6 +187,8 @@ $injector.require("liveSyncProvider", "./providers/livesync-provider");
 $injector.require("appManagerService", "./services/appmanager-service");
 $injector.requireCommand("appmanager|livesync", "./commands/appmanager-livesync");
 
+$injector.require("dateProvider", "./providers/date-provider");
+
 $injector.require("dynamicHelpProvider", "./dynamic-help-provider");
 $injector.require("hostCapabilities", "./host-capabilities");
 

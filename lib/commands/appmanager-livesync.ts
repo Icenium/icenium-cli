@@ -1,7 +1,10 @@
-﻿export class AppManagerLiveSyncCommand implements ICommand {
+﻿import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
+
+export class AppManagerLiveSyncCommand implements ICommand {
 	private static ALL_PLATFORMS_OPTION = "All platforms";
 
 	constructor(private $prompter: IPrompter,
+		private $project: Project.IProject,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $appManagerService: IAppManagerService,
 		private $errors: IErrors,
@@ -11,8 +14,10 @@
 	public execute(args: string[]): IFuture<void> {
 		return ((): void => {
 			let windowsPhonePlatformName = this.$mobileHelper.normalizePlatformName("WP8");
+			let isNativeScript = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
+
 			if(!args || args.length === 0) {
-				let availablePlatforms = this.$config.ON_PREM ? _.without(this.$mobileHelper.platformNames, windowsPhonePlatformName) : this.$mobileHelper.platformNames;
+				let availablePlatforms = this.$config.ON_PREM || isNativeScript ? _.without(this.$mobileHelper.platformNames, windowsPhonePlatformName) : this.$mobileHelper.platformNames;
 				let selectionOptions = availablePlatforms.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
 				let selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", selectionOptions).wait();
 				if(selectedPlatform === AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION) {
@@ -23,7 +28,7 @@
 			} else {
 				// make sure each platform is specified only once
 				let platforms = _.keys(_.groupBy(args, arg => this.$mobileHelper.normalizePlatformName(arg)));
-				if(this.$config.ON_PREM && _.includes(platforms, windowsPhonePlatformName)) {
+				if((this.$config.ON_PREM || isNativeScript) && _.includes(platforms, windowsPhonePlatformName)) {
 					this.$errors.failWithoutHelp(`You cannot upload updates for Windows Phone.`);
 				}
 				this.$appManagerService.publishLivePatch(platforms).wait();

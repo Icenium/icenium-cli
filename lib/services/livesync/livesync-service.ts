@@ -17,8 +17,8 @@ export class LiveSyncService implements ILiveSyncService {
 	public livesync(platform?: string): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
-			platform = $liveSyncServiceBase.getPlatform(platform).wait();
+			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
+			platform = platform || this.$devicesService.platform;
 
 			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
 				this.$errors.failWithoutHelp("The AppBuilder Companion app is not available on %s devices.", platform);
@@ -51,6 +51,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 			let configurations = this.$project.getConfigurationsSpecifiedByUser();
 
+			let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
 			if (!configurations.length) {
 				this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
 				let deviceConfigurations = _.reduce(this.deviceConfigurationInfos, (result, dci) => result + `${EOL}device: ${dci.applicationIdentifier} has "${dci.configuration}" configuration`, "");
