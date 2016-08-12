@@ -22,6 +22,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
 		private $npmService: INpmService,
+		private $typeScriptService: ITypeScriptService,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $projectMigrationService: Project.IProjectMigrationService,
 		private $server: Server.IServer,
@@ -114,7 +115,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 				pluginBasicInfo = this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true }).wait();
 			}
 
-			if (this.$project.isTypeScriptProject().wait()) {
+			if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir).wait()) {
 				// Do not pass version here, we've already added the entry in package.json, so the correct version will be installed anyway.
 				let installResult = this.$npmService.install(this.$project.projectDir, { installTypes: this.$options.types, name: pluginBasicInfo.name }).wait();
 				if (installResult.error) {

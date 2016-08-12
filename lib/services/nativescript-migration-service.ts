@@ -60,6 +60,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $resourceDownloader: IResourceDownloader,
 		private $nativeScriptResources: INativeScriptResources,
 		private $injector: IInjector,
+		private $staticConfig: IStaticConfig,
 		private $typeScriptService: ITypeScriptService,
 		private $npmService: INpmService,
 		private $projectMigrationService: Project.IProjectMigrationService) {

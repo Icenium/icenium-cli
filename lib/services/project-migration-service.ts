@@ -7,6 +7,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 	constructor(private $fs: IFileSystem,
 		private $npmService: INpmService,
 		private $prompter: IPrompter,
+		private $typeScriptService: ITypeScriptService,
 		private $project: Project.IProject) { }
 
 	public ensureAllPlatformAssets(): IFuture<void> {
@@ -16,7 +17,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 	public migrateTypeScriptProject(): IFuture<void> {
 		return (() => {
 			if (this.shouldAskForTypeScriptMigration) {
-				if (this.$project.isTypeScriptProject().wait() && this.$project.projectData &&
+				if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir).wait() && this.$project.projectData &&
 					this.$project.projectData.Framework.toLowerCase() === constants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()) {
 
 					let projectDir = this.$project.projectDir,
