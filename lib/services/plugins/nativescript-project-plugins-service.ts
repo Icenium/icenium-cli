@@ -140,16 +140,13 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 					this.$fs.deleteDirectory(fullPluginPath).wait();
 				}
 
-				delete packageJsonContent.dependencies[pluginBasicInfo.name];
 				if (packageJsonContent.nativescript) {
 					delete packageJsonContent.nativescript[`${pluginBasicInfo.name}-variables`];
 				}
 
 				this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
 
-				if (this.$project.isTypeScriptProject().wait()) {
-					this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name).wait();
-				}
+				this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name).wait();
 
 				this.$logger.printMarkdown(util.format("Successfully removed plugin `%s`.", pluginBasicInfo.name));
 			} else {
