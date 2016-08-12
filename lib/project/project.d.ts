@@ -52,18 +52,6 @@ declare module Project {
 		checkSdkVersions(platform: string): void;
 
 		/**
-		 * Checks if the project language is TypeScript by enumerating all files and checking if there are at least one TypeScript file (.ts), that is not definition file(.d.ts)
-		 * @return {IFuture<boolean>} true when the project contains .ts files and false otherwise.
-		 */
-		isTypeScriptProject(): IFuture<boolean>;
-
-		/**
-		 * Returns new object, containing all typeScript and all TypeScript definition files.
-		 * @return {IFuture<ITypeScriptFiles>} all typeScript and all TypeScript definition files.
-		 */
-		getTypeScriptFiles(): IFuture<ITypeScriptFiles>
-
-		/**
 		 * Gets the path to the project's App_Resources folder
 		 * @return {IFuture<string>} The path to the App_Resources folder
 		 */
@@ -186,14 +174,5 @@ declare module Project {
 		filepath: string;
 		templateFilepath: string;
 		helpText: string;
-	}
-	/**
-	 * Defines an object, containing all TypeScript files (.ts) within project and all TypeScript definition files (.d.ts).
-	 * TypeScript files are all files ending with .ts, so if there are any definition files, they will be placed in both
-	 * typeScript files and definitionFiles collections.
-	 */
-	interface ITypeScriptFiles {
-		definitionFiles: string[],
-		typeScriptFiles: string[]
 	}
 }

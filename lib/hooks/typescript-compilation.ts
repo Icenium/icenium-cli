@@ -4,15 +4,15 @@ import fiberBootstrap = require("./../common/fiber-bootstrap");
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
 fiberBootstrap.run(() => {
-	$injector.require("typeScriptCompilationService", "./common/services/typescript-compilation-service");
 	let project: Project.IProject = $injector.resolve("project");
 	if (!project.projectData) {
 		return;
 	}
 
-	let typeScriptFiles = project.getTypeScriptFiles().wait();
+	let typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
+	let typeScriptFiles = typeScriptService.getTypeScriptFiles(project.getProjectDir().wait()).wait();
+
 	if (typeScriptFiles.typeScriptFiles.length > typeScriptFiles.definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
-		let typeScriptCompilationService: ITypeScriptCompilationService = $injector.resolve("typeScriptCompilationService");
 		let $fs: IFileSystem = $injector.resolve("fs");
 		let pathToTsConfig = path.join(project.getProjectDir().wait(), "tsconfig.json");
 
@@ -25,9 +25,11 @@ fiberBootstrap.run(() => {
 
 		if ($fs.exists(pathToTsConfig).wait()) {
 			let json = $fs.readJson(pathToTsConfig).wait();
-			typeScriptCompilationService.compileWithDefaultOptions({ noEmitOnError: !!(json && json.compilerOptions && json.compilerOptions.noEmitOnError) }).wait();
+			let noEmitOnError = !!(json && json.compilerOptions && json.compilerOptions.noEmitOnError);
+			typeScriptService.transpileWithDefaultOptions(project.getProjectDir().wait(), { compilerOptions: { noEmitOnError } }).wait();
 		} else {
-			typeScriptCompilationService.compileFiles({ noEmitOnError: false }, typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles).wait();
+			let pathToDefaultDefinitionFiles = path.join(__dirname, "../../resources/typescript-definitions-files");
+			typeScriptService.transpile(project.getProjectDir().wait(), typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles, { compilerOptions: { noEmitOnError: false }, pathToDefaultDefinitionFiles }).wait();
 		}
 	}
 });

@@ -13,7 +13,7 @@
 	"USE_CDN_FOR_EXTENSION_DOWNLOAD": false,
 	"AUTO_UPGRADE_PROJECT_FILE": true,
 	"TYPESCRIPT_COMPILER_OPTIONS": {
-		"targetVersion": "ES5",
+		"target": "ES5",
 		"module": "commonjs"
 	}
 }
