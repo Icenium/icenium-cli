@@ -5,7 +5,6 @@ import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
 import {isInteractive} from "../../common/helpers";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../../common/constants";
 import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
@@ -36,8 +35,11 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
+		$progressIndicator: IProgressIndicator,
+		$npmPluginsSource: IPluginsSource,
+		$npmjsPluginsSource: IPluginsSource,
+		$npmRegistryPluginsSource: IPluginsSource) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator, $npmPluginsSource, $npmjsPluginsSource, $npmRegistryPluginsSource);
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
@@ -209,13 +211,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	}
 
 	protected composeSearchQuery(keywords: string[]): string[] {
-		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
-		let hasNativeScriptKeyword = _.some(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
-
-		if (!hasNativeScriptKeyword) {
-			keywords.unshift(nativeScriptKeyword);
-		}
-
 		return keywords;
 	}
 

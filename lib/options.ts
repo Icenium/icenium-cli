@@ -8,13 +8,11 @@ export class Options extends OptionsBase {
 		$staticConfig: IStaticConfig,
 		$hostInfo: IHostInfo) {
 		super({
-				all: { type: OptionType.Boolean},
 				answers: { type: OptionType.String },
 				available: { type: OptionType.Boolean },
 				certificate: { type: OptionType.String  },
 				companion: { type: OptionType.Boolean },
 				core: { type: OptionType.Boolean },
-				count: { type: OptionType.Number },
 				deploy: { type: OptionType.String },
 				download: { type: OptionType.Boolean },
 				force: { type: OptionType.Boolean, alias: "f" },

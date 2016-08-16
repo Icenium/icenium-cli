@@ -24,67 +24,32 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $httpClient: Server.IHttpClient,
 		protected $options: IOptions,
 		private $hostInfo: IHostInfo,
-		private $progressIndicator: IProgressIndicator) { }
+		private $progressIndicator: IProgressIndicator,
+		private $npmPluginsSource: IPluginsSource,
+		private $npmjsPluginsSource: IPluginsSource,
+		private $npmRegistryPluginsSource: IPluginsSource) { }
 
-	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
-		return ((): IBasicPluginInformation[] => {
-			let pluginsFound: IBasicPluginInformation[] = [];
+	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
+		return ((): IPluginsSource => {
+			this.$npmjsPluginsSource.initialize(keywords).wait();
 
-			let query = this.composeSearchQuery(keywords);
-
-			let searchParams = ["search"].concat(query);
-
-			let npmCommand = this.$hostInfo.isWindows ? "npm.cmd" : "npm";
-
-			let npmFuture = this.$childProcess.spawnFromEvent(npmCommand, searchParams, "close");
-
-			this.$logger.printInfoMessageOnSameLine("Searching for plugins in npm, please wait.");
-
-			this.$progressIndicator.showProgressIndicator(npmFuture, 2000).wait();
-
-			let npmSearchResult = npmFuture.get();
-
-			if (npmSearchResult.stderr) {
-				// npm will write "npm WARN Building the local index for the first time, please be patient" to the stderr and if it is the only message on the stderr we should ignore it.
-				let splitError = npmSearchResult.stderr.split("\n");
-				if (splitError.length > 2 || splitError[0].indexOf("Building the local index for the first time") === -1) {
-					this.$errors.failWithoutHelp(npmSearchResult.stderr);
-				}
+			if (this.$npmjsPluginsSource.hasPlugins()) {
+				return this.$npmjsPluginsSource;
 			}
 
-			// Need to split the result only by \n because the npm result contains only \n and on Windows it will not split correctly when using EOL.
-			// Sample output:
-			// NAME                    DESCRIPTION             AUTHOR        DATE       VERSION  KEYWORDS
-			// cordova-plugin-console  Cordova Console Plugin  =csantanapr…  2016-04-20 1.0.3    cordova console ecosystem:cordova cordova-ios
-			let pluginsRows: string[] = npmSearchResult.stdout.split("\n");
-
-			// Remove the table headers row.
-			pluginsRows.shift();
-
-			let npmNameGroup = "(\\S+)";
-			let npmDateGroup = "(\\d+\\-\\d+\\-\\d+)\\s";
-			let npmFreeTextGroup = "([^=]+)";
-			let npmAuthorsGroup = "((?:=\\S+\\s?)+)\\s+";
-
-			// Should look like this /(\S+)\s+([^=]+)((?:=\S+\s?)+)\s+(\d+\-\d+\-\d+)\s(\S+)(\s+([^=]+))?/
-			let pluginRowRegExp = new RegExp(`${npmNameGroup}\\s+${npmFreeTextGroup}${npmAuthorsGroup}${npmDateGroup}${npmNameGroup}(\\s+${npmFreeTextGroup})?`);
-
-			_.each(pluginsRows, (pluginRow: string) => {
-				let matches = pluginRowRegExp.exec(pluginRow.trim());
-
-				if (!matches || !matches[0]) {
-					return;
+			if (this.isScopedDependency(keywords)) {
+				this.$npmRegistryPluginsSource.initialize(keywords).wait();
+				if (this.$npmRegistryPluginsSource.hasPlugins()) {
+					return this.$npmRegistryPluginsSource;
 				}
+			} else {
+				let query = this.composeSearchQuery(keywords);
 
-				pluginsFound.push({
-					name: matches[1],
-					description: matches[2],
-					version: matches[5]
-				});
-			});
+				this.$npmPluginsSource.initialize(query).wait();
 
-			return pluginsFound;
-		}).future<IBasicPluginInformation[]>()();
+				return this.$npmPluginsSource;
+			}
+		}).future<IPluginsSource>()();
 	}
 
 	public fetch(pluginIdentifier: string): IFuture<void> {
@@ -111,8 +76,9 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
 			let pluginUrl = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 
+			// TODO: Use npmRegistryPluginsSource.
 			let npmRegistryResult = this.searchNpmRegistry(pluginIdentifier).wait();
-			let plugins = npmRegistryResult ? [npmRegistryResult] : this.findPlugins([pluginIdentifier]).wait();
+			let plugins = npmRegistryResult ? [npmRegistryResult] : this.findPlugins([pluginIdentifier]).wait().getAllPlugins().wait();
 
 			let pluginKeys = _.map(plugins, (pluginInfo: IBasicPluginInformation) => pluginInfo.name);
 			let pluginsCount = pluginKeys.length;
@@ -372,6 +338,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		return validUrl.isUri(pluginId);
 	}
 
+	// TODO: Remove this code.
 	private searchNpmRegistry(pluginIdentifier: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let npmRegistryRequestFuture = this.$httpClient.httpRequest(`${NpmPluginsServiceBase.NPM_REGISTRY_ADDRESS}/${pluginIdentifier}`);
@@ -403,5 +370,12 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			return pluginInfo.versions[latestVersion];
 		}).future<IBasicPluginInformation>()();
+	}
+
+	// TODO: Move to npmService.
+	private isScopedDependency(keywords: string[]): boolean {
+		let matches = keywords[0].match(/^@.*\/.*/);
+
+		return !!(matches && matches[0]);
 	}
 }

@@ -34,8 +34,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
+		$progressIndicator: IProgressIndicator,
+		$npmPluginsSource: IPluginsSource,
+		$npmjsPluginsSource: IPluginsSource,
+		$npmRegistryPluginsSource: IPluginsSource) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator, $npmPluginsSource, $npmjsPluginsSource, $npmRegistryPluginsSource);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -445,7 +448,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 
 			if (configuration) {
-				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [ configuration ]).wait();
+				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]).wait();
 			} else {
 				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
 			}

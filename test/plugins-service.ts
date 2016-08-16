@@ -12,6 +12,9 @@ import {StaticConfig} from "../lib/config";
 import {ResourceLoader} from "../lib/common/resource-loader";
 import {FileSystem} from "../lib/common/file-system";
 import {ChildProcess} from "../lib/common/child-process";
+import {NpmPluginsSource} from "../lib/common/services/plugins/npm-plugins-source";
+import {NpmjsPluginsSource} from "../lib/common/services/plugins/npmjs-plugins-source";
+import {NpmRegistryPluginsSource} from "../lib/common/services/plugins/npm-registry-plugins-source";
 import {assert} from "chai";
 import * as stubs from "./stubs";
 import * as path from "path";
@@ -31,6 +34,9 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("config", {});
 	testInjector.register("typeScriptService", {});
 	testInjector.register("prompter", {});
+	testInjector.register("npmPluginsSource", NpmPluginsSource);
+	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
+	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);
 	testInjector.register("httpClient", {
 		httpRequest: (): IFuture<Server.IResponse> => Future.fromResult(null)
 	});
@@ -262,6 +268,9 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
+	testInjector.register("npmPluginsSource", NpmPluginsSource);
+	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
+	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
 	});
@@ -315,6 +324,9 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
+	testInjector.register("npmPluginsSource", NpmPluginsSource);
+	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
+	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
 	});
