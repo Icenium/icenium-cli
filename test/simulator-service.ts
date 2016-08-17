@@ -20,9 +20,9 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("loginManager", {
 		ensureLoggedIn: () => { return Future.fromResult(); }
 	});
-	testInjector.register("platformMigrator", {
+	testInjector.register("projectMigrationService", {
 		ensureAllPlatformAssets: () => { return Future.fromResult(); },
-		isRunning: (name: string) => { return Future.fromResult(); }
+		migrateTypeScriptProject: () => Future.fromResult()
 	});
 	testInjector.register("processInfo", {
 		isRunning: (executableName: string) => { return Future.fromResult(!!isRunning); }

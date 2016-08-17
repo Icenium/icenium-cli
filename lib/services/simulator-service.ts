@@ -6,7 +6,7 @@ export class SimulatorService implements ISimulatorService {
 	constructor(private $errors: IErrors,
 		private $logger: ILogger,
 		private $loginManager: ILoginManager,
-		private $platformMigrator: Project.IPlatformMigrator,
+		private $projectMigrationService: Project.IProjectMigrationService,
 		private $processInfo: IProcessInfo,
 		private $project: Project.IProject,
 		private $projectSimulatorService: IProjectSimulatorService,
@@ -23,7 +23,8 @@ export class SimulatorService implements ISimulatorService {
 		this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 
-		this.$platformMigrator.ensureAllPlatformAssets().wait();
+		this.$projectMigrationService.ensureAllPlatformAssets().wait();
+		this.$projectMigrationService.migrateTypeScriptProject().wait();
 		return this.runSimulator(simulatorPackageName);
 	}
 

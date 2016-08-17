@@ -60,7 +60,9 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		private $resourceDownloader: IResourceDownloader,
 		private $nativeScriptResources: INativeScriptResources,
 		private $injector: IInjector,
-		private $staticConfig: Config.IStaticConfig) {
+		private $staticConfig: Config.IStaticConfig,
+		private $npmService: INpmService,
+		private $projectMigrationService: Project.IProjectMigrationService) {
 		this.tnsModulesDirectoryPath = path.join(this.$nativeScriptResources.nativeScriptResourcesDir, NativeScriptMigrationService.TNS_MODULES);
 		this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
 	}
@@ -131,23 +133,14 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return (() => {
 			try {
 				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion).wait();
-				let afterRenameAction = () => (() => {
-					this.$fs.unzip(this.getPathToTypingsZip(newVersion), this.nativeScriptMigrationConfiguration.tnsTypingsPath).wait();
-					this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.typingsBackupName).wait();
-				}).future<void>()();
 
-				this.executeMigrationActions(this.nativeScriptMigrationConfiguration.packageJsonContents,
-					this.nativeScriptMigrationConfiguration.tnsTypingsPath,
-					this.nativeScriptMigrationConfiguration.typingsBackupName,
-					() => Future.fromResult(),
-					afterRenameAction).wait();
+				this.$projectMigrationService.migrateTypeScriptProject().wait();
+				this.$npmService.install(this.$project.getProjectDir().wait()).wait();
+
+				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents).wait();
 			} catch (err) {
 				this.traceError(err);
-				this.executeMigrationActions(this.nativeScriptMigrationConfiguration.oldPackageJsonContents,
-					this.nativeScriptMigrationConfiguration.typingsBackupName,
-					this.nativeScriptMigrationConfiguration.tnsTypingsPath,
-					() => this.$fs.deleteDirectory(this.nativeScriptMigrationConfiguration.tnsTypingsPath),
-					() => Future.fromResult()).wait();
+				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.oldPackageJsonContents).wait();
 
 				let message = "Error during migration. Restored original state of the project.";
 				if (err.errorCode === ErrorCodes.RESOURCE_PROBLEM) {
@@ -225,10 +218,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}).future<any>()();
 	}
 
-	private getPathToTypingsZip(version: string): string {
-		return path.join(this.tnsModulesDirectoryPath, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION, `${version}${NativeScriptMigrationService.TNS_CORE_MODULES}.zip`);
-	}
-
 	private getBackupName(str: string): string {
 		return `${str}.backup`;
 	}
@@ -236,19 +225,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private traceError(err: Error): void {
 		this.$logger.trace("Error during migration. Trying to restore previous state.");
 		this.$logger.trace(err);
-	}
-
-	private executeMigrationActions(jsonContents: any, oldPath: string, newPath: string, beforeRenameAction: () => IFuture<void>, afterRenameAction: () => IFuture<void>): IFuture<void> {
-		return (() => {
-			this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, jsonContents).wait();
-			if (this.$project.isTypeScriptProject().wait()) {
-				beforeRenameAction().wait();
-
-				this.$fs.renameIfExists(oldPath, newPath).wait();
-
-				afterRenameAction().wait();
-			}
-		}).future<void>()();
 	}
 
 	private getModuleVersion(version: string): IFuture<string> {

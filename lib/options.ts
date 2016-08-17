@@ -34,6 +34,7 @@ export class Options extends OptionsBase {
 				skipUi: { type: OptionType.Boolean },
 				splash: { type: OptionType.String},
 				template: { type: OptionType.String, alias: "t" },
+				types: { type: OptionType.Boolean, default: true},
 				validValue: { type: OptionType.Boolean },
 				verified: { type: OptionType.Boolean }
 			},
