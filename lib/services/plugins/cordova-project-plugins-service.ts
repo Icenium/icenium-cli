@@ -33,12 +33,11 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
+		$npmService: INpmService,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator,
-		$npmPluginsSource: IPluginsSource,
-		$npmjsPluginsSource: IPluginsSource,
-		$npmRegistryPluginsSource: IPluginsSource) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator, $npmPluginsSource, $npmjsPluginsSource, $npmRegistryPluginsSource);
+		$pluginsSourceResolver: IPluginsSourceResolver) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $progressIndicator, $pluginsSourceResolver);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {

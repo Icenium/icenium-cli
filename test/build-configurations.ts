@@ -103,6 +103,8 @@ function createTestInjector() {
 	testInjector.register("cordovaProjectPluginsService", cordovaProjectPluginsService.CordovaProjectPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("prompter", {});
+	testInjector.register("pluginsSourceResolver", {});
+	testInjector.register("npmService", {});
 	testInjector.register("npmPluginsSource", {});
 	testInjector.register("npmjsPluginsSource", {});
 	testInjector.register("npmRegistryPluginsSource", {});

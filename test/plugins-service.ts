@@ -15,6 +15,8 @@ import {ChildProcess} from "../lib/common/child-process";
 import {NpmPluginsSource} from "../lib/common/services/plugins/npm-plugins-source";
 import {NpmjsPluginsSource} from "../lib/common/services/plugins/npmjs-plugins-source";
 import {NpmRegistryPluginsSource} from "../lib/common/services/plugins/npm-registry-plugins-source";
+import {NpmService} from "../lib/common/appbuilder/services/npm-service";
+import {PluginsSourceResolver} from "../lib/common/services/plugins/plugins-source-resolver";
 import {assert} from "chai";
 import * as stubs from "./stubs";
 import * as path from "path";
@@ -34,6 +36,8 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("config", {});
 	testInjector.register("typeScriptService", {});
 	testInjector.register("prompter", {});
+	testInjector.register("npmService", NpmService);
+	testInjector.register("pluginsSourceResolver", PluginsSourceResolver);
 	testInjector.register("npmPluginsSource", NpmPluginsSource);
 	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
 	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);
@@ -268,6 +272,8 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
+	testInjector.register("npmService", {});
+	testInjector.register("pluginsSourceResolver", PluginsSourceResolver);
 	testInjector.register("npmPluginsSource", NpmPluginsSource);
 	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
 	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);
@@ -324,6 +330,8 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
+	testInjector.register("npmService", {});
+	testInjector.register("pluginsSourceResolver", PluginsSourceResolver);
 	testInjector.register("npmPluginsSource", NpmPluginsSource);
 	testInjector.register("npmjsPluginsSource", NpmjsPluginsSource);
 	testInjector.register("npmRegistryPluginsSource", NpmRegistryPluginsSource);

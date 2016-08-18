@@ -12,8 +12,6 @@ temp.track();
 export abstract class NpmPluginsServiceBase implements IPluginsService {
 	protected static NODE_MODULES_DIR_NAME = "node_modules";
 
-	private static NPM_REGISTRY_ADDRESS = "http://registry.npmjs.org";
-
 	constructor(protected $errors: IErrors,
 		protected $logger: ILogger,
 		protected $prompter: IPrompter,
@@ -23,31 +21,29 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $childProcess: IChildProcess,
 		protected $httpClient: Server.IHttpClient,
 		protected $options: IOptions,
+		protected $npmService: INpmService,
 		private $hostInfo: IHostInfo,
 		private $progressIndicator: IProgressIndicator,
-		private $npmPluginsSource: IPluginsSource,
-		private $npmjsPluginsSource: IPluginsSource,
-		private $npmRegistryPluginsSource: IPluginsSource) { }
+		private $pluginsSourceResolver: IPluginsSourceResolver) { }
 
 	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
 		return ((): IPluginsSource => {
-			this.$npmjsPluginsSource.initialize(keywords).wait();
+			let npmjsPluginsSource = this.$pluginsSourceResolver.resolveNpmjsPluginsSource(this.$project.projectDir, keywords).wait();
 
-			if (this.$npmjsPluginsSource.hasPlugins()) {
-				return this.$npmjsPluginsSource;
+			if (npmjsPluginsSource.hasPlugins()) {
+				return npmjsPluginsSource;
 			}
 
-			if (this.isScopedDependency(keywords)) {
-				this.$npmRegistryPluginsSource.initialize(keywords).wait();
-				if (this.$npmRegistryPluginsSource.hasPlugins()) {
-					return this.$npmRegistryPluginsSource;
+			if (this.$npmService.isScopedDependency(keywords[0])) {
+				let npmRegistryPluginsSource = this.$pluginsSourceResolver.resolveNpmRegistryPluginsSource(this.$project.projectDir, keywords).wait();
+
+				if (npmRegistryPluginsSource.hasPlugins()) {
+					return npmRegistryPluginsSource;
 				}
 			} else {
 				let query = this.composeSearchQuery(keywords);
 
-				this.$npmPluginsSource.initialize(query).wait();
-
-				return this.$npmPluginsSource;
+				return this.$pluginsSourceResolver.resolveNpmPluginsSource(this.$project.projectDir, query).wait();
 			}
 		}).future<IPluginsSource>()();
 	}
@@ -76,8 +72,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
 			let pluginUrl = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 
-			// TODO: Use npmRegistryPluginsSource.
-			let npmRegistryResult = this.searchNpmRegistry(pluginIdentifier).wait();
+			let npmRegistryPluginsSource = this.$pluginsSourceResolver.resolveNpmRegistryPluginsSource(this.$project.projectDir, [pluginIdentifier]).wait();
+			let npmRegistryResult = npmRegistryPluginsSource.hasPlugins() && npmRegistryPluginsSource.getAllPlugins().wait()[0];
 			let plugins = npmRegistryResult ? [npmRegistryResult] : this.findPlugins([pluginIdentifier]).wait().getAllPlugins().wait();
 
 			let pluginKeys = _.map(plugins, (pluginInfo: IBasicPluginInformation) => pluginInfo.name);
@@ -336,46 +332,5 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 	private isUrlToRepository(pluginId: string): boolean {
 		return validUrl.isUri(pluginId);
-	}
-
-	// TODO: Remove this code.
-	private searchNpmRegistry(pluginIdentifier: string): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
-			let npmRegistryRequestFuture = this.$httpClient.httpRequest(`${NpmPluginsServiceBase.NPM_REGISTRY_ADDRESS}/${pluginIdentifier}`);
-
-			this.$logger.printInfoMessageOnSameLine(`Searching for '${pluginIdentifier}' in ${NpmPluginsServiceBase.NPM_REGISTRY_ADDRESS}, please wait.`);
-			try {
-				this.$progressIndicator.showProgressIndicator(npmRegistryRequestFuture, 2000).wait();
-			} catch (err) {
-				if (err.response.statusCode === 404) {
-					return null;
-				} else {
-					throw err;
-				}
-			}
-
-			let response = npmRegistryRequestFuture.get();
-			let responseBody = response && response.body;
-
-			if (!responseBody) {
-				return null;
-			}
-
-			let pluginInfo: NpmPlugins.INpmRegistryResult = JSON.parse(responseBody);
-
-			let latestVersion = _(pluginInfo.versions)
-				.keys()
-				.sort()
-				.last();
-
-			return pluginInfo.versions[latestVersion];
-		}).future<IBasicPluginInformation>()();
-	}
-
-	// TODO: Move to npmService.
-	private isScopedDependency(keywords: string[]): boolean {
-		let matches = keywords[0].match(/^@.*\/.*/);
-
-		return !!(matches && matches[0]);
 	}
 }

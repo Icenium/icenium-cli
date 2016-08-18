@@ -20,7 +20,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private marketplacePlugins: IPlugin[];
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
-		private $npmService: INpmService,
 		private $typeScriptService: ITypeScriptService,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $projectMigrationService: Project.IProjectMigrationService,
@@ -34,12 +33,11 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
+		$npmService: INpmService,
 		$hostInfo: IHostInfo,
 		$progressIndicator: IProgressIndicator,
-		$npmPluginsSource: IPluginsSource,
-		$npmjsPluginsSource: IPluginsSource,
-		$npmRegistryPluginsSource: IPluginsSource) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator, $npmPluginsSource, $npmjsPluginsSource, $npmRegistryPluginsSource);
+		$pluginsSourceResolver: IPluginsSourceResolver) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $progressIndicator, $pluginsSourceResolver);
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
@@ -190,11 +188,11 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let name: string, version: string;
-			let scopedDependencyRegex = /^(@.+?)(?:@(.+?))?$/;
-			let scopedDependencyMatch = pluginName.match(scopedDependencyRegex);
-			if (!!scopedDependencyMatch) {
-				name = scopedDependencyMatch[1];
-				version = scopedDependencyMatch[2];
+			if (this.$npmService.isScopedDependency(pluginName)) {
+				let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+
+				name = scopedDependencyInfo.name;
+				version = scopedDependencyInfo.version;
 			} else {
 				[name, version] = pluginName.split("@");
 			}
