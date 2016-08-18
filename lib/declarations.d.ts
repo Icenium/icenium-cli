@@ -1316,7 +1316,17 @@ interface IDateProvider {
 	getCurrentDate(): Date;
 }
 
+/**
+ * Describes information about application package.
+ */
 interface IApplicationInformation {
+	/**
+	 * The name of the package file.
+	 */
 	packageName: string;
+
+	/**
+	 * The identifier of the application.
+	 */
 	appIdentifier: string;
 }
