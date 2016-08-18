@@ -7,6 +7,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 		private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $options: IOptions,
+		private $projectConstants: Project.IConstants,
 		$project: Project.IProject,
 		$errors: IErrors) {
 		super($project, $errors);
@@ -27,7 +28,8 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 			this.$options.justlaunch = true;
-			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, <Mobile.IEmulatorOptions>{ appId: this.$project.projectData.AppIdentifier }).wait();
+			let emulateOptions: Mobile.IEmulatorOptions = { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME).wait() };
+			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions).wait();
 		}).future<void>()();
 	}
 
