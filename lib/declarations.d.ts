@@ -40,6 +40,9 @@ declare module Server {
 		format: string;
 		url: string;
 		fileName: string;
+		key?: string;
+		value?: string;
+		architecture?: string;
 	}
 
 	interface IBuildResult {
@@ -204,7 +207,7 @@ declare module Project {
 		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string>;
 		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<string>;
+		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation>;
 		buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string>;
 	}
 
@@ -1311,4 +1314,19 @@ declare module NpmPlugins {
 
 interface IDateProvider {
 	getCurrentDate(): Date;
+}
+
+/**
+ * Describes information about application package.
+ */
+interface IApplicationInformation {
+	/**
+	 * The name of the package file.
+	 */
+	packageName: string;
+
+	/**
+	 * The identifier of the application.
+	 */
+	appIdentifier: string;
 }
