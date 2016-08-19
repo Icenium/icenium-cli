@@ -441,7 +441,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 
 			if (this.checkIsValidLocalPlugin(pathToPlugin).wait()) {
 				let fullPath = path.resolve(pathToPlugin);
-				let packageJsonContent = this.$fs.readText(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+				let packageJsonContent = this.$fs.readJson(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 				return this.constructNativeScriptPluginData(packageJsonContent).wait();
 			}
 
@@ -457,7 +457,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			if (!!url.match(/^(http|git)/)) {
 				let pathToInstalledPackage = this.installPackageToTempDir(url).wait();
 				if (pathToInstalledPackage) {
-					let packageJsonContent = this.$fs.readText(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+					let packageJsonContent = this.$fs.readJson(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 					return this.constructNativeScriptPluginData(packageJsonContent).wait();
 
 				}
@@ -467,28 +467,27 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		}).future<IPlugin>()();
 	}
 
-	private constructNativeScriptPluginData(packageJsonContent: string): IFuture<NativeScriptPluginData> {
+	private constructNativeScriptPluginData(packageJsonContent: any): IFuture<NativeScriptPluginData> {
 		return ((): NativeScriptPluginData => {
-			let jsonResult = JSON.parse(packageJsonContent);
 			let platforms: string[];
 			let supportedVersion: string;
 			let type = PluginType.NpmPlugin;
-			if (jsonResult.nativescript && jsonResult.nativescript.platforms) {
+			if (packageJsonContent.nativescript && packageJsonContent.nativescript.platforms) {
 				type = PluginType.NpmNativeScriptPlugin;
-				platforms = _.keys(jsonResult.nativescript.platforms);
-				supportedVersion = semver.maxSatisfying(_.values<string>(jsonResult.nativescript.platforms), ">=0.0.0");
+				platforms = _.keys(packageJsonContent.nativescript.platforms);
+				supportedVersion = semver.maxSatisfying(_.values<string>(packageJsonContent.nativescript.platforms), ">=0.0.0");
 			}
 
 			let data: IPluginInfoBase = {
-				Authors: jsonResult.author ? [jsonResult.author.name] : null,
-				Name: jsonResult.name,
-				Identifier: jsonResult.name,
-				Version: jsonResult.version,
-				Url: (jsonResult.repository && jsonResult.repository.url) || jsonResult.homepage || '',
+				Authors: packageJsonContent.author ? [packageJsonContent.author.name] : null,
+				Name: packageJsonContent.name,
+				Identifier: packageJsonContent.name,
+				Version: packageJsonContent.version,
+				Url: (packageJsonContent.repository && packageJsonContent.repository.url) || packageJsonContent.homepage || '',
 				Platforms: platforms,
-				Description: jsonResult.description,
+				Description: packageJsonContent.description,
 				SupportedVersion: supportedVersion,
-				Variables: jsonResult.nativescript && jsonResult.nativescript.variables
+				Variables: packageJsonContent.nativescript && packageJsonContent.nativescript.variables
 			};
 
 			return new NativeScriptPluginData(data, type, this.$project);
