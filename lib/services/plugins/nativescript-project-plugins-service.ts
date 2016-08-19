@@ -473,7 +473,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			}
 
 			let data: IPluginInfoBase = {
-				Authors: packageJsonContent.author ? [packageJsonContent.author.name] : null,
+				Authors: packageJsonContent.author ? [packageJsonContent.author.name || packageJsonContent.author] : null,
 				Name: packageJsonContent.name,
 				Identifier: packageJsonContent.name,
 				Version: packageJsonContent.version,

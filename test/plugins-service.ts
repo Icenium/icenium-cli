@@ -45,7 +45,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		httpRequest: (): IFuture<Server.IResponse> => Future.fromResult(null)
 	});
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: () => Future.fromResult()
+		showProgressIndicator: (future: IFuture<any>) => Future.fromResult(future.wait())
 	});
 	testInjector.register("projectConstants", {
 		PACKAGE_JSON_NAME: "package.json"
