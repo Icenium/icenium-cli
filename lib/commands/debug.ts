@@ -3,6 +3,7 @@ import Future = require("fibers/future");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
+	protected platform: string;
 
 	constructor(protected $logger: ILogger,
 		protected $errors: IErrors,
@@ -49,7 +50,7 @@ export class DebugCommand implements ICommand {
 
 				let debuggerParams = [
 					"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
-					"--app-ids", this.$project.projectData.AppIdentifier // We can specify more than one appid. They should be separated with ;.
+					"--app-ids", this.$project.getAppIdentifierForPlatform(this.platform).wait() // We can specify more than one appid. They should be separated with ;.
 				];
 
 				this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
@@ -69,7 +70,8 @@ export class DebugCommand implements ICommand {
 }
 
 export class DebugAndroidCommand extends DebugCommand {
-	constructor($logger: ILogger,
+	constructor(private $projectConstants: Project.IConstants,
+		$logger: ILogger,
 		$errors: IErrors,
 		$hostCapabilities: IHostCapabilities,
 		$loginManager: ILoginManager,
@@ -93,6 +95,8 @@ export class DebugAndroidCommand extends DebugCommand {
 			$winDebuggerService,
 			$hostInfo,
 			$darwinDebuggerService);
+
+		this.platform = this.$projectConstants.ANDROID_PLATFORM_NAME;
 	}
 
 	protected runDebugger(): IFuture<void> {
@@ -100,7 +104,7 @@ export class DebugAndroidCommand extends DebugCommand {
 			super.runDebugger().wait();
 
 			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugAndroidApplication(this.$project.projectData.AppIdentifier).wait();
+				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait()).wait();
 			}
 		}).future<void>()();
 	}

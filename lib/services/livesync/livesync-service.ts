@@ -40,7 +40,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 			let livesyncData: ILiveSyncData = {
 				platform: platform,
-				appIdentifier: this.$project.projectData.AppIdentifier,
+				appIdentifier: this.$project.getAppIdentifierForPlatform(platform).wait(),
 				projectFilesPath: projectDir,
 				syncWorkingDirectory: projectDir,
 				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
