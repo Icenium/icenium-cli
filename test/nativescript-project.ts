@@ -232,7 +232,7 @@ describe("NativeScript project unit tests", () => {
 			let pluginVariables = {
 				"APP_ID": {},
 				"API_KEY": {
-					default: "123456789"
+					defaultValue: "123456789"
 				}
 			};
 			let nativescript: any = {};
