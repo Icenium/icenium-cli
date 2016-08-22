@@ -9,15 +9,15 @@ export class LoggerStub implements ILogger {
 		//this.setLevel("DEBUG");
 	}
 
-	setLevel(level: string): void {}
+	setLevel(level: string): void { }
 	getLevel(): string { return undefined; }
-	fatal(formatStr: string, ...args:string[]): void {}
-	error(formatStr: string, ...args:string[]): void {}
-	warn(formatStr: string, ...args:string[]): void {}
-	warnWithLabel(formatStr: string, ...args:string[]): void {}
-	info(formatStr: string, ...args:string[]): void {}
-	debug(formatStr: string, ...args:string[]): void {}
-	trace(formatStr: string, ...args:string[]): void {
+	fatal(formatStr: string, ...args: string[]): void { }
+	error(formatStr: string, ...args: string[]): void { }
+	warn(formatStr: string, ...args: string[]): void { }
+	warnWithLabel(formatStr: string, ...args: string[]): void { }
+	info(formatStr: string, ...args: string[]): void { }
+	debug(formatStr: string, ...args: string[]): void { }
+	trace(formatStr: string, ...args: string[]): void {
 		// uncomment when debugging unit tests to print to the console
 		//args.unshift(formatStr);
 		//console.log(util.format.apply(null, args));
@@ -25,14 +25,14 @@ export class LoggerStub implements ILogger {
 
 	public output = "";
 
-	out(formatStr: string, ...args:string[]): void {
+	out(formatStr: string, ...args: string[]): void {
 		args.unshift(formatStr);
 		this.output += util.format.apply(null, args) + "\n";
 	}
 
-	write(...args:string[]): void { }
+	write(...args: string[]): void { }
 
-	printMarkdown(...args:string[]): void {
+	printMarkdown(...args: string[]): void {
 		this.output += util.format.apply(null, args) + "\n";
 	}
 
@@ -56,7 +56,7 @@ export class FileSystemStub implements IFileSystem {
 		return Future.fromResult(true);
 	}
 
-	deleteFile(path:string):IFuture<void> {
+	deleteFile(path: string): IFuture<void> {
 		return undefined;
 	}
 
@@ -64,35 +64,35 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	getFileSize(path:string):IFuture<number> {
+	getFileSize(path: string): IFuture<number> {
 		return undefined;
 	}
 
-	futureFromEvent(eventEmitter: NodeJS.EventEmitter, event:string):IFuture<any> {
+	futureFromEvent(eventEmitter: NodeJS.EventEmitter, event: string): IFuture<any> {
 		return undefined;
 	}
 
-	createDirectory(path:string):IFuture<void> {
+	createDirectory(path: string): IFuture<void> {
 		return undefined;
 	}
 
-	readDirectory(path:string):IFuture<string[]> {
+	readDirectory(path: string): IFuture<string[]> {
 		return Future.fromResult([]);
 	}
 
-	readFile(filename:string):IFuture<NodeBuffer> {
+	readFile(filename: string): IFuture<NodeBuffer> {
 		return undefined;
 	}
 
-	readText(filename:string, encoding?:string):IFuture<string> {
+	readText(filename: string, encoding?: string): IFuture<string> {
 		return Future.fromResult("");
 	}
 
-	readJson(filename:string, encoding?:string):IFuture<any> {
+	readJson(filename: string, encoding?: string): IFuture<any> {
 		return Future.fromResult({});
 	}
 
-	writeFile(filename:string, data: any, encoding?:string):IFuture<void> {
+	writeFile(filename: string, data: any, encoding?: string): IFuture<void> {
 		return undefined;
 	}
 
@@ -100,21 +100,21 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	writeJson(filename:string, data:any, space?:string, encoding?:string):IFuture<void> {
+	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void> {
 		return Future.fromResult();
 	}
 
-	copyFile(sourceFileName:string, destinationFileName:string):IFuture<void> {
+	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
 		return undefined;
 	}
 
 	openFile(filename: string): void { }
 
-	createReadStream(path:string, options?:{flags?: string; encoding?: string; fd?: string; mode?: number; bufferSize?: number}): any {
+	createReadStream(path: string, options?: { flags?: string; encoding?: string; fd?: string; mode?: number; bufferSize?: number }): any {
 		return undefined;
 	}
 
-	createWriteStream(path:string, options?:{flags?: string; encoding?: string; string?: string}): any {
+	createWriteStream(path: string, options?: { flags?: string; encoding?: string; string?: string }): any {
 		return undefined;
 	}
 
@@ -178,7 +178,11 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-    rm(options: string, ...files: string[]) {}
+	rm(options: string, ...files: string[]) { }
+
+	deleteEmptyParents(directory: string): IFuture<void> {
+		return Future.fromResult();
+	}
 }
 
 export class ErrorsStub implements IErrors {
@@ -186,8 +190,8 @@ export class ErrorsStub implements IErrors {
 
 	printCallStack: boolean = false;
 
-	fail(formatStr:string, ...args: any[]): void;
-	fail(opts:{formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean}, ...args: any[]): void;
+	fail(formatStr: string, ...args: any[]): void;
+	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
 
 	fail(...args: any[]) {
 		this.impl.fail.apply(this.impl, args);
@@ -197,7 +201,7 @@ export class ErrorsStub implements IErrors {
 		throw new Error(message);
 	}
 
-	beginCommand(action:() => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
+	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
 		return action();
 	}
 
@@ -215,7 +219,7 @@ export class ErrorsNoFailStub implements IErrors {
 	fail(formatStr: string, ...args: any[]): void;
 	fail(opts: { formatStr?: string; errorCode?: number; suppressCommandHelp?: boolean }, ...args: any[]): void;
 
-	fail(...args: any[]) {throw new Error(util.format.apply(null,args)); }
+	fail(...args: any[]) { throw new Error(util.format.apply(null, args)); }
 	failWithoutHelp(message: string, ...args: any[]): void {
 		throw new Error(message);
 	}
@@ -225,7 +229,7 @@ export class ErrorsNoFailStub implements IErrors {
 			try {
 				let result = action().wait();
 				return result;
-			} catch(ex) {
+			} catch (ex) {
 				return false;
 			}
 		}).future<boolean>()();
@@ -242,7 +246,7 @@ export class ErrorsNoFailStub implements IErrors {
 }
 
 export class OpenerStub implements IOpener {
-	open(filename: string): void {}
+	open(filename: string): void { }
 }
 
 export class LoginManager implements ILoginManager {
@@ -272,17 +276,17 @@ export class LoginManager implements ILoginManager {
 }
 
 export class TemplateServiceStub implements ITemplatesService {
-	appResourcesDir:string;
+	appResourcesDir: string;
 
-	buildCordovaJsFilePath(version:string, platform:string):string {
+	buildCordovaJsFilePath(version: string, platform: string): string {
 		return undefined;
 	}
 
-	unpackAppResources():IFuture<void> {
+	unpackAppResources(): IFuture<void> {
 		return undefined;
 	}
 
-	downloadCordovaJsFiles():IFuture<void> {
+	downloadCordovaJsFiles(): IFuture<void> {
 		return undefined;
 	}
 
@@ -308,10 +312,10 @@ export class TemplateServiceStub implements ITemplatesService {
 }
 
 export class PathFilteringServiceStub implements IPathFilteringService {
-	getRulesFromFile(file: string) : string[] {
+	getRulesFromFile(file: string): string[] {
 		return [];
 	}
-	filterIgnoredFiles(files: string[], rules: string[]) : string[] {
+	filterIgnoredFiles(files: string[], rules: string[]): string[] {
 		return files;
 	}
 
@@ -341,7 +345,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public get requiredAndroidApiLevel(): number { return 0; }
 
-	public get configFiles(): Project.IConfigurationFile[]{ return undefined; }
+	public get configFiles(): Project.IConfigurationFile[] { return undefined; }
 
 	public get startPackageActivity(): string { return ""; }
 
@@ -401,7 +405,7 @@ export class ProjectFilesManager implements IProjectFilesManager {
 		return undefined;
 	}
 
-	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): IFuture<void>{
+	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): IFuture<void> {
 		return undefined;
 	}
 }
@@ -456,7 +460,7 @@ export class StaticConfig implements IStaticConfig {
 	}
 
 	public get PATH_TO_BOOTSTRAP(): string {
-		return path.join(__dirname, "..", "lib","bootstrap");
+		return path.join(__dirname, "..", "lib", "bootstrap");
 	}
 }
 
@@ -498,10 +502,10 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 export class PrompterStub implements IPrompter {
 	public confirmResult = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult("");}
-	getPassword(prompt: string, options?: {allowEmpty?: boolean}): IFuture<string> { return Future.fromResult("");}
-	getString(prompt: string): IFuture<string>{ return Future.fromResult("");}
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string>{ return Future.fromResult("");}
+	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
+	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
+	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
 	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
 		return Future.fromResult(this.confirmResult);
 	}
