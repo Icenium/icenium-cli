@@ -642,7 +642,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 				let currentVariablesValues = packageJsonContent.nativescript[pluginVariableNameInPackageJson] || {};
 				let newObj: IStringDictionary = Object.create(null);
 				_.each(variablesInformation, (variableInfo: any, variableName: string) => {
-					let currentValue = currentVariablesValues[variableName] || variableInfo.default;
+					let currentValue = currentVariablesValues[variableName] || variableInfo.defaultValue;
 					newObj[variableName] = this.gatherVariableInformation(variableName, currentValue).wait()[variableName];
 				});
 
