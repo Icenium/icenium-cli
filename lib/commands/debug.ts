@@ -104,8 +104,7 @@ export class DebugAndroidCommand extends DebugCommand {
 			super.runDebugger().wait();
 
 			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework).wait();
-			}
+				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework).wait();			}
 		}).future<void>()();
 	}
 }
