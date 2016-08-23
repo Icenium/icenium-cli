@@ -24,14 +24,17 @@ fiberBootstrap.run(() => {
 			$npmService.install($project.projectDir).wait();
 		}
 
+		let useLocalTypeScriptCompiler = true;
 		if ($fs.exists(pathToTsConfig).wait()) {
 			let json = $fs.readJson(pathToTsConfig).wait();
 			let noEmitOnError = !!(json && json.compilerOptions && json.compilerOptions.noEmitOnError);
-			$typeScriptService.transpile($project.getProjectDir().wait(), null, null, { compilerOptions: { noEmitOnError } }).wait();
+			$typeScriptService.transpile($project.getProjectDir().wait(), null, null, { compilerOptions: { noEmitOnError }, useLocalTypeScriptCompiler }).wait();
 		} else {
 			let $resources: IResourceLoader = $injector.resolve("resources");
 			let pathToDefaultDefinitionFiles = $resources.resolvePath(path.join("resources", "typescript-definitions-files"));
-			$typeScriptService.transpile($project.projectDir, typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles, { compilerOptions: { noEmitOnError: false }, pathToDefaultDefinitionFiles }).wait();
+			let transpileOptions = { compilerOptions: { noEmitOnError: false }, pathToDefaultDefinitionFiles, useLocalTypeScriptCompiler };
+
+			$typeScriptService.transpile($project.projectDir, typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles, transpileOptions).wait();
 		}
 	}
 });
