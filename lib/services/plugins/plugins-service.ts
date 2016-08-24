@@ -47,10 +47,10 @@ export class PluginsService implements IPluginsService {
 		return this.getPluginsService().wait().findPlugins(keywords);
 	}
 
-	public fetch(pluginIdentifier: string): IFuture<void> {
-		return (() => {
+	public fetch(pluginIdentifier: string): IFuture<string> {
+		return ((): string => {
 			return this.getPluginsService().wait().fetch(pluginIdentifier).wait();
-		}).future<void>()();
+		}).future<string>()();
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {

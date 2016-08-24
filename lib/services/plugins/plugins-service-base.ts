@@ -1,17 +1,14 @@
-///<reference path="../../.d.ts"/>
-
 import * as path from "path";
 import * as util from "util";
 import * as shelljs from "shelljs";
 import * as semver from "semver";
 import * as validUrl from "valid-url";
 import * as commonHelpers from "../../common/helpers";
+import {NODE_MODULES_DIR_NAME} from "../../common/constants";
 import temp = require("temp");
 temp.track();
 
-export abstract class NpmPluginsServiceBase implements IPluginsService {
-	protected static NODE_MODULES_DIR_NAME = "node_modules";
-
+export abstract class PluginsServiceBase implements IPluginsService {
 	constructor(protected $errors: IErrors,
 		protected $logger: ILogger,
 		protected $prompter: IPrompter,
@@ -23,33 +20,14 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 		protected $options: IOptions,
 		protected $npmService: INpmService,
 		private $hostInfo: IHostInfo,
-		private $progressIndicator: IProgressIndicator,
-		private $pluginsSourceResolver: IPluginsSourceResolver) { }
+		private $npmPluginsService: INpmPluginsService) { }
 
 	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
-		return ((): IPluginsSource => {
-			let npmjsPluginsSource = this.$pluginsSourceResolver.resolveNpmjsPluginsSource(this.$project.projectDir, keywords).wait();
-
-			if (npmjsPluginsSource.hasPlugins()) {
-				return npmjsPluginsSource;
-			}
-
-			if (this.$npmService.isScopedDependency(keywords[0])) {
-				let npmRegistryPluginsSource = this.$pluginsSourceResolver.resolveNpmRegistryPluginsSource(this.$project.projectDir, keywords).wait();
-
-				if (npmRegistryPluginsSource.hasPlugins()) {
-					return npmRegistryPluginsSource;
-				}
-			} else {
-				let query = this.composeSearchQuery(keywords);
-
-				return this.$pluginsSourceResolver.resolveNpmPluginsSource(this.$project.projectDir, query).wait();
-			}
-		}).future<IPluginsSource>()();
+		return this.$npmPluginsService.search(this.$project.projectDir, keywords, this.composeSearchQuery);
 	}
 
-	public fetch(pluginIdentifier: string): IFuture<void> {
-		return (() => {
+	public fetch(pluginIdentifier: string): IFuture<string> {
+		return ((): string => {
 			this.$project.ensureProject();
 			if (!pluginIdentifier) {
 				this.$errors.fail("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the NPM.");
@@ -65,16 +43,13 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 					options.useOriginalPluginDirectory = false;
 				}
 
-				this.fetchPluginCore(pluginIdentifier, options).wait();
-				return;
+				return this.fetchPluginCore(pluginIdentifier, options).wait();
 			}
 
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
 			let pluginUrl = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 
-			let npmRegistryPluginsSource = this.$pluginsSourceResolver.resolveNpmRegistryPluginsSource(this.$project.projectDir, [pluginIdentifier]).wait();
-			let npmRegistryResult = npmRegistryPluginsSource.hasPlugins() && npmRegistryPluginsSource.getAllPlugins().wait()[0];
-			let plugins = npmRegistryResult ? [npmRegistryResult] : this.findPlugins([pluginIdentifier]).wait().getAllPlugins().wait();
+			let plugins = this.$npmPluginsService.optimizedSearch(this.$project.projectDir, [pluginIdentifier]).wait().getAllPlugins().wait();
 
 			let pluginKeys = _.map(plugins, (pluginInfo: IBasicPluginInformation) => pluginInfo.name);
 			let pluginsCount = pluginKeys.length;
@@ -83,39 +58,35 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				if (pluginUrl) {
 					try {
 						// The plugin is not in npm but it is in our marketplace.
-						this.fetchPluginCore(pluginUrl).wait();
+						return this.fetchPluginCore(pluginUrl).wait();
 					} catch (error) {
-						this.$logger.info("The plugin cannot be downloaded using npm, because it has no package.json in it. You can still download it from this link: " + plugin.data.Url.grey);
+						this.$errors.failWithoutHelp(`The plugin cannot be downloaded using npm, because it has no package.json in it. You can still download it from this link: ${plugin.data.Url.grey}`);
 					}
 				} else {
-					this.fetchPluginCore(pluginIdentifier).wait();
+					return this.fetchPluginCore(pluginIdentifier).wait();
 				}
-
-				return;
 			}
 
 			if (pluginsCount > 1 && pluginKeys[0] !== pluginIdentifier) {
 				if (commonHelpers.isInteractive()) {
 					let selectedPlugin = this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys).wait();
-					this.fetchPluginCore(selectedPlugin).wait();
+					return this.fetchPluginCore(selectedPlugin).wait();
 				} else {
 					this.$errors.failWithoutHelp("There are more then 1 matching plugins: " + pluginKeys.join(", ") + ".");
 				}
-
-				return;
 			}
 
 			try {
-				this.fetchPluginCore(pluginKeys[0]).wait();
+				return this.fetchPluginCore(pluginKeys[0]).wait();
 			} catch (err) {
 				if (pluginUrl) {
 					this.$logger.trace("Error while trying to fetch plugin with id " + pluginIdentifier + " via npm. Error is: " + err.message + ".");
-					this.fetchPluginCore(pluginUrl).wait();
+					return this.fetchPluginCore(pluginUrl).wait();
 				} else {
 					this.$errors.failWithoutHelp(err.message);
 				}
 			}
-		}).future<void>()();
+		}).future<string>()();
 	}
 
 	public abstract getAvailablePlugins(pluginsCount?: number): IPlugin[];
@@ -203,7 +174,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
 
 				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
-				let pathToPackage = path.join(tempInstallDir, NpmPluginsServiceBase.NODE_MODULES_DIR_NAME);
+				let pathToPackage = path.join(tempInstallDir, NODE_MODULES_DIR_NAME);
 
 				if (this.$fs.exists(pathToPackage).wait()) {
 					// Most probably the package is installed inside node_modules dir in temp folder.
@@ -218,7 +189,7 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				//                           └── plugin-var-plugin@1.0.0  extraneous
 				let npm2OutputMatch = npmInstallOutput.match(/.*?tempPackage@1\.0\.0.*?\r?\n.*?\s+?(.*?)@.*?\s+?/m);
 				if (npm2OutputMatch) {
-					return path.join(tempInstallDir, NpmPluginsServiceBase.NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
+					return path.join(tempInstallDir, NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
 				}
 
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
@@ -297,8 +268,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 	protected abstract composeSearchQuery(keywords: string[]): string[];
 
-	private fetchPluginCore(pluginIdentifier: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<void> {
-		return (() => {
+	private fetchPluginCore(pluginIdentifier: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<string> {
+		return ((): string => {
 			let pluginBasicInfo: IBasicPluginInformation;
 			let pluginLocalPath = path.resolve(pluginIdentifier);
 			let pluginLocalPathExists = this.$fs.exists(pluginLocalPath).wait();
@@ -322,8 +293,8 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 
 			pluginBasicInfo = this.fetchPluginBasicInformation(pluginId, "fetch", pluginData, options).wait();
 
-			this.$logger.printMarkdown(util.format("Successfully fetched plugin `%s`.", pluginBasicInfo.name));
-		}).future<void>()();
+			return pluginBasicInfo.name;
+		}).future<string>()();
 	}
 
 	private isLocalPath(pluginId: string): IFuture<boolean> {

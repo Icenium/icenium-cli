@@ -5,12 +5,13 @@ import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
 import {isInteractive} from "../../common/helpers";
-import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
+import {NODE_MODULES_DIR_NAME} from "../../common/constants";
+import {PluginsServiceBase} from "./plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
 temp.track();
 
-export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
+export class NativeScriptProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static NPM_SEARCH_URL = "http://npmsearch.com";
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins", "Advanced Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
@@ -35,9 +36,8 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$options: IOptions,
 		$npmService: INpmService,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator,
-		$pluginsSourceResolver: IPluginsSourceResolver) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $progressIndicator, $pluginsSourceResolver);
+		$npmPluginsService: INpmPluginsService) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $npmPluginsService);
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
@@ -205,7 +205,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	}
 
 	protected getPluginsDirName(): string {
-		return NpmPluginsServiceBase.NODE_MODULES_DIR_NAME;
+		return NODE_MODULES_DIR_NAME;
 	}
 
 	protected composeSearchQuery(keywords: string[]): string[] {

@@ -1,15 +1,16 @@
 import * as util from "util";
 import * as helpers from "../../common/helpers";
+import {NODE_MODULES_DIR_NAME} from "../../common/constants";
 import * as semver from "semver";
 import * as path from "path";
 import * as xmlMapping from "xml-mapping";
 import {EOL} from "os";
 import {PluginType} from "../../plugins-data";
 import {CordovaPluginsService} from "./cordova-plugins";
-import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
+import {PluginsServiceBase} from "./plugins-service-base";
 import Future = require("fibers/future");
 
-export class CordovaProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
+export class CordovaProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
 	private static CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
 	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
@@ -35,9 +36,8 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$options: IOptions,
 		$npmService: INpmService,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator,
-		$pluginsSourceResolver: IPluginsSourceResolver) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $progressIndicator, $pluginsSourceResolver);
+		$npmPluginsService: INpmPluginsService) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $npmPluginsService);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -284,6 +284,12 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
 			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 		}).future<IPlugin[]>()();
+	}
+
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
+		return ((): boolean => {
+			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
+		}).future<boolean>()();
 	}
 
 	protected getPluginsDirName(): string {

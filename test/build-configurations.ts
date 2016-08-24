@@ -105,9 +105,6 @@ function createTestInjector() {
 	testInjector.register("prompter", {});
 	testInjector.register("pluginsSourceResolver", {});
 	testInjector.register("npmService", {});
-	testInjector.register("npmPluginsSource", {});
-	testInjector.register("npmjsPluginsSource", {});
-	testInjector.register("npmRegistryPluginsSource", {});
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
 
@@ -127,6 +124,7 @@ function createTestInjector() {
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("nativeScriptProjectCapabilities", {});
 	testInjector.register("cordovaProjectCapabilities", {});
+	testInjector.register("npmPluginsService", {});
 	return testInjector;
 }
 

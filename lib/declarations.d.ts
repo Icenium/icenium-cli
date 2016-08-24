@@ -659,9 +659,9 @@ interface IPluginsService {
 	/**
 	 * Copies the source code of a plugin inside the project and adds it as a reference, so it can be used within the application.
 	 * @param {string} pluginIdentifier The identifier of the plugin that will be copied to the source code.
-	 * @return {IFuture<void>}
+	 * @return {IFuture<string>} The name of the fetched plugin.
 	 */
-	fetch(pluginIdentifiers: string): IFuture<void>;
+	fetch(pluginIdentifiers: string): IFuture<string>;
 
 	/**
 	 * Search for plugins based on specified keywords and returns plugins source which contains methods for working with the result.
