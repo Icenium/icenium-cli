@@ -11,7 +11,7 @@ fiberBootstrap.run(() => {
 
 	let $projectConstants: Project.IConstants = $injector.resolve("projectConstants");
 	let $typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
-	let typeScriptFiles = $typeScriptService.getTypeScriptFiles($project.getProjectDir().wait()).wait();
+	let typeScriptFilesData = $typeScriptService.getTypeScriptFilesData($project.getProjectDir().wait()).wait();
 
 	if ($typeScriptService.isTypeScriptProject($project.projectDir).wait()) {
 		let $fs: IFileSystem = $injector.resolve("fs");
@@ -34,7 +34,7 @@ fiberBootstrap.run(() => {
 			let pathToDefaultDefinitionFiles = $resources.resolvePath(path.join("resources", "typescript-definitions-files"));
 			let transpileOptions = { compilerOptions: { noEmitOnError: false }, pathToDefaultDefinitionFiles, useLocalTypeScriptCompiler };
 
-			$typeScriptService.transpile($project.projectDir, typeScriptFiles.typeScriptFiles, typeScriptFiles.definitionFiles, transpileOptions).wait();
+			$typeScriptService.transpile($project.projectDir, typeScriptFilesData.typeScriptFiles, typeScriptFilesData.definitionFiles, transpileOptions).wait();
 		}
 	}
 });
