@@ -29,6 +29,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
+	testInjector.register("typeScriptService", {});
 	testInjector.register("prompter", {});
 	testInjector.register("httpClient", {
 		httpRequest: (): IFuture<Server.IResponse> => Future.fromResult(null)

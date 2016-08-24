@@ -721,30 +721,6 @@ export class Project extends ProjectBase implements Project.IProject {
 		}).future<void>()();
 	}
 
-	public isTypeScriptProject(): IFuture<boolean> {
-		return ((): boolean => {
-			let typeScriptFiles = this.getTypeScriptFiles().wait();
-
-			if (typeScriptFiles.typeScriptFiles.length > typeScriptFiles.definitionFiles.length) { // We need this check because some of non-typescript templates(for example KendoUI.Strip) contain typescript definition files
-				return true;
-			}
-			return false;
-		}).future<boolean>()();
-	}
-
-	public getTypeScriptFiles(): IFuture<Project.ITypeScriptFiles> {
-		return ((): Project.ITypeScriptFiles => {
-			let projectDir = this.getProjectDir().wait();
-			// Skip root's node_modules
-			let rootNodeModules = path.join(projectDir, "node_modules");
-			let projectFiles = this.$fs.enumerateFilesInDirectorySync(projectDir,
-				(fileName: string, fstat: IFsStats) => fileName !== rootNodeModules);
-			let typeScriptFiles = _.filter(projectFiles, file => path.extname(file) === ".ts");
-			let definitionFiles = _.filter(typeScriptFiles, file => _.endsWith(file, ".d.ts"));
-			return { definitionFiles: definitionFiles, typeScriptFiles: typeScriptFiles };
-		}).future<Project.ITypeScriptFiles>()();
-	}
-
 	protected validate(): void {
 		if (this.$staticConfig.triggerJsonSchemaValidation) {
 			this.$jsonSchemaValidator.validate(this.projectData);
