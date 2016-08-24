@@ -9,6 +9,7 @@ import Future = require("fibers/future");
 export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
 	private static WP8_DEFAULT_WP8_WINDOWS_PUBLISHER_NAME = "CN=Telerik";
+	private static WHITESPACE_REGEX = /\s/g;
 
 	constructor(private $cordovaResources: ICordovaResourceLoader,
 		private $config: IConfiguration,
@@ -168,11 +169,14 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 
 	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
-			let cordovaJsFileName = path.join(projectDir, util.format("cordova.%s.js", platform).toLowerCase());
-			if (!this.$fs.exists(cordovaJsFileName).wait()) {
+			let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),
+				cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform),
+				cordovaJsFileContents = this.$fs.readText(cordovaJsFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, ""),
+				cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, "");
+
+			if (!this.$fs.exists(cordovaJsFilePath).wait() || cordovaJsFileContents !== cordovaJsSourceFileContents) {
 				this.printAssetUpdateMessage();
-				let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform);
-				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
+				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFilePath).wait();
 			}
 		}).future<void>()();
 	}
