@@ -349,9 +349,16 @@ export abstract class NpmPluginsServiceBase implements IPluginsService {
 				suppressMessage: !suppressMessage
 			};
 
-			options.originalPluginDirectory = pluginLocalPathExists && pluginLocalPath;
+			let pluginId = pluginIdentifier;
 
-			pluginBasicInfo = this.fetchPluginBasicInformation(pluginLocalPathExists ? pluginLocalPath : pluginIdentifier, "fetch", pluginData, options).wait();
+			if (pluginLocalPathExists) {
+				pluginId = pluginLocalPath;
+				options.originalPluginDirectory = pluginLocalPath;
+			} else {
+				options.useOriginalPluginDirectory = false;
+			}
+
+			pluginBasicInfo = this.fetchPluginBasicInformation(pluginId, "fetch", pluginData, options).wait();
 
 			this.$logger.printMarkdown(util.format("Successfully fetched plugin `%s`.", pluginBasicInfo.name));
 		}).future<void>()();
