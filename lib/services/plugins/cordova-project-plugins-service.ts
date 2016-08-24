@@ -262,8 +262,20 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		let [name, version] = pluginName.split("@");
-		return Future.fromResult({ name, version });
+		let result: IBasicPluginInformation;
+		if (this.$npmService.isScopedDependency(pluginName)) {
+			let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+
+			result = {
+				name: scopedDependencyInfo.name,
+				version: scopedDependencyInfo.version || "latest"
+			};
+		} else {
+			let [name, version] = pluginName.split("@");
+			result = { name, version };
+		}
+
+		return Future.fromResult(result);
 	}
 
 	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {
@@ -304,6 +316,17 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+
+			if (!this.$fs.exists(pathToPluginXml).wait()) {
+				let errorMessage = `${pluginOpts.actualName} is not Cordova plugin.`;
+
+				if (!this.$fs.isEmptyDir(pathToPlugin).wait()) {
+					errorMessage = `${errorMessage}${EOL}The plugin is downloaded in ${pathToPlugin}`;
+				}
+
+				this.$errors.failWithoutHelp(errorMessage);
+			}
+
 			let pluginXml: any = xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
 
 			// Need to add $t because of the xmlMapping library.

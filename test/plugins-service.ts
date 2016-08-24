@@ -21,6 +21,7 @@ import * as temp from "temp";
 import * as shelljs from "shelljs";
 import Future = require("fibers/future");
 temp.track();
+let pluginXmlFileName = "plugin.xml";
 
 function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: any[], availableMarketplacePlugins: any[]): IInjector {
 	let testInjector = new Yok();
@@ -266,7 +267,9 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
-	testInjector.register("npmService", {});
+	testInjector.register("npmService", {
+		isScopedDependency: () => false
+	});
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
@@ -321,7 +324,9 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("childProcess", {});
 	testInjector.register("httpClient", {});
-	testInjector.register("npmService", {});
+	testInjector.register("npmService", {
+		isScopedDependency: () => false
+	});
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("progressIndicator", {
 		showProgressIndicator: () => Future.fromResult()
@@ -373,7 +378,9 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 
 	testInjector.register("nativeScriptResources", NativeScriptResources);
 	testInjector.register("pluginVariablesHelper", PluginVariablesHelper);
-	testInjector.register("npmService", {});
+	testInjector.register("npmService", {
+		isScopedDependency: () => false
+	});
 	testInjector.register("projectMigrationService", {
 		migrateTypeScriptProject: () => Future.fromResult()
 	});
@@ -518,9 +525,8 @@ describe("plugins-service", () => {
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let fs: IFileSystem = testInjector.resolve("fs");
-		fs.exists = (path: string) => Future.fromResult(false);
-		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`);
-
+		fs.exists = (dir: string) => Future.fromResult(dir.indexOf(pluginXmlFileName) >= 0);
+		fs.readText = (dir: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`);
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "org.apache.cordova.battery-status").wait();
 		assert.deepEqual(fetchedPluginName, pluginName);
 	});
@@ -668,7 +674,7 @@ describe("plugins-service", () => {
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		let fs: IFileSystem = testInjector.resolve("fs");
-		fs.exists = (path: string) => Future.fromResult(false);
+		fs.exists = (dir: string) => Future.fromResult(dir.indexOf(pluginXmlFileName) >= 0);
 		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`);
 
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "com.telerik.dropbox").wait();

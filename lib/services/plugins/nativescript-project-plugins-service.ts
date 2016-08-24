@@ -204,6 +204,18 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return Future.fromResult(plugins);
 	}
 
+	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {
+		// We need this check because for NS projects we do not extract the tgz.
+		if (this.hasTgzExtension(pathToPlugin)) {
+			return {
+				sourceDirectory: pathToPlugin,
+				destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins")
+			};
+		} else {
+			return super.getCopyLocalPluginData(pathToPlugin);
+		}
+	}
+
 	protected getPluginsDirName(): string {
 		return NODE_MODULES_DIR_NAME;
 	}

@@ -1272,6 +1272,14 @@ declare module NpmPlugins {
 		description: string;
 		versions: IDictionary<IBasicPluginInformation>;
 	}
+
+	/**
+	 * Describes data which is required to copy local plugin.
+	 */
+	interface ICopyLocalPluginData {
+		sourceDirectory: string;
+		destinationDirectory: string;
+	}
 }
 
 interface IDateProvider {
