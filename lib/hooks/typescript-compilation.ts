@@ -1,9 +1,7 @@
-require("./../bootstrap");
 import * as path from "path";
-import fiberBootstrap = require("./../common/fiber-bootstrap");
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
-fiberBootstrap.run(() => {
+module.exports = () => {
 	let $project: Project.IProject = $injector.resolve("project");
 	if (!$project.projectData) {
 		return;
@@ -37,4 +35,4 @@ fiberBootstrap.run(() => {
 			$typeScriptService.transpile($project.projectDir, typeScriptFilesData.typeScriptFiles, typeScriptFilesData.definitionFiles, transpileOptions).wait();
 		}
 	}
-});
+};
