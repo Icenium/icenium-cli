@@ -43,14 +43,14 @@ export class PluginsService implements IPluginsService {
 		return this.getPluginsService().wait().getPluginBasicInformation(pluginName);
 	}
 
-	public findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]> {
+	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
 		return this.getPluginsService().wait().findPlugins(keywords);
 	}
 
-	public fetch(pluginIdentifier: string): IFuture<void>{
-		return (() => {
+	public fetch(pluginIdentifier: string): IFuture<string> {
+		return ((): string => {
 			return this.getPluginsService().wait().fetch(pluginIdentifier).wait();
-		}).future<void>()();
+		}).future<string>()();
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
@@ -59,7 +59,7 @@ export class PluginsService implements IPluginsService {
 
 	private getPluginsService(): IFuture<IPluginsService> {
 		return ((): IPluginsService => {
-			if(!this.frameworkProject) {
+			if (!this.frameworkProject) {
 				this.$loginManager.ensureLoggedIn().wait();
 				this.$project.ensureProject();
 				this.frameworkProject = this.$frameworkProjectResolver.resolve(this.$project.projectData.Framework);

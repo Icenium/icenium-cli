@@ -103,6 +103,8 @@ function createTestInjector() {
 	testInjector.register("cordovaProjectPluginsService", cordovaProjectPluginsService.CordovaProjectPluginsService);
 	testInjector.register("marketplacePluginsService", marketplacePluginsService.MarketplacePluginsService);
 	testInjector.register("prompter", {});
+	testInjector.register("pluginsSourceResolver", {});
+	testInjector.register("npmService", {});
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
 
@@ -122,6 +124,7 @@ function createTestInjector() {
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("nativeScriptProjectCapabilities", {});
 	testInjector.register("cordovaProjectCapabilities", {});
+	testInjector.register("npmPluginsService", {});
 	return testInjector;
 }
 

@@ -659,16 +659,16 @@ interface IPluginsService {
 	/**
 	 * Copies the source code of a plugin inside the project and adds it as a reference, so it can be used within the application.
 	 * @param {string} pluginIdentifier The identifier of the plugin that will be copied to the source code.
-	 * @return {IFuture<void>}
+	 * @return {IFuture<string>} The name of the fetched plugin.
 	 */
-	fetch(pluginIdentifiers: string): IFuture<void>;
+	fetch(pluginIdentifiers: string): IFuture<string>;
 
 	/**
-	 * Search for plugins based on specified keywords and returns basic information about each of them.
+	 * Search for plugins based on specified keywords and returns plugins source which contains methods for working with the result.
 	 * @param {string[]} keywords Array of keywords that will be used for searching.
-	 * @return {IBasicPluginInformation[]} Array of information for all available plugins matching at least one of the specified keywords.
+	 * @return {IPluginsSource} Plugins source which contains methods for working with the result.
 	 */
-	findPlugins(keywords: string[]): IFuture<IBasicPluginInformation[]>;
+	findPlugins(keywords: string[]): IFuture<IPluginsSource>;
 
 	/**
 	 * Filters plugin based on framework specific rules.
@@ -777,30 +777,6 @@ interface IPluginVersion {
 	 * @type {string}
 	 */
 	cordovaVersionRange: string;
-}
-
-interface IBasicPluginInformation {
-	/**
-	 * The plugin's name
-	 * @type {string}
-	 */
-	name: string;
-	/**
-	 * The plugin's description
-	 * @type {string}
-	 */
-	description?: string;
-	/**
-	 * The plugin's version in the form of Major.Minor.Patch
-	 * @type {string}
-	 */
-	version: string;
-
-	/**
-	 * Variables used by the plugin.
-	 * @type {any[]}
-	 */
-	variables?: any[];
 }
 
 /**
@@ -1295,6 +1271,14 @@ declare module NpmPlugins {
 		name: string;
 		description: string;
 		versions: IDictionary<IBasicPluginInformation>;
+	}
+
+	/**
+	 * Describes data which is required to copy local plugin.
+	 */
+	interface ICopyLocalPluginData {
+		sourceDirectory: string;
+		destinationDirectory: string;
 	}
 }
 

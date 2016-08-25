@@ -5,13 +5,13 @@ import {EOL} from "os";
 import {getFuturesResults} from "../../common/helpers";
 import {MarketplacePluginData} from "../../plugins-data";
 import {isInteractive} from "../../common/helpers";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../../common/constants";
-import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
+import {NODE_MODULES_DIR_NAME} from "../../common/constants";
+import {PluginsServiceBase} from "./plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
 temp.track();
 
-export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
+export class NativeScriptProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static NPM_SEARCH_URL = "http://npmsearch.com";
 	private static HEADERS = ["NPM Packages", "NPM NativeScript Plugins", "Marketplace Plugins", "Advanced Plugins"];
 	private static DEFAULT_NUMBER_OF_NPM_PACKAGES = 10;
@@ -21,7 +21,6 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	private marketplacePlugins: IPlugin[];
 
 	constructor(private $nativeScriptResources: INativeScriptResources,
-		private $npmService: INpmService,
 		private $typeScriptService: ITypeScriptService,
 		private $pluginVariablesHelper: IPluginVariablesHelper,
 		private $projectMigrationService: Project.IProjectMigrationService,
@@ -35,9 +34,10 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
+		$npmService: INpmService,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
+		$npmPluginsService: INpmPluginsService) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $npmPluginsService);
 		let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 		let frameworkVersion = this.$project.projectData.FrameworkVersion;
 		if (!_.includes(versions, frameworkVersion)) {
@@ -188,11 +188,11 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let name: string, version: string;
-			let scopedDependencyRegex = /^(@.+?)(?:@(.+?))?$/;
-			let scopedDependencyMatch = pluginName.match(scopedDependencyRegex);
-			if (!!scopedDependencyMatch) {
-				name = scopedDependencyMatch[1];
-				version = scopedDependencyMatch[2];
+			if (this.$npmService.isScopedDependency(pluginName)) {
+				let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+
+				name = scopedDependencyInfo.name;
+				version = scopedDependencyInfo.version;
 			} else {
 				[name, version] = pluginName.split("@");
 			}
@@ -204,18 +204,23 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 		return Future.fromResult(plugins);
 	}
 
+	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {
+		// We need this check because for NS projects we do not extract the tgz.
+		if (this.hasTgzExtension(pathToPlugin)) {
+			return {
+				sourceDirectory: pathToPlugin,
+				destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins")
+			};
+		} else {
+			return super.getCopyLocalPluginData(pathToPlugin);
+		}
+	}
+
 	protected getPluginsDirName(): string {
-		return NpmPluginsServiceBase.NODE_MODULES_DIR_NAME;
+		return NODE_MODULES_DIR_NAME;
 	}
 
 	protected composeSearchQuery(keywords: string[]): string[] {
-		let nativeScriptKeyword = TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase();
-		let hasNativeScriptKeyword = _.some(keywords, (keyword: string) => keyword.toLowerCase().indexOf(nativeScriptKeyword) >= 0);
-
-		if (!hasNativeScriptKeyword) {
-			keywords.unshift(nativeScriptKeyword);
-		}
-
 		return keywords;
 	}
 
@@ -480,7 +485,7 @@ export class NativeScriptProjectPluginsService extends NpmPluginsServiceBase imp
 			}
 
 			let data: IPluginInfoBase = {
-				Authors: packageJsonContent.author ? [packageJsonContent.author.name] : null,
+				Authors: packageJsonContent.author ? [packageJsonContent.author.name || packageJsonContent.author] : null,
 				Name: packageJsonContent.name,
 				Identifier: packageJsonContent.name,
 				Version: packageJsonContent.version,

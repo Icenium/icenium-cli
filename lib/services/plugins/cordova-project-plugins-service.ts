@@ -1,15 +1,16 @@
 import * as util from "util";
 import * as helpers from "../../common/helpers";
+import {NODE_MODULES_DIR_NAME} from "../../common/constants";
 import * as semver from "semver";
 import * as path from "path";
 import * as xmlMapping from "xml-mapping";
 import {EOL} from "os";
 import {PluginType} from "../../plugins-data";
 import {CordovaPluginsService} from "./cordova-plugins";
-import {NpmPluginsServiceBase} from "./npm-plugins-service-base";
+import {PluginsServiceBase} from "./plugins-service-base";
 import Future = require("fibers/future");
 
-export class CordovaProjectPluginsService extends NpmPluginsServiceBase implements IPluginsService {
+export class CordovaProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
 	private static CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
 	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
@@ -33,9 +34,10 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		$childProcess: IChildProcess,
 		$httpClient: Server.IHttpClient,
 		$options: IOptions,
+		$npmService: INpmService,
 		$hostInfo: IHostInfo,
-		$progressIndicator: IProgressIndicator) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $hostInfo, $progressIndicator);
+		$npmPluginsService: INpmPluginsService) {
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $npmPluginsService);
 	}
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
@@ -260,8 +262,20 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		let [name, version] = pluginName.split("@");
-		return Future.fromResult({ name, version });
+		let result: IBasicPluginInformation;
+		if (this.$npmService.isScopedDependency(pluginName)) {
+			let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+
+			result = {
+				name: scopedDependencyInfo.name,
+				version: scopedDependencyInfo.version || "latest"
+			};
+		} else {
+			let [name, version] = pluginName.split("@");
+			result = { name, version };
+		}
+
+		return Future.fromResult(result);
 	}
 
 	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {
@@ -284,6 +298,12 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 		}).future<IPlugin[]>()();
 	}
 
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
+		return ((): boolean => {
+			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
+		}).future<boolean>()();
+	}
+
 	protected getPluginsDirName(): string {
 		return "plugins";
 	}
@@ -296,6 +316,17 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+
+			if (!this.$fs.exists(pathToPluginXml).wait()) {
+				let errorMessage = `${pluginOpts.actualName} is not Cordova plugin.`;
+
+				if (!this.$fs.isEmptyDir(pathToPlugin).wait()) {
+					errorMessage = `${errorMessage}${EOL}The plugin is downloaded in ${pathToPlugin}`;
+				}
+
+				this.$errors.failWithoutHelp(errorMessage);
+			}
+
 			let pluginXml: any = xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
 
 			// Need to add $t because of the xmlMapping library.
@@ -445,7 +476,7 @@ export class CordovaProjectPluginsService extends NpmPluginsServiceBase implemen
 				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 
 			if (configuration) {
-				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [ configuration ]).wait();
+				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]).wait();
 			} else {
 				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
 			}
