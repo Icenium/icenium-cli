@@ -227,7 +227,10 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
 			if (this.shouldCopyToPluginsDirectory(directoryToCheck).wait()) {
-				let pathToInstall = path.join(this.$project.getProjectDir().wait(), "plugins");
+				let copyLocalPluginData = this.getCopyLocalPluginData(pathToPlugin);
+
+				let pathToInstall = copyLocalPluginData.destinationDirectory;
+
 				if (!pluginData || !pluginData.suppressMessage) {
 					let actualPlugin = pluginData ? path.resolve(pluginData.actualName) : pluginPath;
 					this.$logger.printMarkdown(util.format("Copying `%s` to `%s` in order to be able to use the plugin in your project.", actualPlugin, pathToInstall));
@@ -236,12 +239,22 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				// use cp instead of mv, as it would fail if pathToInstalledPlugin is mounted
 				// on a different device from the pluginsPath with error:
 				// Error: EXDEV, cross-device link not permitted
-				shelljs.cp("-Rf", pathToPlugin, pathToInstall);
-				pathToPlugin = path.join(pathToInstall, path.basename(pathToPlugin));
+				this.$fs.ensureDirectoryExists(pathToInstall).wait();
+				shelljs.cp("-Rf", copyLocalPluginData.sourceDirectory, pathToInstall);
+				pathToPlugin = pathToInstall;
 			}
 
 			return this.installLocalPluginCore(pathToPlugin, pluginData).wait();
 		}).future<IBasicPluginInformation>()();
+	}
+
+	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {
+		// We need to get the exact plugin directory relative to the node_modules directory because if we try to fetch scoped dependency for example @angular/core the plugin will not be in node_modeules/core but in node_modules/@angular/core.
+		let targetPluginDirectory = pathToPlugin.substring(pathToPlugin.lastIndexOf(NODE_MODULES_DIR_NAME) + NODE_MODULES_DIR_NAME.length);
+		return {
+			sourceDirectory: path.join(pathToPlugin, path.sep, "*"),
+			destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins", targetPluginDirectory)
+		};
 	}
 
 	protected isPluginPartOfTheProject(pathToPlugin: string): IFuture<boolean> {
