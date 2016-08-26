@@ -39,7 +39,7 @@
     "cookie": "0.1.0",
     "copy-paste": "1.2.0",
     "esprima": "2.7.3",
-    "express": "4.8.5",
+    "express": "4.14.0",
     "ffi": "https://github.com/icenium/node-ffi/tarball/v2.0.0.2",
     "fibers": "https://github.com/Icenium/node-fibers/tarball/v1.0.13.0",
     "filesize": "2.0.3",
