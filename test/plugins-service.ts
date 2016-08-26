@@ -149,6 +149,8 @@ class ProjectStub {
 		Framework: "Cordova"
 	};
 
+	projectDir: string = "";
+
 	configurationSpecificData: any = {
 		"debug":
 		{

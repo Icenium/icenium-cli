@@ -220,13 +220,11 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected installLocalPlugin(pluginPath: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pathToPlugin = path.resolve(pluginPath);
-
 			// In case the user tries to add plugin from local directory we should check if the original directory is part of the project instead of the directory in Temp.
-			let directoryToCheck = (options && options.useOriginalPluginDirectory) ? options.originalPluginDirectory : pathToPlugin;
+			let pathToPlugin = (options && options.useOriginalPluginDirectory) ? options.originalPluginDirectory : path.resolve(pluginPath);
 
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
-			if (this.shouldCopyToPluginsDirectory(directoryToCheck).wait()) {
+			if (this.shouldCopyToPluginsDirectory(pathToPlugin).wait()) {
 				let copyLocalPluginData = this.getCopyLocalPluginData(pathToPlugin);
 
 				let pathToInstall = copyLocalPluginData.destinationDirectory;
@@ -249,8 +247,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 	}
 
 	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {
+		let lastIndexOfNodeModules = pathToPlugin.lastIndexOf(NODE_MODULES_DIR_NAME);
 		// We need to get the exact plugin directory relative to the node_modules directory because if we try to fetch scoped dependency for example @angular/core the plugin will not be in node_modeules/core but in node_modules/@angular/core.
-		let targetPluginDirectory = pathToPlugin.substring(pathToPlugin.lastIndexOf(NODE_MODULES_DIR_NAME) + NODE_MODULES_DIR_NAME.length);
+		let targetPluginDirectory = lastIndexOfNodeModules !== -1 ? pathToPlugin.substring(lastIndexOfNodeModules + NODE_MODULES_DIR_NAME.length) : path.basename(pathToPlugin);
 		return {
 			sourceDirectory: path.join(pathToPlugin, path.sep, "*"),
 			destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins", targetPluginDirectory)

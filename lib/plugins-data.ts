@@ -4,7 +4,8 @@ import * as util from "util";
 export enum PluginType {
 	CorePlugin = 0,
 	AdvancedPlugin = 1,
-	MarketplacePlugin = 2
+	MarketplacePlugin = 2,
+	LocalPlugin = 3,
 }
 
 export class CordovaPluginData implements IPlugin {
@@ -43,7 +44,7 @@ export class CordovaPluginData implements IPlugin {
 
 		let result = [nameRow, identifierRow, versionRow, urlRow];
 
-		if(this.configurations && this.configurations.length > 0) {
+		if (this.configurations && this.configurations.length > 0) {
 			result.push(util.format("    Configuration: %s", this.configurations.join(", ")));
 		}
 
@@ -52,7 +53,7 @@ export class CordovaPluginData implements IPlugin {
 
 	private getPluginVariablesInfo(): string[] {
 		let result: string[] = [];
-		if(this.configurations && this.configurations.length) {
+		if (this.configurations && this.configurations.length) {
 			_.each(this.configurations, (configuration: string) => {
 				let info = this.getPluginVarsStringInformation(configuration).wait();
 				result.push(...info);
@@ -70,25 +71,25 @@ export class CordovaPluginData implements IPlugin {
 			let result: string[] = [];
 			let configString = configuration ? ` for ${configuration} configuration` : "";
 			let pluginVariablesData = this.$project.getPluginVariablesInfo(configuration).wait();
-			if(pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
+			if (pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
 				let variables = pluginVariablesData[this.data.Identifier];
 				let variableNames = _.keys(variables);
-				if(variableNames.length > 0) {
-					let output:string[] = [];
+				if (variableNames.length > 0) {
+					let output: string[] = [];
 					output.push(`    Variables${configString}:`);
-					_.each(variableNames, (variableName:string) => {
+					_.each(variableNames, (variableName: string) => {
 						output.push(util.format("        %s: %s", variableName, variables[variableName]));
 					});
 
 					result.push(output.join(EOL));
 				}
 			} else {
-				if(this.data.Variables) {
+				if (this.data.Variables) {
 					// We should never get here with anything that is not array, but anyway, lets assure we'll not throw some unexpected error.
-					if(_.isArray(this.data.Variables) && (<string[]>this.data.Variables).length) {
+					if (_.isArray(this.data.Variables) && (<string[]>this.data.Variables).length) {
 						// cordova or marketplace plugins
-						result.push(`    Variables${configString}: ${(<string[]>this.data.Variables).join(", ")}`);
-					} else if(_.keys(this.data.Variables).length) {
+						result.push(`    Variables${configString}: ${(_.map(<string[]>this.data.Variables, (v: any) => v.name || v)).join(", ")}`);
+					} else if (_.keys(this.data.Variables).length) {
 						// nativescript
 						result.push(`    Variables${configString}: ${_.keys(this.data.Variables).join(", ")}`);
 					}
@@ -114,15 +115,15 @@ export class MarketplacePluginData extends CordovaPluginData {
 
 	public get pluginInformation(): string[] {
 		let additionalPluginData = [
-			this.buildRow("Available versions",  _.map(this.pluginVersionsData.Versions, pl => pl.Version).join(", "))
+			this.buildRow("Available versions", _.map(this.pluginVersionsData.Versions, pl => pl.Version).join(", "))
 		];
 
-		if(this.data.DownloadsCount) {
+		if (this.data.DownloadsCount) {
 			additionalPluginData.unshift(this.buildRow("Downloads count", this.data.DownloadsCount.toString()));
 		}
 
 		let publisherName = this.getPublisherName(this.data.Publisher);
-		if(publisherName) {
+		if (publisherName) {
 			additionalPluginData.push(this.buildRow("Publisher", publisherName));
 		}
 
@@ -134,12 +135,12 @@ export class MarketplacePluginData extends CordovaPluginData {
 	}
 
 	private getPublisherName(publisher: Server.MarketplacePluginPublisher): string {
-		if(publisher && publisher.Name) {
-			if(publisher.Name === MarketplacePluginData.TELERIK_PUBLISHER_NAME) {
+		if (publisher && publisher.Name) {
+			if (publisher.Name === MarketplacePluginData.TELERIK_PUBLISHER_NAME) {
 				return "Telerik";
 			}
 
-			if(publisher.Name === MarketplacePluginData.TELERIK_PARTNER_PUBLISHER_NAME) {
+			if (publisher.Name === MarketplacePluginData.TELERIK_PARTNER_PUBLISHER_NAME) {
 				return "Telerik Partner";
 			}
 		}
