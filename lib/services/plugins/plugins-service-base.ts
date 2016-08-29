@@ -43,7 +43,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					options.useOriginalPluginDirectory = false;
 				}
 
-				return this.fetchPluginCore(pluginIdentifier, options).wait();
+				return this.fetchPluginCore(pluginIdentifier, null, options).wait();
 			}
 
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
@@ -67,7 +67,8 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				}
 			}
 
-			if (pluginsCount > 1 && pluginKeys[0] !== pluginIdentifier) {
+			let npmPluginResult = plugins[0];
+			if (pluginsCount > 1 && npmPluginResult.name !== pluginIdentifier) {
 				if (commonHelpers.isInteractive()) {
 					let selectedPlugin = this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys).wait();
 					return this.fetchPluginCore(selectedPlugin).wait();
@@ -77,7 +78,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			}
 
 			try {
-				return this.fetchPluginCore(pluginKeys[0]).wait();
+				return this.fetchPluginCore(npmPluginResult.name, npmPluginResult.version).wait();
 			} catch (err) {
 				if (pluginUrl) {
 					this.$logger.trace("Error while trying to fetch plugin with id " + pluginIdentifier + " via npm. Error is: " + err.message + ".");
@@ -141,9 +142,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return this.isLocalPath(pluginidentifier).wait() && (pluginIdentifierExtname === ".tgz" || pluginIdentifierExtname === ".gz");
 	}
 
-	protected fetchPluginBasicInformation(pluginIdentifier: string, failMessageMethodName: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
+	protected fetchPluginBasicInformation(pluginIdentifier: string, version: string, failMessageMethodName: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier).wait();
+			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier, version).wait();
 			let installLocalPluginOptions: ILocalPluginData = {
 				actualName: pluginData && pluginData.actualName,
 				isTgz: pluginData && pluginData.isTgz,
@@ -153,7 +154,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			};
 
 			if (pathToInstalledPlugin) {
-				return this.fetchPluginBasicInformationCore(pathToInstalledPlugin, installLocalPluginOptions, options).wait();
+				return this.fetchPluginBasicInformationCore(pathToInstalledPlugin, version, installLocalPluginOptions, options).wait();
 			} else {
 				let errorMessage = ("Unable to " + failMessageMethodName + " plugin " + pluginIdentifier + ".") +
 					" Make sure this is a valid plugin name, path to existing directory or git URL.";
@@ -162,7 +163,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected installPackageToTempDir(identifier: string): IFuture<string> {
+	protected installPackageToTempDir(identifier: string, version?: string): IFuture<string> {
 		return ((): string => {
 			let tempInstallDir = temp.mkdirSync("pluginInstallation");
 			try {
@@ -172,6 +173,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					version: "1.0.0"
 				};
 				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
+				if (version) {
+					identifier = `${identifier}@${version}`;
+				}
 
 				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
 				let pathToPackage = path.join(tempInstallDir, NODE_MODULES_DIR_NAME);
@@ -272,7 +276,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return (<IMarketplacePlugin>plugin).pluginVersionsData.DefaultVersion;
 	}
 
-	protected abstract fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation>;
+	protected abstract fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation>;
 
 	protected abstract installLocalPluginCore(pluginPath: string, pluginOpts?: ILocalPluginData): IFuture<IBasicPluginInformation>;
 
@@ -280,7 +284,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected abstract composeSearchQuery(keywords: string[]): string[];
 
-	private fetchPluginCore(pluginIdentifier: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<string> {
+	private fetchPluginCore(pluginIdentifier: string, version?: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<string> {
 		return ((): string => {
 			let pluginBasicInfo: IBasicPluginInformation;
 			let pluginLocalPath = path.resolve(pluginIdentifier);
@@ -303,7 +307,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				options.useOriginalPluginDirectory = false;
 			}
 
-			pluginBasicInfo = this.fetchPluginBasicInformation(pluginId, "fetch", pluginData, options).wait();
+			pluginBasicInfo = this.fetchPluginBasicInformation(pluginId, version, "fetch", pluginData, options).wait();
 
 			return pluginBasicInfo.name;
 		}).future<string>()();

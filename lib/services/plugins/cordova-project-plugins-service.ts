@@ -249,7 +249,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return (installedPluginInstances && installedPluginInstances.length > 0) || this.isPluginFetched(pluginName).wait();
 	}
 
-	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {
+	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
 		return (() => {
 			if (this.$project.hasBuildConfigurations) {
 				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
@@ -263,20 +263,12 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		let result: IBasicPluginInformation;
-		if (this.$npmService.isScopedDependency(pluginName)) {
-			let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+		let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
 
-			result = {
-				name: scopedDependencyInfo.name,
-				version: scopedDependencyInfo.version || "latest"
-			};
-		} else {
-			let [name, version] = pluginName.split("@");
-			result = { name, version };
-		}
-
-		return Future.fromResult(result);
+		return Future.fromResult({
+			name: dependencyInfo.name,
+			version: dependencyInfo.version
+		});
 	}
 
 	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {
@@ -332,11 +324,16 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
-		// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
-		pluginData.addPluginToConfigFile = false;
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
+			pluginData.addPluginToConfigFile = false;
 
-		return super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
+			let pluginBasicInfo = super.installLocalPlugin(pathToInstalledPlugin, pluginData, options).wait();
+			this.configurePlugin(pluginBasicInfo.name, version).wait();
+			return pluginBasicInfo;
+		}).future<IBasicPluginInformation>()();
+
 	}
 
 	private loadPluginsData(): IFuture<void> {
@@ -451,7 +448,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
 
-			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version}` : "",
+			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version || plugin.data.Version}` : "",
 				successMessageForConfigSuffix = ` for ${configuration} configuration${versionString}`,
 				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 

@@ -108,7 +108,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			if (this.hasTgzExtension(pluginIdentifier)) {
-				pluginBasicInfo = this.fetchPluginBasicInformation(path.resolve(pluginIdentifier), "add", { actualName: pluginIdentifier, isTgz: true, addPluginToConfigFile: false }).wait();
+				pluginBasicInfo = this.fetchPluginBasicInformation(path.resolve(pluginIdentifier), "add", null, { actualName: pluginIdentifier, isTgz: true, addPluginToConfigFile: false }).wait();
 			} else if (this.checkIsValidLocalPlugin(pluginIdentifier).wait()) {
 				pluginBasicInfo = this.installLocalPlugin(pluginIdentifier, { actualName: pluginIdentifier, isTgz: false, addPluginToConfigFile: true }).wait();
 			} else {
@@ -187,16 +187,8 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let name: string, version: string;
-			if (this.$npmService.isScopedDependency(pluginName)) {
-				let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
-
-				name = scopedDependencyInfo.name;
-				version = scopedDependencyInfo.version;
-			} else {
-				[name, version] = pluginName.split("@");
-			}
-			return this.getBasicPluginInfoFromMarketplace(name, version).wait() || { name, version };
+			let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
+			return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version).wait() || { name: dependencyInfo.name, version: dependencyInfo.version };
 		}).future<IBasicPluginInformation>()();
 	}
 
@@ -251,7 +243,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName).wait()) {
 			pluginData.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 		}
