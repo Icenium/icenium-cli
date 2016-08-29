@@ -12,7 +12,7 @@
         "2"
     ]
     ,"iOSBackgroundMode": []
-    ,"FrameworkVersion": "2.1.0"
+    ,"FrameworkVersion": "2.2.0"
     ,"AndroidPermissions": [
         "android.permission.INTERNET"
      ]
