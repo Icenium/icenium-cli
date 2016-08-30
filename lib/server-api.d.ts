@@ -107,6 +107,7 @@ declare module Server{
 	}
 	interface FrameworkVersion{
 		Version: string;
+		BuildTools: any;
 		DisplayName: string;
 	}
 	interface CordovaMigrationData{
@@ -161,6 +162,7 @@ declare module Server{
 		DefaultVersion: string;
 		Framework: string;
 		PageUrl: string;
+		VersionsRetrievalFailed: boolean;
 	}
 	interface ICordovaServiceContract{
 		getLiveSyncToken(solutionName: string, projectName: string): IFuture<string>;
@@ -227,10 +229,6 @@ declare module Server{
 		getExtensions(frameworkVersion: string): IFuture<any>;
 		getFile(path: string, $resultStream: any): IFuture<void>;
 	}
-	interface IInternalExtensionsServiceContract{
-		publish(package_: any): IFuture<void>;
-		deleteExtension(extensionName: string, extensionVersion: string): IFuture<void>;
-	}
 	interface IUploadServiceContract{
 		completeUpload(path: string, originalFileHash: string): IFuture<void>;
 		initUpload(path: string): IFuture<void>;
@@ -277,40 +275,9 @@ declare module Server{
 		generate(solutionName: string, projectName: string, type: Server.ImageType, image: any): IFuture<string[]>;
 		generateArchive(type: Server.ImageType, image: any, $resultStream: any): IFuture<void>;
 	}
-	interface Uri{
-		AbsolutePath: string;
-		AbsoluteUri: string;
-		LocalPath: string;
-		Authority: string;
-		HostNameType: string;
-		IsDefaultPort: boolean;
-		IsFile: boolean;
-		IsLoopback: boolean;
-		PathAndQuery: string;
-		Segments: string[];
-		IsUnc: boolean;
-		Host: string;
-		Port: number;
-		Query: string;
-		Fragment: string;
-		Scheme: string;
-		OriginalString: string;
-		DnsSafeHost: string;
-		IdnHost: string;
-		IsAbsoluteUri: boolean;
-		UserEscaped: boolean;
-		UserInfo: string;
-	}
-	const enum UriHostNameType{
-		Unknown,
-		Basic,
-		Dns,
-		IPv4,
-		IPv6,
-	}
 	interface IAppsItmstransporterServiceContract{
-		uploadApplication(appId: string, projectName: string, adamId: number, packageUri: Server.Uri, username: string, password: string): IFuture<void>;
-		uploadApplication1(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>;
+		uploadApplicationFromUri(appId: string, projectName: string, adamId: number, packageUri: string, username: string, password: string): IFuture<void>;
+		uploadApplication(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>;
 	}
 	interface Application{
 		AppleID: number;
@@ -322,8 +289,8 @@ declare module Server{
 	}
 	interface IItmstransporterServiceContract{
 		getApplicationsReadyForUpload(username: string, password: string): IFuture<Server.Application[]>;
-		uploadApplication(solutionName: string, projectName: string, adamId: number, packageUri: Server.Uri, username: string, password: string): IFuture<void>;
-		uploadApplication1(solutionName: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>;
+		uploadApplicationFromUri(solutionName: string, projectName: string, adamId: number, packageUri: string, username: string, password: string): IFuture<void>;
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>;
 	}
 	interface KendoDownloadablePackageData{
 		Id: string;
@@ -390,6 +357,7 @@ declare module Server{
 		DefaultVersion: string;
 		Framework: string;
 		PageUrl: string;
+		VersionsRetrievalFailed: boolean;
 	}
 	interface INativescriptServiceContract{
 		migrate(solutionName: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
@@ -399,8 +367,17 @@ declare module Server{
 		migrate(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
 		migrate1(appId: string, projectName: string, targetVersion: string): IFuture<Server.MigrationResult>;
 	}
-	interface IInternalAppsProjectsServiceContract{
-		getProjectPhysicalPaths(appId: string, projectName: string): IFuture<Server.Object>;
+	interface ProjectItemInfo{
+		Project: Server.ProjectInfo;
+		Type: string;
+		Identifier: string;
+	}
+	interface NodeModulesInfo{
+		CombinedDtsUrl: string;
+		NodeModules: Server.ProjectItemInfo[];
+		OperationStatus: string;
+		Log: string;
+		OperationId: string;
 	}
 	interface ProjectTemplateExpansionData{
 		ProjectName: string;
@@ -408,15 +385,19 @@ declare module Server{
 		Framework: string;
 		Arguments: IDictionary<string>;
 	}
-	interface ProjectItemInfo{
-		Project: Server.ProjectInfo;
-		Type: string;
-		Identifier: string;
-	}
 	interface ItemTemplateExpansionData{
 		TemplateIdentifier: string;
 		Framework: string;
 		Arguments: IDictionary<string>;
+	}
+	const enum NpmInstallStatus{
+		Unknown,
+		NotSupported,
+		Installing,
+		FetchingDefinitions,
+		Uploading,
+		Completed,
+		Failed,
 	}
 	interface IAppsProjectsServiceContract{
 		exportProject(appId: string, projectName: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
@@ -426,6 +407,7 @@ declare module Server{
 		getProjectContents(appId: string, projectName: string): IFuture<string>;
 		saveProjectContents(appId: string, projectName: string, projectContents: string): IFuture<void>;
 		getProjectConfiguraitons(appId: string, projectName: string): IFuture<string[]>;
+		getNodeModules(appId: string, projectName: string, operationId: string): IFuture<Server.NodeModulesInfo>;
 		createProject(appId: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
 		deleteProject(appId: string, projectName: string): IFuture<void>;
 		setProjectProperty(appId: string, projectName: string, configuration: string, changeset: IDictionary<string>): IFuture<void>;
@@ -466,10 +448,17 @@ declare module Server{
 		Name: string;
 		Framework: string;
 	}
+	interface WorkspaceUpgradeInfo{
+		Name: string;
+		Description: string;
+		DocumentationUrl: string;
+		Mandatory: boolean;
+	}
 	interface SolutionData{
 		Name: string;
 		Items: Server.IWorkspaceItemData[];
 		IsUpgradeable: boolean;
+		UpgradeDetails: Server.WorkspaceUpgradeInfo[];
 	}
 	interface IProjectsServiceContract{
 		getProjectTemplates(): IFuture<Server.ProjectTemplateData[]>;
@@ -482,8 +471,8 @@ declare module Server{
 		getProjectContents(solutionName: string, projectName: string): IFuture<string>;
 		saveProjectContents(solutionName: string, projectName: string, projectContents: string): IFuture<void>;
 		getProjectConfiguraitons(solutionName: string, projectName: string): IFuture<string[]>;
-		upgradeSolution(solutionName: string): IFuture<void>;
-		getSolution(solutionName: string, checkUpgradability: boolean): IFuture<Server.SolutionData>;
+		upgradeSolution(solutionName: string, mandatoryOnly: boolean): IFuture<void>;
+		getSolution(solutionName: string): IFuture<Server.SolutionData>;
 		canLoadSolution(solutionName: string): IFuture<boolean>;
 		deleteSolution(solutionName: string): IFuture<void>;
 		createSolution(solutionName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
@@ -515,10 +504,10 @@ declare module Server{
 		exportApplication(appId: string, skipMetadata: boolean, $resultStream: any): IFuture<void>;
 		createApplication(applicationData: Server.ApplicationCreationData): IFuture<IDictionary<Object>>;
 		enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>;
-		getApplication(appId: string, checkUpgradability: boolean): IFuture<Server.SolutionData>;
+		getApplication(appId: string): IFuture<Server.SolutionData>;
 		canLoadApplication(appId: string): IFuture<boolean>;
 		deleteApplication(appId: string): IFuture<void>;
-		upgradeApplication(appId: string): IFuture<void>;
+		upgradeApplication(appId: string, mandatoryOnly: boolean): IFuture<void>;
 		getApplicationServices(appId: string, serviceNames: string[]): IFuture<Server.ApplicationServiceData[]>;
 		enableApplicationService(appId: string, serviceData: IDictionary<Object>): IFuture<IDictionary<Object>>;
 		getApplicationType(appId: string): IFuture<string>;
@@ -648,15 +637,15 @@ declare module Server{
 		Username: string;
 		Password: string;
 	}
-	interface IAppsPublishServiceContract{
-		publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
-	}
 	interface IPublishServiceContract{
 		publishFtp(solutionName: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
 	}
+	interface IAppsPublishServiceContract{
+		publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>;
+	}
 	interface IRawSettingsServiceContract{
-		getUserSettings($resultStream: any): IFuture<void>;
-		saveUserSettings(content: any): IFuture<void>;
+		getUserSettings(file: string, $resultStream: any): IFuture<void>;
+		saveUserSettings(file: string, content: any): IFuture<void>;
 		getSolutionUserSettings(solutionName: string, $resultStream: any): IFuture<void>;
 		saveSolutionUserSettings(solutionName: string, content: any): IFuture<void>;
 	}
@@ -686,13 +675,6 @@ declare module Server{
 		ProvisionSettings: Server.IMobileProjectProvisionSettings;
 		SolutionSettings: Server.ISolutionSettings;
 	}
-	interface IAppsSettingsServiceContract{
-		getSettings(appId: string): IFuture<Server.SettingsData>;
-		setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>;
-		setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>;
-		setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>;
-		updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>;
-	}
 	interface ISettingsServiceContract{
 		getSettings(solutionName: string): IFuture<Server.SettingsData>;
 		setCodesignIdentity(solutionName: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>;
@@ -700,18 +682,12 @@ declare module Server{
 		setActiveBuildConfiguration(buildConfiguration: string, solutionName: string): IFuture<void>;
 		updateSettingsProjectIdentifier(solutionName: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>;
 	}
-	interface StorageMachineStatus{
-		Path: string;
-		Elapsed: number;
-	}
-	interface IStatusServiceContract{
-		getLinuxBuildMachineStatus(): IFuture<string>;
-		getMacBuildMachineStatus(): IFuture<string>;
-		getStorageStatus(): IFuture<Server.StorageMachineStatus[]>;
-	}
-	interface TamGroupData{
-		Name: string;
-		Id: string;
+	interface IAppsSettingsServiceContract{
+		getSettings(appId: string): IFuture<Server.SettingsData>;
+		setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>;
+		setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>;
+		setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>;
+		updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>;
 	}
 	interface UploadedAppData{
 		InstallUrl: string;
@@ -729,6 +705,15 @@ declare module Server{
 		IsMandatory: boolean;
 		ProjectConfiguration: string;
 	}
+	interface IAppsTamServiceContract{
+		uploadApplicationFromUri(appId: string, projectName: string, packageUri: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
+		uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
+		uploadApplication(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
+	}
+	interface TamGroupData{
+		Name: string;
+		Id: string;
+	}
 	interface FeatureStatus{
 		IsAvailable: boolean;
 		IsAccountUpgradeRequired: boolean;
@@ -737,15 +722,15 @@ declare module Server{
 	interface ITamServiceContract{
 		verifyStoreCreated(): IFuture<void>;
 		getGroups(): IFuture<Server.TamGroupData[]>;
-		uploadApplication(solutionName: string, projectName: string, packageUri: Server.Uri, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
-		uploadApplication1(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
+		uploadApplicationFromUri(solutionName: string, projectName: string, packageUri: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
 		uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
 		getAccountStatus(): IFuture<Server.FeatureStatus>;
+		uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
 	}
-	interface IAppsTamServiceContract{
-		uploadApplication(appId: string, projectName: string, packageUri: Server.Uri, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
-		uploadApplication1(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>;
-		uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>;
+	interface IAppsTapServiceContract{
+		getRemote(appId: string): IFuture<string>;
+		setRemote(appId: string, remoteUrl: string): IFuture<void>;
+		initCurrentUserSharedRepository(appId: string): IFuture<boolean>;
 	}
 	interface TapSolutionData{
 		id: string;
@@ -790,11 +775,6 @@ declare module Server{
 		getUnreadNotifications(accountId: string): IFuture<Server.TapNotificationData[]>;
 		getReadNotifications(accountId: string, fromDate: Date): IFuture<Server.TapNotificationData[]>;
 	}
-	interface IAppsTapServiceContract{
-		getRemote(appId: string): IFuture<string>;
-		setRemote(appId: string, remoteUrl: string): IFuture<void>;
-		initCurrentUserSharedRepository(appId: string): IFuture<boolean>;
-	}
 	interface BranchItemData{
 		BranchName: string;
 		LocalName: string;
@@ -836,6 +816,7 @@ declare module Server{
 	}
 	interface DiffLineResultData{
 		DiffLineBlock: Server.DiffLineData[];
+		Error: string;
 	}
 	interface ChangeSetData{
 		VersionName: string;
@@ -877,6 +858,7 @@ declare module Server{
 		Conflict,
 		Local,
 		Remote,
+		Error,
 	}
 	const enum ResetMode{
 		Hard,
@@ -945,7 +927,6 @@ declare module Server{
 		identityStore: Server.IIdentityStoreServiceContract;
 		everlive: Server.IEverliveServiceContract;
 		extensions: Server.IExtensionsServiceContract;
-		internalExtensions: Server.IInternalExtensionsServiceContract;
 		upload: Server.IUploadServiceContract;
 		appsFiles: Server.IAppsFilesServiceContract;
 		filesystem: Server.IFilesystemServiceContract;
@@ -958,7 +939,6 @@ declare module Server{
 		mobileprovisions: Server.IMobileprovisionsServiceContract;
 		nativescript: Server.INativescriptServiceContract;
 		appsNativescript: Server.IAppsNativescriptServiceContract;
-		internalAppsProjects: Server.IInternalAppsProjectsServiceContract;
 		appsProjects: Server.IAppsProjectsServiceContract;
 		projects: Server.IProjectsServiceContract;
 		apps: Server.IAppsServiceContract;
@@ -967,17 +947,16 @@ declare module Server{
 		build: Server.IBuildServiceContract;
 		appsBuild: Server.IAppsBuildServiceContract;
 		npm: Server.INpmServiceContract;
-		appsPublish: Server.IAppsPublishServiceContract;
 		publish: Server.IPublishServiceContract;
+		appsPublish: Server.IAppsPublishServiceContract;
 		rawSettings: Server.IRawSettingsServiceContract;
 		appsRawSettings: Server.IAppsRawSettingsServiceContract;
-		appsSettings: Server.IAppsSettingsServiceContract;
 		settings: Server.ISettingsServiceContract;
-		status: Server.IStatusServiceContract;
-		tam: Server.ITamServiceContract;
+		appsSettings: Server.IAppsSettingsServiceContract;
 		appsTam: Server.IAppsTamServiceContract;
-		tap: Server.ITapServiceContract;
+		tam: Server.ITamServiceContract;
 		appsTap: Server.IAppsTapServiceContract;
+		tap: Server.ITapServiceContract;
 		versioncontrol: Server.IVersioncontrolServiceContract;
 		appsVersioncontrol: Server.IAppsVersioncontrolServiceContract;
 	}

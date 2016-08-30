@@ -104,7 +104,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	private getSolutionDataCore(app: ITapAppData): IFuture<Server.SolutionData> {
 		let name = app.isApp ? app.id : app.name;
-		return this.$serviceProxy.makeTapServiceCall(() => this.$server.apps.getApplication(name, true), {discardSolutionSpaceHeader: app.isApp});
+		return this.$serviceProxy.makeTapServiceCall(() => this.$server.apps.getApplication(name), {discardSolutionSpaceHeader: app.isApp});
 	}
 
 	private getProjectData(solutionName: string, projectName: string): IFuture<Server.IWorkspaceItemData> {
