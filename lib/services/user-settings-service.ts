@@ -2,13 +2,14 @@ import * as xmlMapping from "xml-mapping";
 import * as path from "path";
 import * as helpers from "../helpers";
 import {UserSettingsServiceBase} from "../common/services/user-settings-service";
+import {UserSettings} from "../constants";
 
 export class ClientUserSettingsFileService implements IUserSettingsFileService {
 	private userSettingsFile: string;
 
 	constructor(private $fs: IFileSystem,
 		$options: IOptions) {
-		this.userSettingsFile = path.join($options.profileDir, "local-user-settings.json");
+		this.userSettingsFile = path.join($options.profileDir, UserSettings.LocalFileName);
 	}
 
 	public get userSettingsFilePath(): string {
@@ -35,7 +36,7 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 	constructor(private $fs: IFileSystem,
 				private $config: Config.IConfig,
 				private $options: IOptions) {
-		this.userSettingsFile = path.join(this.$options.profileDir, this.$config.AB_SERVER + ".user-settings.xml");
+		this.userSettingsFile = path.join(this.$options.profileDir, this.$config.AB_SERVER + UserSettings.FileExtension);
 	}
 
 	public get userSettingsFilePath(): string {
@@ -84,7 +85,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 	private downloadUserSettings(): IFuture<void> {
 		return(() => {
 			try {
-				this.$server.rawSettings.getUserSettings(this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
+				this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
 				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
 			} catch(error) {
 				if(error.response && error.response.statusCode === 404) {
@@ -159,7 +160,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 			helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
 
 			let xml = xmlMapping.toxml(this.userSettingsData);
-			this.$server.rawSettings.saveUserSettings(xml).wait();
+			this.$server.rawSettings.saveUserSettings(UserSettings.DefaultFileName, xml).wait();
 
 			if (Object.keys(data).length !== 0) {
 				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml).wait();

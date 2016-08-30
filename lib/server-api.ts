@@ -1,6 +1,7 @@
-//
 // automatically generated code; do not edit manually!
 //
+"use strict";
+
 import querystring = require('querystring');
 
 export class AuthenticationService implements Server.IAuthenticationServiceContract{
@@ -156,16 +157,6 @@ export class ExtensionsService implements Server.IExtensionsServiceContract{
 		return this.$serviceProxy.call<void>('GetFile', 'GET', ['api','extensions','files',encodeURI(path.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
 	}
 }
-export class InternalExtensionsService implements Server.IInternalExtensionsServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public publish(package_: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('Publish', 'POST', ['api','internal','extensions','publish'].join('/'), null, [{name: 'package_', value: package_, contentType: 'application/octet-stream'}], null);
-	}
-	public deleteExtension(extensionName: string, extensionVersion: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('DeleteExtension', 'DELETE', ['api','internal','extensions',encodeURI(extensionName.replace(/\\/g, '/')),encodeURI(extensionVersion.replace(/\\/g, '/'))].join('/'), null, null, null);
-	}
-}
 export class UploadService implements Server.IUploadServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -240,11 +231,11 @@ export class ImagesService implements Server.IImagesServiceContract{
 export class AppsItmstransporterService implements Server.IAppsItmstransporterServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public uploadApplication(appId: string, projectName: string, adamId: number, packageUri: Server.Uri, username: string, password: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'itmstransporter','upload',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'packageUri': packageUri, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
+	public uploadApplicationFromUri(appId: string, projectName: string, adamId: number, packageUri: string, username: string, password: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplicationFromUri', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'itmstransporter','upload',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'packageUri': packageUri, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
-	public uploadApplication1(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>{
-			return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'itmstransporter','upload',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
+	public uploadApplication(appId: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'itmstransporter','upload',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
 }
 export class ItmstransporterService implements Server.IItmstransporterServiceContract{
@@ -253,11 +244,11 @@ export class ItmstransporterService implements Server.IItmstransporterServiceCon
 	public getApplicationsReadyForUpload(username: string, password: string): IFuture<Server.Application[]>{
 		return this.$serviceProxy.call<Server.Application[]>('GetApplicationsReadyForUpload', 'POST', ['api','itmstransporter','applications'].join('/') + '?' + querystring.stringify({ 'username': username }), 'application/json', [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
-	public uploadApplication(solutionName: string, projectName: string, adamId: number, packageUri: Server.Uri, username: string, password: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','itmstransporter','upload',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'packageUri': packageUri, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
+	public uploadApplicationFromUri(solutionName: string, projectName: string, adamId: number, packageUri: string, username: string, password: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplicationFromUri', 'POST', ['api','itmstransporter','upload',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'packageUri': packageUri, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
-	public uploadApplication1(solutionName: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>{
-			return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','itmstransporter','upload',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
+	public uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, adamId: number, username: string, password: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadApplication', 'POST', ['api','itmstransporter','upload',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'adamId': adamId, 'username': username }), null, [{name: 'password', value: JSON.stringify(password), contentType: 'application/json'}], null);
 	}
 }
 export class KendoService implements Server.IKendoServiceContract{
@@ -319,13 +310,6 @@ export class AppsNativescriptService implements Server.IAppsNativescriptServiceC
 			return this.$serviceProxy.call<Server.MigrationResult>('Migrate', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'nativescript',encodeURI(projectName.replace(/\\/g, '/')),'migrate'].join('/') + '?' + querystring.stringify({ 'targetVersion': targetVersion }), 'application/json', null, null);
 	}
 }
-export class InternalAppsProjectsService implements Server.IInternalAppsProjectsServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public getProjectPhysicalPaths(appId: string, projectName: string): IFuture<Server.Object>{
-		return this.$serviceProxy.call<Server.Object>('GetProjectPhysicalPaths', 'GET', ['api','internal','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/')),'path'].join('/'), 'application/json', null, null);
-	}
-}
 export class AppsProjectsService implements Server.IAppsProjectsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -349,6 +333,9 @@ export class AppsProjectsService implements Server.IAppsProjectsServiceContract{
 	}
 	public getProjectConfiguraitons(appId: string, projectName: string): IFuture<string[]>{
 		return this.$serviceProxy.call<string[]>('GetProjectConfiguraitons', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects','configurations',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
+	}
+	public getNodeModules(appId: string, projectName: string, operationId: string): IFuture<Server.NodeModulesInfo>{
+		return this.$serviceProxy.call<Server.NodeModulesInfo>('GetNodeModules', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/')),'node_modules',encodeURI(operationId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 	public createProject(appId: string, projectName: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
 		return this.$serviceProxy.call<void>('CreateProject', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'projects',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
@@ -399,11 +386,11 @@ export class ProjectsService implements Server.IProjectsServiceContract{
 	public getProjectConfiguraitons(solutionName: string, projectName: string): IFuture<string[]>{
 		return this.$serviceProxy.call<string[]>('GetProjectConfiguraitons', 'GET', ['api','projects','configurations',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
-	public upgradeSolution(solutionName: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UpgradeSolution', 'UPGRADE', ['api','projects','upgrade',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), null, null, null);
+	public upgradeSolution(solutionName: string, mandatoryOnly: boolean): IFuture<void>{
+		return this.$serviceProxy.call<void>('UpgradeSolution', 'UPGRADE', ['api','projects','upgrade',encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'mandatoryOnly': mandatoryOnly }), null, null, null);
 	}
-	public getSolution(solutionName: string, checkUpgradability: boolean): IFuture<Server.SolutionData>{
-		return this.$serviceProxy.call<Server.SolutionData>('GetSolution', 'GET', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'checkUpgradability': checkUpgradability }), 'application/json', null, null);
+	public getSolution(solutionName: string): IFuture<Server.SolutionData>{
+		return this.$serviceProxy.call<Server.SolutionData>('GetSolution', 'GET', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 	public canLoadSolution(solutionName: string): IFuture<boolean>{
 		return this.$serviceProxy.call<boolean>('CanLoadSolution', 'EXISTS', ['api','projects',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
@@ -448,8 +435,8 @@ export class AppsService implements Server.IAppsServiceContract{
 	public enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): IFuture<void>{
 		return this.$serviceProxy.call<void>('EnableApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), null, [{name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json'}], null);
 	}
-	public getApplication(appId: string, checkUpgradability: boolean): IFuture<Server.SolutionData>{
-		return this.$serviceProxy.call<Server.SolutionData>('GetApplication', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'checkUpgradability': checkUpgradability }), 'application/json', null, null);
+	public getApplication(appId: string): IFuture<Server.SolutionData>{
+		return this.$serviceProxy.call<Server.SolutionData>('GetApplication', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 	public canLoadApplication(appId: string): IFuture<boolean>{
 		return this.$serviceProxy.call<boolean>('CanLoadApplication', 'EXISTS', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
@@ -457,8 +444,8 @@ export class AppsService implements Server.IAppsServiceContract{
 	public deleteApplication(appId: string): IFuture<void>{
 		return this.$serviceProxy.call<void>('DeleteApplication', 'DELETE', ['api','apps',encodeURI(appId.replace(/\\/g, '/'))].join('/'), null, null, null);
 	}
-	public upgradeApplication(appId: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UpgradeApplication', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'upgrade'].join('/'), null, null, null);
+	public upgradeApplication(appId: string, mandatoryOnly: boolean): IFuture<void>{
+		return this.$serviceProxy.call<void>('UpgradeApplication', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'upgrade'].join('/') + '?' + querystring.stringify({ 'mandatoryOnly': mandatoryOnly }), null, null, null);
 	}
 	public getApplicationServices(appId: string, serviceNames: string[]): IFuture<Server.ApplicationServiceData[]>{
 		return this.$serviceProxy.call<Server.ApplicationServiceData[]>('GetApplicationServices', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'services'].join('/') + '?' + querystring.stringify({ 'serviceNames': serviceNames }), 'application/json', null, null);
@@ -529,13 +516,6 @@ export class NpmService implements Server.INpmServiceContract{
 		return this.$serviceProxy.call<number>('GetNpmPackageDownloads', 'GET', ['api','npm','downloads',encodeURI(packageName.replace(/\\/g, '/'))].join('/'), 'application/json', null, null);
 	}
 }
-export class AppsPublishService implements Server.IAppsPublishServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>{
-		return this.$serviceProxy.call<void>('PublishFtp', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'publish','ftp',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'ftpConnectionData', value: JSON.stringify(ftpConnectionData), contentType: 'application/json'}], null);
-	}
-}
 export class PublishService implements Server.IPublishServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
@@ -543,14 +523,21 @@ export class PublishService implements Server.IPublishServiceContract{
 		return this.$serviceProxy.call<void>('PublishFtp', 'POST', ['api','publish','ftp',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'ftpConnectionData', value: JSON.stringify(ftpConnectionData), contentType: 'application/json'}], null);
 	}
 }
+export class AppsPublishService implements Server.IAppsPublishServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public publishFtp(appId: string, projectName: string, ftpConnectionData: Server.FtpConnectionData): IFuture<void>{
+		return this.$serviceProxy.call<void>('PublishFtp', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'publish','ftp',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'ftpConnectionData', value: JSON.stringify(ftpConnectionData), contentType: 'application/json'}], null);
+	}
+}
 export class RawSettingsService implements Server.IRawSettingsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public getUserSettings($resultStream: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('GetUserSettings', 'GET', ['api','rawSettings','currentUser'].join('/'), 'application/octet-stream', null, $resultStream);
+	public getUserSettings(file: string, $resultStream: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('GetUserSettings', 'GET', ['api','rawSettings','currentUser',encodeURI(file.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
 	}
-	public saveUserSettings(content: any): IFuture<void>{
-		return this.$serviceProxy.call<void>('SaveUserSettings', 'POST', ['api','rawSettings','currentUser'].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
+	public saveUserSettings(file: string, content: any): IFuture<void>{
+		return this.$serviceProxy.call<void>('SaveUserSettings', 'POST', ['api','rawSettings','currentUser',encodeURI(file.replace(/\\/g, '/'))].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
 	}
 	public getSolutionUserSettings(solutionName: string, $resultStream: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('GetSolutionUserSettings', 'GET', ['api','rawSettings','solution',encodeURI(solutionName.replace(/\\/g, '/'))].join('/'), 'application/octet-stream', null, $resultStream);
@@ -567,25 +554,6 @@ export class AppsRawSettingsService implements Server.IAppsRawSettingsServiceCon
 	}
 	public saveSolutionUserSettings(appId: string, content: any): IFuture<void>{
 		return this.$serviceProxy.call<void>('SaveSolutionUserSettings', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'rawSettings','solution'].join('/'), null, [{name: 'content', value: content, contentType: 'application/octet-stream'}], null);
-	}
-}
-export class AppsSettingsService implements Server.IAppsSettingsServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public getSettings(appId: string): IFuture<Server.SettingsData>{
-		return this.$serviceProxy.call<Server.SettingsData>('GetSettings', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','solution'].join('/'), 'application/json', null, null);
-	}
-	public setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('SetCodesignIdentity', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','codesignIdentity',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'platform': platform }), null, [{name: 'identityAlias', value: JSON.stringify(identityAlias), contentType: 'application/json'}], null);
-	}
-	public setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('SetMobileProvision', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','mobileProvision',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'provisionIdentifier', value: JSON.stringify(provisionIdentifier), contentType: 'application/json'}], null);
-	}
-	public setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('SetActiveBuildConfiguration', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','buildConfiguration',encodeURI(buildConfiguration.replace(/\\/g, '/'))].join('/'), null, null, null);
-	}
-	public updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('UpdateSettingsProjectIdentifier', 'PATCH', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','updateProjectIdentifier',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'newProjectIdentity', value: JSON.stringify(newProjectIdentity), contentType: 'application/json'}], null);
 	}
 }
 export class SettingsService implements Server.ISettingsServiceContract{
@@ -607,17 +575,36 @@ export class SettingsService implements Server.ISettingsServiceContract{
 		return this.$serviceProxy.call<void>('UpdateSettingsProjectIdentifier', 'PATCH', ['api','settings','updateProjectIdentifier',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'newProjectIdentity', value: JSON.stringify(newProjectIdentity), contentType: 'application/json'}], null);
 	}
 }
-export class StatusService implements Server.IStatusServiceContract{
+export class AppsSettingsService implements Server.IAppsSettingsServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public getLinuxBuildMachineStatus(): IFuture<string>{
-		return this.$serviceProxy.call<string>('GetLinuxBuildMachineStatus', 'GET', ['api','status','build','android'].join('/'), 'application/json', null, null);
+	public getSettings(appId: string): IFuture<Server.SettingsData>{
+		return this.$serviceProxy.call<Server.SettingsData>('GetSettings', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','solution'].join('/'), 'application/json', null, null);
 	}
-	public getMacBuildMachineStatus(): IFuture<string>{
-		return this.$serviceProxy.call<string>('GetMacBuildMachineStatus', 'GET', ['api','status','build','iOS'].join('/'), 'application/json', null, null);
+	public setCodesignIdentity(appId: string, projectIdentity: string, platform: Server.DevicePlatform, identityAlias: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetCodesignIdentity', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','codesignIdentity',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'platform': platform }), null, [{name: 'identityAlias', value: JSON.stringify(identityAlias), contentType: 'application/json'}], null);
 	}
-	public getStorageStatus(): IFuture<Server.StorageMachineStatus[]>{
-		return this.$serviceProxy.call<Server.StorageMachineStatus[]>('GetStorageStatus', 'GET', ['api','status','storage'].join('/'), 'application/json', null, null);
+	public setMobileProvision(appId: string, projectIdentity: string, provisionIdentifier: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetMobileProvision', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','mobileProvision',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'provisionIdentifier', value: JSON.stringify(provisionIdentifier), contentType: 'application/json'}], null);
+	}
+	public setActiveBuildConfiguration(appId: string, buildConfiguration: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetActiveBuildConfiguration', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','buildConfiguration',encodeURI(buildConfiguration.replace(/\\/g, '/'))].join('/'), null, null, null);
+	}
+	public updateSettingsProjectIdentifier(appId: string, projectIdentity: string, newProjectIdentity: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('UpdateSettingsProjectIdentifier', 'PATCH', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'settings','updateProjectIdentifier',encodeURI(projectIdentity.replace(/\\/g, '/'))].join('/'), null, [{name: 'newProjectIdentity', value: JSON.stringify(newProjectIdentity), contentType: 'application/json'}], null);
+	}
+}
+export class AppsTamService implements Server.IAppsTamServiceContract{
+	constructor(private $serviceProxy: Server.IServiceProxy){
+	}
+	public uploadApplicationFromUri(appId: string, projectName: string, packageUri: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
+		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplicationFromUri', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','applications',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'packageUri': packageUri }), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	}
+	public uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>{
+		return this.$serviceProxy.call<void>('UploadPatch', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','patches',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'patchData', value: JSON.stringify(patchData), contentType: 'application/json'}], null);
+	}
+	public uploadApplication(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
+		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','applications',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
 	}
 }
 export class TamService implements Server.ITamServiceContract{
@@ -629,11 +616,8 @@ export class TamService implements Server.ITamServiceContract{
 	public getGroups(): IFuture<Server.TamGroupData[]>{
 		return this.$serviceProxy.call<Server.TamGroupData[]>('GetGroups', 'GET', ['api','tam','groups'].join('/'), 'application/json', null, null);
 	}
-	public uploadApplication(solutionName: string, projectName: string, packageUri: Server.Uri, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
-		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'packageUri': packageUri }), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
-	}
-	public uploadApplication1(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
-			return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	public uploadApplicationFromUri(solutionName: string, projectName: string, packageUri: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
+		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplicationFromUri', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'packageUri': packageUri }), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
 	}
 	public uploadPatch(solutionName: string, projectName: string, patchData: Server.PatchData): IFuture<void>{
 		return this.$serviceProxy.call<void>('UploadPatch', 'POST', ['api','tam',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),'patches'].join('/'), null, [{name: 'patchData', value: JSON.stringify(patchData), contentType: 'application/json'}], null);
@@ -641,18 +625,21 @@ export class TamService implements Server.ITamServiceContract{
 	public getAccountStatus(): IFuture<Server.FeatureStatus>{
 		return this.$serviceProxy.call<Server.FeatureStatus>('GetAccountStatus', 'GET', ['api','tam','account','status'].join('/'), 'application/json', null, null);
 	}
+	public uploadApplication(solutionName: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
+		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','tam','applications',encodeURI(solutionName.replace(/\\/g, '/')),encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	}
 }
-export class AppsTamService implements Server.IAppsTamServiceContract{
+export class AppsTapService implements Server.IAppsTapServiceContract{
 	constructor(private $serviceProxy: Server.IServiceProxy){
 	}
-	public uploadApplication(appId: string, projectName: string, packageUri: Server.Uri, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
-		return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','applications',encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'packageUri': packageUri }), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	public getRemote(appId: string): IFuture<string>{
+		return this.$serviceProxy.call<string>('GetRemote', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), 'application/json', null, null);
 	}
-	public uploadApplication1(appId: string, projectName: string, relativePackagePath: string, settings: Server.PublishSettings): IFuture<Server.UploadedAppData>{
-			return this.$serviceProxy.call<Server.UploadedAppData>('UploadApplication', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','applications',encodeURI(projectName.replace(/\\/g, '/')),encodeURI(relativePackagePath.replace(/\\/g, '/'))].join('/'), 'application/json', [{name: 'settings', value: JSON.stringify(settings), contentType: 'application/json'}], null);
+	public setRemote(appId: string, remoteUrl: string): IFuture<void>{
+		return this.$serviceProxy.call<void>('SetRemote', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), null, [{name: 'remoteUrl', value: JSON.stringify(remoteUrl), contentType: 'application/json'}], null);
 	}
-	public uploadPatch(appId: string, projectName: string, patchData: Server.PatchData): IFuture<void>{
-		return this.$serviceProxy.call<void>('UploadPatch', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tam','patches',encodeURI(projectName.replace(/\\/g, '/'))].join('/'), null, [{name: 'patchData', value: JSON.stringify(patchData), contentType: 'application/json'}], null);
+	public initCurrentUserSharedRepository(appId: string): IFuture<boolean>{
+		return this.$serviceProxy.call<boolean>('InitCurrentUserSharedRepository', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','userProjects','initSharedRepository'].join('/'), 'application/json', null, null);
 	}
 }
 export class TapService implements Server.ITapServiceContract{
@@ -699,19 +686,6 @@ export class TapService implements Server.ITapServiceContract{
 	}
 	public getReadNotifications(accountId: string, fromDate: Date): IFuture<Server.TapNotificationData[]>{
 		return this.$serviceProxy.call<Server.TapNotificationData[]>('GetReadNotifications', 'GET', ['api','tap','notifications',encodeURI(accountId.replace(/\\/g, '/')),'read'].join('/') + '?' + querystring.stringify({ 'fromDate': fromDate }), 'application/json', null, null);
-	}
-}
-export class AppsTapService implements Server.IAppsTapServiceContract{
-	constructor(private $serviceProxy: Server.IServiceProxy){
-	}
-	public getRemote(appId: string): IFuture<string>{
-		return this.$serviceProxy.call<string>('GetRemote', 'GET', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), 'application/json', null, null);
-	}
-	public setRemote(appId: string, remoteUrl: string): IFuture<void>{
-		return this.$serviceProxy.call<void>('SetRemote', 'PUT', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','versioncontrol','remote'].join('/'), null, [{name: 'remoteUrl', value: JSON.stringify(remoteUrl), contentType: 'application/json'}], null);
-	}
-	public initCurrentUserSharedRepository(appId: string): IFuture<boolean>{
-		return this.$serviceProxy.call<boolean>('InitCurrentUserSharedRepository', 'POST', ['api','apps',encodeURI(appId.replace(/\\/g, '/')),'tap','userProjects','initSharedRepository'].join('/'), 'application/json', null, null);
 	}
 }
 export class VersioncontrolService implements Server.IVersioncontrolServiceContract{
@@ -886,7 +860,6 @@ export class ServiceContainer implements Server.IServer{
 	public identityStore: Server.IIdentityStoreServiceContract = this.$injector.resolve(IdentityStoreService);
 	public everlive: Server.IEverliveServiceContract = this.$injector.resolve(EverliveService);
 	public extensions: Server.IExtensionsServiceContract = this.$injector.resolve(ExtensionsService);
-	public internalExtensions: Server.IInternalExtensionsServiceContract = this.$injector.resolve(InternalExtensionsService);
 	public upload: Server.IUploadServiceContract = this.$injector.resolve(UploadService);
 	public appsFiles: Server.IAppsFilesServiceContract = this.$injector.resolve(AppsFilesService);
 	public filesystem: Server.IFilesystemServiceContract = this.$injector.resolve(FilesystemService);
@@ -899,7 +872,6 @@ export class ServiceContainer implements Server.IServer{
 	public mobileprovisions: Server.IMobileprovisionsServiceContract = this.$injector.resolve(MobileprovisionsService);
 	public nativescript: Server.INativescriptServiceContract = this.$injector.resolve(NativescriptService);
 	public appsNativescript: Server.IAppsNativescriptServiceContract = this.$injector.resolve(AppsNativescriptService);
-	public internalAppsProjects: Server.IInternalAppsProjectsServiceContract = this.$injector.resolve(InternalAppsProjectsService);
 	public appsProjects: Server.IAppsProjectsServiceContract = this.$injector.resolve(AppsProjectsService);
 	public projects: Server.IProjectsServiceContract = this.$injector.resolve(ProjectsService);
 	public apps: Server.IAppsServiceContract = this.$injector.resolve(AppsService);
@@ -908,17 +880,16 @@ export class ServiceContainer implements Server.IServer{
 	public build: Server.IBuildServiceContract = this.$injector.resolve(BuildService);
 	public appsBuild: Server.IAppsBuildServiceContract = this.$injector.resolve(AppsBuildService);
 	public npm: Server.INpmServiceContract = this.$injector.resolve(NpmService);
-	public appsPublish: Server.IAppsPublishServiceContract = this.$injector.resolve(AppsPublishService);
 	public publish: Server.IPublishServiceContract = this.$injector.resolve(PublishService);
+	public appsPublish: Server.IAppsPublishServiceContract = this.$injector.resolve(AppsPublishService);
 	public rawSettings: Server.IRawSettingsServiceContract = this.$injector.resolve(RawSettingsService);
 	public appsRawSettings: Server.IAppsRawSettingsServiceContract = this.$injector.resolve(AppsRawSettingsService);
-	public appsSettings: Server.IAppsSettingsServiceContract = this.$injector.resolve(AppsSettingsService);
 	public settings: Server.ISettingsServiceContract = this.$injector.resolve(SettingsService);
-	public status: Server.IStatusServiceContract = this.$injector.resolve(StatusService);
-	public tam: Server.ITamServiceContract = this.$injector.resolve(TamService);
+	public appsSettings: Server.IAppsSettingsServiceContract = this.$injector.resolve(AppsSettingsService);
 	public appsTam: Server.IAppsTamServiceContract = this.$injector.resolve(AppsTamService);
-	public tap: Server.ITapServiceContract = this.$injector.resolve(TapService);
+	public tam: Server.ITamServiceContract = this.$injector.resolve(TamService);
 	public appsTap: Server.IAppsTapServiceContract = this.$injector.resolve(AppsTapService);
+	public tap: Server.ITapServiceContract = this.$injector.resolve(TapService);
 	public versioncontrol: Server.IVersioncontrolServiceContract = this.$injector.resolve(VersioncontrolService);
 	public appsVersioncontrol: Server.IAppsVersioncontrolServiceContract = this.$injector.resolve(AppsVersioncontrolService);
 }

@@ -34,8 +34,8 @@ export class AppStoreService implements IAppStoreService {
 			let projectPath = solutionPath.substr(solutionPath.indexOf("/") + 1);
 
 			let projectData = this.$project.projectData;
-			this.$server.itmstransporter.uploadApplication1(projectData.ProjectName, projectData.ProjectName,
-				projectPath, theApp.AppleID, userName, password).wait();
+			this.$server.itmstransporter.uploadApplicationFromUri(projectData.ProjectName, projectData.ProjectName,
+				theApp.AppleID, projectPath, userName, password).wait();
 
 			this.$logger.info("Upload complete.");
 		}).future<void>()();
