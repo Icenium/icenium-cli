@@ -17,10 +17,10 @@ export class AppStoreService implements IAppStoreService {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
 			}
 
-			this.$logger.info("Building release package.");
+			this.$logger.info("Building package.");
 			let buildResult = this.$buildService.build({
 				platform: "iOS",
-				projectConfiguration: constants.Configurations.Release,
+				projectConfiguration: this.$project.getProjectConfiguration(constants.Configurations.Release),
 				buildConfiguration: constants.Configurations.Release,
 				provisionTypes: [constants.ProvisionType.AppStore]
 			}).wait();
