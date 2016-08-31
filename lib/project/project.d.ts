@@ -76,7 +76,7 @@ declare module Project {
 		getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>>;
 	}
 
-	interface IFrameworkProject {
+	interface IFrameworkProject extends IFrameworkProjectBase {
 		name: string;
 		capabilities: ICapabilities;
 		defaultProjectTemplate: string;
@@ -152,6 +152,12 @@ declare module Project {
 		 * @return {boolean}			whether or not the initial properties have been updated
 		 */
 		completeProjectProperties(properties: any): boolean;
+
+		/**
+		 * Ensures the project has all required files.
+		 * @param {string} projectDir The directory of the project.
+		 */
+		ensureProject(projectDir: string): IFuture<void>;
 	}
 
 	interface IFrameworkProjectResolverBase {

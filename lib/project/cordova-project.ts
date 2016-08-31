@@ -167,6 +167,10 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		}).future<void>()();
 	}
 
+	public ensureProject(projectDir: string): IFuture<void> {
+		return Future.fromResult();
+	}
+
 	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): IFuture<void> {
 		return (() => {
 			let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),

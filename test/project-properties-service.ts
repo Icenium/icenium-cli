@@ -57,7 +57,7 @@ class SampleProject implements Project.IFrameworkProject {
 	projectTemplatesString(): IFuture<string> {
 		return null;
 	}
-	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */}
+	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */ }
 	checkSdkVersions(platform: string, projectData: Project.IData): void {/* mock */ }
 	completeProjectProperties(properties: any): boolean {
 		return this.completeProjectePropertiesResult;
@@ -74,6 +74,20 @@ class SampleProject implements Project.IFrameworkProject {
 	}
 	updateMigrationConfigFile(): IFuture<void> {
 		return Future.fromResult(null);
+	}
+	ensureProject(projectDir: string): IFuture<void> {
+		return Future.fromResult(null);
+	}
+	alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
+	getProjectFileSchemaByName(name: string): IDictionary<any> {
+		return null;
+	}
+	getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]> {
+		return Future.fromResult([]);
+	}
+	printAssetUpdateMessage(): void { /* No implementation required. */ }
+	getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
+		return null;
 	}
 }
 

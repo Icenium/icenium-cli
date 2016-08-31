@@ -340,6 +340,8 @@ export class Project extends ProjectBase implements Project.IProject {
 		if (!this.projectData) {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}
+
+		this.frameworkProject.ensureProject(this.projectDir).wait();
 	}
 
 	public ensureCordovaProject() {
@@ -777,6 +779,8 @@ export class Project extends ProjectBase implements Project.IProject {
 					this.$fs.deleteDirectory(projectDir).wait();
 					throw ex;
 				}
+
+				this.frameworkProject.ensureProject(this.projectDir).wait();
 			} else {
 				let templates = this.frameworkProject.projectTemplatesString().wait();
 				this.$errors.failWithoutHelp(`The specified template ${this.$options.template} does not exist. You can use any of the following templates:${EOL}${templates}`);

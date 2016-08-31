@@ -158,6 +158,10 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectFilesProvider", ProjectFilesProvider);
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("dateProvider", DateProvider);
+	testInjector.register("typeScriptService", {
+		isTypeScriptProject: (projectDir: string): IFuture<boolean> => Future.fromResult(false)
+	});
+	testInjector.register("npmService", {});
 
 	return testInjector;
 }
