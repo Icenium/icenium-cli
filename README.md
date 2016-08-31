@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: AppBuilder 3.4.3
-<br/>Release date: Aug 29, 2016
+<br/>Release date: Aug 31, 2016
 
 > AppBuilder 3.4.3 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4-3" target="_blank">AppBuilder 3.4.3 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
@@ -376,7 +376,7 @@ Features
 ===
 
 Latest version: AppBuilder 3.4.3
-<br/>Release date: Aug 29, 2016
+<br/>Release date: Aug 31, 2016
 
 > AppBuilder 3.4.3 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4-3" target="_blank">AppBuilder 3.4.3 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-4" target="_blank">AppBuilder 3.4 Release Notes</a>.
 
