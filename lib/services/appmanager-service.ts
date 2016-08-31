@@ -31,11 +31,11 @@ class AppManagerService implements IAppManagerService {
 			this.$logger.info("Accessing Telerik AppManager.");
 			this.$server.tam.verifyStoreCreated().wait();
 
-			this.$logger.info("Building release package.");
+			this.$logger.info("Building package.");
 			let buildResult = this.$buildService.build({
 				platform: mobilePlatform,
 				buildConfiguration: constants.Configurations.Release,
-				projectConfiguration: constants.Configurations.Release,
+				projectConfiguration: this.$project.getProjectConfiguration(constants.Configurations.Release),
 				provisionTypes: [constants.ProvisionType.Development, constants.ProvisionType.Enterprise, constants.ProvisionType.AdHoc],
 				showWp8SigningMessage: false,
 				buildForTAM: true,

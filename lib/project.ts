@@ -398,8 +398,13 @@ export class Project extends ProjectBase implements Project.IProject {
 		return _.keys(this.configurationSpecificData);
 	}
 
-	public getProjectConfiguration(): string {
-		return this.getConfigurationsSpecifiedByUser()[0] || _.first(this.getAllConfigurationsNames().sort()) || Configurations.Debug;
+	public getProjectConfiguration(defaultConfiguration?: string): string {
+		let result = this.getConfigurationsSpecifiedByUser()[0];
+		if (!result && defaultConfiguration) {
+			result = _.some(this.getAllConfigurationsNames(), conf => conf.toLowerCase() === defaultConfiguration.toLowerCase()) ? defaultConfiguration : null;
+		}
+
+		return result || _.first(this.getAllConfigurationsNames().sort()) || Configurations.Debug;
 	}
 
 	public updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void> {
