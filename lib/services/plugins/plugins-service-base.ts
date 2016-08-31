@@ -63,7 +63,11 @@ export abstract class PluginsServiceBase implements IPluginsService {
 						this.$errors.failWithoutHelp(`The plugin cannot be downloaded using npm, because it has no package.json in it. You can still download it from this link: ${plugin.data.Url.grey}`);
 					}
 				} else {
-					return this.fetchPluginCore(pluginIdentifier).wait();
+					if (this.$fs.exists(path.resolve(pluginIdentifier)).wait()) {
+						return this.fetchPluginCore(pluginIdentifier).wait();
+					} else {
+						this.$errors.failWithoutHelp(`The plugin ${pluginIdentifier} was not found in npm and it is not path to existing local plugin.`);
+					}
 				}
 			}
 
@@ -145,6 +149,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 	protected fetchPluginBasicInformation(pluginIdentifier: string, version: string, failMessageMethodName: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier, version).wait();
+
+			this.validatePluginInformation(pathToInstalledPlugin).wait();
+
 			let installLocalPluginOptions: ILocalPluginData = {
 				actualName: pluginData && pluginData.actualName,
 				isTgz: pluginData && pluginData.isTgz,
@@ -283,6 +290,8 @@ export abstract class PluginsServiceBase implements IPluginsService {
 	protected abstract getPluginsDirName(): string;
 
 	protected abstract composeSearchQuery(keywords: string[]): string[];
+
+	protected abstract validatePluginInformation(pathToPlugin: string): IFuture<void>;
 
 	private fetchPluginCore(pluginIdentifier: string, version?: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<string> {
 		return ((): string => {

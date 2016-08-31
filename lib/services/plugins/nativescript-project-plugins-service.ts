@@ -261,6 +261,14 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		}).future<boolean>()();
 	}
 
+	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
+		return (() => {
+			if (!this.$fs.exists(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
+				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid NativeScript plugin.`);
+			}
+		}).future<void>()();
+	}
+
 	private getMarketplacePlugins(): IFuture<IPlugin[]> {
 		return ((): IPlugin[] => {
 			if (!this.marketplacePlugins || !this.marketplacePlugins.length) {

@@ -310,16 +310,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): IBasicPluginInformation => {
 			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
 
-			if (!pluginXml) {
-				let errorMessage = `${pluginOpts.actualName} is not Cordova plugin.`;
-
-				if (!this.$fs.isEmptyDir(pathToPlugin).wait()) {
-					errorMessage = `${errorMessage}${EOL}The plugin is downloaded in ${pathToPlugin}`;
-				}
-
-				this.$errors.failWithoutHelp(errorMessage);
-			}
-
 			return this.getLocalPluginBasicInformation(pluginXml).wait();
 		}).future<IBasicPluginInformation>()();
 	}
@@ -334,6 +324,15 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			return pluginBasicInfo;
 		}).future<IBasicPluginInformation>()();
 
+	}
+
+	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
+		return (() => {
+			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+			if (!pluginXml) {
+				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
+			}
+		}).future<void>()();
 	}
 
 	private loadPluginsData(): IFuture<void> {
