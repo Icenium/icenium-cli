@@ -54,6 +54,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("hostInfo", HostInfo);
 	testInjector.register("dateProvider", DateProvider);
 	testInjector.register("injector", testInjector);
+	testInjector.register("typeScriptService", {});
+	testInjector.register("npmService", {});
 
 	return testInjector;
 }

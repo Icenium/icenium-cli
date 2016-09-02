@@ -390,6 +390,26 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	public updateMigrationConfigFile(): IFuture<void> {
 		return Future.fromResult(null);
 	}
+
+	public ensureProject(projectDir: string): IFuture<void> {
+		return Future.fromResult(null);
+	}
+
+	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
+
+	public getProjectFileSchemaByName(name: string): IDictionary<any> {
+		return null;
+	}
+
+	public getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]> {
+		return Future.fromResult([]);
+	}
+
+	public printAssetUpdateMessage(): void { /* No implementation required. */ }
+
+	public getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {
+		return null;
+	}
 }
 
 export class ProjectFilesManager implements IProjectFilesManager {

@@ -84,6 +84,8 @@ export abstract class FrameworkProjectBase implements Project.IFrameworkProjectB
 		return updated;
 	}
 
+	public abstract ensureProject(projectDir: string): IFuture<void>;
+
 	public abstract updateMigrationConfigFile(): IFuture<void>;
 
 	private generateDefaultAppId(appName: string): string {

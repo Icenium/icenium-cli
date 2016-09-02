@@ -413,9 +413,6 @@ export class BuildService implements Project.IBuildService {
 					} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
 						targetFileName = settings.downloadedFilePath
 							|| path.join(this.$project.getProjectDir().wait(), pkg.fileName);
-					} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
-						// We will get here if the disposition is BuildResultMetadata which is not file for download.
-						return;
 					} else {
 						// We will get here if the disposition is BuildResultMetadata which is not file for download.
 						return;

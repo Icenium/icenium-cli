@@ -16,12 +16,14 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		private $injector: IInjector,
 		private $nativeScriptProjectCapabilities: Project.ICapabilities,
 		private $dateProvider: IDateProvider,
+		private $typeScriptService: ITypeScriptService,
+		private $npmService: INpmService,
 		$errors: IErrors,
 		$fs: IFileSystem,
 		$jsonSchemaValidator: IJsonSchemaValidator,
 		$logger: ILogger,
-		$resources: IResourceLoader,
-		$options: IOptions) {
+		$options: IOptions,
+		$resources: IResourceLoader) {
 		super($logger, $fs, $resources, $errors, $jsonSchemaValidator, $options);
 	}
 
@@ -179,6 +181,19 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			if (currentMigrationFileContent !== newMigrationFileContent) {
 				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent).wait();
 				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
+			}
+		}).future<void>()();
+	}
+
+	public ensureProject(projectDir: string): IFuture<void> {
+		return (() => {
+			if (this.$typeScriptService.isTypeScriptProject(projectDir).wait()) {
+				try {
+					this.$npmService.install(projectDir).wait();
+				} catch (err) {
+					this.$logger.trace(`Failed to install all npm dependencies in the project. Error: ${err}.`);
+					this.$logger.warn("The installation of the project dependencies from npm failed. The TypeScript transpilation may fail due to missing .d.ts files.");
+				}
 			}
 		}).future<void>()();
 	}
