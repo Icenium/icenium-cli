@@ -1,6 +1,6 @@
 import * as path from "path";
-import {AppBuilderStaticConfigBase} from "./common/appbuilder/appbuilder-static-config-base";
 import {ConfigBase} from "./common/config-base";
+import { StaticConfigBase } from "./common/static-config-base";
 import * as osenv from "osenv";
 
 export class Configuration extends ConfigBase implements IConfiguration { // User specific config
@@ -75,7 +75,7 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 }
 $injector.register("config", Configuration);
 
-export class StaticConfig extends AppBuilderStaticConfigBase implements IStaticConfig {
+export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	constructor($injector: IInjector) {
 		super($injector);
 		this.RESOURCE_DIR_PATH = path.join(this.RESOURCE_DIR_PATH, "../../resources");

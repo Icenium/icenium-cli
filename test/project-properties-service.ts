@@ -32,7 +32,6 @@ class SampleProject implements Project.IFrameworkProject {
 	liveSyncUrl: string;
 	requiredAndroidApiLevel: number;
 	configFiles: Project.IConfigurationFile[];
-	startPackageActivity: string;
 
 	get relativeAppResourcesPath(): string {
 		return 'App_Resources';

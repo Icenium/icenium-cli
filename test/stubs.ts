@@ -347,8 +347,6 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public get configFiles(): Project.IConfigurationFile[] { return undefined; }
 
-	public get startPackageActivity(): string { return ""; }
-
 	public get relativeAppResourcesPath(): string { return ''; }
 
 	public get projectSpecificFiles(): string[] {
@@ -438,7 +436,6 @@ export class StaticConfig implements IStaticConfig {
 	public TRACK_FEATURE_USAGE_SETTING_NAME = "AnalyticsSettings.TrackFeatureUsage";
 	public ERROR_REPORT_SETTING_NAME = "AnaliticsSettings.TrackExceptions";
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
-	public START_PACKAGE_ACTIVITY_NAME = ".TelerikCallbackActivity";
 	public SYS_REQUIREMENTS_LINK = "";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
 	public APP_RESOURCES_DIR_NAME = "App_Resources";
