@@ -5,7 +5,7 @@ import * as semver from "semver";
 import * as path from "path";
 import * as xmlMapping from "xml-mapping";
 import {EOL} from "os";
-import {PluginType} from "../../plugins-data";
+import {PluginType, CordovaPluginData} from "../../plugins-data";
 import {CordovaPluginsService} from "./cordova-plugins";
 import {PluginsServiceBase} from "./plugins-service-base";
 import Future = require("fibers/future");
@@ -13,13 +13,14 @@ import Future = require("fibers/future");
 export class CordovaProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
 	private static CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME = "CordovaPluginVariables";
-	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins"];
+	private static HEADERS = ["Core Plugins", "Advanced Plugins", "Marketplace Plugins", "Local Plugins"];
 
 	private _identifierToPlugin: IDictionary<IPlugin>;
 	private _obsoletedIntegratedPlugins: any;
 	private pluginsForbiddenConfigurations: IStringDictionary = {
 		"com.telerik.LivePatch": this.$projectConstants.DEBUG_CONFIGURATION_NAME
 	};
+	private _localPlugins: IPlugin[];
 
 	constructor(private $cordovaPluginsService: CordovaPluginsService,
 		private $loginManager: ILoginManager,
@@ -70,7 +71,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
-		return corePlugins;
+		return corePlugins.concat(this.getLocalPlugins().wait());
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
@@ -79,7 +80,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
 		}
 
-		return plugins;
+		return plugins.concat(this.getLocalPlugins().wait());
 	}
 
 	public addPlugin(pluginName: string): IFuture<void> {
@@ -248,7 +249,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return (installedPluginInstances && installedPluginInstances.length > 0) || this.isPluginFetched(pluginName).wait();
 	}
 
-	public configurePlugin(pluginName: string, version: string, configurations?: string[]): IFuture<void> {
+	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
 		return (() => {
 			if (this.$project.hasBuildConfigurations) {
 				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
@@ -262,20 +263,12 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		let result: IBasicPluginInformation;
-		if (this.$npmService.isScopedDependency(pluginName)) {
-			let scopedDependencyInfo = this.$npmService.getScopedDependencyInformation(pluginName);
+		let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
 
-			result = {
-				name: scopedDependencyInfo.name,
-				version: scopedDependencyInfo.version || "latest"
-			};
-		} else {
-			let [name, version] = pluginName.split("@");
-			result = { name, version };
-		}
-
-		return Future.fromResult(result);
+		return Future.fromResult({
+			name: dependencyInfo.name,
+			version: dependencyInfo.version
+		});
 	}
 
 	public getPluginVersions(plugin: IPlugin): IPluginVersion[] {
@@ -315,49 +308,31 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
 
-			if (!this.$fs.exists(pathToPluginXml).wait()) {
-				let errorMessage = `${pluginOpts.actualName} is not Cordova plugin.`;
-
-				if (!this.$fs.isEmptyDir(pathToPlugin).wait()) {
-					errorMessage = `${errorMessage}${EOL}The plugin is downloaded in ${pathToPlugin}`;
-				}
-
-				this.$errors.failWithoutHelp(errorMessage);
-			}
-
-			let pluginXml: any = xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
-
-			// Need to add $t because of the xmlMapping library.
-			let basicPluginInformation: IBasicPluginInformation = {
-				name: pluginXml.plugin.name.$t,
-				description: pluginXml.plugin.description.$t,
-				version: pluginXml.plugin.version
-			};
-
-			let pluginVariables: any[] = [];
-			if (pluginXml.plugin.preference) {
-				// Need to chack if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
-				if (_.isArray(pluginXml.plugin.preference)) {
-					_.each(pluginXml.plugin.preference, (preference: any) => {
-						pluginVariables.push(preference);
-					});
-				} else {
-					pluginVariables.push(pluginXml.plugin.preference);
-				}
-			}
-
-			basicPluginInformation.variables = pluginVariables;
-			return basicPluginInformation;
+			return this.getLocalPluginBasicInformation(pluginXml).wait();
 		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
-		// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
-		pluginData.addPluginToConfigFile = false;
+	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
+			pluginData.addPluginToConfigFile = false;
 
-		return super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
+			let pluginBasicInfo = super.installLocalPlugin(pathToInstalledPlugin, pluginData, options).wait();
+			this.configurePlugin(pluginBasicInfo.name, version).wait();
+			return pluginBasicInfo;
+		}).future<IBasicPluginInformation>()();
+
+	}
+
+	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
+		return (() => {
+			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+			if (!pluginXml) {
+				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
+			}
+		}).future<void>()();
 	}
 
 	private loadPluginsData(): IFuture<void> {
@@ -441,7 +416,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let plugin = this.getBestMatchingPlugin(pluginName, version);
 			let pluginData = <IMarketplacePluginData>plugin.data;
 			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
-			let cordovaPluginVariables: any = JSON.parse(JSON.stringify(originalPluginVariables));
+			let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
 
 			let variables = <string[]>pluginData.Variables;
 			if (variables && variables.length > 0) {
@@ -449,7 +424,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					cordovaPluginVariables[pluginData.Identifier] = {};
 				}
 
-				_.each(variables, (variableName: string) => {
+				_.each(variables, (variable: any) => {
+					let variableName: string = variable.name || variable;
 					let variableInformation = this.gatherVariableInformation(pluginData, variableName, configuration).wait();
 					cordovaPluginVariables[pluginData.Identifier][variableName] = variableInformation[variableName];
 				});
@@ -471,7 +447,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
 
-			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version}` : "",
+			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version || plugin.data.Version}` : "",
 				successMessageForConfigSuffix = ` for ${configuration} configuration${versionString}`,
 				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 
@@ -884,6 +860,91 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<string>()();
 	}
 
+	private getLocalPlugins(): IFuture<IPlugin[]> {
+		return ((): IPlugin[] => {
+			if (!this._localPlugins) {
+				let pluginsDir = path.join(this.$project.projectDir, "plugins");
+				if (!this.$fs.exists(pluginsDir).wait()) {
+					return [];
+				}
+
+				this._localPlugins = _.map(this.$fs.readDirectory(pluginsDir).wait(), (pluginName: string) => {
+					let pluginXml = this.getPluginXmlContent(path.join(pluginsDir, pluginName)).wait();
+					let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml).wait();
+					let plugin = pluginXml.plugin;
+					let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
+					let identifier = plugin.id;
+					let url = "";
+
+					if (_.has(plugin, "repo")) {
+						url = plugin.repo.$t;
+					}
+
+					if (!url && _.has(plugin, "url")) {
+						url = plugin.url.$t;
+					}
+
+					let data: IMarketplacePluginData = {
+						Name: basicPluginInfo.name,
+						Description: basicPluginInfo.description,
+						Assets: null,
+						AndroidRequiredPermissions: null,
+						Authors: [basicPluginInfo.author],
+						Url: url,
+						Identifier: identifier,
+						Version: basicPluginInfo.version,
+						Variables: basicPluginInfo.variables,
+						Publisher: { Name: basicPluginInfo.author, Url: url },
+						DownloadsCount: 0,
+						SupportedVersion: basicPluginInfo.version,
+						Platforms: platforms
+					};
+
+					return new CordovaPluginData(data, PluginType.LocalPlugin, this.$project, this.$projectConstants);
+				});
+			}
+
+			return this._localPlugins;
+		}).future<IPlugin[]>()();
+	}
+
+	private getLocalPluginBasicInformation(pluginXml: any): IFuture<IBasicPluginInformation> {
+		return ((): IBasicPluginInformation => {
+			// Need to add $t because of the xmlMapping library.
+			let basicPluginInformation: IBasicPluginInformation = {
+				name: pluginXml.plugin.name.$t,
+				description: pluginXml.plugin.description.$t,
+				version: pluginXml.plugin.version
+			};
+
+			let pluginVariables: any[] = [];
+			if (pluginXml.plugin.preference) {
+				// Need to check if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
+				if (_.isArray(pluginXml.plugin.preference)) {
+					_.each(pluginXml.plugin.preference, (preference: any) => {
+						pluginVariables.push(preference);
+					});
+				} else {
+					pluginVariables.push(pluginXml.plugin.preference);
+				}
+			}
+
+			basicPluginInformation.variables = pluginVariables;
+			return basicPluginInformation;
+		}).future<IBasicPluginInformation>()();
+	}
+
+	private getPluginXmlContent(pathToPlugin: string): IFuture<any> {
+		return ((): any => {
+			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+
+			if (!this.$fs.exists(pathToPluginXml).wait()) {
+				return null;
+			}
+
+			return xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
+		}).future<any>()();
+	}
 }
 
 $injector.register("cordovaProjectPluginsService", CordovaProjectPluginsService);
