@@ -34,7 +34,13 @@ export class SamplesService implements ISamplesService {
 		private $fs: IFileSystem,
 		private $httpClient: Server.IHttpClient,
 		private $staticConfig: IStaticConfig,
-		private $options: IOptions) {
+		private $options: IOptions,
+		private $typeScriptService: ITypeScriptService,
+		private $injector: IInjector) {
+	}
+
+	public get $analyticsService(): IAnalyticsService {
+		return this.$injector.resolve("analyticsService");
 	}
 
 	public printSamplesInformation(framework?: string): IFuture<void> {
@@ -89,6 +95,13 @@ export class SamplesService implements ISamplesService {
 					this.$fs.copyFile(file, targetDir).wait();
 				});
 			} finally {
+				let featureValue = sample.name;
+
+				if (this.$typeScriptService.isTypeScriptProject(tempDir).wait()) {
+					featureValue = `${featureValue}-TS`;
+				}
+
+				this.$analyticsService.track("CreateProjectFromSample", featureValue).wait();
 				try {
 					this.$fs.deleteDirectory(tempDir).wait();
 				} catch (error) {
