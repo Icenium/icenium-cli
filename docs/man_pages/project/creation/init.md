@@ -5,7 +5,8 @@ Usage | Synopsis
 ------|-------
 General | `$appbuilder init [<Type>]`
 
-Initializes an existing project for development. The command attempts to determine the project type and retain any existing configuration based on the files in the working directory.  
+Initializes an existing project for development. The command attempts to determine the project type and retain any existing configuration based on the files in the working directory.
+The command will create AppBuilder native project from `NativeScript` project or hybrid project from `Cordova` or `Ionic` project.
 
 You can run the `init` command with a command extension that specifies the project type.
 
@@ -14,7 +15,7 @@ You can run the `init` command with a command extension that specifies the proje
 * `hybrid` - Initializes an existing Apache Cordova project for development in the current directory.
 * `native` - Initializes an existing NativeScript project for development in the current directory.
 
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 ### Related Commands
 
 Command | Description
