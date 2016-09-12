@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as constants from "../common/constants";
+import rimraf = require("rimraf");
 
 export class ProjectMigrationService implements Project.IProjectMigrationService {
 	private shouldAskForTypeScriptMigration = true;
@@ -25,7 +26,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 
 					if (this.$fs.exists(pathToTypingsTnsCoreModules).wait()) {
 						if (this.$prompter.confirm("Your project is using old version of AppBuilder TypeScript support. Do you want to migrate it? ", () => true).wait()) {
-							this.$fs.deleteDirectory(pathToTypingsTnsCoreModules).wait();
+							rimraf.sync(pathToTypingsTnsCoreModules);
 							this.$fs.deleteEmptyParents(pathToTypingsTnsCoreModules).wait();
 							this.$npmService.install(projectDir).wait();
 						}
