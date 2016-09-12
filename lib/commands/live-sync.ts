@@ -1,63 +1,99 @@
 import { EnsureProjectCommand } from "./ensure-project-command";
+import Future = require("fibers/future");
 
-class LiveSyncDevicesCommand extends EnsureProjectCommand {
-	constructor(private $liveSyncService: ILiveSyncService,
+class LiveSyncCommandBase extends EnsureProjectCommand {
+	constructor(protected $liveSyncService: ILiveSyncService,
+		private $options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
 		super($project, $errors);
 	}
-	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync();
+
+	public execute(args: string[]): IFuture<void> {
+		this.$options.justlaunch = !this.$options.watch;
+		return Future.fromResult();
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
+
+class LiveSyncDevicesCommand extends LiveSyncCommandBase {
+	constructor($liveSyncService: ILiveSyncService,
+		$options: IOptions,
+		$project: Project.IProject,
+		$errors: IErrors) {
+		super($liveSyncService, $options, $project, $errors);
+	}
+
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
+			super.execute(args).wait();
+			this.$liveSyncService.livesync().wait();
+		}).future<void>()();
+	}
+
+}
+
 $injector.registerCommand(["livesync|*devices", "live-sync|*devices"], LiveSyncDevicesCommand);
 
-class LiveSyncAndroidCommand extends EnsureProjectCommand {
-	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+class LiveSyncAndroidCommand extends LiveSyncCommandBase {
+	constructor(private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$liveSyncService: ILiveSyncService,
+		$options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
-		super($project, $errors);
-	}
-	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
+		super($liveSyncService, $options, $project, $errors);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
+			super.execute(args).wait();
+			this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android).wait();
+		}).future<void>()();
+	}
 }
+
 $injector.registerCommand(["livesync|android", "live-sync|android"], LiveSyncAndroidCommand);
 
-class LiveSyncIosCommand extends EnsureProjectCommand {
-	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+class LiveSyncIosCommand extends LiveSyncCommandBase {
+	constructor(private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+		$liveSyncService: ILiveSyncService,
+		$options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
-		super($project, $errors);
+		super($liveSyncService, $options, $project, $errors);
 	}
-	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
+
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
+			super.execute(args).wait();
+			this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS).wait();
+		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand);
 
-class LiveSyncWP8Command extends EnsureProjectCommand {
-	constructor(private $liveSyncService: ILiveSyncService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
+class LiveSyncWP8Command extends LiveSyncCommandBase {
+	constructor(private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $config: Config.IConfig,
+		$liveSyncService: ILiveSyncService,
+		$options: IOptions,
 		$project: Project.IProject,
 		$errors: IErrors) {
-		super($project, $errors);
-	}
-	execute(args: string[]): IFuture<void> {
-		return this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
+		super($liveSyncService, $options, $project, $errors);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public execute(args: string[]): IFuture<void> {
+		return (() => {
+			super.execute(args).wait();
+			this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8).wait();
+		}).future<void>()();
+	}
 
 	public isDisabled = this.$config.ON_PREM;
 }
+
 $injector.registerCommand(["livesync|wp8", "live-sync|wp8"], LiveSyncWP8Command);
