@@ -102,6 +102,8 @@ class AppManagerService implements IAppManagerService {
 				return;
 			}
 
+			groups = _.sortBy(groups, (group) => group.Name.toLowerCase() );
+
 			let table = new Table({
 				head: ["Index", "Name"],
 				chars: {'mid': '', 'left-mid': '', 'mid-mid': '', 'right-mid': ''}
