@@ -9,11 +9,6 @@ Publishes a new Telerik AppManager LiveSync update of your published application
 
 For more information about AppManager LiveSync, see [Update Your Published App with AppManager LiveSync](http://docs.telerik.com/platform/appbuilder/publishing-your-app/update-appmanager-livesync#cli).<% } %>
 
-<% if(isConsole) { %>
-<% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help appmanager livesync` <% } %>
-<% } %>
-
-<% if((isConsole && isCordova) || isHtml) { %>
 ### Options
 * `--mandatory` - If set, the app users will have to install the required update first in order to continue utilizing the app. Use this option to provide critical bug fixes to your published app.
 
@@ -21,20 +16,15 @@ For more information about AppManager LiveSync, see [Update Your Published App w
 `<Platforms>` is one or more target platforms, separated by a space, for which you want to create a AppManager LiveSync update. You can set the following target platforms.
 * `android` - Publishes an update for your Android application.
 * `ios` - Publishes an update for your iOS application.
-* `wp8` - Publishes an update for your Windows Phone application.
-<% } %>
+<% if(isCordova) { %>* `wp8` - Publishes an update for your Windows Phone application.<% } %>
 
 <% if(isHtml) { %>
 ### Prerequisites
 
 * You must have a published version of your app, enabled for AppManager LiveSync, in AppManager, Google Play, Apple App Store or Windows Phone Store. To create a new version enabled for AppManager LiveSync, complete the following steps.
-	1. Enable your project for AppManager LiveSync by running `$ appbuilder plugin add com.telerik.LivePatch --release`
+	1. Enable your project for AppManager LiveSync by running `$ appbuilder plugin add com.telerik.LivePatch --release` for Apache Cordova apps or `$ appbuilder plugin add nativescript-plugin-livepatch --release` for NativeScript apps.
 	1. Publish your app to [AppManager](http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#cli), [Google Play](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-android#cli), [Apple App Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-ios#cli) or [Windows Phone Store](http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#cli).
-* Your project must target Apache Cordova 3.5.0 or later. To check the target Apache Cordova version of your project, run `$ appbuilder mobileframework`
-
-### Command Limitations
-
-* You cannot run this command on NativeScript projects.
+* If you are developing a hybrid app, it must target Apache Cordova 3.7.0 or later. To check the target Apache Cordova version of your project, run `$ appbuilder mobileframework`
 
 ### Related Commands
 
