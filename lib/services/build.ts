@@ -35,7 +35,7 @@ export class BuildService implements Project.IBuildService {
 		private $projectConstants: Project.IConstants,
 		private $httpClient: Server.IHttpClient) { }
 
-	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string> {
+	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): IFuture<string> {
 		return ((): string => {
 			urlKind = urlKind.toLowerCase();
 			if (urlKind !== "manifest" && urlKind !== "package") {
@@ -43,15 +43,16 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			let fullDownloadPath: string;
-			if (packageDef.format === BuildService.ACCEPT_RESULT_URL) {
+			if (packageDef.format === BuildService.ACCEPT_RESULT_URL && urlKind === "package") {
 				fullDownloadPath = packageDef.url;
 			} else {
 				// escape URLs twice to work around a bug in bit.ly
-				fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s",
+				fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s&projectConfiguration=%s",
 					this.$config.AB_SERVER_PROTO,
 					this.$config.AB_SERVER, urlKind,
 					querystring.escape(querystring.escape(packageDef.relativePath)),
-					querystring.escape(querystring.escape(liveSyncToken)));
+					querystring.escape(querystring.escape(liveSyncToken)),
+					projectConfiguration);
 			}
 
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
@@ -373,10 +374,10 @@ export class BuildService implements Project.IBuildService {
 				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
 				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def).wait();
+					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration).wait();
 
 					let packageUrl = (urlKind !== "package")
-						? this.getDownloadUrl("package", liveSyncToken, def).wait()
+						? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration).wait()
 						: downloadUrl;
 					this.$logger.debug("Download URL is '%s'", packageUrl);
 

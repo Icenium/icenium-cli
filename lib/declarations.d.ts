@@ -204,7 +204,7 @@ declare module Project {
 	}
 
 	interface IBuildService {
-		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef): IFuture<string>;
+		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): IFuture<string>;
 		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void>;
 		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
 		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation>;

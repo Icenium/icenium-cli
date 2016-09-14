@@ -192,7 +192,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					let dirs = this.$fs.readDirectory(pathToPackage).wait().filter(dirName => dirName !== ".bin");
 					// In case npm3 is installed on user's machine and the package has dependencies, there will be more than one dir, so we cannot be sure which one is ours.
 					if (dirs.length === 1) {
-						return path.join(pathToPackage, _.first(dirs));
+						let pathToPlugin = path.join(pathToPackage, _.first(dirs));
+						this.removeFetchedPluginDependencies(pathToPlugin).wait();
+						return pathToPlugin;
 					}
 				}
 
@@ -200,7 +202,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				//                           └── plugin-var-plugin@1.0.0  extraneous
 				let npm2OutputMatch = npmInstallOutput.match(/.*?tempPackage@1\.0\.0.*?\r?\n.*?\s+?(.*?)@.*?\s+?/m);
 				if (npm2OutputMatch) {
-					return path.join(tempInstallDir, NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
+					let pathToPlugin = path.join(tempInstallDir, NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
+					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					return pathToPlugin;
 				}
 
 				// output is something like: nativescript-google-sdk@0.1.18 node_modules\nativescript-google-sdk\n
@@ -217,7 +221,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					.last();
 
 				if (pluginDirectory) {
-					return path.join(tempInstallDir, pluginDirectory);
+					let pathToPlugin = path.join(tempInstallDir, pluginDirectory);
+					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					return pathToPlugin;
 				}
 			} catch (err) {
 				// Uncomment when all of our marketplace plugins have package.json
@@ -328,5 +334,11 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	private isUrlToRepository(pluginId: string): boolean {
 		return validUrl.isUri(pluginId);
+	}
+
+	private removeFetchedPluginDependencies(pathToPlugin: string): IFuture<void> {
+		let dependenciesDirectory = path.join(pathToPlugin, NODE_MODULES_DIR_NAME);
+
+		return this.$fs.deleteDirectory(dependenciesDirectory);
 	}
 }

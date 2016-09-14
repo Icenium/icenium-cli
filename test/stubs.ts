@@ -61,7 +61,7 @@ export class FileSystemStub implements IFileSystem {
 	}
 
 	deleteDirectory(directory: string): IFuture<any> {
-		return undefined;
+		return Future.fromResult();
 	}
 
 	getFileSize(path: string): IFuture<number> {
