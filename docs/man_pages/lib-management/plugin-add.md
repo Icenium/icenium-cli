@@ -24,17 +24,20 @@ Add the default version of an Apache Cordova plugin and set all variables from t
 Usage | Synopsis
 ------|---------
 List custom npm or NativeScript modules | `$ appbuilder plugin add --available [--count]`
-Add custom npm or NativeScript modules | `$ appbuilder plugin add <Name or ID>`
-Add a specific version of a custom npm or NativeScript module | `$ appbuilder plugin add <Name or ID>@<Version>`
-Add the latest version of a verified NativeScript plugin | `$ appbuilder plugin add <Name or ID> --latest [--var.<Variable ID> <Variable Value>]`[\*\*](#note)
-Add the default version of a verified NativeScript plugin | `$ appbuilder plugin add <Name or ID> --default [--var.<Variable ID> <Variable Value>]`[\*\*](#note)
-Add a custom npm or NativeScript module from GitHub URL | `$ appbuilder plugin add <URL>`
-Add a custom npm or NativeScript module from local path | `$ appbuilder plugin add <Path>`
-Add custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID or URL or Path> --var.<Variable ID> <Variable Value>`[\*\*](#note)
-Add a specific version of a custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID>@<Version> --var.<Variable ID> <Variable Value>`[\*\*](#note)
+Add custom npm or NativeScript modules | `$ appbuilder plugin add <Name or ID> [--no-types]`
+Add a specific version of a custom npm or NativeScript module | `$ appbuilder plugin add <Name or ID>@<Version> [--no-types]`
+Add the latest version of a verified NativeScript plugin | `$ appbuilder plugin add <Name or ID> --latest [--var.<Variable ID> <Variable Value>] [--no-types]`[\*\*](#note)
+Add the default version of a verified NativeScript plugin | `$ appbuilder plugin add <Name or ID> --default [--var.<Variable ID> <Variable Value>] [--no-types]`[\*\*](#note)
+Add a custom npm or NativeScript module from GitHub URL | `$ appbuilder plugin add <URL> [--no-types]`
+Add a custom npm or NativeScript module from local path | `$ appbuilder plugin add <Path> [--no-types]`
+Add custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID or URL or Path> --var.<Variable ID> <Variable Value> [--no-types]`[\*\*](#note)
+Add a specific version of a custom npm or NativeScript module and set all variables from the command line | `$ appbuilder plugin add <Name or ID>@<Version> --var.<Variable ID> <Variable Value> [--no-types]`[\*\*](#note)
+
 
 <% if(isHtml) { %><a id="note"></a><% } %>
 \*\* If the NativeScript plugin has multiple variables, you can set `--var` for each variable.
+
+For TypeScript projects, the command will try to install `.d.ts` files for the specified module from `@types`. If you do not want to install the `.d.ts` files, you can set the `--no-types` flag.
 <% } %>
 
 <% var plugins =""; if(isCordova) { plugins+="Apache Cordova plugins" } if(isHtml) { plugins+=" or " } if(isNativeScript) { plugins+="custom npm or NativeScript modules" } %>
@@ -53,7 +56,9 @@ Enables <%=plugins%> for your project. <% if(isHtml) { %>If the plugin has plugi
 * `--release` - Enables the specified Apache Cordova plugin for the Release build configuration only. If `--available` is set, lists all plugins that you can enable for the Release build configuration.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--var.debug.<Variable ID>` - Sets the value for the specified Apache Cordova plugin variable for the Debug configuration only.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %>
 * `--var.release.<Variable ID>` - Sets the value for the specified Apache Cordova plugin variable for the Release configuration only.<% if(isHtml) { %> This option is applicable only to Apache Cordova projects.<% } %><% } %>
-<% if(isNativeScript) { %>* `--count` - When set along with `--available`, specifies the number of npm and NativeScript modules that will be listed.<% if(isHtml) { %> This option is applicable only to NativeScript projects.<% } %><% } %>
+<% if(isNativeScript) { %>* `--count` - If `--available` is set, specifies the number of npm and NativeScript modules that will be listed.<% if(isHtml) { %> This option is applicable only to NativeScript projects.<% } %>
+* `--no-types` - Disables the installation of `.d.ts` from `@types` for the specified module. This option is applicable only to NativeScript projects.
+<% } %>
 
 ### Attributes
 * `<Name or ID>` is the name or ID of the <%=plugin%> as listed by `$ appbuilder plugin add --available`<% if(isNativeScript) { %> or `$ appbuilder plugin find`<% } %>
