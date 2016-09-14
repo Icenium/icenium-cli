@@ -226,6 +226,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 			let oldVersion = this.$project.projectData.FrameworkVersion;
 			let availablePlugins = this.$pluginsService.getAvailablePlugins();
+
+			this.migrateWebView(oldVersion, newVersion).wait();
+
 			this.invalidMarketplacePlugins = _(this.$project.configurations)
 				.map(configuration => <string[]>this.$project.getProperty("CorePlugins", configuration))
 				.union()
@@ -351,6 +354,20 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			return plugin;
 		});
+	}
+
+	private migrateWebView(oldFrameworkVersion: string, newFrameworkVersion: string): IFuture<void> {
+		return (() => {
+			// For Cordova versions below 5.0.0 with WKWebView we need to set the WKWebView to com.telerik.plugins.wkwebview.
+			// For Cordova version 5.0.0 and above with WKWebView we need to set the WKWebView to cordova-plugin-wkwebview-engine.
+			let currentWebViewName = this.$webViewService.getCurrentWebViewName(this.$projectConstants.IOS_PLATFORM_NAME);
+			let currentWebView = this.$webViewService.getWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, oldFrameworkVersion);
+			if (currentWebView.pluginIdentifier) {
+				this.$pluginsService.removePlugin(currentWebView.pluginIdentifier).wait();
+			}
+
+			this.$webViewService.enableWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, newFrameworkVersion).wait();
+		}).future<void>()();
 	}
 }
 $injector.register("cordovaMigrationService", CordovaMigrationService);

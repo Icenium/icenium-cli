@@ -148,7 +148,10 @@ function createTestInjector(): IInjector {
 	testInjector.register("options", optionsLib.Options);
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 	testInjector.register("webViewService", {
-		minSupportedVersion: "4.0.0"
+		minSupportedVersion: "4.0.0",
+		getCurrentWebViewName: () => "Default",
+		getWebView: () => ({ name: "Default" }),
+		enableWebView: () => Future.fromResult()
 	});
 	testInjector.register("serverConfiguration", {});
 
