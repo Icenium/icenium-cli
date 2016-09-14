@@ -999,10 +999,10 @@ interface IFrameworkVersion {
  */
 interface IWebViewService {
 	supportedWebViews: IDictionary<IWebView[]>;
-	getWebView(platform: string, webViewName: string): IWebView;
+	getWebView(platform: string, webViewName: string, frameworkVersion: string): IWebView;
 	getWebViews(platform: string): IWebView[];
 	getWebViewNames(platform: string): string[];
-	enableWebView(platform: string, webViewName: string): IFuture<void>;
+	enableWebView(platform: string, webViewName: string, frameworkVersion: string): IFuture<void>;
 	getCurrentWebViewName(platform: string): string;
 }
 
@@ -1014,6 +1014,7 @@ interface IWebView {
 	minSupportedVersion: string;
 	pluginIdentifier?: string;
 	default?: boolean;
+	frameworkVersionCondition?: string;
 }
 
 /**
