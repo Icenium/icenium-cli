@@ -568,7 +568,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 				if (jsonInfo.nativescript && jsonInfo.nativescript.platforms) {
 					let matchingVersion = semver.maxSatisfying(_.values<string>(jsonInfo.nativescript.platforms), `>=${this.$project.projectData.FrameworkVersion}`);
-					if (matchingVersion) {
+					if (!matchingVersion) {
 						this.$errors.failWithoutHelp(`Plugin ${name} requires newer version of NativeScript, your project targets ${this.$project.projectData.FrameworkVersion}.`);
 					}
 				}
