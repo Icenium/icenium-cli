@@ -40,6 +40,7 @@ export class DeployHelper implements IDeployHelper {
 			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = platform || this.$devicesService.platform;
 			this.$options.justlaunch = true;
+			let appInfo: IApplicationInformation;
 
 			let action = (device: Mobile.IDevice): IFuture<void> => {
 				return (() => {
@@ -52,7 +53,9 @@ export class DeployHelper implements IDeployHelper {
 						}
 					}
 
-					let appInfo = this.getAppInfoFromBuildResult(device).wait();
+					if (!appInfo) {
+						appInfo = this.getAppInfoFromBuildResult(device).wait();
+					}
 
 					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
 					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).wait().toString());
