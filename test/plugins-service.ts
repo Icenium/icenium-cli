@@ -41,7 +41,9 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("config", {});
 	testInjector.register("typeScriptService", {});
-	testInjector.register("prompter", {});
+	testInjector.register("prompter", {
+		get: () => Future.fromResult("test-value")
+	});
 	testInjector.register("npmService", NpmService);
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("httpClient", {

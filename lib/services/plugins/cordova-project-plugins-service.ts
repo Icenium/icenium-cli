@@ -320,7 +320,13 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			pluginData.addPluginToConfigFile = false;
 
 			let pluginBasicInfo = super.installLocalPlugin(pathToInstalledPlugin, pluginData, options).wait();
-			this.configurePlugin(pluginBasicInfo.name, version).wait();
+			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
+
+			_.each(configurations, (configuration) => {
+				this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration).wait();
+			});
+
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
 			return pluginBasicInfo;
 		}).future<IBasicPluginInformation>()();
 
@@ -415,22 +421,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return (() => {
 			let plugin = this.getBestMatchingPlugin(pluginName, version);
 			let pluginData = <IMarketplacePluginData>plugin.data;
-			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
-			let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
 
-			let variables = <string[]>pluginData.Variables;
-			if (variables && variables.length > 0) {
-				if (!cordovaPluginVariables[pluginData.Identifier]) {
-					cordovaPluginVariables[pluginData.Identifier] = {};
-				}
-
-				_.each(variables, (variable: any) => {
-					let variableName: string = variable.name || variable;
-					let variableInformation = this.gatherVariableInformation(pluginData, variableName, configuration).wait();
-					cordovaPluginVariables[pluginData.Identifier][variableName] = variableInformation[variableName];
-				});
-				this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
-			}
+			this.setPluginVariables(pluginData.Identifier, <string[]>pluginData.Variables, configuration).wait();
 
 			let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
 			// remove all instances of the plugin from current configuration
@@ -524,7 +516,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<void>()();
 	}
 
-	private gatherVariableInformation(plugin: IMarketplacePluginData, variableName: string, configuration: string): IFuture<any> {
+	private gatherVariableInformation(pluginIdentifier: string, variableName: string, configuration: string): IFuture<any> {
 		return (() => {
 			let schema: IPromptSchema = {
 				name: variableName,
@@ -533,7 +525,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			};
 
 			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
-			let pluginVariables = cordovaPluginVariables[plugin.Identifier];
+			let pluginVariables = cordovaPluginVariables[pluginIdentifier];
 			if (pluginVariables && pluginVariables[variableName]) {
 				schema["default"] = () => pluginVariables[variableName];
 			}
@@ -944,6 +936,26 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			return xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
 		}).future<any>()();
+	}
+
+	private setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): IFuture<void> {
+		return (() => {
+			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+			let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
+
+			if (variables && variables.length > 0) {
+				if (!cordovaPluginVariables[pluginIdentifier]) {
+					cordovaPluginVariables[pluginIdentifier] = {};
+				}
+
+				_.each(variables, (variable: any) => {
+					let variableName: string = variable.name || variable;
+					let variableInformation = this.gatherVariableInformation(pluginIdentifier, variableName, configuration).wait();
+					cordovaPluginVariables[pluginIdentifier][variableName] = variableInformation[variableName];
+				});
+				this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
+			}
+		}).future<void>()();
 	}
 }
 
