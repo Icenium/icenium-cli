@@ -13,7 +13,7 @@ By keyword(s) | `$ appbuilder plugin fetch [<Keyword> [<Keyword>]*>]`
 
 <% var plugin =""; if(isCordova) { plugin+="Apache Cordova plugin" } if(isHtml) { plugin+=" or " } if(isNativeScript) { plugin+="custom npm or NativeScript module" } %>
 
-Imports the selected <%=plugin%> into your project.<% if(isHtml) { %> You can specify an Apache Cordova plugin by local path, URL to a GitHub repository, name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry. You can specify a custom npm or NativeScript module by local path, URL to a GitHub repository, name, ID or keyword of a module published in the npm registry.
+Imports the selected <%=plugin%> into your project.<% if(isHtml) { %> You can specify an Apache Cordova plugin by local path; URL to a GitHub repository; name, ID or keyword of a plugin published in the Apache Cordova Plugin Registry or the npm registry. You can specify a custom npm or NativeScript module by local path; URL to a GitHub repository; name, ID or keyword of a module published in the npm registry.
 
 For Apache Cordova plugins, this operation copies the Apache Cordova plugin files to the `plugins` directory.  
 For NativeScript projects, this operation copies the module files to the `plugins` directory and adds the module as a dependency in the `package.json` file of your project.
@@ -24,7 +24,7 @@ For NativeScript projects, this operation copies the module files to the `plugin
 ### Command Limitations
 
 * You can fetch only Plugman-compatible Apache Cordova plugins.
-* You can fetch only custom modules which are valid npm packages.
+* You can fetch only custom NativeScript modules which are valid npm packages.
 
 ### Related Commands
 
