@@ -77,7 +77,7 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 
 **Minimum Software Requirements**
 
-* OS X Mavericks
+* OS X Yosemite or later
 * Any of the following Node.js versions:
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
