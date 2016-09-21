@@ -10,7 +10,8 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 		protected $logger: ILogger,
 		protected $config: IConfiguration,
 		protected $staticConfig: IStaticConfig,
-		protected $errors: IErrors) {
+		protected $errors: IErrors,
+		private $npmService: INpmService) {
 	}
 
 	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
@@ -84,13 +85,11 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 				return;
 			}
 
+			this.hasVerifiedLatestVersion = true;
 			let latestVersion: string;
+
 			try {
-				if (!this.hasVerifiedLatestVersion) {
-					// TODO: Handle cases with custom registry.
-					let appBuilderNpmRegistryInfo = this.getInformationFromRegistry().wait();
-					latestVersion = JSON.parse(appBuilderNpmRegistryInfo)["dist-tags"].latest;
-				}
+				latestVersion = this.getInformationFromRegistry().wait();
 			} catch (error) {
 				this.$logger.warn("Failed to retrieve AppBuilder version from npm. Make sure you are running latest version of AppBuilder CLI.");
 				this.$logger.trace(`Error is: ${error.message}`);
@@ -99,16 +98,14 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			if (latestVersion && helpers.versionCompare(latestVersion, this.$staticConfig.version) > 0) {
 				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm install -g appbuilder'.", suppressCommandHelp: true });
 			}
-
-			this.hasVerifiedLatestVersion = true;
 		}).future<void>()();
 	}
 
 	private getInformationFromRegistry(): IFuture<string> {
 		return (() => {
-			const registryRequestTimeout = 5000;
+			const registryRequestTimeout = 6000;
 
-			let httpRequestFuture = this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder");
+			let httpRequestFuture = this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase());
 
 			let timer = setTimeout(() => {
 				if (!httpRequestFuture.isResolved()) {
@@ -118,11 +115,11 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 			// This will not block the event loop
 			// So after 5 seconds in case we do not have result, error will be thrown.
-			let body = httpRequestFuture.wait().body;
+			let version = httpRequestFuture.wait().version;
 
 			clearTimeout(timer);
 
-			return body;
+			return version;
 		}).future<string>()();
 	}
 }
@@ -137,8 +134,9 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		protected $logger: ILogger,
 		protected $config: IConfiguration,
 		protected $staticConfig: IStaticConfig,
-		protected $errors: IErrors) {
-		super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors);
+		protected $errors: IErrors,
+		$npmService: INpmService) {
+		super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors, $npmService);
 	}
 
 	public makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T> {
