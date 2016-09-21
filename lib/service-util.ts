@@ -2,7 +2,7 @@ import * as util from "util";
 import * as helpers from "./helpers";
 
 export class ServiceProxyBase implements Server.IServiceProxy {
-	private latestVersion: string = null;
+	private hasVerifiedLatestVersion = false;
 	private shouldAuthenticate: boolean = true;
 
 	constructor(protected $httpClient: Server.IHttpClient,
@@ -80,23 +80,50 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 	private ensureUpToDate(): IFuture<void> {
 		return (() => {
-			if (this.$config.ON_PREM) {
+			if (this.$config.ON_PREM || this.hasVerifiedLatestVersion) {
 				return;
 			}
 
+			let latestVersion: string;
 			try {
-				if (!this.latestVersion) {
-					this.latestVersion = JSON.parse(this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder").wait().body)["dist-tags"].latest;
+				if (!this.hasVerifiedLatestVersion) {
+					// TODO: Handle cases with custom registry.
+					let appBuilderNpmRegistryInfo = this.getInformationFromRegistry().wait();
+					latestVersion = JSON.parse(appBuilderNpmRegistryInfo)["dist-tags"].latest;
 				}
 			} catch (error) {
-				this.$logger.debug("Failed to retrieve version from npm");
-				this.latestVersion = "0.0.0";
+				this.$logger.warn("Failed to retrieve AppBuilder version from npm. Make sure you are running latest version of AppBuilder CLI.");
+				this.$logger.trace(`Error is: ${error.message}`);
 			}
 
-			if (helpers.versionCompare(this.latestVersion, this.$staticConfig.version) > 0) {
+			if (latestVersion && helpers.versionCompare(latestVersion, this.$staticConfig.version) > 0) {
 				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm install -g appbuilder'.", suppressCommandHelp: true });
 			}
+
+			this.hasVerifiedLatestVersion = true;
 		}).future<void>()();
+	}
+
+	private getInformationFromRegistry(): IFuture<string> {
+		return (() => {
+			const registryRequestTimeout = 5000;
+
+			let httpRequestFuture = this.$httpClient.httpRequest("http://registry.npmjs.org/appbuilder");
+
+			let timer = setTimeout(() => {
+				if (!httpRequestFuture.isResolved()) {
+					httpRequestFuture.throw(`Unable to get response from npm for ${registryRequestTimeout}.`);
+				}
+			}, registryRequestTimeout);
+
+			// This will not block the event loop
+			// So after 5 seconds in case we do not have result, error will be thrown.
+			let body = httpRequestFuture.wait().body;
+
+			clearTimeout(timer);
+
+			return body;
+		}).future<string>()();
 	}
 }
 $injector.register("serviceProxyBase", ServiceProxyBase);
