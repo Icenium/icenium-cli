@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: AppBuilder 3.5
-<br/>Release date: September 26, 2016
+<br/>Release date: September 20, 2016
 
 > For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5" target="_blank">AppBuilder 3.5 Release Notes</a>.
 
@@ -376,7 +376,7 @@ Features
 ===
 
 Latest version: AppBuilder 3.5
-<br/>Release date: September 26, 2016
+<br/>Release date: September 20, 2016
 
 > For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5" target="_blank">AppBuilder 3.5 Release Notes</a>.
 
