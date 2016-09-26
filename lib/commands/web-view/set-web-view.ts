@@ -9,7 +9,7 @@ export class SetWebViewCommand implements ICommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$webViewService.enableWebView(args[0], args[1]).wait();
+			this.$webViewService.enableWebView(args[0], args[1], this.$project.projectData.FrameworkVersion).wait();
 			this.$logger.out(`Operation completed successfully. Your project now uses the ${args[1]} web view for ${args[0]}.`);
 		}).future<void>()();
 	}
@@ -18,7 +18,7 @@ export class SetWebViewCommand implements ICommand {
 		return (() => {
 			this.$project.ensureCordovaProject();
 
-			if(!args[0] || !args[1]) {
+			if (!args[0] || !args[1]) {
 				this.$errors.fail(`You must specify target platform and web view name.`);
 			}
 
@@ -27,21 +27,21 @@ export class SetWebViewCommand implements ICommand {
 			// Validate platform
 			let platform = args[0].toLowerCase();
 			let platforms = _.keys(supportedWebViews);
-			if(!_.includes(platforms, platform)) {
+			if (!_.includes(platforms, platform)) {
 				this.$errors.failWithoutHelp(`Invalid platform. You can set the web view for the following platforms: ${platforms.join(", ")}`);
 			}
 
 			// Validate webView
 			let webViewName = args[1].toLowerCase();
 			let webViewNames = this.$webViewService.getWebViewNames(platform);
-			if(!_.includes(webViewNames, webViewName)) {
+			if (!_.includes(webViewNames, webViewName)) {
 				this.$errors.failWithoutHelp(`Invalid web view. The valid ${platform} web views are: ${webViewNames.join(", ")}`);
 			}
 
 			// Validate project version
 			let currentProjectVersion = this.$project.projectData.FrameworkVersion;
-			let webView = this.$webViewService.getWebView(platform, webViewName);
-			if(semver.lt(currentProjectVersion, webView.minSupportedVersion)) {
+			let webView = this.$webViewService.getWebView(platform, webViewName, this.$project.projectData.FrameworkVersion);
+			if (semver.lt(currentProjectVersion, webView.minSupportedVersion)) {
 				this.$errors.failWithoutHelp(`You cannot set the ${webViewName} web view for projects that target Apache Cordova ${currentProjectVersion}. Your project must target Apache Cordova ${webView.minSupportedVersion} or later. Run \`$ appbuilder mobileframework\` set to change your target framework version.`);
 			}
 
