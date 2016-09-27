@@ -9,6 +9,9 @@ let testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
+testInjector.register("npmService", {
+	getPackageJsonFromNpmRegistry: (packageName: string) => Future.fromResult( { version: "3.0.0" } )
+});
 
 class MockUserDataStore implements IUserDataStore {
 	hasCookie(): IFuture<boolean> {
@@ -86,6 +89,7 @@ describe("ServiceProxy", () => {
 		testInjector.register("fs", stubs.FileSystemStub);
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});
+
 	it("calls api without arguments and expected return", () => {
 		let proxy = makeProxy();
 
