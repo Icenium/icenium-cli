@@ -103,23 +103,13 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 	private getInformationFromRegistry(): IFuture<string> {
 		return (() => {
-			const registryRequestTimeout = 6000;
+			let packageJson = this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase()).wait();
 
-			let httpRequestFuture = this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase());
+			if (!packageJson) {
+				throw new Error("Unable to get information from registry.");
+			}
 
-			let timer = setTimeout(() => {
-				if (!httpRequestFuture.isResolved()) {
-					httpRequestFuture.throw(`Unable to get response from npm for ${registryRequestTimeout}.`);
-				}
-			}, registryRequestTimeout);
-
-			// This will not block the event loop
-			// So after 5 seconds in case we do not have result, error will be thrown.
-			let version = httpRequestFuture.wait().version;
-
-			clearTimeout(timer);
-
-			return version;
+			return packageJson.version;
 		}).future<string>()();
 	}
 }
