@@ -393,9 +393,11 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return (() => {
 			let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
 			let pluginsDir = path.join(this.$project.getProjectDir().wait(), "plugins");
-			(this.$fs.readDirectory(pluginsDir).wait() || [])
-				.filter(pl => _.includes(corePlugins, pl))
-				.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)).wait());
+			if (this.$fs.exists(pluginsDir).wait()) {
+				(this.$fs.readDirectory(pluginsDir).wait() || [])
+					.filter(pl => _.includes(corePlugins, pl))
+					.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)).wait());
+			}
 		}).future<void>()();
 	}
 
