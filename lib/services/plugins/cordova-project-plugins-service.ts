@@ -860,40 +860,48 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					return [];
 				}
 
-				this._localPlugins = _.map(this.$fs.readDirectory(pluginsDir).wait(), (pluginName: string) => {
-					let pluginXml = this.getPluginXmlContent(path.join(pluginsDir, pluginName)).wait();
-					let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml).wait();
-					let plugin = pluginXml.plugin;
-					let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
-					let identifier = plugin.id;
-					let url = "";
+				this._localPlugins = _(this.$fs.readDirectory(pluginsDir).wait())
+					.map((pluginName: string) => {
+						let pathToPlugin = path.join(pluginsDir, pluginName);
+						if (this.$fs.getFsStats(pathToPlugin).wait().isFile()) {
+							return null;
+						}
 
-					if (_.has(plugin, "repo")) {
-						url = plugin.repo.$t;
-					}
+						let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+						let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml).wait();
+						let plugin = pluginXml.plugin;
+						let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
+						let identifier = plugin.id;
+						let url = "";
 
-					if (!url && _.has(plugin, "url")) {
-						url = plugin.url.$t;
-					}
+						if (_.has(plugin, "repo")) {
+							url = plugin.repo.$t;
+						}
 
-					let data: IMarketplacePluginData = {
-						Name: basicPluginInfo.name,
-						Description: basicPluginInfo.description,
-						Assets: null,
-						AndroidRequiredPermissions: null,
-						Authors: [basicPluginInfo.author],
-						Url: url,
-						Identifier: identifier,
-						Version: basicPluginInfo.version,
-						Variables: basicPluginInfo.variables,
-						Publisher: { Name: basicPluginInfo.author, Url: url },
-						DownloadsCount: 0,
-						SupportedVersion: basicPluginInfo.version,
-						Platforms: platforms
-					};
+						if (!url && _.has(plugin, "url")) {
+							url = plugin.url.$t;
+						}
 
-					return new CordovaPluginData(data, PluginType.LocalPlugin, this.$project, this.$projectConstants);
-				});
+						let data: IMarketplacePluginData = {
+							Name: basicPluginInfo.name,
+							Description: basicPluginInfo.description,
+							Assets: null,
+							AndroidRequiredPermissions: null,
+							Authors: [basicPluginInfo.author],
+							Url: url,
+							Identifier: identifier,
+							Version: basicPluginInfo.version,
+							Variables: basicPluginInfo.variables,
+							Publisher: { Name: basicPluginInfo.author, Url: url },
+							DownloadsCount: 0,
+							SupportedVersion: basicPluginInfo.version,
+							Platforms: platforms
+						};
+
+						return new CordovaPluginData(data, PluginType.LocalPlugin, this.$project, this.$projectConstants);
+					})
+					.filter((plugin: IPlugin) => !!plugin)
+					.value();
 			}
 
 			return this._localPlugins;
