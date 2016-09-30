@@ -3,7 +3,7 @@ appstore upload
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder appstore upload <Application Name> [<AppleID>] [<Password>] --certificate <Certificate ID> --provision <Provision ID>`
+General | `$ appbuilder appstore upload [<Application>] [<AppleID>] [<Password>] --certificate <Certificate ID> --provision <Provision ID>`
 
 Builds the project and uploads the application to iTunes Connect.
 
@@ -12,8 +12,8 @@ Builds the project and uploads the application to iTunes Connect.
 * `--certificate` - Sets the **production** certificate that you want to use for code signing your iOS app.
 * `--provision` - Sets the **distribution** provisioning profile that you want to use for code signing your iOS app.
 
-### Attributes 
-* `<Application Name>` is the name for the application record that you want to upload for publishing as listed by `$ appbuilder appstore list`
+### Attributes
+* `<Application>` is the Name or the Bundle Identifier for the application record that you want to upload for publishing as listed by `$ appbuilder appstore list`
 * `<AppleID>` and `<Password>` are your credentials for logging into iTunes Connect.
 * `<Certificate ID>` is the index or name of the certificate as listed by `$ appbuilder certificate`
 * `<Provision ID>` is the index or name of the provisioning profile as listed by `$ appbuilder provision`

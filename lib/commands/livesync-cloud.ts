@@ -1,6 +1,6 @@
-import { EnsureProjectCommand } from "./ensure-project-command";
+import { EnsureProjectCommandWithoutArgs } from "./ensure-project-command-without-args";
 
-export class ImportProjectCommand extends EnsureProjectCommand {
+export class ImportProjectCommand extends EnsureProjectCommandWithoutArgs {
 	constructor($project: Project.IProject,
 		$errors: IErrors) {
 		super($project, $errors);
