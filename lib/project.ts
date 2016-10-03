@@ -263,7 +263,9 @@ export class Project extends ProjectBase implements Project.IProject {
 	public isIonicProject(projectDir: string): IFuture<boolean> {
 		return (() => {
 			let result = false;
-			let ionicProject = path.join(projectDir, "ionic.project");
+			let oldIonicProjectFile = path.join(projectDir, "ionic.project");
+			let newIonicProjectFile = path.join(projectDir, "ionic.config.json");
+			let ionicProject = this.$fs.exists(oldIonicProjectFile).wait() ? oldIonicProjectFile : newIonicProjectFile;
 			let packageJson = path.join(projectDir, "package.json");
 			let hasIonicProject = this.$fs.exists(ionicProject).wait();
 			let hasPackageJson = this.$fs.exists(packageJson).wait();
