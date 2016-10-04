@@ -482,6 +482,9 @@ export class StaticConfig implements IStaticConfig {
 }
 
 export class HooksService implements IHooksService {
+	get hookArgsName(): string {
+		return "hookArgs";
+	}
 	initialize(commandName: string): void {
 	}
 	executeBeforeHooks(): IFuture<void> {
