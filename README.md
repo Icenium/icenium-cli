@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: AppBuilder 3.5.1
-<br/>Release date: October 5, 2016
+<br/>Release date: October 6, 2016
 
 > AppBuilder 3.5.1 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5-1" target="_blank">AppBuilder 3.5.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5" target="_blank">AppBuilder 3.5 Release Notes</a>.
 
@@ -376,7 +376,7 @@ Features
 ===
 
 Latest version: AppBuilder 3.5.1
-<br/>Release date: October 5, 2016
+<br/>Release date: October 6, 2016
 
 > AppBuilder 3.5.1 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5-1" target="_blank">AppBuilder 3.5.1 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-5" target="_blank">AppBuilder 3.5 Release Notes</a>.
 
