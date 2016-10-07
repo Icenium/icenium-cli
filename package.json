@@ -80,7 +80,7 @@
     "winreg": "0.0.12",
     "xml-mapping": "1.5.2",
     "xmlhttprequest": "https://github.com/telerik/node-XMLHttpRequest/tarball/master",
-    "yargs": "4.8.1",
+    "yargs": "6.0.0",
     "zipstream": "https://github.com/Icenium/node-zipstream/tarball/master"
   },
   "analyze": true,
