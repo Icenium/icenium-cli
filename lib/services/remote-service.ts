@@ -9,13 +9,13 @@ export class RemoteService implements IRemoteService {
 	private packageLocation: string;
 
 	constructor(private $logger: ILogger,
-				private $fs: IFileSystem,
-				private $express: IExpress,
-				private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-				private $domainNameSystem: IDomainNameSystem,
-				private $options: IOptions,
-				private $sysInfo: ISysInfo,
-				private $staticConfig: IStaticConfig) {
+		private $fs: IFileSystem,
+		private $express: IExpress,
+		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
+		private $domainNameSystem: IDomainNameSystem,
+		private $options: IOptions,
+		private $sysInfo: ISysInfo,
+		private $staticConfig: IStaticConfig) {
 		this.appBuilderDir = path.join(os.tmpdir(), 'AppBuilder');
 		this.packageLocation = path.join(this.appBuilderDir, 'package.zip');
 	}
@@ -30,7 +30,7 @@ export class RemoteService implements IRemoteService {
 			this.$express.listen(portNumber, () => {
 				let ipAddress = ip.address();
 				this.$logger.info("Listening on port " + portNumber);
-				if(domain) {
+				if (domain) {
 					this.$logger.info("In the AppBuilder Windows client or the extension for Visual Studio, provide the connection information for this server in one of the following formats:\n" +
 						" - Address: http://" + ipAddress + " Port: " + portNumber + "\n" +
 						" - Address: http://" + domain + " Port: " + portNumber);
@@ -76,7 +76,7 @@ export class RemoteService implements IRemoteService {
 			}
 
 			mappedDeviceName = mappedDeviceName || deviceFamily;
-			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, {deviceType: mappedDeviceName}).wait();
+			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, { deviceType: mappedDeviceName, appId: req.query.appId }).wait();
 
 			res.status(200).end();
 		}).future<void>()();
@@ -84,12 +84,15 @@ export class RemoteService implements IRemoteService {
 
 	private static AppBuilderClientToSimulatorDeviceNameMapping: IDictionary<IStringDictionary> = {
 		"6": {
-			"iphoneandipod"	: "iPhone-4s",
+			"iphoneandipod": "iPhone-4s",
 			"ipad": "iPad-2"
 		},
-
 		"7": {
-			"iphoneandipod"	: "iPhone 6",
+			"iphoneandipod": "iPhone 6",
+			"ipad": "iPad 2"
+		},
+		"8": {
+			"iphoneandipod": "iPhone 6",
 			"ipad": "iPad 2"
 		}
 	};
