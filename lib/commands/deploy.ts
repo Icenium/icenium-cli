@@ -1,5 +1,5 @@
 import * as helpers from "../common/helpers";
-import { EnsureProjectCommand } from "./ensure-project-command";
+import { EnsureProjectCommandWithoutArgs } from "./ensure-project-command-without-args";
 
 export class DeployHelper implements IDeployHelper {
 	constructor(protected $devicesService: Mobile.IDevicesService,
@@ -97,7 +97,7 @@ export class DeployHelper implements IDeployHelper {
 }
 $injector.register("deployHelper", DeployHelper);
 
-export class DeployCommand extends EnsureProjectCommand {
+export class DeployCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $deployHelper: IDeployHelper,
 		$project: Project.IProject,
 		$errors: IErrors) {
@@ -112,7 +112,7 @@ export class DeployCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("deploy|*devices", DeployCommand);
 
-export class DeployAndroidCommand extends EnsureProjectCommand {
+export class DeployAndroidCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $deployHelper: IDeployHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
@@ -128,7 +128,7 @@ export class DeployAndroidCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("deploy|android", DeployAndroidCommand);
 
-export class DeployIosCommand extends EnsureProjectCommand {
+export class DeployIosCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $deployHelper: IDeployHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
@@ -144,7 +144,7 @@ export class DeployIosCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("deploy|ios", DeployIosCommand);
 
-export class DeployWP8Command extends EnsureProjectCommand {
+export class DeployWP8Command extends EnsureProjectCommandWithoutArgs {
 	constructor(private $deployHelper: IDeployHelper,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $config: Config.IConfig,

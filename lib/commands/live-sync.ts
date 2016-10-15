@@ -1,7 +1,7 @@
-import { EnsureProjectCommand } from "./ensure-project-command";
+import { EnsureProjectCommandWithoutArgs } from "./ensure-project-command-without-args";
 import Future = require("fibers/future");
 
-class LiveSyncCommandBase extends EnsureProjectCommand {
+class LiveSyncCommandBase extends EnsureProjectCommandWithoutArgs {
 	constructor(protected $liveSyncService: ILiveSyncService,
 		private $options: IOptions,
 		$project: Project.IProject,

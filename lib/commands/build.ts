@@ -1,6 +1,6 @@
-import { EnsureProjectCommand } from "./ensure-project-command";
+import { EnsureProjectCommandWithoutArgs } from "./ensure-project-command-without-args";
 
-export class BuildAndroidCommand extends EnsureProjectCommand {
+export class BuildAndroidCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,
@@ -15,7 +15,7 @@ export class BuildAndroidCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("build|android", BuildAndroidCommand);
 
-export class BuildIosCommand extends EnsureProjectCommand {
+export class BuildIosCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $options: IOptions,
@@ -30,7 +30,7 @@ export class BuildIosCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("build|ios", BuildIosCommand);
 
-export class BuildWP8Command extends EnsureProjectCommand {
+export class BuildWP8Command extends EnsureProjectCommandWithoutArgs {
 	constructor(private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		$project: Project.IProject,

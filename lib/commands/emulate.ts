@@ -1,8 +1,8 @@
 import * as path from "path";
-import { EnsureProjectCommand } from "./ensure-project-command";
+import { EnsureProjectCommandWithoutArgs } from "./ensure-project-command-without-args";
 import {Configurations} from "../common/constants";
 
-export class EmulateAndroidCommand extends EnsureProjectCommand {
+export class EmulateAndroidCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $buildService: Project.IBuildService,
 		private $androidEmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
@@ -43,7 +43,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
 
-export class EmulateIosCommand extends EnsureProjectCommand {
+export class EmulateIosCommand extends EnsureProjectCommandWithoutArgs {
 	constructor(private $fs: IFileSystem,
 		private $buildService: Project.IBuildService,
 		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
@@ -76,7 +76,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 }
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
 
-export class EmulateWp8Command extends EnsureProjectCommand {
+export class EmulateWp8Command extends EnsureProjectCommandWithoutArgs {
 	constructor(private $buildService: Project.IBuildService,
 		private $wp8EmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
