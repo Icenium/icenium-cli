@@ -302,7 +302,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	protected composeSearchQuery(keywords: string[]): string[] {
-		keywords.unshift("ecosystem:cordova");
+		keywords.push("ecosystem:cordova");
 		return keywords;
 	}
 
