@@ -9,7 +9,7 @@ Builds the specified project in the cloud and runs it in the native emulator fro
 <% if(isConsole) { %>
 <% if(isNativeScript) { %>WARNING: This command is not applicable to NativeScript projects. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
 <% if(isLinux) { %>WARNING: You cannot run this command on Linux systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
-<% if(isMacOS) { %>WARNING: You cannot run this command on OS X systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
+<% if(isMacOS) { %>WARNING: You cannot run this command on macOS systems. To view the complete help for this command, run `$ appbuilder help emulate wp8`<% } %>
 <% } %>
 <% if(isHtml) { %>
 ### Prerequisites
@@ -31,7 +31,7 @@ Before running the Windows Phone 8.0 or the Windows Phone 8.1 emulator, verify t
 <% if(isHtml) { %>
 ### Command Limitations
 
-* You cannot run this command on OS X systems.
+* You cannot run this command on macOS systems.
 * You cannot run this command on Linux systems.
 * You cannot run this command on NativeScript projects.
 

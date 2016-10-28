@@ -25,7 +25,7 @@ Before running your app in the **native Android emulator** from the Android SDK,
 Before running your app in the **Genymotion emulator**, verify that your system meets the following requirements.
 * Verify that you have installed Genymotion and its dependencies.
 * On Windows and Linux systems, verify that you have added the Genymotion installation directory to the `PATH` environment variable.
-* On OS X systems, verify that you have added the following paths to the `PATH` environment variable.
+* On macOS systems, verify that you have added the following paths to the `PATH` environment variable.
     * For Genymotion earlier than 2.6:
         * `/Applications/Genymotion.app/Contents/MacOS`
         * `/Applications/Genymotion Shell.app/Contents/MacOS`

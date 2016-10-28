@@ -73,11 +73,11 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 
 > In this version of the AppBuilder CLI, you cannot deploy and LiveSync to connected Windows Phone devices from the command line.
 
-#### OS X Systems
+#### macOS Systems
 
 **Minimum Software Requirements**
 
-* OS X Yosemite or later
+* macOS Yosemite or later
 * Any of the following Node.js versions:
 	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
@@ -153,7 +153,7 @@ In the command prompt, run the following command.
 OS | Node.js installed from http://nodejs.org/ | Node.js installed via package manager
 ---|---------------------|----
 Windows | `npm install appbuilder -g` | `npm install appbuilder -g`
-OS X | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
+macOS | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
 Linux | `sudo npm install appbuilder -g --unsafe-perm` | `npm install appbuilder -g`
 
 To check if your system is configured properly, run the following command.
