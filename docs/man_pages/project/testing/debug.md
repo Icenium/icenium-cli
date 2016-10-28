@@ -14,7 +14,7 @@ WARNING: You can work only with connected iOS and Android devices.
 WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
 <% if(isMacOS && isNativeScript) { %>
-WARNING: This command is not applicable to NativeScript apps on OS X systems. To view the complete help for this command, run `$ appbuilder help debug`
+WARNING: This command is not applicable to NativeScript apps on macOS systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
 <% } %>
 <% if((isConsole && isWindows && (isNativeScript || isCordova)) || (isConsole && isMacOS && isCordova) || isHtml) { %>
@@ -33,7 +33,7 @@ WARNING: This command is not applicable to NativeScript apps on OS X systems. To
 
 * You cannot run this command on Linux systems.
 * You cannot run this command on Windows Phone devices.
-* On OS X systems, you cannot run this command for NativeScript apps.
+* On macOS systems, you cannot run this command for NativeScript apps.
 
 ### Related Commands
 

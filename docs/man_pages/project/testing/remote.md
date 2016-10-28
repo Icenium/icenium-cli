@@ -16,7 +16,7 @@ Starts a remote server to let you run your app in the iOS Simulator from a Windo
 * `--timeout` - Sets the number of seconds that the AppBuilder CLI will wait for the iOS Simulator to start before quitting the operation and releasing the console. The value must be a positive integer. If not set, the default timeout is 90 seconds.
 
 ### Attributes
-* `<Port>` is an integer greater than 1023 that specifies a port on your OS X system. <% if(isHtml) { %>Make sure that the port is open and that your firewall allows traffic on it, if configured. Make sure that your Windows system can reach and send traffic to the OS X system on the specified port.<% } %>
+* `<Port>` is an integer greater than 1023 that specifies a port on your macOS system. <% if(isHtml) { %>Make sure that the port is open and that your firewall allows traffic on it, if configured. Make sure that your Windows system can reach and send traffic to the macOS system on the specified port.<% } %>
 * `<Device Name>` is the name of the iOS Simulator device on which you want to run your app as listed by `$ appbuilder emulate ios --available-devices`
 <% } %>
 <% if(isHtml) { %>

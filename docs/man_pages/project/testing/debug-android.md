@@ -10,7 +10,7 @@ General | `$ appbuilder debug android`
 <% if(isMacOS) { %>For Apache Cordova applications, lets you debug your apps in Google Chrome. This operation opens a device port and prints a link. You need to open the provided link in Google Chrome to access the connected device.<% } %>
 <% } %>
 <% if(isHtml) { %>
-On Windows systems, shows the AppBuilder debug tools to let you debug applications on connected Android devices. On OS X systems, prints a link which you need to manually open in Google Chrome. After you have opened the link in the browser, you can use Google Chrome to debug your Android app.
+On Windows systems, shows the AppBuilder debug tools to let you debug applications on connected Android devices. On macOS systems, prints a link which you need to manually open in Google Chrome. After you have opened the link in the browser, you can use Google Chrome to debug your Android app.
 <% } %>
 
 <% if(isConsole) { %>
@@ -18,14 +18,14 @@ On Windows systems, shows the AppBuilder debug tools to let you debug applicatio
 WARNING: This command is not applicable to Linux systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
 <% if(isMacOS && isNativeScript) { %>
-WARNING: This command is not applicable to NativeScript apps on OS X systems. To view the complete help for this command, run `$ appbuilder help debug`
+WARNING: This command is not applicable to NativeScript apps on macOS systems. To view the complete help for this command, run `$ appbuilder help debug`
 <% } %>
 <% } %>
 
 <% if(isHtml) { %>
 ### Command Limitations
 
-* On OS X systems, you cannot run this command for NativeScript apps.
+* On macOS systems, you cannot run this command for NativeScript apps.
 
 ### Related Commands
 

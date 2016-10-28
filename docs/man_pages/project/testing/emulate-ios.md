@@ -17,7 +17,7 @@ WARNING: You cannot run this command on Linux systems. To view the complete help
 <% if(isHtml) { %>
 ### Prerequisites
 Before running the iOS Simulator, verify that you have met the following requirements.
-* You are running the AppBuilder CLI on OS X.
+* You are running the AppBuilder CLI on macOS.
 * You have installed Xcode. The version of Xcode must be compatible with the ios-sim-portable npm package on which the  AppBuilder CLI depends.  For more information, see [ios-sim-portable](https://www.npmjs.org/package/ios-sim-portable).
 <% } %>
 <% if((isConsole && isMacOS && (isNativeScript || isCordova)) || isHtml) { %>

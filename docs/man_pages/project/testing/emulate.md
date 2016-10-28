@@ -31,7 +31,7 @@ You can choose which files from your project to exclude or include in your appli
 ### Command Limitations
 
 * On Windows systems, you can run this command for Android and Windows Phone.
-* On OS X systems, you can run this command for Android and iOS.
+* On macOS systems, you can run this command for Android and iOS.
 * On Linux systems, you can run this command for Android.
 
 ### Related Commands

@@ -18,7 +18,7 @@ Runs the selected application on a connected Android <% if(isMacOS) { %>or iOS <
 ### Prerequisites
 Before running your app on an iOS device, verify that your system and app meet the following requirements.
 
-* You are running the AppBuilder CLI on an OS X system.
+* You are running the AppBuilder CLI on a macOS system.
 * You have installed Xcode 5 or later.
 * You have built your app with the debug build configuration.
 
