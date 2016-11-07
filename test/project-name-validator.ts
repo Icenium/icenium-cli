@@ -33,4 +33,3 @@ describe("project-name-validator smoke tests", () => {
 		assert.throws(() => validator.validate("Thirtyone character long string"));
 	});
 });
-

@@ -1,4 +1,4 @@
-import {AnalyticsServiceBase} from "../common/services/analytics-service-base";
+import { AnalyticsServiceBase } from "../common/services/analytics-service-base";
 
 export class AnalyticsService extends AnalyticsServiceBase implements IAnalyticsService {
 	private static SUBLIME_ANALYTICS_CLIENT_NAME = "Sublime";
