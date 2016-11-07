@@ -1,20 +1,20 @@
-import {CordovaPluginsService} from "./../lib/services/plugins/cordova-plugins";
-import {MarketplacePluginsService} from "./../lib/services/plugins/marketplace-plugins-service";
-import {CordovaProjectPluginsService} from "./../lib/services/plugins/cordova-project-plugins-service";
-import {NativeScriptProjectPluginsService} from "./../lib/services/plugins/nativescript-project-plugins-service";
-import {Yok} from "../lib/common/yok";
-import {Options} from "../lib/options";
-import {CordovaResourceLoader} from "../lib/cordova-resource-loader";
-import {NativeScriptResources} from "../lib/nativescript-resources";
-import {PluginVariablesHelper} from "../lib/common/plugin-variables-helper";
-import {HostInfo} from "../lib/common/host-info";
-import {StaticConfig} from "../lib/config";
-import {ResourceLoader} from "../lib/common/resource-loader";
-import {FileSystem} from "../lib/common/file-system";
-import {ChildProcess} from "../lib/common/child-process";
-import {NpmService} from "../lib/common/appbuilder/services/npm-service";
-import {NpmPluginsService} from "../lib/common/services/plugins/npm-plugins-service";
-import {assert} from "chai";
+import { CordovaPluginsService } from "./../lib/services/plugins/cordova-plugins";
+import { MarketplacePluginsService } from "./../lib/services/plugins/marketplace-plugins-service";
+import { CordovaProjectPluginsService } from "./../lib/services/plugins/cordova-project-plugins-service";
+import { NativeScriptProjectPluginsService } from "./../lib/services/plugins/nativescript-project-plugins-service";
+import { Yok } from "../lib/common/yok";
+import { Options } from "../lib/options";
+import { CordovaResourceLoader } from "../lib/cordova-resource-loader";
+import { NativeScriptResources } from "../lib/nativescript-resources";
+import { PluginVariablesHelper } from "../lib/common/plugin-variables-helper";
+import { HostInfo } from "../lib/common/host-info";
+import { StaticConfig } from "../lib/config";
+import { ResourceLoader } from "../lib/common/resource-loader";
+import { FileSystem } from "../lib/common/file-system";
+import { ChildProcess } from "../lib/common/child-process";
+import { NpmService } from "../lib/common/appbuilder/services/npm-service";
+import { NpmPluginsService } from "../lib/common/services/plugins/npm-plugins-service";
+import { assert } from "chai";
 import * as stubs from "./stubs";
 import * as path from "path";
 import * as temp from "temp";
@@ -256,18 +256,18 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 				Version: "2.0.1",
 				SupportedVersion: ">=3.5.0"
 			},
-				{
-					Identifier: "nl.x-services.plugins.toast",
-					Name: "Toast",
-					Version: "2.0.4",
-					SupportedVersion: ">=3.5.0"
-				},
-				{
-					Identifier: "nl.x-services.plugins.toast",
-					Name: "Toast",
-					Version: "2.0.5",
-					SupportedVersion: ">=3.5.0"
-				}]
+			{
+				Identifier: "nl.x-services.plugins.toast",
+				Name: "Toast",
+				Version: "2.0.4",
+				SupportedVersion: ">=3.5.0"
+			},
+			{
+				Identifier: "nl.x-services.plugins.toast",
+				Name: "Toast",
+				Version: "2.0.5",
+				SupportedVersion: ">=3.5.0"
+			}]
 		}
 	];
 
@@ -400,7 +400,7 @@ describe("plugins-service", () => {
 			let originalShellJsCopy = shelljs.cp;
 			(<any>shelljs).cp = (options: string, source: string, dest: string): void => { /* No implementation required. */ };
 			let fetchedPluginName = service.fetch(plugin).wait();
-			shelljs.cp = originalShellJsCopy;
+			(<any>shelljs).cp = originalShellJsCopy;
 
 			return fetchedPluginName;
 		}).future<string>()();
@@ -708,12 +708,12 @@ describe("plugins-service", () => {
 			Version: "1.0.4",
 			SupportedVersion: ">=3.5.0"
 		},
-			{
-				Identifier: "nl.x-services.plugins.toast",
-				Name: "Toast",
-				Version: "2.0.1",
-				SupportedVersion: ">=3.5.0"
-			}
+		{
+			Identifier: "nl.x-services.plugins.toast",
+			Name: "Toast",
+			Version: "2.0.1",
+			SupportedVersion: ">=3.5.0"
+		}
 		];
 		let availableMarketplacePlugins = [
 			{
@@ -1440,18 +1440,18 @@ describe("plugins-service", () => {
 						Version: "2.0.1",
 						SupportedVersion: ">=3.7.0"
 					},
-						{
-							Identifier: "nl.x-services.plugins.toast",
-							Name: "Toast",
-							Version: "2.0.4",
-							SupportedVersion: ">=3.5.0"
-						},
-						{
-							Identifier: "nl.x-services.plugins.toast",
-							Name: "Toast",
-							Version: "2.0.5",
-							SupportedVersion: ">=3.7.0"
-						}]
+					{
+						Identifier: "nl.x-services.plugins.toast",
+						Name: "Toast",
+						Version: "2.0.4",
+						SupportedVersion: ">=3.5.0"
+					},
+					{
+						Identifier: "nl.x-services.plugins.toast",
+						Name: "Toast",
+						Version: "2.0.5",
+						SupportedVersion: ">=3.7.0"
+					}]
 				}];
 
 			let testInjector: IInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
@@ -1488,18 +1488,18 @@ describe("plugins-service", () => {
 						Version: "2.0.1",
 						SupportedVersion: ">=3.7.0"
 					},
-						{
-							Identifier: "nl.x-services.plugins.toast",
-							Name: "Toast",
-							Version: "2.0.4",
-							SupportedVersion: ">=3.5.0"
-						},
-						{
-							Identifier: "nl.x-services.plugins.toast",
-							Name: "Toast",
-							Version: "2.0.5",
-							SupportedVersion: ">=3.7.0"
-						}]
+					{
+						Identifier: "nl.x-services.plugins.toast",
+						Name: "Toast",
+						Version: "2.0.4",
+						SupportedVersion: ">=3.5.0"
+					},
+					{
+						Identifier: "nl.x-services.plugins.toast",
+						Name: "Toast",
+						Version: "2.0.5",
+						SupportedVersion: ">=3.7.0"
+					}]
 				}];
 
 			let testInjector: IInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
@@ -1551,66 +1551,66 @@ describe("plugins-service", () => {
 					}
 				]
 			},
-				{
-					"Identifier": "com.telerik.fakeDropBox",
-					"DefaultVersion": "1.0.2",
-					"Framework": "cordova",
-					"Versions": [
-						{
-							"Publisher": {
-								"Name": "Telerik plugins",
-								"Url": "http://www.telerik.com/"
-							},
-							"Authors": [
-								"Telerik"
-							],
-							"SupportedVersion": ">=3.5.0",
-							"Name": "Dropbox",
-							"Identifier": "com.telerik.dropbox",
-							"Version": "1.0.2",
-							"Description": "Cordova Sync SDK",
-							"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
-							"Platforms": [
-								"Android",
-								"iOS"
-							],
-							"Variables": [
-								"APP.KEY.VAR.DATA",
-								"APP1.SECRET.SAMPLE.MSG"
-							]
-						}
-					]
-				},
-				{
-					"Identifier": "com.telerik.fakeDropBox2",
-					"DefaultVersion": "1.0.2",
-					"Framework": "cordova",
-					"Versions": [
-						{
-							"Publisher": {
-								"Name": "Telerik plugins",
-								"Url": "http://www.telerik.com/"
-							},
-							"Authors": [
-								"Telerik"
-							],
-							"SupportedVersion": ">=3.5.0",
-							"Name": "Dropbox",
-							"Identifier": "com.telerik.dropbox",
-							"Version": "1.0.2",
-							"Description": "Cordova Sync SDK",
-							"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
-							"Platforms": [
-								"Android",
-								"iOS"
-							],
-							"Variables": [
-								"APP.KEY.VAR.DATA",
-								"APP.KEY.SAME.MSG"
-							]
-						}
-					]
-				}];
+			{
+				"Identifier": "com.telerik.fakeDropBox",
+				"DefaultVersion": "1.0.2",
+				"Framework": "cordova",
+				"Versions": [
+					{
+						"Publisher": {
+							"Name": "Telerik plugins",
+							"Url": "http://www.telerik.com/"
+						},
+						"Authors": [
+							"Telerik"
+						],
+						"SupportedVersion": ">=3.5.0",
+						"Name": "Dropbox",
+						"Identifier": "com.telerik.dropbox",
+						"Version": "1.0.2",
+						"Description": "Cordova Sync SDK",
+						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+						"Platforms": [
+							"Android",
+							"iOS"
+						],
+						"Variables": [
+							"APP.KEY.VAR.DATA",
+							"APP1.SECRET.SAMPLE.MSG"
+						]
+					}
+				]
+			},
+			{
+				"Identifier": "com.telerik.fakeDropBox2",
+				"DefaultVersion": "1.0.2",
+				"Framework": "cordova",
+				"Versions": [
+					{
+						"Publisher": {
+							"Name": "Telerik plugins",
+							"Url": "http://www.telerik.com/"
+						},
+						"Authors": [
+							"Telerik"
+						],
+						"SupportedVersion": ">=3.5.0",
+						"Name": "Dropbox",
+						"Identifier": "com.telerik.dropbox",
+						"Version": "1.0.2",
+						"Description": "Cordova Sync SDK",
+						"Url": "https://github.com/Telerik-Verified-Plugins/Dropbox",
+						"Platforms": [
+							"Android",
+							"iOS"
+						],
+						"Variables": [
+							"APP.KEY.VAR.DATA",
+							"APP.KEY.SAME.MSG"
+						]
+					}
+				]
+			}];
 
 		beforeEach(() => {
 			testInjector = createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePlugins);
@@ -1800,4 +1800,3 @@ describe("plugins-service", () => {
 		});
 	});
 });
-
