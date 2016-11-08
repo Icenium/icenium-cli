@@ -1,6 +1,6 @@
 // this call must be first to avoid requiring c++ dependencies
 let node = require("../package.json").engines.node;
-require("./common/verify-node-version").verifyNodeVersion(node, "AppBuilder", "3.4");
+require("./common/verify-node-version").verifyNodeVersion(node, "AppBuilder", "3.7");
 
 require("./bootstrap");
 import fiberBootstrap = require("./common/fiber-bootstrap");
