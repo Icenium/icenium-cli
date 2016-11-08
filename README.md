@@ -40,15 +40,13 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 * .NET 4.5 or later
 * Node.js
 	* (Windows 7 systems): Any of the following Node.js versions:
-		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
-		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 		* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
+		* The latest stable official Node.js [7.x](https://nodejs.org/dist/latest-v7.x/)
 	* (Windows 8 and later systems): Any of the following Node.js versions:
-		* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 		* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
-		* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 		* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
+		* The latest stable official Node.js [7.x](https://nodejs.org/dist/latest-v7.x/)
 * An Internet browser (latest official release) with enabled cookies
 * (Optional) git<br/>git is required for development with Screen Builder.
 
@@ -79,10 +77,9 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 
 * macOS Yosemite or later
 * Any of the following Node.js versions:
-	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
-	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 	* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
+	* The latest stable official Node.js [7.x](https://nodejs.org/dist/latest-v7.x/)
 * An Internet browser (latest official release) with enabled cookies
 * Mono 3.12 or later
 * (Optional) git<br/>git is required for development with Screen Builder.
@@ -111,10 +108,9 @@ Before installing the AppBuilder CLI, verify that your system meets the followin
 
 * Ubuntu 14.04 LTS<br/>The AppBuilder CLI is tested and verified to run on Ubuntu 14.04 LTS. You might be able to run the AppBuilder CLI on other Linux distributions.
 * Any of the following Node.js versions:
-	* The latest stable official Node.js [0.12.x](https://nodejs.org/dist/latest-v0.12.x/)
 	* The latest stable official Node.js [4.2.1 or later 4.x](https://nodejs.org/dist/v4.2.1/)<br/>Node.js 4.x with npm 2 is required for development with Screen Builder.
-	* The latest stable official Node.js [5.1 or later 5.x](https://nodejs.org/dist/latest-v5.x/)
 	* The latest stable official Node.js [6.x](https://nodejs.org/dist/latest-v6.x/)
+	* The latest stable official Node.js [7.x](https://nodejs.org/dist/latest-v7.x/)
 
 	You can follow the instructions provided [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) to install Node.js on your system.
 * An Internet browser (latest official release) with enabled cookies
