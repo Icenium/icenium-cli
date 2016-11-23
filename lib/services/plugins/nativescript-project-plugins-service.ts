@@ -567,8 +567,12 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				};
 
 				if (jsonInfo.nativescript && jsonInfo.nativescript.platforms) {
-					let matchingVersion = semver.maxSatisfying(_.values<string>(jsonInfo.nativescript.platforms), `>=${this.$project.projectData.FrameworkVersion}`);
-					if (!matchingVersion) {
+					const requiredVersions = _.values<string>(jsonInfo.nativescript.platforms)
+						.filter(ver => !!semver.valid(ver));
+
+					const notSupportedValues = requiredVersions.filter(ver => semver.gt(ver, this.$project.projectData.FrameworkVersion));
+
+					if (requiredVersions.length && notSupportedValues.length === requiredVersions.length) {
 						this.$errors.failWithoutHelp(`Plugin ${name} requires newer version of NativeScript, your project targets ${this.$project.projectData.FrameworkVersion}.`);
 					}
 				}
