@@ -12,7 +12,6 @@ Gruntfile.js
 *.cmd
 tscommand*.tmp.txt
 .tscache/
-bin/appbuilder
 bin/*.cmd
 **/bin/Microsoft.NodejsTools.WebRole.dll
 
@@ -32,3 +31,5 @@ test/
 **/*.suo
 npm-debug.log
 node_modules
+
+test-scripts/

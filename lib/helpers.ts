@@ -38,7 +38,9 @@ export function capitalizeFirstLetter(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function formatListOfNames(names: string[], conjunction = "or"): string {
+export function formatListOfNames(names: string[], conjunction?: string): string {
+	conjunction = conjunction === undefined ? "or" : conjunction;
+
 	if (names.length <= 1) {
 		return names[0];
 	} else {

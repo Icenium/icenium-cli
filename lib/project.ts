@@ -413,7 +413,9 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void> {
 		return (() => {
-			let { normalizedPropertyName, projectConfigurations } = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations);
+			let data = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
+				normalizedPropertyName = data.normalizedPropertyName,
+				projectConfigurations = data.projectConfigurations;
 
 			if (normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
 				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations).wait();
@@ -424,7 +426,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					});
 				} else {
 					this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
-					_.each(this.configurationSpecificData, data => this.$projectPropertiesService.updateProjectProperty(data, undefined, mode, normalizedPropertyName, propertyValues).wait());
+					_.each(this.configurationSpecificData, configData => this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues).wait());
 				}
 			}
 		}).future<void>()();
@@ -432,7 +434,9 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void> {
 		return (() => {
-			let { normalizedPropertyName, projectConfigurations } = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations);
+			let data = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
+				normalizedPropertyName = data.normalizedPropertyName,
+				projectConfigurations = data.projectConfigurations;
 
 			this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations).wait();
 

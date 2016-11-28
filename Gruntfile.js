@@ -1,6 +1,7 @@
 var os = require("os");
 
 var now = new Date().toISOString();
+var nodeArgs = require("./lib/common/scripts/node-args").getNodeArgs();
 
 function shallowCopy(obj) {
 	var result = {};
@@ -45,15 +46,7 @@ module.exports = function (grunt) {
 
 		pkg: grunt.file.readJSON("package.json"),
 		ts: {
-			options: {
-				target: 'es5',
-				module: 'commonjs',
-				sourceMap: true,
-				declaration: false,
-				removeComments: false,
-				noImplicitAny: true,
-				experimentalDecorators: true
-			},
+			options: grunt.file.readJSON("tsconfig.json").compilerOptions,
 
 			devlib: {
 				src: ["lib/**/*.ts", "!lib/common/node_modules/**/*.ts", "!lib/common/messages/**/*.ts"],
@@ -76,15 +69,15 @@ module.exports = function (grunt) {
 		},
 
 		tslint: {
-            build: {
-                files: {
-                    src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts", "!lib/common/messages/**/*.ts", "lib/common/test/unit-tests/**/*.ts", "definitions/**/*.ts", "!**/*.d.ts"]
-                },
-                options: {
-                    configuration: grunt.file.readJSON("./tslint.json")
-                }
-            }
-        },
+			build: {
+				files: {
+					src: ["lib/**/*.ts", "test/**/*.ts", "!lib/common/node_modules/**/*.ts", "!lib/common/messages/**/*.ts", "lib/common/test/unit-tests/**/*.ts", "definitions/**/*.ts", "!**/*.d.ts"]
+				},
+				options: {
+					configuration: grunt.file.readJSON("./tslint.json")
+				}
+			}
+		},
 
 		watch: {
 			devall: {
@@ -104,11 +97,11 @@ module.exports = function (grunt) {
 			},
 
 			apply_resources_environment: {
-				command: "node bin/appbuilder.js dev-config-apply <%= resourceDownloadEnvironment %>"
+				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-config-apply <%= resourceDownloadEnvironment %>"
 			},
 
 			prepare_resources: {
-				command: "node bin/appbuilder.js dev-prepackage"
+				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-prepackage"
 			},
 
 			ci_unit_tests: {
@@ -126,7 +119,7 @@ module.exports = function (grunt) {
 			},
 
 			apply_deployment_environment: {
-				command: "node bin/appbuilder.js dev-config-apply <%= deploymentEnvironment %>"
+				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-config-apply <%= deploymentEnvironment %>"
 			},
 
 			build_package: {
@@ -144,7 +137,19 @@ module.exports = function (grunt) {
 		},
 
 		clean: {
-			src: ["test/**/*.js*", "lib/**/*.js*", "!lib/common/vendor/*.js", "!lib/hooks/**/*.js", "!lib/common/**/*.json", "!lib/common/Gruntfile.js", "!lib/common/node_modules/**/*", "!lib/common/hooks/**/*.js", "!lib/common/bin/*.js", "*.tgz"]
+			src: ["test/**/*.js*",
+				"lib/**/*.js*",
+				"!test-scripts/**/*",
+				"!lib/common/vendor/*.js",
+				"!lib/hooks/**/*.js",
+				"!lib/common/**/*.json",
+				"!lib/common/Gruntfile.js",
+				"!lib/common/node_modules/**/*",
+				"!lib/common/hooks/**/*.js",
+				"!lib/common/bin/*.js",
+				"!lib/common/test-scripts/**/*",
+				"!lib/common/scripts/**/*",
+				"*.tgz"]
 		}
 	});
 

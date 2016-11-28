@@ -39,9 +39,11 @@ function createTempFile(data: string): IFuture<string> {
 	let pathToTempFile: string;
 	temp.open("tempMultipartUploadFile", function(err, info) {
 		if(!err) {
-			fileSys.write(info.fd, myData, 0, data.length, 0);
 			pathToTempFile = info.path;
-			future.return(pathToTempFile);
+
+			fileSys.write(info.fd, myData, 0, data.length, 0, () => {
+				future.return(pathToTempFile);
+			});
 		} else {
 			future.throw(err);
 		}

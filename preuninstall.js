@@ -1,6 +1,9 @@
-var child_process = require("child_process");
+var child_process = require("child_process"),
+	nodeArgs = require("./lib/common/scripts/node-args").getNodeArgs();
 
-var child = child_process.exec("node bin/appbuilder.js dev-preuninstall", function (error) {
+var commandArgs = ["bin/appbuilder", " dev-preuninstall"];
+
+var child = child_process.exec("node " + nodeArgs.concat(commandArgs).join(" "), function (error) {
 	if (error) {
 		console.error("Failed to complete all pre-uninstall steps. ");
 		console.log(error);

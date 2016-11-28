@@ -16,8 +16,8 @@ After cloning the repository, run:
 This will install all project dependencies.
 
 It is a good idea to add the `bin\` folder to you path environment variable.
-If you do that, you'll get the `appbuilder` command (and `ice` alias) in your path,
-and you won't have to type e.g. `node ..\..\bin\appbuilder.js` before every command.
+If you do that, you'll get the `appbuilder` command in your path,
+and you won't have to type e.g. `node ..\..\bin\appbuilder` before every command.
 
 Life with TypeScript
 ===
@@ -51,7 +51,7 @@ Open a new node.js console, run `node-inspector` and leave it running. You don't
 Start `node` with the `--debug-brk` parameter, e.g.:
 
 ```
-	$ node --debug-brk bin\appbuilder.js build Android
+	$ node --debug-brk bin\appbuilder build Android
 ```
 
 Open Chrome, open `127.0.0.1:8080/debug?port=5858` and start debugging.

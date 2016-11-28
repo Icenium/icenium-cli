@@ -5,13 +5,14 @@
   "author": "Telerik <support@telerik.com>",
   "description": "command line interface to Telerik AppBuilder",
   "bin": {
-    "appbuilder": "./bin/appbuilder.js"
+    "appbuilder": "./bin/appbuilder"
   },
   "scripts": {
-    "test": "node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- --ui mocha-fibers --recursive --reporter spec-xunit-file --require test/test-bootstrap.js --timeout 150000 test/ lib/common/test/unit-tests",
+    "test": "node test-scripts/istanbul.js",
     "postinstall": "node postinstall.js",
     "preuninstall": "node preuninstall.js",
-    "prepublish": "node prepublish.js"
+    "prepublish": "node prepublish.js",
+    "mocha": "node test-scripts/mocha.js"
   },
   "main": "./lib/appbuilder-cli.js",
   "repository": {

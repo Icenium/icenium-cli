@@ -252,7 +252,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			_.each(this.invalidMarketplacePlugins, plugin => {
-				let {name} = this.$pluginsService.getPluginBasicInformation(plugin).wait();
+				let name = this.$pluginsService.getPluginBasicInformation(plugin).wait().name;
 				this.$pluginsService.removePlugin(name).wait();
 			});
 

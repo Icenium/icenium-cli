@@ -56,11 +56,11 @@ export class CordovaPluginData implements IPlugin {
 		if (this.configurations && this.configurations.length) {
 			_.each(this.configurations, (configuration: string) => {
 				let info = this.getPluginVarsStringInformation(configuration).wait();
-				result.push(...info);
+				result = result.concat(info);
 			});
 		} else {
 			let info = this.getPluginVarsStringInformation().wait();
-			result.push(...info);
+			result = result.concat(info);
 		}
 
 		return result;
