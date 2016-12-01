@@ -11,4 +11,3 @@ export class ConfigurePluginCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
 }
 $injector.registerCommand("plugin|configure", ConfigurePluginCommand);
-
