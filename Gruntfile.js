@@ -161,6 +161,13 @@ module.exports = function (grunt) {
 		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
 	});
 
+	grunt.registerTask("setBundleDependencies", function (version) {
+		var buildVersion = getBuildVersion(version);
+		var packageJson = grunt.file.readJSON("package.json");
+		packageJson.bundleDependencies = Object.keys(packageJson.dependencies);
+		grunt.file.write("package.json", JSON.stringify(packageJson, null, "  "));
+	});
+
 	grunt.registerTask("setPackageName", function (version) {
 		var fs = require("fs");
 		var fileExtension = ".tgz";
@@ -220,6 +227,7 @@ module.exports = function (grunt) {
 		"setPackageName",
 		"printPackageJsonWarning"
 	]);
+	grunt.registerTask("bundle-pack", ["setBundleDependencies", "pack"]);
 	grunt.registerTask("lint", ["tslint:build"]);
 	grunt.registerTask("all", ["clean", "test", "lint"]);
 	grunt.registerTask("rebuild", ["clean", "ts:devlib"]);
