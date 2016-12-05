@@ -24,7 +24,7 @@ Installation
 ===
 
 Latest version: AppBuilder 3.6.0
-<br/>Release date: November 28, 2016
+<br/>Release date: November 30, 2016
 
 > For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-6" target="_blank">AppBuilder 3.6 Release Notes</a>.
 
@@ -372,7 +372,7 @@ Features
 ===
 
 Latest version: AppBuilder 3.6.0
-<br/>Release date: November 28, 2016
+<br/>Release date: November 30, 2016
 
 > For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-6" target="_blank">AppBuilder 3.6 Release Notes</a>.
 
