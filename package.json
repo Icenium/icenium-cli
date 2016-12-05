@@ -74,7 +74,7 @@
     "shelljs": "0.5.3",
     "tabtab": "https://github.com/Icenium/node-tabtab/tarball/master",
     "temp": "0.8.3",
-    "typescript": "2.0.7",
+    "typescript": "2.0.10",
     "valid-url": "1.0.9",
     "validator": "3.2.1",
     "winreg": "0.0.12",
