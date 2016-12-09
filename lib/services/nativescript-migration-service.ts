@@ -70,7 +70,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	public downloadMigrationData(): IFuture<void> {
 		return (() => {
 			this.$fs.deleteDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
-			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir).wait();
+			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
 
 			// Make sure to download this file first, as data from it is used for fileDownloadFutures
 			this.downloadMigrationConfigFile().wait();

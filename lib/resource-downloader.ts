@@ -28,7 +28,7 @@ class ResourceDownloader implements IResourceDownloader {
 			cordovaVersions.forEach((version) => {
 				platforms.forEach((platform) => {
 					let targetFilePath = this.$cordovaResources.buildCordovaJsFilePath(version, platform);
-					this.$fs.createDirectory(path.dirname(targetFilePath)).wait();
+					this.$fs.createDirectory(path.dirname(targetFilePath));
 					let targetFile = this.$fs.createWriteStream(targetFilePath);
 					this.$server.cordova.getJs(version, <any>platform, targetFile).wait();
 				});

@@ -72,7 +72,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	createDirectory(path: string): IFuture<void> {
+	createDirectory(path: string): void {
 		return undefined;
 	}
 

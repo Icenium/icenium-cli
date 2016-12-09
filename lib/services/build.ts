@@ -291,7 +291,7 @@ export class BuildService implements Project.IBuildService {
 			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
-				let buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
+				let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
 				this.$fs.writeFile(buildLogFilePath, result.output).wait();
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
@@ -316,7 +316,7 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
+			let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir(), path.basename(file)));
 
 			_(_.zip(templateFiles, targetFiles)).each(zipped => {
 				let srcFile = zipped[0];
@@ -465,7 +465,7 @@ export class BuildService implements Project.IBuildService {
 	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
 		return (() => {
 			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
-			let tempDir = this.$project.getTempDir("emulatorFiles").wait();
+			let tempDir = this.$project.getTempDir("emulatorFiles");
 			this.$fs.unzip(packageFile, tempDir).wait();
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
 			return appFilePath;

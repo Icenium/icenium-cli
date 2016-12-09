@@ -45,7 +45,7 @@ export class TemplatesService implements ITemplatesService {
 			let templates = this.$server.projects.getProjectTemplates().wait();
 			let templatesDir = this.projectTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
-			this.$fs.createDirectory(templatesDir).wait();
+			this.$fs.createDirectory(templatesDir);
 
 			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
 		}).future<void>()();
@@ -56,7 +56,7 @@ export class TemplatesService implements ITemplatesService {
 			let templates = this.$server.projects.getItemTemplates().wait();
 			let templatesDir = this.itemTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
-			this.$fs.createDirectory(templatesDir).wait();
+			this.$fs.createDirectory(templatesDir);
 
 			_.each(templates, (template) => {
 				if (template["Category"] === "Configuration") {

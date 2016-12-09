@@ -28,7 +28,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		return (() => {
 			temp.track();
 			this.$fs.deleteDirectory(this.schemasFolderPath);
-			this.$fs.createDirectory(this.schemasFolderPath).wait();
+			this.$fs.createDirectory(this.schemasFolderPath);
 
 			let filePath = temp.path({suffix: ".zip"});
 			let file = this.$fs.createWriteStream(filePath);

@@ -64,7 +64,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 	public loadUserSettingsFile(): IFuture<void> {
 		return(() => {
 			if(!this.userSettingsData) {
-				this.$fs.createDirectory(this.$options.profileDir).wait();
+				this.$fs.createDirectory(this.$options.profileDir);
 
 				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath)) {
 					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath);

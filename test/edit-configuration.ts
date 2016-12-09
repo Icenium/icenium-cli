@@ -74,7 +74,7 @@ describe("edit-configuration", () => {
 			openArgument = filepath;
 		};
 		let templateFilepath = path.join(tempDir, template.filepath);
-		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath)).wait();
+		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		command.execute([template.template]).wait();
@@ -93,7 +93,7 @@ describe("edit-configuration", () => {
 			openArgument = filepath;
 		};
 		let templateFilepath = path.join(tempDir, template.filepath);
-		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath)).wait();
+		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath));
 
 		let options: IOptions = testInjector.resolve("options");
 		options.skipUi = true;
@@ -116,7 +116,7 @@ describe("edit-configuration", () => {
 		};
 
 		let templateFilePath = path.join(tempDir, template.filepath);
-		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath)).wait();
+		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
 		command.execute([template.template]).wait();

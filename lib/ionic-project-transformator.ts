@@ -121,7 +121,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			// Currently the default template does not add App_Resources directory.
 			if (!this.$fs.exists(appBuilderResourcesDirectory)) {
-				this.$fs.createDirectory(appBuilderResourcesDirectory).wait();
+				this.$fs.createDirectory(appBuilderResourcesDirectory);
 			}
 
 			this.cloneConfigXml(appBuilderResourcesDirectory).wait();
@@ -257,7 +257,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			let appbuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, appBuilderPlatformName);
 			if (!this.$fs.exists(appbuilderPlatformResourcesDirectory)) {
-				this.$fs.createDirectory(appbuilderPlatformResourcesDirectory).wait();
+				this.$fs.createDirectory(appbuilderPlatformResourcesDirectory);
 			}
 
 			_.each(ionicPlatformResources, (resourceName: string) => {
@@ -361,7 +361,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 				this.$fs.deleteDirectory(ionicProjectBackupDir);
 			}
 
-			this.$fs.createDirectory(ionicProjectBackupDir).wait();
+			this.$fs.createDirectory(ionicProjectBackupDir);
 
 			// Cannot copy directly project dir to the backup dir because it will end up in endless recursion.
 			_.each(allProjectItems, (item: string) => {

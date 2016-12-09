@@ -217,7 +217,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public createTemplateFolder(projectDir: string): IFuture<void> {
 		return (() => {
-			this.$fs.createDirectory(projectDir).wait();
+			this.$fs.createDirectory(projectDir);
 			let projectDirFiles = this.$fs.readDirectory(projectDir).wait();
 
 			if (projectDirFiles.length !== 0) {
@@ -230,7 +230,7 @@ export class Project extends ProjectBase implements Project.IProject {
 		return ((): void => {
 			properties = properties || {};
 
-			this.$fs.createDirectory(projectDir).wait();
+			this.$fs.createDirectory(projectDir);
 			this.cachedProjectDir = projectDir;
 			this.projectData = properties;
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
@@ -363,16 +363,15 @@ export class Project extends ProjectBase implements Project.IProject {
 		return projectFiles;
 	}
 
-	public getTempDir(extraSubdir?: string): IFuture<string> {
-		return (() => {
-			let dir = path.join(this.getProjectDir(), ".ab");
-			this.$fs.createDirectory(dir).wait();
-			if (extraSubdir) {
-				dir = path.join(dir, extraSubdir);
-				this.$fs.createDirectory(dir).wait();
-			}
-			return dir;
-		}).future<string>()();
+	// TODO: Remove IFuture, reason: createDirectory
+	public getTempDir(extraSubdir?: string): string {
+		let dir = path.join(this.getProjectDir(), ".ab");
+		this.$fs.createDirectory(dir);
+		if (extraSubdir) {
+			dir = path.join(dir, extraSubdir);
+			this.$fs.createDirectory(dir);
+		}
+		return dir;
 	}
 
 	public getConfigurationsSpecifiedByUser(): string[] {
@@ -689,7 +688,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public zipProject(): IFuture<string> {
 		return (() => {
-			let tempDir = this.getTempDir().wait();
+			let tempDir = this.getTempDir();
 
 			let projectZipFile = path.join(tempDir, "Build.zip");
 			this.$fs.deleteFile(projectZipFile);
@@ -774,7 +773,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					this.createProjectFile(projectDir, properties).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir);
-					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
+					this.$fs.createDirectory(path.join(projectDir, "hooks"));
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				} catch (ex) {
 					this.$fs.deleteDirectory(projectDir);

@@ -54,7 +54,7 @@ export class ExtensionsServiceBase {
 				}
 
 				this.$fs.deleteDirectory(extensionPath);
-				this.$fs.createDirectory(extensionPath).wait();
+				this.$fs.createDirectory(extensionPath);
 				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
 
 				try {

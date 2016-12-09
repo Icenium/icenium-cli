@@ -412,7 +412,7 @@ describe("Ionic project transformator", () => {
 
 				// Clear the Android resources from the template.
 				fs.deleteDirectory(ionicAndroidResourcesDirectory);
-				fs.createDirectory(path.join(ionicAndroidResourcesDirectory, resourceName)).wait();
+				fs.createDirectory(path.join(ionicAndroidResourcesDirectory, resourceName));
 
 				_.each([ldpiFolderName, hdpiFolderName, hdpiLandFolderName], (folderName: string) => {
 					shelljs.exec(`echo "test" > ${path.join(ionicAndroidResourcesDirectory, resourceName, `${folderName}-${resourceFileName}`)}`);

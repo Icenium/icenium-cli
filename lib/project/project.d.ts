@@ -15,7 +15,14 @@ declare module Project {
 		getProjectSchema(): IFuture<any>;
 		getLiveSyncUrl(): string;
 		getBuildConfiguration(): string;
-		getTempDir(extraSubdir?: string): IFuture<string>;
+
+		/**
+		 * Creates and returns path to a temp directory in a project, where build artifacts are persisted.
+		 * @param {string} @optional extraSubdir Directory that will be created inside the temp dir.
+		 * @returns {string} Path to the temp dir (including the subDir in case it's passed).
+		 */
+		getTempDir(extraSubdir?: string): string;
+
 		getProperty(propertyName: string, configuration: string): any;
 		getProjectTargets(): IFuture<string[]>;
 		getConfigFileContent(template: string): IFuture<any>;

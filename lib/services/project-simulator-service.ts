@@ -52,7 +52,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 				try {
 					this.$logger.info("Downloading core Cordova plugins...");
 
-					this.$fs.createDirectory(pluginsPath).wait();
+					this.$fs.createDirectory(pluginsPath);
 					let zipPath = path.join(pluginsPath, "plugins.zip");
 
 					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
