@@ -58,7 +58,7 @@ export class DeployHelper implements IDeployHelper {
 					}
 
 					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
-					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).wait().toString());
+					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).toString());
 
 					device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName).wait();
 					this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);

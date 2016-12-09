@@ -711,7 +711,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			this.$loginManager.ensureLoggedIn().wait();
 			let projectZipFile = this.zipProject().wait();
-			let fileSize = this.$fs.getFileSize(projectZipFile).wait();
+			let fileSize = this.$fs.getFileSize(projectZipFile);
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
 			let projectName = this.projectData.ProjectName;
 			let bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));

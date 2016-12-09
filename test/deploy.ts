@@ -201,7 +201,7 @@ function prepareTestInjectorForWindows(): IInjector {
 	mobileHelper.isPlatformSupported = (platform: string) => true;
 
 	let fs = testInjector.resolve("fs");
-	fs.getFileSize = (packageFilePath: string) => Future.fromResult("123");
+	fs.getFileSize = (packageFilePath: string) => 123;
 
 	testInjector.register("hostInfo", {
 		isWindows: true
@@ -223,7 +223,7 @@ function prepareTestInjectorForDarwin(): IInjector {
 	mobileHelper.isPlatformSupported = (platform: string) => true;
 
 	let fs = testInjector.resolve("fs");
-	fs.getFileSize = (packageFilePath: string) => Future.fromResult("123");
+	fs.getFileSize = (packageFilePath: string) => 123;
 
 	testInjector.register("hostInfo", {
 		isDarwin: true
