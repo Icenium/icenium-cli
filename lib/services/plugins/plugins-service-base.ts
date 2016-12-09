@@ -194,7 +194,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					// In case npm3 is installed on user's machine and the package has dependencies, there will be more than one dir, so we cannot be sure which one is ours.
 					if (dirs.length === 1) {
 						let pathToPlugin = path.join(pathToPackage, _.first(dirs));
-						this.removeFetchedPluginDependencies(pathToPlugin).wait();
+						this.removeFetchedPluginDependencies(pathToPlugin);
 						return pathToPlugin;
 					}
 				}
@@ -204,7 +204,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				let npm2OutputMatch = npmInstallOutput.match(/.*?tempPackage@1\.0\.0.*?\r?\n.*?\s+?(.*?)@.*?\s+?/m);
 				if (npm2OutputMatch) {
 					let pathToPlugin = path.join(tempInstallDir, NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
-					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					this.removeFetchedPluginDependencies(pathToPlugin);
 					return pathToPlugin;
 				}
 
@@ -223,7 +223,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 				if (pluginDirectory) {
 					let pathToPlugin = path.join(tempInstallDir, pluginDirectory);
-					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					this.removeFetchedPluginDependencies(pathToPlugin);
 					return pathToPlugin;
 				}
 			} catch (err) {
@@ -335,7 +335,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return validUrl.isUri(pluginId);
 	}
 
-	private removeFetchedPluginDependencies(pathToPlugin: string): IFuture<void> {
+	private removeFetchedPluginDependencies(pathToPlugin: string): void {
 		let dependenciesDirectory = path.join(pathToPlugin, NODE_MODULES_DIR_NAME);
 
 		return this.$fs.deleteDirectory(dependenciesDirectory);

@@ -53,7 +53,7 @@ export class PrePackageCommand implements ICommand {
 
 			let testCoverageResultsDir = path.join(__dirname, "../../../coverage");
 			this.$logger.trace(`Removing test coverage results directory: '${testCoverageResultsDir}'.`);
-			this.$fs.deleteDirectory(testCoverageResultsDir).wait();
+			this.$fs.deleteDirectory(testCoverageResultsDir);
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

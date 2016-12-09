@@ -38,7 +38,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();
 			} catch(err) {
 				this.$logger.trace(err);
-				this.$fs.deleteDirectory(projectPath).wait();
+				this.$fs.deleteDirectory(projectPath);
 				throw err;
 			}
 

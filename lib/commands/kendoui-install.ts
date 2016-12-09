@@ -106,7 +106,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 				this.$fs.rename(backupFolder, outDir).wait();
 				throw error;
 			} finally {
-				this.$fs.deleteDirectory(backupFolder).wait();
+				this.$fs.deleteDirectory(backupFolder);
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully updated Kendo UI to version `%s`.", version));

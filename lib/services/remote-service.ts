@@ -47,7 +47,7 @@ export class RemoteService implements IRemoteService {
 		return (() => {
 			this.$logger.info("launch simulator request received ... ");
 			// Clean the tempdir before new launch
-			this.$fs.deleteDirectory(this.appBuilderDir).wait();
+			this.$fs.deleteDirectory(this.appBuilderDir);
 			this.$fs.createDirectory(this.appBuilderDir).wait();
 
 			let deviceFamily = req.query.deviceFamily.toLowerCase();

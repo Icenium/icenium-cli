@@ -53,7 +53,7 @@ export class ExtensionsServiceBase {
 					actions.beforeDownloadAction().wait();
 				}
 
-				this.$fs.deleteDirectory(extensionPath).wait();
+				this.$fs.deleteDirectory(extensionPath);
 				this.$fs.createDirectory(extensionPath).wait();
 				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
 
@@ -68,7 +68,7 @@ export class ExtensionsServiceBase {
 					this.saveVersionsFile().wait();
 				} catch(err) {
 					this.$fs.deleteFile(zipFileName);
-					this.$fs.deleteDirectory(extensionPath).wait();
+					this.$fs.deleteDirectory(extensionPath);
 					throw err;
 				}
 				this.$logger.trace("Finished updating %s package.", packageName);

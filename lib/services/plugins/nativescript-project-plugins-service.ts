@@ -138,7 +138,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				let fullPluginPath = path.join(this.$project.projectDir, pathToPlugin);
 
 				if (this.checkIsValidLocalPlugin(pathToPlugin).wait() || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
-					this.$fs.deleteDirectory(fullPluginPath).wait();
+					this.$fs.deleteDirectory(fullPluginPath);
 				}
 
 				if (packageJsonContent.nativescript) {

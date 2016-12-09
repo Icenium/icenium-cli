@@ -103,7 +103,7 @@ export class SamplesService implements ISamplesService {
 
 				this.$analyticsService.track("CreateProjectFromSample", featureValue).wait();
 				try {
-					this.$fs.deleteDirectory(tempDir).wait();
+					this.$fs.deleteDirectory(tempDir);
 				} catch (error) {
 					this.$logger.debug(error);
 				}

@@ -777,7 +777,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				} catch (ex) {
-					this.$fs.deleteDirectory(projectDir).wait();
+					this.$fs.deleteDirectory(projectDir);
 					throw ex;
 				}
 

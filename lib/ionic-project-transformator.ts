@@ -358,7 +358,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir());
 
 			if (this.$fs.exists(ionicProjectBackupDir)) {
-				this.$fs.deleteDirectory(ionicProjectBackupDir).wait();
+				this.$fs.deleteDirectory(ionicProjectBackupDir);
 			}
 
 			this.$fs.createDirectory(ionicProjectBackupDir).wait();
@@ -396,7 +396,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			if (this.$fs.exists(pluginsDir)) {
 				(this.$fs.readDirectory(pluginsDir).wait() || [])
 					.filter(pl => _.includes(corePlugins, pl))
-					.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)).wait());
+					.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)));
 			}
 		}).future<void>()();
 	}

@@ -65,7 +65,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 					this.$logger.info("Finished downloading plugins.");
 				} catch(err) {
 					this.$fs.closeStream(zipFile).wait();
-					this.$fs.deleteDirectory(pluginsPath).wait();
+					this.$fs.deleteDirectory(pluginsPath);
 					throw err;
 				}
 			}

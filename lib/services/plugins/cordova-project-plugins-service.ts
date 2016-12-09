@@ -183,7 +183,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					}
 
 					if (shouldDeleteFetchedPlugin) {
-						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName)).wait();
+						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName));
 						this.$logger.out(`Plugin ${pluginName} was successfully removed.`);
 					} else {
 						this.$logger.out(`Plugin ${pluginName} was not removed.`);
