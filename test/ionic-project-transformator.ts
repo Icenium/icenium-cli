@@ -269,7 +269,7 @@ describe("Ionic project transformator", () => {
 
 			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
-			assert.isTrue(fs.exists(backupDirectory).wait());
+			assert.isTrue(fs.exists(backupDirectory));
 		});
 
 		it("should not create backup if createBackup is false", () => {
@@ -277,7 +277,7 @@ describe("Ionic project transformator", () => {
 
 			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
-			assert.isTrue(!fs.exists(backupDirectory).wait());
+			assert.isTrue(!fs.exists(backupDirectory));
 		});
 
 		it("should create full backup of the project", () => {
@@ -297,7 +297,7 @@ describe("Ionic project transformator", () => {
 
 			let indexHtml = path.join(projectDirectory, "index.html");
 
-			assert.isTrue(fs.exists(indexHtml).wait());
+			assert.isTrue(fs.exists(indexHtml));
 		});
 
 		describe("config.xml cloning", () => {
@@ -308,7 +308,7 @@ describe("Ionic project transformator", () => {
 
 			beforeEach(() => {
 				ionicConfigXmlDirectory = path.join(projectDirectory, configXmlName);
-				ionicConfiXml = fs.exists(ionicConfigXmlDirectory).wait() && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory).wait());
+				ionicConfiXml = fs.exists(ionicConfigXmlDirectory) && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory).wait());
 				appResourcesDirectory = path.join(projectDirectory, appResourcesFolderName);
 			});
 
@@ -319,7 +319,7 @@ describe("Ionic project transformator", () => {
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
-					assert.isTrue(fs.exists(clonedConfigXmlDirectory).wait(), `Expected the ${context.platformName} configuration to be cloned from the Ionic config.xml.`);
+					assert.isTrue(fs.exists(clonedConfigXmlDirectory), `Expected the ${context.platformName} configuration to be cloned from the Ionic config.xml.`);
 				});
 
 				it(`should clone correctly for ${platform} when only one resource is added to icon and slpash`, () => {
@@ -391,9 +391,9 @@ describe("Ionic project transformator", () => {
 
 				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
-				assert.isTrue(fs.exists(androidTestContext.clonedConfigXmlDirectory).wait(), "Expected the Android configuration to be cloned.");
-				assert.isTrue(fs.exists(iosTestContext.clonedConfigXmlDirectory).wait(), "Expected the iOS configuration to be cloned.");
-				assert.isTrue(fs.exists(wp8TestContext.clonedConfigXmlDirectory).wait(), "Expected the WP8 configuration to be cloned.");
+				assert.isTrue(fs.exists(androidTestContext.clonedConfigXmlDirectory), "Expected the Android configuration to be cloned.");
+				assert.isTrue(fs.exists(iosTestContext.clonedConfigXmlDirectory), "Expected the iOS configuration to be cloned.");
+				assert.isTrue(fs.exists(wp8TestContext.clonedConfigXmlDirectory), "Expected the WP8 configuration to be cloned.");
 			});
 		});
 
@@ -420,12 +420,12 @@ describe("Ionic project transformator", () => {
 
 				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName)).wait(), "Expected to get the name of the directory from the Android ionic resource name for landscape orientation.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name.");
-				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName, resourceFileName)).wait(), "Expected to get the name of the resource from the Android ionic resource name for landscape orientation.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName)), "Expected to get the name of the directory from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName)), "Expected to get the name of the directory from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName)), "Expected to get the name of the directory from the Android ionic resource name for landscape orientation.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName, resourceFileName)), "Expected to get the name of the resource from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName, resourceFileName)), "Expected to get the name of the resource from the Android ionic resource name.");
+				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiLandFolderName, resourceFileName)), "Expected to get the name of the resource from the Android ionic resource name for landscape orientation.");
 			});
 
 			_.each(["iOS", "WP8"], (appbuilderPlatformName: string) => {
@@ -460,7 +460,7 @@ describe("Ionic project transformator", () => {
 				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
 				_.each(ionicProjectSpecificFilesAndFolders, (item: string) => {
-					assert.isFalse(fs.exists(path.join(projectDirectory, item)).wait(), `Expected ${item} to be deleted.`);
+					assert.isFalse(fs.exists(path.join(projectDirectory, item)), `Expected ${item} to be deleted.`);
 				});
 			});
 		});

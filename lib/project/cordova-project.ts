@@ -157,7 +157,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
 				let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
+				if (!this.$fs.exists(targetFilePath)) {
 					this.printAssetUpdateMessage();
 					this.$logger.trace("File not found, copying %s", appResourceFile);
 					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
@@ -176,7 +176,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 			let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),
 				cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform),
 				cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, ""),
-				shouldCopyCordovaJsFile = !this.$fs.exists(cordovaJsFilePath).wait() ||
+				shouldCopyCordovaJsFile = !this.$fs.exists(cordovaJsFilePath) ||
 					this.$fs.readText(cordovaJsFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, "") !== cordovaJsSourceFileContents;
 
 			if (shouldCopyCordovaJsFile) {

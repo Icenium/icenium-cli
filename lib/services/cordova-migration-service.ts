@@ -294,7 +294,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			try {
 				_.each(this.$mobileHelper.platformNames, (platform) => {
 					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
-					let cordovaJsFileName = path.join(this.$project.getProjectDir().wait(), `cordova.${platform}.js`.toLowerCase());
+					let cordovaJsFileName = path.join(this.$project.getProjectDir(), `cordova.${platform}.js`.toLowerCase());
 					let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(newVersion, platform);
 					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
 					backedUpFiles.push(cordovaJsFileName);

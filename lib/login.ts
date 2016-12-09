@@ -83,7 +83,7 @@ export class UserDataStore implements IUserDataStore {
 
 	private checkCookieExists<T>(sourceFile: string, getter: () => T): IFuture<boolean> {
 		return (() => {
-			return (getter() || this.$fs.exists(sourceFile).wait());
+			return (getter() || this.$fs.exists(sourceFile));
 		}).future<boolean>()();
 	}
 

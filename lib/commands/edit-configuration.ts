@@ -45,10 +45,10 @@ export class EditConfigurationCommand implements ICommand {
 	private executeImplementation(template: Project.IConfigurationFile): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			let projectPath = this.$project.getProjectDir().wait();
+			let projectPath = this.$project.getProjectDir();
 			let filepath = path.join(projectPath, template.filepath);
 			let directory = path.dirname(filepath);
-			if (!this.$fs.exists(filepath).wait()) {
+			if (!this.$fs.exists(filepath)) {
 				this.$logger.info("Creating configuration file: " + filepath);
 				let templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
 				this.$fs.unzip(templateFilePath, directory).wait();

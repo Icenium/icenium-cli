@@ -215,9 +215,9 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	testInjector.register("fs", {
 		exists: (path: string) => {
 			if(path.indexOf("abproject") !== -1) {
-				return Future.fromResult(true);
+				return true;
 			} else {
-				return Future.fromResult(false);
+				return false;
 			}
 		},
 		createWriteStream: (path: string) => {/* mock */},
@@ -377,12 +377,12 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when projectDir exists", () => {
-					fs.exists = (projectDir: string) => { return Future.fromResult(true); };
+					fs.exists = (projectDir: string) => true;
 					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
 				});
 
 				it("warns when unable to create project file", () => {
-					fs.exists = (param: string) => Future.fromResult(false);
+					fs.exists = (param: string) => false;
 					project.createProjectFile = (projectDir: string, properties: any) => {
 						let future = new Future<void>();
 						future.throw(new Error("error is raised"));

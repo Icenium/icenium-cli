@@ -47,7 +47,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
 			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
 
-			if (!this.$fs.exists(pluginsPath).wait()) {
+			if (!this.$fs.exists(pluginsPath)) {
 				let zipFile: any;
 				try {
 					this.$logger.info("Downloading core Cordova plugins...");

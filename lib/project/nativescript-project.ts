@@ -121,7 +121,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
 				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
+				if (!this.$fs.exists(targetFilePath)) {
 					this.printAssetUpdateMessage();
 					this.$logger.trace("File not found, copying %s", appResourceFile);
 					this.$fs.copyFile(appResourceFile, targetFilePath).wait();

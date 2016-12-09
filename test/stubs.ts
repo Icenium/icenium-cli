@@ -52,8 +52,8 @@ export class FileSystemStub implements IFileSystem {
 	unzip(zipFile: string, destination: string): IFuture<void> {
 		return undefined;
 	}
-	exists(path: string): IFuture<boolean> {
-		return Future.fromResult(true);
+	exists(path: string): boolean {
+		return true;
 	}
 
 	deleteFile(path: string): IFuture<void> {
@@ -122,7 +122,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	getUniqueFileName(baseName: string): IFuture<string> {
+	getUniqueFileName(baseName: string): string {
 		return undefined;
 	}
 
@@ -415,7 +415,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 }
 
 export class ProjectFilesManager implements IProjectFilesManager {
-	public getProjectFiles(projectFilesPath: string, additionalExcludedProjectDirsAndFiles?: string[], filter?: (filePath: string, stat: IFsStats) => IFuture<boolean>, opts?: any): string[] {
+	public getProjectFiles(projectFilesPath: string, additionalExcludedProjectDirsAndFiles?: string[], filter?: (filePath: string, stat: IFsStats) => boolean, opts?: any): string[] {
 		return undefined;
 	}
 

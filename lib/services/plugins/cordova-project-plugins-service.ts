@@ -291,10 +291,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<IPlugin[]>()();
 	}
 
-	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
-		return ((): boolean => {
-			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
-		}).future<boolean>()();
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): boolean {
+		return super.shouldCopyToPluginsDirectory(pathToPlugin) || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
 	}
 
 	protected getPluginsDirName(): string {
@@ -477,7 +475,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 
 				if (configuration) {
-					this.$project.saveProject(this.$project.getProjectDir().wait(), [configuration]).wait();
+					this.$project.saveProject(this.$project.getProjectDir(), [configuration]).wait();
 					this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
 				} else {
 					this.$project.saveProject().wait();
@@ -858,7 +856,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): IPlugin[] => {
 			if (!this._localPlugins) {
 				let pluginsDir = path.join(this.$project.projectDir, "plugins");
-				if (!this.$fs.exists(pluginsDir).wait()) {
+				if (!this.$fs.exists(pluginsDir)) {
 					return [];
 				}
 
@@ -940,7 +938,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): any => {
 			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
 
-			if (!this.$fs.exists(pathToPluginXml).wait()) {
+			if (!this.$fs.exists(pathToPluginXml)) {
 				return null;
 			}
 

@@ -64,7 +64,7 @@ export class SamplesService implements ISamplesService {
 	public cloneSample(sampleName: string): IFuture<void> {
 		return (() => {
 			let cloneTo = this.$options.path || sampleName;
-			if (this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
+			if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).wait().length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 

@@ -54,9 +54,9 @@ declare module Project {
 
 		/**
 		 * Gets the path to the project's App_Resources folder
-		 * @return {IFuture<string>} The path to the App_Resources folder
+		 * @return {string} The path to the App_Resources folder
 		 */
-		appResourcesPath(): IFuture<string>;
+		appResourcesPath(): string;
 
 		/**
 		 * Get information about plugin variables for current project.

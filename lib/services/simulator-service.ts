@@ -44,7 +44,7 @@ export class SimulatorService implements ISimulatorService {
 			this.$logger.info("Starting simulator...");
 
 			let simulatorParams = [
-				"--path", this.$project.getProjectDir().wait(),
+				"--path", this.$project.getProjectDir(),
 				"--assemblypaths", this.simulatorPath,
 				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];

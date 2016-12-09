@@ -9,7 +9,7 @@ module.exports = () => {
 
 	let $projectConstants: Project.IConstants = $injector.resolve("projectConstants");
 	let $typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
-	let typeScriptFilesData = $typeScriptService.getTypeScriptFilesData($project.getProjectDir().wait()).wait();
+	let typeScriptFilesData = $typeScriptService.getTypeScriptFilesData($project.getProjectDir()).wait();
 
 	if ($typeScriptService.isTypeScriptProject($project.projectDir).wait()) {
 		let $fs: IFileSystem = $injector.resolve("fs");
@@ -23,10 +23,10 @@ module.exports = () => {
 		}
 
 		let useLocalTypeScriptCompiler = true;
-		if ($fs.exists(pathToTsConfig).wait()) {
+		if ($fs.exists(pathToTsConfig)) {
 			let json = $fs.readJson(pathToTsConfig).wait();
 			let noEmitOnError = !!(json && json.compilerOptions && json.compilerOptions.noEmitOnError);
-			$typeScriptService.transpile($project.getProjectDir().wait(), null, null, { compilerOptions: { noEmitOnError }, useLocalTypeScriptCompiler }).wait();
+			$typeScriptService.transpile($project.getProjectDir(), null, null, { compilerOptions: { noEmitOnError }, useLocalTypeScriptCompiler }).wait();
 		} else {
 			let $resources: IResourceLoader = $injector.resolve("resources");
 			let pathToDefaultDefinitionFiles = $resources.resolvePath(path.join("resources", "typescript-definitions-files"));

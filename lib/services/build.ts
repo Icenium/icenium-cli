@@ -410,10 +410,10 @@ export class BuildService implements Project.IBuildService {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
 					let targetFileName: string;
 					if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
-						targetFileName = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
+						targetFileName = path.join(this.$project.getProjectDir(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
 					} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
 						targetFileName = settings.downloadedFilePath
-							|| path.join(this.$project.getProjectDir().wait(), pkg.fileName);
+							|| path.join(this.$project.getProjectDir(), pkg.fileName);
 					} else {
 						// We will get here if the disposition is BuildResultMetadata which is not file for download.
 						return;

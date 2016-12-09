@@ -24,7 +24,7 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		super($fs);
 
 		let configPath = this.getConfigPath("config");
-		if (!this.$fs.exists(configPath).wait()) {
+		if (!this.$fs.exists(configPath)) {
 			let configBase = this.loadConfig("config-base").wait();
 			this.$fs.writeJson(configPath, configBase).wait();
 		} else {

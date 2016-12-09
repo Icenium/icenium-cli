@@ -25,8 +25,8 @@ function createTestInjector() {
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
 
 	testInjector.register("project", {
-		getProjectDir: (): IFuture<string> => {
-			return (() => testInjector.resolve("options").path).future<string>()();
+		getProjectDir: (): string => {
+			return testInjector.resolve("options").path;
 		},
 		ensureProject: () => { /* mock*/},
 		projectConfigFiles: [{ template: "android-manifest",

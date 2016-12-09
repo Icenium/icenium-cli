@@ -72,7 +72,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	 */
 	private get ionicResourcesDirectory(): string {
 		if (!this._ionicResourcesDirectory) {
-			this._ionicResourcesDirectory = path.join(this.$project.getProjectDir().wait(), "resources");
+			this._ionicResourcesDirectory = path.join(this.$project.getProjectDir(), "resources");
 		}
 
 		return this._ionicResourcesDirectory;
@@ -83,7 +83,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	 */
 	private get ionicConfigXml(): IonicConfigXmlFile.IConfigXmlFile {
 		if (!this._ionicConfigXml) {
-			this._ionicConfigXml = <IonicConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(path.join(this.$project.getProjectDir().wait(), IonicProjectTransformator.CONFIG_XML_FILE_NAME)).wait());
+			this._ionicConfigXml = <IonicConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(path.join(this.$project.getProjectDir(), IonicProjectTransformator.CONFIG_XML_FILE_NAME)).wait());
 		}
 
 		return this._ionicConfigXml;
@@ -113,14 +113,14 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	 */
 	private cloneResources(): IFuture<void> {
 		return (() => {
-			if (!this.$fs.exists(this.ionicResourcesDirectory).wait()) {
+			if (!this.$fs.exists(this.ionicResourcesDirectory)) {
 				return;
 			}
 
-			let appBuilderResourcesDirectory = path.join(this.$project.getProjectDir().wait(), "App_Resources");
+			let appBuilderResourcesDirectory = path.join(this.$project.getProjectDir(), "App_Resources");
 
 			// Currently the default template does not add App_Resources directory.
-			if (!this.$fs.exists(appBuilderResourcesDirectory).wait()) {
+			if (!this.$fs.exists(appBuilderResourcesDirectory)) {
 				this.$fs.createDirectory(appBuilderResourcesDirectory).wait();
 			}
 
@@ -248,7 +248,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			let ionicPlatformResourcesDirectory = path.join(this.ionicResourcesDirectory, ionicPlatformName);
 
-			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName).wait() ||
+			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName) ||
 				!this.$fs.getFsStats(ionicPlatformResourcesDirectory).wait().isDirectory()) {
 				return;
 			}
@@ -256,7 +256,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			let ionicPlatformResources = this.$fs.readDirectory(ionicPlatformResourcesDirectory).wait();
 
 			let appbuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, appBuilderPlatformName);
-			if (!this.$fs.exists(appbuilderPlatformResourcesDirectory).wait()) {
+			if (!this.$fs.exists(appbuilderPlatformResourcesDirectory)) {
 				this.$fs.createDirectory(appbuilderPlatformResourcesDirectory).wait();
 			}
 
@@ -344,20 +344,20 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		}).future<void>()();
 	}
 
-	private checkIfPlatformIsAddedToProject(resourcesDirectory: string, platformName: string): IFuture<boolean> {
+	private checkIfPlatformIsAddedToProject(resourcesDirectory: string, platformName: string): boolean {
 		return this.$fs.exists(path.join(resourcesDirectory, platformName));
 	}
 
 	private backupCurrentProject(): IFuture<void> {
 		return (() => {
-			let ionicProjectBackupDir = path.join(this.$project.getProjectDir().wait(), IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME);
+			let ionicProjectBackupDir = path.join(this.$project.getProjectDir(), IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME);
 
 			this.$logger.warn(`Creating backup in ${ionicProjectBackupDir}. This could take more than one minute. Please be patient.`);
 
 			// Use -A to get only the folders and files names without the "." and ".." entries.
-			let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir().wait());
+			let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir());
 
-			if (this.$fs.exists(ionicProjectBackupDir).wait()) {
+			if (this.$fs.exists(ionicProjectBackupDir)) {
 				this.$fs.deleteDirectory(ionicProjectBackupDir).wait();
 			}
 
@@ -366,7 +366,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			// Cannot copy directly project dir to the backup dir because it will end up in endless recursion.
 			_.each(allProjectItems, (item: string) => {
 				if (item.indexOf(IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME) < 0) {
-					let itemSourceDirectory = path.join(this.$project.getProjectDir().wait(), item);
+					let itemSourceDirectory = path.join(this.$project.getProjectDir(), item);
 					let itemDestinationDirectory = path.join(ionicProjectBackupDir, item);
 					if (this.$fs.getFsStats(itemSourceDirectory).wait().isDirectory()) {
 						shelljs.cp("-R", `${itemSourceDirectory}/`, `${itemDestinationDirectory}`);
@@ -384,7 +384,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private createReroutingIndexHtml(): IFuture<void> {
 		return (() => {
 			const indexHtmlContent = '<html><head><meta http-equiv="refresh" content="0; url=www/index.html" /></head></html>';
-			let indexHtml = path.join(this.$project.getProjectDir().wait(), "index.html");
+			let indexHtml = path.join(this.$project.getProjectDir(), "index.html");
 			this.$fs.writeFile(indexHtml, indexHtmlContent).wait();
 		}).future<void>()();
 	}
@@ -392,8 +392,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	private deleteEnabledPlugins(): IFuture<void> {
 		return (() => {
 			let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
-			let pluginsDir = path.join(this.$project.getProjectDir().wait(), "plugins");
-			if (this.$fs.exists(pluginsDir).wait()) {
+			let pluginsDir = path.join(this.$project.getProjectDir(), "plugins");
+			if (this.$fs.exists(pluginsDir)) {
 				(this.$fs.readDirectory(pluginsDir).wait() || [])
 					.filter(pl => _.includes(corePlugins, pl))
 					.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)).wait());
@@ -401,8 +401,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		}).future<void>()();
 	}
 
-	private deleteAssortedFilesAndDirectories() {
-		let projectDir = this.$project.getProjectDir().wait();
+	private deleteAssortedFilesAndDirectories(): void {
+		let projectDir = this.$project.getProjectDir();
 		let assortedFilesAndDirectories = ["platforms", "hooks", "resources", ".editorconfig", "ionic.project", "package.json"];
 		let itemsToRemove = _.map(assortedFilesAndDirectories, (item: string) => path.join(projectDir, item));
 

@@ -49,7 +49,7 @@ export class InitProjectCommand implements ICommand {
 			let projectData = this.projectFilesDescriptors[projectType];
 
 			_.each(projectData.mandatoryFiles, (file: FileDescriptor) => {
-				if(!this.$fs.exists(file.path).wait()) {
+				if(!this.$fs.exists(file.path)) {
 					this.$logger.trace("Missing %s %s. The project type is not %s.", file.path, file.type, projectType);
 					result = false;
 					// break execution of _.each
@@ -59,7 +59,7 @@ export class InitProjectCommand implements ICommand {
 
 			if(result) {
 				_.each(projectData.forbiddenFiles, (file: FileDescriptor) => {
-					if(this.$fs.exists(file.path).wait()) {
+					if(this.$fs.exists(file.path)) {
 						this.$logger.trace("Found %s %s. The project type is not %s.", file.path, file.type, projectType);
 						result = false;
 						// break execution of _.each

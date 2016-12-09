@@ -519,7 +519,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			let targetFileName = path.join(this.getPath(), util.format("%s.%s", sanitizedName,
 				CryptographicIdentityConstants.PKCS12_EXTENSION));
 
-			if (this.$fs.exists(targetFileName).wait()) {
+			if (this.$fs.exists(targetFileName)) {
 				this.$errors.fail("The target file '%s' already exists.", targetFileName);
 			}
 
@@ -540,7 +540,7 @@ export class ExportCryptographicIdentity implements ICommand {
 
 		if (!path) {
 			path = process.cwd();
-		} else if (!this.$fs.exists(path).wait()) {
+		} else if (!this.$fs.exists(path)) {
 			this.$errors.fail("The path '%s' does not exist.", path);
 		}
 		return path;
@@ -575,7 +575,7 @@ export class ImportCryptographicIdentity implements ICommand {
 
 			let importType = extension === ".p12" ? CryptographicIdentityConstants.PKCS12CERTIFICATE : CryptographicIdentityConstants.X509CERTIFICATE;
 
-			if (!this.$fs.exists(certificateFile).wait()) {
+			if (!this.$fs.exists(certificateFile)) {
 				this.$errors.fail("The file '%s' does not exist.", certificateFile);
 			}
 
@@ -763,11 +763,11 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 		return ((): void => {
 			let targetFileName = this.$options.saveTo;
 			if (targetFileName) {
-				if (this.$fs.exists(targetFileName).wait()) {
+				if (this.$fs.exists(targetFileName)) {
 					this.$errors.fail("The output file already exists.");
 				}
 			} else {
-				targetFileName = this.$fs.getUniqueFileName("certificate_request.csr").wait();
+				targetFileName = this.$fs.getUniqueFileName("certificate_request.csr");
 			}
 
 			let targetFile = this.$fs.createWriteStream(targetFileName);
@@ -791,7 +791,7 @@ class FileNameCommandParameter implements ICommandParameter {
 				this.$errors.fail("No file specified.");
 			}
 
-			if (!this.$fs.exists(fileName).wait()) {
+			if (!this.$fs.exists(fileName)) {
 				this.$errors.fail({ formatStr: "File '%s' does not exist.", suppressCommandHelp: true }, fileName);
 			}
 
@@ -829,7 +829,7 @@ class ImportProvisionCommand implements ICommand {
 				this.$errors.fail("No file specified.");
 			}
 
-			if (!this.$fs.exists(fileName).wait()) {
+			if (!this.$fs.exists(fileName)) {
 				this.$errors.fail({ formatStr: "File '%s' does not exist.", suppressCommandHelp: true }, fileName);
 			}
 

@@ -9,7 +9,7 @@ export class ExtensionsServiceBase {
 		protected $httpClient: Server.IHttpClient,
 		protected $logger: ILogger,
 		protected $options: IOptions) {
-		if (this.$fs.exists(this.versionsFile).wait()) {
+		if (this.$fs.exists(this.versionsFile)) {
 			this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 		}
 	}
@@ -29,7 +29,7 @@ export class ExtensionsServiceBase {
 		return ((): void => {
 			actions = actions || {};
 
-			if (this.$fs.exists(this.versionsFile).wait()) {
+			if (this.$fs.exists(this.versionsFile)) {
 				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
 			}
 

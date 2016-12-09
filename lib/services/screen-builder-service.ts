@@ -129,12 +129,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<IScaffolder>()();
 	}
 
-	public ensureScreenBuilderProject(projectDir: string): IFuture<void> {
-		return (() => {
-			if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
-				this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
-			}
-		}).future<void>()();
+	public ensureScreenBuilderProject(projectDir: string): void {
+		if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)))) {
+			this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
+		}
 	}
 
 	public shouldUpgrade(projectPath: string): IFuture<boolean> {
@@ -255,8 +253,8 @@ class ScreenBuilderDynamicCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			let projectDir = this.$project.getProjectDir().wait();
-			this.$screenBuilderService.ensureScreenBuilderProject(projectDir).wait();
+			let projectDir = this.$project.getProjectDir();
+			this.$screenBuilderService.ensureScreenBuilderProject(projectDir);
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				type: this.command.substr(this.command.indexOf("-") + 1)

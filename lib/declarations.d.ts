@@ -423,7 +423,12 @@ interface IScreenBuilderService {
 	allSupportedCommands(projectPath: string, generatorName?: string): IFuture<string[]>;
 	generateAllCommands(projectPath: string, generatorName?: string): IFuture<void>;
 	composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
-	ensureScreenBuilderProject(projectPath: string): IFuture<void>;
+
+	/**
+	 * Checks if current project is created with ScreenBuilder. In case it's not, an error is thrown.
+	 * @param {string} projectPath Path to project that will be checked.
+	 */
+	ensureScreenBuilderProject(projectPath: string): void;
 	shouldUpgrade(projectPath: string): IFuture<boolean>;
 	upgrade(projectPath: string): IFuture<void>;
 }

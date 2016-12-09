@@ -86,7 +86,7 @@ class ImageService implements IImageService {
 
 	public generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void> {
 		return (() => {
-			this.validateImage(initialImagePath).wait();
+			this.validateImage(initialImagePath);
 
 			temp.track();
 			let inputImageStream = this.$fs.createReadStream(initialImagePath),
@@ -109,7 +109,7 @@ class ImageService implements IImageService {
 					return;
 				}
 
-				let projectImagePath = path.join(this.$project.appResourcesPath().wait(), imagePath.substring(imageBasePath.length));
+				let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
 				this.copyImageToProject(imagePath, projectImagePath).wait();
 			});
 		}).future<void>()();
@@ -119,7 +119,7 @@ class ImageService implements IImageService {
 		return (() => {
 			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath)).wait();
 
-			if (this.replaceAll || !this.$fs.exists(projectImagePath).wait()) {
+			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
 				return this.$fs.copyFile(imagePath, projectImagePath).wait();
 			}
 
@@ -149,20 +149,18 @@ class ImageService implements IImageService {
 		table.push(['', '', '']);
 	}
 
-	private validateImage(imagePath: string): IFuture<void> {
-		return (() => {
-			if (!imagePath) {
-				this.$errors.failWithoutHelp('You must providе a valid image path.');
-			}
+	private validateImage(imagePath: string): void {
+		if (!imagePath) {
+			this.$errors.failWithoutHelp('You must providе a valid image path.');
+		}
 
-			if (!this.$fs.exists(imagePath).wait()) {
-				this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
-			}
+		if (!this.$fs.exists(imagePath)) {
+			this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
+		}
 
-			if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {
-				this.$errors.failWithoutHelp('You must specify a PNG image source.');
-			}
-		}).future<void>()();
+		if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {
+			this.$errors.failWithoutHelp('You must specify a PNG image source.');
+		}
 	}
 
 	private getImageDimensions(image: ImageData): string {

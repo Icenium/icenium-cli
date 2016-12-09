@@ -60,9 +60,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	}
 
 	public getInstalledPlugins(): IPlugin[] {
-		let pathToPackageJson = this.getPathToProjectPackageJson().wait();
+		let pathToPackageJson = this.getPathToProjectPackageJson();
 
-		if (this.$fs.exists(pathToPackageJson).wait()) {
+		if (this.$fs.exists(pathToPackageJson)) {
 			let content = this.$fs.readJson(pathToPackageJson).wait();
 			if (content && content.dependencies) {
 				let items = _.map(content.dependencies, (version: string, name: string) => {
@@ -129,7 +129,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	public removePlugin(pluginName: string): IFuture<void> {
 		return (() => {
-			let pathToPackageJson = this.getPathToProjectPackageJson().wait();
+			let pathToPackageJson = this.getPathToProjectPackageJson();
 			let packageJsonContent = this.getProjectPackageJsonContent().wait();
 			let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
 			if (packageJsonContent.dependencies[pluginBasicInfo.name]) {
@@ -137,7 +137,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 				let fullPluginPath = path.join(this.$project.projectDir, pathToPlugin);
 
-				if (this.checkIsValidLocalPlugin(pathToPlugin).wait() || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath).wait())) {
+				if (this.checkIsValidLocalPlugin(pathToPlugin).wait() || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
 					this.$fs.deleteDirectory(fullPluginPath).wait();
 				}
 
@@ -201,7 +201,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		if (this.hasTgzExtension(pathToPlugin)) {
 			return {
 				sourceDirectory: pathToPlugin,
-				destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins")
+				destinationDirectory: path.join(this.$project.getProjectDir(), "plugins")
 			};
 		} else {
 			return super.getCopyLocalPluginData(pathToPlugin);
@@ -226,10 +226,10 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				variables: content.nativescript && content.nativescript.variables
 			};
 
-			let pathToPackageJson = this.getPathToProjectPackageJson().wait();
+			let pathToPackageJson = this.getPathToProjectPackageJson();
 			let packageJsonContent = this.getProjectPackageJsonContent().wait();
 			if (pluginData && pluginData.addPluginToConfigFile) {
-				packageJsonContent.dependencies[name] = "file:" + path.relative(this.$project.getProjectDir().wait(), pathToPlugin);
+				packageJsonContent.dependencies[name] = "file:" + path.relative(this.$project.getProjectDir(), pathToPlugin);
 			}
 
 			// Skip variables configuration for AppManager LiveSync Plugin.
@@ -244,7 +244,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	}
 
 	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
-		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName).wait()) {
+		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName)) {
 			pluginData.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 		}
 
@@ -255,15 +255,15 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return super.installLocalPlugin(pluginData && pluginData.isTgz ? pluginData.actualName : pathToInstalledPlugin, pluginData, options);
 	}
 
-	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
-		return ((): boolean => {
-			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(this.getPluginsDirName()) !== -1;
-		}).future<boolean>()();
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): boolean {
+		return super.shouldCopyToPluginsDirectory(pathToPlugin) || pathToPlugin.indexOf(this.getPluginsDirName()) !== -1;
 	}
 
+	// TODO: Remove IFuture, reason: fs.exists - not available at the moment
+	// Remark: Cannot do it until cordova-project-plugins-service has async call.
 	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
 		return (() => {
-			if (!this.$fs.exists(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
+			if (!this.$fs.exists(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME))) {
 				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid NativeScript plugin.`);
 			}
 		}).future<void>()();
@@ -302,17 +302,15 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		}).future<IPlugin[]>()();
 	}
 
-	private getPathToProjectPackageJson(): IFuture<string> {
-		return (() => {
-			return path.join(this.$project.getProjectDir().wait(), this.$projectConstants.PACKAGE_JSON_NAME);
-		}).future<string>()();
+	private getPathToProjectPackageJson(): string {
+		return path.join(this.$project.getProjectDir(), this.$projectConstants.PACKAGE_JSON_NAME);
 	}
 
 	private getProjectPackageJsonContent(): IFuture<any> {
 		return ((): any => {
-			let pathToPackageJson = this.getPathToProjectPackageJson().wait();
+			let pathToPackageJson = this.getPathToProjectPackageJson();
 
-			if (!this.$fs.exists(pathToPackageJson).wait()) {
+			if (!this.$fs.exists(pathToPackageJson)) {
 				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, pathToPackageJson).wait();
 			}
 
@@ -504,7 +502,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return ((): boolean => {
 			let fullPath = path.resolve(pluginName);
 
-			return this.$fs.exists(fullPath).wait() && this.$fs.exists(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
+			return this.$fs.exists(fullPath) && this.$fs.exists(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME));
 		}).future<boolean>()();
 	}
 
@@ -614,7 +612,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	private setPluginInPackageJson(pluginIdentifier: string, pluginOpts?: { addPluginToPackageJson: boolean }): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pathToPackageJson = this.getPathToProjectPackageJson().wait(),
+			let pathToPackageJson = this.getPathToProjectPackageJson(),
 				packageJsonContent = this.getProjectPackageJsonContent().wait(),
 				pluginBasicInfo = this.getPluginBasicInformation(pluginIdentifier).wait(),
 				name = pluginBasicInfo.name,

@@ -28,18 +28,16 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 
 	injector.register("dynamicHelpProvider", dynamicHelpProviderLib.DynamicHelpProvider);
 	injector.register("dynamicHelpService", {
-		isProjectType: (...args: string[]): IFuture<boolean> => { return Future.fromResult(opts.isProjectTypeResult); },
+		isProjectType: (...args: string[]): boolean => opts.isProjectTypeResult,
 		isPlatform: (...args: string[]): boolean => { return opts.isPlatformResult; },
-		getLocalVariables: (): IFuture<IDictionary<any>> => {
-			return (() => {
-				let localVariables: IDictionary<any> = {};
-				localVariables["isCordova"] = opts.isProjectTypeResult;
-				localVariables["isNativeScript"] = opts.isProjectTypeResult;
-				localVariables["isLinux"] = opts.isPlatformResult;
-				localVariables["isWindows"] = opts.isPlatformResult;
-				localVariables["isMacOS"] = opts.isPlatformResult;
-				return localVariables;
-			}).future<IDictionary<any>>()();
+		getLocalVariables: (): IDictionary<any> => {
+			let localVariables: IDictionary<any> = {};
+			localVariables["isCordova"] = opts.isProjectTypeResult;
+			localVariables["isNativeScript"] = opts.isProjectTypeResult;
+			localVariables["isLinux"] = opts.isPlatformResult;
+			localVariables["isWindows"] = opts.isPlatformResult;
+			localVariables["isMacOS"] = opts.isPlatformResult;
+			return localVariables;
 		}
 	});
 	injector.register("microTemplateService", microTemplateServiceLib.MicroTemplateService);

@@ -72,12 +72,10 @@ function mockFsForAppResources(requiredResources: string[], resourcesInProject: 
 		}).future<void>()();
 	};
 
-	$fs.exists = (path: string): IFuture<boolean> => {
-		return ((): boolean => {
-			return _.some(resourcesInProject, (resource: string) => {
-				return path.indexOf(resource) >= 0;
-			});
-		}).future<boolean>()();
+	$fs.exists = (path: string): boolean => {
+		return _.some(resourcesInProject, (resource: string) => {
+			return path.indexOf(resource) >= 0;
+		});
 	};
 
 	return { copiedFilesReference };

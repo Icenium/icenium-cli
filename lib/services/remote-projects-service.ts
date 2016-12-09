@@ -116,7 +116,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	private getExportDir(dirName: string, tapServiceCall: (_unzipStream: any) => IFuture<any>, solutionSpaceHeaderOptions: {discardSolutionSpaceHeader: boolean}): IFuture<string> {
 		return ((): string =>{
 			let exportDir = path.join(this.$project.getNewProjectDir(), dirName);
-			if(this.$fs.exists(exportDir).wait()) {
+			if(this.$fs.exists(exportDir)) {
 				this.$errors.fail("The folder %s already exists!", exportDir);
 			}
 
@@ -136,7 +136,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			try {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
 				let projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
-				if(!this.$fs.exists(projectFile).wait()) {
+				if(!this.$fs.exists(projectFile)) {
 					let properties = this.getProjectProperties(remoteSolutionName, remoteProjectName).wait();
 					this.$project.createProjectFile(projectDir, properties).wait();
 				}

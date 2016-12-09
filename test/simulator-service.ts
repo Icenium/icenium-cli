@@ -28,7 +28,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 		isRunning: (executableName: string) => { return Future.fromResult(!!isRunning); }
 	});
 	testInjector.register("project", {
-		getProjectDir: () => { return Future.fromResult(projectDir); }
+		getProjectDir: () => projectDir
 	});
 	testInjector.register("projectSimulatorService", {
 		getSimulatorParams: (simulatorPackageName: string) => { return Future.fromResult(baseParams); }

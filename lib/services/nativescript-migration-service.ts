@@ -15,7 +15,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private _nativeScriptMigrationConfiguration: INativeScriptMigrationConfiguration;
 	private get nativeScriptMigrationConfiguration(): INativeScriptMigrationConfiguration {
 		if (!this._nativeScriptMigrationConfiguration) {
-			let projectDir = this.$project.getProjectDir().wait(),
+			let projectDir = this.$project.getProjectDir(),
 				tnsModulesProjectPath = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, NativeScriptMigrationService.TNS_MODULES),
 				tnsTypingsPath = path.join(projectDir, NativeScriptMigrationService.TYPINGS, NativeScriptMigrationService.TNS_CORE_MODULES);
 
@@ -28,7 +28,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				typingsBackupName: this.getBackupName(tnsTypingsPath),
 				oldPackageJsonContents: this.getProjectPackageJsonContent().wait(),
 
-				pathToPackageJson: this.getPathToProjectPackageJson().wait(),
+				pathToPackageJson: this.getPathToProjectPackageJson(),
 				projectDir: projectDir,
 				appResourcesRequiredPath: path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME, this.$staticConfig.APP_RESOURCES_DIR_NAME),
 				shouldRollBackAppResources: false
@@ -135,7 +135,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion).wait();
 
 				this.$projectMigrationService.migrateTypeScriptProject().wait();
-				this.$npmService.install(this.$project.getProjectDir().wait()).wait();
+				this.$npmService.install(this.$project.getProjectDir()).wait();
 
 				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents).wait();
 			} catch (err) {
@@ -188,7 +188,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return (() => {
 			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
 			if (_.includes(versions, newVersion)
-				&& !this.$fs.exists(path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait()) {
+				&& !this.$fs.exists(path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME))) {
 				// From version 1.1.2 we need package.json file at the root of the project.
 				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
 			}
@@ -200,17 +200,15 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile);
 	}
 
-	private getPathToProjectPackageJson(): IFuture<string> {
-		return (() => {
-			return path.join(this.$project.getProjectDir().wait(), this.$projectConstants.PACKAGE_JSON_NAME);
-		}).future<string>()();
+	private getPathToProjectPackageJson(): string {
+		return path.join(this.$project.getProjectDir(), this.$projectConstants.PACKAGE_JSON_NAME);
 	}
 
 	private getProjectPackageJsonContent(): IFuture<any> {
 		return ((): any => {
-			let pathToPackageJson = this.getPathToProjectPackageJson().wait();
+			let pathToPackageJson = this.getPathToProjectPackageJson();
 
-			if (!this.$fs.exists(pathToPackageJson).wait()) {
+			if (!this.$fs.exists(pathToPackageJson)) {
 				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, pathToPackageJson).wait();
 			}
 

@@ -89,11 +89,11 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 
-			let outDir = path.join(this.$project.getProjectDir().wait(), "kendo"),
+			let outDir = path.join(this.$project.getProjectDir(), "kendo"),
 				backupFolder = `${outDir}.ab-backup`;
 
 			try {
-				if (this.$fs.exists(outDir).wait()) {
+				if (this.$fs.exists(outDir)) {
 					this.$fs.rename(outDir, backupFolder).wait();
 				}
 

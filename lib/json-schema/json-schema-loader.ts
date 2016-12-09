@@ -44,7 +44,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 	private loadSchemas(): IFuture<void> {
 		return (() => {
-			if(this.$fs.exists(this.schemasFolderPath).wait()) {
+			if(this.$fs.exists(this.schemasFolderPath)) {
 
 				let fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
 				_.each(fileNames, (fileName: string) => {
