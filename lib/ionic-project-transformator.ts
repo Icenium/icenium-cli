@@ -407,7 +407,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		let itemsToRemove = _.map(assortedFilesAndDirectories, (item: string) => path.join(projectDir, item));
 
 		try {
-			this.$fs.rm("-rf", ...itemsToRemove);
+			this.$fs.rm.apply(this.$fs, [ "-rf" ].concat(itemsToRemove));
 		} catch (e) {
 			// Some files do not exist in older ionic projects, ignore the error.
 			this.$logger.trace(`Deleting unexisting file from Ionic project: ${e}`);

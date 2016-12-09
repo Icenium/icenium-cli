@@ -2,6 +2,8 @@
 
 var shelljs = require("shelljs"),
 	path = require("path"),
+	child_process = require("child_process"),
+	nodeArgs = require("./lib/common/scripts/node-args").getNodeArgs(),
 	nodeModulesDirName = "node_modules",
 	iosSimPortableDirName = "ios-sim-portable",
 	fibersDirName = "fibers";
@@ -19,5 +21,6 @@ if (skipPostinstallTasks) {
 	return;
 }
 
-var child_process = require("child_process");
-child_process.spawn(process.argv[0], ["bin/appbuilder.js", "dev-post-install"], {stdio: "inherit"});
+var commandArgs = ["bin/appbuilder", "dev-post-install"];
+
+child_process.spawn(process.argv[0], nodeArgs.concat(commandArgs), {stdio: "inherit"});

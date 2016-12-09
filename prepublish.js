@@ -3,9 +3,10 @@ if (skipPostinstallTasks) {
 	return;
 }
 
-var fs = require("fs");
-var path = require("path");
-var child_process = require("child_process");
+var fs = require("fs"),
+	path = require("path"),
+	child_process = require("child_process"),
+	nodeArgs = require("./lib/common/scripts/node-args").getNodeArgs();
 
 function invokeGrunt(callback) {
 	if (!fs.existsSync("lib/appbuilder-cli.js")) {
@@ -17,8 +18,10 @@ function invokeGrunt(callback) {
 	}
 }
 
+var commandArgs = ["bin/appbuilder", "dev-prepackage"];
+
 invokeGrunt(function () {
-	var child = child_process.exec("node bin/appbuilder.js dev-prepackage", { env: process.env }, function (error) {
+	var child = child_process.exec("node " + nodeArgs.concat(commandArgs).join(" "), { env: process.env }, function (error) {
 		if (error) {
 			console.error("Failed to complete all pre-publishing steps.");
 			throw error;

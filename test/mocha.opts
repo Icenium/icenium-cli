@@ -1,0 +1,7 @@
+--ui mocha-fibers
+--recursive
+--reporter spec-xunit-file
+--require test/test-bootstrap.js
+--timeout 15000
+test/
+lib/common/test/unit-tests

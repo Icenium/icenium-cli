@@ -539,5 +539,5 @@ export class PrompterStub implements IPrompter {
 export class MessagesServiceStub implements IMessagesService {
 	pathsToMessageJsonFiles: string[];
 
-	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [id, ...args]); }
+	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [ id ].concat(args)); }
 }

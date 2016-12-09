@@ -5,7 +5,8 @@ import * as semver from "semver";
 import * as validUrl from "valid-url";
 import * as commonHelpers from "../../common/helpers";
 import {NODE_MODULES_DIR_NAME} from "../../common/constants";
-import temp = require("temp");
+import * as temp from "temp";
+
 temp.track();
 
 export abstract class PluginsServiceBase implements IPluginsService {
@@ -299,8 +300,10 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected abstract validatePluginInformation(pathToPlugin: string): IFuture<void>;
 
-	private fetchPluginCore(pluginIdentifier: string, version?: string, options: NpmPlugins.IFetchLocalPluginOptions = { useOriginalPluginDirectory: false }): IFuture<string> {
+	private fetchPluginCore(pluginIdentifier: string, version?: string, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<string> {
 		return ((): string => {
+			options = options === undefined ? { useOriginalPluginDirectory: false } : options;
+
 			let pluginBasicInfo: IBasicPluginInformation;
 			let pluginLocalPath = path.resolve(pluginIdentifier);
 			let pluginLocalPathExists = this.$fs.exists(pluginLocalPath).wait();

@@ -366,7 +366,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}
 
 		return _.map(corePlugins, pluginIdentifier => {
-			let [name, version] = pluginIdentifier.split("@");
+			let data = pluginIdentifier.split("@"),
+				name = data[0],
+				version = data[1];
 			let plugin = this.getBestMatchingPlugin(name, version);
 
 			if (!plugin) {
@@ -426,15 +428,15 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
 			// remove all instances of the plugin from current configuration
-			newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(plugin.data.Identifier).map(plug => plug.toProjectDataRecord()));
+			newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(plugin.data.Identifier).map(plug => plug.toProjectDataRecord())));
 			let obsoletedBy = this.getObsoletedByPluginIdentifier(plugin.data.Identifier).wait(),
 				obsoletingKey = this.getObsoletingPluginIdentifier(plugin.data.Identifier).wait();
 			if (obsoletedBy) {
-				newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(obsoletedBy).map(plug => plug.toProjectDataRecord()));
+				newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(obsoletedBy).map(plug => plug.toProjectDataRecord())));
 			}
 
 			if (obsoletingKey) {
-				newCorePlugins = _.without(newCorePlugins, ...this.getPluginInstancesByName(obsoletingKey).map(plug => plug.toProjectDataRecord()));
+				newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(obsoletingKey).map(plug => plug.toProjectDataRecord())));
 			}
 
 			newCorePlugins.push(plugin.toProjectDataRecord(version));
