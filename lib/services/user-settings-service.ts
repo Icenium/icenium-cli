@@ -16,7 +16,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 		return this.userSettingsFile;
 	}
 
-	public deleteUserSettingsFile(): IFuture<void> {
+	public deleteUserSettingsFile(): void {
 		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }
@@ -43,7 +43,7 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 		return this.userSettingsFile;
 	}
 
-	public deleteUserSettingsFile(): IFuture<void> {
+	public deleteUserSettingsFile(): void {
 		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }

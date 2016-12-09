@@ -60,7 +60,7 @@ export class ExtensionsServiceBase {
 				try {
 					this.downloadPackage(extensionData.downloadUri, zipFileName).wait();
 					this.$fs.unzip(zipFileName, extensionPath).wait();
-					this.$fs.deleteFile(zipFileName).wait();
+					this.$fs.deleteFile(zipFileName);
 					this.extensionVersions[packageName] = extensionVersion;
 					if(actions.afterDownloadAction) {
 						actions.afterDownloadAction().wait();

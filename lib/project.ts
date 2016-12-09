@@ -692,7 +692,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			let tempDir = this.getTempDir().wait();
 
 			let projectZipFile = path.join(tempDir, "Build.zip");
-			this.$fs.deleteFile(projectZipFile).wait();
+			this.$fs.deleteFile(projectZipFile);
 			let projectDir = this.getProjectDir();
 
 			let files = this.enumerateProjectFiles();
@@ -773,7 +773,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					this.$logger.trace("Saving project file.");
 					this.createProjectFile(projectDir, properties).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
-					this.removeExtraFiles(projectDir).wait();
+					this.removeExtraFiles(projectDir);
 					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				} catch (ex) {
@@ -798,11 +798,9 @@ export class Project extends ProjectBase implements Project.IProject {
 		return properties;
 	}
 
-	private removeExtraFiles(projectDir: string): IFuture<void> {
-		return ((): void => {
-			_.each(["mobile.vstemplate"],
-				(file) => this.$fs.deleteFile(path.join(projectDir, file)).wait());
-		}).future<void>()();
+	private removeExtraFiles(projectDir: string): void {
+		_.each(["mobile.vstemplate"],
+			(file) => this.$fs.deleteFile(path.join(projectDir, file)));
 	}
 
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<Project.IData> {

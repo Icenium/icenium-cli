@@ -39,12 +39,13 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.user = JSON.parse(value));
 	}
 
+	// TODO: Remove IFuture, reason: fs.deleteFile - not available until writeFile is sync.
 	public setCookies(cookies?: IStringDictionary): IFuture<void> {
 		this.cookies = cookies;
 		if(this.cookies) {
 			return this.$fs.writeFile(this.getCookieFilePath(), JSON.stringify(this.cookies));
 		} else {
-			return this.$fs.deleteFile(this.getCookieFilePath());
+			return Future.fromResult(this.$fs.deleteFile(this.getCookieFilePath()));
 		}
 	}
 
@@ -68,7 +69,7 @@ export class UserDataStore implements IUserDataStore {
 				this.$fs.writeJson(this.getUserStateFilePath(), user).wait();
 				this.trackTenantInformation(user).wait();
 			} else {
-				this.$fs.deleteFile(this.getUserStateFilePath()).wait();
+				this.$fs.deleteFile(this.getUserStateFilePath());
 			}
 		}).future<void>()();
 
@@ -161,7 +162,7 @@ export class LoginManager implements ILoginManager {
 	private localLogout(): IFuture<void> {
 		return (() => {
 			this.$userDataStore.clearLoginData().wait();
-			this.$sharedUserSettingsFileService.deleteUserSettingsFile().wait();
+			this.$sharedUserSettingsFileService.deleteUserSettingsFile();
 		}).future<void>()();
 	}
 

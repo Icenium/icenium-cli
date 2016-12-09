@@ -439,7 +439,7 @@ describe("Ionic project transformator", () => {
 					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
 					// Need to remove the config.xml file from the AppBuilder folder to compare only the resources.
-					fs.deleteFile(path.join(appbuilderResourcesDirectory, configXmlName)).wait();
+					fs.deleteFile(path.join(appbuilderResourcesDirectory, configXmlName));
 
 					let differentResources = _.difference(shelljs.ls("-R", appbuilderResourcesDirectory),
 						ionicResources);

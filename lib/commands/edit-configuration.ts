@@ -54,7 +54,7 @@ export class EditConfigurationCommand implements ICommand {
 				this.$fs.unzip(templateFilePath, directory).wait();
 
 				//delete extra file in template zip
-				this.$fs.deleteFile(path.join(directory, "server.vstemplate")).wait();
+				this.$fs.deleteFile(path.join(directory, "server.vstemplate"));
 				if (this.$hostInfo.isWindows) {
 					let contents = this.$fs.readText(filepath).wait();
 					contents = helpers.stringReplaceAll(contents, "\n", "\r\n");

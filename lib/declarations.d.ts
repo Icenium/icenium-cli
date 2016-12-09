@@ -382,7 +382,10 @@ interface IResourceDownloader {
 }
 
 interface IUserSettingsFileService {
-	deleteUserSettingsFile(): IFuture<void>;
+	/**
+	 * Deletes the user settings file.
+	 */
+	deleteUserSettingsFile(): void;
 	userSettingsFilePath: string;
 }
 

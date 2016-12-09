@@ -309,7 +309,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 			finally {
 				_.each(backedUpFiles, file => {
-					this.$fs.deleteFile(file + backupSuffix).wait();
+					this.$fs.deleteFile(file + backupSuffix);
 				});
 			}
 		}).future<void>()();
