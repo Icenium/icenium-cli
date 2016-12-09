@@ -85,7 +85,7 @@ function mockFsStats($fs: any, options: { hoursToAddToMtime: number }): void {
 	let modifiedDate = new Date(currentDate.getTime());
 	modifiedDate.setHours(currentDate.getHours() + options.hoursToAddToMtime);
 
-	$fs.getFsStats = (): IFuture<any> => Future.fromResult({ mtime: modifiedDate });
+	$fs.getFsStats = (): any => ({ mtime: modifiedDate });
 }
 
 function mockFsReadText($fs: IFileSystem, modifiedNativeScriptMigrationFile: any, currentNativeScriptMigrationFile: any): void {

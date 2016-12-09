@@ -249,7 +249,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			let ionicPlatformResourcesDirectory = path.join(this.ionicResourcesDirectory, ionicPlatformName);
 
 			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName) ||
-				!this.$fs.getFsStats(ionicPlatformResourcesDirectory).wait().isDirectory()) {
+				!this.$fs.getFsStats(ionicPlatformResourcesDirectory).isDirectory()) {
 				return;
 			}
 
@@ -262,7 +262,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			_.each(ionicPlatformResources, (resourceName: string) => {
 				let resourceDirectory = path.join(ionicPlatformResourcesDirectory, resourceName);
-				if (!this.$fs.getFsStats(resourceDirectory).wait().isDirectory()) {
+				if (!this.$fs.getFsStats(resourceDirectory).isDirectory()) {
 					return;
 				}
 
@@ -277,7 +277,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 	private copyWindowsPhoneResources(resourceDirectory: string, appBuilderWindowsPhoneResourcesDirectory: string): IFuture<void> {
 		return (() => {
-			if (!this.$fs.getFsStats(resourceDirectory).wait().isDirectory()) {
+			if (!this.$fs.getFsStats(resourceDirectory).isDirectory()) {
 				return;
 			}
 
@@ -295,7 +295,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 				_.each(allResources, (item: string) => {
 					let resourceItemSourceDirectory = path.join(resourceDirectory, item);
 					let resourceDestinationDirectory = path.join(appBuilderWindowsPhoneResourcesDirectory, item);
-					if (this.$fs.getFsStats(resourceItemSourceDirectory).wait().isFile()) {
+					if (this.$fs.getFsStats(resourceItemSourceDirectory).isFile()) {
 						let itemNameWithoutExtension = item.substring(0, item.lastIndexOf("."));
 						if (_.isArray(ionicWindowsPhoneConfig.splash)) {
 							if (_.some(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
@@ -368,7 +368,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 				if (item.indexOf(IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME) < 0) {
 					let itemSourceDirectory = path.join(this.$project.getProjectDir(), item);
 					let itemDestinationDirectory = path.join(ionicProjectBackupDir, item);
-					if (this.$fs.getFsStats(itemSourceDirectory).wait().isDirectory()) {
+					if (this.$fs.getFsStats(itemSourceDirectory).isDirectory()) {
 						shelljs.cp("-R", `${itemSourceDirectory}/`, `${itemDestinationDirectory}`);
 					} else if (!this.isAppBuilderProjectFile(itemSourceDirectory)) {
 						this.$fs.copyFile(itemSourceDirectory, itemDestinationDirectory).wait();

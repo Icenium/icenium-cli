@@ -155,7 +155,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	public updateMigrationConfigFile(): IFuture<void> {
 		return (() => {
 			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
-			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName).wait();
+			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
 			let currentTime = this.$dateProvider.getCurrentDate();
 
 			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {

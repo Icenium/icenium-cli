@@ -67,7 +67,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 				this.$fs.createDirectory(this.$options.profileDir).wait();
 
 				if(this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath)) {
-					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath).wait();
+					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath);
 					let timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
 					let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 					if(diffDays > 1) {

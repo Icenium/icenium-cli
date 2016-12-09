@@ -863,7 +863,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this._localPlugins = _(this.$fs.readDirectory(pluginsDir).wait())
 					.map((pluginName: string) => {
 						let pathToPlugin = path.join(pluginsDir, pluginName);
-						if (this.$fs.getFsStats(pathToPlugin).wait().isFile()) {
+						if (this.$fs.getFsStats(pathToPlugin).isFile()) {
 							return null;
 						}
 
