@@ -94,7 +94,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 
 			try {
 				if (this.$fs.exists(outDir)) {
-					this.$fs.rename(outDir, backupFolder).wait();
+					this.$fs.rename(outDir, backupFolder);
 				}
 
 				this.$fs.unzip(filepath, outDir).wait();
@@ -103,7 +103,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 					this.$errors.failWithoutHelp(`Permission denied, make sure ${outDir} is not locked.`);
 				}
 
-				this.$fs.rename(backupFolder, outDir).wait();
+				this.$fs.rename(backupFolder, outDir);
 				throw error;
 			} finally {
 				this.$fs.deleteDirectory(backupFolder);
