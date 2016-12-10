@@ -1,4 +1,5 @@
 import * as path from "path";
+import Future = require("fibers/future");
 
 export class ProjectSimulatorService implements IProjectSimulatorService {
 
@@ -64,7 +65,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 					this.$logger.info("Finished downloading plugins.");
 				} catch(err) {
-					this.$fs.closeStream(zipFile).wait();
+					this.closeStream(zipFile).wait();
 					this.$fs.deleteDirectory(pluginsPath);
 					throw err;
 				}
@@ -72,6 +73,18 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 			return pluginsPath;
 		}).future<string>()();
+	}
+
+	public closeStream(stream: any): IFuture<void> {
+		let future = new Future<void>();
+		stream.close((err: Error, data: any) => {
+			if (err) {
+				future.throw(err);
+			} else {
+				future.return();
+			}
+		});
+		return future;
 	}
 
 	private getPluginsDirName(serverVersion: string) {
