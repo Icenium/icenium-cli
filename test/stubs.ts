@@ -80,7 +80,7 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	readFile(filename: string): IFuture<NodeBuffer> {
+	readFile(filename: string): NodeBuffer|string {
 		return undefined;
 	}
 
