@@ -150,7 +150,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	symlink(sourePath: string, destinationPath: string): IFuture<void> {
+	symlink(sourePath: string, destinationPath: string): void {
 		return undefined;
 	}
 
