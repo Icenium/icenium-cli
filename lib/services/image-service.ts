@@ -117,7 +117,7 @@ class ImageService implements IImageService {
 
 	private copyImageToProject(imagePath: string, projectImagePath: string): IFuture<void> {
 		return (() => {
-			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath)).wait();
+			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
 
 			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
 				return this.$fs.copyFile(imagePath, projectImagePath).wait();

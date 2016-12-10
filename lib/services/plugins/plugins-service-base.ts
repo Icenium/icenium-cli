@@ -255,7 +255,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				// use cp instead of mv, as it would fail if pathToInstalledPlugin is mounted
 				// on a different device from the pluginsPath with error:
 				// Error: EXDEV, cross-device link not permitted
-				this.$fs.ensureDirectoryExists(pathToInstall).wait();
+				this.$fs.ensureDirectoryExists(pathToInstall);
 				shelljs.cp("-Rf", copyLocalPluginData.sourceDirectory, pathToInstall);
 				pathToPlugin = pathToInstall;
 			}

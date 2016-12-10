@@ -138,8 +138,8 @@ export class FileSystemStub implements IFileSystem {
 		return false;
 	}
 
-	ensureDirectoryExists(directoryPath: string): IFuture<void> {
-		return Future.fromResult();
+	ensureDirectoryExists(directoryPath: string): void {
+		return undefined;
 	}
 
 	rename(oldPath: string, newPath: string): IFuture<void> {

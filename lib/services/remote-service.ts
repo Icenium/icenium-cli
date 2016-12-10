@@ -22,7 +22,7 @@ export class RemoteService implements IRemoteService {
 
 	public startApiServer(portNumber: number): IFuture<void> {
 		return (() => {
-			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
+			this.$fs.ensureDirectoryExists(this.appBuilderDir);
 
 			this.$express.post("/launch", (req: Request, res: Response) => this.onLaunchRequest(req, res));
 			let domain = this.$domainNameSystem.getDomains().wait()[0];
