@@ -46,7 +46,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		return (() => {
 			if(this.$fs.exists(this.schemasFolderPath)) {
 
-				let fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
+				let fileNames = this.$fs.readDirectory(this.schemasFolderPath);
 				_.each(fileNames, (fileName: string) => {
 					if( path.extname(fileName) === ".json") {
 						let fullFilePath = path.join(this.schemasFolderPath, fileName);

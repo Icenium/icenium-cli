@@ -190,7 +190,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 				if (this.$fs.exists(pathToPackage)) {
 					// Most probably the package is installed inside node_modules dir in temp folder.
-					let dirs = this.$fs.readDirectory(pathToPackage).wait().filter(dirName => dirName !== ".bin");
+					let dirs = this.$fs.readDirectory(pathToPackage).filter(dirName => dirName !== ".bin");
 					// In case npm3 is installed on user's machine and the package has dependencies, there will be more than one dir, so we cannot be sure which one is ours.
 					if (dirs.length === 1) {
 						let pathToPlugin = path.join(pathToPackage, _.first(dirs));

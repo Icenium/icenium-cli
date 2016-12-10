@@ -76,8 +76,8 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	readDirectory(path: string): IFuture<string[]> {
-		return Future.fromResult([]);
+	readDirectory(path: string): string[] {
+		return [];
 	}
 
 	readFile(filename: string): IFuture<NodeBuffer> {
@@ -130,7 +130,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	isEmptyDir(directoryPath: string): IFuture<boolean> {
+	isEmptyDir(directoryPath: string): boolean {
 		return undefined;
 	}
 
@@ -176,9 +176,7 @@ export class FileSystemStub implements IFileSystem {
 
 	rm(options: string, ...files: string[]) { }
 
-	deleteEmptyParents(directory: string): IFuture<void> {
-		return Future.fromResult();
-	}
+	deleteEmptyParents(directory: string): void { }
 
 	getLsStats(path: string): IFuture<IFsStats> {
 		return undefined;
@@ -298,7 +296,7 @@ export class TemplateServiceStub implements ITemplatesService {
 		return path.join(__dirname, "../resources/ItemTemplates");
 	}
 
-	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
+	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string {
 		return undefined;
 	}
 
@@ -359,7 +357,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return util.format("Telerik.Mobile.%s.%s.zip", this.framework, name);
 	}
 
-	public projectTemplatesString(): IFuture<string> { return undefined; }
+	public getProjectTemplatesString(): string { return undefined; }
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
 
@@ -369,7 +367,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> { return undefined; }
+	public getProjectTargets(projectDir: string): string[] { return undefined; }
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any { return undefined; }
 
@@ -399,8 +397,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return null;
 	}
 
-	public getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]> {
-		return Future.fromResult([]);
+	public getProjectTargetsBase(projectDir: string, fileMask: RegExp): string[] {
+		return [];
 	}
 
 	public printAssetUpdateMessage(): void { /* No implementation required. */ }

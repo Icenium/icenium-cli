@@ -24,20 +24,19 @@ export class TemplatesService implements ITemplatesService {
 		return this.$resources.resolvePath("ItemTemplates");
 	}
 
-	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
-		return (() => {
-			let templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
-				.map((file) => {
-					let match = file.match(regexp),
-						templateName = match && match[1],
-						replacementName = templateName && replacementNames[templateName.toLowerCase()];
+	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string {
+		let templates = _(this.$fs.readDirectory(this.projectTemplatesDir))
+			.map((file) => {
+				let match = file.match(regexp),
+					templateName = match && match[1],
+					replacementName = templateName && replacementNames[templateName.toLowerCase()];
 
-					return replacementName || templateName;
-				})
-				.filter((file: string) => file !== null)
-				.value();
-			return helpers.formatListOfNames(templates);
-		}).future<string>()();
+				return replacementName || templateName;
+			})
+			.filter((file: string) => file !== null)
+			.value();
+
+		return helpers.formatListOfNames(templates);
 	}
 
 	public downloadProjectTemplates(): IFuture<void> {

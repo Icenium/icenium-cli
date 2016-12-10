@@ -62,7 +62,7 @@ export class RemoteService implements IRemoteService {
 
 			this.$fs.unzip(this.packageLocation, this.appBuilderDir).wait();
 
-			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
+			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).filter(minimatch.filter("*.app"))[0]);
 
 			this.$iOSEmulatorServices.checkAvailability(false).wait();
 			let xcodeVersion = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait().xcodeVer,

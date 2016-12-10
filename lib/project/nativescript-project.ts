@@ -3,7 +3,6 @@ import * as util from "util";
 import * as temp from "temp";
 import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
 import {FrameworkProjectBase} from "./framework-project-base";
-import Future = require("fibers/future");
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -88,19 +87,17 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 
 	public checkSdkVersions(platform: string, projectData: Project.IData): void { /* this method is not applicable to {N} projects */ }
 
-	public projectTemplatesString(): IFuture<string> {
-		return ((): string => {
-			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/, { "blank": "JavaScript.Blank" }).wait();
-			return templateStrings.replace(/TS[.]/g, "TypeScript.");
-		}).future<string>()();
+	public getProjectTemplatesString(): string {
+		let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/, { "blank": "JavaScript.Blank" });
+		return templateStrings.replace(/TS[.]/g, "TypeScript.");
 	}
 
 	public getProjectFileSchema(): IDictionary<any> {
 		return this.getProjectFileSchemaByName(this.name);
 	}
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> {
-		return Future.fromResult(["android", "ios"]);
+	public getProjectTargets(projectDir: string): string[] {
+		return ["android", "ios"];
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {

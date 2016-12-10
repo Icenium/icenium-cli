@@ -222,7 +222,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 		},
 		createWriteStream: (path: string) => {/* mock */},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
-		readDirectory: (projectDir: string) => Future.fromResult([])
+		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("remoteProjectService", remoteProjectsServiceLib.RemoteProjectService);
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);

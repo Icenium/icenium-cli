@@ -495,7 +495,7 @@ describe("project integration tests", () => {
 			let projectName = "Test";
 			let projectFolder = path.join(tempFolder, projectName);
 
-			project.createTemplateFolder(projectFolder).wait();
+			project.createTemplateFolder(projectFolder);
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
@@ -505,7 +505,7 @@ describe("project integration tests", () => {
 			let projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
-			project.createTemplateFolder(projectFolder).wait();
+			project.createTemplateFolder(projectFolder);
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
@@ -516,7 +516,7 @@ describe("project integration tests", () => {
 
 			fs.mkdirSync(projectFolder);
 			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", "0666"));
-			assert.throws(() => project.createTemplateFolder(projectFolder).wait());
+			assert.throws(() => project.createTemplateFolder(projectFolder));
 		});
 	});
 });

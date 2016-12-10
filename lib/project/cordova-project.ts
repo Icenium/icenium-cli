@@ -89,7 +89,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		}).future<IDictionary<IStringDictionary>>()();
 	}
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> {
+	public getProjectTargets(projectDir: string): string[] {
 		let fileMask = /^cordova\.(\w*)\.js$/i;
 		return this.getProjectTargetsBase(projectDir, fileMask);
 	}
@@ -117,7 +117,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
-	public projectTemplatesString(): IFuture<string> {
+	public getProjectTemplatesString(): string {
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/, { "blank": "JavaScript.Blank", "kendoui.empty": "KendoUI.Blank" });
 	}
 

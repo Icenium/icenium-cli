@@ -88,7 +88,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let slnName = app.isApp ? app.id : app.name;
 			let solutionDir = this.getExportDir(app.name, (unzipStream: any) => this.$server.apps.exportApplication(slnName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp}).wait();
 
-			let projectsDirectories = this.$fs.readDirectory(solutionDir).wait();
+			let projectsDirectories = this.$fs.readDirectory(solutionDir);
 			projectsDirectories.forEach(projectName => this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName).wait());
 
 			this.$logger.info("%s has been successfully exported to %s", slnName, solutionDir);

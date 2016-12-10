@@ -467,7 +467,7 @@ export class BuildService implements Project.IBuildService {
 			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles");
 			this.$fs.unzip(packageFile, tempDir).wait();
-			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
 			return appFilePath;
 		}).future<string>()();
 	}

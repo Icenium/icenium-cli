@@ -37,7 +37,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 				"--frameworkversion", projectData.FrameworkVersion,
 				"--orientations", projectData.DeviceOrientations.join(";"),
 				"--corepluginspath", pluginsPath,
-				"--supportedplatforms", this.$project.getProjectTargets().wait().join(";"),
+				"--supportedplatforms", this.$project.getProjectTargets().join(";"),
 				"--plugins", (corePlugins || []).join(";")
 			];
 		}).future<string[]>()();

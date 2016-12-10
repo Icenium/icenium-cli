@@ -102,7 +102,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			this.cloneResources().wait();
 
-			this.deleteEnabledPlugins().wait();
+			this.deleteEnabledPlugins();
 
 			this.deleteAssortedFilesAndDirectories();
 		}).future<void>()();
@@ -253,7 +253,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 				return;
 			}
 
-			let ionicPlatformResources = this.$fs.readDirectory(ionicPlatformResourcesDirectory).wait();
+			let ionicPlatformResources = this.$fs.readDirectory(ionicPlatformResourcesDirectory);
 
 			let appbuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, appBuilderPlatformName);
 			if (!this.$fs.exists(appbuilderPlatformResourcesDirectory)) {
@@ -266,7 +266,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 					return;
 				}
 
-				let resources = this.$fs.readDirectory(resourceDirectory).wait();
+				let resources = this.$fs.readDirectory(resourceDirectory);
 
 				_.each(resources, (ionicResourceName: string) => {
 					cloneFunction.apply(this, [resourceDirectory, appbuilderPlatformResourcesDirectory, ionicResourceName, resourceName]).wait();
@@ -281,7 +281,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 				return;
 			}
 
-			let allResources = this.$fs.readDirectory(resourceDirectory).wait();
+			let allResources = this.$fs.readDirectory(resourceDirectory);
 			let ionicWindowsPhoneConfig: IonicConfigXmlFile.IPlatform;
 
 			if (_.isArray(this.ionicConfigXml.widget.platform)) {
@@ -389,16 +389,14 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		}).future<void>()();
 	}
 
-	private deleteEnabledPlugins(): IFuture<void> {
-		return (() => {
-			let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
-			let pluginsDir = path.join(this.$project.getProjectDir(), "plugins");
-			if (this.$fs.exists(pluginsDir)) {
-				(this.$fs.readDirectory(pluginsDir).wait() || [])
-					.filter(pl => _.includes(corePlugins, pl))
-					.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)));
-			}
-		}).future<void>()();
+	private deleteEnabledPlugins(): void {
+		let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
+		let pluginsDir = path.join(this.$project.getProjectDir(), "plugins");
+		if (this.$fs.exists(pluginsDir)) {
+			(this.$fs.readDirectory(pluginsDir) || [])
+				.filter(pl => _.includes(corePlugins, pl))
+				.forEach(pl => this.$fs.deleteDirectory(path.join(pluginsDir, pl)));
+		}
 	}
 
 	private deleteAssortedFilesAndDirectories(): void {

@@ -94,12 +94,10 @@ export class Project extends ProjectBase implements Project.IProject {
 		}).future<IDictionary<IStringDictionary>>()();
 	}
 
-	public getProjectTargets(): IFuture<string[]> {
-		return (() => {
-			let projectDir = this.getProjectDir();
-			let projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
-			return projectTargets;
-		}).future<string[]>()();
+	public getProjectTargets(): string[] {
+		let projectDir = this.getProjectDir();
+		let projectTargets = this.frameworkProject.getProjectTargets(projectDir);
+		return projectTargets;
 	}
 
 	public getConfigFileContent(template: string): IFuture<any> {
@@ -215,15 +213,13 @@ export class Project extends ProjectBase implements Project.IProject {
 		return path.join(this.getProjectDir(), this.frameworkProject.relativeAppResourcesPath);
 	}
 
-	public createTemplateFolder(projectDir: string): IFuture<void> {
-		return (() => {
-			this.$fs.createDirectory(projectDir);
-			let projectDirFiles = this.$fs.readDirectory(projectDir).wait();
+	public createTemplateFolder(projectDir: string): void {
+		this.$fs.createDirectory(projectDir);
+		let projectDirFiles = this.$fs.readDirectory(projectDir);
 
-			if (projectDirFiles.length !== 0) {
-				this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
-			}
-		}).future<void>()();
+		if (projectDirFiles.length !== 0) {
+			this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
+		}
 	}
 
 	public createProjectFile(projectDir: string, properties: any): IFuture<void> {
@@ -760,7 +756,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			if (this.$fs.exists(templateFileName)) {
 				projectDir = this.$options.path ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
-				this.createTemplateFolder(projectDir).wait();
+				this.createTemplateFolder(projectDir);
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
@@ -782,7 +778,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 				this.frameworkProject.ensureProject(this.projectDir).wait();
 			} else {
-				let templates = this.frameworkProject.projectTemplatesString().wait();
+				let templates = this.frameworkProject.getProjectTemplatesString();
 				this.$errors.failWithoutHelp(`The specified template ${this.$options.template} does not exist. You can use any of the following templates:${EOL}${templates}`);
 			}
 		}).future<void>()();
@@ -804,7 +800,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<Project.IData> {
 		return ((): any => {
-			let projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
+			let projectFile = _.find(this.$fs.readDirectory(projectDir), file => {
 				let extension = path.extname(file);
 				return extension === ".proj" || extension === ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
 			});

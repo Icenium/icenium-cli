@@ -50,10 +50,10 @@ class SampleProject implements Project.IFrameworkProject {
 	getProjectFileSchema(): IDictionary<any> {
 		return null;
 	}
-	getProjectTargets(projectDir: string): IFuture<string[]> {
+	getProjectTargets(projectDir: string): string[] {
 		return null;
 	}
-	projectTemplatesString(): IFuture<string> {
+	getProjectTemplatesString(): string {
 		return null;
 	}
 	alterPropertiesForNewProject(properties: any, projectName: string): void {/* mock */ }
@@ -81,8 +81,8 @@ class SampleProject implements Project.IFrameworkProject {
 	getProjectFileSchemaByName(name: string): IDictionary<any> {
 		return null;
 	}
-	getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]> {
-		return Future.fromResult([]);
+	getProjectTargetsBase(projectDir: string, fileMask: RegExp): string[] {
+		return [];
 	}
 	printAssetUpdateMessage(): void { /* No implementation required. */ }
 	getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any {

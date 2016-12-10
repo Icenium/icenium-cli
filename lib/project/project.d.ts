@@ -9,7 +9,13 @@ declare module Project {
 		createNewProject(projectName: string, framework: string, template?: string): IFuture<void>;
 		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
-		createTemplateFolder(projectDir: string): IFuture<void>;
+
+		/**
+		 * Creates directory for the new project.
+		 * @param {string} projectDir Directory where the project will be created.
+		 * @returns {void}
+		 */
+		createTemplateFolder(projectDir: string): void;
 
 		getNewProjectDir(): string;
 		getProjectSchema(): IFuture<any>;
@@ -24,7 +30,13 @@ declare module Project {
 		getTempDir(extraSubdir?: string): string;
 
 		getProperty(propertyName: string, configuration: string): any;
-		getProjectTargets(): IFuture<string[]>;
+
+		/**
+		 * Returns list of the mobile frameworks targeted by the current project.
+		 * @returns {string[]} list of all targeted mobile frameworks.
+		 */
+		getProjectTargets(): string[];
+
 		getConfigFileContent(template: string): IFuture<any>;
 		updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
@@ -109,8 +121,17 @@ declare module Project {
 		getTemplateFilename(name: string): string;
 		getValidationSchemaId(): string;
 		getProjectFileSchema(): IDictionary<any>;
-		getProjectTargets(projectDir: string): IFuture<string[]>;
-		projectTemplatesString(): IFuture<string>;
+		/**
+		 * Returns list of the mobile frameworks targeted by the current project.
+		 * @returns {string[]} list of all targeted mobile frameworks.
+		 */
+		getProjectTargets(projectDir: string): string[];
+
+		/**
+		 * Gets list of all available templates.
+		 * @returns {string} String, containing all available templates.
+		 */
+		getProjectTemplatesString(): string;
 		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		completeProjectProperties(properties: any): boolean;
 		adjustBuildProperties(buildProperties: any, projectInformation?: IProjectInformation): any;
@@ -150,7 +171,15 @@ declare module Project {
 	interface IFrameworkProjectBase {
 		alterPropertiesForNewProjectBase(properties: any, projectName: string): void;
 		getProjectFileSchemaByName(name: string): IDictionary<any>;
-		getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]>;
+
+		/**
+		 * Returns list of the mobile frameworks targeted by the current project.
+		 * @param {string} projectDir Project directory.
+		 * @param {RegExp} fileMask Filtering mask used to check the project dir for platform specific files.
+		 * @returns {string[]} list of all targeted mobile frameworks.
+		 */
+		getProjectTargetsBase(projectDir: string, fileMask: RegExp): string[];
+
 		printAssetUpdateMessage(): void;
 		getProperty(propertyName: string, configuration: string, projectInformation: Project.IProjectInformation): any;
 		/**

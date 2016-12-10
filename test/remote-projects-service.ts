@@ -114,7 +114,7 @@ function createTestInjector(): IInjector {
 		},
 		createWriteStream: (path: string) => { /* intentionally empty body*/},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
-		readDirectory: (projectDir: string) => Future.fromResult([])
+		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("logger", stubs.LoggerStub);
 	return testInjector;
