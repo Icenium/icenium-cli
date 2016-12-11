@@ -100,21 +100,20 @@ export class Project extends ProjectBase implements Project.IProject {
 		return projectTargets;
 	}
 
-	// TODO: Remove IFuture, reason: readText
-	public getConfigFileContent(template: string): IFuture<any> {
-		return (() => {
-			let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
-			if (configFile) {
-				try {
-					let configFileContent = this.$fs.readText(configFile.filepath);
-					return configFileContent;
-				} catch (e) {
-					return null;
-				}
-			}
+	public getConfigFileContent(template: string): any {
+		let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
 
-			return null;
-		}).future<any>()();
+		if (configFile) {
+			try {
+				let configFileContent = this.$fs.readText(configFile.filepath);
+				return configFileContent;
+			} catch (e) {
+				this.$logger.trace(`Error while trying to read file: ${configFile.filepath}. Error is: {e.message}.`);
+				return null;
+			}
+		}
+
+		return null;
 	}
 
 	public configurationFilesString(): string {
@@ -360,7 +359,6 @@ export class Project extends ProjectBase implements Project.IProject {
 		return projectFiles;
 	}
 
-	// TODO: Remove IFuture, reason: createDirectory
 	public getTempDir(extraSubdir?: string): string {
 		let dir = path.join(this.getProjectDir(), ".ab");
 		this.$fs.createDirectory(dir);

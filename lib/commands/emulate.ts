@@ -18,7 +18,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureAllPlatformAssets().wait();
-			this.$androidEmulatorServices.checkAvailability().wait();
+			this.$androidEmulatorServices.checkAvailability();
 			let tempDir = this.$project.getTempDir("emulatorfiles");
 			let packageFilePath = path.join(tempDir, "package.apk");
 			this.$buildService.build({
@@ -61,7 +61,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 		return (() => {
 			this.$project.ensureAllPlatformAssets().wait();
 			this.$iOSEmulatorServices.checkDependencies().wait();
-			this.$iOSEmulatorServices.checkAvailability().wait();
+			this.$iOSEmulatorServices.checkAvailability();
 			let app = "";
 
 			if (!this.$options.availableDevices) {
@@ -92,7 +92,7 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 		return (() => {
 			this.$project.ensureAllPlatformAssets().wait();
 			this.$wp8EmulatorServices.checkDependencies().wait();
-			this.$wp8EmulatorServices.checkAvailability().wait();
+			this.$wp8EmulatorServices.checkAvailability();
 
 			let tempDir = this.$project.getTempDir("emulatorfiles");
 			let packageFilePath = path.join(tempDir, "package.xap");

@@ -151,7 +151,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return ((): IBasicPluginInformation => {
 			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier, version).wait();
 
-			this.validatePluginInformation(pathToInstalledPlugin).wait();
+			this.validatePluginInformation(pathToInstalledPlugin);
 
 			let installLocalPluginOptions: ILocalPluginData = {
 				actualName: pluginData && pluginData.actualName,
@@ -294,7 +294,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected abstract composeSearchQuery(keywords: string[]): string[];
 
-	protected abstract validatePluginInformation(pathToPlugin: string): IFuture<void>;
+	protected abstract validatePluginInformation(pathToPlugin: string): void;
 
 	private fetchPluginCore(pluginIdentifier: string, version?: string, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<string> {
 		return ((): string => {

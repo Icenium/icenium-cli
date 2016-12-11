@@ -330,14 +330,11 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	}
 
-	// TODO: Remove IFuture, reason: readText
-	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
-		return (() => {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin);
-			if (!pluginXml) {
-				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
-			}
-		}).future<void>()();
+	protected validatePluginInformation(pathToPlugin: string): void {
+		let pluginXml = this.getPluginXmlContent(pathToPlugin);
+		if (!pluginXml) {
+			this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
+		}
 	}
 
 	private loadPluginsData(): IFuture<void> {

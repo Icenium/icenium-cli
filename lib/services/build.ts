@@ -178,7 +178,7 @@ export class BuildService implements Project.IBuildService {
 			} else if (settings.platform === "iOS") {
 				let appIdentifier = projectData.AppIdentifier;
 
-				let configFileContent = this.$project.getConfigFileContent("ios-info").wait();
+				let configFileContent = this.$project.getConfigFileContent("ios-info");
 				if (configFileContent) {
 					let parsed = plist.parse(configFileContent);
 					let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;

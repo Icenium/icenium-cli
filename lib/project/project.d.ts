@@ -37,7 +37,13 @@ declare module Project {
 		 */
 		getProjectTargets(): string[];
 
-		getConfigFileContent(template: string): IFuture<any>;
+		/**
+		 * Gets the content of a project configuration file (Info.plist, AndroidManifest.xml, etc.).
+		 * @param {string} template The key of the edit file that has to be read.
+		 * @returns {any} The content of the file.
+		 */
+		getConfigFileContent(template: string): any;
+
 		updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
 		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
 		printProjectProperty(property: string, configuration?: string): IFuture<void>;

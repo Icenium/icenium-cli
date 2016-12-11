@@ -259,14 +259,10 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return super.shouldCopyToPluginsDirectory(pathToPlugin) || pathToPlugin.indexOf(this.getPluginsDirName()) !== -1;
 	}
 
-	// TODO: Remove IFuture, reason: fs.exists - not available at the moment
-	// Remark: Cannot do it until cordova-project-plugins-service has async call.
-	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
-		return (() => {
-			if (!this.$fs.exists(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME))) {
-				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid NativeScript plugin.`);
-			}
-		}).future<void>()();
+	protected validatePluginInformation(pathToPlugin: string): void {
+		if (!this.$fs.exists(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME))) {
+			this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid NativeScript plugin.`);
+		}
 	}
 
 	private getMarketplacePlugins(): IFuture<IPlugin[]> {
