@@ -18,7 +18,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<Project.IData> {
 		return ((): any => {
 			let properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
-				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject).wait();
+				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject);
 
 			if (properties) {
 				this.completeProjectProperties(properties, frameworkProject);
@@ -222,28 +222,26 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return help.join(EOL);
 	}
 
-	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): IFuture<any> {
-		return ((): any => {
-			let properties: any = {};
-			let result: any = xmlMapping.tojson(this.$fs.readText(projectFile).wait());
-			let propertyGroup: any = result.Project.PropertyGroup[0];
+	private getProjectPropertiesFromXmlProjectFile(projectFile: string, frameworkProject: Project.IFrameworkProject): any {
+		let properties: any = {};
+		let result: any = xmlMapping.tojson(this.$fs.readText(projectFile));
+		let propertyGroup: any = result.Project.PropertyGroup[0];
 
-			let projectSchema = frameworkProject.getProjectFileSchema();
-			_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
-				if (propertyGroup.hasOwnProperty(propertyName)) {
-					properties[propertyName] = propertyGroup[propertyName][0];
-				}
-			});
-
-			// only old style .proj files (before project unification) have ProjectName
-			if (propertyGroup.ProjectName) {
-				properties.ProjectName = propertyGroup.ProjectName[0];
-			} else {
-				properties = null;
+		let projectSchema = frameworkProject.getProjectFileSchema();
+		_.sortBy(Object.keys(projectSchema), key => key === "FrameworkVersion" ? -1 : 1).forEach((propertyName) => {
+			if (propertyGroup.hasOwnProperty(propertyName)) {
+				properties[propertyName] = propertyGroup[propertyName][0];
 			}
+		});
 
-			return properties;
-		}).future<any>()();
+		// only old style .proj files (before project unification) have ProjectName
+		if (propertyGroup.ProjectName) {
+			properties.ProjectName = propertyGroup.ProjectName[0];
+		} else {
+			properties = null;
+		}
+
+		return properties;
 	}
 
 	private notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): IFuture<void> {

@@ -326,7 +326,7 @@ export class BuildService implements Project.IBuildService {
 			});
 
 			let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
-			let htmlTemplateContents = this.$fs.readText(scanFile).wait();
+			let htmlTemplateContents = this.$fs.readText(scanFile);
 			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
 				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
 			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();

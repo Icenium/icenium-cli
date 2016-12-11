@@ -175,9 +175,9 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return (() => {
 			let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),
 				cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform),
-				cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, ""),
+				cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).replace(CordovaProject.WHITESPACE_REGEX, ""),
 				shouldCopyCordovaJsFile = !this.$fs.exists(cordovaJsFilePath) ||
-					this.$fs.readText(cordovaJsFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, "") !== cordovaJsSourceFileContents;
+					this.$fs.readText(cordovaJsFilePath).replace(CordovaProject.WHITESPACE_REGEX, "") !== cordovaJsSourceFileContents;
 
 			if (shouldCopyCordovaJsFile) {
 				this.printAssetUpdateMessage();

@@ -308,7 +308,7 @@ describe("Ionic project transformator", () => {
 
 			beforeEach(() => {
 				ionicConfigXmlDirectory = path.join(projectDirectory, configXmlName);
-				ionicConfiXml = fs.exists(ionicConfigXmlDirectory) && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory).wait());
+				ionicConfiXml = fs.exists(ionicConfigXmlDirectory) && xmlMapping.tojson(fs.readText(ionicConfigXmlDirectory));
 				appResourcesDirectory = path.join(projectDirectory, appResourcesFolderName);
 			});
 
@@ -333,7 +333,7 @@ describe("Ionic project transformator", () => {
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
-					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
+					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory));
 
 					let expectedIconResource: IonicConfigXmlFile.IResource = context.expectedIconResource;
 
@@ -359,7 +359,7 @@ describe("Ionic project transformator", () => {
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
-					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory).wait());
+					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory));
 
 					let appBuilderPlatformData = (<IonicConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
 

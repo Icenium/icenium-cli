@@ -89,15 +89,13 @@ function mockFsStats($fs: any, options: { hoursToAddToMtime: number }): void {
 }
 
 function mockFsReadText($fs: IFileSystem, modifiedNativeScriptMigrationFile: any, currentNativeScriptMigrationFile: any): void {
-	$fs.readText = (fileName: string): IFuture<string> => {
-		return ((): string => {
-			if (returnNewMigrationFileContent) {
-				returnNewMigrationFileContent = false;
-				return JSON.stringify(modifiedNativeScriptMigrationFile);
-			}
+	$fs.readText = (fileName: string): string => {
+		if (returnNewMigrationFileContent) {
+			returnNewMigrationFileContent = false;
+			return JSON.stringify(modifiedNativeScriptMigrationFile);
+		}
 
-			return JSON.stringify(currentNativeScriptMigrationFile);
-		}).future<string>()();
+		return JSON.stringify(currentNativeScriptMigrationFile);
 	};
 }
 

@@ -306,7 +306,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
 			return this.getLocalPluginBasicInformation(pluginXml).wait();
 		}).future<IBasicPluginInformation>()();
@@ -330,9 +330,10 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	}
 
+	// TODO: Remove IFuture, reason: readText
 	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
 		return (() => {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 			if (!pluginXml) {
 				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
 			}
@@ -867,7 +868,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 							return null;
 						}
 
-						let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+						let pluginXml = this.getPluginXmlContent(pathToPlugin);
 						let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml).wait();
 						let plugin = pluginXml.plugin;
 						let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
@@ -934,16 +935,14 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<IBasicPluginInformation>()();
 	}
 
-	private getPluginXmlContent(pathToPlugin: string): IFuture<any> {
-		return ((): any => {
-			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+	private getPluginXmlContent(pathToPlugin: string): any {
+		let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
 
-			if (!this.$fs.exists(pathToPluginXml)) {
-				return null;
-			}
+		if (!this.$fs.exists(pathToPluginXml)) {
+			return null;
+		}
 
-			return xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
-		}).future<any>()();
+		return xmlMapping.tojson(this.$fs.readText(pathToPluginXml));
 	}
 
 	private setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): IFuture<void> {

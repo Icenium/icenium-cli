@@ -95,7 +95,7 @@ export class UserDataStore implements IUserDataStore {
 					throw new Error("Not logged in.");
 				}
 
-				let contents = this.$fs.readText(sourceFile).wait();
+				let contents = this.$fs.readText(sourceFile);
 				try {
 					setter(contents);
 				} catch(err) {

@@ -83,7 +83,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	 */
 	private get ionicConfigXml(): IonicConfigXmlFile.IConfigXmlFile {
 		if (!this._ionicConfigXml) {
-			this._ionicConfigXml = <IonicConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(path.join(this.$project.getProjectDir(), IonicProjectTransformator.CONFIG_XML_FILE_NAME)).wait());
+			const configXmlPath = path.join(this.$project.getProjectDir(), IonicProjectTransformator.CONFIG_XML_FILE_NAME);
+			this._ionicConfigXml = <IonicConfigXmlFile.IConfigXmlFile>xmlMapping.tojson(this.$fs.readText(configXmlPath));
 		}
 
 		return this._ionicConfigXml;

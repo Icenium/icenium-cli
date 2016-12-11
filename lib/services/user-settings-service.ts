@@ -73,7 +73,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 					if(diffDays > 1) {
 						this.downloadUserSettings().wait();
 					} else {
-						this.readUserSettingsFile().wait();
+						this.readUserSettingsFile();
 					}
 				} else {
 					this.downloadUserSettings().wait();
@@ -86,7 +86,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 		return(() => {
 			try {
 				this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
-				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
+				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
 			} catch(error) {
 				if(error.response && error.response.statusCode === 404) {
 					this.userSettingsData = null;
@@ -121,10 +121,8 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 		}).future<T>()();
 	}
 
-	private readUserSettingsFile(): IFuture<void> {
-		return(() => {
-			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath).wait());
-		}).future<void>()();
+	private readUserSettingsFile(): void {
+		this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
 	}
 
 	public saveSetting<T>(key: string, value: T): IFuture<void> {
@@ -141,7 +139,7 @@ export  class SharedUserSettingsService extends UserSettingsServiceBase implemen
 			if (Object.keys(data).length !== 0) {
 				this.downloadUserSettings().wait();
 			} else {
-				this.readUserSettingsFile().wait();
+				this.readUserSettingsFile();
 			}
 
 			this.userSettingsData = this.userSettingsData || {};

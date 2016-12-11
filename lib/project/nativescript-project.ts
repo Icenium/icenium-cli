@@ -172,8 +172,8 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 				return;
 			}
 
-			let newMigrationFileContent = this.$fs.readText(downloadedFilePath).wait();
-			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName).wait();
+			let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
+			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
 
 			if (currentMigrationFileContent !== newMigrationFileContent) {
 				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent).wait();

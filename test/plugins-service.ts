@@ -533,7 +533,7 @@ describe("plugins-service", () => {
 		service.configurePlugin = () => Future.fromResult();
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
-		fs.readText = (dir: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`);
+		fs.readText = (dir: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`;
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "org.apache.cordova.battery-status").wait();
 		assert.deepEqual(fetchedPluginName, pluginName);
 	});
@@ -685,7 +685,7 @@ describe("plugins-service", () => {
 		service.configurePlugin = () => Future.fromResult();
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
-		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`);
+		fs.readText = (path: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`;
 
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "com.telerik.dropbox").wait();
 		assert.deepEqual(fetchedPluginName, pluginName);

@@ -100,12 +100,13 @@ export class Project extends ProjectBase implements Project.IProject {
 		return projectTargets;
 	}
 
+	// TODO: Remove IFuture, reason: readText
 	public getConfigFileContent(template: string): IFuture<any> {
 		return (() => {
 			let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
 			if (configFile) {
 				try {
-					let configFileContent = this.$fs.readText(configFile.filepath).wait();
+					let configFileContent = this.$fs.readText(configFile.filepath);
 					return configFileContent;
 				} catch (e) {
 					return null;
