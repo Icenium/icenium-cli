@@ -174,7 +174,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
 
 			if (currentMigrationFileContent !== newMigrationFileContent) {
-				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent).wait();
+				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
 				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
 			}
 		}).future<void>()();

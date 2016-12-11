@@ -286,11 +286,9 @@ describe("NativeScript project unit tests", () => {
 
 		beforeEach(() => {
 			$fs = testInjector.resolve("fs");
-			$fs.writeFile = (fileName: string, data: any): IFuture<void> => {
-				return (() => {
-					changedMigrationFileContent = JSON.parse(data);
-					hasChangedTheMigrationFile = true;
-				}).future<void>()();
+			$fs.writeFile = (fileName: string, data: any): void => {
+				changedMigrationFileContent = JSON.parse(data);
+				hasChangedTheMigrationFile = true;
 			};
 
 			$dateProvider = testInjector.resolve("dateProvider");

@@ -92,7 +92,7 @@ export class FileSystemStub implements IFileSystem {
 		return {};
 	}
 
-	writeFile(filename: string, data: any, encoding?: string): IFuture<void> {
+	writeFile(filename: string, data: any, encoding?: string): void {
 		return undefined;
 	}
 

@@ -39,17 +39,17 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.user = JSON.parse(value));
 	}
 
-	// TODO: Remove IFuture, reason: fs.deleteFile - not available until writeFile is sync.
-	public setCookies(cookies?: IStringDictionary): IFuture<void> {
+	// TODO: Remove IFuture, reason: writeFile
+	public setCookies(cookies?: IStringDictionary): void {
 		this.cookies = cookies;
 		if(this.cookies) {
 			return this.$fs.writeFile(this.getCookieFilePath(), JSON.stringify(this.cookies));
 		} else {
-			return Future.fromResult(this.$fs.deleteFile(this.getCookieFilePath()));
+			return this.$fs.deleteFile(this.getCookieFilePath());
 		}
 	}
 
-	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void> {
+	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): void {
 		cookies = cookies || {};
 		_.each(setCookieHeader, (cookieStr: string) => {
 			let parsed = cookielib.parse(cookieStr);
@@ -77,7 +77,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public clearLoginData(): IFuture<void> {
 		return (() => {
-			this.setCookies(null).wait();
+			this.setCookies(null);
 			this.setUser(null).wait();
 		}).future<void>()();
 	}
@@ -259,7 +259,7 @@ export class LoginManager implements ILoginManager {
 			}
 
 			let cookies = JSON.parse(cookieData);
-			this.$userDataStore.setCookies(cookies).wait();
+			this.$userDataStore.setCookies(cookies);
 
 			let userData = this.$server.authentication.getLoggedInUser().wait();
 			this.$userDataStore.setUser(<any>userData).wait();
@@ -281,7 +281,7 @@ export class LoginManager implements ILoginManager {
 
 			let cookies = response.headers["set-cookie"];
 			if(cookies) {
-				this.$userDataStore.parseAndSetCookies(cookies).wait();
+				this.$userDataStore.parseAndSetCookies(cookies);
 
 				let userData = this.$server.authentication.getLoggedInUser().wait();
 				this.$userDataStore.setUser(<any>userData).wait();

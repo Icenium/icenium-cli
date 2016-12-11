@@ -327,7 +327,7 @@ describe("Ionic project transformator", () => {
 
 					ionicConfiXml.widget.platform = context.platformDataWithSingleResources;
 
-					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml)).wait();
+					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
 					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
@@ -353,7 +353,7 @@ describe("Ionic project transformator", () => {
 
 					ionicConfiXml.widget.platform = context.platformDataWithMultipleResources;
 
-					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml)).wait();
+					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
 					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 
@@ -387,7 +387,7 @@ describe("Ionic project transformator", () => {
 
 				ionicConfiXml.widget.platform = platformConfigXmlItem;
 
-				fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml)).wait();
+				fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
 				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
 

@@ -58,7 +58,7 @@ export class EditConfigurationCommand implements ICommand {
 				if (this.$hostInfo.isWindows) {
 					let contents = this.$fs.readText(filepath);
 					contents = helpers.stringReplaceAll(contents, "\n", "\r\n");
-					this.$fs.writeFile(filepath, contents).wait();
+					this.$fs.writeFile(filepath, contents);
 				}
 			}
 

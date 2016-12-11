@@ -150,8 +150,8 @@ interface IUserDataStore {
 	hasCookie(): IFuture<boolean>;
 	getCookies(): IFuture<IStringDictionary>;
 	getUser(): IFuture<IUser>;
-	setCookies(cookies?: IStringDictionary): IFuture<void>;
-	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void>;
+	setCookies(cookies?: IStringDictionary): void;
+	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): void;
 	setUser(user?: IUser): IFuture<void>;
 	clearLoginData(): IFuture<void>;
 }

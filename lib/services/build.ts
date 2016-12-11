@@ -1,7 +1,7 @@
 import * as util from "util";
 import * as querystring from "querystring";
 import * as path from "path";
-import {EOL} from "os";
+import { EOL } from "os";
 import * as plist from "plist";
 import * as iOSDeploymentValidatorLib from "../validators/ios-deployment-validator";
 import * as constants from "../common/constants";
@@ -292,7 +292,7 @@ export class BuildService implements Project.IBuildService {
 
 			if (result.output) {
 				let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
-				this.$fs.writeFile(buildLogFilePath, result.output).wait();
+				this.$fs.writeFile(buildLogFilePath, result.output);
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
 
@@ -329,7 +329,7 @@ export class BuildService implements Project.IBuildService {
 			let htmlTemplateContents = this.$fs.readText(scanFile);
 			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
 				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
-			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
+			this.$fs.writeFile(scanFile, htmlTemplateContents);
 
 			this.$logger.debug("Updated scan.html");
 			this.$opener.open(scanFile);
