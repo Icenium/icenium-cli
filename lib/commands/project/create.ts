@@ -32,7 +32,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				answers: {
 					name: projectName
 				}
-			}).wait();
+			});
 
 			try {
 				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();

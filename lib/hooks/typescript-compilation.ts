@@ -24,7 +24,7 @@ module.exports = () => {
 
 		let useLocalTypeScriptCompiler = true;
 		if ($fs.exists(pathToTsConfig)) {
-			let json = $fs.readJson(pathToTsConfig).wait();
+			let json = $fs.readJson(pathToTsConfig);
 			let noEmitOnError = !!(json && json.compilerOptions && json.compilerOptions.noEmitOnError);
 			$typeScriptService.transpile($project.getProjectDir(), null, null, { compilerOptions: { noEmitOnError }, useLocalTypeScriptCompiler }).wait();
 		} else {

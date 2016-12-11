@@ -99,16 +99,14 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
-		return (() => {
-			let screenBuilderOptions = bacisSceenBuilderOptions || {};
+	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IScreenBuilderOptions {
+		let screenBuilderOptions = bacisSceenBuilderOptions || {};
 
-			if (answers) {
-				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers)).wait();
-			}
+		if (answers) {
+			screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers));
+		}
 
-			return screenBuilderOptions;
-		}).future<IScreenBuilderOptions>()();
+		return screenBuilderOptions;
 	}
 
 	public promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
@@ -168,7 +166,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			if (!this.scaffolder) {
 				this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
 
-				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
+				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName);
 
 				let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
 
@@ -258,7 +256,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				type: this.command.substr(this.command.indexOf("-") + 1)
-			}).wait();
+			});
 
 			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions).wait();
 		}).future<void>()();

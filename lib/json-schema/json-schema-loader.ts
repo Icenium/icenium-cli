@@ -18,7 +18,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		this.schemas = Object.create(null);
 		this.loadedSchemas = Object.create(null);
 
-		this.loadSchemas().wait();
+		this.loadSchemas();
 
 		let schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
 		this.$injector.register("jsonSchemaResolver", schemaResolver);
@@ -42,23 +42,21 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		}).future<void>()();
 	}
 
-	private loadSchemas(): IFuture<void> {
-		return (() => {
-			if(this.$fs.exists(this.schemasFolderPath)) {
+	private loadSchemas(): void {
+		if(this.$fs.exists(this.schemasFolderPath)) {
 
-				let fileNames = this.$fs.readDirectory(this.schemasFolderPath);
-				_.each(fileNames, (fileName: string) => {
-					if( path.extname(fileName) === ".json") {
-						let fullFilePath = path.join(this.schemasFolderPath, fileName);
-						let schema = this.$fs.readJson(fullFilePath).wait();
-						this.schemas[schema.id] = schema;
-					}
-				});
+			let fileNames = this.$fs.readDirectory(this.schemasFolderPath);
+			_.each(fileNames, (fileName: string) => {
+				if( path.extname(fileName) === ".json") {
+					let fullFilePath = path.join(this.schemasFolderPath, fileName);
+					let schema = this.$fs.readJson(fullFilePath);
+					this.schemas[schema.id] = schema;
+				}
+			});
 
-				let schemas = _.values(this.schemas);
-				_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
-			}
-		}).future<void>()();
+			let schemas = _.values(this.schemas);
+			_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
+		}
 	}
 
 	private isSchemaLoaded(schemaId: string): boolean {

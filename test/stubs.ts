@@ -88,8 +88,8 @@ export class FileSystemStub implements IFileSystem {
 		return "";
 	}
 
-	readJson(filename: string, encoding?: string): IFuture<any> {
-		return Future.fromResult({});
+	readJson(filename: string, encoding?: string): any {
+		return {};
 	}
 
 	writeFile(filename: string, data: any, encoding?: string): IFuture<void> {
@@ -379,8 +379,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public pluginsService: IPluginsService;
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return Future.fromResult(null);
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		return null;
 	}
 
 	public updateMigrationConfigFile(): IFuture<void> {

@@ -285,8 +285,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
-		return ((): IPlugin[] => {
-			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
+		return (() => {
+			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins()).map(pluginId => pluginId.toLowerCase());
 			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 		}).future<IPlugin[]>()();
 	}
@@ -817,20 +817,18 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return obj;
 	}
 
-	private getObsoletedIntegratedPlugins(): IFuture<any> {
-		return (() => {
-			if (!this._obsoletedIntegratedPlugins) {
-				let cordovaJsonContent = this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova.json")).wait();
-				this._obsoletedIntegratedPlugins = cordovaJsonContent && cordovaJsonContent.obsoletedIntegratedPlugins;
-			}
+	private getObsoletedIntegratedPlugins(): any {
+		if (!this._obsoletedIntegratedPlugins) {
+			let cordovaJsonContent = this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova.json"));
+			this._obsoletedIntegratedPlugins = cordovaJsonContent && cordovaJsonContent.obsoletedIntegratedPlugins;
+		}
 
-			return this._obsoletedIntegratedPlugins;
-		}).future<any>()();
+		return this._obsoletedIntegratedPlugins;
 	}
 
 	private getObsoletedByPluginIdentifier(pluginIdentifier: string): IFuture<string> {
 		return ((): string => {
-			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
+			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
 			return obsoletedByInfo.obsoletedBy;
 		}).future<string>()();
 	}
@@ -839,7 +837,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): string => {
 			let obsoletingKey: string;
 
-			_.each(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => {
+			_.each(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => {
 				if (obsoletedPluginInfo.obsoletedBy.toLowerCase() === pluginIdentifier.toLowerCase()) {
 					obsoletingKey = key;
 					return false;

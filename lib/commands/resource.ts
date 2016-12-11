@@ -4,7 +4,9 @@ class Resource implements ICommand {
 	constructor(private $imageService: IImageService) { }
 
 	execute(args: string[]): IFuture<void> {
-		return this.$imageService.printDefinitions();
+		return (() => {
+			return this.$imageService.printDefinitions();
+		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];

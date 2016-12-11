@@ -10,7 +10,7 @@ export class ExtensionsServiceBase {
 		protected $logger: ILogger,
 		protected $options: IOptions) {
 		if (this.$fs.exists(this.versionsFile)) {
-			this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
+			this.extensionVersions = this.$fs.readJson(this.versionsFile) || {};
 		}
 	}
 
@@ -30,7 +30,7 @@ export class ExtensionsServiceBase {
 			actions = actions || {};
 
 			if (this.$fs.exists(this.versionsFile)) {
-				this.extensionVersions = this.$fs.readJson(this.versionsFile).wait() || {};
+				this.extensionVersions = this.$fs.readJson(this.versionsFile) || {};
 			}
 
 			let packageName = extensionData.packageName;

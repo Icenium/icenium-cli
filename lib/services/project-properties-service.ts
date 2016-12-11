@@ -15,17 +15,15 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		private $resources: IResourceLoader,
 		private $logger: ILogger) { }
 
-	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<Project.IData> {
-		return ((): any => {
-			let properties = isJsonProjectFile ? this.$fs.readJson(projectFile).wait() :
-				this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject);
+	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): Project.IData {
+		let properties = isJsonProjectFile ? this.$fs.readJson(projectFile) :
+			this.getProjectPropertiesFromXmlProjectFile(projectFile, frameworkProject);
 
-			if (properties) {
-				this.completeProjectProperties(properties, frameworkProject);
-			}
+		if (properties) {
+			this.completeProjectProperties(properties, frameworkProject);
+		}
 
-			return properties;
-		}).future<Project.IData>()();
+		return properties;
 	}
 
 	public completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean {

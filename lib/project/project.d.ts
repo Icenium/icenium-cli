@@ -5,7 +5,13 @@ declare module Project {
 		requiredAndroidApiLevel: number;
 		projectConfigFiles: Project.IConfigurationFile[];
 
-		isIonicProject(projectDir: string): IFuture<boolean>;
+		/**
+		 * Checks if current project is ionic one.
+		 * @param {string} projectDir Path to project directory.
+		 * @return {boolean} True in case current project is Ionic, false otherwise.
+		 */
+		isIonicProject(projectDir: string): boolean;
+
 		createNewProject(projectName: string, framework: string, template?: string): IFuture<void>;
 		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
 		createProjectFile(projectDir: string, properties: any): IFuture<void>;
@@ -98,7 +104,7 @@ declare module Project {
 		 *    }
 		 * }
 		 */
-		getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>>;
+		getPluginVariablesInfo(configuration?: string): IDictionary<IStringDictionary>;
 	}
 
 	interface IFrameworkProject extends IFrameworkProjectBase {
@@ -149,6 +155,7 @@ declare module Project {
 		 * @param {Project.IData} projectData The project's data, needed to check an SDK version
 		 */
 		checkSdkVersions(platform: string, projectData: Project.IData): void;
+
 		/**
 		 * Get information about plugin variables for current project.
 		 * @param {Project.IProjectInformation} projectInformation Information about the project - values of properties from .abproject and configuration specific .abproject.
@@ -167,7 +174,8 @@ declare module Project {
 		 *    }
 		 * }
 		 */
-		getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>>;
+		getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary>;
+
 		/**
 		 * Updates the json file which contains the migration information. If the user is not connectet to the internet the file will not be updated and the CLI will use the one which is downloaded when the CLI is installed or updated.
 		 */

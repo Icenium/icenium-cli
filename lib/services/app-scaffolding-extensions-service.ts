@@ -27,7 +27,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 
 	public prepareAppScaffolding(): IFuture<void> {
 		return (() => {
-			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
+			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig();
 			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
 				return (() => {

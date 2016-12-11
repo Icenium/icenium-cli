@@ -83,10 +83,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
 	}
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			return this.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration, projectInformation);
-		}).future<IDictionary<IStringDictionary>>()();
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		return this.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration, projectInformation);
 	}
 
 	public getProjectTargets(projectDir: string): string[] {

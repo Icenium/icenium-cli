@@ -35,7 +35,7 @@ testInjector.register("cordovaResources", {});
 
 function registerMockedFS(mockResult: any): void {
 	testInjector.register("fs", {
-		readJson: () => { return Future.fromResult(mockResult); },
+		readJson: () => mockResult,
 	});
 }
 

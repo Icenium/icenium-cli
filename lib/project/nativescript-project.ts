@@ -127,26 +127,24 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		}).future<void>()();
 	}
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			let packageJsonContent = this.$fs.readJson(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
-			let nativescript = packageJsonContent && packageJsonContent.nativescript;
-			let dependencies = packageJsonContent && packageJsonContent.dependencies;
-			if (nativescript && dependencies) {
-				let pluginsVariables: IStringDictionary = {};
-				_.keys(dependencies).forEach(dependency => {
-					let variablesKey = `${dependency}-variables`;
-					let variables = nativescript[variablesKey];
-					if (variables) {
-						pluginsVariables[dependency] = variables;
-					}
-				});
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		let packageJsonContent = this.$fs.readJson(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME));
+		let nativescript = packageJsonContent && packageJsonContent.nativescript;
+		let dependencies = packageJsonContent && packageJsonContent.dependencies;
+		if (nativescript && dependencies) {
+			let pluginsVariables: IDictionary<IStringDictionary> = {};
+			_.keys(dependencies).forEach(dependency => {
+				let variablesKey = `${dependency}-variables`;
+				let variables = nativescript[variablesKey];
+				if (variables) {
+					pluginsVariables[dependency] = variables;
+				}
+			});
 
-				return pluginsVariables;
-			}
+			return pluginsVariables;
+		}
 
-			return null;
-		}).future<IDictionary<IStringDictionary>>()();
+		return null;
 	}
 
 	public updateMigrationConfigFile(): IFuture<void> {

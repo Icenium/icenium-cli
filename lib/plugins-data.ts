@@ -55,49 +55,47 @@ export class CordovaPluginData implements IPlugin {
 		let result: string[] = [];
 		if (this.configurations && this.configurations.length) {
 			_.each(this.configurations, (configuration: string) => {
-				let info = this.getPluginVarsStringInformation(configuration).wait();
+				let info = this.getPluginVarsStringInformation(configuration);
 				result = result.concat(info);
 			});
 		} else {
-			let info = this.getPluginVarsStringInformation().wait();
+			let info = this.getPluginVarsStringInformation();
 			result = result.concat(info);
 		}
 
 		return result;
 	}
 
-	private getPluginVarsStringInformation(configuration?: string): IFuture<string[]> {
-		return ((): string[] => {
-			let result: string[] = [];
-			let configString = configuration ? ` for ${configuration} configuration` : "";
-			let pluginVariablesData = this.$project.getPluginVariablesInfo(configuration).wait();
-			if (pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
-				let variables = pluginVariablesData[this.data.Identifier];
-				let variableNames = _.keys(variables);
-				if (variableNames.length > 0) {
-					let output: string[] = [];
-					output.push(`    Variables${configString}:`);
-					_.each(variableNames, (variableName: string) => {
-						output.push(util.format("        %s: %s", variableName, variables[variableName]));
-					});
+	private getPluginVarsStringInformation(configuration?: string): string[] {
+		let result: string[] = [];
+		let configString = configuration ? ` for ${configuration} configuration` : "";
+		let pluginVariablesData = this.$project.getPluginVariablesInfo(configuration);
+		if (pluginVariablesData && pluginVariablesData[this.data.Identifier]) {
+			let variables = pluginVariablesData[this.data.Identifier];
+			let variableNames = _.keys(variables);
+			if (variableNames.length > 0) {
+				let output: string[] = [];
+				output.push(`    Variables${configString}:`);
+				_.each(variableNames, (variableName: string) => {
+					output.push(util.format("        %s: %s", variableName, variables[variableName]));
+				});
 
-					result.push(output.join(EOL));
-				}
-			} else {
-				if (this.data.Variables) {
-					// We should never get here with anything that is not array, but anyway, lets assure we'll not throw some unexpected error.
-					if (_.isArray(this.data.Variables) && (<string[]>this.data.Variables).length) {
-						// cordova or marketplace plugins
-						result.push(`    Variables${configString}: ${(_.map(<string[]>this.data.Variables, (v: any) => v.name || v)).join(", ")}`);
-					} else if (_.keys(this.data.Variables).length) {
-						// nativescript
-						result.push(`    Variables${configString}: ${_.keys(this.data.Variables).join(", ")}`);
-					}
+				result.push(output.join(EOL));
+			}
+		} else {
+			if (this.data.Variables) {
+				// We should never get here with anything that is not array, but anyway, lets assure we'll not throw some unexpected error.
+				if (_.isArray(this.data.Variables) && (<string[]>this.data.Variables).length) {
+					// cordova or marketplace plugins
+					result.push(`    Variables${configString}: ${(_.map(<string[]>this.data.Variables, (v: any) => v.name || v)).join(", ")}`);
+				} else if (_.keys(this.data.Variables).length) {
+					// nativescript
+					result.push(`    Variables${configString}: ${_.keys(this.data.Variables).join(", ")}`);
 				}
 			}
+		}
 
-			return result;
-		}).future<string[]>()();
+		return result;
 	}
 }
 

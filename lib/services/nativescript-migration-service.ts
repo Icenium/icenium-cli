@@ -43,11 +43,9 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	}
 
 	private _nativeScriptMigrationData: INativeScriptMigrationData;
-	private get nativeScriptMigrationData(): IFuture<INativeScriptMigrationData> {
-		return ((): INativeScriptMigrationData => {
-			this._nativeScriptMigrationData = this._nativeScriptMigrationData || this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait();
-			return this._nativeScriptMigrationData;
-		}).future<INativeScriptMigrationData>()();
+	private get nativeScriptMigrationData(): INativeScriptMigrationData {
+		this._nativeScriptMigrationData = this._nativeScriptMigrationData || this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile);
+		return this._nativeScriptMigrationData;
 	}
 
 	constructor(private $config: IConfiguration,
@@ -75,7 +73,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			// Make sure to download this file first, as data from it is used for fileDownloadFutures
 			this.downloadMigrationConfigFile().wait();
 
-			let fileDownloadFutures = _(this.nativeScriptMigrationData.wait().supportedVersions)
+			let fileDownloadFutures = _(this.nativeScriptMigrationData.supportedVersions)
 				.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
 				.flatten<IFuture<void>>()
 				.value();
@@ -84,30 +82,24 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}).future<void>()();
 	}
 
-	public getSupportedVersions(): IFuture<string[]> {
-		return ((): string[] => {
-			let migrationData = this.nativeScriptMigrationData.wait();
-			return _.map(migrationData.supportedVersions, supportedVersion => supportedVersion.version);
-		}).future<string[]>()();
+	public getSupportedVersions(): string[] {
+		let migrationData = this.nativeScriptMigrationData;
+		return _.map(migrationData.supportedVersions, supportedVersion => supportedVersion.version);
 	}
 
-	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
-		return ((): IFrameworkVersion[] => {
-			let migrationData = this.nativeScriptMigrationData.wait();
-			return migrationData.supportedVersions;
-		}).future<IFrameworkVersion[]>()();
+	public getSupportedFrameworks(): IFrameworkVersion[] {
+		let migrationData = this.nativeScriptMigrationData;
+		return migrationData.supportedVersions;
 	}
 
-	public getDisplayNameForVersion(version: string): IFuture<string> {
-		return ((): string => {
-			let framework = _.find(this.getSupportedFrameworks().wait(), (fw: IFrameworkVersion) => fw.version === version);
-			this.warnIfVersionDeprecated(version).wait();
-			if (framework) {
-				return framework.displayName;
-			} else {
-				return version;
-			}
-		}).future<string>()();
+	public getDisplayNameForVersion(version: string): string {
+		let framework = _.find(this.getSupportedFrameworks(), (fw: IFrameworkVersion) => fw.version === version);
+		this.warnIfVersionDeprecated(version);
+		if (framework) {
+			return framework.displayName;
+		} else {
+			return version;
+		}
 	}
 
 	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
@@ -132,7 +124,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	private migrateByModifyingPackageJson(currentVersion: string, newVersion: string): IFuture<void> {
 		return (() => {
 			try {
-				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion).wait();
+				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion);
 
 				this.$projectMigrationService.migrateTypeScriptProject().wait();
 				this.$npmService.install(this.$project.getProjectDir()).wait();
@@ -169,24 +161,20 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return `${version}${NativeScriptMigrationService.TNS_CORE_MODULES}.zip`;
 	}
 
-	private getDeprecatedVersions(): IFuture<string[]> {
-		return ((): string[] => {
-			let migrationData = this.nativeScriptMigrationData.wait();
-			return _.map(migrationData.deprecatedVersions, deprecatedVersion => deprecatedVersion.version);
-		}).future<string[]>()();
+	private getDeprecatedVersions(): string[] {
+		let migrationData = this.nativeScriptMigrationData;
+		return _.map(migrationData.deprecatedVersions, deprecatedVersion => deprecatedVersion.version);
 	}
 
-	private warnIfVersionDeprecated(version: string): IFuture<void> {
-		return (() => {
-			if (_.includes(this.getDeprecatedVersions().wait(), version)) {
-				this.$logger.warn(`Your project targets NativeScript ${version}. This version is deprecated and will not be available in a future release. You can still develop and build your project but it is recommended that you commit all changes to version control and migrate to a newer version of NativeScript.`);
-			}
-		}).future<void>()();
+	private warnIfVersionDeprecated(version: string): void {
+		if (_.includes(this.getDeprecatedVersions(), version)) {
+			this.$logger.warn(`Your project targets NativeScript ${version}. This version is deprecated and will not be available in a future release. You can still develop and build your project but it is recommended that you commit all changes to version control and migrate to a newer version of NativeScript.`);
+		}
 	}
 
 	private ensurePackageJsonExists(newVersion: string): IFuture<void> {
 		return (() => {
-			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).wait().supportedVersions).map(version => version.version);
+			let versions: string[] = (<any[]>this.$fs.readJson(this.$nativeScriptResources.nativeScriptMigrationFile).supportedVersions).map(version => version.version);
 			if (_.includes(versions, newVersion)
 				&& !this.$fs.exists(path.join(this.nativeScriptMigrationConfiguration.projectDir, this.$projectConstants.PACKAGE_JSON_NAME))) {
 				// From version 1.1.2 we need package.json file at the root of the project.
@@ -212,7 +200,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, pathToPackageJson).wait();
 			}
 
-			return this.$fs.readJson(pathToPackageJson).wait();
+			return this.$fs.readJson(pathToPackageJson);
 		}).future<any>()();
 	}
 
@@ -225,19 +213,17 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		this.$logger.trace(err);
 	}
 
-	private getModuleVersion(version: string): IFuture<string> {
-		return (() => {
-			let versionObject = _.find(this.nativeScriptMigrationData.wait().supportedVersions, sv => sv.version === version);
-			if (!versionObject || !versionObject.modulesVersion) {
-				this.$errors.fail({
-					formatStr: `There seems to be a problem with ${this.$staticConfig.CLIENT_NAME}. Try reinstalling to fix the issue.`,
-					suppressCommandHelp: true,
-					errorCode: ErrorCodes.RESOURCE_PROBLEM
-				});
-			}
+	private getModuleVersion(version: string): string {
+		let versionObject = _.find(this.nativeScriptMigrationData.supportedVersions, sv => sv.version === version);
+		if (!versionObject || !versionObject.modulesVersion) {
+			this.$errors.fail({
+				formatStr: `There seems to be a problem with ${this.$staticConfig.CLIENT_NAME}. Try reinstalling to fix the issue.`,
+				suppressCommandHelp: true,
+				errorCode: ErrorCodes.RESOURCE_PROBLEM
+			});
+		}
 
-			return versionObject.modulesVersion;
-		}).future<string>()();
+		return versionObject.modulesVersion;
 	}
 }
 

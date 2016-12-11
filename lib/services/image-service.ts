@@ -42,29 +42,27 @@ class ImageService implements IImageService {
 		}
 	}
 
-	public printDefinitions(): IFuture<void> {
-		return (() => {
-			let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
-				imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath).wait(),
-				table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
+	public printDefinitions(): void {
+		let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
+			imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath),
+			table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
 
-			_.each(imageDefinitionsContents, imageDefinition => {
-				if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
-					return;
-				}
+		_.each(imageDefinitionsContents, imageDefinition => {
+			if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
+				return;
+			}
 
-				let maxLength = Math.max(imageDefinition.Icons.length, imageDefinition.SplashScreens.length);
+			let maxLength = Math.max(imageDefinition.Icons.length, imageDefinition.SplashScreens.length);
 
-				for (let i = 0; i < maxLength; ++i) {
-					let platformName = i ? '' : imageDefinition.Platform;
-					this.pushImageToTable(table, platformName, imageDefinition.Icons[i], imageDefinition.SplashScreens[i]);
-				}
+			for (let i = 0; i < maxLength; ++i) {
+				let platformName = i ? '' : imageDefinition.Platform;
+				this.pushImageToTable(table, platformName, imageDefinition.Icons[i], imageDefinition.SplashScreens[i]);
+			}
 
-				table.push(['', '', '']);
-			});
+			table.push(['', '', '']);
+		});
 
-			this.$logger.out(table.toString());
-		}).future<void>()();
+		this.$logger.out(table.toString());
 	}
 
 	public promptForImageInformation(force: boolean): IFuture<void> {

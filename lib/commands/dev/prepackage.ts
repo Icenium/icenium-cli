@@ -24,7 +24,7 @@ export class PrePackageCommand implements ICommand {
 			if (buildSource) {
 				// Need to set the property to config-base.json because when executing dev-config-apply the changes in config.json will be deleted.
 				let configJsonDirectory = path.join(__dirname, "..", "..", "..", "config", "config-base.json");
-				let configFileContent = this.$fs.readJson(configJsonDirectory).wait();
+				let configFileContent = this.$fs.readJson(configJsonDirectory);
 				configFileContent.BUILD_SOURCE = buildSource;
 
 				this.$fs.writeJson(configJsonDirectory, configFileContent).wait();

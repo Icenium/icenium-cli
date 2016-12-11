@@ -599,7 +599,7 @@ describe("plugins-service", () => {
 			let originalIsInteractive = helpers.isInteractive;
 			helpers.isInteractive = () => { return true; };
 			let originalFrameworkVersion = project.projectData.FrameworkVersion;
-			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).wait().FrameworkVersion;
+			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).FrameworkVersion;
 
 			let prompter: IPrompter = testInjector.resolve("prompter");
 			let promptsCount = 0;
@@ -622,7 +622,7 @@ describe("plugins-service", () => {
 
 		it("for NativeScript project from tgz.", () => {
 			let originalFrameworkVersion = project.projectData.FrameworkVersion;
-			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).wait().FrameworkVersion;
+			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).FrameworkVersion;
 
 			let prompter: IPrompter = testInjector.resolve("prompter");
 			prompter.get = () => Future.fromResult("testvalue");

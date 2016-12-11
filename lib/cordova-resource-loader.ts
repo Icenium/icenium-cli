@@ -8,7 +8,7 @@ export class CordovaResourceLoader implements ICordovaResourceLoader {
 		return path.join(this.$resources.resolvePath("Cordova"), version, `cordova.${platform.toLowerCase()}.js`);
 	}
 
-	public getCordovaMigrationData(): IFuture<ICordovaJsonData> {
+	public getCordovaMigrationData(): ICordovaJsonData {
 		return this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova-migration-data.json"));
 	}
 }

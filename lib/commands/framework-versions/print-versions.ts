@@ -10,8 +10,8 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
-			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks().wait();
-			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion).wait();
+			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks();
+			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion);
 			if (projectFrameworkVersion) {
 				this.$logger.info(`Your project is using version ${projectFrameworkVersion}`);
 			}

@@ -25,10 +25,10 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 
 		let configPath = this.getConfigPath("config");
 		if (!this.$fs.exists(configPath)) {
-			let configBase = this.loadConfig("config-base").wait();
+			let configBase = this.loadConfig("config-base");
 			this.$fs.writeJson(configPath, configBase).wait();
 		} else {
-			this.mergeConfig(this, this.loadConfig("config").wait());
+			this.mergeConfig(this, this.loadConfig("config"));
 		}
 	}
 
@@ -38,18 +38,16 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 
 	public apply(configName: string): IFuture<void> {
 		return ((): any => {
-			let baseConfig = this.loadConfig("config-base").wait();
-			let newConfig = this.loadConfig("config-" + configName).wait();
+			let baseConfig = this.loadConfig("config-base");
+			let newConfig = this.loadConfig("config-" + configName);
 			this.mergeConfig(baseConfig, newConfig);
 			this.saveConfig(baseConfig, "config").wait();
 		}).future<void>()();
 	}
 
-	public printConfigData(): IFuture<void> {
-		return (() => {
-			let config = this.loadConfig("config").wait();
-			console.log(config);
-		}).future<void>()();
+	public printConfigData(): void {
+		let config = this.loadConfig("config");
+		console.log(config);
 	}
 
 	private copyFile(from: string, to: string): IFuture<void> {

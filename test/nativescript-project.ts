@@ -216,9 +216,9 @@ describe("NativeScript project unit tests", () => {
 		});
 
 		it("should return null if the package.json of the project is invalid.", () => {
-			$fs.readJson = (): IFuture<any> => Future.fromResult({});
+			$fs.readJson = (): any => ({});
 
-			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp").wait();
+			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp");
 			assert.deepEqual(pluginVariablesInfo, null);
 		});
 
@@ -241,9 +241,9 @@ describe("NativeScript project unit tests", () => {
 				dependencies
 			};
 
-			$fs.readJson = (): IFuture<any> => Future.fromResult(packageJson);
+			$fs.readJson = (): any => packageJson;
 
-			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp").wait();
+			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp");
 
 			let expectedResult: any = {};
 			expectedResult[pluginName] = pluginVariables;

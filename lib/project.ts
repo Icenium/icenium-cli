@@ -88,10 +88,8 @@ export class Project extends ProjectBase implements Project.IProject {
 		return this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || super.getShouldSaveProject();
 	}
 
-	public getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			return this.frameworkProject.getPluginVariablesInfo(this.projectInformation, this.getProjectDir(), configuration).wait();
-		}).future<IDictionary<IStringDictionary>>()();
+	public getPluginVariablesInfo(configuration?: string): IDictionary<IStringDictionary> {
+		return this.frameworkProject.getPluginVariablesInfo(this.projectInformation, this.getProjectDir(), configuration);
 	}
 
 	public getProjectTargets(): string[] {
@@ -252,26 +250,24 @@ export class Project extends ProjectBase implements Project.IProject {
 		return [`*${this.$projectConstants.PROJECT_FILE}`, `*${this.$projectConstants.PROJECT_IGNORE_FILE}`];
 	}
 
-	public isIonicProject(projectDir: string): IFuture<boolean> {
-		return (() => {
-			let result = false;
-			let oldIonicProjectFile = path.join(projectDir, "ionic.project");
-			let newIonicProjectFile = path.join(projectDir, "ionic.config.json");
-			let ionicProject = this.$fs.exists(oldIonicProjectFile) ? oldIonicProjectFile : newIonicProjectFile;
-			let packageJson = path.join(projectDir, "package.json");
-			let hasIonicProject = this.$fs.exists(ionicProject);
-			let hasPackageJson = this.$fs.exists(packageJson);
-			if (hasIonicProject && hasPackageJson) {
-				try {
-					let content = this.$fs.readJson(ionicProject).wait();
-					result = _.has(content, "name") && _.has(content, "app_id");
-				} catch (e) {
-					// it is not valid Ionic project, leave the value of `result` as is
-				}
+	public isIonicProject(projectDir: string): boolean {
+		let result = false;
+		let oldIonicProjectFile = path.join(projectDir, "ionic.project");
+		let newIonicProjectFile = path.join(projectDir, "ionic.config.json");
+		let ionicProject = this.$fs.exists(oldIonicProjectFile) ? oldIonicProjectFile : newIonicProjectFile;
+		let packageJson = path.join(projectDir, "package.json");
+		let hasIonicProject = this.$fs.exists(ionicProject);
+		let hasPackageJson = this.$fs.exists(packageJson);
+		if (hasIonicProject && hasPackageJson) {
+			try {
+				let content = this.$fs.readJson(ionicProject);
+				result = _.has(content, "name") && _.has(content, "app_id");
+			} catch (e) {
+				// it is not valid Ionic project, leave the value of `result` as is
 			}
+		}
 
-			return result;
-		}).future<boolean>()();
+		return result;
 	}
 
 	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
@@ -284,7 +280,7 @@ export class Project extends ProjectBase implements Project.IProject {
 				this.$errors.failWithoutHelp(`The specified folder '${projectDir}' does not exist!`);
 			}
 
-			let ionicProject = this.isIonicProject(projectDir).wait();
+			let ionicProject = this.isIonicProject(projectDir);
 			let createBackupOfIonicProject: boolean = false;
 			if (ionicProject && !this.$options.force) {
 				this.$logger.warn(prompt);
@@ -761,7 +757,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
 					this.$logger.trace("Reading template project properties.");
 
-					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
+					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject);
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
@@ -806,7 +802,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			if (projectFile) {
 				let isJsonProjectFile = projectFile === this.$projectConstants.PROJECT_FILE;
-				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject).wait();
+				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject);
 			}
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");

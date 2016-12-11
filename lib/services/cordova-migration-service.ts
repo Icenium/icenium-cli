@@ -48,14 +48,12 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		return this.$injector.resolve("pluginsService");
 	}
 
-	private get migrationData(): IFuture<MigrationData> {
-		return (() => {
-			if (!this._migrationData) {
-				this._migrationData = this.$fs.readJson(this.cordovaMigrationFile).wait();
-			}
+	private get migrationData(): MigrationData {
+		if (!this._migrationData) {
+			this._migrationData = this.$fs.readJson(this.cordovaMigrationFile);
+		}
 
-			return this._migrationData;
-		}).future<MigrationData>()();
+		return this._migrationData;
 	}
 
 	private get $resourceDownloader(): IResourceDownloader {
@@ -66,41 +64,31 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		return this._resourceDownloader;
 	}
 
-	public getCordovaJsonData(): IFuture<ICordovaJsonData> {
+	public getCordovaJsonData(): ICordovaJsonData {
 		return this.$fs.readJson(this.cordovaJsonFilePath);
 	}
 
-	public getDisplayNameForVersion(version: string): IFuture<string> {
-		return ((): string => {
-			let supportedFrameworks: IFrameworkVersion[] = this.getSupportedFrameworks().wait();
-			let framework = _.find(supportedFrameworks, (fw: IFrameworkVersion) => fw.version === version);
-			if (framework) {
-				return framework.displayName;
-			}
+	public getDisplayNameForVersion(version: string): string {
+		let supportedFrameworks: IFrameworkVersion[] = this.getSupportedFrameworks();
+		let framework = _.find(supportedFrameworks, (fw: IFrameworkVersion) => fw.version === version);
+		if (framework) {
+			return framework.displayName;
+		}
 
-			this.$logger.error(`Version ${version} in not supported.`);
-			return null;
-		}).future<string>()();
+		this.$logger.error(`Version ${version} in not supported.`);
+		return null;
 	}
 
-	public getSupportedFrameworks(): IFuture<IFrameworkVersion[]> {
-		return (() => {
-
-			return this.migrationData.wait().supportedFrameworkVersions;
-
-		}).future<IFrameworkVersion[]>()();
+	public getSupportedFrameworks(): IFrameworkVersion[] {
+		return this.migrationData.supportedFrameworkVersions;
 	}
 
-	public getSupportedVersions(): IFuture<string[]> {
-		return (() => {
-			return this.migrationData.wait().supportedVersions;
-		}).future<string[]>()();
+	public getSupportedVersions(): string[] {
+		return this.migrationData.supportedVersions;
 	}
 
-	public pluginsForVersion(version: string): IFuture<string[]> {
-		return (() => {
-			return this.migrationData.wait().integratedPlugins[version] || [];
-		}).future<string[]>()();
+	public pluginsForVersion(version: string): string[] {
+		return this.migrationData.integratedPlugins[version] || [];
 	}
 
 	public migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]> {
@@ -109,7 +97,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let smallerVersion = isUpgrade ? fromVersion : toVersion;
 			let biggerVersion = isUpgrade ? toVersion : fromVersion;
 
-			let renames = _.filter(this.migrationData.wait().renamedPlugins, (renamedPlugin: RenamedPlugin) => {
+			let renames = _.filter(this.migrationData.renamedPlugins, (renamedPlugin: RenamedPlugin) => {
 				return helpers.versionCompare(smallerVersion, renamedPlugin.version) <= 0 && helpers.versionCompare(renamedPlugin.version, biggerVersion) <= 0;
 			}).sort((a, b) => helpers.versionCompare(a.version, b.version) * (isUpgrade ? 1 : -1));
 
@@ -117,11 +105,11 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			plugins = this.applyTransitions(plugins, transitions);
 
-			let supportedPlugins = this.pluginsForVersion(toVersion).wait();
+			let supportedPlugins = this.pluginsForVersion(toVersion);
 			plugins = _.filter(plugins, plugin => _.includes(supportedPlugins, plugin) || (_.includes(plugin, '@') && !_.includes(this.invalidMarketplacePlugins, plugin)));
 
-			let cordovaJsonData = this.getCordovaJsonData().wait();
-			let sourceSupportedPlugins = this.pluginsForVersion(fromVersion).wait();
+			let cordovaJsonData = this.getCordovaJsonData();
+			let sourceSupportedPlugins = this.pluginsForVersion(fromVersion);
 			let sourceSupportedPluginsRenamed = this.applyTransitions(sourceSupportedPlugins, transitions);
 			let defaultEnabledPluginsIncludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsIncludeRegex);
 			let defaultEnabledPluginsExcludeRegex = new RegExp(cordovaJsonData.defaultEnabledPluginsExcludeRegex);
@@ -182,7 +170,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			if (helpers.versionCompare(newVersion, "8.0") > 0) {
 				// at least Cordova 3.7 is required
 				if (helpers.versionCompare(this.$project.projectData.FrameworkVersion, "3.7.0") < 0) {
-					let cordovaVersions = this.getSupportedFrameworks().wait();
+					let cordovaVersions = this.getSupportedFrameworks();
 
 					// Find last framework which is not experimental.
 					let selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
@@ -210,7 +198,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				return;
 			}
 
-			let versionDisplayName = this.getDisplayNameForVersion(newVersion).wait();
+			let versionDisplayName = this.getDisplayNameForVersion(newVersion);
 			this.$project.ensureAllPlatformAssets().wait();
 
 			if (this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
@@ -244,7 +232,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				this.promptUserForInvalidPluginsAction(this.invalidMarketplacePlugins, newVersion).wait();
 			}
 
-			let cordovaJsonData = this.getCordovaJsonData().wait();
+			let cordovaJsonData = this.getCordovaJsonData();
 
 			if (semver.gte(newVersion, cordovaJsonData.forceHardwareAccelerationAfter)) {
 				this.$project.projectData.AndroidHardwareAcceleration = "true";
@@ -269,18 +257,16 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}).future<void>()();
 	}
 
-	public getSupportedPlugins(): IFuture<string[]> {
-		return (() => {
-			let version: string;
-			if (this.$project.projectData) {
-				version = this.$project.projectData.FrameworkVersion;
-			} else {
-				let selectedFramework = _.findLast(this.getSupportedFrameworks().wait(), (sv: IFrameworkVersion) => sv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
-				version = selectedFramework.version;
-			}
+	public getSupportedPlugins(): string[] {
+		let version: string;
+		if (this.$project.projectData) {
+			version = this.$project.projectData.FrameworkVersion;
+		} else {
+			let selectedFramework = _.findLast(this.getSupportedFrameworks(), (sv: IFrameworkVersion) => sv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
+			version = selectedFramework.version;
+		}
 
-			return this.pluginsForVersion(version).wait();
-		}).future<string[]>()();
+		return this.pluginsForVersion(version);
 	}
 
 	private get cordovaJsonFilePath(): string {

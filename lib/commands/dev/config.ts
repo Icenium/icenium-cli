@@ -4,7 +4,9 @@ export class DevConfigCommand implements ICommand {
 	constructor(private $config: IConfiguration) { }
 
 	public execute(args: string[]): IFuture<void> {
-		return this.$config.printConfigData();
+		return (() => {
+			return this.$config.printConfigData();
+		}).future<void>()();
 	}
 }
 $injector.registerCommand("dev-config", DevConfigCommand);
