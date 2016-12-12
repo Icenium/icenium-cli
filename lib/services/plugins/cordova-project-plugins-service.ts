@@ -202,21 +202,21 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				// If there are no configurations specified by the user we need to remove the plugin from all configurations.
 				let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 				_.each(configurations, (configuration: string) => {
-					this.removePluginCore(pluginName, plugin, configuration).wait();
+					this.removePluginCore(pluginName, plugin, configuration);
 					if (obsoletedBy) {
-						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration).wait();
+						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration);
 					}
 					if (obsoletingKey) {
-						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration).wait();
+						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration);
 					}
 				});
 			} else {
-				this.removePluginCore(pluginName, plugin).wait();
+				this.removePluginCore(pluginName, plugin);
 				if (obsoletedBy) {
-					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]).wait();
+					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]);
 				}
 				if (obsoletingKey) {
-					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]).wait();
+					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]);
 				}
 			}
 		}).future<void>()();
@@ -324,7 +324,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration).wait();
 			});
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 			return pluginBasicInfo;
 		}).future<IBasicPluginInformation>()();
 
@@ -447,40 +447,38 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
 			}
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 
 			this.$logger.out(successMessage);
 		}).future<void>()();
 	}
 
-	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): IFuture<void> {
-		return (() => {
-			let pluginData = <IMarketplacePluginData>plugin.data;
-			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): void {
+		let pluginData = <IMarketplacePluginData>plugin.data;
+		let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
 
-			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
-				_.each(pluginData.Variables, (variableName: string) => {
-					delete cordovaPluginVariables[pluginData.Identifier][variableName];
-				});
-			}
+		if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
+			_.each(pluginData.Variables, (variableName: string) => {
+				delete cordovaPluginVariables[pluginData.Identifier][variableName];
+			});
+		}
 
-			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
-				delete cordovaPluginVariables[pluginData.Identifier];
-			}
-			let oldCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
-			let newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
-			if (newCorePlugins.length !== oldCorePlugins.length) {
-				this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+		if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
+			delete cordovaPluginVariables[pluginData.Identifier];
+		}
+		let oldCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+		let newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
+		if (newCorePlugins.length !== oldCorePlugins.length) {
+			this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 
-				if (configuration) {
-					this.$project.saveProject(this.$project.getProjectDir(), [configuration]).wait();
-					this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
-				} else {
-					this.$project.saveProject().wait();
-					this.$logger.out("Plugin %s was successfully removed.", pluginName);
-				}
+			if (configuration) {
+				this.$project.saveProject(this.$project.getProjectDir(), [configuration]);
+				this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+			} else {
+				this.$project.saveProject();
+				this.$logger.out("Plugin %s was successfully removed.", pluginName);
 			}
-		}).future<void>()();
+		}
 	}
 
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
@@ -663,7 +661,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				switch (selectedItem) {
 					case removeItemChoice:
 						selectedVersion = this.selectPluginVersion(version, installedPlugin).wait();
-						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove).wait());
+						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
 						_.each(this.specifiedConfigurations, (selectedConfiguration: string) => this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait());
 						break;
 					case modifyAllConfigs:

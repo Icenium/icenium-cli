@@ -100,9 +100,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void> {
-		return Future.fromResult();
-	}
+	writeJson(filename: string, data: any, space?: string, encoding?: string): void { }
 
 	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
 		return undefined;

@@ -56,7 +56,14 @@ declare module Project {
 		setProperty(propertyName: string, value: any, configuration: string): void;
 		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
 		adjustBuildProperties(buildProperties: any): any;
-		saveProject(projectDir?: string, configurations?: string[]): IFuture<void>;
+
+		/**
+		 * Saves the project files, including configuration specific ones (.abproject, .debug.abproject, package.json, etc.)
+		 * @param {string} projectDir @optional The project directory.
+		 * @param {string[]} configurations Project configurations that will be persisted.
+		 * @returns {void}
+		 */
+		saveProject(projectDir?: string, configurations?: string[]): void;
 		zipProject(): IFuture<string>;
 		importProject(): IFuture<void>;
 

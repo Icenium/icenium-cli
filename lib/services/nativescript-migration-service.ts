@@ -129,10 +129,10 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				this.$projectMigrationService.migrateTypeScriptProject().wait();
 				this.$npmService.install(this.$project.getProjectDir()).wait();
 
-				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents).wait();
+				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents);
 			} catch (err) {
 				this.traceError(err);
-				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.oldPackageJsonContents).wait();
+				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.oldPackageJsonContents);
 
 				let message = "Error during migration. Restored original state of the project.";
 				if (err.errorCode === ErrorCodes.RESOURCE_PROBLEM) {

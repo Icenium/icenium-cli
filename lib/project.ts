@@ -72,7 +72,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public get projectData(): Project.IData {
 		if (!this._projectData) {
-			this.readProjectData().wait();
+			this.readProjectData();
 		}
 
 		return this._projectData;
@@ -220,6 +220,7 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
+	// TODO: Remove IFuture, reason: writeJson
 	public createProjectFile(projectDir: string, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
@@ -232,7 +233,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
 
 			this.validateProjectData(this.projectData);
-			this.saveProject(projectDir).wait();
+			this.saveProject(projectDir);
 		}).future<void>()();
 	}
 
@@ -315,7 +316,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			try {
 				this.validateProjectData(this.projectData);
-				this.saveProject(projectDir).wait();
+				this.saveProject(projectDir);
 			} catch (e) {
 				this.$errors.fail("There was an error while initialising the project: " + EOL + e);
 			}
@@ -425,7 +426,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations).wait();
 
-			this.saveProject(this.getProjectDir(), this.getAllConfigurationsNames()).wait();
+			this.saveProject(this.getProjectDir(), this.getAllConfigurationsNames());
 			projectConfigurations.forEach(configuration => {
 				this.printProjectProperty(normalizedPropertyName, configuration).wait();
 			});
@@ -660,21 +661,19 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
-	public saveProject(projectDir: string, configurations?: string[]): IFuture<void> {
-		return (() => {
-			let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
-			projectDir = projectDir || this.getProjectDir();
-			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
+	public saveProject(projectDir: string, configurations?: string[]): void {
+		let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
+		projectDir = projectDir || this.getProjectDir();
+		this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData);
 
-			_.each(configs, (configuration: string) => {
-				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
+		_.each(configs, (configuration: string) => {
+			let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
-				if (this.$fs.exists(configFilePath) && this.configurationSpecificData[configuration]) {
-					let configurationSpecificKeys = _.reduce(this.configurationSpecificData[configuration], (result, value, key) => _.isEqual(value, this.projectData[key]) ? result : result.concat(key), []);
-					this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], configurationSpecificKeys)).wait();
-				}
-			});
-		}).future<void>()();
+			if (this.$fs.exists(configFilePath) && this.configurationSpecificData[configuration]) {
+				let configurationSpecificKeys = _.reduce(this.configurationSpecificData[configuration], (result, value, key) => _.isEqual(value, this.projectData[key]) ? result : result.concat(key), []);
+				this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], configurationSpecificKeys));
+			}
+		});
 	}
 
 	public zipProject(): IFuture<string> {
@@ -727,7 +726,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	protected saveProjectIfNeeded(): void {
 		if (this.getShouldSaveProject() && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
-			this.saveProject(this.projectDir).wait();
+			this.saveProject(this.projectDir);
 		}
 	}
 

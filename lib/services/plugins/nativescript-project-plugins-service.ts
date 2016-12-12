@@ -145,7 +145,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 					delete packageJsonContent.nativescript[`${pluginBasicInfo.name}-variables`];
 				}
 
-				this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
+				this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 
 				this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name).wait();
 
@@ -237,7 +237,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				packageJsonContent = this.setPluginVariables(packageJsonContent, basicPluginInfo).wait();
 			}
 
-			this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
+			this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 
 			return basicPluginInfo;
 		}).future<IBasicPluginInformation>()();
@@ -630,7 +630,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				packageJsonContent = this.setPluginVariables(packageJsonContent, basicPlugin).wait();
 			}
 
-			this.$fs.writeJson(pathToPackageJson, packageJsonContent).wait();
+			this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 			return basicPlugin;
 		}).future<IBasicPluginInformation>()();
 	}

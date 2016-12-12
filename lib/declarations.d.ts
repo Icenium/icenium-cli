@@ -298,7 +298,13 @@ interface IConfiguration extends Config.IConfig {
 	TYPESCRIPT_COMPILER_OPTIONS: ITypeScriptCompilerOptions;
 
 	reset(): IFuture<void>;
-	apply(configName: string): IFuture<void>;
+
+	/**
+	 * Applies specific configuration and saves it in config.json
+	 * @param {string} configName The name of the configuration to be applied.
+	 * @returns {void}
+	 */
+	apply(configName: string): void;
 	printConfigData(): void;
 }
 

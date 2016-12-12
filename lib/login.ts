@@ -65,7 +65,7 @@ export class UserDataStore implements IUserDataStore {
 		return (() => {
 			this.user = user;
 			if(user) {
-				this.$fs.writeJson(this.getUserStateFilePath(), user).wait();
+				this.$fs.writeJson(this.getUserStateFilePath(), user);
 				this.trackTenantInformation(user).wait();
 			} else {
 				this.$fs.deleteFile(this.getUserStateFilePath());

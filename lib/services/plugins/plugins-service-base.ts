@@ -180,7 +180,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					name: "tempPackage",
 					version: "1.0.0"
 				};
-				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
+				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData);
 				if (version) {
 					identifier = `${identifier}@${version}`;
 				}

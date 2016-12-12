@@ -27,7 +27,7 @@ export class PrePackageCommand implements ICommand {
 				let configFileContent = this.$fs.readJson(configJsonDirectory);
 				configFileContent.BUILD_SOURCE = buildSource;
 
-				this.$fs.writeJson(configJsonDirectory, configFileContent).wait();
+				this.$fs.writeJson(configJsonDirectory, configFileContent);
 				this.$logger.trace(`Build source ${buildSource} added to config.json.`);
 			}
 

@@ -26,7 +26,7 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		let configPath = this.getConfigPath("config");
 		if (!this.$fs.exists(configPath)) {
 			let configBase = this.loadConfig("config-base");
-			this.$fs.writeJson(configPath, configBase).wait();
+			this.$fs.writeJson(configPath, configBase);
 		} else {
 			this.mergeConfig(this, this.loadConfig("config"));
 		}
@@ -36,13 +36,11 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		return this.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
 	}
 
-	public apply(configName: string): IFuture<void> {
-		return ((): any => {
-			let baseConfig = this.loadConfig("config-base");
-			let newConfig = this.loadConfig("config-" + configName);
-			this.mergeConfig(baseConfig, newConfig);
-			this.saveConfig(baseConfig, "config").wait();
-		}).future<void>()();
+	public apply(configName: string): void {
+		let baseConfig = this.loadConfig("config-base");
+		let newConfig = this.loadConfig("config-" + configName);
+		this.mergeConfig(baseConfig, newConfig);
+		this.saveConfig(baseConfig, "config");
 	}
 
 	public printConfigData(): void {
@@ -54,7 +52,7 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		return this.$fs.copyFile(from, to);
 	}
 
-	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
+	private saveConfig(config: IConfiguration, name: string): void {
 		let configNoFunctions = Object.create(null);
 		_.each(<any>config, (entry, key) => {
 			if (typeof entry !== "function") {

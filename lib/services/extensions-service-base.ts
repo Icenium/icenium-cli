@@ -65,7 +65,7 @@ export class ExtensionsServiceBase {
 					if(actions.afterDownloadAction) {
 						actions.afterDownloadAction().wait();
 					}
-					this.saveVersionsFile().wait();
+					this.saveVersionsFile();
 				} catch(err) {
 					this.$fs.deleteFile(zipFileName);
 					this.$fs.deleteDirectory(extensionPath);
@@ -84,7 +84,7 @@ export class ExtensionsServiceBase {
 		return path.join(this.$options.profileDir, "Cache", "extension-versions.json");
 	}
 
-	private saveVersionsFile() : IFuture<void> {
+	private saveVersionsFile() : void {
 		return this.$fs.writeJson(this.versionsFile, this.extensionVersions);
 	}
 

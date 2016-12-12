@@ -142,7 +142,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.filter(fv => _.includes(cliSupportedVersions, fv.version))
 				.value();
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
-			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData).wait();
+			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData);
 
 			this.downloadMigrationConfigFile().wait();
 		}).future<void>()();
@@ -236,7 +236,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			if (semver.gte(newVersion, cordovaJsonData.forceHardwareAccelerationAfter)) {
 				this.$project.projectData.AndroidHardwareAcceleration = "true";
-				this.$project.saveProject().wait();
+				this.$project.saveProject();
 			}
 
 			_.each(this.invalidMarketplacePlugins, plugin => {
