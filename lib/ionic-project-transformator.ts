@@ -96,7 +96,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 			if (createBackup) {
 				this.backupCurrentProject().wait();
-				this.addIonicBackupFolderToAbIgnoreFile().wait();
+				this.addIonicBackupFolderToAbIgnoreFile();
 			}
 
 			this.createReroutingIndexHtml();
@@ -452,14 +452,12 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return isAppBuilderFile;
 	}
 
-	private addIonicBackupFolderToAbIgnoreFile(): IFuture<void> {
-		return (() => {
-			let abIgnoreFilePath = path.join(this.$project.projectDir, this.$projectConstants.PROJECT_IGNORE_FILE);
+	private addIonicBackupFolderToAbIgnoreFile(): void {
+		let abIgnoreFilePath = path.join(this.$project.projectDir, this.$projectConstants.PROJECT_IGNORE_FILE);
 
-			let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}${EOL}`;
+		let ignoreText = `${EOL}# Ionic backup folder${EOL}${IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME}${EOL}`;
 
-			this.$fs.appendFile(abIgnoreFilePath, ignoreText).wait();
-		}).future<void>()();
+		this.$fs.appendFile(abIgnoreFilePath, ignoreText);
 	}
 }
 

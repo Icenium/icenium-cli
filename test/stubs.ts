@@ -96,7 +96,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	appendFile(filename: string, data: any, encoding?: string): IFuture<void> {
+	appendFile(filename: string, data: any, encoding?: string): void {
 		return undefined;
 	}
 
