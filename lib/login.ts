@@ -39,7 +39,6 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.user = JSON.parse(value));
 	}
 
-	// TODO: Remove IFuture, reason: writeFile
 	public setCookies(cookies?: IStringDictionary): void {
 		this.cookies = cookies;
 		if(this.cookies) {

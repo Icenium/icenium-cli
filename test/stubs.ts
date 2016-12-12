@@ -421,7 +421,7 @@ export class ProjectFilesManager implements IProjectFilesManager {
 		return undefined;
 	}
 
-	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): IFuture<void> {
+	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): void {
 		return undefined;
 	}
 }
