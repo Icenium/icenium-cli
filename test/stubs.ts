@@ -160,10 +160,6 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	tryExecuteFileOperation(path: string, operation: () => IFuture<any>, enoentErrorMessage?: string): IFuture<void> {
-		return undefined;
-	}
-
 	getFileShasum(fileName: string): IFuture<string> {
 		return undefined;
 	}
