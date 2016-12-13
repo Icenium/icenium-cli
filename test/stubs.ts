@@ -172,7 +172,7 @@ export class FileSystemStub implements IFileSystem {
 
 	deleteEmptyParents(directory: string): void { }
 
-	getLsStats(path: string): IFuture<IFsStats> {
+	getLsStats(path: string): IFsStats {
 		return undefined;
 	}
 }
