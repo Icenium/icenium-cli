@@ -183,7 +183,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					}
 
 					if (shouldDeleteFetchedPlugin) {
-						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName)).wait();
+						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName));
 						this.$logger.out(`Plugin ${pluginName} was successfully removed.`);
 					} else {
 						this.$logger.out(`Plugin ${pluginName} was not removed.`);
@@ -202,21 +202,21 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				// If there are no configurations specified by the user we need to remove the plugin from all configurations.
 				let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 				_.each(configurations, (configuration: string) => {
-					this.removePluginCore(pluginName, plugin, configuration).wait();
+					this.removePluginCore(pluginName, plugin, configuration);
 					if (obsoletedBy) {
-						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration).wait();
+						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration);
 					}
 					if (obsoletingKey) {
-						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration).wait();
+						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration);
 					}
 				});
 			} else {
-				this.removePluginCore(pluginName, plugin).wait();
+				this.removePluginCore(pluginName, plugin);
 				if (obsoletedBy) {
-					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]).wait();
+					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]);
 				}
 				if (obsoletingKey) {
-					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]).wait();
+					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]);
 				}
 			}
 		}).future<void>()();
@@ -285,16 +285,14 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
-		return ((): IPlugin[] => {
-			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins().wait()).map(pluginId => pluginId.toLowerCase());
+		return (() => {
+			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins()).map(pluginId => pluginId.toLowerCase());
 			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 		}).future<IPlugin[]>()();
 	}
 
-	protected shouldCopyToPluginsDirectory(pathToPlugin: string): IFuture<boolean> {
-		return ((): boolean => {
-			return super.shouldCopyToPluginsDirectory(pathToPlugin).wait() || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
-		}).future<boolean>()();
+	protected shouldCopyToPluginsDirectory(pathToPlugin: string): boolean {
+		return super.shouldCopyToPluginsDirectory(pathToPlugin) || pathToPlugin.indexOf(path.join(this.$project.projectDir, NODE_MODULES_DIR_NAME)) >= 0;
 	}
 
 	protected getPluginsDirName(): string {
@@ -308,7 +306,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
 			return this.getLocalPluginBasicInformation(pluginXml).wait();
 		}).future<IBasicPluginInformation>()();
@@ -326,19 +324,17 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration).wait();
 			});
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 			return pluginBasicInfo;
 		}).future<IBasicPluginInformation>()();
 
 	}
 
-	protected validatePluginInformation(pathToPlugin: string): IFuture<void> {
-		return (() => {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
-			if (!pluginXml) {
-				this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
-			}
-		}).future<void>()();
+	protected validatePluginInformation(pathToPlugin: string): void {
+		let pluginXml = this.getPluginXmlContent(pathToPlugin);
+		if (!pluginXml) {
+			this.$errors.failWithoutHelp(`${path.basename(pathToPlugin)} is not a valid Cordova plugin.`);
+		}
 	}
 
 	private loadPluginsData(): IFuture<void> {
@@ -451,40 +447,38 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
 			}
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames()).wait();
+			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 
 			this.$logger.out(successMessage);
 		}).future<void>()();
 	}
 
-	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): IFuture<void> {
-		return (() => {
-			let pluginData = <IMarketplacePluginData>plugin.data;
-			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
+	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): void {
+		let pluginData = <IMarketplacePluginData>plugin.data;
+		let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration);
 
-			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
-				_.each(pluginData.Variables, (variableName: string) => {
-					delete cordovaPluginVariables[pluginData.Identifier][variableName];
-				});
-			}
+		if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length > 0) {
+			_.each(pluginData.Variables, (variableName: string) => {
+				delete cordovaPluginVariables[pluginData.Identifier][variableName];
+			});
+		}
 
-			if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
-				delete cordovaPluginVariables[pluginData.Identifier];
-			}
-			let oldCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
-			let newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
-			if (newCorePlugins.length !== oldCorePlugins.length) {
-				this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
+		if (cordovaPluginVariables && _.keys(cordovaPluginVariables[pluginData.Identifier]).length === 0) {
+			delete cordovaPluginVariables[pluginData.Identifier];
+		}
+		let oldCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration);
+		let newCorePlugins = _.without(oldCorePlugins, plugin.toProjectDataRecord());
+		if (newCorePlugins.length !== oldCorePlugins.length) {
+			this.$project.setProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, configuration);
 
-				if (configuration) {
-					this.$project.saveProject(this.$project.getProjectDir().wait(), [configuration]).wait();
-					this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
-				} else {
-					this.$project.saveProject().wait();
-					this.$logger.out("Plugin %s was successfully removed.", pluginName);
-				}
+			if (configuration) {
+				this.$project.saveProject(this.$project.getProjectDir(), [configuration]);
+				this.$logger.out("Plugin %s was successfully removed for %s configuration.", pluginName, configuration);
+			} else {
+				this.$project.saveProject();
+				this.$logger.out("Plugin %s was successfully removed.", pluginName);
 			}
-		}).future<void>()();
+		}
 	}
 
 	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
@@ -667,7 +661,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				switch (selectedItem) {
 					case removeItemChoice:
 						selectedVersion = this.selectPluginVersion(version, installedPlugin).wait();
-						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove).wait());
+						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
 						_.each(this.specifiedConfigurations, (selectedConfiguration: string) => this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion).wait());
 						break;
 					case modifyAllConfigs:
@@ -821,20 +815,18 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return obj;
 	}
 
-	private getObsoletedIntegratedPlugins(): IFuture<any> {
-		return (() => {
-			if (!this._obsoletedIntegratedPlugins) {
-				let cordovaJsonContent = this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova.json")).wait();
-				this._obsoletedIntegratedPlugins = cordovaJsonContent && cordovaJsonContent.obsoletedIntegratedPlugins;
-			}
+	private getObsoletedIntegratedPlugins(): any {
+		if (!this._obsoletedIntegratedPlugins) {
+			let cordovaJsonContent = this.$fs.readJson(path.join(this.$resources.resolvePath("Cordova"), "cordova.json"));
+			this._obsoletedIntegratedPlugins = cordovaJsonContent && cordovaJsonContent.obsoletedIntegratedPlugins;
+		}
 
-			return this._obsoletedIntegratedPlugins;
-		}).future<any>()();
+		return this._obsoletedIntegratedPlugins;
 	}
 
 	private getObsoletedByPluginIdentifier(pluginIdentifier: string): IFuture<string> {
 		return ((): string => {
-			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
+			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
 			return obsoletedByInfo.obsoletedBy;
 		}).future<string>()();
 	}
@@ -843,7 +835,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): string => {
 			let obsoletingKey: string;
 
-			_.each(this.getObsoletedIntegratedPlugins().wait(), (obsoletedPluginInfo: any, key: string) => {
+			_.each(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => {
 				if (obsoletedPluginInfo.obsoletedBy.toLowerCase() === pluginIdentifier.toLowerCase()) {
 					obsoletingKey = key;
 					return false;
@@ -858,18 +850,18 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return ((): IPlugin[] => {
 			if (!this._localPlugins) {
 				let pluginsDir = path.join(this.$project.projectDir, "plugins");
-				if (!this.$fs.exists(pluginsDir).wait()) {
+				if (!this.$fs.exists(pluginsDir)) {
 					return [];
 				}
 
-				this._localPlugins = _(this.$fs.readDirectory(pluginsDir).wait())
+				this._localPlugins = _(this.$fs.readDirectory(pluginsDir))
 					.map((pluginName: string) => {
 						let pathToPlugin = path.join(pluginsDir, pluginName);
-						if (this.$fs.getFsStats(pathToPlugin).wait().isFile()) {
+						if (this.$fs.getFsStats(pathToPlugin).isFile()) {
 							return null;
 						}
 
-						let pluginXml = this.getPluginXmlContent(pathToPlugin).wait();
+						let pluginXml = this.getPluginXmlContent(pathToPlugin);
 						let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml).wait();
 						let plugin = pluginXml.plugin;
 						let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
@@ -936,16 +928,14 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}).future<IBasicPluginInformation>()();
 	}
 
-	private getPluginXmlContent(pathToPlugin: string): IFuture<any> {
-		return ((): any => {
-			let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
+	private getPluginXmlContent(pathToPlugin: string): any {
+		let pathToPluginXml = path.join(pathToPlugin, "plugin.xml");
 
-			if (!this.$fs.exists(pathToPluginXml).wait()) {
-				return null;
-			}
+		if (!this.$fs.exists(pathToPluginXml)) {
+			return null;
+		}
 
-			return xmlMapping.tojson(this.$fs.readText(pathToPluginXml).wait());
-		}).future<any>()();
+		return xmlMapping.tojson(this.$fs.readText(pathToPluginXml));
 	}
 
 	private setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): IFuture<void> {

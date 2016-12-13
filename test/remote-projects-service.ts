@@ -107,14 +107,14 @@ function createTestInjector(): IInjector {
 	testInjector.register("fs", {
 		exists: (path: string) => {
 			if(path.indexOf("abproject") !== -1) {
-				return Future.fromResult(true);
+				return true;
 			} else {
-				return Future.fromResult(false);
+				return false;
 			}
 		},
 		createWriteStream: (path: string) => { /* intentionally empty body*/},
 		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
-		readDirectory: (projectDir: string) => Future.fromResult([])
+		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("logger", stubs.LoggerStub);
 	return testInjector;

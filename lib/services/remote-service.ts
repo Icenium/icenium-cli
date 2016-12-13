@@ -22,7 +22,7 @@ export class RemoteService implements IRemoteService {
 
 	public startApiServer(portNumber: number): IFuture<void> {
 		return (() => {
-			this.$fs.ensureDirectoryExists(this.appBuilderDir).wait();
+			this.$fs.ensureDirectoryExists(this.appBuilderDir);
 
 			this.$express.post("/launch", (req: Request, res: Response) => this.onLaunchRequest(req, res));
 			let domain = this.$domainNameSystem.getDomains().wait()[0];
@@ -47,8 +47,8 @@ export class RemoteService implements IRemoteService {
 		return (() => {
 			this.$logger.info("launch simulator request received ... ");
 			// Clean the tempdir before new launch
-			this.$fs.deleteDirectory(this.appBuilderDir).wait();
-			this.$fs.createDirectory(this.appBuilderDir).wait();
+			this.$fs.deleteDirectory(this.appBuilderDir);
+			this.$fs.createDirectory(this.appBuilderDir);
 
 			let deviceFamily = req.query.deviceFamily.toLowerCase();
 			let archive = this.$fs.createWriteStream(this.packageLocation);
@@ -62,9 +62,9 @@ export class RemoteService implements IRemoteService {
 
 			this.$fs.unzip(this.packageLocation, this.appBuilderDir).wait();
 
-			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).wait().filter(minimatch.filter("*.app"))[0]);
+			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).filter(minimatch.filter("*.app"))[0]);
 
-			this.$iOSEmulatorServices.checkAvailability(false).wait();
+			this.$iOSEmulatorServices.checkAvailability(false);
 			let xcodeVersion = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait().xcodeVer,
 				xcodeVersionMatch = xcodeVersion.match(/Xcode (.*)/),
 				splittedVersion = xcodeVersionMatch && xcodeVersionMatch[1] && xcodeVersionMatch[1].split("."),

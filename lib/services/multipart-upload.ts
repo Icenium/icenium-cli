@@ -17,7 +17,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 
 	public uploadFileByChunks(filePath: string, bucketKey: string): IFuture<void> {
 		return (() => {
-			let fileSize: number = this.$fs.getFileSize(filePath).wait();
+			let fileSize: number = this.$fs.getFileSize(filePath);
 			let chunkStartByte = 0,
 				endByte: number;
 

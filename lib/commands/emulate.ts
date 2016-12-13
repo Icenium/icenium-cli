@@ -17,9 +17,9 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureAllPlatformAssets().wait();
-			this.$androidEmulatorServices.checkAvailability().wait();
-			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+			this.$project.ensureAllPlatformAssets();
+			this.$androidEmulatorServices.checkAvailability();
+			let tempDir = this.$project.getTempDir("emulatorfiles");
 			let packageFilePath = path.join(tempDir, "package.apk");
 			this.$buildService.build({
 				platform: this.$devicePlatformsConstants.Android,
@@ -59,13 +59,13 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureAllPlatformAssets().wait();
+			this.$project.ensureAllPlatformAssets();
 			this.$iOSEmulatorServices.checkDependencies().wait();
-			this.$iOSEmulatorServices.checkAvailability().wait();
+			this.$iOSEmulatorServices.checkAvailability();
 			let app = "";
 
 			if (!this.$options.availableDevices) {
-				let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+				let tempDir = this.$project.getTempDir("emulatorfiles");
 				app = this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa")).wait();
 			}
 
@@ -90,11 +90,11 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.ensureAllPlatformAssets().wait();
+			this.$project.ensureAllPlatformAssets();
 			this.$wp8EmulatorServices.checkDependencies().wait();
-			this.$wp8EmulatorServices.checkAvailability().wait();
+			this.$wp8EmulatorServices.checkAvailability();
 
-			let tempDir = this.$project.getTempDir("emulatorfiles").wait();
+			let tempDir = this.$project.getTempDir("emulatorfiles");
 			let packageFilePath = path.join(tempDir, "package.xap");
 			this.$buildService.build({
 				platform: this.$devicePlatformsConstants.WP8,

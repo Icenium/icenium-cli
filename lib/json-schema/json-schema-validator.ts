@@ -65,8 +65,8 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		}
 
 		let projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json",framework.toLowerCase()));
-		if(this.$fs.exists(projectPropertiesFilePath).wait()) {
-			let fileContent = this.$fs.readJson(projectPropertiesFilePath).wait();
+		if(this.$fs.exists(projectPropertiesFilePath)) {
+			let fileContent = this.$fs.readJson(projectPropertiesFilePath);
 			let additionalProperties = _.keys(fileContent);
 			_.each(additionalProperties, (propertyName: string) => {
 				_.each(_.keys(fileContent[propertyName]), (key: string) => {

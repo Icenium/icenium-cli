@@ -27,15 +27,15 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 
 	public prepareAppScaffolding(): IFuture<void> {
 		return (() => {
-			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig().wait();
+			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig();
 			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
 				return (() => {
 					let scaffoldingNodeModulesPath = path.join(this.appScaffoldingPath, "node_modules");
-					if (this.$fs.exists(scaffoldingNodeModulesPath).wait()) {
+					if (this.$fs.exists(scaffoldingNodeModulesPath)) {
 						// Call npm install for each dependency that ships with the scaffolding package itself
 						// this is done because calling npm install inside the scaffolding directory doesn't install dependencies' dependencies on some versions of npm
-						_.each(this.$fs.readDirectory(scaffoldingNodeModulesPath).wait(), dir => {
+						_.each(this.$fs.readDirectory(scaffoldingNodeModulesPath), dir => {
 							this.npmInstall(null, path.join(scaffoldingNodeModulesPath, dir)).wait();
 						});
 					}

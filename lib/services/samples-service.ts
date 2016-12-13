@@ -64,7 +64,7 @@ export class SamplesService implements ISamplesService {
 	public cloneSample(sampleName: string): IFuture<void> {
 		return (() => {
 			let cloneTo = this.$options.path || sampleName;
-			if (this.$fs.exists(cloneTo).wait() && this.$fs.readDirectory(cloneTo).wait().length > 0) {
+			if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 
@@ -82,7 +82,7 @@ export class SamplesService implements ISamplesService {
 				let filepath = path.join(tempDir, sampleName);
 				let file = this.$fs.createWriteStream(filepath);
 				let fileEnd = this.$fs.futureFromEvent(file, "finish");
-				let accessToken = this.getGitHubAccessTokenQueryParameter("?").wait();
+				let accessToken = this.getGitHubAccessTokenQueryParameter("?");
 				this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
 				fileEnd.wait();
 
@@ -92,7 +92,7 @@ export class SamplesService implements ISamplesService {
 				let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {
 					let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
-					this.$fs.copyFile(file, targetDir).wait();
+					this.$fs.copyFile(file, targetDir);
 				});
 			} finally {
 				let featureValue = sample.name;
@@ -103,7 +103,7 @@ export class SamplesService implements ISamplesService {
 
 				this.$analyticsService.track("CreateProjectFromSample", featureValue).wait();
 				try {
-					this.$fs.deleteDirectory(tempDir).wait();
+					this.$fs.deleteDirectory(tempDir);
 				} catch (error) {
 					this.$logger.debug(error);
 				}
@@ -185,7 +185,7 @@ export class SamplesService implements ISamplesService {
 		return (() => {
 			try {
 				let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
-				let accessToken = this.getGitHubAccessTokenQueryParameter("&").wait();
+				let accessToken = this.getGitHubAccessTokenQueryParameter("&");
 				let result = JSON.parse(this.$httpClient.httpRequest(`${requestUrl}${accessToken}`).wait().body);
 				return result;
 			} catch (error) {
@@ -224,25 +224,23 @@ export class SamplesService implements ISamplesService {
 		return matchedCategory ? matchedCategory.id : null;
 	}
 
-	private getGitHubAccessTokenQueryParameter(queryToken: string): IFuture<string> {
-		return ((): string => {
-			let accessToken = "";
-			let tokenFile = this.$staticConfig.GITHUB_ACCESS_TOKEN_FILEPATH;
-			try {
-				let content = this.$fs.readFile(tokenFile).wait();
-				if (content) {
-					accessToken = `${queryToken}access_token=${content}`;
-				}
-			} catch (err) {
-				if (err.code !== "ENOENT") {
-					this.$logger.trace(`Error happened while trying to open '${tokenFile}'. Error is: ${err}`);
-				} else {
-					this.$logger.trace(`File '${tokenFile}' does not exist. GitHub api calls will be executed without access_token.`);
-				}
+	private getGitHubAccessTokenQueryParameter(queryToken: string): string {
+		let accessToken = "";
+		let tokenFile = this.$staticConfig.GITHUB_ACCESS_TOKEN_FILEPATH;
+		try {
+			let content = this.$fs.readFile(tokenFile);
+			if (content) {
+				accessToken = `${queryToken}access_token=${content}`;
 			}
+		} catch (err) {
+			if (err.code !== "ENOENT") {
+				this.$logger.trace(`Error happened while trying to open '${tokenFile}'. Error is: ${err}`);
+			} else {
+				this.$logger.trace(`File '${tokenFile}' does not exist. GitHub api calls will be executed without access_token.`);
+			}
+		}
 
-			return accessToken;
-		}).future<string>()();
+		return accessToken;
 	}
 }
 $injector.register("samplesService", SamplesService);

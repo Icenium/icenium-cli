@@ -42,29 +42,27 @@ class ImageService implements IImageService {
 		}
 	}
 
-	public printDefinitions(): IFuture<void> {
-		return (() => {
-			let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
-				imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath).wait(),
-				table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
+	public printDefinitions(): void {
+		let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
+			imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath),
+			table = helpers.createTable(['Platform', 'Icon', 'Splash Screen'], []);
 
-			_.each(imageDefinitionsContents, imageDefinition => {
-				if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
-					return;
-				}
+		_.each(imageDefinitionsContents, imageDefinition => {
+			if (imageDefinition.Platform === 'WP8' && !this.$project.capabilities.wp8Supported) {
+				return;
+			}
 
-				let maxLength = Math.max(imageDefinition.Icons.length, imageDefinition.SplashScreens.length);
+			let maxLength = Math.max(imageDefinition.Icons.length, imageDefinition.SplashScreens.length);
 
-				for (let i = 0; i < maxLength; ++i) {
-					let platformName = i ? '' : imageDefinition.Platform;
-					this.pushImageToTable(table, platformName, imageDefinition.Icons[i], imageDefinition.SplashScreens[i]);
-				}
+			for (let i = 0; i < maxLength; ++i) {
+				let platformName = i ? '' : imageDefinition.Platform;
+				this.pushImageToTable(table, platformName, imageDefinition.Icons[i], imageDefinition.SplashScreens[i]);
+			}
 
-				table.push(['', '', '']);
-			});
+			table.push(['', '', '']);
+		});
 
-			this.$logger.out(table.toString());
-		}).future<void>()();
+		this.$logger.out(table.toString());
 	}
 
 	public promptForImageInformation(force: boolean): IFuture<void> {
@@ -86,7 +84,7 @@ class ImageService implements IImageService {
 
 	public generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void> {
 		return (() => {
-			this.validateImage(initialImagePath).wait();
+			this.validateImage(initialImagePath);
 
 			temp.track();
 			let inputImageStream = this.$fs.createReadStream(initialImagePath),
@@ -109,7 +107,7 @@ class ImageService implements IImageService {
 					return;
 				}
 
-				let projectImagePath = path.join(this.$project.appResourcesPath().wait(), imagePath.substring(imageBasePath.length));
+				let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
 				this.copyImageToProject(imagePath, projectImagePath).wait();
 			});
 		}).future<void>()();
@@ -117,10 +115,10 @@ class ImageService implements IImageService {
 
 	private copyImageToProject(imagePath: string, projectImagePath: string): IFuture<void> {
 		return (() => {
-			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath)).wait();
+			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
 
-			if (this.replaceAll || !this.$fs.exists(projectImagePath).wait()) {
-				return this.$fs.copyFile(imagePath, projectImagePath).wait();
+			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
+				return this.$fs.copyFile(imagePath, projectImagePath);
 			}
 
 			let replaceOptions = ['Yes for all', 'Yes', 'No', 'No for all'],
@@ -129,9 +127,9 @@ class ImageService implements IImageService {
 			switch (chosenOption) {
 				case replaceOptions[0]:
 					this.replaceAll = true;
-					return this.$fs.copyFile(imagePath, projectImagePath).wait();
+					return this.$fs.copyFile(imagePath, projectImagePath);
 				case replaceOptions[1]:
-					return this.$fs.copyFile(imagePath, projectImagePath).wait();
+					return this.$fs.copyFile(imagePath, projectImagePath);
 				case replaceOptions[3]:
 					this.$errors.failWithoutHelp('Operation canceled.');
 			}
@@ -149,20 +147,18 @@ class ImageService implements IImageService {
 		table.push(['', '', '']);
 	}
 
-	private validateImage(imagePath: string): IFuture<void> {
-		return (() => {
-			if (!imagePath) {
-				this.$errors.failWithoutHelp('You must providе a valid image path.');
-			}
+	private validateImage(imagePath: string): void {
+		if (!imagePath) {
+			this.$errors.failWithoutHelp('You must providе a valid image path.');
+		}
 
-			if (!this.$fs.exists(imagePath).wait()) {
-				this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
-			}
+		if (!this.$fs.exists(imagePath)) {
+			this.$errors.failWithoutHelp(`The specified file ${imagePath} does not exist.`);
+		}
 
-			if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {
-				this.$errors.failWithoutHelp('You must specify a PNG image source.');
-			}
-		}).future<void>()();
+		if (path.extname(imagePath) !== ImageConstants.PNG_EXTENSION) {
+			this.$errors.failWithoutHelp('You must specify a PNG image source.');
+		}
 	}
 
 	private getImageDimensions(image: ImageData): string {

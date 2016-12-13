@@ -18,7 +18,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		this.schemas = Object.create(null);
 		this.loadedSchemas = Object.create(null);
 
-		this.loadSchemas().wait();
+		this.loadSchemas();
 
 		let schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
 		this.$injector.register("jsonSchemaResolver", schemaResolver);
@@ -27,8 +27,8 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 	public downloadSchemas(): IFuture<void> {
 		return (() => {
 			temp.track();
-			this.$fs.deleteDirectory(this.schemasFolderPath).wait();
-			this.$fs.createDirectory(this.schemasFolderPath).wait();
+			this.$fs.deleteDirectory(this.schemasFolderPath);
+			this.$fs.createDirectory(this.schemasFolderPath);
 
 			let filePath = temp.path({suffix: ".zip"});
 			let file = this.$fs.createWriteStream(filePath);
@@ -42,23 +42,21 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		}).future<void>()();
 	}
 
-	private loadSchemas(): IFuture<void> {
-		return (() => {
-			if(this.$fs.exists(this.schemasFolderPath).wait()) {
+	private loadSchemas(): void {
+		if(this.$fs.exists(this.schemasFolderPath)) {
 
-				let fileNames = this.$fs.readDirectory(this.schemasFolderPath).wait();
-				_.each(fileNames, (fileName: string) => {
-					if( path.extname(fileName) === ".json") {
-						let fullFilePath = path.join(this.schemasFolderPath, fileName);
-						let schema = this.$fs.readJson(fullFilePath).wait();
-						this.schemas[schema.id] = schema;
-					}
-				});
+			let fileNames = this.$fs.readDirectory(this.schemasFolderPath);
+			_.each(fileNames, (fileName: string) => {
+				if( path.extname(fileName) === ".json") {
+					let fullFilePath = path.join(this.schemasFolderPath, fileName);
+					let schema = this.$fs.readJson(fullFilePath);
+					this.schemas[schema.id] = schema;
+				}
+			});
 
-				let schemas = _.values(this.schemas);
-				_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
-			}
-		}).future<void>()();
+			let schemas = _.values(this.schemas);
+			_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
+		}
 	}
 
 	private isSchemaLoaded(schemaId: string): boolean {

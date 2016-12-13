@@ -2,16 +2,14 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 	constructor(private $project: Project.IProject,
 		private $errors: IErrors) { }
 
-	public canStart(platform: string): IFuture<boolean> {
-		return (() => {
-			this.$project.ensureProject();
+	public canStart(platform: string): boolean {
+		this.$project.ensureProject();
 
-			if(this.$project.capabilities.emulate) {
-				return _.includes(this.$project.getProjectTargets().wait(), platform.toLowerCase());
-			}
+		if(this.$project.capabilities.emulate) {
+			return _.includes(this.$project.getProjectTargets(), platform.toLowerCase());
+		}
 
-			this.$errors.fail("The operation is not supported for %s projects.", this.$project.projectData.Framework);
-		}).future<boolean>()();
+		this.$errors.fail("The operation is not supported for %s projects.", this.$project.projectData.Framework);
 	}
 
 	public get minVersion(): number {

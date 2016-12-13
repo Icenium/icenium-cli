@@ -25,22 +25,20 @@ export abstract class FrameworkProjectBase implements Project.IFrameworkProjectB
 		return this.$jsonSchemaValidator.tryResolveValidationSchema(name);
 	}
 
-	public getProjectTargetsBase(dir: string, fileMask: RegExp): IFuture<string[]> {
-		return (() => {
-			let result: string[] = [];
+	public getProjectTargetsBase(dir: string, fileMask: RegExp): string[] {
+		let result: string[] = [];
 
-			if (dir) {
-				let files = this.$fs.readDirectory(dir).wait();
-				_.each(files, (file) => {
-					let matches = file.match(fileMask);
-					if (matches) {
-						result.push(matches[1].toLowerCase());
-					}
-				});
-			}
+		if (dir) {
+			let files = this.$fs.readDirectory(dir);
+			_.each(files, (file) => {
+				let matches = file.match(fileMask);
+				if (matches) {
+					result.push(matches[1].toLowerCase());
+				}
+			});
+		}
 
-			return result;
-		}).future<string[]>()();
+		return result;
 	}
 
 	public printAssetUpdateMessage(): void {

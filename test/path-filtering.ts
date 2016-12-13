@@ -60,7 +60,7 @@ describe("PathFilteringService", () => {
 	it("different OS line endings -> \\n", () => {
 		let fs: IFileSystem = testInjector.resolve("fs");
 		let ignoreRules = "a\nb";
-		fs.readText = () => ((_:string) => ignoreRules).future<string>()();
+		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
 		let expected = ["a","b"];
@@ -70,7 +70,7 @@ describe("PathFilteringService", () => {
 	it("different OS line endings -> \\r", () => {
 		let fs = testInjector.resolve("fs");
 		let ignoreRules = "a\rb";
-		fs.readText = () => (() => ignoreRules).future<string>()();
+		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
 		let expected = ["a","b"];
@@ -80,7 +80,7 @@ describe("PathFilteringService", () => {
 	it("different OS line endings -> \\r\\n", () => {
 		let fs = testInjector.resolve("fs");
 		let ignoreRules = "a\r\nb";
-		fs.readText = () => (() => ignoreRules).future<string>()();
+		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
 		let expected = ["a","b"];

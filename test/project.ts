@@ -344,7 +344,7 @@ describe("project integration tests", () => {
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
@@ -352,7 +352,7 @@ describe("project integration tests", () => {
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
@@ -360,7 +360,7 @@ describe("project integration tests", () => {
 			it("existing TypeScript.Blank project has project files after init", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
@@ -370,7 +370,7 @@ describe("project integration tests", () => {
 			it("existing project has project files after init", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
@@ -408,7 +408,7 @@ describe("project integration tests", () => {
 			it("existing project has configuration specific files and .abignore files after init", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
 				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
@@ -424,7 +424,7 @@ describe("project integration tests", () => {
 			it("Blank template has all mandatory files", () => {
 				options.template = "Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
@@ -435,7 +435,7 @@ describe("project integration tests", () => {
 			it("TypeScript.Blank template has mandatory files", () => {
 				options.template = "TypeScript.Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
@@ -446,7 +446,7 @@ describe("project integration tests", () => {
 			it("KendoUI.Drawer template has mandatory files", () => {
 				options.template = "KendoUI.Drawer";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
@@ -457,7 +457,7 @@ describe("project integration tests", () => {
 			it("When KendoUI.Blank is specified use KendoUI.Empty", () => {
 				options.template = "KendoUI.Blank";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = `cordova.${platform.toLowerCase()}.js`;
@@ -468,7 +468,7 @@ describe("project integration tests", () => {
 			it("KendoUI.Empty template has mandatory files", () => {
 				options.template = "KendoUI.Empty";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
@@ -479,7 +479,7 @@ describe("project integration tests", () => {
 			it("KendoUI.TabStrip template has mandatory files", () => {
 				options.template = "KendoUI.TabStrip";
 				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-				let projectDir = project.getProjectDir().wait();
+				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
 					let cordovaFile = util.format("cordova.%s.js", platform).toLowerCase();
@@ -495,7 +495,7 @@ describe("project integration tests", () => {
 			let projectName = "Test";
 			let projectFolder = path.join(tempFolder, projectName);
 
-			project.createTemplateFolder(projectFolder).wait();
+			project.createTemplateFolder(projectFolder);
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
@@ -505,7 +505,7 @@ describe("project integration tests", () => {
 			let projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
-			project.createTemplateFolder(projectFolder).wait();
+			project.createTemplateFolder(projectFolder);
 			assert.isTrue(fs.existsSync(projectFolder));
 		});
 
@@ -516,7 +516,7 @@ describe("project integration tests", () => {
 
 			fs.mkdirSync(projectFolder);
 			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", "0666"));
-			assert.throws(() => project.createTemplateFolder(projectFolder).wait());
+			assert.throws(() => project.createTemplateFolder(projectFolder));
 		});
 	});
 });
@@ -1015,25 +1015,25 @@ describe("project unit tests (canonical paths)", () => {
 	it("no ending path separator", () => {
 		options.path = "test";
 		project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
 	it("one ending path separator", () => {
 		options.path = "test" + path.sep;
 		project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
 	it("multiple ending path separator", () => {
 		options.path = "test" + path.sep + path.sep;
 		project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test"));
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test"));
 	});
 
 	it("do not remove separators which are not at the end", () => {
 		options.path = "test" + path.sep + "test" + path.sep;
 		project = testInjector.resolve(projectlib.Project);
-		assert.strictEqual(project.getProjectDir().wait(), path.join(process.cwd(), "test" + path.sep + "test"));
+		assert.strictEqual(project.getProjectDir(), path.join(process.cwd(), "test" + path.sep + "test"));
 	});
 });
 

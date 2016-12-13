@@ -1,9 +1,8 @@
 import * as path from "path";
 import * as util from "util";
 import * as temp from "temp";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
-import {FrameworkProjectBase} from "./framework-project-base";
-import Future = require("fibers/future");
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
+import { FrameworkProjectBase } from "./framework-project-base";
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -88,19 +87,17 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 
 	public checkSdkVersions(platform: string, projectData: Project.IData): void { /* this method is not applicable to {N} projects */ }
 
-	public projectTemplatesString(): IFuture<string> {
-		return ((): string => {
-			let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/, { "blank": "JavaScript.Blank" }).wait();
-			return templateStrings.replace(/TS[.]/g, "TypeScript.");
-		}).future<string>()();
+	public getProjectTemplatesString(): string {
+		let templateStrings = this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.NS\.(.+)\.zip/, { "blank": "JavaScript.Blank" });
+		return templateStrings.replace(/TS[.]/g, "TypeScript.");
 	}
 
 	public getProjectFileSchema(): IDictionary<any> {
 		return this.getProjectFileSchemaByName(this.name);
 	}
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> {
-		return Future.fromResult(["android", "ios"]);
+	public getProjectTargets(projectDir: string): string[] {
+		return ["android", "ios"];
 	}
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
@@ -111,51 +108,47 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return buildProperties;
 	}
 
-	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
-		return (() => {
-			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
-			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
-			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void {
+		let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+		let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+		let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
 
-			appResourceFiles.forEach((appResourceFile) => {
-				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
-				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
-					this.printAssetUpdateMessage();
-					this.$logger.trace("File not found, copying %s", appResourceFile);
-					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
-				}
-			});
-		}).future<void>()();
+		appResourceFiles.forEach((appResourceFile) => {
+			let relativePath = path.relative(appResourcesDir, appResourceFile);
+			let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
+			this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
+			if (!this.$fs.exists(targetFilePath)) {
+				this.printAssetUpdateMessage();
+				this.$logger.trace("File not found, copying %s", appResourceFile);
+				this.$fs.copyFile(appResourceFile, targetFilePath);
+			}
+		});
 	}
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			let packageJsonContent = this.$fs.readJson(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME)).wait();
-			let nativescript = packageJsonContent && packageJsonContent.nativescript;
-			let dependencies = packageJsonContent && packageJsonContent.dependencies;
-			if (nativescript && dependencies) {
-				let pluginsVariables: IStringDictionary = {};
-				_.keys(dependencies).forEach(dependency => {
-					let variablesKey = `${dependency}-variables`;
-					let variables = nativescript[variablesKey];
-					if (variables) {
-						pluginsVariables[dependency] = variables;
-					}
-				});
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		let packageJsonContent = this.$fs.readJson(path.join(projectDir, this.$projectConstants.PACKAGE_JSON_NAME));
+		let nativescript = packageJsonContent && packageJsonContent.nativescript;
+		let dependencies = packageJsonContent && packageJsonContent.dependencies;
+		if (nativescript && dependencies) {
+			let pluginsVariables: IDictionary<IStringDictionary> = {};
+			_.keys(dependencies).forEach(dependency => {
+				let variablesKey = `${dependency}-variables`;
+				let variables = nativescript[variablesKey];
+				if (variables) {
+					pluginsVariables[dependency] = variables;
+				}
+			});
 
-				return pluginsVariables;
-			}
+			return pluginsVariables;
+		}
 
-			return null;
-		}).future<IDictionary<IStringDictionary>>()();
+		return null;
 	}
 
 	public updateMigrationConfigFile(): IFuture<void> {
 		return (() => {
 			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
-			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName).wait();
+			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
 			let currentTime = this.$dateProvider.getCurrentDate();
 
 			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
@@ -175,11 +168,11 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 				return;
 			}
 
-			let newMigrationFileContent = this.$fs.readText(downloadedFilePath).wait();
-			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName).wait();
+			let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
+			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
 
 			if (currentMigrationFileContent !== newMigrationFileContent) {
-				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent).wait();
+				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
 				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
 			}
 		}).future<void>()();

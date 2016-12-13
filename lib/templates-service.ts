@@ -24,28 +24,27 @@ export class TemplatesService implements ITemplatesService {
 		return this.$resources.resolvePath("ItemTemplates");
 	}
 
-	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
-		return (() => {
-			let templates = _(this.$fs.readDirectory(this.projectTemplatesDir).wait())
-				.map((file) => {
-					let match = file.match(regexp),
-						templateName = match && match[1],
-						replacementName = templateName && replacementNames[templateName.toLowerCase()];
+	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string {
+		let templates = _(this.$fs.readDirectory(this.projectTemplatesDir))
+			.map((file) => {
+				let match = file.match(regexp),
+					templateName = match && match[1],
+					replacementName = templateName && replacementNames[templateName.toLowerCase()];
 
-					return replacementName || templateName;
-				})
-				.filter((file: string) => file !== null)
-				.value();
-			return helpers.formatListOfNames(templates);
-		}).future<string>()();
+				return replacementName || templateName;
+			})
+			.filter((file: string) => file !== null)
+			.value();
+
+		return helpers.formatListOfNames(templates);
 	}
 
 	public downloadProjectTemplates(): IFuture<void> {
 		return (() => {
 			let templates = this.$server.projects.getProjectTemplates().wait();
 			let templatesDir = this.projectTemplatesDir;
-			this.$fs.deleteDirectory(templatesDir).wait();
-			this.$fs.createDirectory(templatesDir).wait();
+			this.$fs.deleteDirectory(templatesDir);
+			this.$fs.createDirectory(templatesDir);
 
 			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
 		}).future<void>()();
@@ -55,8 +54,8 @@ export class TemplatesService implements ITemplatesService {
 		return (() => {
 			let templates = this.$server.projects.getItemTemplates().wait();
 			let templatesDir = this.itemTemplatesDir;
-			this.$fs.deleteDirectory(templatesDir).wait();
-			this.$fs.createDirectory(templatesDir).wait();
+			this.$fs.deleteDirectory(templatesDir);
+			this.$fs.createDirectory(templatesDir);
 
 			_.each(templates, (template) => {
 				if (template["Category"] === "Configuration") {

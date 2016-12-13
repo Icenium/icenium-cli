@@ -1,4 +1,5 @@
 import * as path from "path";
+import Future = require("fibers/future");
 
 export class ProjectSimulatorService implements IProjectSimulatorService {
 
@@ -36,7 +37,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 				"--frameworkversion", projectData.FrameworkVersion,
 				"--orientations", projectData.DeviceOrientations.join(";"),
 				"--corepluginspath", pluginsPath,
-				"--supportedplatforms", this.$project.getProjectTargets().wait().join(";"),
+				"--supportedplatforms", this.$project.getProjectTargets().join(";"),
 				"--plugins", (corePlugins || []).join(";")
 			];
 		}).future<string[]>()();
@@ -47,12 +48,12 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
 			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
 
-			if (!this.$fs.exists(pluginsPath).wait()) {
+			if (!this.$fs.exists(pluginsPath)) {
 				let zipFile: any;
 				try {
 					this.$logger.info("Downloading core Cordova plugins...");
 
-					this.$fs.createDirectory(pluginsPath).wait();
+					this.$fs.createDirectory(pluginsPath);
 					let zipPath = path.join(pluginsPath, "plugins.zip");
 
 					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
@@ -64,14 +65,26 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 					this.$logger.info("Finished downloading plugins.");
 				} catch(err) {
-					this.$fs.closeStream(zipFile).wait();
-					this.$fs.deleteDirectory(pluginsPath).wait();
+					this.closeStream(zipFile).wait();
+					this.$fs.deleteDirectory(pluginsPath);
 					throw err;
 				}
 			}
 
 			return pluginsPath;
 		}).future<string>()();
+	}
+
+	public closeStream(stream: any): IFuture<void> {
+		let future = new Future<void>();
+		stream.close((err: Error, data: any) => {
+			if (err) {
+				future.throw(err);
+			} else {
+				future.return();
+			}
+		});
+		return future;
 	}
 
 	private getPluginsDirName(serverVersion: string) {

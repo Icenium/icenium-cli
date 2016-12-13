@@ -24,39 +24,31 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		super($fs);
 
 		let configPath = this.getConfigPath("config");
-		if (!this.$fs.exists(configPath).wait()) {
-			let configBase = this.loadConfig("config-base").wait();
-			this.$fs.writeJson(configPath, configBase).wait();
+		if (!this.$fs.exists(configPath)) {
+			let configBase = this.loadConfig("config-base");
+			this.$fs.writeJson(configPath, configBase);
 		} else {
-			this.mergeConfig(this, this.loadConfig("config").wait());
+			this.mergeConfig(this, this.loadConfig("config"));
 		}
 	}
 
-	public reset(): IFuture<void> {
-		return this.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
+	public reset(): void {
+		return this.$fs.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
 	}
 
-	public apply(configName: string): IFuture<void> {
-		return ((): any => {
-			let baseConfig = this.loadConfig("config-base").wait();
-			let newConfig = this.loadConfig("config-" + configName).wait();
-			this.mergeConfig(baseConfig, newConfig);
-			this.saveConfig(baseConfig, "config").wait();
-		}).future<void>()();
+	public apply(configName: string): void {
+		let baseConfig = this.loadConfig("config-base");
+		let newConfig = this.loadConfig("config-" + configName);
+		this.mergeConfig(baseConfig, newConfig);
+		this.saveConfig(baseConfig, "config");
 	}
 
-	public printConfigData(): IFuture<void> {
-		return (() => {
-			let config = this.loadConfig("config").wait();
-			console.log(config);
-		}).future<void>()();
+	public printConfigData(): void {
+		let config = this.loadConfig("config");
+		console.log(config);
 	}
 
-	private copyFile(from: string, to: string): IFuture<void> {
-		return this.$fs.copyFile(from, to);
-	}
-
-	private saveConfig(config: IConfiguration, name: string): IFuture<void> {
+	private saveConfig(config: IConfiguration, name: string): void {
 		let configNoFunctions = Object.create(null);
 		_.each(<any>config, (entry, key) => {
 			if (typeof entry !== "function") {

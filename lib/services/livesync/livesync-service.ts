@@ -36,7 +36,7 @@ export class LiveSyncService implements ILiveSyncService {
 				this.$errors.failWithoutHelp("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
 			}
 
-			let projectDir = this.$project.getProjectDir().wait();
+			let projectDir = this.$project.getProjectDir();
 
 			let livesyncData: ILiveSyncData = {
 				platform: platform,

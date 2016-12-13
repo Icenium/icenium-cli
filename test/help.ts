@@ -28,18 +28,16 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 
 	injector.register("dynamicHelpProvider", dynamicHelpProviderLib.DynamicHelpProvider);
 	injector.register("dynamicHelpService", {
-		isProjectType: (...args: string[]): IFuture<boolean> => { return Future.fromResult(opts.isProjectTypeResult); },
+		isProjectType: (...args: string[]): boolean => opts.isProjectTypeResult,
 		isPlatform: (...args: string[]): boolean => { return opts.isPlatformResult; },
-		getLocalVariables: (): IFuture<IDictionary<any>> => {
-			return (() => {
-				let localVariables: IDictionary<any> = {};
-				localVariables["isCordova"] = opts.isProjectTypeResult;
-				localVariables["isNativeScript"] = opts.isProjectTypeResult;
-				localVariables["isLinux"] = opts.isPlatformResult;
-				localVariables["isWindows"] = opts.isPlatformResult;
-				localVariables["isMacOS"] = opts.isPlatformResult;
-				return localVariables;
-			}).future<IDictionary<any>>()();
+		getLocalVariables: (): IDictionary<any> => {
+			let localVariables: IDictionary<any> = {};
+			localVariables["isCordova"] = opts.isProjectTypeResult;
+			localVariables["isNativeScript"] = opts.isProjectTypeResult;
+			localVariables["isLinux"] = opts.isPlatformResult;
+			localVariables["isWindows"] = opts.isPlatformResult;
+			localVariables["isMacOS"] = opts.isPlatformResult;
+			return localVariables;
 		}
 	});
 	injector.register("microTemplateService", microTemplateServiceLib.MicroTemplateService);
@@ -67,7 +65,7 @@ describe("help", () => {
 
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <%= #{module.command} %> bla")
+			readText: () => "bla <%= #{module.command} %> bla"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -83,7 +81,7 @@ describe("help", () => {
 
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (#{module.command}) { %> secondBla <% } %>")
+			readText: () => "bla <% if (#{module.command}) { %> secondBla <% } %>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -101,7 +99,7 @@ describe("help", () => {
 
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (#{module.command}) { %>secondBla<% } %>")
+			readText: () => "bla <% if (#{module.command}) { %>secondBla<% } %>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -118,7 +116,7 @@ describe("help", () => {
 
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (false) { %> secondBla <% } %>")
+			readText: () => "bla <% if (false) { %> secondBla <% } %>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -134,7 +132,7 @@ describe("help", () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (true) { %>secondBla<% } %>")
+			readText: () => "bla <% if (true) { %>secondBla<% } %>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -150,7 +148,7 @@ describe("help", () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>")
+			readText: () => "bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -164,7 +162,7 @@ describe("help", () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>")
+			readText: () => "bla <% if (isCordova) { %>isCordova<% } %> <% if(isNativeScript) { %>isNativeScript<%}%>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -180,7 +178,7 @@ describe("help", () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isLinux) { %>isLinux<% } %> <% if(isWindows) { %>isWindows<%}%> <%if(isMacOS) {%>isMacOS<%}%>")
+			readText: () => "bla <% if (isLinux) { %>isLinux<% } %> <% if(isWindows) { %>isWindows<%}%> <%if(isMacOS) {%>isMacOS<%}%>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -193,7 +191,7 @@ describe("help", () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isLinux) { %>isLinux<% } %> <% if(isWindows) { %>isWindows<%}%> <%if(isMacOS) {%>isMacOS<%}%>")
+			readText: () => "bla <% if (isLinux) { %>isLinux<% } %> <% if(isWindows) { %>isWindows<%}%> <%if(isMacOS) {%>isMacOS<%}%>"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -212,7 +210,7 @@ describe("help", () => {
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
 			// all variables must be true
-			readText: () => Future.fromResult("bla <% if (isLinux) { %><% if(isCordova) {%>isLinux and isCordova <% } %><% } %>end")
+			readText: () => "bla <% if (isLinux) { %><% if(isCordova) {%>isLinux and isCordova <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -227,7 +225,7 @@ describe("help", () => {
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
 			// all variables must be false
-			readText: () => Future.fromResult("bla <% if (isLinux) { %><% if(isCordova) {%>isLinux and isCordova <% } %><% } %>end")
+			readText: () => "bla <% if (isLinux) { %><% if(isCordova) {%>isLinux and isCordova <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -244,7 +242,7 @@ describe("help", () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: true });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (isLinux) { %>isLinux <% if(isCordova) {%>isCordova <% } %><% } %>end")
+			readText: () => "bla <% if (isLinux) { %>isLinux <% if(isCordova) {%>isCordova <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -261,7 +259,7 @@ describe("help", () => {
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (#{module.command1}) { %>command1<% if(#{module.command2}) {%> and command2 <% } %><% } %>end")
+			readText: () => "bla <% if (#{module.command1}) { %>command1<% if(#{module.command2}) {%> and command2 <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -278,7 +276,7 @@ describe("help", () => {
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (#{module.command1}) { %>command1<% if(#{module.command2}) {%> and command2 <% } %><% } %>end")
+			readText: () => "bla <% if (#{module.command1}) { %>command1<% if(#{module.command2}) {%> and command2 <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -299,7 +297,7 @@ describe("help", () => {
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <% if (#{module.command1}) { %>command1 <% if(#{module.command2}) {%> and command2 <% if(#{module.command3}) { %>and command3 <% } %> <% } %><% } %>end")
+			readText: () => "bla <% if (#{module.command1}) { %>command1 <% if(#{module.command2}) {%> and command2 <% if(#{module.command3}) { %>and command3 <% } %> <% } %><% } %>end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -319,7 +317,7 @@ describe("help", () => {
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("bla <%= #{module.command1}%> <%= #{module.command2} %> <%= #{module.command3} %> end")
+			readText: () => "bla <%= #{module.command1}%> <%= #{module.command2} %> <%= #{module.command3} %> end"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
@@ -335,7 +333,7 @@ describe("help", () => {
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
-			readText: () => Future.fromResult("--[foo]-- bla <%= #{module.command1(param1, param2)}%> end--[/]--")
+			readText: () => "--[foo]-- bla <%= #{module.command1(param1, param2)}%> end--[/]--"
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);

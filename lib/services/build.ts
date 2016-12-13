@@ -1,7 +1,7 @@
 import * as util from "util";
 import * as querystring from "querystring";
 import * as path from "path";
-import {EOL} from "os";
+import { EOL } from "os";
 import * as plist from "plist";
 import * as iOSDeploymentValidatorLib from "../validators/ios-deployment-validator";
 import * as constants from "../common/constants";
@@ -178,7 +178,7 @@ export class BuildService implements Project.IBuildService {
 			} else if (settings.platform === "iOS") {
 				let appIdentifier = projectData.AppIdentifier;
 
-				let configFileContent = this.$project.getConfigFileContent("ios-info").wait();
+				let configFileContent = this.$project.getConfigFileContent("ios-info");
 				if (configFileContent) {
 					let parsed = plist.parse(configFileContent);
 					let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
@@ -291,8 +291,8 @@ export class BuildService implements Project.IBuildService {
 			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
 
 			if (result.output) {
-				let buildLogFilePath = path.join(this.$project.getTempDir().wait(), "build.log");
-				this.$fs.writeFile(buildLogFilePath, result.output).wait();
+				let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
+				this.$fs.writeFile(buildLogFilePath, result.output);
 				this.$logger.info("Build log written to '%s'", buildLogFilePath);
 			}
 
@@ -309,31 +309,29 @@ export class BuildService implements Project.IBuildService {
 		}).future<Project.IBuildResult>()();
 	}
 
-	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): IFuture<void> {
-		return (() => {
-			if (!packageDefs.length) {
-				return;
-			}
+	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): void {
+		if (!packageDefs.length) {
+			return;
+		}
 
-			let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir().wait(), path.basename(file)));
+		let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
+		let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir(), path.basename(file)));
 
-			_(_.zip(templateFiles, targetFiles)).each(zipped => {
-				let srcFile = zipped[0];
-				let targetFile = zipped[1];
-				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
-				this.$fs.copyFile(srcFile, targetFile).wait();
-			});
+		_(_.zip(templateFiles, targetFiles)).each(zipped => {
+			let srcFile = zipped[0];
+			let targetFile = zipped[1];
+			this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
+			this.$fs.copyFile(srcFile, targetFile);
+		});
 
-			let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
-			let htmlTemplateContents = this.$fs.readText(scanFile).wait();
-			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
-				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
-			this.$fs.writeFile(scanFile, htmlTemplateContents).wait();
+		let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
+		let htmlTemplateContents = this.$fs.readText(scanFile);
+		htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
+			.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
+		this.$fs.writeFile(scanFile, htmlTemplateContents);
 
-			this.$logger.debug("Updated scan.html");
-			this.$opener.open(scanFile);
-		}).future<void>()();
+		this.$logger.debug("Updated scan.html");
+		this.$opener.open(scanFile);
 	}
 
 	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
@@ -350,7 +348,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
 				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
-			this.$projectMigrationService.ensureAllPlatformAssets().wait();
+			this.$project.ensureAllPlatformAssets();
 			this.$projectMigrationService.migrateTypeScriptProject().wait();
 			this.$project.importProject().wait();
 
@@ -403,17 +401,17 @@ export class BuildService implements Project.IBuildService {
 					packageDownloadViewModels.push(aetDef);
 				}
 
-				this.showQRCodes(packageDownloadViewModels).wait();
+				this.showQRCodes(packageDownloadViewModels);
 			}
 
 			if (settings.downloadFiles) {
 				packageDefs.forEach((pkg: Server.IPackageDef) => {
 					let targetFileName: string;
 					if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
-						targetFileName = path.join(this.$project.getProjectDir().wait(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
+						targetFileName = path.join(this.$project.getProjectDir(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
 					} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
 						targetFileName = settings.downloadedFilePath
-							|| path.join(this.$project.getProjectDir().wait(), pkg.fileName);
+							|| path.join(this.$project.getProjectDir(), pkg.fileName);
 					} else {
 						// We will get here if the disposition is BuildResultMetadata which is not file for download.
 						return;
@@ -465,9 +463,9 @@ export class BuildService implements Project.IBuildService {
 	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
 		return (() => {
 			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
-			let tempDir = this.$project.getTempDir("emulatorFiles").wait();
+			let tempDir = this.$project.getTempDir("emulatorFiles");
 			this.$fs.unzip(packageFile, tempDir).wait();
-			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).wait().filter(minimatch.filter("*.app"))[0]);
+			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
 			return appFilePath;
 		}).future<string>()();
 	}
@@ -545,7 +543,7 @@ export class BuildService implements Project.IBuildService {
 			this.showQRCodes([{
 				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
 				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
-			}]).wait();
+			}]);
 		}).future<void>()();
 	}
 }

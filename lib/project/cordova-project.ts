@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as util from "util";
-import {FrameworkProjectBase} from "./framework-project-base";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
+import { FrameworkProjectBase } from "./framework-project-base";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import helpers = require("./../common/helpers");
 import semver = require("semver");
 import Future = require("fibers/future");
@@ -83,13 +83,11 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return this.$jsonSchemaConstants.CORDOVA_VERSION_3_SCHEMA_ID;
 	}
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			return this.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration, projectInformation);
-		}).future<IDictionary<IStringDictionary>>()();
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		return this.getProperty(this.$projectConstants.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration, projectInformation);
 	}
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> {
+	public getProjectTargets(projectDir: string): string[] {
 		let fileMask = /^cordova\.(\w*)\.js$/i;
 		return this.getProjectTargetsBase(projectDir, fileMask);
 	}
@@ -117,7 +115,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return util.format("%s.%s", CordovaProject.WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX, sanitizedName).substr(0, 50);
 	}
 
-	public projectTemplatesString(): IFuture<string> {
+	public getProjectTemplatesString(): string {
 		return this.$templatesService.getTemplatesString(/.*Telerik\.Mobile\.Cordova\.(.+)\.zip/, { "blank": "JavaScript.Blank", "kendoui.empty": "KendoUI.Blank" });
 	}
 
@@ -146,44 +144,39 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return buildProperties;
 	}
 
-	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
-		return (() => {
-			let platforms = this.$mobileHelper.platformNames;
-			_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion).wait());
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void {
+		let platforms = this.$mobileHelper.platformNames;
+		_.each(platforms, (platform: string) => this.ensureCordovaJs(platform, projectDir, frameworkVersion));
 
-			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
-			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
-			appResourceFiles.forEach((appResourceFile) => {
-				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
-				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
-					this.printAssetUpdateMessage();
-					this.$logger.trace("File not found, copying %s", appResourceFile);
-					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
-				}
-			});
-
-		}).future<void>()();
+		let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
+		let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+		appResourceFiles.forEach((appResourceFile) => {
+			let relativePath = path.relative(appResourcesDir, appResourceFile);
+			let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
+			this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
+			if (!this.$fs.exists(targetFilePath)) {
+				this.printAssetUpdateMessage();
+				this.$logger.trace("File not found, copying %s", appResourceFile);
+				this.$fs.copyFile(appResourceFile, targetFilePath);
+			}
+		});
 	}
 
 	public ensureProject(projectDir: string): IFuture<void> {
 		return Future.fromResult();
 	}
 
-	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): IFuture<void> {
-		return (() => {
-			let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),
-				cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform),
-				cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, ""),
-				shouldCopyCordovaJsFile = !this.$fs.exists(cordovaJsFilePath).wait() ||
-					this.$fs.readText(cordovaJsFilePath).wait().replace(CordovaProject.WHITESPACE_REGEX, "") !== cordovaJsSourceFileContents;
+	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): void {
+		let cordovaJsFilePath = path.join(projectDir, `cordova.${platform.toLowerCase()}.js`),
+			cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(frameworkVersion, platform),
+			cordovaJsSourceFileContents = this.$fs.readText(cordovaJsSourceFilePath).replace(CordovaProject.WHITESPACE_REGEX, ""),
+			shouldCopyCordovaJsFile = !this.$fs.exists(cordovaJsFilePath) ||
+				this.$fs.readText(cordovaJsFilePath).replace(CordovaProject.WHITESPACE_REGEX, "") !== cordovaJsSourceFileContents;
 
-			if (shouldCopyCordovaJsFile) {
-				this.printAssetUpdateMessage();
-				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFilePath).wait();
-			}
-		}).future<void>()();
+		if (shouldCopyCordovaJsFile) {
+			this.printAssetUpdateMessage();
+			this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFilePath);
+		}
 	}
 
 	public completeProjectProperties(properties: any): boolean {

@@ -23,7 +23,7 @@ export class SimulatorService implements ISimulatorService {
 		this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 
-		this.$projectMigrationService.ensureAllPlatformAssets().wait();
+		this.$project.ensureAllPlatformAssets();
 		this.$projectMigrationService.migrateTypeScriptProject().wait();
 		return this.runSimulator(simulatorPackageName);
 	}
@@ -44,7 +44,7 @@ export class SimulatorService implements ISimulatorService {
 			this.$logger.info("Starting simulator...");
 
 			let simulatorParams = [
-				"--path", this.$project.getProjectDir().wait(),
+				"--path", this.$project.getProjectDir(),
 				"--assemblypaths", this.simulatorPath,
 				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];

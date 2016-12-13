@@ -30,23 +30,13 @@ function createTestInjector(): IInjector {
 		projectType: 1 // Cordova
 	});
 	let migrationService = {
-		getSupportedVersions: (): IFuture<string[]> => {
-			return (() => {
-				return ["1.0.0", "1.0.1", "1.0.2"];
-			}).future<string[]>()();
+		getSupportedVersions: (): string[] => ["1.0.0", "1.0.1", "1.0.2"],
+
+		getSupportedFrameworks: (): IFrameworkVersion[] => {
+			return [{ displayName: "version_1_0_0", version: "1.0.0" }, { displayName: "version_1_0_1", version: "1.0.1" }];
 		},
 
-		getSupportedFrameworks: (): IFuture<IFrameworkVersion[]> => {
-			return (() => {
-				return [{ displayName: "version_1_0_0", version: "1.0.0" }, { displayName: "version_1_0_1", version: "1.0.1" }];
-			}).future<IFrameworkVersion[]>()();
-		},
-
-		getDisplayNameForVersion: (version: string): IFuture<string> => {
-			return ((): string => {
-				return "version_1_0_0";
-			}).future<string>()();
-		}
+		getDisplayNameForVersion: (version: string): string =>  "version_1_0_0"
 	};
 
 	testInjector.register("cordovaMigrationService", migrationService);

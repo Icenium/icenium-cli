@@ -39,7 +39,7 @@ export class UserDataStore implements IUserDataStore {
 			(value: string) => this.user = JSON.parse(value));
 	}
 
-	public setCookies(cookies?: IStringDictionary): IFuture<void> {
+	public setCookies(cookies?: IStringDictionary): void {
 		this.cookies = cookies;
 		if(this.cookies) {
 			return this.$fs.writeFile(this.getCookieFilePath(), JSON.stringify(this.cookies));
@@ -48,7 +48,7 @@ export class UserDataStore implements IUserDataStore {
 		}
 	}
 
-	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void> {
+	public parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): void {
 		cookies = cookies || {};
 		_.each(setCookieHeader, (cookieStr: string) => {
 			let parsed = cookielib.parse(cookieStr);
@@ -65,10 +65,10 @@ export class UserDataStore implements IUserDataStore {
 		return (() => {
 			this.user = user;
 			if(user) {
-				this.$fs.writeJson(this.getUserStateFilePath(), user).wait();
+				this.$fs.writeJson(this.getUserStateFilePath(), user);
 				this.trackTenantInformation(user).wait();
 			} else {
-				this.$fs.deleteFile(this.getUserStateFilePath()).wait();
+				this.$fs.deleteFile(this.getUserStateFilePath());
 			}
 		}).future<void>()();
 
@@ -76,14 +76,14 @@ export class UserDataStore implements IUserDataStore {
 
 	public clearLoginData(): IFuture<void> {
 		return (() => {
-			this.setCookies(null).wait();
+			this.setCookies(null);
 			this.setUser(null).wait();
 		}).future<void>()();
 	}
 
 	private checkCookieExists<T>(sourceFile: string, getter: () => T): IFuture<boolean> {
 		return (() => {
-			return (getter() || this.$fs.exists(sourceFile).wait());
+			return (getter() || this.$fs.exists(sourceFile));
 		}).future<boolean>()();
 	}
 
@@ -94,7 +94,7 @@ export class UserDataStore implements IUserDataStore {
 					throw new Error("Not logged in.");
 				}
 
-				let contents = this.$fs.readText(sourceFile).wait();
+				let contents = this.$fs.readText(sourceFile);
 				try {
 					setter(contents);
 				} catch(err) {
@@ -161,7 +161,7 @@ export class LoginManager implements ILoginManager {
 	private localLogout(): IFuture<void> {
 		return (() => {
 			this.$userDataStore.clearLoginData().wait();
-			this.$sharedUserSettingsFileService.deleteUserSettingsFile().wait();
+			this.$sharedUserSettingsFileService.deleteUserSettingsFile();
 		}).future<void>()();
 	}
 
@@ -186,7 +186,7 @@ export class LoginManager implements ILoginManager {
 
 	private doLogin(): IFuture<void> {
 		return (() => {
-			this.$fs.createDirectory(this.$options.profileDir).wait();
+			this.$fs.createDirectory(this.$options.profileDir);
 
 			this.loginInBrowser().wait();
 
@@ -258,7 +258,7 @@ export class LoginManager implements ILoginManager {
 			}
 
 			let cookies = JSON.parse(cookieData);
-			this.$userDataStore.setCookies(cookies).wait();
+			this.$userDataStore.setCookies(cookies);
 
 			let userData = this.$server.authentication.getLoggedInUser().wait();
 			this.$userDataStore.setUser(<any>userData).wait();
@@ -280,7 +280,7 @@ export class LoginManager implements ILoginManager {
 
 			let cookies = response.headers["set-cookie"];
 			if(cookies) {
-				this.$userDataStore.parseAndSetCookies(cookies).wait();
+				this.$userDataStore.parseAndSetCookies(cookies);
 
 				let userData = this.$server.authentication.getLoggedInUser().wait();
 				this.$userDataStore.setUser(<any>userData).wait();

@@ -52,19 +52,19 @@ export class FileSystemStub implements IFileSystem {
 	unzip(zipFile: string, destination: string): IFuture<void> {
 		return undefined;
 	}
-	exists(path: string): IFuture<boolean> {
-		return Future.fromResult(true);
+	exists(path: string): boolean {
+		return true;
 	}
 
-	deleteFile(path: string): IFuture<void> {
+	deleteFile(path: string): void {
 		return undefined;
 	}
 
-	deleteDirectory(directory: string): IFuture<any> {
-		return Future.fromResult();
+	deleteDirectory(directory: string): any {
+		return null;
 	}
 
-	getFileSize(path: string): IFuture<number> {
+	getFileSize(path: string): number {
 		return undefined;
 	}
 
@@ -72,39 +72,37 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	createDirectory(path: string): IFuture<void> {
+	createDirectory(path: string): void {
 		return undefined;
 	}
 
-	readDirectory(path: string): IFuture<string[]> {
-		return Future.fromResult([]);
+	readDirectory(path: string): string[] {
+		return [];
 	}
 
-	readFile(filename: string): IFuture<NodeBuffer> {
+	readFile(filename: string): NodeBuffer|string {
 		return undefined;
 	}
 
-	readText(filename: string, encoding?: string): IFuture<string> {
-		return Future.fromResult("");
+	readText(filename: string, encoding?: string): string {
+		return "";
 	}
 
-	readJson(filename: string, encoding?: string): IFuture<any> {
-		return Future.fromResult({});
+	readJson(filename: string, encoding?: string): any {
+		return {};
 	}
 
-	writeFile(filename: string, data: any, encoding?: string): IFuture<void> {
+	writeFile(filename: string, data: any, encoding?: string): void {
 		return undefined;
 	}
 
-	appendFile(filename: string, data: any, encoding?: string): IFuture<void> {
+	appendFile(filename: string, data: any, encoding?: string): void {
 		return undefined;
 	}
 
-	writeJson(filename: string, data: any, space?: string, encoding?: string): IFuture<void> {
-		return Future.fromResult();
-	}
+	writeJson(filename: string, data: any, space?: string, encoding?: string): void { }
 
-	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
+	copyFile(sourceFileName: string, destinationFileName: string): void {
 		return undefined;
 	}
 
@@ -118,19 +116,19 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	chmod(path: string, mode: any): IFuture<any> {
+	chmod(path: string, mode: any): any {
 		return undefined;
 	}
 
-	getUniqueFileName(baseName: string): IFuture<string> {
+	getUniqueFileName(baseName: string): string {
 		return undefined;
 	}
 
-	getFsStats(path: string): IFuture<IFsStats> {
+	getFsStats(path: string): IFsStats {
 		return undefined;
 	}
 
-	isEmptyDir(directoryPath: string): IFuture<boolean> {
+	isEmptyDir(directoryPath: string): boolean {
 		return undefined;
 	}
 
@@ -138,23 +136,19 @@ export class FileSystemStub implements IFileSystem {
 		return false;
 	}
 
-	ensureDirectoryExists(directoryPath: string): IFuture<void> {
-		return Future.fromResult();
-	}
-
-	rename(oldPath: string, newPath: string): IFuture<void> {
+	ensureDirectoryExists(directoryPath: string): void {
 		return undefined;
 	}
 
-	renameIfExists(oldPath: string, newPath: string): IFuture<boolean> {
+	rename(oldPath: string, newPath: string): void {
 		return undefined;
 	}
 
-	symlink(sourePath: string, destinationPath: string): IFuture<void> {
+	renameIfExists(oldPath: string, newPath: string): boolean {
 		return undefined;
 	}
 
-	closeStream(stream: any): IFuture<void> {
+	symlink(sourePath: string, destinationPath: string): void {
 		return undefined;
 	}
 
@@ -164,10 +158,6 @@ export class FileSystemStub implements IFileSystem {
 
 	enumerateFilesInDirectorySync(directoryPath: string, filterCallback?: (file: string, stat: IFsStats) => boolean): string[] {
 		return [];
-	}
-
-	tryExecuteFileOperation(path: string, operation: () => IFuture<any>, enoentErrorMessage?: string): IFuture<void> {
-		return undefined;
 	}
 
 	getFileShasum(fileName: string): IFuture<string> {
@@ -180,11 +170,9 @@ export class FileSystemStub implements IFileSystem {
 
 	rm(options: string, ...files: string[]) { }
 
-	deleteEmptyParents(directory: string): IFuture<void> {
-		return Future.fromResult();
-	}
+	deleteEmptyParents(directory: string): void { }
 
-	getLsStats(path: string): IFuture<IFsStats> {
+	getLsStats(path: string): IFsStats {
 		return undefined;
 	}
 }
@@ -302,7 +290,7 @@ export class TemplateServiceStub implements ITemplatesService {
 		return path.join(__dirname, "../resources/ItemTemplates");
 	}
 
-	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): IFuture<string> {
+	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string {
 		return undefined;
 	}
 
@@ -363,7 +351,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return util.format("Telerik.Mobile.%s.%s.zip", this.framework, name);
 	}
 
-	public projectTemplatesString(): IFuture<string> { return undefined; }
+	public getProjectTemplatesString(): string { return undefined; }
 
 	public alterPropertiesForNewProject(properties: any, projectName: string): void { }
 
@@ -373,11 +361,11 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
 
-	public getProjectTargets(projectDir: string): IFuture<string[]> { return undefined; }
+	public getProjectTargets(projectDir: string): string[] { return undefined; }
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any { return undefined; }
 
-	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void { return undefined; }
 
 	public getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
 
@@ -385,8 +373,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public pluginsService: IPluginsService;
 
-	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return Future.fromResult(null);
+	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
+		return null;
 	}
 
 	public updateMigrationConfigFile(): IFuture<void> {
@@ -403,8 +391,8 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return null;
 	}
 
-	public getProjectTargetsBase(projectDir: string, fileMask: RegExp): IFuture<string[]> {
-		return Future.fromResult([]);
+	public getProjectTargetsBase(projectDir: string, fileMask: RegExp): string[] {
+		return [];
 	}
 
 	public printAssetUpdateMessage(): void { /* No implementation required. */ }
@@ -415,7 +403,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 }
 
 export class ProjectFilesManager implements IProjectFilesManager {
-	public getProjectFiles(projectFilesPath: string, additionalExcludedProjectDirsAndFiles?: string[], filter?: (filePath: string, stat: IFsStats) => IFuture<boolean>, opts?: any): string[] {
+	public getProjectFiles(projectFilesPath: string, additionalExcludedProjectDirsAndFiles?: string[], filter?: (filePath: string, stat: IFsStats) => boolean, opts?: any): string[] {
 		return undefined;
 	}
 
@@ -427,7 +415,7 @@ export class ProjectFilesManager implements IProjectFilesManager {
 		return undefined;
 	}
 
-	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): IFuture<void> {
+	public processPlatformSpecificFiles(directoryPath: string, platform: string, excludedDirs?: string[]): void {
 		return undefined;
 	}
 }

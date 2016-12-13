@@ -205,11 +205,7 @@ function createTestInjector(): IInjector {
 
 function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInjector {
 	testInjector.register("resources", {
-		readJson: (resourcePath: string): IFuture<any> => {
-			return (() => {
-				return commandHelpData;
-			}).future()();
-		},
+		readJson: (resourcePath: string): any => commandHelpData,
 		resolvePath: (resourcePath: string): string => {
 			return '';
 		}
@@ -452,7 +448,6 @@ describe("commands service", () => {
 			commandsService = testInjector.resolve("commandsService");
 
 			commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []).wait();
-
 			assert.deepEqual(loggerOutput, commandHelpData.testingCommand);
 		});
 

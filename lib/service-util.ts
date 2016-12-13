@@ -67,7 +67,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			let newCookies = response.headers["set-cookie"];
 
 			if (newCookies) {
-				this.$userDataStore.parseAndSetCookies(newCookies, cookies).wait();
+				this.$userDataStore.parseAndSetCookies(newCookies, cookies);
 			}
 
 			let resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;

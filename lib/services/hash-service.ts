@@ -12,7 +12,7 @@ export class HashService implements IHashService {
 
 	public getFileHash(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): IFuture<string> {
 		return ((): string => {
-			this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding).wait();
+			this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding);
 
 			let cryptoHash = crypto.createHash(hashAlgorithm);
 			let future = new Future<void>();
@@ -38,22 +38,20 @@ export class HashService implements IHashService {
 		}).future<string>()();
 	}
 
-	private validateInputParameters(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): IFuture<void> {
-		return (() => {
-			if(!this.$fs.exists(filePath).wait()) {
-				this.$errors.fail(util.format("Specified file %s does not exist.", filePath));
-			}
+	private validateInputParameters(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): void {
+		if(!this.$fs.exists(filePath)) {
+			this.$errors.fail(util.format("Specified file %s does not exist.", filePath));
+		}
 
-			if(!_.includes(HashService.validInputEncodings, inputEncoding)) {
-				this.$errors.fail(util.format("Specified input file encoding %s is not valid. Valid values are %s", inputEncoding, HashService.validInputEncodings));
-			}
+		if(!_.includes(HashService.validInputEncodings, inputEncoding)) {
+			this.$errors.fail(util.format("Specified input file encoding %s is not valid. Valid values are %s", inputEncoding, HashService.validInputEncodings));
+		}
 
-			this.validateHashAlgorithm(hashAlgorithm);
+		this.validateHashAlgorithm(hashAlgorithm);
 
-			if(!_.includes(HashService.validHashEncodings, hashEncoding)) {
-				this.$errors.fail(util.format("Specified hash encoding %s is not valid. Valid values are %s", hashEncoding, HashService.validHashEncodings));
-			}
-		}).future<void>()();
+		if(!_.includes(HashService.validHashEncodings, hashEncoding)) {
+			this.$errors.fail(util.format("Specified hash encoding %s is not valid. Valid values are %s", hashEncoding, HashService.validHashEncodings));
+		}
 	}
 
 	private validateHashAlgorithm(hashAlgorithm: string): void {

@@ -55,7 +55,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	public get projectDir(): string {
-		return this.getProjectDir().wait();
+		return this.getProjectDir();
 	}
 
 	public get capabilities(): Project.ICapabilities {
@@ -72,7 +72,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public get projectData(): Project.IData {
 		if (!this._projectData) {
-			this.readProjectData().wait();
+			this.readProjectData();
 		}
 
 		return this._projectData;
@@ -88,34 +88,30 @@ export class Project extends ProjectBase implements Project.IProject {
 		return this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject) || super.getShouldSaveProject();
 	}
 
-	public getPluginVariablesInfo(configuration?: string): IFuture<IDictionary<IStringDictionary>> {
-		return (() => {
-			return this.frameworkProject.getPluginVariablesInfo(this.projectInformation, this.getProjectDir().wait(), configuration).wait();
-		}).future<IDictionary<IStringDictionary>>()();
+	public getPluginVariablesInfo(configuration?: string): IDictionary<IStringDictionary> {
+		return this.frameworkProject.getPluginVariablesInfo(this.projectInformation, this.getProjectDir(), configuration);
 	}
 
-	public getProjectTargets(): IFuture<string[]> {
-		return (() => {
-			let projectDir = this.getProjectDir().wait();
-			let projectTargets = this.frameworkProject.getProjectTargets(projectDir).wait();
-			return projectTargets;
-		}).future<string[]>()();
+	public getProjectTargets(): string[] {
+		let projectDir = this.getProjectDir();
+		let projectTargets = this.frameworkProject.getProjectTargets(projectDir);
+		return projectTargets;
 	}
 
-	public getConfigFileContent(template: string): IFuture<any> {
-		return (() => {
-			let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
-			if (configFile) {
-				try {
-					let configFileContent = this.$fs.readText(configFile.filepath).wait();
-					return configFileContent;
-				} catch (e) {
-					return null;
-				}
+	public getConfigFileContent(template: string): any {
+		let configFile = _.find(this.projectConfigFiles, _configFile => _configFile.template === template);
+
+		if (configFile) {
+			try {
+				let configFileContent = this.$fs.readText(configFile.filepath);
+				return configFileContent;
+			} catch (e) {
+				this.$logger.trace(`Error while trying to read file: ${configFile.filepath}. Error is: {e.message}.`);
+				return null;
 			}
+		}
 
-			return null;
-		}).future<any>()();
+		return null;
 	}
 
 	public configurationFilesString(): string {
@@ -184,57 +180,52 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
-	public getProjectDir(): IFuture<string> {
-		return (() => {
-			if (this.cachedProjectDir) {
-				return this.cachedProjectDir;
-			}
-			this.cachedProjectDir = null;
-
-			let projectDir = path.resolve(this.$options.path || ".");
-			while (true) {
-				this.$logger.trace("Looking for project in '%s'", projectDir);
-
-				if (this.$fs.exists(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME)).wait()) {
-					this.$logger.debug("Project directory is '%s'.", projectDir);
-					this.cachedProjectDir = projectDir;
-					break;
-				}
-
-				let dir = path.dirname(projectDir);
-				if (dir === projectDir) {
-					this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
-					break;
-				}
-				projectDir = dir;
-			}
-
+	public getProjectDir(): string {
+		if (this.cachedProjectDir) {
 			return this.cachedProjectDir;
-		}).future<string>()();
-	}
+		}
+		this.cachedProjectDir = null;
 
-	public appResourcesPath(): IFuture<string> {
-		return (() => {
-			return path.join(this.getProjectDir().wait(), this.frameworkProject.relativeAppResourcesPath);
-		}).future<string>()();
-	}
+		let projectDir = path.resolve(this.$options.path || ".");
+		while (true) {
+			this.$logger.trace("Looking for project in '%s'", projectDir);
 
-	public createTemplateFolder(projectDir: string): IFuture<void> {
-		return (() => {
-			this.$fs.createDirectory(projectDir).wait();
-			let projectDirFiles = this.$fs.readDirectory(projectDir).wait();
-
-			if (projectDirFiles.length !== 0) {
-				this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
+			if (this.$fs.exists(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME))) {
+				this.$logger.debug("Project directory is '%s'.", projectDir);
+				this.cachedProjectDir = projectDir;
+				break;
 			}
-		}).future<void>()();
+
+			let dir = path.dirname(projectDir);
+			if (dir === projectDir) {
+				this.$logger.debug("No project found at or above '%s'.", path.resolve("."));
+				break;
+			}
+			projectDir = dir;
+		}
+
+		return this.cachedProjectDir;
 	}
 
+	public appResourcesPath(): string {
+		return path.join(this.getProjectDir(), this.frameworkProject.relativeAppResourcesPath);
+	}
+
+	public createTemplateFolder(projectDir: string): void {
+		this.$fs.createDirectory(projectDir);
+		let projectDirFiles = this.$fs.readDirectory(projectDir);
+
+		if (projectDirFiles.length !== 0) {
+			this.$errors.fail("The specified directory '%s' must be empty to create a new project.", projectDir);
+		}
+	}
+
+	// TODO: Remove IFuture, reason: writeJson
 	public createProjectFile(projectDir: string, properties: any): IFuture<void> {
 		return ((): void => {
 			properties = properties || {};
 
-			this.$fs.createDirectory(projectDir).wait();
+			this.$fs.createDirectory(projectDir);
 			this.cachedProjectDir = projectDir;
 			this.projectData = properties;
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
@@ -242,7 +233,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.$projectPropertiesService.completeProjectProperties(this.projectData, this.frameworkProject);
 
 			this.validateProjectData(this.projectData);
-			this.saveProject(projectDir).wait();
+			this.saveProject(projectDir);
 		}).future<void>()();
 	}
 
@@ -260,26 +251,24 @@ export class Project extends ProjectBase implements Project.IProject {
 		return [`*${this.$projectConstants.PROJECT_FILE}`, `*${this.$projectConstants.PROJECT_IGNORE_FILE}`];
 	}
 
-	public isIonicProject(projectDir: string): IFuture<boolean> {
-		return (() => {
-			let result = false;
-			let oldIonicProjectFile = path.join(projectDir, "ionic.project");
-			let newIonicProjectFile = path.join(projectDir, "ionic.config.json");
-			let ionicProject = this.$fs.exists(oldIonicProjectFile).wait() ? oldIonicProjectFile : newIonicProjectFile;
-			let packageJson = path.join(projectDir, "package.json");
-			let hasIonicProject = this.$fs.exists(ionicProject).wait();
-			let hasPackageJson = this.$fs.exists(packageJson).wait();
-			if (hasIonicProject && hasPackageJson) {
-				try {
-					let content = this.$fs.readJson(ionicProject).wait();
-					result = _.has(content, "name") && _.has(content, "app_id");
-				} catch (e) {
-					// it is not valid Ionic project, leave the value of `result` as is
-				}
+	public isIonicProject(projectDir: string): boolean {
+		let result = false;
+		let oldIonicProjectFile = path.join(projectDir, "ionic.project");
+		let newIonicProjectFile = path.join(projectDir, "ionic.config.json");
+		let ionicProject = this.$fs.exists(oldIonicProjectFile) ? oldIonicProjectFile : newIonicProjectFile;
+		let packageJson = path.join(projectDir, "package.json");
+		let hasIonicProject = this.$fs.exists(ionicProject);
+		let hasPackageJson = this.$fs.exists(packageJson);
+		if (hasIonicProject && hasPackageJson) {
+			try {
+				let content = this.$fs.readJson(ionicProject);
+				result = _.has(content, "name") && _.has(content, "app_id");
+			} catch (e) {
+				// it is not valid Ionic project, leave the value of `result` as is
 			}
+		}
 
-			return result;
-		}).future<boolean>()();
+		return result;
 	}
 
 	public initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void> {
@@ -288,11 +277,11 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			projectDir = projectDir || this.getNewProjectDir();
 
-			if (!this.$fs.exists(projectDir).wait()) {
+			if (!this.$fs.exists(projectDir)) {
 				this.$errors.failWithoutHelp(`The specified folder '${projectDir}' does not exist!`);
 			}
 
-			let ionicProject = this.isIonicProject(projectDir).wait();
+			let ionicProject = this.isIonicProject(projectDir);
 			let createBackupOfIonicProject: boolean = false;
 			if (ionicProject && !this.$options.force) {
 				this.$logger.warn(prompt);
@@ -300,7 +289,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			}
 
 			let projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
-			if (this.$fs.exists(projectFile).wait()) {
+			if (this.$fs.exists(projectFile)) {
 				this.$errors.failWithoutHelp("The specified folder is already an AppBuilder command line project!");
 			}
 
@@ -327,7 +316,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			try {
 				this.validateProjectData(this.projectData);
-				this.saveProject(projectDir).wait();
+				this.saveProject(projectDir);
 			} catch (e) {
 				this.$errors.fail("There was an error while initialising the project: " + EOL + e);
 			}
@@ -354,30 +343,27 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
-	private enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): IFuture<string[]> {
-		return (() => {
-			let projectDir = this.getProjectDir().wait();
-			let filter = (filePath: string, stat: IFsStats) => {
-				return (() => {
-					let isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE)).wait();
-					return isSubprojectDir;
-				}).future<boolean>()();
-			};
-			let projectFiles = this.$projectFilesManager.getProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles, filter);
-			return projectFiles;
-		}).future<string[]>()();
+	private enumerateProjectFiles(additionalExcludedProjectDirsAndFiles?: string[]): string[] {
+		let projectDir = this.getProjectDir();
+
+		let filter = (filePath: string, stat: IFsStats) => {
+			let isSubprojectDir = stat.isDirectory() && this.$fs.exists(path.join(filePath, this.$projectConstants.PROJECT_FILE));
+			return isSubprojectDir;
+		};
+
+		let projectFiles = this.$projectFilesManager.getProjectFiles(projectDir, additionalExcludedProjectDirsAndFiles, filter);
+
+		return projectFiles;
 	}
 
-	public getTempDir(extraSubdir?: string): IFuture<string> {
-		return (() => {
-			let dir = path.join(this.getProjectDir().wait(), ".ab");
-			this.$fs.createDirectory(dir).wait();
-			if (extraSubdir) {
-				dir = path.join(dir, extraSubdir);
-				this.$fs.createDirectory(dir).wait();
-			}
-			return dir;
-		}).future<string>()();
+	public getTempDir(extraSubdir?: string): string {
+		let dir = path.join(this.getProjectDir(), ".ab");
+		this.$fs.createDirectory(dir);
+		if (extraSubdir) {
+			dir = path.join(dir, extraSubdir);
+			this.$fs.createDirectory(dir);
+		}
+		return dir;
 	}
 
 	public getConfigurationsSpecifiedByUser(): string[] {
@@ -440,7 +426,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations).wait();
 
-			this.saveProject(this.getProjectDir().wait(), this.getAllConfigurationsNames()).wait();
+			this.saveProject(this.getProjectDir(), this.getAllConfigurationsNames());
 			projectConfigurations.forEach(configuration => {
 				this.printProjectProperty(normalizedPropertyName, configuration).wait();
 			});
@@ -661,11 +647,9 @@ export class Project extends ProjectBase implements Project.IProject {
 		return this.frameworkProject.requiredAndroidApiLevel;
 	}
 
-	public ensureAllPlatformAssets(): IFuture<void> {
-		return (() => {
-			let projectDir = this.getProjectDir().wait();
-			this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion).wait();
-		}).future<void>()();
+	public ensureAllPlatformAssets(): void {
+		let projectDir = this.getProjectDir();
+		this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion);
 	}
 
 	private validateProjectData(properties: any): void {
@@ -675,32 +659,30 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
-	public saveProject(projectDir: string, configurations?: string[]): IFuture<void> {
-		return (() => {
-			let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
-			projectDir = projectDir || this.getProjectDir().wait();
-			this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData).wait();
+	public saveProject(projectDir: string, configurations?: string[]): void {
+		let configs = (configurations && configurations.length > 0) ? configurations : this.configurations;
+		projectDir = projectDir || this.getProjectDir();
+		this.$fs.writeJson(path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME), this.projectData);
 
-			_.each(configs, (configuration: string) => {
-				let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
+		_.each(configs, (configuration: string) => {
+			let configFilePath = path.join(projectDir, util.format(".%s%s", configuration, this.$projectConstants.PROJECT_FILE));
 
-				if (this.$fs.exists(configFilePath).wait() && this.configurationSpecificData[configuration]) {
-					let configurationSpecificKeys = _.reduce(this.configurationSpecificData[configuration], (result, value, key) => _.isEqual(value, this.projectData[key]) ? result : result.concat(key), []);
-					this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], configurationSpecificKeys)).wait();
-				}
-			});
-		}).future<void>()();
+			if (this.$fs.exists(configFilePath) && this.configurationSpecificData[configuration]) {
+				let configurationSpecificKeys = _.reduce(this.configurationSpecificData[configuration], (result, value, key) => _.isEqual(value, this.projectData[key]) ? result : result.concat(key), []);
+				this.$fs.writeJson(configFilePath, _.pick(this.configurationSpecificData[configuration], configurationSpecificKeys));
+			}
+		});
 	}
 
 	public zipProject(): IFuture<string> {
 		return (() => {
-			let tempDir = this.getTempDir().wait();
+			let tempDir = this.getTempDir();
 
 			let projectZipFile = path.join(tempDir, "Build.zip");
-			this.$fs.deleteFile(projectZipFile).wait();
-			let projectDir = this.getProjectDir().wait();
+			this.$fs.deleteFile(projectZipFile);
+			let projectDir = this.getProjectDir();
 
-			let files = this.enumerateProjectFiles().wait();
+			let files = this.enumerateProjectFiles();
 			let zipOp = this.$fs.zipFiles(projectZipFile, files,
 				p => this.getProjectRelativePath(p, projectDir));
 
@@ -716,7 +698,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			this.$loginManager.ensureLoggedIn().wait();
 			let projectZipFile = this.zipProject().wait();
-			let fileSize = this.$fs.getFileSize(projectZipFile).wait();
+			let fileSize = this.$fs.getFileSize(projectZipFile);
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
 			let projectName = this.projectData.ProjectName;
 			let bucketKey = util.format("%s_%s", projectName, path.basename(projectZipFile));
@@ -742,7 +724,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	protected saveProjectIfNeeded(): void {
 		if (this.getShouldSaveProject() && this.$config.AUTO_UPGRADE_PROJECT_FILE) {
-			this.saveProject(this.projectDir).wait();
+			this.saveProject(this.projectDir);
 		}
 	}
 
@@ -763,32 +745,32 @@ export class Project extends ProjectBase implements Project.IProject {
 			let templateFileName = path.join(templatesDir, this.frameworkProject.getTemplateFilename(template));
 
 			this.$logger.trace("Using template '%s'", templateFileName);
-			if (this.$fs.exists(templateFileName).wait()) {
+			if (this.$fs.exists(templateFileName)) {
 				projectDir = this.$options.path ? projectDir : path.join(projectDir, appname);
 				this.$logger.trace("Creating template folder '%s'", projectDir);
-				this.createTemplateFolder(projectDir).wait();
+				this.createTemplateFolder(projectDir);
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
 					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
 					this.$logger.trace("Reading template project properties.");
 
-					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject).wait();
+					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject);
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
 					this.createProjectFile(projectDir, properties).wait();
 					this.$logger.trace("Removing unnecessary files from template.");
-					this.removeExtraFiles(projectDir).wait();
-					this.$fs.createDirectory(path.join(projectDir, "hooks")).wait();
+					this.removeExtraFiles(projectDir);
+					this.$fs.createDirectory(path.join(projectDir, "hooks"));
 					this.$logger.info("Project '%s' has been successfully created in '%s'.", appname, projectDir);
 				} catch (ex) {
-					this.$fs.deleteDirectory(projectDir).wait();
+					this.$fs.deleteDirectory(projectDir);
 					throw ex;
 				}
 
 				this.frameworkProject.ensureProject(this.projectDir).wait();
 			} else {
-				let templates = this.frameworkProject.projectTemplatesString().wait();
+				let templates = this.frameworkProject.getProjectTemplatesString();
 				this.$errors.failWithoutHelp(`The specified template ${this.$options.template} does not exist. You can use any of the following templates:${EOL}${templates}`);
 			}
 		}).future<void>()();
@@ -803,23 +785,21 @@ export class Project extends ProjectBase implements Project.IProject {
 		return properties;
 	}
 
-	private removeExtraFiles(projectDir: string): IFuture<void> {
-		return ((): void => {
-			_.each(["mobile.vstemplate"],
-				(file) => this.$fs.deleteFile(path.join(projectDir, file)).wait());
-		}).future<void>()();
+	private removeExtraFiles(projectDir: string): void {
+		_.each(["mobile.vstemplate"],
+			(file) => this.$fs.deleteFile(path.join(projectDir, file)));
 	}
 
 	private getProjectPropertiesFromExistingProject(projectDir: string, appname: string): IFuture<Project.IData> {
 		return ((): any => {
-			let projectFile = _.find(this.$fs.readDirectory(projectDir).wait(), file => {
+			let projectFile = _.find(this.$fs.readDirectory(projectDir), file => {
 				let extension = path.extname(file);
 				return extension === ".proj" || extension === ".iceproj" || file === this.$projectConstants.PROJECT_FILE;
 			});
 
 			if (projectFile) {
 				let isJsonProjectFile = projectFile === this.$projectConstants.PROJECT_FILE;
-				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject).wait();
+				return this.$projectPropertiesService.getProjectProperties(path.join(projectDir, projectFile), isJsonProjectFile, this.frameworkProject);
 			}
 
 			this.$logger.warn("No AppBuilder project file found in folder. Creating project with default settings!");

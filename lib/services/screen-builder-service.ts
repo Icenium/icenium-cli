@@ -99,16 +99,14 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<void>()();
 	}
 
-	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions> {
-		return (() => {
-			let screenBuilderOptions = bacisSceenBuilderOptions || {};
+	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IScreenBuilderOptions {
+		let screenBuilderOptions = bacisSceenBuilderOptions || {};
 
-			if (answers) {
-				screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers)).wait();
-			}
+		if (answers) {
+			screenBuilderOptions.answers = this.$fs.readJson(path.resolve(answers));
+		}
 
-			return screenBuilderOptions;
-		}).future<IScreenBuilderOptions>()();
+		return screenBuilderOptions;
 	}
 
 	public promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
@@ -129,12 +127,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}).future<IScaffolder>()();
 	}
 
-	public ensureScreenBuilderProject(projectDir: string): IFuture<void> {
-		return (() => {
-			if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)).wait())) {
-				this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
-			}
-		}).future<void>()();
+	public ensureScreenBuilderProject(projectDir: string): void {
+		if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)))) {
+			this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
+		}
 	}
 
 	public shouldUpgrade(projectPath: string): IFuture<boolean> {
@@ -170,7 +166,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			if (!this.scaffolder) {
 				this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
 
-				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName).wait();
+				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName);
 
 				let appScaffoldingPath = this.$appScaffoldingExtensionsService.appScaffoldingPath;
 
@@ -255,12 +251,12 @@ class ScreenBuilderDynamicCommand implements ICommand {
 	public execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$project.ensureProject();
-			let projectDir = this.$project.getProjectDir().wait();
-			this.$screenBuilderService.ensureScreenBuilderProject(projectDir).wait();
+			let projectDir = this.$project.getProjectDir();
+			this.$screenBuilderService.ensureScreenBuilderProject(projectDir);
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				type: this.command.substr(this.command.indexOf("-") + 1)
-			}).wait();
+			});
 
 			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions).wait();
 		}).future<void>()();

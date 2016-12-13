@@ -12,10 +12,6 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 		private $project: Project.IProject,
 		private $logger: ILogger) { }
 
-	public ensureAllPlatformAssets(): IFuture<void> {
-		return this.$project.ensureAllPlatformAssets();
-	}
-
 	public migrateTypeScriptProject(): IFuture<void> {
 		return (() => {
 			if (this.shouldAskForTypeScriptMigration) {
@@ -25,11 +21,11 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 					let projectDir = this.$project.projectDir,
 						pathToTypingsTnsCoreModules = path.join(projectDir, "typings", constants.TNS_CORE_MODULES);
 
-					if (this.$fs.exists(pathToTypingsTnsCoreModules).wait()) {
+					if (this.$fs.exists(pathToTypingsTnsCoreModules)) {
 						this.$logger.printMarkdown("`AppBuilder 3.5` has introduced improved TypeScript support using npm modules. The `tns-core-modules` typings are now redundant and will be removed from your app.");
 						if (this.$prompter.confirm("Do you want to continue?", () => true).wait()) {
 							rimraf.sync(pathToTypingsTnsCoreModules);
-							this.$fs.deleteEmptyParents(pathToTypingsTnsCoreModules).wait();
+							this.$fs.deleteEmptyParents(pathToTypingsTnsCoreModules);
 							this.$npmService.install(projectDir).wait();
 						}
 					}

@@ -66,18 +66,14 @@ function mockFsForAppResources(requiredResources: string[], resourcesInProject: 
 
 	let copiedFilesReference: string[] = [];
 
-	$fs.copyFile = (sourceFileName: string, destinationFileName: string): IFuture<void> => {
-		return (() => {
-			copiedFilesReference.push(sourceFileName);
-		}).future<void>()();
+	$fs.copyFile = (sourceFileName: string, destinationFileName: string): void => {
+		copiedFilesReference.push(sourceFileName);
 	};
 
-	$fs.exists = (path: string): IFuture<boolean> => {
-		return ((): boolean => {
-			return _.some(resourcesInProject, (resource: string) => {
-				return path.indexOf(resource) >= 0;
-			});
-		}).future<boolean>()();
+	$fs.exists = (path: string): boolean => {
+		return _.some(resourcesInProject, (resource: string) => {
+			return path.indexOf(resource) >= 0;
+		});
 	};
 
 	return { copiedFilesReference };
@@ -87,19 +83,17 @@ function mockFsStats($fs: any, options: { hoursToAddToMtime: number }): void {
 	let modifiedDate = new Date(currentDate.getTime());
 	modifiedDate.setHours(currentDate.getHours() + options.hoursToAddToMtime);
 
-	$fs.getFsStats = (): IFuture<any> => Future.fromResult({ mtime: modifiedDate });
+	$fs.getFsStats = (): any => ({ mtime: modifiedDate });
 }
 
 function mockFsReadText($fs: IFileSystem, modifiedNativeScriptMigrationFile: any, currentNativeScriptMigrationFile: any): void {
-	$fs.readText = (fileName: string): IFuture<string> => {
-		return ((): string => {
-			if (returnNewMigrationFileContent) {
-				returnNewMigrationFileContent = false;
-				return JSON.stringify(modifiedNativeScriptMigrationFile);
-			}
+	$fs.readText = (fileName: string): string => {
+		if (returnNewMigrationFileContent) {
+			returnNewMigrationFileContent = false;
+			return JSON.stringify(modifiedNativeScriptMigrationFile);
+		}
 
-			return JSON.stringify(currentNativeScriptMigrationFile);
-		}).future<string>()();
+		return JSON.stringify(currentNativeScriptMigrationFile);
 	};
 }
 
@@ -193,7 +187,7 @@ describe("NativeScript project unit tests", () => {
 
 			let copiedFilesReference = mockFsForAppResources(requiredResources, resourcesInProject, testInjector).copiedFilesReference;
 
-			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0").wait();
+			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0");
 
 			assert.deepEqual(copiedFilesReference.length, requiredResources.length);
 			assert.sameMembers(copiedFilesReference, expectedResourcesToBeAdded);
@@ -205,7 +199,7 @@ describe("NativeScript project unit tests", () => {
 
 			let copiedFilesReference = mockFsForAppResources(requiredResources, resourcesInProject, testInjector).copiedFilesReference;
 
-			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0").wait();
+			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0");
 
 			assert.deepEqual(copiedFilesReference.length, expectedResourcesToBeAdded.length);
 			assert.sameMembers(copiedFilesReference, expectedResourcesToBeAdded);
@@ -220,9 +214,9 @@ describe("NativeScript project unit tests", () => {
 		});
 
 		it("should return null if the package.json of the project is invalid.", () => {
-			$fs.readJson = (): IFuture<any> => Future.fromResult({});
+			$fs.readJson = (): any => ({});
 
-			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp").wait();
+			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp");
 			assert.deepEqual(pluginVariablesInfo, null);
 		});
 
@@ -245,9 +239,9 @@ describe("NativeScript project unit tests", () => {
 				dependencies
 			};
 
-			$fs.readJson = (): IFuture<any> => Future.fromResult(packageJson);
+			$fs.readJson = (): any => packageJson;
 
-			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp").wait();
+			let pluginVariablesInfo = nativeScriptProject.getPluginVariablesInfo(null, "myapp");
 
 			let expectedResult: any = {};
 			expectedResult[pluginName] = pluginVariables;
@@ -290,11 +284,9 @@ describe("NativeScript project unit tests", () => {
 
 		beforeEach(() => {
 			$fs = testInjector.resolve("fs");
-			$fs.writeFile = (fileName: string, data: any): IFuture<void> => {
-				return (() => {
-					changedMigrationFileContent = JSON.parse(data);
-					hasChangedTheMigrationFile = true;
-				}).future<void>()();
+			$fs.writeFile = (fileName: string, data: any): void => {
+				changedMigrationFileContent = JSON.parse(data);
+				hasChangedTheMigrationFile = true;
 			};
 
 			$dateProvider = testInjector.resolve("dateProvider");

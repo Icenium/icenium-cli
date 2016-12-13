@@ -10,8 +10,8 @@ class UpgradeScreenBuilder implements ICommand {
 	canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
 			this.$project.ensureProject();
-			let projectDir = this.$project.getProjectDir().wait();
-			this.$screenBuilderService.ensureScreenBuilderProject(projectDir).wait();
+			let projectDir = this.$project.getProjectDir();
+			this.$screenBuilderService.ensureScreenBuilderProject(projectDir);
 
 			return true;
 		}).future<boolean>()();

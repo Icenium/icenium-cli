@@ -25,21 +25,20 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
 
 			this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
-			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)).wait());
+			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)));
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
 				projectPath: projectPath,
 				answers: {
 					name: projectName
 				}
-			}).wait();
+			});
 
 			try {
-
 				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();
 			} catch(err) {
 				this.$logger.trace(err);
-				this.$fs.deleteDirectory(projectPath).wait();
+				this.$fs.deleteDirectory(projectPath);
 				throw err;
 			}
 

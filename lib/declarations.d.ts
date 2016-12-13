@@ -150,8 +150,8 @@ interface IUserDataStore {
 	hasCookie(): IFuture<boolean>;
 	getCookies(): IFuture<IStringDictionary>;
 	getUser(): IFuture<IUser>;
-	setCookies(cookies?: IStringDictionary): IFuture<void>;
-	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): IFuture<void>;
+	setCookies(cookies?: IStringDictionary): void;
+	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): void;
 	setUser(user?: IUser): IFuture<void>;
 	clearLoginData(): IFuture<void>;
 }
@@ -228,7 +228,6 @@ declare module Project {
 	}
 
 	interface IProjectMigrationService {
-		ensureAllPlatformAssets(): IFuture<void>;
 		migrateTypeScriptProject(): IFuture<void>;
 	}
 }
@@ -240,7 +239,15 @@ interface IProjectTypes {
 }
 
 interface IProjectPropertiesService {
-	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): IFuture<Project.IData>;
+	/**
+	 * Gets all project properties.
+	 * @param {string} projectFile The path to projectFile (.abproject or package.json).
+	 * @param {boolean} isJsonProjectFile Boolean value indicating if the content of the project is JSON. In case this value is set to false, the project file is read as xml.
+	 * @param {Project.IFrameworkProject} frameworkProject The specified project (Cordova or NativeScript) instance.
+	 * @returns {Project.IData} Project settings.
+	 */
+	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): Project.IData;
+
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
 	updateProjectProperty(projectData: any, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): IFuture<void>;
 	normalizePropertyName(property: string, projectData: Project.IData): string;
@@ -289,9 +296,19 @@ interface IConfiguration extends Config.IConfig {
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	TYPESCRIPT_COMPILER_OPTIONS: ITypeScriptCompilerOptions;
 
-	reset(): IFuture<void>;
-	apply(configName: string): IFuture<void>;
-	printConfigData(): IFuture<void>;
+	/**
+	 * Resets config.json to it's default values.
+	 * @returns {void}
+	 */
+	reset(): void;
+
+	/**
+	 * Applies specific configuration and saves it in config.json
+	 * @param {string} configName The name of the configuration to be applied.
+	 * @returns {void}
+	 */
+	apply(configName: string): void;
+	printConfigData(): void;
 }
 
 interface IStaticConfig extends Config.IStaticConfig {
@@ -306,9 +323,9 @@ interface IStaticConfig extends Config.IStaticConfig {
 
 interface IDependencyConfigService {
 	dependencyConfigFilePath: string;
-	getAppScaffoldingConfig(): IFuture<IAppScaffoldingConfig>;
-	getAllGenerators(): IFuture<IGeneratorConfig[]>;
-	getGeneratorConfig(generatorName: string): IFuture<IGeneratorConfig>;
+	getAppScaffoldingConfig(): IAppScaffoldingConfig;
+	getAllGenerators(): IGeneratorConfig[];
+	getGeneratorConfig(generatorName: string): IGeneratorConfig;
 }
 
 interface IServerConfiguration {
@@ -382,7 +399,10 @@ interface IResourceDownloader {
 }
 
 interface IUserSettingsFileService {
-	deleteUserSettingsFile(): IFuture<void>;
+	/**
+	 * Deletes the user settings file.
+	 */
+	deleteUserSettingsFile(): void;
 	userSettingsFilePath: string;
 }
 
@@ -422,8 +442,20 @@ interface IScreenBuilderService {
 	prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
 	allSupportedCommands(projectPath: string, generatorName?: string): IFuture<string[]>;
 	generateAllCommands(projectPath: string, generatorName?: string): IFuture<void>;
-	composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderOptions>;
-	ensureScreenBuilderProject(projectPath: string): IFuture<void>;
+
+	/**
+	 * Gets answers of all screenBuilder questions from specified JSON file.
+	 * @param {string} answers Path to file containing the answers.
+	 * @param {IScreenBuilderOptions} basic ScreenBuilder options.
+	 * @returns {IScreenBuilderOptions}
+	 */
+	composeScreenBuilderOptions(answers: string, basicSceenBuilderOptions?: IScreenBuilderOptions): IScreenBuilderOptions;
+
+	/**
+	 * Checks if current project is created with ScreenBuilder. In case it's not, an error is thrown.
+	 * @param {string} projectPath Path to project that will be checked.
+	 */
+	ensureScreenBuilderProject(projectPath: string): void;
 	shouldUpgrade(projectPath: string): IFuture<boolean>;
 	upgrade(projectPath: string): IFuture<void>;
 }
@@ -486,22 +518,22 @@ interface IFrameworkMigrationService {
 
 	/**
 	 * Gives a list of all supported versions. Each version is a string in the following format <Major>.<Minor>.<Patch>
-	 * @return {IFuture<string[]>} List of all supported versions.
+	 * @return {string[]} List of all supported versions.
 	 */
-	getSupportedVersions(): IFuture<string[]>;
+	getSupportedVersions(): string[];
 
 	/**
 	 * Gives a list of all supported framework versions. Each one is presented with version and user-friendly display name.
-	 * @return {IFuture<IFrameworkVersion[]>} List of all supported frameworks, each one with version and display name.
+	 * @return {IFrameworkVersion[]} List of all supported frameworks, each one with version and display name.
 	 */
-	getSupportedFrameworks(): IFuture<IFrameworkVersion[]>;
+	getSupportedFrameworks(): IFrameworkVersion[];
 
 	/**
 	 * Gets the user-friendly name of the specified version.
 	 * @param  {string} version The version of the framework.
-	 * @return {IFuture<string>} User-friendly name of the specified version.
+	 * @return {string} User-friendly name of the specified version.
 	 */
-	getDisplayNameForVersion(version: string): IFuture<string>;
+	getDisplayNameForVersion(version: string): string;
 
 	/**
 	 * Hook which is dynamically called when a project's framework version is changing
@@ -520,7 +552,7 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 	 * @param {string} version The Cordova Framework version.
 	 * @return {string[]} plugins available for the selected Cordova version
 	 */
-	pluginsForVersion(version: string): IFuture<string[]>;
+	pluginsForVersion(version: string): string[];
 	/**
 	 * Migrate plugins from one Cordova version to another.
 	 * @param {string} fromVersion The current Cordova Framework version.
@@ -673,7 +705,7 @@ interface IPluginsService {
 	/**
 	 * Filters plugin based on framework specific rules.
 	 * @param {IPlugin[]} plugins Array of plugins to be filtered.
-	 * @return {IPlugin[]} Plugins that pass the filter.
+	 * @return {IFuture<IPlugin[]>} Plugins that pass the filter.
 	 */
 	filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]>;
 }
@@ -1036,7 +1068,7 @@ interface IImageService {
 	/**
 	 * Print image definitions
 	 */
-	printDefinitions(): IFuture<void>;
+	printDefinitions(): void;
 	/**
 	 * Generate images and save them to the project
 	 * @param  {string}           initialImagePath hi-res image from which to generate all the others
@@ -1079,9 +1111,9 @@ interface ICordovaResourceLoader {
 
 	/**
 	 * Reads the content of cordova-migration-data.json and returns it as JavaScript object.
-	 * @return {IFuture<ICordovaJsonData>} The content of cordova-migration-data.json parsed as JavaScript object.
+	 * @return {ICordovaJsonData} The content of cordova-migration-data.json parsed as JavaScript object.
 	 */
-	getCordovaMigrationData(): IFuture<ICordovaJsonData>;
+	getCordovaMigrationData(): ICordovaJsonData;
 }
 
 /**

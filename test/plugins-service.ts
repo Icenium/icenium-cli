@@ -75,7 +75,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 			this.projectData[propertyName] = value;
 		},
 		saveProject: () => Future.fromResult(),
-		getProjectDir: () => Future.fromResult(""),
+		getProjectDir: () => "",
 		ensureProject: () => { /*mock*/ },
 		ensureCordovaProject: () => {/*mock*/ },
 		configurations: [],
@@ -196,7 +196,7 @@ class ProjectStub {
 
 	saveProject = () => Future.fromResult();
 
-	getProjectDir = () => Future.fromResult("");
+	getProjectDir = () => "";
 
 	ensureProject = () => {/*mock*/ };
 	ensureCordovaProject = () => {/*mock*/ };
@@ -532,8 +532,8 @@ describe("plugins-service", () => {
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		service.configurePlugin = () => Future.fromResult();
 		let fs: IFileSystem = testInjector.resolve("fs");
-		fs.exists = (dir: string) => Future.fromResult(dir.indexOf(pluginXmlFileName) >= 0);
-		fs.readText = (dir: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`);
+		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
+		fs.readText = (dir: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`;
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "org.apache.cordova.battery-status").wait();
 		assert.deepEqual(fetchedPluginName, pluginName);
 	});
@@ -562,7 +562,7 @@ describe("plugins-service", () => {
 			project = testInjector.resolve("project");
 			projectDir = temp.mkdirSync("test-project");
 
-			project.getProjectDir = () => Future.fromResult(projectDir);
+			project.getProjectDir = () => projectDir;
 			project.projectDir = projectDir;
 		});
 
@@ -599,7 +599,7 @@ describe("plugins-service", () => {
 			let originalIsInteractive = helpers.isInteractive;
 			helpers.isInteractive = () => { return true; };
 			let originalFrameworkVersion = project.projectData.FrameworkVersion;
-			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).wait().FrameworkVersion;
+			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).FrameworkVersion;
 
 			let prompter: IPrompter = testInjector.resolve("prompter");
 			let promptsCount = 0;
@@ -622,7 +622,7 @@ describe("plugins-service", () => {
 
 		it("for NativeScript project from tgz.", () => {
 			let originalFrameworkVersion = project.projectData.FrameworkVersion;
-			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).wait().FrameworkVersion;
+			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).FrameworkVersion;
 
 			let prompter: IPrompter = testInjector.resolve("prompter");
 			prompter.get = () => Future.fromResult("testvalue");
@@ -684,8 +684,8 @@ describe("plugins-service", () => {
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 		service.configurePlugin = () => Future.fromResult();
 		let fs: IFileSystem = testInjector.resolve("fs");
-		fs.exists = (dir: string) => Future.fromResult(dir.indexOf(pluginXmlFileName) >= 0);
-		fs.readText = (path: string) => Future.fromResult(`<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`);
+		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
+		fs.readText = (path: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`;
 
 		let fetchedPluginName = fetchWithMockedShellJsCp(service, "com.telerik.dropbox").wait();
 		assert.deepEqual(fetchedPluginName, pluginName);

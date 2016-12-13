@@ -40,7 +40,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 
 	private getPluginTypeByIdentifier(pluginIdentifier: string): PluginType {
 		let pluginType = PluginType.AdvancedPlugin;
-		let corePluginRegex = this.$cordovaResources.getCordovaMigrationData().wait().corePluginRegex;
+		let corePluginRegex = this.$cordovaResources.getCordovaMigrationData().corePluginRegex;
 		let isCorePlugin = new RegExp(corePluginRegex).test(pluginIdentifier);
 		if (isCorePlugin) {
 			pluginType = PluginType.CorePlugin;

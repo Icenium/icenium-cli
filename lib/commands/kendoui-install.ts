@@ -89,12 +89,12 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
 
-			let outDir = path.join(this.$project.getProjectDir().wait(), "kendo"),
+			let outDir = path.join(this.$project.getProjectDir(), "kendo"),
 				backupFolder = `${outDir}.ab-backup`;
 
 			try {
-				if (this.$fs.exists(outDir).wait()) {
-					this.$fs.rename(outDir, backupFolder).wait();
+				if (this.$fs.exists(outDir)) {
+					this.$fs.rename(outDir, backupFolder);
 				}
 
 				this.$fs.unzip(filepath, outDir).wait();
@@ -103,10 +103,10 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 					this.$errors.failWithoutHelp(`Permission denied, make sure ${outDir} is not locked.`);
 				}
 
-				this.$fs.rename(backupFolder, outDir).wait();
+				this.$fs.rename(backupFolder, outDir);
 				throw error;
 			} finally {
-				this.$fs.deleteDirectory(backupFolder).wait();
+				this.$fs.deleteDirectory(backupFolder);
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully updated Kendo UI to version `%s`.", version));

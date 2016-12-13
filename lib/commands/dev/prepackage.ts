@@ -24,10 +24,10 @@ export class PrePackageCommand implements ICommand {
 			if (buildSource) {
 				// Need to set the property to config-base.json because when executing dev-config-apply the changes in config.json will be deleted.
 				let configJsonDirectory = path.join(__dirname, "..", "..", "..", "config", "config-base.json");
-				let configFileContent = this.$fs.readJson(configJsonDirectory).wait();
+				let configFileContent = this.$fs.readJson(configJsonDirectory);
 				configFileContent.BUILD_SOURCE = buildSource;
 
-				this.$fs.writeJson(configJsonDirectory, configFileContent).wait();
+				this.$fs.writeJson(configJsonDirectory, configFileContent);
 				this.$logger.trace(`Build source ${buildSource} added to config.json.`);
 			}
 
@@ -53,7 +53,7 @@ export class PrePackageCommand implements ICommand {
 
 			let testCoverageResultsDir = path.join(__dirname, "../../../coverage");
 			this.$logger.trace(`Removing test coverage results directory: '${testCoverageResultsDir}'.`);
-			this.$fs.deleteDirectory(testCoverageResultsDir).wait();
+			this.$fs.deleteDirectory(testCoverageResultsDir);
 
 			this.$serviceProxy.setShouldAuthenticate(true);
 		}).future<void>()();

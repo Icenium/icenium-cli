@@ -34,7 +34,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				this.$errors.fail("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the NPM.");
 			}
 
-			if (this.isUrlToRepository(pluginIdentifier) || this.isLocalPath(pluginIdentifier).wait()) {
+			if (this.isUrlToRepository(pluginIdentifier) || this.isLocalPath(pluginIdentifier)) {
 				let options: NpmPlugins.IFetchLocalPluginOptions = {
 					useOriginalPluginDirectory: true
 				};
@@ -64,7 +64,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 						this.$errors.failWithoutHelp(`The plugin cannot be downloaded using npm, because it has no package.json in it. You can still download it from this link: ${plugin.data.Url.grey}`);
 					}
 				} else {
-					if (this.$fs.exists(path.resolve(pluginIdentifier)).wait()) {
+					if (this.$fs.exists(path.resolve(pluginIdentifier))) {
 						return this.fetchPluginCore(pluginIdentifier).wait();
 					} else {
 						this.$errors.failWithoutHelp(`The plugin ${pluginIdentifier} was not found in npm and it is not path to existing local plugin.`);
@@ -119,7 +119,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			let projectPluginsDirectory = path.join(this.$project.projectDir, "plugins");
 			let filterOptions = { enumerateDirectories: true, includeEmptyDirectories: false };
 
-			if (!this.$fs.exists(projectPluginsDirectory).wait()) {
+			if (!this.$fs.exists(projectPluginsDirectory)) {
 				return false;
 			}
 
@@ -144,14 +144,14 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected hasTgzExtension(pluginidentifier: string): boolean {
 		let pluginIdentifierExtname = path.extname(pluginidentifier);
-		return this.isLocalPath(pluginidentifier).wait() && (pluginIdentifierExtname === ".tgz" || pluginIdentifierExtname === ".gz");
+		return this.isLocalPath(pluginidentifier) && (pluginIdentifierExtname === ".tgz" || pluginIdentifierExtname === ".gz");
 	}
 
 	protected fetchPluginBasicInformation(pluginIdentifier: string, version: string, failMessageMethodName: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier, version).wait();
 
-			this.validatePluginInformation(pathToInstalledPlugin).wait();
+			this.validatePluginInformation(pathToInstalledPlugin);
 
 			let installLocalPluginOptions: ILocalPluginData = {
 				actualName: pluginData && pluginData.actualName,
@@ -180,7 +180,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					name: "tempPackage",
 					version: "1.0.0"
 				};
-				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData).wait();
+				this.$fs.writeJson(path.join(tempInstallDir, this.$projectConstants.PACKAGE_JSON_NAME), packageJsonData);
 				if (version) {
 					identifier = `${identifier}@${version}`;
 				}
@@ -188,13 +188,13 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
 				let pathToPackage = path.join(tempInstallDir, NODE_MODULES_DIR_NAME);
 
-				if (this.$fs.exists(pathToPackage).wait()) {
+				if (this.$fs.exists(pathToPackage)) {
 					// Most probably the package is installed inside node_modules dir in temp folder.
-					let dirs = this.$fs.readDirectory(pathToPackage).wait().filter(dirName => dirName !== ".bin");
+					let dirs = this.$fs.readDirectory(pathToPackage).filter(dirName => dirName !== ".bin");
 					// In case npm3 is installed on user's machine and the package has dependencies, there will be more than one dir, so we cannot be sure which one is ours.
 					if (dirs.length === 1) {
 						let pathToPlugin = path.join(pathToPackage, _.first(dirs));
-						this.removeFetchedPluginDependencies(pathToPlugin).wait();
+						this.removeFetchedPluginDependencies(pathToPlugin);
 						return pathToPlugin;
 					}
 				}
@@ -204,7 +204,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				let npm2OutputMatch = npmInstallOutput.match(/.*?tempPackage@1\.0\.0.*?\r?\n.*?\s+?(.*?)@.*?\s+?/m);
 				if (npm2OutputMatch) {
 					let pathToPlugin = path.join(tempInstallDir, NODE_MODULES_DIR_NAME, npm2OutputMatch[1]);
-					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					this.removeFetchedPluginDependencies(pathToPlugin);
 					return pathToPlugin;
 				}
 
@@ -223,7 +223,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 				if (pluginDirectory) {
 					let pathToPlugin = path.join(tempInstallDir, pluginDirectory);
-					this.removeFetchedPluginDependencies(pathToPlugin).wait();
+					this.removeFetchedPluginDependencies(pathToPlugin);
 					return pathToPlugin;
 				}
 			} catch (err) {
@@ -242,7 +242,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			let pathToPlugin = (options && options.useOriginalPluginDirectory) ? options.originalPluginDirectory : path.resolve(pluginPath);
 
 			// In case the plugin is not part of the project or it is under node_modules, copy it to plugins
-			if (this.shouldCopyToPluginsDirectory(pathToPlugin).wait()) {
+			if (this.shouldCopyToPluginsDirectory(pathToPlugin)) {
 				let copyLocalPluginData = this.getCopyLocalPluginData(pathToPlugin);
 
 				let pathToInstall = copyLocalPluginData.destinationDirectory;
@@ -255,7 +255,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				// use cp instead of mv, as it would fail if pathToInstalledPlugin is mounted
 				// on a different device from the pluginsPath with error:
 				// Error: EXDEV, cross-device link not permitted
-				this.$fs.ensureDirectoryExists(pathToInstall).wait();
+				this.$fs.ensureDirectoryExists(pathToInstall);
 				shelljs.cp("-Rf", copyLocalPluginData.sourceDirectory, pathToInstall);
 				pathToPlugin = pathToInstall;
 			}
@@ -270,20 +270,16 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		let targetPluginDirectory = lastIndexOfNodeModules !== -1 ? pathToPlugin.substring(lastIndexOfNodeModules + NODE_MODULES_DIR_NAME.length) : path.basename(pathToPlugin);
 		return {
 			sourceDirectory: path.join(pathToPlugin, path.sep, "*"),
-			destinationDirectory: path.join(this.$project.getProjectDir().wait(), "plugins", targetPluginDirectory)
+			destinationDirectory: path.join(this.$project.getProjectDir(), "plugins", targetPluginDirectory)
 		};
 	}
 
-	protected isPluginPartOfTheProject(pathToPlugin: string): IFuture<boolean> {
-		return ((): boolean => {
-			return pathToPlugin.indexOf(this.$project.getProjectDir().wait()) !== -1;
-		}).future<boolean>()();
+	protected isPluginPartOfTheProject(pathToPlugin: string): boolean {
+		return pathToPlugin.indexOf(this.$project.getProjectDir()) !== -1;
 	}
 
-	protected shouldCopyToPluginsDirectory(pluginPath: string): IFuture<boolean> {
-		return ((): boolean => {
-			return !this.isPluginPartOfTheProject(pluginPath).wait();
-		}).future<boolean>()();
+	protected shouldCopyToPluginsDirectory(pluginPath: string): boolean {
+		return !this.isPluginPartOfTheProject(pluginPath);
 	}
 
 	protected getDefaultPluginVersion(plugin: IPlugin): string {
@@ -298,7 +294,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	protected abstract composeSearchQuery(keywords: string[]): string[];
 
-	protected abstract validatePluginInformation(pathToPlugin: string): IFuture<void>;
+	protected abstract validatePluginInformation(pathToPlugin: string): void;
 
 	private fetchPluginCore(pluginIdentifier: string, version?: string, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<string> {
 		return ((): string => {
@@ -306,8 +302,8 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 			let pluginBasicInfo: IBasicPluginInformation;
 			let pluginLocalPath = path.resolve(pluginIdentifier);
-			let pluginLocalPathExists = this.$fs.exists(pluginLocalPath).wait();
-			let suppressMessage = pluginLocalPathExists && (pluginLocalPath.indexOf(this.$project.getProjectDir().wait()) === -1 || pluginLocalPath.indexOf(this.getPluginsDirName()) !== -1);
+			let pluginLocalPathExists = this.$fs.exists(pluginLocalPath);
+			let suppressMessage = pluginLocalPathExists && (pluginLocalPath.indexOf(this.$project.getProjectDir()) === -1 || pluginLocalPath.indexOf(this.getPluginsDirName()) !== -1);
 
 			let pluginData: ILocalPluginData = {
 				actualName: pluginIdentifier,
@@ -331,7 +327,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		}).future<string>()();
 	}
 
-	private isLocalPath(pluginId: string): IFuture<boolean> {
+	private isLocalPath(pluginId: string): boolean {
 		return this.$fs.exists(pluginId);
 	}
 
@@ -339,7 +335,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return validUrl.isUri(pluginId);
 	}
 
-	private removeFetchedPluginDependencies(pathToPlugin: string): IFuture<void> {
+	private removeFetchedPluginDependencies(pathToPlugin: string): void {
 		let dependenciesDirectory = path.join(pathToPlugin, NODE_MODULES_DIR_NAME);
 
 		return this.$fs.deleteDirectory(dependenciesDirectory);
