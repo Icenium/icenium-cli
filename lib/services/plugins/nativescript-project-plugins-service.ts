@@ -1,12 +1,12 @@
 import * as path from "path";
 import * as util from "util";
 import * as semver from "semver";
-import {EOL} from "os";
-import {getFuturesResults} from "../../common/helpers";
-import {MarketplacePluginData} from "../../plugins-data";
-import {isInteractive} from "../../common/helpers";
-import {NODE_MODULES_DIR_NAME} from "../../common/constants";
-import {PluginsServiceBase} from "./plugins-service-base";
+import { EOL } from "os";
+import { getFuturesResults } from "../../common/helpers";
+import { MarketplacePluginData } from "../../plugins-data";
+import { isInteractive } from "../../common/helpers";
+import { NODE_MODULES_DIR_NAME } from "../../common/constants";
+import { PluginsServiceBase } from "./plugins-service-base";
 import Future = require("fibers/future");
 import temp = require("temp");
 temp.track();
@@ -130,7 +130,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	public removePlugin(pluginName: string): IFuture<void> {
 		return (() => {
 			let pathToPackageJson = this.getPathToProjectPackageJson();
-			let packageJsonContent = this.getProjectPackageJsonContent().wait();
+			let packageJsonContent = this.getProjectPackageJsonContent();
 			let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
 			if (packageJsonContent.dependencies[pluginBasicInfo.name]) {
 				let pathToPlugin = packageJsonContent.dependencies[pluginBasicInfo.name].toString().replace("file:", "");
@@ -159,7 +159,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
 		return (() => {
 			let basicPluginInfo = this.getPluginBasicInformation(pluginName).wait(),
-				packageJsonContent = this.getProjectPackageJsonContent().wait(),
+				packageJsonContent = this.getProjectPackageJsonContent(),
 				dependencies = _.keys(packageJsonContent.dependencies);
 
 			if (!_.some(dependencies, d => d === basicPluginInfo.name)) {
@@ -178,7 +178,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
-		let packageJsonContent = this.getProjectPackageJsonContent().wait();
+		let packageJsonContent = this.getProjectPackageJsonContent();
 		let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
 		return (packageJsonContent
 			&& !!packageJsonContent.dependencies && !!packageJsonContent.dependencies[pluginBasicInfo.name]
@@ -227,7 +227,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			};
 
 			let pathToPackageJson = this.getPathToProjectPackageJson();
-			let packageJsonContent = this.getProjectPackageJsonContent().wait();
+			let packageJsonContent = this.getProjectPackageJsonContent();
 			if (pluginData && pluginData.addPluginToConfigFile) {
 				packageJsonContent.dependencies[name] = "file:" + path.relative(this.$project.getProjectDir(), pathToPlugin);
 			}
@@ -302,16 +302,14 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return path.join(this.$project.getProjectDir(), this.$projectConstants.PACKAGE_JSON_NAME);
 	}
 
-	private getProjectPackageJsonContent(): IFuture<any> {
-		return ((): any => {
-			let pathToPackageJson = this.getPathToProjectPackageJson();
+	private getProjectPackageJsonContent(): any {
+		let pathToPackageJson = this.getPathToProjectPackageJson();
 
-			if (!this.$fs.exists(pathToPackageJson)) {
-				this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, pathToPackageJson).wait();
-			}
+		if (!this.$fs.exists(pathToPackageJson)) {
+			this.$fs.copyFile(this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile, pathToPackageJson);
+		}
 
-			return this.$fs.readJson(pathToPackageJson);
-		}).future<any>()();
+		return this.$fs.readJson(pathToPackageJson);
 	}
 
 	private getTopNpmPackages(count: number): IFuture<IPlugin[]> {
@@ -609,7 +607,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	private setPluginInPackageJson(pluginIdentifier: string, pluginOpts?: { addPluginToPackageJson: boolean }): IFuture<IBasicPluginInformation> {
 		return ((): IBasicPluginInformation => {
 			let pathToPackageJson = this.getPathToProjectPackageJson(),
-				packageJsonContent = this.getProjectPackageJsonContent().wait(),
+				packageJsonContent = this.getProjectPackageJsonContent(),
 				pluginBasicInfo = this.getPluginBasicInformation(pluginIdentifier).wait(),
 				name = pluginBasicInfo.name,
 				selectedVersion = pluginBasicInfo.version || "latest",

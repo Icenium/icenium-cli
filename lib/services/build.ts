@@ -309,31 +309,29 @@ export class BuildService implements Project.IBuildService {
 		}).future<Project.IBuildResult>()();
 	}
 
-	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): IFuture<void> {
-		return (() => {
-			if (!packageDefs.length) {
-				return;
-			}
+	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): void {
+		if (!packageDefs.length) {
+			return;
+		}
 
-			let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
-			let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir(), path.basename(file)));
+		let templateFiles = this.$fs.enumerateFilesInDirectorySync(path.join(__dirname, "../../resources/qr"));
+		let targetFiles = _.map(templateFiles, (file) => path.join(this.$project.getTempDir(), path.basename(file)));
 
-			_(_.zip(templateFiles, targetFiles)).each(zipped => {
-				let srcFile = zipped[0];
-				let targetFile = zipped[1];
-				this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
-				this.$fs.copyFile(srcFile, targetFile).wait();
-			});
+		_(_.zip(templateFiles, targetFiles)).each(zipped => {
+			let srcFile = zipped[0];
+			let targetFile = zipped[1];
+			this.$logger.debug("Copying '%s' to '%s'", srcFile, targetFile);
+			this.$fs.copyFile(srcFile, targetFile);
+		});
 
-			let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
-			let htmlTemplateContents = this.$fs.readText(scanFile);
-			htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
-				.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
-			this.$fs.writeFile(scanFile, htmlTemplateContents);
+		let scanFile = _.find(targetFiles, (file) => path.basename(file) === "scan.html");
+		let htmlTemplateContents = this.$fs.readText(scanFile);
+		htmlTemplateContents = htmlTemplateContents.replace(/\$ApplicationName\$/g, this.$project.projectData.ProjectName)
+			.replace(/\$Packages\$/g, JSON.stringify(packageDefs));
+		this.$fs.writeFile(scanFile, htmlTemplateContents);
 
-			this.$logger.debug("Updated scan.html");
-			this.$opener.open(scanFile);
-		}).future<void>()();
+		this.$logger.debug("Updated scan.html");
+		this.$opener.open(scanFile);
 	}
 
 	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
@@ -350,7 +348,7 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
 				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
-			this.$projectMigrationService.ensureAllPlatformAssets().wait();
+			this.$project.ensureAllPlatformAssets();
 			this.$projectMigrationService.migrateTypeScriptProject().wait();
 			this.$project.importProject().wait();
 
@@ -403,7 +401,7 @@ export class BuildService implements Project.IBuildService {
 					packageDownloadViewModels.push(aetDef);
 				}
 
-				this.showQRCodes(packageDownloadViewModels).wait();
+				this.showQRCodes(packageDownloadViewModels);
 			}
 
 			if (settings.downloadFiles) {
@@ -545,7 +543,7 @@ export class BuildService implements Project.IBuildService {
 			this.showQRCodes([{
 				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
 				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
-			}]).wait();
+			}]);
 		}).future<void>()();
 	}
 }

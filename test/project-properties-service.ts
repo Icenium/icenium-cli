@@ -64,8 +64,8 @@ class SampleProject implements Project.IFrameworkProject {
 	adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any {
 		return null;
 	}
-	ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
-		return Future.fromResult();
+	ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void {
+		return null;
 	}
 	pluginsService: IPluginsService;
 	getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {

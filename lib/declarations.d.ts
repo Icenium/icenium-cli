@@ -228,7 +228,6 @@ declare module Project {
 	}
 
 	interface IProjectMigrationService {
-		ensureAllPlatformAssets(): IFuture<void>;
 		migrateTypeScriptProject(): IFuture<void>;
 	}
 }
@@ -297,7 +296,11 @@ interface IConfiguration extends Config.IConfig {
 	AUTO_UPGRADE_PROJECT_FILE: boolean;
 	TYPESCRIPT_COMPILER_OPTIONS: ITypeScriptCompilerOptions;
 
-	reset(): IFuture<void>;
+	/**
+	 * Resets config.json to it's default values.
+	 * @returns {void}
+	 */
+	reset(): void;
 
 	/**
 	 * Applies specific configuration and saves it in config.json

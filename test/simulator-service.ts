@@ -21,14 +21,14 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 		ensureLoggedIn: () => { return Future.fromResult(); }
 	});
 	testInjector.register("projectMigrationService", {
-		ensureAllPlatformAssets: () => { return Future.fromResult(); },
 		migrateTypeScriptProject: () => Future.fromResult()
 	});
 	testInjector.register("processInfo", {
 		isRunning: (executableName: string) => { return Future.fromResult(!!isRunning); }
 	});
 	testInjector.register("project", {
-		getProjectDir: () => projectDir
+		getProjectDir: () => projectDir,
+		ensureAllPlatformAssets: () => { /* Intentionally left blanck */ }
 	});
 	testInjector.register("projectSimulatorService", {
 		getSimulatorParams: (simulatorPackageName: string) => { return Future.fromResult(baseParams); }

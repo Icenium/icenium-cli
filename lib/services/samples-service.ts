@@ -92,7 +92,7 @@ export class SamplesService implements ISamplesService {
 				let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
 				_.each(files, file => {
 					let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
-					this.$fs.copyFile(file, targetDir).wait();
+					this.$fs.copyFile(file, targetDir);
 				});
 			} finally {
 				let featureValue = sample.name;

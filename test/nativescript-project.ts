@@ -66,10 +66,8 @@ function mockFsForAppResources(requiredResources: string[], resourcesInProject: 
 
 	let copiedFilesReference: string[] = [];
 
-	$fs.copyFile = (sourceFileName: string, destinationFileName: string): IFuture<void> => {
-		return (() => {
-			copiedFilesReference.push(sourceFileName);
-		}).future<void>()();
+	$fs.copyFile = (sourceFileName: string, destinationFileName: string): void => {
+		copiedFilesReference.push(sourceFileName);
 	};
 
 	$fs.exists = (path: string): boolean => {
@@ -189,7 +187,7 @@ describe("NativeScript project unit tests", () => {
 
 			let copiedFilesReference = mockFsForAppResources(requiredResources, resourcesInProject, testInjector).copiedFilesReference;
 
-			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0").wait();
+			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0");
 
 			assert.deepEqual(copiedFilesReference.length, requiredResources.length);
 			assert.sameMembers(copiedFilesReference, expectedResourcesToBeAdded);
@@ -201,7 +199,7 @@ describe("NativeScript project unit tests", () => {
 
 			let copiedFilesReference = mockFsForAppResources(requiredResources, resourcesInProject, testInjector).copiedFilesReference;
 
-			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0").wait();
+			nativeScriptProject.ensureAllPlatformAssets("myapp", "2.1.0");
 
 			assert.deepEqual(copiedFilesReference.length, expectedResourcesToBeAdded.length);
 			assert.sameMembers(copiedFilesReference, expectedResourcesToBeAdded);

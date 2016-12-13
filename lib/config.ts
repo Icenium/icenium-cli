@@ -32,8 +32,8 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 		}
 	}
 
-	public reset(): IFuture<void> {
-		return this.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
+	public reset(): void {
+		return this.$fs.copyFile(this.getConfigPath("config-base"), this.getConfigPath("config"));
 	}
 
 	public apply(configName: string): void {
@@ -46,10 +46,6 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 	public printConfigData(): void {
 		let config = this.loadConfig("config");
 		console.log(config);
-	}
-
-	private copyFile(from: string, to: string): IFuture<void> {
-		return this.$fs.copyFile(from, to);
 	}
 
 	private saveConfig(config: IConfiguration, name: string): void {

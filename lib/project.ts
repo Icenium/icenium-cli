@@ -647,11 +647,9 @@ export class Project extends ProjectBase implements Project.IProject {
 		return this.frameworkProject.requiredAndroidApiLevel;
 	}
 
-	public ensureAllPlatformAssets(): IFuture<void> {
-		return (() => {
-			let projectDir = this.getProjectDir();
-			this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion).wait();
-		}).future<void>()();
+	public ensureAllPlatformAssets(): void {
+		let projectDir = this.getProjectDir();
+		this.frameworkProject.ensureAllPlatformAssets(projectDir, this.projectData.FrameworkVersion);
 	}
 
 	private validateProjectData(properties: any): void {

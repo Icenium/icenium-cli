@@ -23,7 +23,7 @@ export class SimulatorService implements ISimulatorService {
 		this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
 		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
 
-		this.$projectMigrationService.ensureAllPlatformAssets().wait();
+		this.$project.ensureAllPlatformAssets();
 		this.$projectMigrationService.migrateTypeScriptProject().wait();
 		return this.runSimulator(simulatorPackageName);
 	}

@@ -95,13 +95,13 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			this.$analyticsService.track("Migrate from Ionic", "true").wait();
 
 			if (createBackup) {
-				this.backupCurrentProject().wait();
+				this.backupCurrentProject();
 				this.addIonicBackupFolderToAbIgnoreFile();
 			}
 
 			this.createReroutingIndexHtml();
 
-			this.cloneResources().wait();
+			this.cloneResources();
 
 			this.deleteEnabledPlugins();
 
@@ -112,25 +112,23 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	/**
 	 * Clones the resources from the Ionic resources folder to App_Resources folder.
 	 */
-	private cloneResources(): IFuture<void> {
-		return (() => {
-			if (!this.$fs.exists(this.ionicResourcesDirectory)) {
-				return;
-			}
+	private cloneResources(): void {
+		if (!this.$fs.exists(this.ionicResourcesDirectory)) {
+			return;
+		}
 
-			let appBuilderResourcesDirectory = path.join(this.$project.getProjectDir(), "App_Resources");
+		let appBuilderResourcesDirectory = path.join(this.$project.getProjectDir(), "App_Resources");
 
-			// Currently the default template does not add App_Resources directory.
-			if (!this.$fs.exists(appBuilderResourcesDirectory)) {
-				this.$fs.createDirectory(appBuilderResourcesDirectory);
-			}
+		// Currently the default template does not add App_Resources directory.
+		if (!this.$fs.exists(appBuilderResourcesDirectory)) {
+			this.$fs.createDirectory(appBuilderResourcesDirectory);
+		}
 
-			this.cloneConfigXml(appBuilderResourcesDirectory);
+		this.cloneConfigXml(appBuilderResourcesDirectory);
 
-			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.Android.toLowerCase(), this.copyAndroidResources).wait();
-			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.iOS.toLowerCase(), this.copyResources).wait();
-			this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.WP8.toLowerCase(), this.copyWindowsPhoneResources).wait();
-		}).future<void>()();
+		this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.Android.toLowerCase(), this.copyAndroidResources);
+		this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.iOS.toLowerCase(), this.copyResources);
+		this.cloneResourcesCore(this.ionicResourcesDirectory, appBuilderResourcesDirectory, this.$devicePlatformsConstants.WP8.toLowerCase(), this.copyWindowsPhoneResources);
 	}
 
 	/**
@@ -235,141 +233,131 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return resource;
 	}
 
-	private cloneResourcesCore(projectDir: string, appBuilderResourcesDirectory: string, platformKeyName: string, cloneFunction: Function): IFuture<void> {
-		return (() => {
-			let ionicPlatformName = this.$projectConstants.IONIC_PROJECT_PLATFORMS_NAMES[platformKeyName];
-			let appBuilderPlatformName = this.$projectConstants.APPBUILDER_PROJECT_PLATFORMS_NAMES[platformKeyName];
+	private cloneResourcesCore(projectDir: string, appBuilderResourcesDirectory: string, platformKeyName: string, cloneFunction: Function): void {
+		let ionicPlatformName = this.$projectConstants.IONIC_PROJECT_PLATFORMS_NAMES[platformKeyName];
+		let appBuilderPlatformName = this.$projectConstants.APPBUILDER_PROJECT_PLATFORMS_NAMES[platformKeyName];
 
-			let ionicPlatformResourcesDirectory = path.join(this.ionicResourcesDirectory, ionicPlatformName);
+		let ionicPlatformResourcesDirectory = path.join(this.ionicResourcesDirectory, ionicPlatformName);
 
-			if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName) ||
-				!this.$fs.getFsStats(ionicPlatformResourcesDirectory).isDirectory()) {
-				return;
-			}
+		if (!this.checkIfPlatformIsAddedToProject(this.ionicResourcesDirectory, ionicPlatformName) ||
+			!this.$fs.getFsStats(ionicPlatformResourcesDirectory).isDirectory()) {
+			return;
+		}
 
-			let ionicPlatformResources = this.$fs.readDirectory(ionicPlatformResourcesDirectory);
+		let ionicPlatformResources = this.$fs.readDirectory(ionicPlatformResourcesDirectory);
 
-			let appbuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, appBuilderPlatformName);
-			if (!this.$fs.exists(appbuilderPlatformResourcesDirectory)) {
-				this.$fs.createDirectory(appbuilderPlatformResourcesDirectory);
-			}
+		let appbuilderPlatformResourcesDirectory = path.join(appBuilderResourcesDirectory, appBuilderPlatformName);
+		if (!this.$fs.exists(appbuilderPlatformResourcesDirectory)) {
+			this.$fs.createDirectory(appbuilderPlatformResourcesDirectory);
+		}
 
-			_.each(ionicPlatformResources, (resourceName: string) => {
-				let resourceDirectory = path.join(ionicPlatformResourcesDirectory, resourceName);
-				if (!this.$fs.getFsStats(resourceDirectory).isDirectory()) {
-					return;
-				}
-
-				let resources = this.$fs.readDirectory(resourceDirectory);
-
-				_.each(resources, (ionicResourceName: string) => {
-					cloneFunction.apply(this, [resourceDirectory, appbuilderPlatformResourcesDirectory, ionicResourceName, resourceName]).wait();
-				});
-			});
-		}).future<void>()();
-	}
-
-	private copyWindowsPhoneResources(resourceDirectory: string, appBuilderWindowsPhoneResourcesDirectory: string): IFuture<void> {
-		return (() => {
+		_.each(ionicPlatformResources, (resourceName: string) => {
+			let resourceDirectory = path.join(ionicPlatformResourcesDirectory, resourceName);
 			if (!this.$fs.getFsStats(resourceDirectory).isDirectory()) {
 				return;
 			}
 
-			let allResources = this.$fs.readDirectory(resourceDirectory);
-			let ionicWindowsPhoneConfig: IonicConfigXmlFile.IPlatform;
+			let resources = this.$fs.readDirectory(resourceDirectory);
 
-			if (_.isArray(this.ionicConfigXml.widget.platform)) {
-				ionicWindowsPhoneConfig = _.filter(<IonicConfigXmlFile.IPlatform[]>this.ionicConfigXml.widget.platform, (platform: IonicConfigXmlFile.IPlatform) => platform.name === this.$devicePlatformsConstants.WP8.toLowerCase())[0];
-			} else {
-				ionicWindowsPhoneConfig = (<IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).name === this.$devicePlatformsConstants.WP8.toLowerCase() ? <IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform : null;
-			}
+			_.each(resources, (ionicResourceName: string) => {
+				cloneFunction.apply(this, [resourceDirectory, appbuilderPlatformResourcesDirectory, ionicResourceName, resourceName]);
+			});
+		});
+	}
 
-			// Windows Phone 8 supports only JPG splash screens and Ionic projects provides PNG splash screens.
-			if (ionicWindowsPhoneConfig) {
-				_.each(allResources, (item: string) => {
-					let resourceItemSourceDirectory = path.join(resourceDirectory, item);
-					let resourceDestinationDirectory = path.join(appBuilderWindowsPhoneResourcesDirectory, item);
-					if (this.$fs.getFsStats(resourceItemSourceDirectory).isFile()) {
-						let itemNameWithoutExtension = item.substring(0, item.lastIndexOf("."));
-						if (_.isArray(ionicWindowsPhoneConfig.splash)) {
-							if (_.some(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
-								resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
-							}
-						} else {
-							if ((<IonicConfigXmlFile.IResource>ionicWindowsPhoneConfig.splash).src.indexOf(itemNameWithoutExtension) >= 0) {
-								resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
-							}
+	private copyWindowsPhoneResources(resourceDirectory: string, appBuilderWindowsPhoneResourcesDirectory: string): void {
+		if (!this.$fs.getFsStats(resourceDirectory).isDirectory()) {
+			return;
+		}
+
+		let allResources = this.$fs.readDirectory(resourceDirectory);
+		let ionicWindowsPhoneConfig: IonicConfigXmlFile.IPlatform;
+
+		if (_.isArray(this.ionicConfigXml.widget.platform)) {
+			ionicWindowsPhoneConfig = _.filter(<IonicConfigXmlFile.IPlatform[]>this.ionicConfigXml.widget.platform, (platform: IonicConfigXmlFile.IPlatform) => platform.name === this.$devicePlatformsConstants.WP8.toLowerCase())[0];
+		} else {
+			ionicWindowsPhoneConfig = (<IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform).name === this.$devicePlatformsConstants.WP8.toLowerCase() ? <IonicConfigXmlFile.IPlatform>this.ionicConfigXml.widget.platform : null;
+		}
+
+		// Windows Phone 8 supports only JPG splash screens and Ionic projects provides PNG splash screens.
+		if (ionicWindowsPhoneConfig) {
+			_.each(allResources, (item: string) => {
+				let resourceItemSourceDirectory = path.join(resourceDirectory, item);
+				let resourceDestinationDirectory = path.join(appBuilderWindowsPhoneResourcesDirectory, item);
+				if (this.$fs.getFsStats(resourceItemSourceDirectory).isFile()) {
+					let itemNameWithoutExtension = item.substring(0, item.lastIndexOf("."));
+					if (_.isArray(ionicWindowsPhoneConfig.splash)) {
+						if (_.some(ionicWindowsPhoneConfig.splash, (splash: IonicConfigXmlFile.IResource) => splash.src.indexOf(itemNameWithoutExtension) >= 0)) {
+							resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
 						}
-
-						this.$fs.copyFile(path.join(resourceDirectory, item), resourceDestinationDirectory).wait();
 					} else {
-						shelljs.cp("-R", resourceItemSourceDirectory, resourceDestinationDirectory);
+						if ((<IonicConfigXmlFile.IResource>ionicWindowsPhoneConfig.splash).src.indexOf(itemNameWithoutExtension) >= 0) {
+							resourceDestinationDirectory = resourceDestinationDirectory.replace(IonicProjectTransformator.WINDOWS_PHONE_IONIC_SPLASH_SCREEN_FORMAT, IonicProjectTransformator.WINDOWS_PHONE_SUPPORTED_SPLASH_SCREEN_FORMAT);
+						}
 					}
-				});
-			} else {
-				// If there are no specific resources for wp8 the copy is straightforward.
-				this.copyResources(resourceDirectory, appBuilderWindowsPhoneResourcesDirectory).wait();
-			}
-		}).future<void>()();
-	}
 
-	private copyResources(resourceDirectory: string, appBuilderPlatformResourcesDirectory: string): IFuture<void> {
-		return (() => {
-			// Need to add / at the end of resourceDirectory to copy the content of the directory directly to appBuilderPlatformResourcesDirectory not in subfolder.
-			let resourceDirectoryContentPath = `${resourceDirectory}/`;
-
-			shelljs.cp("-rf", resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory);
-		}).future<void>()();
-	}
-
-	private copyAndroidResources(resourceDirectory: string, appBuilderAndroidResourcesDirectory: string, ionicResourceName: string): IFuture<void> {
-		return (() => {
-			_.each(this.supportedScreensFolderNames, (folderName: string) => {
-				if (ionicResourceName.indexOf(folderName) >= 0) {
-					// Android resources in Ionic projects contain the resolution folder name in the resource name (e.g. drawable-hdpi-icon.png).
-					let resourceName = ionicResourceName.split(`${folderName}-`)[1];
-
-					let resourceDestinationDirectory = path.join(appBuilderAndroidResourcesDirectory, folderName, resourceName);
-
-					this.$fs.copyFile(path.join(resourceDirectory, ionicResourceName), resourceDestinationDirectory).wait();
-					return false;
+					this.$fs.copyFile(path.join(resourceDirectory, item), resourceDestinationDirectory);
+				} else {
+					shelljs.cp("-R", resourceItemSourceDirectory, resourceDestinationDirectory);
 				}
 			});
-		}).future<void>()();
+		} else {
+			// If there are no specific resources for wp8 the copy is straightforward.
+			this.copyResources(resourceDirectory, appBuilderWindowsPhoneResourcesDirectory);
+		}
+	}
+
+	private copyResources(resourceDirectory: string, appBuilderPlatformResourcesDirectory: string): void {
+		// Need to add / at the end of resourceDirectory to copy the content of the directory directly to appBuilderPlatformResourcesDirectory not in subfolder.
+		let resourceDirectoryContentPath = `${resourceDirectory}/`;
+
+		shelljs.cp("-rf", resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory);
+	}
+
+	private copyAndroidResources(resourceDirectory: string, appBuilderAndroidResourcesDirectory: string, ionicResourceName: string): void {
+		_.each(this.supportedScreensFolderNames, (folderName: string) => {
+			if (ionicResourceName.indexOf(folderName) >= 0) {
+				// Android resources in Ionic projects contain the resolution folder name in the resource name (e.g. drawable-hdpi-icon.png).
+				let resourceName = ionicResourceName.split(`${folderName}-`)[1];
+
+				let resourceDestinationDirectory = path.join(appBuilderAndroidResourcesDirectory, folderName, resourceName);
+
+				this.$fs.copyFile(path.join(resourceDirectory, ionicResourceName), resourceDestinationDirectory);
+				return false;
+			}
+		});
 	}
 
 	private checkIfPlatformIsAddedToProject(resourcesDirectory: string, platformName: string): boolean {
 		return this.$fs.exists(path.join(resourcesDirectory, platformName));
 	}
 
-	private backupCurrentProject(): IFuture<void> {
-		return (() => {
-			let ionicProjectBackupDir = path.join(this.$project.getProjectDir(), IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME);
+	private backupCurrentProject(): void {
+		let ionicProjectBackupDir = path.join(this.$project.getProjectDir(), IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME);
 
-			this.$logger.warn(`Creating backup in ${ionicProjectBackupDir}. This could take more than one minute. Please be patient.`);
+		this.$logger.warn(`Creating backup in ${ionicProjectBackupDir}. This could take more than one minute. Please be patient.`);
 
-			// Use -A to get only the folders and files names without the "." and ".." entries.
-			let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir());
+		// Use -A to get only the folders and files names without the "." and ".." entries.
+		let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir());
 
-			if (this.$fs.exists(ionicProjectBackupDir)) {
-				this.$fs.deleteDirectory(ionicProjectBackupDir);
-			}
+		if (this.$fs.exists(ionicProjectBackupDir)) {
+			this.$fs.deleteDirectory(ionicProjectBackupDir);
+		}
 
-			this.$fs.createDirectory(ionicProjectBackupDir);
+		this.$fs.createDirectory(ionicProjectBackupDir);
 
-			// Cannot copy directly project dir to the backup dir because it will end up in endless recursion.
-			_.each(allProjectItems, (item: string) => {
-				if (item.indexOf(IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME) < 0) {
-					let itemSourceDirectory = path.join(this.$project.getProjectDir(), item);
-					let itemDestinationDirectory = path.join(ionicProjectBackupDir, item);
-					if (this.$fs.getFsStats(itemSourceDirectory).isDirectory()) {
-						shelljs.cp("-R", `${itemSourceDirectory}/`, `${itemDestinationDirectory}`);
-					} else if (!this.isAppBuilderProjectFile(itemSourceDirectory)) {
-						this.$fs.copyFile(itemSourceDirectory, itemDestinationDirectory).wait();
-					}
+		// Cannot copy directly project dir to the backup dir because it will end up in endless recursion.
+		_.each(allProjectItems, (item: string) => {
+			if (item.indexOf(IonicProjectTransformator.IONIC_PROJECT_BACKUP_FOLDER_NAME) < 0) {
+				let itemSourceDirectory = path.join(this.$project.getProjectDir(), item);
+				let itemDestinationDirectory = path.join(ionicProjectBackupDir, item);
+				if (this.$fs.getFsStats(itemSourceDirectory).isDirectory()) {
+					shelljs.cp("-R", `${itemSourceDirectory}/`, `${itemDestinationDirectory}`);
+				} else if (!this.isAppBuilderProjectFile(itemSourceDirectory)) {
+					this.$fs.copyFile(itemSourceDirectory, itemDestinationDirectory);
 				}
-			});
-		}).future<void>()();
+			}
+		});
 	}
 
 	/**

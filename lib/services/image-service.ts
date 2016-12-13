@@ -118,7 +118,7 @@ class ImageService implements IImageService {
 			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
 
 			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
-				return this.$fs.copyFile(imagePath, projectImagePath).wait();
+				return this.$fs.copyFile(imagePath, projectImagePath);
 			}
 
 			let replaceOptions = ['Yes for all', 'Yes', 'No', 'No for all'],
@@ -127,9 +127,9 @@ class ImageService implements IImageService {
 			switch (chosenOption) {
 				case replaceOptions[0]:
 					this.replaceAll = true;
-					return this.$fs.copyFile(imagePath, projectImagePath).wait();
+					return this.$fs.copyFile(imagePath, projectImagePath);
 				case replaceOptions[1]:
-					return this.$fs.copyFile(imagePath, projectImagePath).wait();
+					return this.$fs.copyFile(imagePath, projectImagePath);
 				case replaceOptions[3]:
 					this.$errors.failWithoutHelp('Operation canceled.');
 			}

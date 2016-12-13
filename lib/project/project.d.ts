@@ -69,7 +69,13 @@ declare module Project {
 
 		ensureCordovaProject(): void;
 		ensureProject(): void;
-		ensureAllPlatformAssets(): IFuture<void>;
+
+		/**
+		 * Checks all assets (App_Resources) and completes the missing one from the default template.
+		 * @returns {void}
+		 */
+		ensureAllPlatformAssets(): void;
+
 		getConfigurationsSpecifiedByUser(): string[];
 		/**
 		 * Returns a project configuration, passed by the user as a flag. Defaults to defaultConfiguration, the lexicographically first project configuration or `debug` in that order.
@@ -154,7 +160,15 @@ declare module Project {
 		alterPropertiesForNewProject(properties: any, projectName: string): void;
 		completeProjectProperties(properties: any): boolean;
 		adjustBuildProperties(buildProperties: any, projectInformation?: IProjectInformation): any;
-		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void>;
+
+		/**
+		 * Checks all assets (App_Resources) and completes the missing one from the default template.
+		 * @param {string} projectDir The directory where the project is located.
+		 * @param {string} frameworkVersion The version of mobile framework (Cordova's or NativeScript's version).
+		 * @returns {void}
+		 */
+		ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void;
+
 		/**
 		 * Checks wether compatible sdk versions for the given platform are used.
 		 * Issues a warning if there are updated versions available.

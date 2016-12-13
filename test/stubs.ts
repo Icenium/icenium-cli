@@ -102,7 +102,7 @@ export class FileSystemStub implements IFileSystem {
 
 	writeJson(filename: string, data: any, space?: string, encoding?: string): void { }
 
-	copyFile(sourceFileName: string, destinationFileName: string): IFuture<void> {
+	copyFile(sourceFileName: string, destinationFileName: string): void {
 		return undefined;
 	}
 
@@ -365,7 +365,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public adjustBuildProperties(buildProperties: any, projectInformation?: Project.IProjectInformation): any { return undefined; }
 
-	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> { return undefined; }
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void { return undefined; }
 
 	public getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
 

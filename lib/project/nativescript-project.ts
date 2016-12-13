@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as util from "util";
 import * as temp from "temp";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
-import {FrameworkProjectBase} from "./framework-project-base";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
+import { FrameworkProjectBase } from "./framework-project-base";
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -108,23 +108,21 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return buildProperties;
 	}
 
-	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): IFuture<void> {
-		return (() => {
-			let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
-			let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
-			let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
+	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void {
+		let appResourcesDir = this.$resources.getPathToAppResources(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+		let appResourceFiles = this.$fs.enumerateFilesInDirectorySync(appResourcesDir);
+		let appResourcesHolderDirectory = path.join(projectDir, this.$projectConstants.NATIVESCRIPT_APP_DIR_NAME);
 
-			appResourceFiles.forEach((appResourceFile) => {
-				let relativePath = path.relative(appResourcesDir, appResourceFile);
-				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
-				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath)) {
-					this.printAssetUpdateMessage();
-					this.$logger.trace("File not found, copying %s", appResourceFile);
-					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
-				}
-			});
-		}).future<void>()();
+		appResourceFiles.forEach((appResourceFile) => {
+			let relativePath = path.relative(appResourcesDir, appResourceFile);
+			let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
+			this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
+			if (!this.$fs.exists(targetFilePath)) {
+				this.printAssetUpdateMessage();
+				this.$logger.trace("File not found, copying %s", appResourceFile);
+				this.$fs.copyFile(appResourceFile, targetFilePath);
+			}
+		});
 	}
 
 	public getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {

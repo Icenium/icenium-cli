@@ -199,7 +199,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			let versionDisplayName = this.getDisplayNameForVersion(newVersion);
-			this.$project.ensureAllPlatformAssets().wait();
+			this.$project.ensureAllPlatformAssets();
 
 			if (this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
 				let shouldUpdateWPSdk = this.$prompter.confirm(`You cannot build with the Windows Phone ${this.$project.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`).wait();
@@ -251,7 +251,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				this.$project.setProperty("CorePlugins", newPluginsList, configuration);
 			});
 
-			this.migrateCordovaJsFiles(newVersion).wait();
+			this.migrateCordovaJsFiles(newVersion);
 
 			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
 		}).future<void>()();
@@ -273,32 +273,30 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		return path.join(this.$resources.resolvePath(CordovaMigrationService.CORDOVA_FOLDER_NAME), CordovaMigrationService.CORDOVA_JSON_FILE_NAME);
 	}
 
-	private migrateCordovaJsFiles(newVersion: string): IFuture<void> {
-		return ((): void => {
-			let backedUpFiles: string[] = [],
-				backupSuffix = ".backup";
-			try {
-				_.each(this.$mobileHelper.platformNames, (platform) => {
-					this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
-					let cordovaJsFileName = path.join(this.$project.getProjectDir(), `cordova.${platform}.js`.toLowerCase());
-					let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(newVersion, platform);
-					this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix).wait();
-					backedUpFiles.push(cordovaJsFileName);
-					this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName).wait();
-				});
-			} catch (error) {
-				_.each(backedUpFiles, file => {
-					this.$logger.trace("Reverting %s", file);
-					this.$fs.copyFile(file + backupSuffix, file).wait();
-				});
-				this.$errors.failWithoutHelp(error.message);
-			}
-			finally {
-				_.each(backedUpFiles, file => {
-					this.$fs.deleteFile(file + backupSuffix);
-				});
-			}
-		}).future<void>()();
+	private migrateCordovaJsFiles(newVersion: string): void {
+		let backedUpFiles: string[] = [],
+			backupSuffix = ".backup";
+		try {
+			_.each(this.$mobileHelper.platformNames, (platform) => {
+				this.$logger.trace("Replacing cordova.js file for %s platform ", platform);
+				let cordovaJsFileName = path.join(this.$project.getProjectDir(), `cordova.${platform}.js`.toLowerCase());
+				let cordovaJsSourceFilePath = this.$cordovaResources.buildCordovaJsFilePath(newVersion, platform);
+				this.$fs.copyFile(cordovaJsFileName, cordovaJsFileName + backupSuffix);
+				backedUpFiles.push(cordovaJsFileName);
+				this.$fs.copyFile(cordovaJsSourceFilePath, cordovaJsFileName);
+			});
+		} catch (error) {
+			_.each(backedUpFiles, file => {
+				this.$logger.trace("Reverting %s", file);
+				this.$fs.copyFile(file + backupSuffix, file);
+			});
+			this.$errors.failWithoutHelp(error.message);
+		}
+		finally {
+			_.each(backedUpFiles, file => {
+				this.$fs.deleteFile(file + backupSuffix);
+			});
+		}
 	}
 
 	private promptUserForInvalidPluginsAction(plugins: string[], toVersion: string): IFuture<void> {

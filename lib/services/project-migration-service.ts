@@ -12,10 +12,6 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 		private $project: Project.IProject,
 		private $logger: ILogger) { }
 
-	public ensureAllPlatformAssets(): IFuture<void> {
-		return this.$project.ensureAllPlatformAssets();
-	}
-
 	public migrateTypeScriptProject(): IFuture<void> {
 		return (() => {
 			if (this.shouldAskForTypeScriptMigration) {
