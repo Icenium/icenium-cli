@@ -116,7 +116,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	chmod(path: string, mode: any): IFuture<any> {
+	chmod(path: string, mode: any): any {
 		return undefined;
 	}
 
