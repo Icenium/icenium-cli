@@ -41,8 +41,7 @@ export class DeployHelper implements IDeployHelper {
 			this.$options.justlaunch = true;
 			let appInfo: IApplicationInformation;
 
-			let action = (device: Mobile.IDevice): IFuture<void> => {
-				return (() => {
+			let action = async (device: Mobile.IDevice): Promise<void> => {
 					let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
 					if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
 						let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
@@ -80,7 +79,6 @@ export class DeployHelper implements IDeployHelper {
 			};
 
 			await this.$devicesService.execute(action, canExecute);
-		}).future<void>()();
 	}
 
 	private async getAppInfoFromBuildResult(device: Mobile.IDevice): Promise<IApplicationInformation> {

@@ -389,15 +389,13 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 }
 
 describe("plugins-service", () => {
-	let fetchWithMockedShellJsCp = (service: IPluginsService, plugin: string): IFuture<string> => {
-		return ((): string => {
+	let fetchWithMockedShellJsCp = async (service: IPluginsService, plugin: string): Promise<string> => {
 			let originalShellJsCopy = shelljs.cp;
 			(<any>shelljs).cp = (options: string, source: string, dest: string): void => { /* No implementation required. */ };
 			let fetchedPluginName = await  service.fetch(plugin);
 			(<any>shelljs).cp = originalShellJsCopy;
 
 			return fetchedPluginName;
-		}).future<string>()();
 	};
 
 	afterEach(() => {
@@ -515,10 +513,8 @@ describe("plugins-service", () => {
 		};
 
 		let progressIndicator: IProgressIndicator = testInjector.resolve("progressIndicator");
-		progressIndicator.showProgressIndicator = (future: IFuture<any>, timeout: number): IFuture<void> => {
-			return (() => {
+		progressIndicator.showProgressIndicator = async (future: IFuture<any>, timeout: number): Promise<void> => {
 				await future;
-			}).future<void>()();
 		};
 
 		childProcess.exec = () => Promise.resolve("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");

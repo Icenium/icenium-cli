@@ -231,13 +231,11 @@ describe("commands service", () => {
 		});
 
 		it("executes command which has only StringCommandParameter when param is NOT passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("commandWithStringParam", []);
@@ -245,13 +243,11 @@ describe("commands service", () => {
 		});
 
 		it("executes command which has only StringCommandParameter when param is passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]);
@@ -259,13 +255,11 @@ describe("commands service", () => {
 		});
 
 		it("does not execute command which has mandatory StringCommandParameter created with StringParameterBuilder and param is not passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", []);
@@ -273,13 +267,11 @@ describe("commands service", () => {
 		});
 
 		it("executes command which has mandatory StringCommandParameter created with StringParameterBuilder and param is passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]);
@@ -287,13 +279,11 @@ describe("commands service", () => {
 		});
 
 		it("calls executeCommand when command name is valid", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
@@ -301,13 +291,11 @@ describe("commands service", () => {
 		});
 
 		it("does not call executeCommand when command name is invalid", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
 					if (commandName !== "help") {
 						isCommandExecuted = true;
 					}
 					return false;
-				}).future<boolean>()();
 			};
 
 			await commandsService.tryExecuteCommand("InvalidCommandName", []);

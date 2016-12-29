@@ -12,8 +12,8 @@ let fileSystemFile = require("../lib/common/file-system");
 let hashServiceFile = require("../lib/services/hash-service");
 
 class ServiceProxy implements Server.IServiceProxy {
-	call<T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> {
-		return (() => {/*intentionally empty*/}).future<any>()();
+	call<T> (name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> {
+		/*intentionally empty*/
 	}
 	setShouldAuthenticate(shouldAuthenticate: boolean): void { /* mock */}
 	setSolutionSpaceName(solutionSpaceName: string): void { /* mock */ }
@@ -71,9 +71,8 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 
 		let actualContentRanges: string[] = [];
 		testInjector.register("serviceProxy", {
-			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> => {
-				return (() => {
-					actualContentRanges.push(headers["Content-Range"]);
+			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> => {
+				actualContentRanges.push(headers["Content-Range"]);
 			},
 			setShouldAuthenticate: (shouldAuthenticate: boolean): void => {/* mock */ },
 			setSolutionSpaceName: (solutionSpaceName: string): void => {/* mock */ }
@@ -85,7 +84,6 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 		await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
 
 		return actualContentRanges;
-	}).future<string[]>()();
 }
 
 function createDataWithSpecifiedLength(length: number): string {
