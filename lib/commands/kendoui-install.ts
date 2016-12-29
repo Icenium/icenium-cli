@@ -61,9 +61,9 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			}
 
 			if (selectedPackage.HasReleaseNotes && !this.$options.force) {
-				let shouldShowReleaseNotes = this.$prompter.confirm(
+				let shouldShowReleaseNotes = await this.$prompter.confirm(
 				"Do you want to review the release notes for this package?",
-				() => await  true);
+				() => true);
 				if (shouldShowReleaseNotes) {
 					this.$opener.open(selectedPackage.ReleaseNotesUrl);
 				}

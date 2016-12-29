@@ -290,7 +290,7 @@ describe("Ionic project transformator", () => {
 			assert.deepEqual(projectDirectoryContent, projectBackupDirectoryContent);
 		});
 
-		it("should create rerouting index.html", () => {
+		it("should create rerouting index.html", async () => {
 			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 			let indexHtml = path.join(projectDirectory, "index.html");

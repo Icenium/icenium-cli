@@ -113,7 +113,7 @@ describe("simulator-service", () => {
 	it("launchSimulator fails when simulator is running during download of new version", () => {
 		let testInjector = createTestInjector(true, true, true, true);
 		let service = testInjector.resolve("simulatorService");
-		assert.throws(() => await  service.launchSimulator());
+		assert.throws(async () => await  service.launchSimulator());
 	});
 
 	it("launchSimulator does not fail when simulator is running during download of new version", () => {

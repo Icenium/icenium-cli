@@ -45,7 +45,7 @@ export class TemplatesService implements ITemplatesService {
 			this.$fs.deleteDirectory(templatesDir);
 			this.$fs.createDirectory(templatesDir);
 
-			_.each(templates, (template) => await  this.downloadTemplate(template, templatesDir));
+			_.each(templates, async (template) => await  this.downloadTemplate(template, templatesDir));
 	}
 
 	public async downloadItemTemplates(): Promise<void> {

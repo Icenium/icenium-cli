@@ -268,7 +268,7 @@ export class TelerikLoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager,
 		private $stringParameterBuilder: IStringParameterBuilder) { }
 	async execute(args: string[]): Promise<void> {
-		return (() => {
+		return (async () => {
 			await this.$loginManager.telerikLogin(args[0], args[1]);
 	}
 

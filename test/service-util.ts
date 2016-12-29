@@ -130,7 +130,7 @@ describe("ServiceProxy", () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
-		assert.throws(() => {
+		assert.throws(async () => {
 			await proxy.call("test4", "GET", "/package/zip", "application/json", null, null);
 		}, "404");
 	});

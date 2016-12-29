@@ -107,7 +107,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let solutionZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
 			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
 
-			this.$serviceProxy.makeTapServiceCall(() => await  tapServiceCall.apply(null, [unzipStream]), solutionSpaceHeaderOptions);
+			this.$serviceProxy.makeTapServiceCall(async () => await  tapServiceCall.apply(null, [unzipStream]), solutionSpaceHeaderOptions);
 			await this.$fs.unzip(solutionZipFilePath, exportDir);
 
 			return exportDir;

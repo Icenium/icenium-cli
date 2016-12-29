@@ -256,7 +256,7 @@ describe("project integration tests", () => {
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 		});
 
-		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", () => {
+		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", async () => {
 			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk must be 8.1");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
@@ -267,7 +267,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
 		});
 
-		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", () => {
+		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", async () => {
 			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be updated to 3.7.0 when WPSdk is updated to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk should have been updated to 8.1");
@@ -276,7 +276,7 @@ describe("project integration tests", () => {
 		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", () => {
 			prompter.confirmResult = false;
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-			assert.throws(() => await  project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]));
+			assert.throws(async () => await  project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]));
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
 		});
@@ -288,12 +288,12 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
 
 			prompter.confirmResult = false;
-			assert.throws(() => await  project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]));
+			assert.throws(async () => await  project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]));
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
 		});
 
-		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", () => {
+		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", async () => {
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 			prompter.confirmCalled = false;
@@ -302,7 +302,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.5.0");
 		});
 
-		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", () => {
+		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", async () => {
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 
@@ -595,13 +595,13 @@ describe("project unit tests", () => {
 		it("disallows 'add' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]));
+			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]));
 		});
 
 		it("disallows 'del' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]));
+			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]));
 		});
 
 		it("sets bundle version when given proper input", () => {
@@ -614,7 +614,7 @@ describe("project unit tests", () => {
 		it("throws on invalid bundle version string", () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			assert.throws(() => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]));
+			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]));
 		});
 
 		it("sets enumerated property", () => {
@@ -627,7 +627,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated property", () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			assert.throws(() => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]));
+			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]));
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
@@ -667,7 +667,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			assert.throws(() => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]));
+			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]));
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
@@ -756,7 +756,7 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("adds CorePlugins to configuration specfic data when it is specified", () => {
+			it("adds CorePlugins to configuration specfic data when it is specified", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -772,7 +772,7 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("removes CorePlugin from debug configuration data when it is specified", () => {
+			it("removes CorePlugin from debug configuration data when it is specified", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -786,7 +786,7 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("sets CorePlugins to debug configuration when it is specified", () => {
+			it("sets CorePlugins to debug configuration when it is specified", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -868,7 +868,7 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("after prop add", () => {
+			it("after prop add", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status",
@@ -876,7 +876,7 @@ describe("project unit tests", () => {
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop set", () => {
+			it("after prop set", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -884,7 +884,7 @@ describe("project unit tests", () => {
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop rm", () => {
+			it("after prop rm", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -912,7 +912,7 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("adds CorePlugins to configuration specfic data", () => {
+			it("adds CorePlugins to configuration specfic data", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -929,7 +929,7 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("removes CorePlugin from all configurations", () => {
+			it("removes CorePlugin from all configurations", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], []);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
@@ -942,7 +942,7 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("sets CorePlugins to both configurations when it is specified", () => {
+			it("sets CorePlugins to both configurations when it is specified", async () => {
 				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], []);
 				assert.deepEqual(["org.apache.cordova.file"], projectData.CorePlugins);
 
@@ -965,7 +965,7 @@ describe("project unit tests", () => {
 					CorePlugins: ["org.apache.cordova.camera"]
 				}
 			};
-			assert.throws(() => await  projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []));
+			assert.throws(async () => await  projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []));
 			assert.deepEqual(["org.apache.cordova.battery-status"], projectData.CorePlugins);
 			assert.deepEqual(["org.apache.cordova.contacts"], configSpecificData["debug"].CorePlugins);
 			assert.deepEqual(["org.apache.cordova.camera"], configSpecificData["release"].CorePlugins);

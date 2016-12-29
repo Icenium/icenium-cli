@@ -302,42 +302,42 @@ describe("commands service", () => {
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it has valid mandatory arguments", () => {
+		it("executes command when it has valid mandatory arguments", async () => {
 			await commandsService.tryExecuteCommand("commandWithOneMandatArg", ["simple string param"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it has missing mandatory argument", () => {
+		it("does not execute command when it has missing mandatory argument", async () => {
 			await commandsService.tryExecuteCommand("commandWithOneMandatArg", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it doesn't accept arguments and there aren't passed any", () => {
+		it("executes command when it doesn't accept arguments and there aren't passed any", async () => {
 			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it doesn't accept arguments, but there are passed some", () => {
+		it("does not execute command when it doesn't accept arguments, but there are passed some", async () => {
 			await commandsService.tryExecuteCommand("commandWithoutArgs", ["argument"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("does not execute command when it accepts arguments and the validation method of one of them is failing", () => {
+		it("does not execute command when it accepts arguments and the validation method of one of them is failing", async () => {
 			await commandsService.tryExecuteCommand("commandWithInvalidArgs", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it has some nonmandatory arguments and there aren't passed any", () => {
+		it("executes command when it has some nonmandatory arguments and there aren't passed any", async () => {
 			await commandsService.tryExecuteCommand("commandWithOneNonMandatArg", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("executes command when it has some mandatory arguments and all of them are passed", () => {
+		it("executes command when it has some mandatory arguments and all of them are passed", async () => {
 			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1", "param2"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it has some mandatory arguments and not all of them are passed", () => {
+		it("does not execute command when it has some mandatory arguments and not all of them are passed", async () => {
 			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1"]);
 			assert.isFalse(isCommandExecuted);
 		});
@@ -357,17 +357,17 @@ describe("commands service", () => {
 			assert.isFalse(isValidateCommandArgumentsCalled);
 		});
 
-		it("executes command when it implements canExecute and it returns true", () => {
+		it("executes command when it implements canExecute and it returns true", async () => {
 			await commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it implements canExecute and it returns false", () => {
+		it("does not execute command when it implements canExecute and it returns false", async () => {
 			await commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("does not execute command when it has isEnabled set to false", () => {
+		it("does not execute command when it has isEnabled set to false", async () => {
 			await commandsService.tryExecuteCommand("commandWithIsDisabledSetToTrue", []);
 			assert.isFalse(isCommandExecuted);
 		});

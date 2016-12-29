@@ -252,53 +252,53 @@ describe("cloud project commands", () => {
 					exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
 				});
 
-				it("returns true when no arguments are specified", () => {
+				it("returns true when no arguments are specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute([]));
 				});
 
-				it("returns true when valid solution name is specified", () => {
+				it("returns true when valid solution name is specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["Sln1"]));
 				});
 
-				it("returns true when valid solution name and project name are specified", () => {
+				it("returns true when valid solution name and project name are specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 
-				it("returns true when valid solution index is specified", () => {
+				it("returns true when valid solution index is specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["1"]));
 				});
 
-				it("returns true when valid solution id and project name are specified", () => {
+				it("returns true when valid solution id and project name are specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]));
 				});
 
-				it("returns true when valid solution name and project id are specified", () => {
+				it("returns true when valid solution name and project id are specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]));
 				});
 
-				it("returns true when valid solution id and project id are specified", () => {
+				it("returns true when valid solution id and project id are specified", async () => {
 					await assert.isTrue(exportProjectCommand.canExecute(["1", "2"]));
 				});
 
 				it("fails when more than two arguments are passed", () => {
-					assert.throws(() => await  exportProjectCommand.canExecute(["1", "2", "3"]));
+					assert.throws(async () => await  exportProjectCommand.canExecute(["1", "2", "3"]));
 				});
 
 				it("fails when solution does not have any projects", () => {
-					assert.throws(() => await  exportProjectCommand.canExecute(["Sln2"]));
+					assert.throws(async () => await  exportProjectCommand.canExecute(["Sln2"]));
 				});
 
 				it("fails when there's projectData", () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
-					assert.throws(() => await  exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
+					assert.throws(async () => await  exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 			});
 
 			it("fails when console is not interactive and command arguments are not passed", () => {
 				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-				assert.throws(() => await  exportProjectCommand.canExecute([]));
+				assert.throws(async () => await  exportProjectCommand.canExecute([]));
 			});
 		});
 
@@ -318,19 +318,19 @@ describe("cloud project commands", () => {
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 				});
 
-				it("successfully exports project when solution name and project name are correct", () => {
+				it("successfully exports project when solution name and project name are correct", async () => {
 					await exportProjectCommand.execute(["Sln1", "BlankProj"]);
 				});
 
-				it("successfully exports project when solution id and project name are correct", () => {
+				it("successfully exports project when solution id and project name are correct", async () => {
 					await exportProjectCommand.execute(["1", "BlankProj"]);
 				});
 
-				it("successfully exports project when solution name and project id are correct", () => {
+				it("successfully exports project when solution name and project id are correct", async () => {
 					await exportProjectCommand.execute(["Sln1", "2"]);
 				});
 
-				it("successfully exports project when solution id and project id are correct", () => {
+				it("successfully exports project when solution id and project id are correct", async () => {
 					await exportProjectCommand.execute(["1", "2"]);
 				});
 			});
@@ -343,12 +343,12 @@ describe("cloud project commands", () => {
 					assert.equal("", logger.infoOutput);
 				});
 
-				it("successfully exports project when solution name is correct and there are more than one projects in solution", () => {
+				it("successfully exports project when solution name is correct and there are more than one projects in solution", async () => {
 					await exportProjectCommand.execute(["Sln1"]);
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 				});
 
-				it("successfully exports project when solution name is correct and there is only one projects in solution", () => {
+				it("successfully exports project when solution name is correct and there is only one projects in solution", async () => {
 					await exportProjectCommand.execute(["Sln3"]);
 					let prompter:PrompterStub = testInjector.resolve("prompter");
 					assert.isFalse(prompter.isPrompterCalled);
@@ -378,7 +378,7 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", () => {
 					fs.exists = (projectDir: string) => true;
-					assert.throws(() => await  exportProjectCommand.execute(["Sln1", "BlankProj"]));
+					assert.throws(async () => await  exportProjectCommand.execute(["Sln1", "BlankProj"]));
 				});
 
 				it("warns when unable to create project file", () => {
@@ -407,23 +407,23 @@ describe("cloud project commands", () => {
 				commandParamter = listProjectCommand.allowedParameters[0];
 			});
 
-			it("validate method returns true when valid solution name is passed", () => {
+			it("validate method returns true when valid solution name is passed", async () => {
 				await assert.isTrue(commandParamter.validate("Sln1"));
 			});
 
-			it("validate method returns true when valid solution id is passed", () => {
+			it("validate method returns true when valid solution id is passed", async () => {
 				await assert.isTrue(commandParamter.validate("1"));
 			});
 
 			it("validate method throws error when invalid solution name is passed", () => {
-				assert.throws(() => await  commandParamter.validate("Invalid name"));
+				assert.throws(async () => await  commandParamter.validate("Invalid name"));
 			});
 
 			it("validate method throws error when invalid solution id is passed", () => {
-				assert.throws(() => await  commandParamter.validate("100"));
+				assert.throws(async () => await  commandParamter.validate("100"));
 			});
 
-			it("validate method returns false when validation value is not passed", () => {
+			it("validate method returns false when validation value is not passed", async () => {
 				await assert.isFalse(commandParamter.validate(undefined));
 			});
 		});
@@ -445,15 +445,15 @@ describe("cloud project commands", () => {
 				assert.isTrue(aBlankPrjMobileTestingIndex < blankProjIndex);
 			});
 
-			it("when solution name is passed", () => {
+			it("when solution name is passed", async () => {
 				await listProjectCommand.execute(["Sln1"]);
 			});
 
-			it("when solution id is passed", () => {
+			it("when solution id is passed", async () => {
 				await listProjectCommand.execute(["1"]);
 			});
 
-			it("when solution name is NOT passed", () => {
+			it("when solution name is NOT passed", async () => {
 				await listProjectCommand.execute([]);
 			});
 		});

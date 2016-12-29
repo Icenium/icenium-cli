@@ -248,7 +248,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
 			if (this.$project.hasBuildConfigurations) {
 				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
-				_.each(configs, (configuration: string) => {
+				_.each(configs, async (configuration: string) => {
 					await this.configurePluginCore(pluginName, configuration, version);
 				});
 			} else {
@@ -309,7 +309,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let pluginBasicInfo = await  super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
 			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 
-			_.each(configurations, (configuration) => {
+			_.each(configurations, async (configuration) => {
 				await this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration);
 			});
 
@@ -627,7 +627,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				}
 
 				selectedVersion = await  this.selectPluginVersion(version, installedPlugin, { excludeCurrentVersion: true });
-				_.each(configurationsToEdit, (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+				_.each(configurationsToEdit, async (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
 				return;
 			}
 
@@ -637,7 +637,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					case removeItemChoice:
 						selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
 						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
-						_.each(this.specifiedConfigurations, (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+						_.each(this.specifiedConfigurations, async (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
 						break;
 					case modifyAllConfigs:
 						selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
