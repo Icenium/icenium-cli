@@ -7,27 +7,27 @@ declare module Server {
 	}
 
 	interface IServiceProxy {
-		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T>;
+		call<T>(name: string, method: string, path: string, accept: string, body: IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T>;
 		setShouldAuthenticate(shouldAuthenticate: boolean): void;
 	}
 
 	interface IAppBuilderServiceProxy extends IServiceProxy {
-		makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T>
+		makeTapServiceCall<T>(call: () => Promise<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T>
 	}
 
 	interface IServiceContractProvider {
-		getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract>;
+		getApi(path?: string): Promise<Swagger.ISwaggerServiceContract>;
 	}
 
 	interface IIdentityManager {
-		listCertificates(): IFuture<void>;
-		listProvisions(provisionStr?: string): IFuture<void>;
-		findCertificate(identityStr: string): IFuture<ICryptographicIdentity>;
-		findProvision(provisionStr: string): IFuture<IProvision>;
-		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): IFuture<IProvision>;
-		autoselectCertificate(provision: IProvision): IFuture<ICryptographicIdentity>;
+		listCertificates(): Promise<void>;
+		listProvisions(provisionStr?: string): Promise<void>;
+		findCertificate(identityStr: string): Promise<ICryptographicIdentity>;
+		findProvision(provisionStr: string): Promise<IProvision>;
+		autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): Promise<IProvision>;
+		autoselectCertificate(provision: IProvision): Promise<ICryptographicIdentity>;
 		isCertificateCompatibleWithProvision(certificate: ICryptographicIdentity, provision: IProvision): boolean;
-		findReleaseCertificate(): IFuture<ICryptographicIdentity>;
+		findReleaseCertificate(): Promise<ICryptographicIdentity>;
 	}
 
 	interface IPackageDef {
@@ -147,21 +147,21 @@ interface IUser {
 }
 
 interface IUserDataStore {
-	hasCookie(): IFuture<boolean>;
-	getCookies(): IFuture<IStringDictionary>;
-	getUser(): IFuture<IUser>;
+	hasCookie(): Promise<boolean>;
+	getCookies(): Promise<IStringDictionary>;
+	getUser(): Promise<IUser>;
 	setCookies(cookies?: IStringDictionary): void;
 	parseAndSetCookies(setCookieHeader: any, cookies?: IStringDictionary): void;
-	setUser(user?: IUser): IFuture<void>;
-	clearLoginData(): IFuture<void>;
+	setUser(user?: IUser): Promise<void>;
+	clearLoginData(): Promise<void>;
 }
 
 interface ILoginManager {
-	login(): IFuture<void>;
-	logout(): IFuture<void>;
-	isLoggedIn(): IFuture<boolean>;
-	ensureLoggedIn(): IFuture<void>;
-	telerikLogin(user: string, password: string): IFuture<void>;
+	login(): Promise<void>;
+	logout(): Promise<void>;
+	isLoggedIn(): Promise<boolean>;
+	ensureLoggedIn(): Promise<void>;
+	telerikLogin(user: string, password: string): Promise<void>;
 }
 
 declare module Server.Contract {
@@ -204,11 +204,11 @@ declare module Project {
 	}
 
 	interface IBuildService {
-		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): IFuture<string>;
-		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void>;
-		build(settings: IBuildSettings): IFuture<Server.IPackageDef[]>;
-		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation>;
-		buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string>;
+		getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): Promise<string>;
+		executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void>;
+		build(settings: IBuildSettings): Promise<Server.IPackageDef[]>;
+		buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): Promise<IApplicationInformation>;
+		buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): Promise<string>;
 	}
 
 	interface IBuildSettings {
@@ -228,7 +228,7 @@ declare module Project {
 	}
 
 	interface IProjectMigrationService {
-		migrateTypeScriptProject(): IFuture<void>;
+		migrateTypeScriptProject(): Promise<void>;
 	}
 }
 
@@ -249,10 +249,10 @@ interface IProjectPropertiesService {
 	getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): Project.IData;
 
 	completeProjectProperties(properties: any, frameworkProject: Project.IFrameworkProject): boolean;
-	updateProjectProperty(projectData: any, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): IFuture<void>;
+	updateProjectProperty(projectData: any, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): Promise<void>;
 	normalizePropertyName(property: string, projectData: Project.IData): string;
-	getValidValuesForProperty(propData: any): IFuture<string[]>;
-	getPropertiesForAllSupportedProjects(): IFuture<string>;
+	getValidValuesForProperty(propData: any): Promise<string[]>;
+	getPropertiesForAllSupportedProjects(): Promise<string>;
 	/**
 	 * Removes property from the project and validates the result data.  If it is configuration specific (commonly written in .debug.abproject or .release.abproject)
 	 * you have to pass the projectData as last parameter of the method.
@@ -271,11 +271,11 @@ interface IProjectPropertiesService {
 	 * @param {string} mode Type of operation which should be executed with the property.
 	 * @param {Array<any>} newValue The new value that should be used for CorePlugins modification.
 	 * @param {string[]} configurationsSpecifiedByUser The configurations which the user want to modify.
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 * @throws Error when the modified data cannot be validated with the respective JSON schema. In this case the modification is not saved to the file.
 	 * @throws Error when the different CorePlugins are enabled in projectData and any configuration specific data.
 	 */
-	updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void>
+	updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): Promise<void>
 }
 
 interface IServerConfigurationData {
@@ -329,9 +329,9 @@ interface IDependencyConfigService {
 }
 
 interface IServerConfiguration {
-	tfisServer: IFuture<string>;
-	assemblyVersion: IFuture<string>;
-	resourcesPath: IFuture<string>;
+	tfisServer: Promise<string>;
+	assemblyVersion: Promise<string>;
+	resourcesPath: Promise<string>;
 }
 
 interface IExtensionPlatformServices extends IRunValidator {
@@ -341,12 +341,12 @@ interface IExtensionPlatformServices extends IRunValidator {
 }
 
 interface IDebuggerService {
-	debugAndroidApplication(applicationId: string, framework: string): IFuture<void>;
+	debugAndroidApplication(applicationId: string, framework: string): Promise<void>;
 	debugIosApplication(applicationId: string): void;
 }
 
 interface IRunValidator {
-	canRunApplication(): IFuture<boolean>;
+	canRunApplication(): Promise<boolean>;
 }
 
 interface IX509Certificate {
@@ -381,21 +381,21 @@ interface IPackageDownloadViewModel {
 interface IResourceDownloader {
 	/**
 	 * Download all cordova javascript fies - Android, iOS and WP8
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	downloadCordovaJsFiles(): IFuture<void>;
+	downloadCordovaJsFiles(): Promise<void>;
 	/**
 	 * Download a specific resource from the server
 	 * @param  {string}        remotePath the path to the resource on the remote server
 	 * @param  {string}        targetPath the path where the resource is written
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	downloadResourceFromServer(remotePath: string, targetPath: string): IFuture<void>;
+	downloadResourceFromServer(remotePath: string, targetPath: string): Promise<void>;
 	/**
 	 * Download image definitions json file from the server
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	downloadImageDefinitions(): IFuture<void>;
+	downloadImageDefinitions(): Promise<void>;
 }
 
 interface IUserSettingsFileService {
@@ -427,21 +427,21 @@ interface IExtensionsServiceBase {
 }
 
 interface IServerExtensionsService extends IExtensionsServiceBase {
-	prepareExtension(packageName: string, beforeDownloadPackageAction: () => void): IFuture<void>;
+	prepareExtension(packageName: string, beforeDownloadPackageAction: () => void): Promise<void>;
 }
 
 interface IAppScaffoldingExtensionsService {
 	appScaffoldingPath: string;
-	prepareAppScaffolding(afterPrepareAction?: () => void): IFuture<void>;
+	prepareAppScaffolding(afterPrepareAction?: () => void): Promise<void>;
 }
 
 interface IScreenBuilderService {
 	generatorFullName: string;
 	commandsPrefix: string;
 	screenBuilderSpecificFiles: string[];
-	prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean>;
-	allSupportedCommands(projectPath: string, generatorName?: string): IFuture<string[]>;
-	generateAllCommands(projectPath: string, generatorName?: string): IFuture<void>;
+	prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<boolean>;
+	allSupportedCommands(projectPath: string, generatorName?: string): Promise<string[]>;
+	generateAllCommands(projectPath: string, generatorName?: string): Promise<void>;
 
 	/**
 	 * Gets answers of all screenBuilder questions from specified JSON file.
@@ -456,8 +456,8 @@ interface IScreenBuilderService {
 	 * @param {string} projectPath Path to project that will be checked.
 	 */
 	ensureScreenBuilderProject(projectPath: string): void;
-	shouldUpgrade(projectPath: string): IFuture<boolean>;
-	upgrade(projectPath: string): IFuture<void>;
+	shouldUpgrade(projectPath: string): Promise<boolean>;
+	upgrade(projectPath: string): Promise<void>;
 }
 
 /**
@@ -505,16 +505,16 @@ interface IExtensionData {
 interface IFrameworkMigrationService {
 	/**
 	 * Downloads the data that is required in order to be able to migrate any project.
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	downloadMigrationData(): IFuture<void>;
+	downloadMigrationData(): Promise<void>;
 
 	/**
 	 * Downloads the configuration file which contains information about migrating project.
 	 * @param  {string} the directory in which to save the file.
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	downloadMigrationConfigFile(targetPath?: string): IFuture<void>;
+	downloadMigrationConfigFile(targetPath?: string): Promise<void>;
 
 	/**
 	 * Gives a list of all supported versions. Each version is a string in the following format <Major>.<Minor>.<Patch>
@@ -538,9 +538,9 @@ interface IFrameworkMigrationService {
 	/**
 	 * Hook which is dynamically called when a project's framework version is changing
 	 * @param  {string} newVersion The version to upgrade/downgrade to
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	onFrameworkVersionChanging(newVersion: string): IFuture<void>;
+	onFrameworkVersionChanging(newVersion: string): Promise<void>;
 }
 
 /**
@@ -559,13 +559,13 @@ interface ICordovaMigrationService extends IFrameworkMigrationService {
 	 * @param {string} toVersion The Cordova Framework version to be used.
 	 * @return {string[]} Migrated plugins.
 	 */
-	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]>;
+	migratePlugins(plugins: string[], fromVersion: string, toVersion: string): Promise<string[]>;
 	/**
 	 * Hook which is dynamically called when a project's windows phone sdk version is changing
 	 * @param  {string} newVersion The version to upgrade/downgrade to
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	onWPSdkVersionChanging?(newVersion: string): IFuture<void>;
+	onWPSdkVersionChanging?(newVersion: string): Promise<void>;
 }
 
 /**
@@ -604,22 +604,22 @@ interface ICordovaJsonData {
 }
 
 interface ISamplesService {
-	cloneSample(sampleName: string): IFuture<void>;
-	printSamplesInformation(framework?: string): IFuture<void>;
+	cloneSample(sampleName: string): Promise<void>;
+	printSamplesInformation(framework?: string): Promise<void>;
 }
 
 interface IExpress {
 	run(): void;
 	listen(port: number, callback?: Function): any;
-	post(route: string, callback: (req: any, res: any) => IFuture<void>): void;
+	post(route: string, callback: (req: any, res: any) => Promise<void>): void;
 }
 
 interface IDomainNameSystem {
-	getDomains(): IFuture<string[]>;
+	getDomains(): Promise<string[]>;
 }
 
 interface ICordovaPluginsService {
-	getAvailablePlugins(): IFuture<Server.CordovaPluginData[]>;
+	getAvailablePlugins(): Promise<Server.CordovaPluginData[]>;
 	createPluginData(plugin: any): IPlugin[];
 }
 
@@ -654,25 +654,25 @@ interface IPluginsService {
 	 * Adds plugin to the current project, so it can be used in the application.
 	 * @param {string} pluginName The name of the plugin that has to be added. It can contains the required version.
 	 * For example these are valid names: "lodash", "lodash@3.10.1"
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	addPlugin(pluginName: string): IFuture<void>;
+	addPlugin(pluginName: string): Promise<void>;
 
 	/**
 	 * Removes plugin from the current project.
 	 * @param {string} pluginName The name of the plugin that has to be removed.
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	removePlugin(pluginName: string): IFuture<void>;
+	removePlugin(pluginName: string): Promise<void>;
 
 	/**
 	 * Used to configure a plugin.
 	 * @param  {string}        pluginName     The name of the plugin.
 	 * @param  {string}        version        The version of the plugin.
 	 * @param  {string[]}      configurations Configurations in which the plugin should be configured. Example: ['debug'], ['debug', 'release']
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
+	configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void>;
 
 	/**
 	 * Checks if the specified plugin is installed for the current project.
@@ -684,30 +684,30 @@ interface IPluginsService {
 	/**
 	 * Returns basic information about the plugin - it's name, version and cordova version range
 	 * @param  {string}                  pluginName The name of the plugin
-	 * @return {IFuture<IBasicPluginInformation>}            Basic information about the plugin
+	 * @return {Promise<IBasicPluginInformation>}            Basic information about the plugin
 	 */
-	getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation>;
+	getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation>;
 
 	/**
 	 * Copies the source code of a plugin inside the project and adds it as a reference, so it can be used within the application.
 	 * @param {string} pluginIdentifier The identifier of the plugin that will be copied to the source code.
-	 * @return {IFuture<string>} The name of the fetched plugin.
+	 * @return {Promise<string>} The name of the fetched plugin.
 	 */
-	fetch(pluginIdentifiers: string): IFuture<string>;
+	fetch(pluginIdentifiers: string): Promise<string>;
 
 	/**
 	 * Search for plugins based on specified keywords and returns plugins source which contains methods for working with the result.
 	 * @param {string[]} keywords Array of keywords that will be used for searching.
 	 * @return {IPluginsSource} Plugins source which contains methods for working with the result.
 	 */
-	findPlugins(keywords: string[]): IFuture<IPluginsSource>;
+	findPlugins(keywords: string[]): Promise<IPluginsSource>;
 
 	/**
 	 * Filters plugin based on framework specific rules.
 	 * @param {IPlugin[]} plugins Array of plugins to be filtered.
-	 * @return {IFuture<IPlugin[]>} Plugins that pass the filter.
+	 * @return {Promise<IPlugin[]>} Plugins that pass the filter.
 	 */
-	filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]>;
+	filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]>;
 }
 
 interface IPlugin {
@@ -885,32 +885,32 @@ interface IMarketplacePlugin extends IPlugin {
 }
 
 interface IProcessInfo {
-	isRunning(name: string): IFuture<boolean>;
+	isRunning(name: string): Promise<boolean>;
 }
 
 interface IRemoteProjectService {
-	getProjectProperties(solutionName: string, projectName: string): IFuture<any>;
-	getProjectsForSolution(solutionId: string): IFuture<Server.IWorkspaceItemData[]>;
-	getProjectName(solutionId: string, projectId: string): IFuture<string>;
-	exportProject(remoteSolutionName: string, remoteProjectName: string): IFuture<void>;
-	exportSolution(remoteSolutionName: string): IFuture<void>;
-	getAvailableAppsAndSolutions(): IFuture<ITapAppData[]>;
-	getSolutionData(propertyValue: string): IFuture<Server.SolutionData>;
+	getProjectProperties(solutionName: string, projectName: string): Promise<any>;
+	getProjectsForSolution(solutionId: string): Promise<Server.IWorkspaceItemData[]>;
+	getProjectName(solutionId: string, projectId: string): Promise<string>;
+	exportProject(remoteSolutionName: string, remoteProjectName: string): Promise<void>;
+	exportSolution(remoteSolutionName: string): Promise<void>;
+	getAvailableAppsAndSolutions(): Promise<ITapAppData[]>;
+	getSolutionData(propertyValue: string): Promise<Server.SolutionData>;
 }
 
 interface IProjectSimulatorService {
-	getSimulatorParams(simulatorPackageName: string): IFuture<string[]>;
+	getSimulatorParams(simulatorPackageName: string): Promise<string[]>;
 }
 
 interface ILiveSyncService {
-	livesync(platform?: string): IFuture<void>;
+	livesync(platform?: string): Promise<void>;
 }
 
 interface IAppManagerService {
-	upload(platform: string): IFuture<void>;
+	upload(platform: string): Promise<void>;
 	openAppManagerStore(): void;
-	publishLivePatch(platforms: string[]): IFuture<void>;
-	getGroups(): IFuture<void>;
+	publishLivePatch(platforms: string[]): Promise<void>;
+	getGroups(): Promise<void>;
 }
 
 interface IDynamicSubCommandInfo {
@@ -920,14 +920,14 @@ interface IDynamicSubCommandInfo {
 }
 
 interface IKendoUIService {
-	getKendoPackages(options: IKendoUIFilterOptions): IFuture<Server.IKendoDownloadablePackageData[]>;
+	getKendoPackages(options: IKendoUIFilterOptions): Promise<Server.IKendoDownloadablePackageData[]>;
 }
 
 interface IPublishService {
-	publish(idOrUrl: string, username: string, password: string): IFuture<void>;
+	publish(idOrUrl: string, username: string, password: string): Promise<void>;
 	listAllConnections(): void;
-	addConnection(name: string, publishUrl: string): IFuture<void>;
-	removeConnection(idOrName: string): IFuture<void>;
+	addConnection(name: string, publishUrl: string): Promise<void>;
+	removeConnection(idOrName: string): Promise<void>;
 }
 
 interface IPublishConnection extends IStringDictionary {
@@ -1034,7 +1034,7 @@ interface IWebViewService {
 	getWebView(platform: string, webViewName: string, frameworkVersion: string): IWebView;
 	getWebViews(platform: string): IWebView[];
 	getWebViewNames(platform: string): string[];
-	enableWebView(platform: string, webViewName: string, frameworkVersion: string): IFuture<void>;
+	enableWebView(platform: string, webViewName: string, frameworkVersion: string): Promise<void>;
 	getCurrentWebViewName(platform: string): string;
 }
 
@@ -1055,9 +1055,9 @@ interface IWebView {
 interface ISimulatorService {
 	/**
 	 * Used to start simulator
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	launchSimulator(): IFuture<void>;
+	launchSimulator(): Promise<void>;
 }
 
 
@@ -1074,15 +1074,15 @@ interface IImageService {
 	 * @param  {string}           initialImagePath hi-res image from which to generate all the others
 	 * @param  {Server.ImageType} imageType        Icon or Splashscreen
 	 * @param  {boolean}          force            whether to overwrite conflicting images
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void>;
+	generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): Promise<void>;
 	/**
 	 * Prompt the user for more information about image generation
 	 * @param  {boolean}       force whether to overwrite conflicting images
-	 * @return {IFuture<void>}
+	 * @return {Promise<void>}
 	 */
-	promptForImageInformation(force: boolean): IFuture<void>;
+	promptForImageInformation(force: boolean): Promise<void>;
 }
 
 /**
@@ -1094,7 +1094,7 @@ interface IRemoteService {
 	 * Listens on an API endpoint to launch ios simulator
 	 * @param portNumber
 	 */
-	startApiServer(portNumber: number): IFuture<void>;
+	startApiServer(portNumber: number): Promise<void>;
 }
 
 /**
@@ -1126,14 +1126,14 @@ interface IAppStoreService {
 	 * @param password
 	 * @param application
 	 */
-	upload(userName: string, password: string, application: string): IFuture<void>;
+	upload(userName: string, password: string, application: string): Promise<void>;
 
 	/**
 	 * Query the server for applications ready to upload to itunes connect
 	 * @param userName
 	 * @param password
 	 */
-	getApplicationsReadyForUpload(userName: string, password: string): IFuture<Server.Application[]>;
+	getApplicationsReadyForUpload(userName: string, password: string): Promise<Server.Application[]>;
 }
 
 
@@ -1142,7 +1142,7 @@ interface IAppStoreService {
  */
 interface IScaffolder {
 	scaffolder: any;
-	future: IFuture<any>;
+	future: Promise<any>;
 	callback: Function;
 }
 
@@ -1229,7 +1229,7 @@ interface IIonicProjectTransformator {
 	/**
 	 * Creates AppBuilder project from Ionic project by removing unnecesary files, copying the resources and parsing the Ionic config.xml file.
 	 */
-	transformToAppBuilderProject(createBackup: boolean): IFuture<void>
+	transformToAppBuilderProject(createBackup: boolean): Promise<void>
 }
 
 /**
@@ -1241,13 +1241,13 @@ interface IClipboardService {
 	 * @param {string} text to place in the clipboard.
 	 * @return {string} the same value passed in.
 	 */
-	copy(text: string): IFuture<string>;
+	copy(text: string): Promise<string>;
 
 	/**
 	 * Returns the current contents of the system clipboard.
 	 * @return {string} the current contents of the system clipboard.
 	 */
-	paste(): IFuture<string>;
+	paste(): Promise<string>;
 }
 
 /**

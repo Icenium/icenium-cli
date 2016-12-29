@@ -10,7 +10,7 @@ interface ITemplatesService {
 	 * @returns {string} A string including list of all available templates.
 	 */
 	getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string;
-	downloadProjectTemplates(): IFuture<void>;
-	downloadItemTemplates(): IFuture<void>;
-	unpackAppResources(): IFuture<void>;
+	downloadProjectTemplates(): Promise<void>;
+	downloadItemTemplates(): Promise<void>;
+	unpackAppResources(): Promise<void>;
 }

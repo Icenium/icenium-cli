@@ -1,6 +1,6 @@
 interface ICryptographicIdentityStoreService {
-	getAllProvisions(): IFuture<IProvision[]>;
-	getAllIdentities(): IFuture<ICryptographicIdentity[]>;
+	getAllProvisions(): Promise<IProvision[]>;
+	getAllIdentities(): Promise<ICryptographicIdentity[]>;
 }
 
 interface IProvision {

@@ -60,9 +60,9 @@ interface IValidator<Input> {
 }
 
 interface IAsyncValidator<Input> {
-	throwIfInvalid(data: Input): IFuture<void>;
-	validate(data: Input): IFuture<IValidationResult>;
-	validateProperty(data: Input, propertyName: string): IFuture<IValidationResult>;
+	throwIfInvalid(data: Input): Promise<void>;
+	validate(data: Input): Promise<IValidationResult>;
+	validateProperty(data: Input, propertyName: string): Promise<IValidationResult>;
 }
 
 interface IiOSDeploymentValidatorModel {
