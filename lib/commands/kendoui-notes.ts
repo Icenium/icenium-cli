@@ -16,8 +16,7 @@ class KendoUINotesCommand extends KendoUIBaseCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let packages = await  this.getKendoPackages({withReleaseNotesOnly: true});
 			if (packages.length === 1) {
 				this.$opener.open(_.first(packages).ReleaseNotesUrl);
@@ -40,7 +39,6 @@ class KendoUINotesCommand extends KendoUIBaseCommand implements ICommand {
 				selectedPackage = packages[parseInt(choice.packageIdx) - 1];
 
 			this.$opener.open(selectedPackage.ReleaseNotesUrl);
-		}).future<void>()();
 	}
 }
 

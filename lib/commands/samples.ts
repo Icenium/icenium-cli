@@ -43,8 +43,7 @@ class CloneCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			if(validationValue) {
 				let sampleName = <string>validationValue;
 				let cloneTo = this.$options.path || sampleName;
@@ -56,6 +55,5 @@ class CloneCommandParameter implements ICommandParameter {
 			}
 
 			return false;
-		}).future<boolean>()();
 	}
 }

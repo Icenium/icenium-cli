@@ -216,15 +216,13 @@ export class ErrorsNoFailStub implements IErrors {
 		throw new Error(message);
 	}
 
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		return (() => {
+	async beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): Promise<boolean> {
 			try {
 				let result = await  action();
 				return result;
 			} catch (ex) {
 				return false;
 			}
-		}).future<boolean>()();
 	}
 
 	executeAction(action: Function): any {
@@ -479,11 +477,10 @@ export class HooksService implements IHooksService {
 	}
 	initialize(commandName: string): void {
 	}
-	executeBeforeHooks(): IFuture<void> {
-		return (() => { }).future<void>()();
+	async executeBeforeHooks(): Promise<void> { }).future<void>()();
 	}
 	executeAfterHooks(): IFuture<void> {
-		return (() => { }).future<void>()();
+		return (() => {
 	}
 }
 

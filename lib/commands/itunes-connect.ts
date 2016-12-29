@@ -25,8 +25,7 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 
     allowedParameters = [new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
-    execute(args: string[]): IFuture<void> {
-		return (() => {
+    async execute(args: string[]): Promise<void> {
 			await this.$loginManager.ensureLoggedIn();
 
 			let userName = args[0];
@@ -54,8 +53,6 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 				table.push([app.Application, (<any>app)["Version Number"], app.ReservedBundleIdentifier]);
 			});
 			this.$logger.out(table.toString());
-
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("appstore|list", ListApplicationsReadyForUploadCommand);
@@ -75,8 +72,7 @@ export class UploadApplicationCommand implements ICommand {
 	allowedParameters = [this.$stringParameterBuilder.createMandatoryParameter("No application specified. Specify an application that is ready for upload in iTunes Connect."),
 		new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector)];
 
-	execute(args:string[]): IFuture<void> {
-		return (() => {
+	async execute(args:string[]): Promise<void> {
 			if(!this.$project.capabilities.uploadToAppstore) {
 				this.$errors.failWithoutHelp("You cannot upload %s projects to AppStore.", this.$project.projectData.Framework);
 			}
@@ -109,7 +105,6 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			await this.$appStoreService.upload(userName, password, application);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("appstore|upload", UploadApplicationCommand);

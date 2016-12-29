@@ -7,8 +7,7 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 		this.$project.ensureProject();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	async canExecute(args: string[]): Promise<boolean> {
 			if (await this.$project.validateProjectProperty(args[0], _.tail(args), "add")) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
@@ -17,13 +16,10 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 			}
 
 			return false;
-		}).future<boolean>()();
 	}
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			await this.$project.updateProjectPropertyAndSave("add", args[0], _.tail(args));
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];

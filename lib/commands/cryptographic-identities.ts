@@ -254,8 +254,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 		private $httpClient: Server.IHttpClient,
 		private $logger: ILogger) { }
 
-	gatherIdentityInformation(model: IIdentityInformation): IFuture<IIdentityInformation> {
-		return (() => {
+	async gatherIdentityInformation(model: IIdentityInformation): Promise<IIdentityInformation> {
 			let myCountry = model.Country;
 			if (!myCountry) {
 				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
@@ -303,8 +302,6 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 			}
 
 			return schema.length ? await this.$prompter.get(schema) : {};
-
-		}).future<IIdentityInformation>()();
 	}
 
 	private async getDefaultCountry(): Promise<string> {
@@ -330,8 +327,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 		private $errors: IErrors,
 		private $injector: IInjector) { }
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let type = args[3];
 			if (type && type.toLowerCase() !== "generic" && type.toLowerCase() !== "googleplay") {
 				this.$errors.fail("Certificate type must be either 'Generic' or 'GooglePlay'");
@@ -359,7 +355,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 			let endDate = this.model.EndDate;
 			if (!endDate) {
-				endDate = this.$prompter.get([{
+				endDate = await this.$prompter.get([{
 					message: "Valid until (yyyy-mm-dd)",
 					type: "input",
 					name: "EndDate",
@@ -374,14 +370,13 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 						return validationResult.isSuccessful ? true : validationResult.error;
 					}
-				await }]);
+				}]);
 				_.extend(this.model, endDate);
 			}
 
 			let identityGenerationData = IdentityGenerationDataFactory.create(this.model);
 			let result = await  this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData);
 			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [new commandParams.StringCommandParameter(this.$injector), new commandParams.StringCommandParameter(this.$injector),
@@ -452,15 +447,13 @@ export class RemoveCryptographicIdentity implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index.")];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let nameOrIndex = args[0];
 			let identity = await  this.$identityManager.findCertificate(nameOrIndex);
 
 			if (this.$options.force || await  this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false)) {
 				await this.$server.identityStore.removeIdentity(identity.Alias);
 			}
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("certificate|remove", RemoveCryptographicIdentity);
@@ -479,8 +472,7 @@ export class ExportCryptographicIdentity implements ICommand {
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate name or index."),
 		new commandParams.StringCommandParameter(this.$injector)];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let nameOrIndex = args[0];
 			let password = args[1];
 
@@ -510,7 +502,6 @@ export class ExportCryptographicIdentity implements ICommand {
 
 			this.$logger.info("Exporting certificate to file '%s'.", targetFileName);
 			await this.$server.identityStore.getIdentity(name, password, targetFile);
-		}).future<void>()();
 	}
 
 	private getPath(): string {
@@ -540,8 +531,7 @@ export class ImportCryptographicIdentity implements ICommand {
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("No certificate file specified."),
 		new commandParams.StringCommandParameter(this.$injector)];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let certificateFile = args[0],
 				password = args[1],
 				extension = path.extname(certificateFile).toLowerCase();
@@ -565,7 +555,6 @@ export class ImportCryptographicIdentity implements ICommand {
 			_.each(result, identity => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
 			});
-		}).future<void>()();
 	}
 
 	private async importCertificateWithPassword(importType: string, password: string, certificateFile: string): Promise<Server.CryptographicIdentityData[]> {
@@ -621,8 +610,7 @@ class CreateCertificateSigningRequest implements ICommand {
 		new commandParams.StringCommandParameter(this.$injector),
 		new commandParams.StringCommandParameter(this.$injector)];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let model: IIdentityInformation = {
 				Name: args[0],
 				Email: args[1],
@@ -637,7 +625,6 @@ class CreateCertificateSigningRequest implements ICommand {
 
 			let downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
 			await downloader.downloadCertificate(certificateData.UniqueName);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("certificate-request|create", CreateCertificateSigningRequest);
@@ -648,8 +635,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let requests: any[] = await  this.$server.identityStore.getCertificateRequests();
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
@@ -658,7 +644,6 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 			if (!requests.length) {
 				this.$logger.info("No certificate signing requests.");
 			}
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("certificate-request|*list", ListCertificateSigningRequestsCommand);
@@ -690,8 +675,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate signing request index to delete.")];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let indexStr = args[0];
 
 			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
@@ -700,7 +684,6 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 				await this.$server.identityStore.removeCertificateRequest(req.UniqueName);
 				this.$logger.info("Removed certificate request '%s'", req.Subject);
 			}
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("certificate-request|remove", RemoveCertificateSigningRequestCommand);
@@ -720,8 +703,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify certificate signing request index to delete.")];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let indexStr = args[0];
 			if (!indexStr) {
 				this.$errors.fail("Specify certificate signing request index to download.");
@@ -729,7 +711,6 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
 			await this.downloadCertificate(req.UniqueName);
-		}).future<void>()();
 	}
 
 	public async downloadCertificate(uniqueName: string): Promise<void> {
@@ -755,8 +736,7 @@ class FileNameCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			let fileName = validationValue;
 			if (!fileName) {
 				this.$errors.fail("No file specified.");
@@ -767,17 +747,14 @@ class FileNameCommandParameter implements ICommandParameter {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }
 
 export class ListProvisionsCommand implements ICommand {
 	constructor(private $identityManager: Server.IIdentityManager,
 		private $stringParameter: ICommandParameter) { }
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			await this.$identityManager.listProvisions(args[0]);
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameter];
@@ -793,8 +770,7 @@ class ImportProvisionCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [new FileNameCommandParameter(this.$errors, this.$fs)];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let fileName = args[0];
 			if (!fileName) {
 				this.$errors.fail("No file specified.");
@@ -809,7 +785,6 @@ class ImportProvisionCommand implements ICommand {
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
 			await this.$commandsService.tryExecuteCommand("provision", []);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("provision|import", ImportProvisionCommand);
@@ -819,11 +794,9 @@ class ProvisionIdCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			await this.$identityManager.findProvision(validationValue);
 			return true;
-		}).future<boolean>()();
 	}
 }
 
@@ -835,14 +808,12 @@ class RemoveProvisionCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [new ProvisionIdCommandParameter(this.$identityManager)];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let provisionData = await  this.$identityManager.findProvision(args[0]);
 			await this.$server.mobileprovisions.removeProvision(provisionData.Identifier);
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
 			await this.$commandsService.tryExecuteCommand("provision", []);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("provision|remove", RemoveProvisionCommand);

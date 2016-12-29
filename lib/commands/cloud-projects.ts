@@ -4,15 +4,13 @@ class SolutionIdCommandParameter implements ICommandParameter {
 	constructor(private $remoteProjectService: IRemoteProjectService) { }
 	mandatory = false;
 
-	validate(validationValue?: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue?: string): Promise<boolean> {
 			if(validationValue) {
 				let app = await  this.$remoteProjectService.getSolutionData(validationValue);
 				return !!app;
 			}
 
 			return false;
-		}).future<boolean>()();
 	}
 }
 
@@ -37,8 +35,7 @@ export class CloudListProjectsCommand implements ICommand {
 		this.$logger.out(table.toString());
 	}
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let apps = await  this.$remoteProjectService.getAvailableAppsAndSolutions();
 			let slnName = args[0];
 			if(!slnName) {
@@ -53,7 +50,6 @@ export class CloudListProjectsCommand implements ICommand {
 
 			let projects = (await  this.$remoteProjectService.getProjectsForSolution(slnName)).map(proj => proj.Name);
 			this.printList(projects, slnName);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("cloud|*list", CloudListProjectsCommand);
@@ -66,8 +62,7 @@ export class CloudExportProjectsCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let projectIdentifier = args[1];
 			let slnName = args[0];
 			if(!slnName) {
@@ -88,11 +83,9 @@ export class CloudExportProjectsCommand implements ICommand {
 			} else {
 				await this.$remoteProjectService.exportSolution(slnName);
 			}
-		}).future<void>()();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
+	async canExecute(args: string[]): Promise<boolean> {
 			let solutionNames = (await  this.$remoteProjectService.getAvailableAppsAndSolutions()).map(sln => sln.colorizedDisplayName);
 			if(!solutionNames || !solutionNames.length) {
 				this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
@@ -122,7 +115,6 @@ export class CloudExportProjectsCommand implements ICommand {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("cloud|export", CloudExportProjectsCommand);

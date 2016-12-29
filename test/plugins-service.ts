@@ -86,10 +86,8 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		getConfigurationsSpecifiedByUser: (): string[] => {
 			return [];
 		},
-		updateProjectProperty(mode: string, property: string, newValue: any): IFuture<void> {
-			return (() => {
+		async updateProjectProperty(mode: string, property: string, newValue: any): Promise<void> {
 				this.projectData.CorePlugins = newValue;
-			}).future<void>()();
 		}
 	});
 
@@ -216,8 +214,7 @@ class ProjectStub {
 		return configs;
 	};
 
-	updateProjectProperty(mode: string, propertyName: string, newValue: any, configs?: string[]): IFuture<void> {
-		return (() => {
+	async updateProjectProperty(mode: string, propertyName: string, newValue: any, configs?: string[]): Promise<void> {
 			let configurations = configs && configs.length ? configs : this.configurations;
 			_.each(configurations, configuration => {
 				if ((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
@@ -226,7 +223,6 @@ class ProjectStub {
 					this.projectData[propertyName] = newValue;
 				}
 			});
-		}).future<void>()();
 	}
 }
 

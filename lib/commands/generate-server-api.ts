@@ -7,12 +7,10 @@ export class GenerateServerApiCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let result = await  this.$serviceContractGenerator.generate();
 			this.$fs.writeFile(path.join(__dirname, "../server-api.d.ts"), result.interfaceFile);
 			this.$fs.writeFile(path.join(__dirname, "../server-api.ts"), result.implementationFile);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("dev-generate-api", GenerateServerApiCommand);

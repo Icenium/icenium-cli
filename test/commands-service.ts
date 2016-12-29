@@ -47,8 +47,7 @@ class MockCommandParameter implements ICommandParameter {
 	}
 
 	mandatory = false;
-	validate(value: string): IFuture<boolean> {
-		return (() => { return true; }).future<boolean>()();
+	async validate(value: string): Promise<boolean> { return true;
 	}
 }
 
@@ -58,8 +57,7 @@ class MockInvalidCommandParameter implements ICommandParameter {
 	}
 
 	mandatory = false;
-	validate(value: string): IFuture<boolean> {
-		return (() => { return false; }).future<boolean>()();
+	async validate(value: string): Promise<boolean> { return false;
 	}
 }
 

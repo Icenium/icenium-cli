@@ -3,8 +3,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 				private $config: IConfiguration) {
 	}
 
-	getApi(path?: string): IFuture<Swagger.ISwaggerServiceContract> {
-		return (() => {
+	async getApi(path?: string): Promise<Swagger.ISwaggerServiceContract> {
 			let request:any = {
 				proto: this.$config.AB_SERVER_PROTO,
 				host: this.$config.AB_SERVER,
@@ -22,8 +21,6 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 			} else {
 				return JSON.parse(result.body);
 			}
-
-		}).future<Swagger.ISwaggerServiceContract>()();
 	}
 }
 $injector.register("serviceContractProvider", ServiceContractProvider);

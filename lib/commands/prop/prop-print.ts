@@ -10,8 +10,7 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 		}
 	}
 
-	execute(args:string[]): IFuture<void> {
-		return ((): void => {
+	async execute(args:string[]): Promise<void> {
 			let configs = this.$project.getConfigurationsSpecifiedByUser();
 			if(configs.length) {
 				_.each(configs, config => {
@@ -20,7 +19,6 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 			} else {
 				await this.$project.printProjectProperty(args[0]);
 			}
-		}).future<void>()();
 	}
 
 	allowedParameters:ICommandParameter[] = [new PrintProjectCommandParameter(this.$project)];
@@ -32,9 +30,7 @@ class PrintProjectCommandParameter implements ICommandParameter {
 
 	mandatory = false;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return ((): boolean => {
+	async validate(validationValue: string): Promise<boolean> {
 			return !!validationValue;
-		}).future<boolean>()();
 	}
 }

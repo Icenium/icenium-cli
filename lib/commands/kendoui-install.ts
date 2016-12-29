@@ -21,8 +21,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
+	async execute(args: string[]): Promise<void> {
 			let packages = await  this.getKendoPackages();
 
 			let selectedPackage = await  this.selectKendoVersion(packages);
@@ -37,8 +36,6 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			}
 
 			await this.updateKendoFiles(selectedPackage.DownloadUrl, selectedPackage.Version);
-
-		}).future<void>()();
 	}
 
 	private async selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): Promise<Server.IKendoDownloadablePackageData> {

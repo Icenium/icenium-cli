@@ -59,13 +59,11 @@ class PluginCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(pluginName: string): IFuture<boolean> {
-		return ((): boolean => {
+	async validate(pluginName: string): Promise<boolean> {
 			if(!pluginName) {
 				this.$errors.fail("No plugin name specified");
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }

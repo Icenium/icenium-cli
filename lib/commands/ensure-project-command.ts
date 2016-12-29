@@ -12,8 +12,7 @@ export class EnsureProjectCommand implements ICommand {
 		return Promise.resolve();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	async canExecute(args: string[]): Promise<boolean> {
 			if(args.length) {
   				this.$errors.fail("This command doesn't accept parameters.");
 				return false;
@@ -21,6 +20,5 @@ export class EnsureProjectCommand implements ICommand {
 
 			this.$project.ensureProject();
 			return true;
-		}).future<boolean>()();
 	}
 }

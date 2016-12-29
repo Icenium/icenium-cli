@@ -7,8 +7,7 @@ export class EditConfigurationCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			let template = _.find(this.$project.projectConfigFiles, { template: validationValue });
 			if(!template) {
 				if(validationValue) {
@@ -19,7 +18,6 @@ export class EditConfigurationCommandParameter implements ICommandParameter {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }
 

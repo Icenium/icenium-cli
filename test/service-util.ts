@@ -18,10 +18,8 @@ class MockUserDataStore implements IUserDataStore {
 		return Promise.resolve(false);
 	}
 
-	getCookies(): IFuture<IStringDictionary> {
-		return (() => {
+	async getCookies(): Promise<IStringDictionary> {
 			return {"tlrkappshell": "dummy"};
-		}).future<IStringDictionary>()();
 	}
 
 	getUser():IFuture<any> {

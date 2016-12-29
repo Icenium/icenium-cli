@@ -6,8 +6,7 @@ export class PortCommandParameter implements ICommandParameter {
 
 	mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			if(!this.$hostInfo.isDarwin) {
 				this.$errors.failWithoutHelp("You can use remote command only on MacOS.");
 			}
@@ -27,7 +26,6 @@ export class PortCommandParameter implements ICommandParameter {
 					"To use a non-system port, re-run the command with a port number greater than 1023.", parsedPortNumber.toString());
 			}
 			return true;
-		}).future<boolean>()();
 	}
 }
 

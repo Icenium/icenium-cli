@@ -7,8 +7,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 		this.$project.ensureProject();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	async canExecute(args: string[]): Promise<boolean> {
 			if (await this.$project.validateProjectProperty(args[0], _.tail(args), "del")) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
@@ -16,7 +15,6 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 				}
 			}
 			return false;
-		}).future<boolean>()();
 	}
 
 	execute(args: string[]): IFuture<void> {

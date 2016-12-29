@@ -1,10 +1,8 @@
 export class NameParameter implements ICommandParameter {
 	constructor(private $projectNameValidator: IProjectNameValidator) { }
 	mandatory = true;
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
+	async validate(validationValue: string): Promise<boolean> {
 			return this.$projectNameValidator.validate(validationValue);
-		}).future<boolean>()();
 	}
 }
 $injector.register("nameCommandParameter", NameParameter);

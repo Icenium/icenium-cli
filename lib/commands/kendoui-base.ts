@@ -12,8 +12,7 @@ export class KendoUIBaseCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
+	async canExecute(args: string[]): Promise<boolean> {
 			if(args && args.length > 0) {
 				this.$errors.fail("This command does not accept parameters.");
 			}
@@ -23,7 +22,6 @@ export class KendoUIBaseCommand implements ICommand {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 
 	execute(args: string[]): IFuture<void> {
