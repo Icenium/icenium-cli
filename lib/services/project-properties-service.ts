@@ -160,7 +160,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	private async getPropRange(propData: any): Promise<string[]> {
 			if (propData.dynamicRange) {
-				await return this.$injector.dynamicCall(propData.dynamicRange);
+				return await this.$injector.dynamicCall(propData.dynamicRange);
 			}
 			if (propData.enum) {
 				return propData.enum;

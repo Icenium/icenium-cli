@@ -92,7 +92,7 @@ export class SamplesService implements ISamplesService {
 			} finally {
 				let featureValue = sample.name;
 
-				await if (this.$typeScriptService.isTypeScriptProject(tempDir)) {
+				if (await this.$typeScriptService.isTypeScriptProject(tempDir)) {
 					featureValue = `${featureValue}-TS`;
 				}
 

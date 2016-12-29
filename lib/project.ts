@@ -669,7 +669,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			let result = new Future<string>();
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
-			await return result;
+			return await result;
 	}
 
 	public async importProject(): Promise<void> {

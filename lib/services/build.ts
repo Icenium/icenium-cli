@@ -263,7 +263,7 @@ export class BuildService implements Project.IBuildService {
 					}
 				}
 
-				await return this.beginBuild(buildProperties);
+				return await this.beginBuild(buildProperties);
 			} else {
 				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
 				return null;

@@ -85,7 +85,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public async getSolutionData(solutionIdentifier: string): Promise<Server.SolutionData> {
 			let app = await  this.getApp(solutionIdentifier);
-			await return this.getSolutionDataCore(app);
+			return await this.getSolutionDataCore(app);
 	}
 
 	private async getSolutionDataCore(app: ITapAppData): Promise<Server.SolutionData> {
@@ -94,7 +94,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getProjectData(solutionName: string, projectName: string): Promise<Server.IWorkspaceItemData> {
-			await return _.find(this.getProjectsForSolution(solutionName), pr => pr.Name === projectName);
+			return _.find(await this.getProjectsForSolution(solutionName), pr => pr.Name === projectName);
 	}
 
 	private async getExportDir(dirName: string, tapServiceCall: (_unzipStream: any) => IFuture<any>, solutionSpaceHeaderOptions: {discardSolutionSpaceHeader: boolean}): Promise<string> {

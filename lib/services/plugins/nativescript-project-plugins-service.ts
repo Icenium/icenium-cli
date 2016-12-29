@@ -114,7 +114,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				pluginBasicInfo = await  this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true });
 			}
 
-			await if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir)) {
+			if (await this.$typeScriptService.isTypeScriptProject(this.$project.projectDir)) {
 				// Do not pass version here, we've already added the entry in package.json, so the correct version will be installed anyway.
 				let installResult = await  this.$npmService.install(this.$project.projectDir, { installTypes: this.$options.types, name: pluginBasicInfo.name });
 				if (installResult.error) {
@@ -134,7 +134,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 				let fullPluginPath = path.join(this.$project.projectDir, pathToPlugin);
 
-				await if (this.checkIsValidLocalPlugin(pathToPlugin) || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
+				if (await this.checkIsValidLocalPlugin(pathToPlugin) || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
 					this.$fs.deleteDirectory(fullPluginPath);
 				}
 
@@ -162,7 +162,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			let pluginVersion = packageJsonContent.dependencies[basicPluginInfo.name].replace("file:", "");
-			await if (this.checkIsValidLocalPlugin(pluginVersion)) {
+			if (await this.checkIsValidLocalPlugin(pluginVersion)) {
 				await this.installLocalPlugin(pluginVersion);
 			} else {
 				await this.setPluginInPackageJson(pluginName);
@@ -181,7 +181,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
 			let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
-			await return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version) || { name: dependencyInfo.name, version: dependencyInfo.version };
+			return await this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version) || { name: dependencyInfo.name, version: dependencyInfo.version };
 	}
 
 	public async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]> {
@@ -276,7 +276,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	}
 
 	private async getUniqueMarketplacePlugins(): Promise<IPlugin[]> {
-			await return _(this.getMarketplacePlugins())
+			return _(await this.getMarketplacePlugins())
 				.groupBy(pl => pl.data.Name)
 				.map((pluginGroup: IPlugin[]) => _(pluginGroup)
 					.sortBy(gr => gr.data.Version)
@@ -403,7 +403,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			version = version || "latest";
 			let result = await  this.$npmService.getPackageJsonFromNpmRegistry(packageName, version);
 			if (result) {
-				await return this.constructNativeScriptPluginData(result);
+				return await this.constructNativeScriptPluginData(result);
 			}
 
 			return null;
@@ -414,10 +414,10 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				pathToPlugin = pathToPlugin.replace("file:", "");
 			}
 
-			await if (this.checkIsValidLocalPlugin(pathToPlugin)) {
+			if (await this.checkIsValidLocalPlugin(pathToPlugin)) {
 				let fullPath = path.resolve(pathToPlugin);
 				let packageJsonContent = this.$fs.readJson(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME));
-				await return this.constructNativeScriptPluginData(packageJsonContent);
+				return await this.constructNativeScriptPluginData(packageJsonContent);
 			}
 
 			return null;
@@ -431,7 +431,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				let pathToInstalledPackage = await  this.installPackageToTempDir(url);
 				if (pathToInstalledPackage) {
 					let packageJsonContent = this.$fs.readJson(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME));
-					await return this.constructNativeScriptPluginData(packageJsonContent);
+					return await this.constructNativeScriptPluginData(packageJsonContent);
 
 				}
 			}

@@ -28,7 +28,7 @@ class WinSimulatorPlatformServices extends platformServicesRunValidatorLib.Platf
 	}
 
 	public async canRunApplication(): Promise<boolean> {
-			await return super.canRunApplication() && await  this.$hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.");
+			return await super.canRunApplication() && await  this.$hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 }
 

@@ -128,9 +128,9 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 				let user = await  this.$userDataStore.getUser();
 				this.solutionSpaceName = user.tenant.id;
 				if (solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
-					await return this.callWithoutSolutionSpaceHeader(call);
+					return await this.callWithoutSolutionSpaceHeader(call);
 				} else {
-					await return call();
+					return await call();
 				}
 			} finally {
 				this.solutionSpaceName = null;
@@ -156,7 +156,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			if (this.useSolutionSpaceNameHeader) {
 				headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 			}
-			await return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers);
+			return await super.call<any>(name, method, path, accept, bodyValues, resultStream, headers);
 	}
 }
 $injector.register("serviceProxy", AppBuilderServiceProxy);

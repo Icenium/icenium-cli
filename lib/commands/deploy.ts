@@ -53,7 +53,7 @@ export class DeployHelper implements IDeployHelper {
 					}
 
 					if (!appInfo) {
-						appInfo = await  this.getAppInfoFromBuildResult(device);
+						appInfo = await this.getAppInfoFromBuildResult(device);
 					}
 
 					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
@@ -85,9 +85,9 @@ export class DeployHelper implements IDeployHelper {
 
 	private async getAppInfoFromBuildResult(device: Mobile.IDevice): Promise<IApplicationInformation> {
 			if (this.$devicesService.isiOSSimulator(device)) {
-				await return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device), appIdentifier: this.$project.projectData.AppIdentifier };
+				return { packageName: await this.$buildService.buildForiOSSimulator(this.$options.saveTo, device), appIdentifier: this.$project.projectData.AppIdentifier };
 			} else {
-				await return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device);
+				return await this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device);
 			}
 	}
 }

@@ -27,11 +27,11 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 
 			let selectedPackage = await  this.selectKendoVersion(packages);
 
-			let confirm = this.$options.force || this.$prompter.confirm(
+			let confirm = this.$options.force || await this.$prompter.confirm(
 				"This operation will overwrite existing Kendo UI framework files and " +
 				"any changes will be lost. ".red.bold +
 				"Are you sure you want to continue?",
-				() => await  true);
+				() => true);
 			if (!confirm) {
 				return;
 			}

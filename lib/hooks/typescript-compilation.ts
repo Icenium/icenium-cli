@@ -11,7 +11,7 @@ module.exports = () => {
 	let $typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
 	let typeScriptFilesData = await  $typeScriptService.getTypeScriptFilesData($project.getProjectDir());
 
-	await if ($typeScriptService.isTypeScriptProject($project.projectDir)) {
+	if (await $typeScriptService.isTypeScriptProject($project.projectDir)) {
 		let $fs: IFileSystem = $injector.resolve("fs");
 		let pathToTsConfig = path.join($project.projectDir, $projectConstants.TSCONFIG_JSON_NAME);
 

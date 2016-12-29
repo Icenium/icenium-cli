@@ -60,7 +60,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			.value();
 	}
 
-	public getInstalledPlugins(): IPlugin[] {
+	public async getInstalledPlugins(): Promise<IPlugin[]> {
 		let corePlugins: IPlugin[] = [];
 		if (this.specifiedConfigurations.length) {
 			corePlugins = _(this.specifiedConfigurations)
@@ -71,16 +71,16 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
-		await return corePlugins.concat(this.getLocalPlugins());
+		return corePlugins.concat(await this.getLocalPlugins());
 	}
 
-	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
+	public async getAvailablePlugins(pluginsCount?: number): Promise<IPlugin[]> {
 		let plugins: IPlugin[] = _.values(this.identifierToPlugin);
 		if (this.$project.projectData) {
 			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
 		}
 
-		await return plugins.concat(this.getLocalPlugins());
+		return plugins.concat(await this.getLocalPlugins());
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
@@ -123,13 +123,13 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					// In case integrated and Marketplace plugins have duplicate identifiers, try using MarketplacePlugin
 					let mpPlugin = _.find(installedPluginInstances, pl => pl.type === PluginType.MarketplacePlugin);
 					if (mpPlugin) {
-						await return this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version);
+						return await this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version);
 					} else {
 						this.$errors.failWithoutHelp("There are several plugins with name '%s' and they have different types: '%s'", pluginName, installedPluginsType.join(", "));
 					}
 				} else if (installedPluginsType.length === 1) {
 					if (installedPluginsType[0].toString() === PluginType.MarketplacePlugin.toString()) {
-						await return this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version);
+						return await this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version);
 					} else {
 						// Check if plugin is installed for current configuration.
 						let installedPlugin = this.getInstalledPluginByName(pluginName);
@@ -172,7 +172,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let plugin = installedPlugins[0];
 			if (!plugin) {
 				// Need to check the plugins directory because the plugin can be fetched, not added.
-				await if (this.isPluginFetched(pluginName)) {
+				if (await this.isPluginFetched(pluginName)) {
 					let shouldDeleteFetchedPlugin = true;
 
 					if (helpers.isInteractive()) {
@@ -299,7 +299,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	protected async installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): Promise<IBasicPluginInformation> {
 			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
-			await return this.getLocalPluginBasicInformation(pluginXml);
+			return await this.getLocalPluginBasicInformation(pluginXml);
 	}
 
 	protected async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
@@ -545,7 +545,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async promptForVersion(pluginName: string, versions: any[]): Promise<string> {
-			await return versions.length > 1 ? this.promptForVersionCore(pluginName, versions) : versions[0].value;
+			return await versions.length > 1 ? this.promptForVersionCore(pluginName, versions) : versions[0].value;
 	}
 
 	private async promptForVersionCore(pluginName: string, versions: any[]): Promise<string> {

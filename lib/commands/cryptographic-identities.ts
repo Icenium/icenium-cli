@@ -302,7 +302,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 				});
 			}
 
-			await return schema.length ? this.$prompter.get(schema) : {};
+			return schema.length ? await this.$prompter.get(schema) : {};
 
 		}).future<IIdentityInformation>()();
 	}
@@ -604,7 +604,7 @@ export class ImportCryptographicIdentity implements ICommand {
 	private async importCertificateWithoutPassword(importType: string, certificateFile: string): Promise<Server.CryptographicIdentityData[]> {
 			try {
 				let targetFile = this.$fs.createReadStream(certificateFile);
-				await return this.$server.identityStore.importIdentity(<any>importType, '', targetFile);
+				return await this.$server.identityStore.importIdentity(<any>importType, '', targetFile);
 			} catch (error) {
 				this.$errors.failWithoutHelp(error.message);
 			}
@@ -696,7 +696,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 
 			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
 
-			await if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject))) {
+			if (await this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject))) {
 				await this.$server.identityStore.removeCertificateRequest(req.UniqueName);
 				this.$logger.info("Removed certificate request '%s'", req.Subject);
 			}

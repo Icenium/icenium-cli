@@ -9,7 +9,7 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			await if(this.$project.validateProjectProperty(args[0], _.tail(args), "add")) {
+			if (await this.$project.validateProjectProperty(args[0], _.tail(args), "add")) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
 					return true;
