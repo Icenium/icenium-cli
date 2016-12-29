@@ -5,10 +5,8 @@ export class DevConfigApplyCommand implements ICommand {
 	public allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify dev environment to be applied")];
 	public disableAnalytics = true;
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$config.apply(args[0].toLowerCase());
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("dev-config-apply", DevConfigApplyCommand);

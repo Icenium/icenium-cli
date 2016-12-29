@@ -21,8 +21,7 @@ class ResourceDownloader implements IResourceDownloader {
 		return this.$injector.resolve("cordovaMigrationService");
 	}
 
-	public downloadCordovaJsFiles(): IFuture<void> {
-		return (() => {
+	public async downloadCordovaJsFiles(): Promise<void> {
 			let cordovaVersions = this.$cordovaMigrationService.getSupportedVersions();
 			let platforms = this.$mobileHelper.platformNames;
 			cordovaVersions.forEach((version) => {
@@ -33,18 +32,15 @@ class ResourceDownloader implements IResourceDownloader {
 					this.$server.cordova.getJs(version, <any>platform, targetFile).wait();
 				});
 			});
-		}).future<void>()();
 	}
 
-	public downloadResourceFromServer(remotePath: string, targetPath: string): IFuture<void> {
-		return (() => {
+	public async downloadResourceFromServer(remotePath: string, targetPath: string): Promise<void> {
 			this.$fs.writeFile(targetPath, "");
 			let file = this.$fs.createWriteStream(targetPath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. Target path is: '${targetPath}'.`);
 			this.$httpClient.httpRequest({ url: remotePath, pipeTo: file }).wait();
 			fileEnd.wait();
-		}).future<void>()();
 	}
 
 	public downloadImageDefinitions(): IFuture<void> {

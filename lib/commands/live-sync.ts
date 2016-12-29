@@ -25,11 +25,9 @@ class LiveSyncDevicesCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			super.execute(args).wait();
 			this.$liveSyncService.livesync().wait();
-		}).future<void>()();
 	}
 
 }
@@ -45,11 +43,9 @@ class LiveSyncAndroidCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			super.execute(args).wait();
 			this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android).wait();
-		}).future<void>()();
 	}
 }
 
@@ -64,11 +60,9 @@ class LiveSyncIosCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			super.execute(args).wait();
 			this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS).wait();
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];
@@ -86,11 +80,9 @@ class LiveSyncWP8Command extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			super.execute(args).wait();
 			this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8).wait();
-		}).future<void>()();
 	}
 
 	public isDisabled = this.$config.ON_PREM;

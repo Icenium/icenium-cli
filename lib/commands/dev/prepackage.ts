@@ -14,8 +14,7 @@ export class PrePackageCommand implements ICommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			let jenkinsParameterSha1 = process.env.sha1;
 			let jenkinsParameterBranchToBuild = process.env.BranchToBuild;
 
@@ -56,7 +55,6 @@ export class PrePackageCommand implements ICommand {
 			this.$fs.deleteDirectory(testCoverageResultsDir);
 
 			this.$serviceProxy.setShouldAuthenticate(true);
-		}).future<void>()();
 	}
 }
 

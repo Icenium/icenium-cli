@@ -65,8 +65,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		this.remoteNativeScriptResourcesPath = `http://${this.$config.AB_SERVER}/appbuilder/Resources/NativeScript`;
 	}
 
-	public downloadMigrationData(): IFuture<void> {
-		return (() => {
+	public async downloadMigrationData(): Promise<void> {
 			this.$fs.deleteDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
 			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
 
@@ -79,7 +78,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 				.value();
 			fileDownloadFutures.push(this.downloadPackageJsonResourceFile());
 			Future.wait(fileDownloadFutures);
-		}).future<void>()();
 	}
 
 	public getSupportedVersions(): string[] {
@@ -102,8 +100,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}
 	}
 
-	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
-		return (() => {
+	public async onFrameworkVersionChanging(newVersion: string): Promise<void> {
 			let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
 			this.$logger.trace(`Migrating from version ${currentFrameworkVersion} to ${newVersion}.`);
 			if (currentFrameworkVersion === newVersion) {
@@ -113,7 +110,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			this.ensurePackageJsonExists(newVersion);
 
 			this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion).wait();
-		}).future<void>()();
 	}
 
 	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
@@ -121,8 +117,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, targetPath || this.$nativeScriptResources.nativeScriptMigrationFile);
 	}
 
-	private migrateByModifyingPackageJson(currentVersion: string, newVersion: string): IFuture<void> {
-		return (() => {
+	private async migrateByModifyingPackageJson(currentVersion: string, newVersion: string): Promise<void> {
 			try {
 				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion);
 
@@ -143,7 +138,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			}
 
 			this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
-		}).future<void>()();
 	}
 
 	private downloadTnsPackage(language: string, version: string): IFuture<void> {

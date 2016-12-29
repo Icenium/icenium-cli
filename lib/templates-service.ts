@@ -39,19 +39,16 @@ export class TemplatesService implements ITemplatesService {
 		return helpers.formatListOfNames(templates);
 	}
 
-	public downloadProjectTemplates(): IFuture<void> {
-		return (() => {
+	public async downloadProjectTemplates(): Promise<void> {
 			let templates = this.$server.projects.getProjectTemplates().wait();
 			let templatesDir = this.projectTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
 			this.$fs.createDirectory(templatesDir);
 
 			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
-		}).future<void>()();
 	}
 
-	public downloadItemTemplates(): IFuture<void> {
-		return (() => {
+	public async downloadItemTemplates(): Promise<void> {
 			let templates = this.$server.projects.getItemTemplates().wait();
 			let templatesDir = this.itemTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
@@ -62,20 +59,16 @@ export class TemplatesService implements ITemplatesService {
 					this.downloadTemplate(template, templatesDir).wait();
 				}
 			});
-		}).future<void>()();
 	}
 
-	public unpackAppResources(): IFuture<void> {
-		return (() => {
+	public async unpackAppResources(): Promise<void> {
 			let cordovaAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
 			this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName).wait();
 			let nsAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.NS.Blank.zip");
 			this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName).wait();
-		}).future<void>()();
 	}
 
-	private unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): IFuture<void> {
-		return (() => {
+	private async unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): Promise<void> {
 			temp.track();
 			let extractionDir = temp.mkdirSync("appResourcesTemp");
 
@@ -90,11 +83,9 @@ export class TemplatesService implements ITemplatesService {
 			if (appResourcesDirInTemp) {
 				shelljs.cp("-rf", `${appResourcesDirInTemp}`, appResourcesDir);
 			}
-		}).future<void>()();
 	}
 
-	private downloadTemplate(template: any, templatesDir: string): IFuture<void> {
-		return (() => {
+	private async downloadTemplate(template: any, templatesDir: string): Promise<void> {
 			let downloadUri = template.DownloadUri;
 			let name = path.basename(downloadUri);
 			let filepath = path.join(templatesDir, name);
@@ -103,7 +94,6 @@ export class TemplatesService implements ITemplatesService {
 
 			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
 			fileEnd.wait();
-		}).future<void>()();
 	}
 }
 $injector.register("templatesService", TemplatesService);

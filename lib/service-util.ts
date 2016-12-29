@@ -14,8 +14,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 		private $npmService: INpmService) {
 	}
 
-	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
-		return (() => {
+	public async call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<Т> {
 			this.ensureUpToDate().wait();
 			headers = headers || Object.create(null);
 
@@ -72,15 +71,13 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 			let resultValue = accept === "application/json" ? JSON.parse(response.body) : response.body;
 			return resultValue;
-		}).future<any>()();
 	}
 
 	public setShouldAuthenticate(shouldAuthenticate: boolean): void {
 		this.shouldAuthenticate = shouldAuthenticate;
 	}
 
-	private ensureUpToDate(): IFuture<void> {
-		return (() => {
+	private async ensureUpToDate(): Promise<void> {
 			if (this.$config.ON_PREM || this.hasVerifiedLatestVersion) {
 				return;
 			}
@@ -98,11 +95,9 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			if (latestVersion && helpers.versionCompare(latestVersion, this.$staticConfig.version) > 0) {
 				this.$errors.fail({ formatStr: "You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm install -g appbuilder'.", suppressCommandHelp: true });
 			}
-		}).future<void>()();
 	}
 
-	private getInformationFromRegistry(): IFuture<string> {
-		return (() => {
+	private async getInformationFromRegistry(): Promise<string> {
 			let packageJson = this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase()).wait();
 
 			if (!packageJson) {
@@ -110,7 +105,6 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			}
 
 			return packageJson.version;
-		}).future<string>()();
 	}
 }
 $injector.register("serviceProxyBase", ServiceProxyBase);
@@ -129,8 +123,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors, $npmService);
 	}
 
-	public makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T> {
-		return (() => {
+	public async makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T> {
 			try {
 				let user = this.$userDataStore.getUser().wait();
 				this.solutionSpaceName = user.tenant.id;
@@ -142,11 +135,9 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			} finally {
 				this.solutionSpaceName = null;
 			}
-		}).future<T>()();
 	}
 
-	private callWithoutSolutionSpaceHeader(action: () => IFuture<any>): IFuture<any> {
-		return (() => {
+	private async callWithoutSolutionSpaceHeader(action: () => IFuture<any>): Promise<any> {
 			let cachedUseSolutionSpaceNameValue = this.useSolutionSpaceNameHeader;
 			this.useSolutionSpaceNameHeader = false;
 			let result: any;
@@ -157,18 +148,15 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			}
 
 			return result;
-		}).future<any>()();
 	}
 
-	public call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<Т> {
-		return (() => {
+	public async call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<Т> {
 			path = `appbuilder/${path}`;
 			headers = headers || Object.create(null);
 			if (this.useSolutionSpaceNameHeader) {
 				headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 			}
 			return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers).wait();
-		}).future<any>()();
 	}
 }
 $injector.register("serviceProxy", AppBuilderServiceProxy);

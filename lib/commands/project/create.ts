@@ -16,8 +16,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		super($errors, $project);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.validateProjectData();
 
 			let projectName = args[0];
@@ -45,7 +44,6 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
-		}).future<void>()();
 	}
 
 	allowedParameters = [this.$nameCommandParameter];

@@ -35,8 +35,7 @@ export class BuildService implements Project.IBuildService {
 		private $projectConstants: Project.IConstants,
 		private $httpClient: Server.IHttpClient) { }
 
-	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): IFuture<string> {
-		return ((): string => {
+	public async getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): Promise<string> {
 			urlKind = urlKind.toLowerCase();
 			if (urlKind !== "manifest" && urlKind !== "package") {
 				throw new Error("urlKind must be either 'manifest' or 'package'");
@@ -65,11 +64,9 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.debug("Device install URL '%s'", url);
 
 			return url;
-		}).future<string>()();
 	}
 
-	private buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
-		return ((): Server.IBuildResult => {
+	private async buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): Promise<Server.IBuildResult> {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 			this.$logger.printInfoMessageOnSameLine("Building...");
 
@@ -115,11 +112,9 @@ export class BuildService implements Project.IBuildService {
 				output: body.Output,
 				errors: body.Errors.map(error => error.Message)
 			};
-		}).future<Server.IBuildResult>()();
 	}
 
-	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
-		return ((): Project.IBuildResult => {
+	private async requestCloudBuild(settings: Project.IBuildSettings): Promise<Project.IBuildResult> {
 			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
 			let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()] || this.$project.projectData;
 
@@ -273,11 +268,9 @@ export class BuildService implements Project.IBuildService {
 				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
 				return null;
 			}
-		}).future<Project.IBuildResult>()();
 	}
 
-	private beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
-		return ((): Project.IBuildResult => {
+	private async beginBuild(buildProperties: any): Promise<Project.IBuildResult> {
 			Object.keys(buildProperties).forEach((prop) => {
 				if (buildProperties[prop] === undefined) {
 					this.$logger.warn(`Build property '${prop}' is undefined. The property is optional, but you can set it by running '${this.$staticConfig.CLIENT_NAME.toLowerCase()} prop set ${prop} <value>'.`);
@@ -306,7 +299,6 @@ export class BuildService implements Project.IBuildService {
 				buildProperties: buildProperties,
 				packageDefs: result.buildResults
 			};
-		}).future<Project.IBuildResult>()();
 	}
 
 	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): void {
@@ -334,8 +326,7 @@ export class BuildService implements Project.IBuildService {
 		this.$opener.open(scanFile);
 	}
 
-	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
-		return ((): Server.IPackageDef[] => {
+	public async build(settings: Project.IBuildSettings): Promise<Server.IPackageDef[]> {
 			this.$project.ensureProject();
 
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
@@ -435,11 +426,9 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			return packageDefs;
-		}).future<Server.IPackageDef[]>()();
 	}
 
-	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation> {
-		return ((): IApplicationInformation => {
+	public async buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): Promise<IApplicationInformation> {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			let buildResult = this.build({
@@ -457,21 +446,17 @@ export class BuildService implements Project.IBuildService {
 				packageName,
 				appIdentifier
 			};
-		}).future<IApplicationInformation>()();
 	}
 
-	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
-		return (() => {
+	public async buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): Promise<string> {
 			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles");
 			this.$fs.unzip(packageFile, tempDir).wait();
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
 			return appFilePath;
-		}).future<string>()();
 	}
 
-	public executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
-		return (() => {
+	public async executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void> {
 			this.$project.ensureProject();
 
 			if (!this.$project.capabilities.build) {
@@ -479,11 +464,9 @@ export class BuildService implements Project.IBuildService {
 			}
 
 			this.executeBuildCore(platform, opts).wait();
-		}).future<void>()();
 	}
 
-	private executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
-		return (() => {
+	private async executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void> {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 
 			if (this.$options.saveTo) {
@@ -514,11 +497,9 @@ export class BuildService implements Project.IBuildService {
 					buildForiOSSimulator: opts && opts.buildForiOSSimulator
 				}).wait();
 			}
-		}).future<void>()();
 	}
 
-	private deployToIon(platform: string): IFuture<void> {
-		return (() => {
+	private async deployToIon(platform: string): Promise<void> {
 			platform = this.$mobileHelper.validatePlatformName(platform);
 			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
 				this.$errors.fail("The companion app is not available on %s.", platform);
@@ -544,7 +525,6 @@ export class BuildService implements Project.IBuildService {
 				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
 				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
 			}]);
-		}).future<void>()();
 	}
 }
 

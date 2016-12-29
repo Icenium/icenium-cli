@@ -99,8 +99,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		this.$logger.out(outputLines.join(EOL + EOL));
 	}
 
-	public addPlugin(pluginIdentifier: string): IFuture<void> {
-		return (() => {
+	public async addPlugin(pluginIdentifier: string): Promise<void> {
 			let pluginBasicInfo: IBasicPluginInformation;
 			if (this.isPluginInstalled(pluginIdentifier)) {
 				this.$logger.printMarkdown(util.format("Plugin `%s` is already installed.", pluginIdentifier));
@@ -124,11 +123,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully added plugin `%s`.", pluginBasicInfo.name));
-		}).future<void>()();
 	}
 
-	public removePlugin(pluginName: string): IFuture<void> {
-		return (() => {
+	public async removePlugin(pluginName: string): Promise<void> {
 			let pathToPackageJson = this.getPathToProjectPackageJson();
 			let packageJsonContent = this.getProjectPackageJsonContent();
 			let pluginBasicInfo = this.getPluginBasicInformation(pluginName).wait();
@@ -153,11 +150,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			} else {
 				this.$logger.printMarkdown(util.format("Plugin `%s` is not installed.", pluginBasicInfo.name));
 			}
-		}).future<void>()();
 	}
 
-	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
-		return (() => {
+	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
 			let basicPluginInfo = this.getPluginBasicInformation(pluginName).wait(),
 				packageJsonContent = this.getProjectPackageJsonContent(),
 				dependencies = _.keys(packageJsonContent.dependencies);
@@ -174,7 +169,6 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully configured plugin `%s`.", basicPluginInfo.name));
-		}).future<void>()();
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
@@ -185,11 +179,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			&& (!pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName).wait());
 	}
 
-	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
 			let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
 			return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version).wait() || { name: dependencyInfo.name, version: dependencyInfo.version };
-		}).future<IBasicPluginInformation>()();
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
@@ -216,8 +208,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return keywords;
 	}
 
-	protected installLocalPluginCore(pathToPlugin: string, pluginData: ILocalPluginData): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	protected async installLocalPluginCore(pathToPlugin: string, pluginData: ILocalPluginData): Promise<IBasicPluginInformation> {
 			let content = pluginData && pluginData.configFileContents || this.$fs.readJson(path.join(pathToPlugin, this.$projectConstants.PACKAGE_JSON_NAME));
 			let name = content.name;
 			let basicPluginInfo: IBasicPluginInformation = {
@@ -240,7 +231,6 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 
 			return basicPluginInfo;
-		}).future<IBasicPluginInformation>()();
 	}
 
 	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
@@ -265,8 +255,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		}
 	}
 
-	private getMarketplacePlugins(): IFuture<IPlugin[]> {
-		return ((): IPlugin[] => {
+	private async getMarketplacePlugins(): Promise<IPlugin[]> {
 			if (!this.marketplacePlugins || !this.marketplacePlugins.length) {
 				try {
 					let plugins = this.$server.nativescript.getMarketplacePluginVersionsData().wait();
@@ -284,18 +273,15 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return this.marketplacePlugins;
-		}).future<IPlugin[]>()();
 	}
 
-	private getUniqueMarketplacePlugins(): IFuture<IPlugin[]> {
-		return ((): IPlugin[] => {
+	private async getUniqueMarketplacePlugins(): Promise<IPlugin[]> {
 			return _(this.getMarketplacePlugins().wait())
 				.groupBy(pl => pl.data.Name)
 				.map((pluginGroup: IPlugin[]) => _(pluginGroup)
 					.sortBy(gr => gr.data.Version)
 					.last())
 				.value();
-		}).future<IPlugin[]>()();
 	}
 
 	private getPathToProjectPackageJson(): string {
@@ -312,8 +298,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return this.$fs.readJson(pathToPackageJson);
 	}
 
-	private getTopNpmPackages(count: number): IFuture<IPlugin[]> {
-		return (() => {
+	private async getTopNpmPackages(count: number): Promise<IPlugin[]> {
 			let plugins: IPlugin[];
 			try {
 				let url = `${NativeScriptProjectPluginsService.NPM_SEARCH_URL}/query?fields=name,version,rating,homepage,description,repository,author&sort=rating+desc&start=0&size=${count}`;
@@ -346,7 +331,6 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return plugins;
-		}).future<IPlugin[]>()();
 	}
 
 	private getStringFromNpmSearchResult(pluginResult: any, propertyName: string): string {
@@ -360,8 +344,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return "";
 	}
 
-	private getFeaturedNpmPackages(): IFuture<IPlugin[]> {
-		return (() => {
+	private async getFeaturedNpmPackages(): Promise<IPlugin[]> {
 			let plugins: IPlugin[] = [];
 			try {
 				if (this.featuredNpmPackages && this.featuredNpmPackages.length) {
@@ -385,11 +368,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return plugins;
-		}).future<IPlugin[]>()();
 	}
 
-	private getTopNativeScriptNpmPackages(count: number): IFuture<IPlugin[]> {
-		return (() => {
+	private async getTopNativeScriptNpmPackages(count: number): Promise<IPlugin[]> {
 			let currentPage = 0;
 			let shouldBreak = false;
 			let plugins: IPlugin[] = [];
@@ -416,11 +397,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return plugins;
-		}).future<IPlugin[]>()();
 	}
 
-	private getDataForNpmPackage(packageName: string, version?: string): IFuture<IPlugin> {
-		return ((): IPlugin => {
+	private async getDataForNpmPackage(packageName: string, version?: string): Promise<IPlugin> {
 			version = version || "latest";
 			let result = this.$npmService.getPackageJsonFromNpmRegistry(packageName, version).wait();
 			if (result) {
@@ -428,11 +407,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return null;
-		}).future<IPlugin>()();
 	}
 
-	private getDataForLocalPlugin(packageName: string, pathToPlugin?: string): IFuture<IPlugin> {
-		return ((): IPlugin => {
+	private async getDataForLocalPlugin(packageName: string, pathToPlugin?: string): Promise<IPlugin> {
 			if (!!pathToPlugin.match(/^file:/)) {
 				pathToPlugin = pathToPlugin.replace("file:", "");
 			}
@@ -444,11 +421,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return null;
-		}).future<IPlugin>()();
 	}
 
-	private getDataFromGitHubUrl(packageName: string, url?: string): IFuture<IPlugin> {
-		return ((): IPlugin => {
+	private async getDataFromGitHubUrl(packageName: string, url?: string): Promise<IPlugin> {
 			/* From `npm help install`:
 			 * <protocol> is one of git, git+ssh, git+http, or git+https. If no <commit-ish> is specified, then master is used.
 			 */
@@ -462,11 +437,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return null;
-		}).future<IPlugin>()();
 	}
 
-	private constructNativeScriptPluginData(packageJsonContent: any): IFuture<NativeScriptPluginData> {
-		return ((): NativeScriptPluginData => {
+	private async constructNativeScriptPluginData(packageJsonContent: any): Promise<NativeScriptPluginData> {
 			let platforms: string[];
 			let supportedVersion: string;
 			let type = PluginType.NpmPlugin;
@@ -489,19 +462,15 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			};
 
 			return new NativeScriptPluginData(data, type, this.$project);
-		}).future<NativeScriptPluginData>()();
 	}
 
-	private checkIsValidLocalPlugin(pluginName: string): IFuture<boolean> {
-		return ((): boolean => {
+	private async checkIsValidLocalPlugin(pluginName: string): Promise<boolean> {
 			let fullPath = path.resolve(pluginName);
 
 			return this.$fs.exists(fullPath) && this.$fs.exists(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME));
-		}).future<boolean>()();
 	}
 
-	private getBasicPluginInfoFromMarketplace(pluginName: string, version: string): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	private async getBasicPluginInfoFromMarketplace(pluginName: string, version: string): Promise<IBasicPluginInformation> {
 			let basicInfo: IBasicPluginInformation;
 			let allMarketplacePlugins = this.getMarketplacePlugins().wait();
 			let marketPlacePlugins: IPlugin[] = _.filter(allMarketplacePlugins, pl => pl.data.Identifier.toLowerCase() === pluginName.toLowerCase());
@@ -523,7 +492,6 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return basicInfo;
-		}).future<IBasicPluginInformation>()();
 	}
 
 	private selectMarketplacePlugin(marketPlacePlugins: IPlugin[], version: string): IPlugin {
@@ -547,8 +515,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return plugin;
 	}
 
-	private getBasicPluginInfoFromNpm(name: string, version: string): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	private async getBasicPluginInfoFromNpm(name: string, version: string): Promise<IBasicPluginInformation> {
 			let basicInfo: IBasicPluginInformation;
 			let jsonInfo = this.$npmService.getPackageJsonFromNpmRegistry(name, version).wait();
 			if (jsonInfo) {
@@ -571,18 +538,14 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return basicInfo;
-		}).future<IBasicPluginInformation>()();
 	}
 
-	private getPluginVariablesInfoFromNpm(name: string, version: string): IFuture<any> {
-		return ((): any => {
+	private async getPluginVariablesInfoFromNpm(name: string, version: string): Promise<any> {
 			let jsonInfo = this.$npmService.getPackageJsonFromNpmRegistry(name, version).wait();
 			return jsonInfo && jsonInfo.nativescript && jsonInfo.nativescript.variables;
-		}).future<any>()();
 	}
 
-	private getBasicPluginInfoFromUrl(url: string): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	private async getBasicPluginInfoFromUrl(url: string): Promise<IBasicPluginInformation> {
 			let basicInfo: IBasicPluginInformation;
 
 			/* From `npm help install`:
@@ -601,11 +564,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return basicInfo;
-		}).future<IBasicPluginInformation>()();
 	}
 
-	private setPluginInPackageJson(pluginIdentifier: string, pluginOpts?: { addPluginToPackageJson: boolean }): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	private async setPluginInPackageJson(pluginIdentifier: string, pluginOpts?: { addPluginToPackageJson: boolean }): Promise<IBasicPluginInformation> {
 			let pathToPackageJson = this.getPathToProjectPackageJson(),
 				packageJsonContent = this.getProjectPackageJsonContent(),
 				pluginBasicInfo = this.getPluginBasicInformation(pluginIdentifier).wait(),
@@ -630,11 +591,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 			this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 			return basicPlugin;
-		}).future<IBasicPluginInformation>()();
 	}
 
-	private setPluginVariables(packageJsonContent: any, basicPlugin: IBasicPluginInformation): IFuture<any> {
-		return ((): any => {
+	private async setPluginVariables(packageJsonContent: any, basicPlugin: IBasicPluginInformation): Promise<any> {
 			let variablesInformation = basicPlugin.variables;
 			if (variablesInformation && _.keys(variablesInformation).length) {
 				this.$logger.trace(`Plugin ${basicPlugin.name}@${basicPlugin.version} describes the following plugin variables:`);
@@ -655,11 +614,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return packageJsonContent;
-		}).future<any>()();
 	}
 
-	private gatherVariableInformation(variableName: string, defaultValue: any): IFuture<any> {
-		return (() => {
+	private async gatherVariableInformation(variableName: string, defaultValue: any): Promise<any> {
 			let schema: IPromptSchema = {
 				name: variableName,
 				type: "input",
@@ -683,7 +640,6 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			return fromVarOpion || this.$prompter.get([schema]).wait();
-		}).future<any>()();
 	}
 }
 

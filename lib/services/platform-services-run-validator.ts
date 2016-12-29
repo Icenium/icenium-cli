@@ -3,8 +3,7 @@ export class PlatformServicesRunValidator implements IRunValidator {
 		protected $hostCapabilities: IHostCapabilities,
 		protected $project: Project.IProject) { }
 
-	public canRunApplication(): IFuture<boolean> {
-		return (() => {
+	public async canRunApplication(): Promise<boolean> {
 			if (!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 				this.$errors.fail(`In this version of the Telerik AppBuilder CLI, you cannot run the device simulator on ${process.platform}. The device simulator for ${process.platform} will become available in a future release of the Telerik AppBuilder CLI.`);
 			}
@@ -16,6 +15,5 @@ export class PlatformServicesRunValidator implements IRunValidator {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }

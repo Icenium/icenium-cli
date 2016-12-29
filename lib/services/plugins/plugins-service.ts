@@ -17,22 +17,16 @@ export class PluginsService implements IPluginsService {
 		this.getPluginsService().wait().printPlugins(plugins);
 	}
 
-	public addPlugin(pluginName: string): IFuture<void> {
-		return (() => {
+	public async addPlugin(pluginName: string): Promise<void> {
 			this.getPluginsService().wait().addPlugin(pluginName).wait();
-		}).future<void>()();
 	}
 
-	public removePlugin(pluginName: string): IFuture<void> {
-		return (() => {
+	public async removePlugin(pluginName: string): Promise<void> {
 			this.getPluginsService().wait().removePlugin(pluginName).wait();
-		}).future<void>()();
 	}
 
-	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
-		return (() => {
+	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
 			this.getPluginsService().wait().configurePlugin(pluginName, version, configurations).wait();
-		}).future<void>()();
 	}
 
 	public isPluginInstalled(pluginName: string): boolean {
@@ -47,18 +41,15 @@ export class PluginsService implements IPluginsService {
 		return this.getPluginsService().wait().findPlugins(keywords);
 	}
 
-	public fetch(pluginIdentifier: string): IFuture<string> {
-		return ((): string => {
+	public async fetch(pluginIdentifier: string): Promise<string> {
 			return this.getPluginsService().wait().fetch(pluginIdentifier).wait();
-		}).future<string>()();
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
 		return this.getPluginsService().wait().filterPlugins(plugins);
 	}
 
-	private getPluginsService(): IFuture<IPluginsService> {
-		return ((): IPluginsService => {
+	private async getPluginsService(): Promise<IPluginsService> {
 			if (!this.frameworkProject) {
 				this.$loginManager.ensureLoggedIn().wait();
 				this.$project.ensureProject();
@@ -66,7 +57,6 @@ export class PluginsService implements IPluginsService {
 				return this.frameworkProject.pluginsService;
 			}
 			return this.frameworkProject.pluginsService;
-		}).future<IPluginsService>()();
 	}
 }
 $injector.register("pluginsService", PluginsService);

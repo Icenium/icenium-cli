@@ -16,15 +16,13 @@ export class UserDataStore implements IUserDataStore {
 		private $options: IOptions,
 		private $injector: IInjector) { }
 
-	public hasCookie(): IFuture<boolean> {
-		return (() => {
+	public async hasCookie(): Promise<boolean> {
 			try {
 				this.getCookies().wait();
 				return true;
 			} catch(err) {
 				return false;
 			}
-		}).future<boolean>()();
 	}
 
 	public getCookies(): IFuture<IStringDictionary> {
@@ -61,8 +59,7 @@ export class UserDataStore implements IUserDataStore {
 		return this.setCookies(cookies);
 	}
 
-	public setUser(user?: IUser): IFuture<void> {
-		return (() => {
+	public async setUser(user?: IUser): Promise<void> {
 			this.user = user;
 			if(user) {
 				this.$fs.writeJson(this.getUserStateFilePath(), user);
@@ -70,25 +67,19 @@ export class UserDataStore implements IUserDataStore {
 			} else {
 				this.$fs.deleteFile(this.getUserStateFilePath());
 			}
-		}).future<void>()();
 
 	}
 
-	public clearLoginData(): IFuture<void> {
-		return (() => {
+	public async clearLoginData(): Promise<void> {
 			this.setCookies(null);
 			this.setUser(null).wait();
-		}).future<void>()();
 	}
 
-	private checkCookieExists<T>(sourceFile: string, getter: () => T): IFuture<boolean> {
-		return (() => {
+	private async checkCookieExists<T>(sourceFile: string, getter: () => T): Promise<boolean> {
 			return (getter() || this.$fs.exists(sourceFile));
-		}).future<boolean>()();
 	}
 
-	private readAndCache<T>(sourceFile: string, getter: () => T, setter: (value: string) => void): IFuture<T> {
-		return (() => {
+	private async readAndCache<T>(sourceFile: string, getter: () => T, setter: (value: string) => void): Promise<T> {
 			if(!getter()) {
 				if(!this.checkCookieExists(sourceFile, getter).wait()) {
 					throw new Error("Not logged in.");
@@ -106,7 +97,6 @@ export class UserDataStore implements IUserDataStore {
 			}
 
 			return getter();
-		}).future<T>()();
 	}
 
 	private getCookieFilePath(): string {
@@ -117,14 +107,12 @@ export class UserDataStore implements IUserDataStore {
 		return path.join(this.$options.profileDir, this.$config.AB_SERVER + ".user");
 	}
 
-	private trackTenantInformation(userData: any): IFuture<void> {
-		return (() => {
+	private async trackTenantInformation(userData: any): Promise<void> {
 			if(userData && userData.tenant) {
 				let tenantEdition = userData.tenant.editionType || "no-edition";
 				let $analyticsService = this.$injector.resolve("analyticsService");
 				$analyticsService.track("UserTenant", tenantEdition).wait();
 			}
-		}).future<void>()();
 	}
 }
 $injector.register("userDataStore", UserDataStore);
@@ -144,8 +132,7 @@ export class LoginManager implements ILoginManager {
 		private $httpClient: Server.IHttpClient,
 		private $options: IOptions) { }
 
-	public logout(): IFuture<void> {
-		return (() => {
+	public async logout(): Promise<void> {
 			this.$logger.info("Logging out...");
 
 			this.localLogout().wait();
@@ -155,52 +142,42 @@ export class LoginManager implements ILoginManager {
 			this.$opener.open(logoutUrl);
 
 			this.$logger.info("Logout completed.");
-		}).future<void>()();
 	}
 
-	private localLogout(): IFuture<void> {
-		return (() => {
+	private async localLogout(): Promise<void> {
 			this.$userDataStore.clearLoginData().wait();
 			this.$sharedUserSettingsFileService.deleteUserSettingsFile();
-		}).future<void>()();
 	}
 
-	public login(): IFuture<void> {
-		return (() => {
+	public async login(): Promise<void> {
 			this.localLogout().wait();
 			this.doLogin().wait();
-		}).future<void>()();
 	}
 
 	public isLoggedIn(): IFuture<boolean> {
 		return this.$userDataStore.hasCookie();
 	}
 
-	public ensureLoggedIn(): IFuture<void> {
-		return (() => {
+	public async ensureLoggedIn(): Promise<void> {
 			if(!this.isLoggedIn().wait()) {
 				this.doLogin().wait();
 			}
-		}).future<void>()();
 	}
 
-	private doLogin(): IFuture<void> {
-		return (() => {
+	private async doLogin(): Promise<void> {
 			this.$fs.createDirectory(this.$options.profileDir);
 
 			this.loginInBrowser().wait();
 
 			this.$logger.info("Login completed.");
 			this.$commandsService.tryExecuteCommand("user", []).wait();
-		}).future<void>()();
 	}
 
 	private serveLoginFile(relPath: string): (request: http.ServerRequest, response: http.ServerResponse) => void {
 		return this.$httpServer.serveFile(path.join(__dirname, "../resources/login", relPath));
 	}
 
-	private loginInBrowser(): IFuture<any> {
-		return (() => {
+	private async loginInBrowser(): Promise<any> {
 			let authComplete = new Future<string>();
 
 			this.$logger.info("Launching login page in browser.");
@@ -285,7 +262,6 @@ export class LoginManager implements ILoginManager {
 				let userData = this.$server.authentication.getLoggedInUser().wait();
 				this.$userDataStore.setUser(<any>userData).wait();
 			}
-		}).future<void>()();
 	}
 }
 $injector.register("loginManager", LoginManager);

@@ -20,8 +20,7 @@ export class RemoteService implements IRemoteService {
 		this.packageLocation = path.join(this.appBuilderDir, 'package.zip');
 	}
 
-	public startApiServer(portNumber: number): IFuture<void> {
-		return (() => {
+	public async startApiServer(portNumber: number): Promise<void> {
 			this.$fs.ensureDirectoryExists(this.appBuilderDir);
 
 			this.$express.post("/launch", (req: Request, res: Response) => this.onLaunchRequest(req, res));
@@ -40,11 +39,9 @@ export class RemoteService implements IRemoteService {
 				}
 			});
 			this.$express.run();
-		}).future<void>()();
 	}
 
-	private onLaunchRequest(req: Request, res: Response): IFuture<void> {
-		return (() => {
+	private async onLaunchRequest(req: Request, res: Response): Promise<void> {
 			this.$logger.info("launch simulator request received ... ");
 			// Clean the tempdir before new launch
 			this.$fs.deleteDirectory(this.appBuilderDir);
@@ -79,7 +76,6 @@ export class RemoteService implements IRemoteService {
 			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, { deviceType: mappedDeviceName, appId: req.query.appId }).wait();
 
 			res.status(200).end();
-		}).future<void>()();
 	}
 
 	private static AppBuilderClientToSimulatorDeviceNameMapping: IDictionary<IStringDictionary> = {

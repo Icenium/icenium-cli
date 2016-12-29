@@ -6,8 +6,7 @@ export class ListWebViewsCommand implements ICommand {
 		private $logger: ILogger,
 		private $project: Project.IProject) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureCordovaProject();
 
 			let currentProjectVersion = this.$project.projectData.FrameworkVersion;
@@ -24,8 +23,6 @@ export class ListWebViewsCommand implements ICommand {
 			let table = helpers.createTable(headers, data);
 
 			this.$logger.out(table.toString());
-
-		}).future<void>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

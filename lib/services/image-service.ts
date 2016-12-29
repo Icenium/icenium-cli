@@ -65,8 +65,7 @@ class ImageService implements IImageService {
 		this.$logger.out(table.toString());
 	}
 
-	public promptForImageInformation(force: boolean): IFuture<void> {
-		return (() => {
+	public async promptForImageInformation(force: boolean): Promise<void> {
 			let imagePath = this.$prompter.getString('Enter image file path:').wait(),
 				imageOptions = ['Icons', 'Splash Screens'],
 				chosenOption = this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions).wait(),
@@ -79,11 +78,9 @@ class ImageService implements IImageService {
 			}
 
 			this.generateImages(imagePath, imageType, force).wait();
-		}).future<void>()();
 	}
 
-	public generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void> {
-		return (() => {
+	public async generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): Promise<void> {
 			this.validateImage(initialImagePath);
 
 			temp.track();
@@ -110,11 +107,9 @@ class ImageService implements IImageService {
 				let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
 				this.copyImageToProject(imagePath, projectImagePath).wait();
 			});
-		}).future<void>()();
 	}
 
-	private copyImageToProject(imagePath: string, projectImagePath: string): IFuture<void> {
-		return (() => {
+	private async copyImageToProject(imagePath: string, projectImagePath: string): Promise<void> {
 			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
 
 			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
@@ -133,7 +128,6 @@ class ImageService implements IImageService {
 				case replaceOptions[3]:
 					this.$errors.failWithoutHelp('Operation canceled.');
 			}
-		}).future<void>()();
 	}
 
 	private pushImageToTable(table: any, platform: string, icon: ImageData, splashScreen: ImageData): void {

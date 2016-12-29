@@ -10,8 +10,7 @@ export class HashService implements IHashService {
 	private static validHashEncodings: string[] = ["hex", "binary", "base64"];
 	private static validInputEncodings: string[] = ["utf8", "ascii", "binary"];
 
-	public getFileHash(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): IFuture<string> {
-		return ((): string => {
+	public async getFileHash(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): Promise<string> {
 			this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding);
 
 			let cryptoHash = crypto.createHash(hashAlgorithm);
@@ -35,7 +34,6 @@ export class HashService implements IHashService {
 
 			future.wait();
 			return cryptoHash.digest(hashEncoding);
-		}).future<string>()();
 	}
 
 	private validateInputParameters(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): void {

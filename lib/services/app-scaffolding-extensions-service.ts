@@ -25,8 +25,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 		return this.getExtensionPath(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME);
 	}
 
-	public prepareAppScaffolding(): IFuture<void> {
-		return (() => {
+	public async prepareAppScaffolding(): Promise<void> {
 			let appScaffoldingConfig = this.$dependencyConfigService.getAppScaffoldingConfig();
 			appScaffoldingConfig.pathToSave = this.$options.screenBuilderCacheDir;
 			let afterPrepareAction = () => {
@@ -53,15 +52,12 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 					if (!userNpmVersion || !semver.valid(userNpmVersion) || semver.major(userNpmVersion) !== 3) {
 						this.npmDedupe().wait();
 					}
-
-				}).future<void>()();
 			};
 			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction).wait();
 		}).future<void>()();
 	}
 
-	public prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): IFuture<void> {
-		return (() => {
+	public async prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): Promise<void> {
 			let extensionVersion = this.getExtensionVersion(dependencyExtensionName);
 			let cachedVersion = extensionVersion || AppScaffoldingExtensionsService.DEFAULT_CACHED_VERSION;
 			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb/generators/${dependencyExtensionName}/${dependencyConfig.version}` : `${AppScaffoldingExtensionsService.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;
@@ -81,7 +77,6 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 
 				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, {afterDownloadAction: () => this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100)}), 5000).wait();
 			}
-		}).future<void>()();
 	}
 
 	protected npmInstall(packageToInstall?: string, cwd?: string): IFuture<void> {

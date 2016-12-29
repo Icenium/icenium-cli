@@ -31,8 +31,7 @@ export class KendoUIBaseCommand implements ICommand {
 		return Future.fromResult();
 	}
 
-	public getKendoPackages(configuration?: { withReleaseNotesOnly: boolean }): IFuture<Server.IKendoDownloadablePackageData[]>{
-		return (() => {
+	public async getKendoPackages(configuration?: { withReleaseNotesOnly: boolean }): Promise<Server.IKendoDownloadablePackageData[]> {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.$project.ensureCordovaProject();
 			if (!this.$project.capabilities.updateKendo) {
@@ -58,7 +57,6 @@ export class KendoUIBaseCommand implements ICommand {
 			}
 
 			return packages;
-		}).future<Server.IKendoDownloadablePackageData[]>()();
 	}
 
 	public getKendoPackagesAsTable(packages: Server.IKendoDownloadablePackageData[]): string {

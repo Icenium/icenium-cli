@@ -5,8 +5,7 @@ export class AddPluginCommand implements ICommand {
 				private $injector: IInjector,
 				private $options: IOptions) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			if(this.$options.available){
 				let installedPlugins = this.$pluginsService.getInstalledPlugins();
 				let plugins = _.reject(this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
@@ -35,13 +34,11 @@ export class AddPluginCommand implements ICommand {
 			} else {
 				this.$pluginsService.addPlugin(args[0]).wait();
 			}
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			if(this.$options.available) {
 				return true;
 			}
@@ -52,7 +49,6 @@ export class AddPluginCommand implements ICommand {
 			pluginCommandParameter.validate(pluginName).wait();
 
 			return true;
-		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("plugin|add", AddPluginCommand);

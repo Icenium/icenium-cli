@@ -91,8 +91,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		return this.migrationData.integratedPlugins[version] || [];
 	}
 
-	public migratePlugins(plugins: string[], fromVersion: string, toVersion: string): IFuture<string[]> {
-		return (() => {
+	public async migratePlugins(plugins: string[], fromVersion: string, toVersion: string): Promise<string[]> {
 			let isUpgrade = helpers.versionCompare(fromVersion, toVersion) < 0;
 			let smallerVersion = isUpgrade ? fromVersion : toVersion;
 			let biggerVersion = isUpgrade ? toVersion : fromVersion;
@@ -119,11 +118,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.value();
 
 			return _.union(plugins, newEnabledPlugins);
-		}).future<string[]>()();
 	}
 
-	public downloadMigrationData(): IFuture<void> {
-		return (() => {
+	public async downloadMigrationData(): Promise<void> {
 			let json = this.$server.cordova.getMigrationData().wait();
 			let renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(
 				this.parseMscorlibVersion(plugin.Version),
@@ -145,18 +142,14 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData);
 
 			this.downloadMigrationConfigFile().wait();
-		}).future<void>()();
 	}
 
-	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
-		return (() => {
+	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
 			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
 			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath).wait();
-		}).future<void>()();
 	}
 
-	public onWPSdkVersionChanging(newVersion: string): IFuture<void> {
-		return ((): void => {
+	public async onWPSdkVersionChanging(newVersion: string): Promise<void> {
 			if (newVersion === this.$project.projectData["WPSdk"]) {
 				return;
 			}
@@ -189,11 +182,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					}
 				}
 			}
-		}).future<void>()();
 	}
 
-	public onFrameworkVersionChanging(newVersion: string): IFuture<void> {
-		return ((): void => {
+	public async onFrameworkVersionChanging(newVersion: string): Promise<void> {
 			if (newVersion === this.$project.projectData.FrameworkVersion) {
 				return;
 			}
@@ -254,7 +245,6 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this.migrateCordovaJsFiles(newVersion);
 
 			this.$logger.info("Successfully migrated to version %s", versionDisplayName);
-		}).future<void>()();
 	}
 
 	public getSupportedPlugins(): string[] {
@@ -299,8 +289,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}
 	}
 
-	private promptUserForInvalidPluginsAction(plugins: string[], toVersion: string): IFuture<void> {
-		return (() => {
+	private async promptUserForInvalidPluginsAction(plugins: string[], toVersion: string): Promise<void> {
 			let multipleInvalidPlugins = plugins.length > 1,
 				remove = multipleInvalidPlugins ? `Remove those plugins from all configurations` : `Remove this plugin from all configurations`,
 				cancel = 'Cancel Cordova migration',
@@ -309,11 +298,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			if (choice === cancel) {
 				this.$errors.failWithoutHelp("Cordova migration interrupted");
 			}
-		}).future<void>()();
 	}
 
-	private getSupportedWPFrameworks(): IFuture<string[]> {
-		return ((): string[] => {
+	private async getSupportedWPFrameworks(): Promise<string[]> {
 			let validValues: string[] = [];
 			let projectSchema = this.$project.getProjectSchema().wait();
 			if (projectSchema) {
@@ -321,7 +308,6 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			return validValues;
-		}).future<string[]>()();
 	}
 
 	private parseMscorlibVersion(json: any): string {
@@ -340,8 +326,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		});
 	}
 
-	private migrateWebView(oldFrameworkVersion: string, newFrameworkVersion: string): IFuture<void> {
-		return (() => {
+	private async migrateWebView(oldFrameworkVersion: string, newFrameworkVersion: string): Promise<void> {
 			// For Cordova versions below 5.0.0 with WKWebView we need to set the WKWebView to com.telerik.plugins.wkwebview.
 			// For Cordova version 5.0.0 and above with WKWebView we need to set the WKWebView to cordova-plugin-wkwebview-engine.
 			let currentWebViewName = this.$webViewService.getCurrentWebViewName(this.$projectConstants.IOS_PLATFORM_NAME);
@@ -355,7 +340,6 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 				this.$webViewService.enableWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, newFrameworkVersion).wait();
 			}
-		}).future<void>()();
 	}
 }
 $injector.register("cordovaMigrationService", CordovaMigrationService);

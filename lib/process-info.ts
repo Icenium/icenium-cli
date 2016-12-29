@@ -4,8 +4,7 @@ export class ProcessInfo implements IProcessInfo {
 	constructor(private $childProcess: IChildProcess,
 		private $hostInfo: IHostInfo) { }
 
-	public isRunning(name: string): IFuture<boolean> {
-		return (() => {
+	public async isRunning(name: string): Promise<boolean> {
 			let result: boolean;
 
 			if (this.$hostInfo.isWindows) {
@@ -21,7 +20,6 @@ export class ProcessInfo implements IProcessInfo {
 			}
 
 			return result;
-		}).future<boolean>()();
 	}
 }
 

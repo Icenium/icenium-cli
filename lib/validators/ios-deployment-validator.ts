@@ -20,8 +20,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		super($injector);
 	}
 
-	public validate(model: IiOSDeploymentValidatorModel): IFuture<IValidationResult> {
-		return (() => {
+	public async validate(model: IiOSDeploymentValidatorModel): Promise<IValidationResult> {
 			if(!model.provisionOption) {
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_PROVISION_ERROR_MESSAGE);
 			}
@@ -45,8 +44,6 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 			}
 
 			return new ValidationResult.ValidationResult(null);
-
-		}).future<IValidationResult>()();
 	}
 
 	public validateProvision(provision: IProvision):IValidationResult {
@@ -73,8 +70,7 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		return new ValidationResult.ValidationResult(null);
 	}
 
-	public validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IFuture<IValidationResult> {
-		return(() => {
+	public async validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): Promise<IValidationResult> {
 			if(!certificate) {
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_CERTIFICATE_ERROR_MESSAGE);
 			}
@@ -88,7 +84,6 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 			}
 
 			return new ValidationResult.ValidationResult(null);
-		}).future<IValidationResult>()();
 	}
 
 	private isCertificateExpired(certificate: string): boolean {

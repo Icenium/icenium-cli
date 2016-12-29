@@ -17,8 +17,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 		this.$opener.open(`${pathToDebuggingGuideHtml}`, "Safari");
 	}
 
-	public debugAndroidApplication(applicationId: string, framework: string): IFuture<void> {
-		return (() => {
+	public async debugAndroidApplication(applicationId: string, framework: string): Promise<void> {
 			let deviceIdentifier: string;
 			this.$devicesService.detectCurrentlyAttachedDevices().wait();
 			let connectedDevices = this.$devicesService.getDevicesForPlatform("android");
@@ -54,7 +53,6 @@ export class DarwinDebuggerService implements IDebuggerService {
 
 			this.$logger.out(`Your application is available for debugging on port: ${tcpPort}.`);
 			this.$logger.out(`Open Google Chrome and in the address bar enter ${inspectorAddress}. You can just paste it, it is already copied to your clipboard.`);
-		}).future<void>()();
 	}
 }
 

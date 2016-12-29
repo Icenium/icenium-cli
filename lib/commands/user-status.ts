@@ -8,8 +8,7 @@ export class UserStatusCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	public execute(args:string[]): IFuture<void> {
-		return (() => {
+	public async execute(args:string[]): Promise<void> {
 			let user = this.$userDataStore.getUser().wait();
 
 			let fields: IStringDictionary = {
@@ -31,7 +30,6 @@ export class UserStatusCommand implements ICommand {
 				this.$logger.out("%s%s: %s", padding, field, fields[field]);
 			});
 			this.$logger.out("\nView your account at %s://%s/appbuilder/account/subscription", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-		}).future<void>()();
 	}
 }
 

@@ -8,8 +8,7 @@ export class AppStoreService implements IAppStoreService {
 				private $buildService: Project.IBuildService
 			) {}
 
-	public upload(userName: string, password: string, application: string): IFuture<void> {
-		return (() => {
+	public async upload(userName: string, password: string, application: string): Promise<void> {
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
 			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			let theApp = _.find(apps, (app: Server.Application) => app.Application === application);
@@ -38,15 +37,12 @@ export class AppStoreService implements IAppStoreService {
 				theApp.AppleID, projectPath, userName, password).wait();
 
 			this.$logger.info("Upload complete.");
-		}).future<void>()();
 	}
 
-	public getApplicationsReadyForUpload(userName: string, password: string): IFuture<Server.Application[]> {
-		return (() => {
+	public async getApplicationsReadyForUpload(userName: string, password: string): Promise<Server.Application[]> {
 			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
 			apps = _.sortBy(apps, (app: Server.Application) => app.Application);
 			return apps;
-		}).future<Server.Application[]>()();
 	}
 }
 $injector.register("appStoreService", AppStoreService);

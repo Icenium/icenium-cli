@@ -22,8 +22,7 @@ class AppManagerService implements IAppManagerService {
 		private $options: IOptions,
 		private $injector: IInjector) { }
 
-	public upload(platform: string): IFuture<void> {
-		return (() => {
+	public async upload(platform: string): Promise<void> {
 			let mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
@@ -86,11 +85,9 @@ class AppManagerService implements IAppManagerService {
 			}
 
 			this.openAppManagerStore();
-		}).future<void>()();
 	}
 
-	public getGroups(): IFuture<void> {
-		return (() => {
+	public async getGroups(): Promise<void> {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			this.$logger.info("Accessing Telerik AppManager.");
@@ -114,8 +111,6 @@ class AppManagerService implements IAppManagerService {
 			});
 
 			this.$logger.out(table.toString());
-
-		}).future<void>()();
 	}
 
 	public openAppManagerStore(): void {
@@ -124,8 +119,7 @@ class AppManagerService implements IAppManagerService {
 		this.$opener.open(tamUrl);
 	}
 
-	public publishLivePatch(platforms: string[]): IFuture<void> {
-		return (() => {
+	public async publishLivePatch(platforms: string[]): Promise<void> {
 			this.$project.ensureProject();
 			this.$loginManager.ensureLoggedIn().wait();
 
@@ -149,11 +143,9 @@ class AppManagerService implements IAppManagerService {
 			this.$options.release = cachedOptionsRelease;
 
 			this.openAppManagerStore();
-		}).future<void>()();
 	}
 
-	private configureLivePatchPlugin(): IFuture<void> {
-		return (() => {
+	private async configureLivePatchPlugin(): Promise<void> {
 			// Resolve pluginsService here as in its constructor it fails when project is not Cordova.
 			let $pluginsService: IPluginsService = this.$injector.resolve("pluginsService");
 			let plugins = $pluginsService.getInstalledPlugins();
@@ -165,11 +157,9 @@ class AppManagerService implements IAppManagerService {
 				$pluginsService.addPlugin(livePatchPluginId).wait();
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");
 			}
-		}).future<void>()();
 	}
 
-	private findGroups(identityStrings:string[]): IFuture<string[]> {
-		return ((): string[] => {
+	private async findGroups(identityStrings:string[]): Promise<string[]> {
 			let availableGroups = this.$server.tam.getGroups().wait();
 
 			if (!availableGroups.length) {
@@ -187,7 +177,6 @@ class AppManagerService implements IAppManagerService {
 
 				return group.Id;
 			});
-		}).future<string[]>()();
 	}
 }
 $injector.register("appManagerService", AppManagerService);

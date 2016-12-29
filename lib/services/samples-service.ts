@@ -43,26 +43,21 @@ export class SamplesService implements ISamplesService {
 		return this.$injector.resolve("analyticsService");
 	}
 
-	public printSamplesInformation(framework?: string): IFuture<void> {
-		return (() => {
+	public async printSamplesInformation(framework?: string): Promise<void> {
 			this.$logger.info("You can choose a sample from the following: %s", EOL);
 			if (framework) {
 				this.printSamplesInformationForFramework(framework).wait();
 			} else {
 				_.values<string>(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
 			}
-		}).future<void>()();
 	}
 
-	private printSamplesInformationForFramework(framework: string): IFuture<void> {
-		return (() => {
+	private async printSamplesInformationForFramework(framework: string): Promise<void> {
 			this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
 			this.$logger.info(this.getSamplesInformation(framework).wait() + EOL + EOL);
-		}).future<void>()();
 	}
 
-	public cloneSample(sampleName: string): IFuture<void> {
-		return (() => {
+	public async cloneSample(sampleName: string): Promise<void> {
 			let cloneTo = this.$options.path || sampleName;
 			if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
 				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
@@ -108,11 +103,9 @@ export class SamplesService implements ISamplesService {
 					this.$logger.debug(error);
 				}
 			}
-		}).future<void>()();
 	}
 
-	private getSamplesInformation(framework: string): IFuture<string> {
-		return (() => {
+	private async getSamplesInformation(framework: string): Promise<string> {
 			let availableSamples: Sample[];
 			try {
 				availableSamples = this.getSamples(framework).wait();
@@ -146,7 +139,6 @@ export class SamplesService implements ISamplesService {
 			});
 
 			return outputLines.join(EOL + EOL);
-		}).future<string>()();
 	}
 
 	private getRegExpForFramework(framework?: string): RegExp {
@@ -161,8 +153,7 @@ export class SamplesService implements ISamplesService {
 		}
 	}
 
-	private getSamples(framework?: string): IFuture<Sample[]> {
-		return (() => {
+	private async getSamples(framework?: string): Promise<Sample[]> {
 			let regex = this.getRegExpForFramework(framework);
 			let repos = _.filter(this.getIceniumRepositories().wait(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
 			let samples = _.map(repos, (repo: any) => {
@@ -178,11 +169,9 @@ export class SamplesService implements ISamplesService {
 			let sortedSamples = _.sortBy(samples, sample => sample.displayName);
 
 			return sortedSamples;
-		}).future<Sample[]>()();
 	}
 
-	private getPagedResult(gitHubEndpointUrl: string, page: number): IFuture<string[]> {
-		return (() => {
+	private async getPagedResult(gitHubEndpointUrl: string, page: number): Promise<string[]> {
 			try {
 				let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
 				let accessToken = this.getGitHubAccessTokenQueryParameter("&");
@@ -192,14 +181,11 @@ export class SamplesService implements ISamplesService {
 				this.$logger.debug(error);
 				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
 			}
-
-		}).future<string[]>()();
 	}
 
 	private _repos: string[];
 
-	private getIceniumRepositories(): IFuture<string[]> {
-		return ((): string[] => {
+	private async getIceniumRepositories(): Promise<string[]> {
 			if (!this._repos) {
 				let gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
 				this._repos = [];
@@ -214,7 +200,6 @@ export class SamplesService implements ISamplesService {
 			}
 
 			return this._repos;
-		}).future<string[]>()();
 	}
 
 	private getTypeFromDescription(description: string): string {

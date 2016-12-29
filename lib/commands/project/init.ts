@@ -29,8 +29,7 @@ export class InitProjectCommand implements ICommand {
 		this.generateMandatoryAndForbiddenFiles();
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait()) {
 				this.$logger.info("Attempting to initialize Cordova project.");
 				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
@@ -40,11 +39,9 @@ export class InitProjectCommand implements ICommand {
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}
-		}).future<void>()();
 	}
 
-	private isProjectType(projectType: string): IFuture<boolean> {
-		return (() => {
+	private async isProjectType(projectType: string): Promise<boolean> {
 			let result = true;
 			let projectData = this.projectFilesDescriptors[projectType];
 
@@ -74,7 +71,6 @@ export class InitProjectCommand implements ICommand {
 			}
 
 			return result;
-		}).future<boolean>()();
 	}
 
 	private generateMandatoryAndForbiddenFiles() {

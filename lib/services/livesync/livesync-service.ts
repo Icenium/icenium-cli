@@ -14,8 +14,7 @@ export class LiveSyncService implements ILiveSyncService {
 		private $options: IOptions,
 		private $injector: IInjector) { }
 
-	public livesync(platform?: string): IFuture<void> {
-		return (() => {
+	public async livesync(platform?: string): Promise<void> {
 			this.$project.ensureProject();
 			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = platform || this.$devicesService.platform;
@@ -84,7 +83,6 @@ export class LiveSyncService implements ILiveSyncService {
 					$liveSyncServiceBase.sync([livesyncData]).wait();
 				});
 			}
-		}).future<void>()();
 	}
 
 	private fillDeviceConfigurationInfos(appIdentifier: string): IFuture<void> {

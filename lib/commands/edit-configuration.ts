@@ -42,8 +42,7 @@ export class EditConfigurationCommand implements ICommand {
 		return this.executeImplementation(template);
 	}
 
-	private executeImplementation(template: Project.IConfigurationFile): IFuture<void> {
-		return (() => {
+	private async executeImplementation(template: Project.IConfigurationFile): Promise<void> {
 			this.$project.ensureProject();
 			let projectPath = this.$project.getProjectDir();
 			let filepath = path.join(projectPath, template.filepath);
@@ -66,7 +65,6 @@ export class EditConfigurationCommand implements ICommand {
 				this.$logger.info("Opening configuration file: " + filepath);
 				this.$opener.open(filepath);
 			}
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("edit-configuration", EditConfigurationCommand);

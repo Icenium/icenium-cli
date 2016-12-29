@@ -25,8 +25,7 @@ export class ExtensionsServiceBase {
 		return path.join(this.cacheDir, packageName);
 	}
 
-	public prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, actions?: { beforeDownloadAction?: () => IFuture<void>; afterDownloadAction?: () => IFuture<void>}): IFuture<void> {
-		return ((): void => {
+	public async prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, actions?: { beforeDownloadAction?: () => IFuture<void>; afterDownloadAction?: () => IFuture<void>}): Promise<void> {
 			actions = actions || {};
 
 			if (this.$fs.exists(this.versionsFile)) {
@@ -73,7 +72,6 @@ export class ExtensionsServiceBase {
 				}
 				this.$logger.trace("Finished updating %s package.", packageName);
 			}
-		}).future<void>()();
 	}
 
 	public shouldUpdatePackage(cachedVersion: string, extensionVersion: string): boolean {

@@ -41,8 +41,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 		}).future<void>()();
 	}
 
-	private selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): IFuture<Server.IKendoDownloadablePackageData> {
-		return ((): Server.IKendoDownloadablePackageData => {
+	private async selectKendoVersion(packages: Server.IKendoDownloadablePackageData[]): Promise<Server.IKendoDownloadablePackageData> {
 			let selectedPackage: Server.IKendoDownloadablePackageData;
 			if (packages.length === 1) {
 				selectedPackage = _.first(packages);
@@ -76,11 +75,9 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			this.$logger.trace("The selected package is:");
 			this.$logger.trace(selectedPackage);
 			return selectedPackage;
-		}).future<Server.IKendoDownloadablePackageData>()();
 	}
 
-	private updateKendoFiles(downloadUri: string, version: string): IFuture<void> {
-		return (() => {
+	private async updateKendoFiles(downloadUri: string, version: string): Promise<void> {
 			temp.track();
 
 			let filepath = temp.path({suffix: ".zip", prefix: "abkendoupdate-"});
@@ -110,7 +107,6 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully updated Kendo UI to version `%s`.", version));
-		}).future<void>()();
 	}
 }
 

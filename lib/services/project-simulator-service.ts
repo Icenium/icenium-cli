@@ -26,8 +26,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		private $server: Server.IServer,
 		private $serverExtensionsService: IServerExtensionsService) { }
 
-	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
-		return (() => {
+	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
 			let pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
 			let projectData = this.$project.projectData;
 			let corePlugins = this.$project.getProperty("CorePlugins", "debug");
@@ -40,11 +39,9 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 				"--supportedplatforms", this.$project.getProjectTargets().join(";"),
 				"--plugins", (corePlugins || []).join(";")
 			];
-		}).future<string[]>()();
 	}
 
-	private prepareCordovaPlugins(simulatorPackageName: string): IFuture<string> {
-		return (() => {
+	private async prepareCordovaPlugins(simulatorPackageName: string): Promise<string> {
 			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
 			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
 
@@ -72,7 +69,6 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 			}
 
 			return pluginsPath;
-		}).future<string>()();
 	}
 
 	public closeStream(stream: any): IFuture<void> {

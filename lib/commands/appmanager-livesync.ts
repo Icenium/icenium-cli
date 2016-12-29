@@ -11,8 +11,7 @@ export class AppManagerLiveSyncCommand implements ICommand {
 		private $logger:ILogger,
 		private $config: Config.IConfig) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return ((): void => {
+	public async execute(args: string[]): Promise<void> {
 			let windowsPhonePlatformName = this.$mobileHelper.normalizePlatformName("WP8");
 			let isNativeScript = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.NativeScript;
 
@@ -33,14 +32,11 @@ export class AppManagerLiveSyncCommand implements ICommand {
 				}
 				this.$appManagerService.publishLivePatch(platforms).wait();
 			}
-		}).future<void>()();
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			_.each(args, platform => this.$mobileHelper.validatePlatformName(platform));
 			return true;
-		}).future<boolean>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

@@ -24,8 +24,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		this.$injector.register("jsonSchemaResolver", schemaResolver);
 	}
 
-	public downloadSchemas(): IFuture<void> {
-		return (() => {
+	public async downloadSchemas(): Promise<void> {
 			temp.track();
 			this.$fs.deleteDirectory(this.schemasFolderPath);
 			this.$fs.createDirectory(this.schemasFolderPath);
@@ -39,7 +38,6 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			fileEnd.wait();
 
 			this.$fs.unzip(filePath, this.schemasFolderPath).wait();
-		}).future<void>()();
 	}
 
 	private loadSchemas(): void {
@@ -64,8 +62,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		return _.includes(schemaIds, schemaId);
 	}
 
-	private loadSchema(schema: ISchema): IFuture<void> {
-		return (() => {
+	private async loadSchema(schema: ISchema): Promise<void> {
 			let id = schema.id;
 			let extendsProperty = schema.extends;
 
@@ -85,7 +82,6 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 
 				this.loadedSchemas[schema.id] = schema;
 			}
-		}).future<void>()();
 	}
 
 	private findSchema(schemaId: string): ISchema {

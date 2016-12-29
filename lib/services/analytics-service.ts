@@ -16,14 +16,12 @@ export class AnalyticsService extends AnalyticsServiceBase implements IAnalytics
 		super($logger, $options, $staticConfig, $errors, $prompter, $userSettingsService, $analyticsSettingsService, $progressIndicator, $osInfo);
 	}
 
-	public trackFeature(featureName: string): IFuture<void> {
-		return (() => {
+	public async trackFeature(featureName: string): Promise<void> {
 			if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
 				super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY).wait();
 			}
 
 			super.trackFeature(featureName).wait();
-		}).future<void>()();
 	}
 }
 

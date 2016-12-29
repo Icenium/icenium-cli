@@ -7,11 +7,9 @@ export class InitProjectCommand implements ICommand {
 		return this.initializeProjectFromExistingFiles(this.frameworkIdentifier);
 	}
 
-	public initializeProjectFromExistingFiles(frameworkIdentifier: string): IFuture<void> {
-		return (() => {
+	public async initializeProjectFromExistingFiles(frameworkIdentifier: string): Promise<void> {
 			this.$project.initializeProjectFromExistingFiles(frameworkIdentifier).wait();
 			this.$logger.out("Successfully initialized %s project.", frameworkIdentifier);
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];

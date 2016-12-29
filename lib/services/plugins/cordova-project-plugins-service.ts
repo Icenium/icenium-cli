@@ -83,8 +83,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return plugins.concat(this.getLocalPlugins().wait());
 	}
 
-	public addPlugin(pluginName: string): IFuture<void> {
-		return (() => {
+	public async addPlugin(pluginName: string): Promise<void> {
 			if (!pluginName) {
 				this.$errors.fail("No plugin name specified");
 			}
@@ -162,11 +161,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			this.configurePlugin(pluginName, version, configurations).wait();
-		}).future<void>()();
 	}
 
-	public removePlugin(pluginName: string): IFuture<void> {
-		return (() => {
+	public async removePlugin(pluginName: string): Promise<void> {
 			if (!pluginName) {
 				this.$errors.fail("No plugin name specified.");
 			}
@@ -219,7 +216,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]);
 				}
 			}
-		}).future<void>()();
 	}
 
 	public printPlugins(plugins: IPlugin[]): void {
@@ -249,8 +245,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return (installedPluginInstances && installedPluginInstances.length > 0) || this.isPluginFetched(pluginName).wait();
 	}
 
-	public configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void> {
-		return (() => {
+	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
 			if (this.$project.hasBuildConfigurations) {
 				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
 				_.each(configs, (configuration: string) => {
@@ -259,7 +254,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			} else {
 				this.configurePluginCore(pluginName, version).wait();
 			}
-		}).future<void>()();
 	}
 
 	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
@@ -284,11 +278,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		});
 	}
 
-	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
-		return (() => {
+	public async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]> {
 			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins()).map(pluginId => pluginId.toLowerCase());
 			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
-		}).future<IPlugin[]>()();
 	}
 
 	protected shouldCopyToPluginsDirectory(pathToPlugin: string): boolean {
@@ -304,16 +296,13 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return keywords;
 	}
 
-	protected installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	protected async installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): Promise<IBasicPluginInformation> {
 			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
 			return this.getLocalPluginBasicInformation(pluginXml).wait();
-		}).future<IBasicPluginInformation>()();
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	protected async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
 			// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
 			pluginData.addPluginToConfigFile = false;
 
@@ -326,7 +315,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 			return pluginBasicInfo;
-		}).future<IBasicPluginInformation>()();
 
 	}
 
@@ -337,15 +325,13 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}
 	}
 
-	private loadPluginsData(): IFuture<void> {
-		return (() => {
+	private async loadPluginsData(): Promise<void> {
 			// Cordova plugin commands are only applicable to Cordova projects
 			this.$project.ensureCordovaProject();
 			this.$loginManager.ensureLoggedIn().wait();
 			this._identifierToPlugin = Object.create(null);
 			Future.wait([this.createPluginsData(this.$cordovaPluginsService),
 				this.createPluginsData(this.$marketplacePluginsService)]);
-		}).future<void>()();
 	}
 
 	private getInstalledPluginsForConfiguration(config?: string): IPlugin[] {
@@ -415,8 +401,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return installedPluginInstances;
 	}
 
-	private configurePluginCore(pluginName: string, configuration?: string, version?: string): IFuture<void> {
-		return (() => {
+	private async configurePluginCore(pluginName: string, configuration?: string, version?: string): Promise<void> {
 			let plugin = this.getBestMatchingPlugin(pluginName, version);
 			let pluginData = <IMarketplacePluginData>plugin.data;
 
@@ -450,7 +435,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 
 			this.$logger.out(successMessage);
-		}).future<void>()();
 	}
 
 	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): void {
@@ -481,8 +465,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		}
 	}
 
-	private createPluginsData(pluginsService: ICordovaPluginsService): IFuture<void> {
-		return (() => {
+	private async createPluginsData(pluginsService: ICordovaPluginsService): Promise<void> {
 			let plugins = pluginsService.getAvailablePlugins().wait();
 			_.each(plugins, (plugin: IMarketplacePluginData) => {
 				try {
@@ -509,11 +492,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					this.$logger.trace(e);
 				}
 			});
-		}).future<void>()();
 	}
 
-	private gatherVariableInformation(pluginIdentifier: string, variableName: string, configuration: string): IFuture<any> {
-		return (() => {
+	private async gatherVariableInformation(pluginIdentifier: string, variableName: string, configuration: string): Promise<any> {
 			let schema: IPromptSchema = {
 				name: variableName,
 				type: "input",
@@ -527,7 +508,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			return this.getPluginVariableFromVarOption(variableName, configuration) || this.$prompter.get([schema]).wait();
-		}).future<any>()();
 	}
 
 	private getPluginInstancesByName(pluginName: string, version?: string): IPlugin[] {
@@ -564,14 +544,11 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return matchingPlugins;
 	}
 
-	private promptForVersion(pluginName: string, versions: any[]): IFuture<string> {
-		return (() => {
+	private async promptForVersion(pluginName: string, versions: any[]): Promise<string> {
 			return versions.length > 1 ? this.promptForVersionCore(pluginName, versions).wait() : versions[0].value;
-		}).future<string>()();
 	}
 
-	private promptForVersionCore(pluginName: string, versions: any[]): IFuture<string> {
-		return (() => {
+	private async promptForVersionCore(pluginName: string, versions: any[]): Promise<string> {
 			let version: string;
 			if (helpers.isInteractive()) {
 				version = this.$prompter.promptForChoice("Which plugin version do you want to use?", versions).wait();
@@ -580,7 +557,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			return version;
-		}).future<string>()();
 	}
 
 	private printPluginsCore(plugins: IPlugin[]): void {
@@ -599,8 +575,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		this.$logger.out(outputLines.join(EOL + EOL));
 	}
 
-	private modifyInstalledMarketplacePlugin(pluginName: string, version: string): IFuture<void> {
-		return ((): void => {
+	private async modifyInstalledMarketplacePlugin(pluginName: string, version: string): Promise<void> {
 			pluginName = pluginName.toLowerCase();
 			let isConsoleInteractive = helpers.isInteractive();
 			let allInstalledPlugins = this.getInstalledPluginsForConfiguration();
@@ -674,11 +649,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			} else {
 				this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
 			}
-		}).future<void>()();
 	}
 
-	private selectPluginVersion(version: string, plugin: IPlugin, options?: { excludeCurrentVersion: boolean }): IFuture<string> {
-		return ((): string => {
+	private async selectPluginVersion(version: string, plugin: IPlugin, options?: { excludeCurrentVersion: boolean }): Promise<string> {
 			let pluginName = plugin.data.Name;
 			let versions = this.getPluginVersions(plugin);
 			if (version) {
@@ -699,7 +672,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			return version;
-		}).future<string>()();
 	}
 
 	/**
@@ -824,15 +796,12 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return this._obsoletedIntegratedPlugins;
 	}
 
-	private getObsoletedByPluginIdentifier(pluginIdentifier: string): IFuture<string> {
-		return ((): string => {
+	private async getObsoletedByPluginIdentifier(pluginIdentifier: string): Promise<string> {
 			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
 			return obsoletedByInfo.obsoletedBy;
-		}).future<string>()();
 	}
 
-	private getObsoletingPluginIdentifier(pluginIdentifier: string): IFuture<string> {
-		return ((): string => {
+	private async getObsoletingPluginIdentifier(pluginIdentifier: string): Promise<string> {
 			let obsoletingKey: string;
 
 			_.each(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => {
@@ -843,11 +812,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			});
 
 			return obsoletingKey;
-		}).future<string>()();
 	}
 
-	private getLocalPlugins(): IFuture<IPlugin[]> {
-		return ((): IPlugin[] => {
+	private async getLocalPlugins(): Promise<IPlugin[]> {
 			if (!this._localPlugins) {
 				let pluginsDir = path.join(this.$project.projectDir, "plugins");
 				if (!this.$fs.exists(pluginsDir)) {
@@ -899,11 +866,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			return this._localPlugins;
-		}).future<IPlugin[]>()();
 	}
 
-	private getLocalPluginBasicInformation(pluginXml: any): IFuture<IBasicPluginInformation> {
-		return ((): IBasicPluginInformation => {
+	private async getLocalPluginBasicInformation(pluginXml: any): Promise<IBasicPluginInformation> {
 			// Need to add $t because of the xmlMapping library.
 			let basicPluginInformation: IBasicPluginInformation = {
 				name: pluginXml.plugin.name.$t,
@@ -925,7 +890,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 			basicPluginInformation.variables = pluginVariables;
 			return basicPluginInformation;
-		}).future<IBasicPluginInformation>()();
 	}
 
 	private getPluginXmlContent(pathToPlugin: string): any {
@@ -938,8 +902,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return xmlMapping.tojson(this.$fs.readText(pathToPluginXml));
 	}
 
-	private setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): IFuture<void> {
-		return (() => {
+	private async setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): Promise<void> {
 			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 			let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
 
@@ -955,7 +918,6 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				});
 				this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
 			}
-		}).future<void>()();
 	}
 }
 

@@ -37,11 +37,9 @@ export class RemoteCommand implements ICommand {
 		private $hostInfo: IHostInfo) {
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			let portNumber = parseInt(args[0]);
 			this.$remoteService.startApiServer(portNumber).wait();
-		}).future<void>()();
 	}
 
 	allowedParameters = [new PortCommandParameter(this.$errors, this.$hostInfo)];

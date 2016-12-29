@@ -90,8 +90,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		return this._ionicConfigXml;
 	}
 
-	public transformToAppBuilderProject(createBackup: boolean): IFuture<void> {
-		return (() => {
+	public async transformToAppBuilderProject(createBackup: boolean): Promise<void> {
 			this.$analyticsService.track("Migrate from Ionic", "true").wait();
 
 			if (createBackup) {
@@ -106,7 +105,6 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 			this.deleteEnabledPlugins();
 
 			this.deleteAssortedFilesAndDirectories();
-		}).future<void>()();
 	}
 
 	/**

@@ -25,12 +25,10 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		"AndroidRequiredPermissions": ["android.permission.INTERNET"]
 	};
 
-	public getAvailablePlugins(): IFuture<Server.CordovaPluginData[]> {
-		return ((): Server.CordovaPluginData[] => {
+	public async getAvailablePlugins(): Promise<Server.CordovaPluginData[]> {
 			this.$project.ensureCordovaProject();
 			// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
 			return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).wait().concat([this.livePatchPlugin]);
-		}).future<Server.CordovaPluginData[]>()();
 	}
 
 	public createPluginData(plugin: IMarketplacePluginData): IPlugin[] {

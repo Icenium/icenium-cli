@@ -27,10 +27,8 @@ class WinSimulatorPlatformServices extends platformServicesRunValidatorLib.Platf
 			{ stdio: "ignore", detached: true }).unref();
 	}
 
-	public canRunApplication(): IFuture<boolean> {
-		return (() => {
+	public async canRunApplication(): Promise<boolean> {
 			return super.canRunApplication().wait() && this.$hostInfo.isDotNet40Installed("Unable to start the simulator. Verify that you have installed .NET 4.0 or later and try again.").wait();
-		}).future<boolean>()();
 	}
 }
 

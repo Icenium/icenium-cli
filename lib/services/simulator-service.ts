@@ -28,19 +28,16 @@ export class SimulatorService implements ISimulatorService {
 		return this.runSimulator(simulatorPackageName);
 	}
 
-	private ensureSimulatorIsNotRunning(): IFuture<void> {
-		return (() => {
+	private async ensureSimulatorIsNotRunning(): Promise<void> {
 			this.$logger.info(); // HACK - display simulator downloading indicator correctly
 			let isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + EOL +
 					"Close it and run $ appbuilder simulate again.");
 			}
-		}).future<void>()();
 	}
 
-	private runSimulator(simulatorPackageName: string): IFuture<void> {
-		return (() => {
+	private async runSimulator(simulatorPackageName: string): Promise<void> {
 			this.$logger.info("Starting simulator...");
 
 			let simulatorParams = [
@@ -59,7 +56,6 @@ export class SimulatorService implements ISimulatorService {
 
 			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
-		}).future<void>()();
 	}
 }
 $injector.register("simulatorService", SimulatorService);

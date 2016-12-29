@@ -22,13 +22,11 @@ export class BaseValidator<Input> implements IValidator<Input> {
 export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 	constructor(private $injector: IInjector) { }
 
-	public throwIfInvalid(data: Input): IFuture<void> {
-		return (() => {
+	public async throwIfInvalid(data: Input): Promise<void> {
 			let validationResult: IValidationResult = this.validate(data).wait();
 			if (!validationResult.isSuccessful) {
 				this.$injector.resolve("$errors").fail(validationResult.error);
 			}
-		}).future<void>()();
 	}
 
 	public validate(data: Input): IFuture<IValidationResult> {
@@ -50,15 +48,13 @@ export class Helpers {
 		return ValidationResult.ValidationResult.Successful;
 	}
 
-	public static validateAsync(validators: Function[]): IFuture<IValidationResult> {
-		return (() => {
+	public async static validateAsync(validators: Function[]): Promise<IValidationResult> {
 			let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
 			let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 			if (firstFailedValidationResult) {
 				return firstFailedValidationResult;
 			}
 			return ValidationResult.ValidationResult.Successful;
-		}).future<IValidationResult>()();
 	}
 
 	private static getFirstFailedValidationResult(validationResults: IValidationResult[]): IValidationResult {

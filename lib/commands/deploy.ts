@@ -35,8 +35,7 @@ export class DeployHelper implements IDeployHelper {
 		return this.deployCore(platform);
 	}
 
-	private deployCore(platform: string): IFuture<void> {
-		return ((): void => {
+	private async deployCore(platform: string): Promise<void> {
 			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
 			platform = platform || this.$devicesService.platform;
 			this.$options.justlaunch = true;
@@ -65,7 +64,6 @@ export class DeployHelper implements IDeployHelper {
 					if (device.applicationManager.canStartApplication()) {
 						device.applicationManager.startApplication(appInfo.appIdentifier).wait();
 					}
-				}).future<void>()();
 			};
 
 			let canExecute = (device: Mobile.IDevice): boolean => {
@@ -85,14 +83,12 @@ export class DeployHelper implements IDeployHelper {
 		}).future<void>()();
 	}
 
-	private getAppInfoFromBuildResult(device: Mobile.IDevice): IFuture<IApplicationInformation> {
-		return ((): IApplicationInformation => {
+	private async getAppInfoFromBuildResult(device: Mobile.IDevice): Promise<IApplicationInformation> {
 			if (this.$devicesService.isiOSSimulator(device)) {
 				return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait(), appIdentifier: this.$project.projectData.AppIdentifier };
 			} else {
 				return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
 			}
-		}).future<IApplicationInformation>()();
 	}
 }
 $injector.register("deployHelper", DeployHelper);

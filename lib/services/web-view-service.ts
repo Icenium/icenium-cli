@@ -63,21 +63,17 @@ export class WebViewService implements IWebViewService {
 		return this.enableWebViewCore(webView);
 	}
 
-	private enableWebViewCore(webView: IWebView): IFuture<void> {
-		return (() => {
+	private async enableWebViewCore(webView: IWebView): Promise<void> {
 			if (!this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
 				this.$options.default = true;
 				this.$pluginsService.addPlugin(webView.pluginIdentifier).wait();
 			}
-		}).future<void>()();
 	}
 
-	private enableDefaultWebView(platform: string): IFuture<void> {
-		return (() => {
+	private async enableDefaultWebView(platform: string): Promise<void> {
 			_(this.getWebViews(platform))
 				.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
 				.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait());
-		}).future<void>()();
 	}
 }
 $injector.register("webViewService", WebViewService);

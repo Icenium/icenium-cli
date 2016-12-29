@@ -12,8 +12,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 		private $project: Project.IProject,
 		private $logger: ILogger) { }
 
-	public migrateTypeScriptProject(): IFuture<void> {
-		return (() => {
+	public async migrateTypeScriptProject(): Promise<void> {
 			if (this.shouldAskForTypeScriptMigration) {
 				if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir).wait() && this.$project.projectData &&
 					this.$project.projectData.Framework.toLowerCase() === constants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()) {
@@ -34,7 +33,6 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 				// Ask once per process.
 				this.shouldAskForTypeScriptMigration = false;
 			}
-		}).future<void>()();
 	}
 }
 $injector.register("projectMigrationService", ProjectMigrationService);

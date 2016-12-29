@@ -11,8 +11,7 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 		super(path.join($options.profileDir, "Cache"), $fs, $httpClient, $logger, $options);
 	}
 
-	public prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): IFuture<void> {
-		return (() => {
+	public async prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): Promise<void> {
 			let cachedVersion = "0.0.0.0";
 			let extensionData = {
 				packageName: packageName,
@@ -21,11 +20,9 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 			};
 
 			this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction }).wait();
-		}).future<void>()();
 	}
 
-	private getExtensionDownloadUri(packageName: string): IFuture<string> {
-		return (() => {
+	private async getExtensionDownloadUri(packageName: string): Promise<string> {
 			let serverUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER;
 			let downloadUri: string;
 
@@ -42,7 +39,6 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 			}
 
 			return downloadUri;
-		}).future<string>()();
 	}
 }
 $injector.register("serverExtensionsService", ServerExtensionsService);

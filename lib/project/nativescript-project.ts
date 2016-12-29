@@ -145,8 +145,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return null;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
-		return (() => {
+	public async updateMigrationConfigFile(): Promise<void> {
 			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
 			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
 			let currentTime = this.$dateProvider.getCurrentDate();
@@ -175,11 +174,9 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
 				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
 			}
-		}).future<void>()();
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
-		return (() => {
+	public async ensureProject(projectDir: string): Promise<void> {
 			if (this.$typeScriptService.isTypeScriptProject(projectDir).wait()) {
 				try {
 					this.$npmService.install(projectDir).wait();
@@ -188,7 +185,6 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 					this.$logger.warn("The installation of the project dependencies from npm failed. The TypeScript transpilation may fail due to missing .d.ts files.");
 				}
 			}
-		}).future<void>()();
 	}
 }
 

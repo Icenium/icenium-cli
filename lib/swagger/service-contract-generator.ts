@@ -18,8 +18,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 		this.pendingModels = {};
 	}
 
-	public generate(): IFuture<IServiceContractClientCode> {
-		return ((): IServiceContractClientCode => {
+	public async generate(): Promise<IServiceContractClientCode> {
 			let swagger = this.$serviceContractProvider.getApi().wait();
 			let interfacesFile= new Block();
 			let implementationsFile = new Block();
@@ -80,8 +79,6 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 				interfaceFile: codePrinter.composeBlock(interfacesFile),
 				implementationFile: codePrinter.composeBlock(implementationsFile)
 			};
-
-		}).future<IServiceContractClientCode>()();
 	}
 
 	private generateModels(models: IDictionary<CodeGeneration.IModel>): CodeGeneration.IBlock[] {

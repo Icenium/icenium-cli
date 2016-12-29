@@ -7,8 +7,7 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 		private $logger: ILogger,
 		private $errors: IErrors) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
 			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks();
 			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion);
@@ -20,13 +19,11 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 			_.each(supportedVersions, (sv: IFrameworkVersion) => {
 				this.$logger.info(sv.displayName);
 			});
-		}).future<void>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			if (args && args.length > 0) {
 				this.$errors.fail("This command does not accept parameters.");
 			}
@@ -37,7 +34,6 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 			}
 
 			return true;
-		}).future<boolean>()();
 	}
 }
 $injector.registerCommand(["mobileframework|*print", "prop|print|frameworkversion"], PrintFrameworkVersionsCommand);

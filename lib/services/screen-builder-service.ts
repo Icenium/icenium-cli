@@ -39,8 +39,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "add";
 	}
 
-	private promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScreenBuilderMigrationData> {
-		return (() => {
+	private async promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScreenBuilderMigrationData> {
 			let wasMigrated = !this.shouldUpgrade(projectPath).wait(),
 				didMigrate = false;
 
@@ -58,11 +57,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return { wasMigrated: wasMigrated, didMigrate: didMigrate };
-		}).future<IScreenBuilderMigrationData>()();
 	}
 
-	public prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<boolean> {
-		return (() => {
+	public async prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<boolean> {
 			generatorName = generatorName || this.generatorFullName;
 			let migrationData = this.promptForUpgrade(projectPath, generatorName, screenBuilderOptions).wait(),
 				disableCommandHelpSuggestion = !migrationData.didMigrate;
@@ -72,11 +69,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return disableCommandHelpSuggestion;
-		}).future<boolean>()();
 	}
 
-	public allSupportedCommands(projectDir: string, generatorName?: string): IFuture<string[]> {
-		return (() => {
+	public async allSupportedCommands(projectDir: string, generatorName?: string): Promise<string[]> {
 			if (!this.allCommandsCache) {
 				generatorName = generatorName || this.generatorFullName;
 				let scaffolder = this.createScaffolder(projectDir, generatorName, { isSync: true }).wait().scaffolder;
@@ -88,15 +83,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return this.allCommandsCache;
-		}).future<string[]>()();
 	}
 
-	public generateAllCommands(projectDir: string, generatorName?: string): IFuture<void> {
-		return (() => {
+	public async generateAllCommands(projectDir: string, generatorName?: string): Promise<void> {
 			generatorName = generatorName || this.generatorFullName;
 			let commands = this.allSupportedCommands(projectDir, generatorName).wait();
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
-		}).future<void>()();
 	}
 
 	public composeScreenBuilderOptions(answers: string, bacisSceenBuilderOptions?: IScreenBuilderOptions): IScreenBuilderOptions {
@@ -109,8 +101,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return screenBuilderOptions;
 	}
 
-	public promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
-		return (() => {
+	public async promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScaffolder> {
 			generatorName = generatorName || this.generatorFullName;
 			let scaffolderData = this.createScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
 			let scaffolder = scaffolderData.scaffolder;
@@ -124,7 +115,6 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return scaffolderData;
-		}).future<IScaffolder>()();
 	}
 
 	public ensureScreenBuilderProject(projectDir: string): void {
@@ -133,8 +123,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		}
 	}
 
-	public shouldUpgrade(projectPath: string): IFuture<boolean> {
-		return (() => {
+	public async shouldUpgrade(projectPath: string): Promise<boolean> {
 			if (!this.shouldUpgradeCached) {
 				let scaffolderData = this.createScaffolder(projectPath, this.generatorFullName).wait();
 
@@ -144,11 +133,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return this.shouldUpgradeCached;
-		}).future<boolean>()();
 	}
 
-	public upgrade(projectPath: string): IFuture<void> {
-		return (() => {
+	public async upgrade(projectPath: string): Promise<void> {
 			if (!this.shouldUpgrade(projectPath).wait()) {
 				return;
 			}
@@ -158,11 +145,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
 			scaffolderData.future.wait();
-		}).future<void>()();
 	}
 
-	private getScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<any> {
-		return (() => {
+	private async getScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<any> {
 			if (!this.scaffolder) {
 				this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
 
@@ -186,11 +171,9 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			}
 
 			return this.scaffolder;
-		}).future<IScaffolder>()();
 	}
 
-	private createScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): IFuture<IScaffolder> {
-		return (() => {
+	private async createScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScaffolder> {
 			screenBuilderOptions = screenBuilderOptions || {};
 
 			let scaffolder = this.getScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
@@ -214,7 +197,6 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			};
 
 			return { scaffolder: scaffolder, future: future, callback: callback };
-		}).future<IScaffolder>()();
 	}
 
 	private getErrorsRecursive(errorObject: any): string[] {
@@ -248,8 +230,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 		private $project: Project.IProject,
 		private $screenBuilderService: IScreenBuilderService) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureProject();
 			let projectDir = this.$project.getProjectDir();
 			this.$screenBuilderService.ensureScreenBuilderProject(projectDir);
@@ -259,7 +240,6 @@ class ScreenBuilderDynamicCommand implements ICommand {
 			});
 
 			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions).wait();
-		}).future<void>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

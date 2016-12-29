@@ -9,8 +9,7 @@ class DoctorService implements IDoctorService {
 		private $logger: ILogger,
 		private $staticConfig: IStaticConfig) {	}
 
-	public printWarnings(): IFuture<boolean> {
-		return ((): boolean => {
+	public async printWarnings(): Promise<boolean> {
 			let result = false;
 			let sysInfo = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait();
 
@@ -66,7 +65,6 @@ class DoctorService implements IDoctorService {
 			}
 
 			return result;
-		}).future<boolean>()();
 	}
 
 	private printPackageManagerTip() {

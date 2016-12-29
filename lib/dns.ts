@@ -16,12 +16,10 @@ export class DomainNameSystem implements IDomainNameSystem {
 		return future;
 	}
 
-	public getDomains(): IFuture<string[]> {
-		return (() => {
+	public async getDomains(): Promise<string[]> {
 			let ipAddress = ip.address();
 			let domains = this.reverse(ipAddress).wait();
 			return domains;
-		}).future<string[]>()();
 	}
 }
 $injector.register("domainNameSystem", DomainNameSystem);

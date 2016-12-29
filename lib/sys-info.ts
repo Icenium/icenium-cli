@@ -10,15 +10,13 @@ export class SysInfo extends SysInfoBase {
 		super($childProcess, $hostInfo, $iTunesValidator, $logger, $winreg);
 	}
 
-	public getSysInfo(pathToPackageJson: string, androidToolsInfo?: {pathToAdb: string, pathToAndroid: string}): IFuture<ISysInfoData> {
-		return ((): ISysInfoData => {
+	public async getSysInfo(pathToPackageJson: string, androidToolsInfo?: {pathToAdb: string, pathToAndroid: string}): Promise<ISysInfoData> {
 			let defaultAndroidToolsInfo = {
 				pathToAdb: "adb",
 				pathToAndroid: "android" + (this.$hostInfo.isWindows ? ".bat" : "")
 			};
 
 			return super.getSysInfo(pathToPackageJson  || this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo).wait();
-		}).future<ISysInfoData>()();
 	}
 }
 $injector.register("sysInfo", SysInfo);

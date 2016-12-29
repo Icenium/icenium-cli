@@ -55,8 +55,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return dataToBeUpdated;
 	}
 
-	public updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): IFuture<void> {
-		return ((): void => {
+	public async updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): Promise<void> {
 			this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
 
 			if (configurationsSpecifiedByUser.length === 0) {
@@ -69,11 +68,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 			// check if CorePlugins in all configurations are the same
 			this.tryMovingCorePluginsToProjectData(projectData, configurationSpecificData);
-		}).future<void>()();
 	}
 
-	public updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): IFuture<void> {
-		return ((): void => {
+	public async updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): Promise<void> {
 			let normalizedProperty = this.normalizePropertyName(property, projectData);
 			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
 			if (isString) {
@@ -109,7 +106,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			}
 
 			this.validateProjectData(projectData, configurationSpecificData);
-		}).future<void>()();
 	}
 
 	public normalizePropertyName(propertyName: string, projectData: Project.IData): string {
@@ -124,8 +120,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return normalizedPropertyName;
 	}
 
-	public getPropertiesForAllSupportedProjects(): IFuture<string> {
-		return (() => {
+	public async getPropertiesForAllSupportedProjects(): Promise<string> {
 			let result: string[] = [];
 			let schemas: IDictionary<IDictionary<any>> = Object.create(null);
 
@@ -157,15 +152,13 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
 			return result.join(EOL + EOL);
-		}).future<string>()();
 	}
 
 	private getValidProperties(projectData: Project.IData): any {
 		return this.$jsonSchemaValidator.getValidProperties(projectData.Framework, projectData.FrameworkVersion);
 	}
 
-	private getPropRange(propData: any): IFuture<string[]> {
-		return (() => {
+	private async getPropRange(propData: any): Promise<string[]> {
 			if (propData.dynamicRange) {
 				return this.$injector.dynamicCall(propData.dynamicRange).wait();
 			}
@@ -178,11 +171,9 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				}
 			}
 			return propData.range;
-		}).future<string[]>()();
 	}
 
-	public getValidValuesForProperty(propData: any): IFuture<string[]> {
-		return ((): string[] => {
+	public async getValidValuesForProperty(propData: any): Promise<string[]> {
 			let range = this.getPropRange(propData).wait();
 			if (range) {
 				return _.sortBy(_.values<string>(range), (val: string) => {
@@ -191,7 +182,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			}
 
 			return null;
-		}).future<string[]>()();
 	}
 
 	private getProjectSchemaPartHelp(schema: any, title: string): string {
@@ -242,14 +232,12 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		return properties;
 	}
 
-	private notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): IFuture<void> {
-		return ((): void => {
+	private async notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): Promise<void> {
 			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
 			let propData = projectSchema[propertyName];
 			if (propData && propData.onChanging) {
 				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
 			}
-		}).future<void>()();
 	}
 
 	private moveCorePluginsToConfigurationSpecificData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {

@@ -7,20 +7,16 @@ export class FindPluginsCommand implements ICommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			if (!args.length) {
 				this.$errors.fail("You have to provide all required parameters.");
 			}
 			return true;
-		}).future<boolean>()();
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			let pluginsSource = this.$pluginsService.findPlugins(args).wait();
 			this.$printPluginsService.printPlugins(pluginsSource, { showAllPlugins: this.$options.all }).wait();
-		}).future<void>()();
 	}
 }
 

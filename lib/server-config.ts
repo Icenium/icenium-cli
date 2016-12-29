@@ -4,8 +4,7 @@ export class ServerConfiguration implements IServerConfiguration {
 	constructor(private $config: IConfiguration,
 		private $injector: IInjector) { }
 
-	private getConfigurationFromServer(): IFuture<any> {
-		return (() => {
+	private async getConfigurationFromServer(): Promise<any> {
 			if(!this.cachedServerConfiguration) {
 				let configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
 				let httpClient = this.$injector.resolve("httpClient");
@@ -13,26 +12,19 @@ export class ServerConfiguration implements IServerConfiguration {
 			}
 
 			return this.cachedServerConfiguration;
-		}).future<any>()();
 	}
 
-	public get tfisServer(): IFuture<string> {
-		return (() => {
+	public async get tfisServer(): Promise<string> {
 			return this.getConfigurationFromServer().wait().stsServer;
-		}).future<string>()();
 	}
 
-	public get assemblyVersion(): IFuture<string> {
-		return (() => {
+	public async get assemblyVersion(): Promise<string> {
 			return this.getConfigurationFromServer().wait().assemblyVersion;
-		}).future<string>()();
 	}
 
-	public get resourcesPath(): IFuture<string> {
-		return (() => {
+	public async get resourcesPath(): Promise<string> {
 			let resourcesRelativePath = this.getConfigurationFromServer().wait().resourcesPath;
 			return `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/${resourcesRelativePath}`;
-		}).future<string>()();
 	}
 }
 $injector.register("serverConfiguration", ServerConfiguration);

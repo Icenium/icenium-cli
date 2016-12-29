@@ -5,12 +5,10 @@ export class FetchPluginCommand implements ICommand {
 
 	public allowedParameters = [this.$stringParameter];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			let pluginName = this.$pluginsService.fetch(args[0]).wait();
 
 			this.$logger.printMarkdown(`Successfully fetched plugin \`${pluginName}\``);
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("plugin|fetch", FetchPluginCommand);

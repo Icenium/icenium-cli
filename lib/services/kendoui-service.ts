@@ -8,8 +8,7 @@ export class KendoUIService implements IKendoUIService {
 	constructor(private $server: Server.IServer) {
 	}
 
-	public getKendoPackages(options: IKendoUIFilterOptions): IFuture<Server.IKendoDownloadablePackageData[]> {
-		return (() => {
+	public async getKendoPackages(options: IKendoUIFilterOptions): Promise<Server.IKendoDownloadablePackageData[]> {
 			if (!this._packages) {
 				let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
 				if (options.verified) {
@@ -37,7 +36,6 @@ export class KendoUIService implements IKendoUIService {
 			}
 
 			return this._packages;
-		}).future<Server.IKendoDownloadablePackageData[]>()();
 	}
 }
 

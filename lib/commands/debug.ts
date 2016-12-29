@@ -20,13 +20,11 @@ export class DebugCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.$project.ensureProject();
 
 			this.runDebugger().wait();
-		}).future<void>()();
 	}
 
 	public canExecute(args: string[]): IFuture<boolean> {
@@ -37,8 +35,7 @@ export class DebugCommand implements ICommand {
 		return this.$hostInfo.isDarwin ? Future.fromResult(true) : this.$winDebuggerService.canRunApplication();
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
+	protected async runDebugger(): Promise<void> {
 			if (this.$hostInfo.isWindows) {
 				this.$logger.info("Starting debugger...");
 
@@ -55,17 +52,14 @@ export class DebugCommand implements ICommand {
 
 				this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
 			}
-		}).future<void>()();
 	}
 
-	private ensureDebuggerIsNotRunning(): IFuture<void> {
-		return (() => {
+	private async ensureDebuggerIsNotRunning(): Promise<void> {
 			let isRunning = this.$processInfo.isRunning(this.$winDebuggerService.executableName).wait();
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
 					"Close it and run $ appbuilder debug again.");
 			}
-		}).future<void>()();
 	}
 }
 
@@ -99,13 +93,11 @@ export class DebugAndroidCommand extends DebugCommand {
 		this.platform = this.$projectConstants.ANDROID_PLATFORM_NAME;
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
+	protected async runDebugger(): Promise<void> {
 			super.runDebugger().wait();
 
 			if (!this.$hostInfo.isWindows) {
 				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework).wait();			}
-		}).future<void>()();
 	}
 }
 
@@ -138,14 +130,12 @@ export class DebugIosCommand extends DebugCommand {
 			$darwinDebuggerService);
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
+	protected async runDebugger(): Promise<void> {
 			super.runDebugger().wait();
 
 			if (!this.$hostInfo.isWindows) {
 				this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);
 			}
-		}).future<void>()();
 	}
 }
 

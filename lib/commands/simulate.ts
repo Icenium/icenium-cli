@@ -9,12 +9,10 @@ export class SimulateCommand implements ICommand {
 			this.projectData = $project.projectData;
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			if (this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [];

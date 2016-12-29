@@ -7,15 +7,12 @@ export class SetWebViewCommand implements ICommand {
 		private $logger: ILogger,
 		private $project: Project.IProject) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$webViewService.enableWebView(args[0], args[1], this.$project.projectData.FrameworkVersion).wait();
 			this.$logger.out(`Operation completed successfully. Your project now uses the ${args[1]} web view for ${args[0]}.`);
-		}).future<void>()();
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			this.$project.ensureCordovaProject();
 
 			if (!args[0] || !args[1]) {
@@ -46,8 +43,6 @@ export class SetWebViewCommand implements ICommand {
 			}
 
 			return true;
-
-		}).future<boolean>()();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

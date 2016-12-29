@@ -22,8 +22,7 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 
 	public mandatory = true;
 
-	public validate(value: string, errorMessage?: string): IFuture<boolean> {
-		return (() => {
+	public async validate(value: string, errorMessage?: string): Promise<boolean> {
 			this.$project.ensureProject();
 			if(!this.$project.capabilities.canChangeFrameworkVersion) {
 				this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`);
@@ -42,6 +41,5 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 			}
 
 			this.$errors.failWithoutHelp("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");
-		}).future<boolean>()();
 	}
 }

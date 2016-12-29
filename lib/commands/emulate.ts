@@ -15,8 +15,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureAllPlatformAssets();
 			this.$androidEmulatorServices.checkAvailability();
 			let tempDir = this.$project.getTempDir("emulatorfiles");
@@ -30,15 +29,12 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 			this.$options.justlaunch = true;
 			let emulateOptions: Mobile.IEmulatorOptions = { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME).wait() };
 			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions).wait();
-		}).future<void>()();
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
+	public async canExecute(args: string[]): Promise<boolean> {
 			super.canExecute(args).wait();
 			this.$androidEmulatorServices.checkDependencies().wait();
 			return true;
-		}).future<boolean>()();
 	}
 }
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
@@ -57,8 +53,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureAllPlatformAssets();
 			this.$iOSEmulatorServices.checkDependencies().wait();
 			this.$iOSEmulatorServices.checkAvailability();
@@ -70,8 +65,6 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 			}
 
 			this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
-
-		}).future<void>()();
 	}
 }
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
@@ -88,8 +81,7 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
+	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureAllPlatformAssets();
 			this.$wp8EmulatorServices.checkDependencies().wait();
 			this.$wp8EmulatorServices.checkAvailability();
@@ -106,7 +98,6 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 			}).wait();
 
 			this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath).wait();
-		}).future<void>()();
 	}
 
 	public isDisabled = this.$config.ON_PREM;

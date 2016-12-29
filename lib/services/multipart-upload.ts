@@ -15,8 +15,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 		private $errors: IErrors,
 		private $logger: ILogger) { }
 
-	public uploadFileByChunks(filePath: string, bucketKey: string): IFuture<void> {
-		return (() => {
+	public async uploadFileByChunks(filePath: string, bucketKey: string): Promise<void> {
 			let fileSize: number = this.$fs.getFileSize(filePath);
 			let chunkStartByte = 0,
 				endByte: number;
@@ -49,7 +48,6 @@ export class MultipartUploadService implements IMultipartUploadService {
 			let fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
 
 			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
-		}).future<void>()();
 	}
 
 	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {

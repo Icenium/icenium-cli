@@ -61,8 +61,7 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 
-	public loadUserSettingsFile(): IFuture<void> {
-		return (() => {
+	public async loadUserSettingsFile(): Promise<void> {
 			if (!this.userSettingsData) {
 				this.$fs.createDirectory(this.$options.profileDir);
 
@@ -79,11 +78,9 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 					this.downloadUserSettings().wait();
 				}
 			}
-		}).future<void>()();
 	}
 
-	private downloadUserSettings(): IFuture<void> {
-		return (() => {
+	private async downloadUserSettings(): Promise<void> {
 			try {
 				this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
 				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
@@ -94,11 +91,9 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 					throw error;
 				}
 			}
-		}).future<void>()();
 	}
 
-	public getSettingValue<T>(settingName: string): IFuture<T> {
-		return (() => {
+	public async getSettingValue<T>(settingName: string): Promise<T> {
 			this.$loginManager.ensureLoggedIn().wait();
 			this.loadUserSettingsFile().wait();
 
@@ -118,7 +113,6 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 			}
 
 			return data;
-		}).future<T>()();
 	}
 
 	private readUserSettingsFile(): void {
@@ -132,8 +126,7 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 		return this.saveSettings(settingObject);
 	}
 
-	public saveSettings(data: { [key: string]: {} }): IFuture<void> {
-		return (() => {
+	public async saveSettings(data: { [key: string]: {} }): Promise<void> {
 			this.$loginManager.ensureLoggedIn().wait();
 
 			if (Object.keys(data).length !== 0) {
@@ -163,7 +156,6 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 			if (Object.keys(data).length !== 0) {
 				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml);
 			}
-		}).future<void>()();
 	}
 }
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);
