@@ -10,12 +10,12 @@ testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("npmService", {
-	getPackageJsonFromNpmRegistry: (packageName: string) => Future.fromResult( { version: "3.0.0" } )
+	getPackageJsonFromNpmRegistry: (packageName: string) => Promise.resolve( { version: "3.0.0" } )
 });
 
 class MockUserDataStore implements IUserDataStore {
 	hasCookie(): IFuture<boolean> {
-		return Future.fromResult(false);
+		return Promise.resolve(false);
 	}
 
 	getCookies(): IFuture<IStringDictionary> {

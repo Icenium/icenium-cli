@@ -46,7 +46,7 @@ function createTestInjector(): IInjector {
 		resolve: () => testInjector.resolve("nativeScriptProject")
 	});
 	testInjector.register("httpClient", { /*intentionally empty body */ });
-	testInjector.register("nativeScriptMigrationService", { downloadMigrationConfigFile: (targetPath: string): IFuture<void> => Future.fromResult() });
+	testInjector.register("nativeScriptMigrationService", { downloadMigrationConfigFile: (targetPath: string): IFuture<void> => Promise.resolve() });
 	testInjector.register("nativeScriptResources", { /*intentionally empty body */ });
 	testInjector.register("mobileHelper", MobileHelper);
 	testInjector.register("mobilePlatformsCapabilities", MobilePlatformsCapabilities);

@@ -11,7 +11,7 @@ class LiveSyncCommandBase extends EnsureProjectCommand {
 
 	public async execute(args: string[]): Promise<void> {
 		this.$options.justlaunch = !this.$options.watch;
-		return Future.fromResult();
+		return Promise.resolve();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

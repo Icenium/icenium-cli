@@ -114,7 +114,7 @@ class MockCommandWithCanExecuteImplemented implements ICommand {
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {
-		return future.fromResult(args[0] === "true");
+		return Promise.resolve(args[0] === "true");
 	}
 
 	disableAnalytics = true;
@@ -181,8 +181,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("stringParameter", StringCommandParameter);
 	testInjector.register("stringParameterBuilder", StringParameterBuilder);
 	testInjector.register("analyticsService", {
-		checkConsent: (): IFuture<void> => { return future.fromResult(); },
-		trackFeature: (featureName: string): IFuture<void> => { return future.fromResult(); }
+		checkConsent: (): IFuture<void> => { return Promise.resolve(); },
+		trackFeature: (featureName: string): IFuture<void> => { return Promise.resolve(); }
 	});
 	testInjector.register("resources", {});
 	testInjector.register("injector", testInjector);
@@ -213,7 +213,7 @@ function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInj
 
 	for (let command in commandHelpData) {
 		testInjector.registerCommand(command, {
-			execute: (args: string[]): IFuture<void> => { return future.fromResult(); }
+			execute: (args: string[]): IFuture<void> => { return Promise.resolve(); }
 		});
 	}
 

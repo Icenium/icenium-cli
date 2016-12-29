@@ -66,14 +66,14 @@ function createTestInjector(): IInjector {
 		getInstalledPlugins: () => <IPlugin[]>[]
 	});
 	testInjector.register("cordovaPluginsService", {
-		getAvailablePlugins: () => Future.fromResult([])
+		getAvailablePlugins: () => Promise.resolve([])
 	});
 	testInjector.register("loginManager", {
-		ensureLoggedIn: () => Future.fromResult(true)
+		ensureLoggedIn: () => Promise.resolve(true)
 	});
 	testInjector.register("server", {
 		cordova: {
-			getMarketplacePluginsData: () => Future.fromResult([])
+			getMarketplacePluginsData: () => Promise.resolve([])
 		}
 	});
 	testInjector.register("cordovaProjectCapabilities", {});
@@ -89,7 +89,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("templatesService", {});
 	testInjector.register("options", {});
 	testInjector.register("analyticsService", {
-		track: () => Future.fromResult()
+		track: () => Promise.resolve()
 	});
 
 	return testInjector;

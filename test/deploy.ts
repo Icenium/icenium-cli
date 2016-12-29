@@ -46,11 +46,11 @@ function createTestInjector(): IInjector {
 		}
 	});
 	testInjector.register("buildService", {
-		buildForiOSSimulator: () => Future.fromResult(""),
-		buildForDeploy: () => Future.fromResult("")
+		buildForiOSSimulator: () => Promise.resolve(""),
+		buildForDeploy: () => Promise.resolve("")
 	});
 	testInjector.register("liveSyncService", {
-		livesync: () => Future.fromResult()
+		livesync: () => Promise.resolve()
 	});
 
 	testInjector.register("errors", Errors);
@@ -74,7 +74,7 @@ function createTestInjector(): IInjector {
 		}
 	});
 	testInjector.register("wp8EmulatorServices", {
-		startEmulator: () => Future.fromResult()
+		startEmulator: () => Promise.resolve()
 	});
 
 	testInjector.register("mobilePlatformsCapabilities", MobilePlatformsCapabilities);

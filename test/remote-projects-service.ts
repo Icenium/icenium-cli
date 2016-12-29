@@ -9,13 +9,13 @@ function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
-		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
+		getUser: () =>  Promise.resolve({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
 		makeTapServiceCall: (call: () => IFuture<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
 	});
 	testInjector.register("serviceProxyBase", {
-		call: (tenantId: string) => { return Future.fromResult(
+		call: (tenantId: string) => { return Promise.resolve(
 				[{
 					"id": "id2",
 					"name": "Sln2",
@@ -40,16 +40,16 @@ function createTestInjector(): IInjector {
 	testInjector.register("server", {
 		tap: {
 			getExistingClientSolutions: () => {
-				return Future.fromResult();
+				return Promise.resolve();
 			},
 
 			getFeatures: (accountId: string, serviceType: string) => {
-				return Future.fromResult(["projects-to-app"]);
+				return Promise.resolve(["projects-to-app"]);
 			}
 		},
 		apps: {
 			getApplication: (slnName: string, checkUpgradability: boolean) => {
-				return Future.fromResult({
+				return Promise.resolve({
 					"Name": "Sln1",
 					"Items": [
 						{
@@ -90,18 +90,18 @@ function createTestInjector(): IInjector {
 				});
 			},
 			exportApplication: (solutionName: string, skipMetadata: boolean, $resultStream: any) => {
-				return Future.fromResult();
+				return Promise.resolve();
 			}
 		},
 		appsProjects: {
 			exportProject: (solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
-				return Future.fromResult();
+				return Promise.resolve();
 			}
 		}
 	});
 	testInjector.register("project", {
 		getNewProjectDir:() => "proj dir",
-		createProjectFile: (projectDir: string, properties: any) => Future.fromResult()
+		createProjectFile: (projectDir: string, properties: any) => Promise.resolve()
 	});
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("fs", {
@@ -113,7 +113,7 @@ function createTestInjector(): IInjector {
 			}
 		},
 		createWriteStream: (path: string) => { /* intentionally empty body*/},
-		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
+		unzip: (zipFile: string, destinationDir: string) => Promise.resolve(),
 		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("logger", stubs.LoggerStub);

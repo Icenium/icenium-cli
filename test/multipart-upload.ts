@@ -58,13 +58,13 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 		testInjector.register("server", {
 			upload: {
 				completeUpload(path: string, originalFileHash: string): IFuture<void>{
-					return Future.fromResult();
+					return Promise.resolve();
 				},
 				initUpload(path: string): IFuture<void>{
-					return Future.fromResult();
+					return Promise.resolve();
 				},
 				uploadChunk(path: string, hash: string, content: any): IFuture<void>{
-					return Future.fromResult();
+					return Promise.resolve();
 				}
 			}
 		});

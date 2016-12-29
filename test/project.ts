@@ -42,13 +42,13 @@ class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
 	public confirmCalled: boolean = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
-	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
+	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(""); }
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
+	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
+	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Promise.resolve(""); }
 	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
 		this.confirmCalled = true;
-		return Future.fromResult(this.confirmResult);
+		return Promise.resolve(this.confirmResult);
 	}
 	public dispose() { /* intentionally empty body */ }
 }
@@ -75,7 +75,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("server", {
 		cordova: {
 			getCordovaFrameworkVersions: () => {
-				return Future.fromResult([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
+				return Promise.resolve([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
 					{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
 					{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
 			}
@@ -116,7 +116,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
-	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Future.fromResult(); } });
+	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Promise.resolve(); } });
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("httpClient", { /*intentionally empty body */ });
 	testInjector.register("multipartUploadService", {});
@@ -125,7 +125,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("cordovaProjectCapabilities", CordovaProjectCapabilities);
 
 	testInjector.register("pluginsService", {
-		getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
+		getPluginBasicInformation: (pluginName: string) => Promise.resolve({ name: 'Name', version: '1.0.0' }),
 		getPluginVersions: (plugin: IPlugin) => {
 			return [{
 				name: '1.0.0',
@@ -151,7 +151,7 @@ function createTestInjector(): IInjector {
 		minSupportedVersion: "4.0.0",
 		getCurrentWebViewName: () => "Default",
 		getWebView: () => ({ name: "Default" }),
-		enableWebView: () => Future.fromResult()
+		enableWebView: () => Promise.resolve()
 	});
 	testInjector.register("serverConfiguration", {});
 
@@ -162,7 +162,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("dateProvider", DateProvider);
 	testInjector.register("typeScriptService", {
-		isTypeScriptProject: (projectDir: string): IFuture<boolean> => Future.fromResult(false)
+		isTypeScriptProject: (projectDir: string): IFuture<boolean> => Promise.resolve(false)
 	});
 	testInjector.register("npmService", {});
 

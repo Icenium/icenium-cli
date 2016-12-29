@@ -9,7 +9,7 @@ testInjector.register("errors", {});
 testInjector.register("logger", {});
 testInjector.register("mobileHelper", {});
 testInjector.register("pluginsService", {
-	getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
+	getPluginBasicInformation: (pluginName: string) => Promise.resolve({ name: 'Name', version: '1.0.0' }),
 	getPluginVersions: (plugin: IPlugin) => {
 		return [{
 			name: '1.0.0',
@@ -17,17 +17,17 @@ testInjector.register("pluginsService", {
 			minCordova: '3.0.0'
 		}];
 	},
-	removePlugin: (pluginName: string) => { return Future.fromResult(); },
+	removePlugin: (pluginName: string) => { return Promise.resolve(); },
 	isPluginSupported: (plugin: IPlugin, version: string, migrationVersion: string) => { return true;}
 });
 testInjector.register("project", {});
 testInjector.register("projectConstants", {});
 testInjector.register("projectPropertiesService", {});
 testInjector.register("prompter", {
-	promptForChoice: (promptMessage: string, choices: any[]) => { return Future.fromResult<string>(choices[0]); }
+	promptForChoice: (promptMessage: string, choices: any[]) => { return Promise.resolve<string>(choices[0]); }
 });
 testInjector.register("resources", {resolvePath: (x: string) => ""});
-testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Future.fromResult(); }});
+testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Promise.resolve(); }});
 testInjector.register("webViewService", {});
 testInjector.register("serverConfiguration", {});
 testInjector.register("httpClient", {});

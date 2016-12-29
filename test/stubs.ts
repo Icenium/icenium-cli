@@ -255,7 +255,7 @@ export class LoginManager implements ILoginManager {
 	}
 
 	isLoggedIn(): IFuture<boolean> {
-		return Future.fromResult(false);
+		return Promise.resolve(false);
 	}
 
 	ensureLoggedIn(): IFuture<void> {
@@ -378,11 +378,11 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 	}
 
 	public async updateMigrationConfigFile(): Promise<void> {
-		return Future.fromResult(null);
+		return Promise.resolve(null);
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
-		return Future.fromResult(null);
+		return Promise.resolve(null);
 	}
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
@@ -465,7 +465,7 @@ export class StaticConfig implements IStaticConfig {
 	}
 
 	public async getAdbFilePath(): Promise<string> {
-		return Future.fromResult("");
+		return Promise.resolve("");
 	}
 
 	public get PATH_TO_BOOTSTRAP(): string {
@@ -514,12 +514,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 export class PrompterStub implements IPrompter {
 	public confirmResult = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
-	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
+	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(""); }
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
+	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
+	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Promise.resolve(""); }
 	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
-		return Future.fromResult(this.confirmResult);
+		return Promise.resolve(this.confirmResult);
 	}
 	dispose(): void { }
 }

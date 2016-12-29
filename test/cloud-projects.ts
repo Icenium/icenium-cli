@@ -67,11 +67,11 @@ export class PrompterStub {
 		this.isPrompterCalled = true;
 		if(promptMessage.indexOf("solution") === -1) {
 			assert.isTrue(_.includes(choices, this.promptPrjName));
-			return Future.fromResult(this.promptPrjName);
+			return Promise.resolve(this.promptPrjName);
 		}
 
 		assert.isTrue(_.includes(choices, this.promptSlnName));
-		return Future.fromResult(this.promptSlnName);
+		return Promise.resolve(this.promptSlnName);
 	}
 }
 
@@ -82,14 +82,14 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	helpers.isInteractive = () => { return isInteractive; };
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
-		getUser: () =>  Future.fromResult({tenant: {id: "id"}}),
+		getUser: () =>  Promise.resolve({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
 		makeTapServiceCall: (call: () => IFuture<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
 	});
 
 	testInjector.register("serviceProxyBase", {
-		call: (tenantId: string) => { return Future.fromResult(
+		call: (tenantId: string) => { return Promise.resolve(
 				[{
 					"id": "id2",
 					"name": "Sln2",
@@ -124,17 +124,17 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	testInjector.register("server", {
 		tap: {
 			getExistingClientSolutions: () => {
-				return Future.fromResult();
+				return Promise.resolve();
 			},
 
 			getFeatures: (accountId: string, serviceType: string) => {
-				return Future.fromResult(["projects-to-app"]);
+				return Promise.resolve(["projects-to-app"]);
 			}
 		},
 		apps: {
 			getApplication: (slnName: string, checkUpgradability: boolean) => {
 				if(slnName === "id1") {
-					return Future.fromResult({
+					return Promise.resolve({
 						"Name": "Sln1",
 						"Items": [
 							{
@@ -174,13 +174,13 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 						"IsUpgradeable": false
 					});
 				} else if (slnName === "id2") {
-					return Future.fromResult({
+					return Promise.resolve({
 						"Name": "Sln1",
 						"Items": [],
 						"IsUpgradeable": false
 					});
 				} else if(slnName === "id3") {
-					return Future.fromResult({
+					return Promise.resolve({
 						"Name": "Sln1",
 						"Items": [
 							{
@@ -203,12 +203,12 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 				}
 			},
 			exportApplication: (solutionName: string, skipMetadata: boolean, $resultStream: any) => {
-				return Future.fromResult();
+				return Promise.resolve();
 			}
 		},
 		appsProjects: {
 			exportProject: (solutionName: string, projectName: string, skipMetadata: boolean, $resultStream: any) => {
-				return Future.fromResult();
+				return Promise.resolve();
 			}
 		}
 	});
@@ -221,14 +221,14 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 			}
 		},
 		createWriteStream: (path: string) => {/* mock */},
-		unzip: (zipFile: string, destinationDir: string) => Future.fromResult(),
+		unzip: (zipFile: string, destinationDir: string) => Promise.resolve(),
 		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("remoteProjectService", remoteProjectsServiceLib.RemoteProjectService);
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("project", {
 		getNewProjectDir:() => "proj dir",
-		createProjectFile: (projectDir: string, properties: any) => Future.fromResult()
+		createProjectFile: (projectDir: string, properties: any) => Promise.resolve()
 	});
 	testInjector.register("prompter", new PrompterStub(promptSlnName, promptPrjName));
 	testInjector.register("logger", new LoggerStub());

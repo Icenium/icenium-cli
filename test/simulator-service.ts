@@ -18,20 +18,20 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("loginManager", {
-		ensureLoggedIn: () => { return Future.fromResult(); }
+		ensureLoggedIn: () => { return Promise.resolve(); }
 	});
 	testInjector.register("projectMigrationService", {
-		migrateTypeScriptProject: () => Future.fromResult()
+		migrateTypeScriptProject: () => Promise.resolve()
 	});
 	testInjector.register("processInfo", {
-		isRunning: (executableName: string) => { return Future.fromResult(!!isRunning); }
+		isRunning: (executableName: string) => { return Promise.resolve(!!isRunning); }
 	});
 	testInjector.register("project", {
 		getProjectDir: () => projectDir,
 		ensureAllPlatformAssets: () => { /* Intentionally left blanck */ }
 	});
 	testInjector.register("projectSimulatorService", {
-		getSimulatorParams: (simulatorPackageName: string) => { return Future.fromResult(baseParams); }
+		getSimulatorParams: (simulatorPackageName: string) => { return Promise.resolve(baseParams); }
 	});
 	testInjector.register("serverExtensionsService", {
 		getExtensionPath: (packageName: string) => { return "extensionPath"; },
@@ -39,7 +39,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 			if(useBeforeDownloadAction) {
 				return beforeDownloadPackageAction();
 			}
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 	testInjector.register("simulatorPlatformServices", {
@@ -54,12 +54,12 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("analyticsService", {
 		isEnabled: (featureName: string) => {
 			if(featureName === staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME) {
-				return Future.fromResult(isFeatureTrackingEnabled);
+				return Promise.resolve(isFeatureTrackingEnabled);
 			} else if (featureName === staticConfig.TRACK_EXCEPTIONS_SETTING_NAME) {
-				return Future.fromResult(isExceptionsTrackingEnabled);
+				return Promise.resolve(isExceptionsTrackingEnabled);
 			}
 
-			return Future.fromResult(undefined);
+			return Promise.resolve(undefined);
 		}
 	});
 	testInjector.register("simulatorService", simulatorServiceLib.SimulatorService);

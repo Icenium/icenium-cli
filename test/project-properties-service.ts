@@ -72,10 +72,10 @@ class SampleProject implements Project.IFrameworkProject {
 		return null;
 	}
 	updateMigrationConfigFile(): IFuture<void> {
-		return Future.fromResult(null);
+		return Promise.resolve(null);
 	}
 	ensureProject(projectDir: string): IFuture<void> {
-		return Future.fromResult(null);
+		return Promise.resolve(null);
 	}
 	alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
 	getProjectFileSchemaByName(name: string): IDictionary<any> {

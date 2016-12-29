@@ -116,7 +116,7 @@ function createTestInjector() {
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("loginManager", {
 		ensureLoggedIn: (): IFuture<void> => {
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
@@ -133,13 +133,13 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 	testInjector.register("server", {
 		cordova: {
 			getPlugins: () => {
-				return Future.fromResult(cordovaPlugins);
+				return Promise.resolve(cordovaPlugins);
 			},
 			getMarketplacePluginData: (pluginIdentifier: string, pluginVersion: string) => {
-				return Future.fromResult(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
+				return Promise.resolve(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
 			},
 			getMarketplacePluginsData: () => {
-				return Future.fromResult(cordovaPlugins);
+				return Promise.resolve(cordovaPlugins);
 			}
 		}
 	});
@@ -147,7 +147,7 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 	// Register mocked httpClient
 	testInjector.register("httpClient", {
 		httpRequest: (): IFuture<any> => {
-			return Future.fromResult({
+			return Promise.resolve({
 				body: createMarketplacePluginsData(availableMarketplacePlugins)
 			});
 		}

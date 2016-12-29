@@ -9,7 +9,7 @@ export class EnsureProjectCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		assert.fail("","", "You should never get here. Please contact Telerik support and send the output of your command, executed with `--log trace`.");
-		return Future.fromResult();
+		return Promise.resolve();
 	}
 
 	canExecute(args: string[]): IFuture<boolean> {

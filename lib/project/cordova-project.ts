@@ -163,7 +163,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
-		return Future.fromResult();
+		return Promise.resolve();
 	}
 
 	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): void {
@@ -206,7 +206,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	public async updateMigrationConfigFile(): Promise<void> {
-		return Future.fromResult();
+		return Promise.resolve();
 	}
 
 	private generateWP8GUID(): string {

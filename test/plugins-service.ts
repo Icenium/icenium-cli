@@ -42,22 +42,22 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("config", {});
 	testInjector.register("typeScriptService", {});
 	testInjector.register("prompter", {
-		get: () => Future.fromResult("test-value")
+		get: () => Promise.resolve("test-value")
 	});
 	testInjector.register("npmService", NpmService);
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("httpClient", {
-		httpRequest: (): IFuture<Server.IResponse> => Future.fromResult(null)
+		httpRequest: (): IFuture<Server.IResponse> => Promise.resolve(null)
 	});
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: (future: IFuture<any>) => await  Future.fromResult(future)
+		showProgressIndicator: (future: IFuture<any>) => await  Promise.resolve(future)
 	});
 	testInjector.register("projectConstants", {
 		PACKAGE_JSON_NAME: "package.json"
 	});
 
 	testInjector.register("childProcess", {
-		spawnFromEvent: () => Future.fromResult({ stdout: "" })
+		spawnFromEvent: () => Promise.resolve({ stdout: "" })
 	});
 
 	// Register mocked project
@@ -74,7 +74,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		setProperty(propertyName: string, value: any, configuration: string): void {
 			this.projectData[propertyName] = value;
 		},
-		saveProject: () => Future.fromResult(),
+		saveProject: () => Promise.resolve(),
 		getProjectDir: () => "",
 		ensureProject: () => { /*mock*/ },
 		ensureCordovaProject: () => {/*mock*/ },
@@ -96,17 +96,17 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("server", {
 		cordova: {
 			getPlugins: () => {
-				return Future.fromResult(cordovaPlugins);
+				return Promise.resolve(cordovaPlugins);
 			},
 			getMarketplacePluginsData: () => {
-				return Future.fromResult(availableMarketplacePlugins);
+				return Promise.resolve(availableMarketplacePlugins);
 			}
 		}
 	});
 
 	testInjector.register("loginManager", {
 		ensureLoggedIn: (): IFuture<void> => {
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 
@@ -130,9 +130,9 @@ async function unzipPluginsFolder(fs: IFileSystem): Promise<string> {
 
 class PrompterStub implements IPrompter {
 	constructor(public choiceIndex: number, public versionIndex?: number, public pluginVariableResult?: any) { }
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(this.pluginVariableResult); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
-	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
+	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(this.pluginVariableResult); }
+	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
+	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
 	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> {
 		let selectedChoice = choices[this.choiceIndex];
 
@@ -144,9 +144,9 @@ class PrompterStub implements IPrompter {
 			selectedChoice = selectedChoice.value;
 		}
 
-		return Future.fromResult(selectedChoice);
+		return Promise.resolve(selectedChoice);
 	}
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> { return Future.fromResult(true); }
+	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> { return Promise.resolve(true); }
 	dispose(): void {/*mock*/ }
 }
 
@@ -192,7 +192,7 @@ class ProjectStub {
 		return ["debug", "release"];
 	}
 
-	saveProject = () => Future.fromResult();
+	saveProject = () => Promise.resolve();
 
 	getProjectDir = () => "";
 
@@ -280,7 +280,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("npmService", npmServiceMock);
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: () => Future.fromResult()
+		showProgressIndicator: () => Promise.resolve()
 	});
 	testInjector.register("config", {});
 
@@ -295,17 +295,17 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	testInjector.register("server", {
 		cordova: {
 			getPlugins: () => {
-				return Future.fromResult([]);
+				return Promise.resolve([]);
 			},
 			getMarketplacePluginsData: () => {
-				return Future.fromResult(availableMarketplacePlugins);
+				return Promise.resolve(availableMarketplacePlugins);
 			}
 		}
 	});
 
 	testInjector.register("loginManager", {
 		ensureLoggedIn: (): IFuture<void> => {
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 
@@ -335,7 +335,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("npmService", npmServiceMock);
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: () => Future.fromResult()
+		showProgressIndicator: () => Promise.resolve()
 	});
 	testInjector.register("config", {});
 
@@ -350,17 +350,17 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	testInjector.register("server", {
 		cordova: {
 			getPlugins: () => {
-				return Future.fromResult([]);
+				return Promise.resolve([]);
 			},
 			getMarketplacePluginsData: () => {
-				return Future.fromResult(availableMarketplacePlugins);
+				return Promise.resolve(availableMarketplacePlugins);
 			}
 		}
 	});
 
 	testInjector.register("loginManager", {
 		ensureLoggedIn: (): IFuture<void> => {
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 
@@ -386,7 +386,7 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 	testInjector.register("pluginVariablesHelper", PluginVariablesHelper);
 	testInjector.register("npmService", npmServiceMock);
 	testInjector.register("projectMigrationService", {
-		migrateTypeScriptProject: () => Future.fromResult()
+		migrateTypeScriptProject: () => Promise.resolve()
 	});
 
 	return testInjector;
@@ -525,10 +525,10 @@ describe("plugins-service", () => {
 			}).future<void>()();
 		};
 
-		childProcess.exec = () => Future.fromResult("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");
+		childProcess.exec = () => Promise.resolve("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-		service.configurePlugin = () => Future.fromResult();
+		service.configurePlugin = () => Promise.resolve();
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
 		fs.readText = (dir: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`;
@@ -566,7 +566,7 @@ describe("plugins-service", () => {
 
 		it("for Cordova project.", () => {
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			service.configurePlugin = () => Future.fromResult();
+			service.configurePlugin = () => Promise.resolve();
 
 			await service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginName));
 
@@ -577,7 +577,7 @@ describe("plugins-service", () => {
 
 		it("for Cordova project from tgz and extracts it.", () => {
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			service.configurePlugin = () => Future.fromResult();
+			service.configurePlugin = () => Promise.resolve();
 
 			await service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginTgzName));
 
@@ -603,7 +603,7 @@ describe("plugins-service", () => {
 			let promptsCount = 0;
 			prompter.get = () => {
 				promptsCount++;
-				return Future.fromResult("testvalue");
+				return Promise.resolve("testvalue");
 			};
 
 			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
@@ -623,7 +623,7 @@ describe("plugins-service", () => {
 			project.projectData.FrameworkVersion = fs.readJson(path.join(__dirname, "resources/blank-NativeScript.abproject")).FrameworkVersion;
 
 			let prompter: IPrompter = testInjector.resolve("prompter");
-			prompter.get = () => Future.fromResult("testvalue");
+			prompter.get = () => Promise.resolve("testvalue");
 
 			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
 
@@ -677,10 +677,10 @@ describe("plugins-service", () => {
 		let testInjector = createTestInjector(cordovaPlugins, [], availableMarketplacePlugins);
 		let childProcess = testInjector.resolve("childProcess");
 
-		childProcess.exec = () => Future.fromResult("com.telerik.dropbox@0.1.18 node_modules\\com.telerik.dropbox\n");
+		childProcess.exec = () => Promise.resolve("com.telerik.dropbox@0.1.18 node_modules\\com.telerik.dropbox\n");
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-		service.configurePlugin = () => Future.fromResult();
+		service.configurePlugin = () => Promise.resolve();
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
 		fs.readText = (path: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`;

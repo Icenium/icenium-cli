@@ -47,7 +47,7 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 	});
 	injector.register("commandsServiceProvider", {
 		getDynamicCommands: (): IFuture<string[]> => {
-			return Future.fromResult(<string[]>[]);
+			return Promise.resolve(<string[]>[]);
 		}
 	});
 

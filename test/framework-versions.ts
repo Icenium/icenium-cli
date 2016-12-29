@@ -22,8 +22,8 @@ function createTestInjector(): IInjector {
 			FrameworkVersion: "",
 			Framework: "Cordova"
 		},
-		saveProject: (): IFuture<void> => { return Future.fromResult(); },
-		onFrameworkVersionChanging: (): IFuture<void> => { return Future.fromResult(); },
+		saveProject: (): IFuture<void> => { return Promise.resolve(); },
+		onFrameworkVersionChanging: (): IFuture<void> => { return Promise.resolve(); },
 		capabilities: {
 			canChangeFrameworkVersion: true
 		},
