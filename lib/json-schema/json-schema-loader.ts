@@ -34,10 +34,10 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
 			let schemasEndpoint = `http://${this.$config.AB_SERVER}/appbuilder/Resources/Files/Schemas.zip`;
-			this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file}).wait();
-			fileEnd.wait();
+			await this.$httpClient.httpRequest({ url: schemasEndpoint, pipeTo: file});
+			await fileEnd;
 
-			this.$fs.unzip(filePath, this.schemasFolderPath).wait();
+			await this.$fs.unzip(filePath, this.schemasFolderPath);
 	}
 
 	private loadSchemas(): void {
@@ -76,7 +76,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 							this.$errors.fail("Schema %s not found.", schemaRef);
 						}
 
-						this.loadSchema(extSchema).wait();
+						await this.loadSchema(extSchema);
 					});
 				}
 

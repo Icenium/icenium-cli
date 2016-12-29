@@ -8,7 +8,7 @@ export class SetWebViewCommand implements ICommand {
 		private $project: Project.IProject) { }
 
 	public async execute(args: string[]): Promise<void> {
-			this.$webViewService.enableWebView(args[0], args[1], this.$project.projectData.FrameworkVersion).wait();
+			await this.$webViewService.enableWebView(args[0], args[1], this.$project.projectData.FrameworkVersion);
 			this.$logger.out(`Operation completed successfully. Your project now uses the ${args[1]} web view for ${args[0]}.`);
 	}
 

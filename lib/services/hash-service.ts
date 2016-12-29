@@ -32,7 +32,7 @@ export class HashService implements IHashService {
 				}
 			});
 
-			future.wait();
+			await future;
 			return cryptoHash.digest(hashEncoding);
 	}
 

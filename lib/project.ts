@@ -50,7 +50,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 		if (this.projectData && this.projectData.Framework) {
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
-			this.frameworkProject.updateMigrationConfigFile().wait();
+			await this.frameworkProject.updateMigrationConfigFile();
 		}
 	}
 
@@ -292,12 +292,12 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 			let blankTemplateFile = this.frameworkProject.getTemplateFilename("Blank");
-			this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, this.projectFilePatterns.concat(this.frameworkProject.projectSpecificFiles)).wait();
+			await this.$fs.unzip(path.join(this.$templatesService.projectTemplatesDir, blankTemplateFile), projectDir, { overwriteExisitingFiles: false }, this.projectFilePatterns.concat(this.frameworkProject.projectSpecificFiles));
 
-			this.createProjectFileFromExistingProject(projectDir, appName).wait();
+			await this.createProjectFileFromExistingProject(projectDir, appName);
 
 			if (ionicProject) {
-				this.$ionicProjectTransformator.transformToAppBuilderProject(createBackupOfIonicProject).wait();
+				await this.$ionicProjectTransformator.transformToAppBuilderProject(createBackupOfIonicProject);
 			}
 
 			this.$logger.info("Successfully initialized %s project.", framework);
@@ -326,7 +326,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.$errors.fail("No project found at or above '%s' and neither was a --path specified.", process.cwd());
 		}
 
-		this.frameworkProject.ensureProject(this.projectDir).wait();
+		await this.frameworkProject.ensureProject(this.projectDir);
 	}
 
 	public ensureCordovaProject() {
@@ -397,14 +397,14 @@ export class Project extends ProjectBase implements Project.IProject {
 				projectConfigurations = data.projectConfigurations;
 
 			if (normalizedPropertyName === this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME) {
-				this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations).wait();
+				await this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations);
 			} else {
 				if (projectConfigurations.length) {
 					_.each(projectConfigurations, configuration => {
-						this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues).wait();
+						await this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues);
 					});
 				} else {
-					this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
+					await this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues);
 					_.each(this.configurationSpecificData, configData => await  this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues));
 				}
 			}
@@ -415,15 +415,15 @@ export class Project extends ProjectBase implements Project.IProject {
 				normalizedPropertyName = data.normalizedPropertyName,
 				projectConfigurations = data.projectConfigurations;
 
-			this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations).wait();
+			await this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations);
 
 			this.saveProject(this.getProjectDir(), this.getAllConfigurationsNames());
 			projectConfigurations.forEach(configuration => {
-				this.printProjectProperty(normalizedPropertyName, configuration).wait();
+				await this.printProjectProperty(normalizedPropertyName, configuration);
 			});
 
 			if (!projectConfigurations || !projectConfigurations.length) {
-				this.printProjectProperty(normalizedPropertyName).wait();
+				await this.printProjectProperty(normalizedPropertyName);
 			}
 	}
 
@@ -442,7 +442,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					if (this.$options.validValue) {
 						// '$ appbuilder prop print <PropName> --validValue' called inside project dir
 						let prop: any = schema[normalizedPropertyName];
-						this.printValidValuesOfProperty(prop).wait();
+						await this.printValidValuesOfProperty(prop);
 					} else {
 						// '$ appbuilder prop print <PropName>' called inside project dir
 						if (_.has(mergedProjectData, normalizedPropertyName)) {
@@ -463,7 +463,7 @@ export class Project extends ProjectBase implements Project.IProject {
 						_.each(sortedProperties, propKey => {
 							let prop = schema[propKey];
 							this.$logger.info("  " + propKey);
-							this.printValidValuesOfProperty(prop).wait();
+							await this.printValidValuesOfProperty(prop);
 						});
 					} else {
 						// 'appbuilder prop print' called inside project dir
@@ -482,11 +482,11 @@ export class Project extends ProjectBase implements Project.IProject {
 						let currentProp = _.find(_.keys(projectSchema), key => key === property);
 						if (currentProp) {
 							this.$logger.out("  Project type %s:", targetFrameworkIdentifier);
-							this.printValidValuesOfProperty(projectSchema[currentProp]).wait();
+							await this.printValidValuesOfProperty(projectSchema[currentProp]);
 						}
 					});
 				} else {
-					this.$logger.out(this.$projectPropertiesService.getPropertiesForAllSupportedProjects().wait());
+					await this.$logger.out(this.$projectPropertiesService.getPropertiesForAllSupportedProjects());
 				}
 			}
 	}
@@ -669,13 +669,13 @@ export class Project extends ProjectBase implements Project.IProject {
 
 			let result = new Future<string>();
 			zipOp.resolveSuccess(() => result.return(projectZipFile));
-			return result.wait();
+			await return result;
 	}
 
 	public async importProject(): Promise<void> {
 			this.ensureProject();
 
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 			let projectZipFile = await  this.zipProject();
 			let fileSize = this.$fs.getFileSize(projectZipFile);
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
@@ -684,11 +684,11 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.$logger.printInfoMessageOnSameLine("Uploading...");
 			if (fileSize > Project.CHUNK_UPLOAD_MIN_FILE_SIZE) {
 				this.$logger.trace("Start uploading file by chunks.");
-				this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000, { surpressTrailingNewLine: true }).wait();
-				this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey, true), 2000).wait();
+				await this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000, { surpressTrailingNewLine: true });
+				await this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey, true), 2000);
 			} else {
 				this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName, true,
-					this.$fs.createReadStream(projectZipFile)), 2000).wait();
+					await this.$fs.createReadStream(projectZipFile)), 2000);
 			}
 
 			this.$logger.trace("Project imported");
@@ -728,14 +728,14 @@ export class Project extends ProjectBase implements Project.IProject {
 				this.createTemplateFolder(projectDir);
 				try {
 					this.$logger.trace("Extracting template from '%s'", templateFileName);
-					this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false }).wait();
+					await this.$fs.unzip(templateFileName, projectDir, { caseSensitive: false });
 					this.$logger.trace("Reading template project properties.");
 
 					let properties = this.$projectPropertiesService.getProjectProperties(path.join(projectDir, this.$projectConstants.PROJECT_FILE), true, this.frameworkProject);
 					properties = this.alterPropertiesForNewProject(properties, appname);
 					this.$logger.trace(properties);
 					this.$logger.trace("Saving project file.");
-					this.createProjectFile(projectDir, properties).wait();
+					await this.createProjectFile(projectDir, properties);
 					this.$logger.trace("Removing unnecessary files from template.");
 					this.removeExtraFiles(projectDir);
 					this.$fs.createDirectory(path.join(projectDir, "hooks"));
@@ -745,7 +745,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					throw ex;
 				}
 
-				this.frameworkProject.ensureProject(this.projectDir).wait();
+				await this.frameworkProject.ensureProject(this.projectDir);
 			} else {
 				let templates = this.frameworkProject.getProjectTemplatesString();
 				this.$errors.failWithoutHelp(`The specified template ${this.$options.template} does not exist. You can use any of the following templates:${EOL}${templates}`);

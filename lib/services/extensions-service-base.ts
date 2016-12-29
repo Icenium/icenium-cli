@@ -49,7 +49,7 @@ export class ExtensionsServiceBase {
 				let zipFileName = path.join(this.cacheDir, packageName + ".zip");
 
 				if(actions.beforeDownloadAction) {
-					actions.beforeDownloadAction().wait();
+					await actions.beforeDownloadAction();
 				}
 
 				this.$fs.deleteDirectory(extensionPath);
@@ -57,12 +57,12 @@ export class ExtensionsServiceBase {
 				this.$logger.trace("Extension path for %s: %s", packageName, extensionPath);
 
 				try {
-					this.downloadPackage(extensionData.downloadUri, zipFileName).wait();
-					this.$fs.unzip(zipFileName, extensionPath).wait();
+					await this.downloadPackage(extensionData.downloadUri, zipFileName);
+					await this.$fs.unzip(zipFileName, extensionPath);
 					this.$fs.deleteFile(zipFileName);
 					this.extensionVersions[packageName] = extensionVersion;
 					if(actions.afterDownloadAction) {
-						actions.afterDownloadAction().wait();
+						await actions.afterDownloadAction();
 					}
 					this.saveVersionsFile();
 				} catch(err) {

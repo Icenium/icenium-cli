@@ -70,13 +70,13 @@ export class BuildService implements Project.IBuildService {
 			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
 			this.$logger.printInfoMessageOnSameLine("Building...");
 
-			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier }).wait();
+			await this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier });
 
 			let liveSyncToken = await  this.$server.cordova.getLiveSyncToken(solutionName, projectName);
 			buildProperties.LiveSyncToken = liveSyncToken;
 
 			let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
-			this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000).wait();
+			await this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000);
 
 			let body = buildProjectFuture.get();
 			let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
@@ -231,7 +231,7 @@ export class BuildService implements Project.IBuildService {
 						deviceIdentifier: settings.device ? settings.device.deviceInfo.identifier : null
 					});
 					iOSDeploymentValidator.throwIfInvalid(
-						{ provisionOption: this.$options.provision, certificateOption: this.$options.certificate }).wait();
+						await { provisionOption: this.$options.provision, certificateOption: this.$options.certificate });
 				}
 
 				if (provisionData) {
@@ -263,7 +263,7 @@ export class BuildService implements Project.IBuildService {
 					}
 				}
 
-				return this.beginBuild(buildProperties).wait();
+				await return this.beginBuild(buildProperties);
 			} else {
 				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
 				return null;
@@ -331,7 +331,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
-			this.$project.validateAppIdentifier(settings.platform).wait();
+			await this.$project.validateAppIdentifier(settings.platform);
 
 			settings.projectConfiguration = settings.projectConfiguration || this.$project.getProjectConfiguration();
 			settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
@@ -340,8 +340,8 @@ export class BuildService implements Project.IBuildService {
 				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
 			this.$project.ensureAllPlatformAssets();
-			this.$projectMigrationService.migrateTypeScriptProject().wait();
-			this.$project.importProject().wait();
+			await this.$projectMigrationService.migrateTypeScriptProject();
+			await this.$project.importProject();
 
 			let buildResult = await  this.requestCloudBuild(settings);
 			let packageDefs = buildResult.packageDefs;
@@ -366,7 +366,7 @@ export class BuildService implements Project.IBuildService {
 					let downloadUrl = await  this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration);
 
 					let packageUrl = (urlKind !== "package")
-						? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration).wait()
+						await ? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration)
 						: downloadUrl;
 					this.$logger.debug("Download URL is '%s'", packageUrl);
 
@@ -415,9 +415,9 @@ export class BuildService implements Project.IBuildService {
 						this.$httpClient.httpRequest({
 							url: pkg.url,
 							pipeTo: targetFile
-						}).wait();
+						await });
 					} else {
-						this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
+						await this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile);
 					}
 
 					this.$logger.info("Download completed: %s", targetFileName);
@@ -437,7 +437,7 @@ export class BuildService implements Project.IBuildService {
 				downloadedFilePath: downloadedFilePath,
 				buildForiOSSimulator: buildForiOSSimulator,
 				device: device
-			}).wait();
+			await });
 
 			let packageName = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
 			let metadata = _.filter(buildResult, (def: Server.IPackageDef) => def.disposition === "BuildResultMetadata" && def.key === "AppIdentifier")[0];
@@ -451,7 +451,7 @@ export class BuildService implements Project.IBuildService {
 	public async buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): Promise<string> {
 			let packageFile = (await  this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device)).packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles");
-			this.$fs.unzip(packageFile, tempDir).wait();
+			await this.$fs.unzip(packageFile, tempDir);
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
 			return appFilePath;
 	}
@@ -463,7 +463,7 @@ export class BuildService implements Project.IBuildService {
 				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
 			}
 
-			this.executeBuildCore(platform, opts).wait();
+			await this.executeBuildCore(platform, opts);
 	}
 
 	private async executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void> {
@@ -477,12 +477,12 @@ export class BuildService implements Project.IBuildService {
 				this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
 			}
 
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			this.$project.checkSdkVersions(platform);
 
 			if (this.$options.companion) {
-				this.deployToIon(platform).wait();
+				await this.deployToIon(platform);
 			} else {
 				if (!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
 					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
@@ -495,7 +495,7 @@ export class BuildService implements Project.IBuildService {
 					downloadFiles: this.$options.download,
 					downloadedFilePath: this.$options.saveTo,
 					buildForiOSSimulator: opts && opts.buildForiOSSimulator
-				}).wait();
+				await });
 			}
 	}
 
@@ -507,7 +507,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.info("Deploying to AppBuilder companion app.");
 
-			this.$project.importProject().wait();
+			await this.$project.importProject();
 
 			let appIdentifier = await  this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.getAppIdentifierForPlatform(platform), platform, null);
 			let liveSyncToken = await  this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName);

@@ -15,11 +15,11 @@ export class ServerConfiguration implements IServerConfiguration {
 	}
 
 	public async get tfisServer(): Promise<string> {
-			return this.getConfigurationFromServer().wait().stsServer;
+			await return this.getConfigurationFromServer().stsServer;
 	}
 
 	public async get assemblyVersion(): Promise<string> {
-			return this.getConfigurationFromServer().wait().assemblyVersion;
+			await return this.getConfigurationFromServer().assemblyVersion;
 	}
 
 	public async get resourcesPath(): Promise<string> {

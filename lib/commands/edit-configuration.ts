@@ -50,7 +50,7 @@ export class EditConfigurationCommand implements ICommand {
 			if (!this.$fs.exists(filepath)) {
 				this.$logger.info("Creating configuration file: " + filepath);
 				let templateFilePath = path.join(this.$templatesService.itemTemplatesDir, template.templateFilepath);
-				this.$fs.unzip(templateFilePath, directory).wait();
+				await this.$fs.unzip(templateFilePath, directory);
 
 				//delete extra file in template zip
 				this.$fs.deleteFile(path.join(directory, "server.vstemplate"));

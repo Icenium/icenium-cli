@@ -20,7 +20,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 			let chunkStartByte = 0,
 				endByte: number;
 
-			this.$server.upload.initUpload(bucketKey).wait();
+			await this.$server.upload.initUpload(bucketKey);
 
 			let chunks: IFuture<void>[] = [];
 			while(chunkStartByte < fileSize) {
@@ -47,7 +47,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 
 			let fileHash = await  this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING);
 
-			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
+			await this.$server.upload.completeUpload(bucketKey, fileHash);
 	}
 
 	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {

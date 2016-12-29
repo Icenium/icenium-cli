@@ -13,7 +13,7 @@ export class SetAndroidVersionCodeCommand extends SetProjectPropertyCommand impl
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			super.execute(["AndroidVersionCode", args[0]]).wait();
+			await super.execute(["AndroidVersionCode", args[0]]);
 			if (this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova) {
 				this.$logger.printMarkdown("Your final AndroidVersionCode will be `%s2` because Apache Cordova automatically appends a specific number to the version code based on the target Android SDK and architecture. For more information, see https://issues.apache.org/jira/browse/CB-8976.", args[0]);
 			}

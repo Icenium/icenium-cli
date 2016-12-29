@@ -18,7 +18,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public async hasCookie(): Promise<boolean> {
 			try {
-				this.getCookies().wait();
+				await this.getCookies();
 				return true;
 			} catch(err) {
 				return false;
@@ -63,7 +63,7 @@ export class UserDataStore implements IUserDataStore {
 			this.user = user;
 			if(user) {
 				this.$fs.writeJson(this.getUserStateFilePath(), user);
-				this.trackTenantInformation(user).wait();
+				await this.trackTenantInformation(user);
 			} else {
 				this.$fs.deleteFile(this.getUserStateFilePath());
 			}
@@ -72,7 +72,7 @@ export class UserDataStore implements IUserDataStore {
 
 	public async clearLoginData(): Promise<void> {
 			this.setCookies(null);
-			this.setUser(null).wait();
+			await this.setUser(null);
 	}
 
 	private async checkCookieExists<T>(sourceFile: string, getter: () => T): Promise<boolean> {
@@ -91,7 +91,7 @@ export class UserDataStore implements IUserDataStore {
 				} catch(err) {
 					this.$logger.debug("Error while reading user data file '%s':\n%s\n\nContents:\n%s",
 						sourceFile, err.toString(), contents);
-					this.clearLoginData().wait();
+					await this.clearLoginData();
 					throw new Error("Not logged in.");
 				}
 			}
@@ -111,7 +111,7 @@ export class UserDataStore implements IUserDataStore {
 			if(userData && userData.tenant) {
 				let tenantEdition = userData.tenant.editionType || "no-edition";
 				let $analyticsService = this.$injector.resolve("analyticsService");
-				$analyticsService.track("UserTenant", tenantEdition).wait();
+				await $analyticsService.track("UserTenant", tenantEdition);
 			}
 	}
 }
@@ -135,7 +135,7 @@ export class LoginManager implements ILoginManager {
 	public async logout(): Promise<void> {
 			this.$logger.info("Logging out...");
 
-			this.localLogout().wait();
+			await this.localLogout();
 
 			let logoutUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/Logout`;
 			this.$logger.debug("Logout URL is '%s'", logoutUrl);
@@ -145,13 +145,13 @@ export class LoginManager implements ILoginManager {
 	}
 
 	private async localLogout(): Promise<void> {
-			this.$userDataStore.clearLoginData().wait();
+			await this.$userDataStore.clearLoginData();
 			this.$sharedUserSettingsFileService.deleteUserSettingsFile();
 	}
 
 	public async login(): Promise<void> {
-			this.localLogout().wait();
-			this.doLogin().wait();
+			await this.localLogout();
+			await this.doLogin();
 	}
 
 	public isLoggedIn(): IFuture<boolean> {
@@ -160,17 +160,17 @@ export class LoginManager implements ILoginManager {
 
 	public async ensureLoggedIn(): Promise<void> {
 			if(! await this.isLoggedIn()) {
-				this.doLogin().wait();
+				await this.doLogin();
 			}
 	}
 
 	private async doLogin(): Promise<void> {
 			this.$fs.createDirectory(this.$options.profileDir);
 
-			this.loginInBrowser().wait();
+			await this.loginInBrowser();
 
 			this.$logger.info("Login completed.");
-			this.$commandsService.tryExecuteCommand("user", []).wait();
+			await this.$commandsService.tryExecuteCommand("user", []);
 	}
 
 	private serveLoginFile(relPath: string): (request: http.ServerRequest, response: http.ServerResponse) => void {
@@ -203,7 +203,7 @@ export class LoginManager implements ILoginManager {
 			});
 
 			localhostServer.listen(0);
-			this.$fs.futureFromEvent(localhostServer, "listening").wait();
+			await this.$fs.futureFromEvent(localhostServer, "listening");
 
 			let port = localhostServer.address().port;
 			loginUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/ClientLogin?port=${port}&client_name=AppBuilderCLI`;
@@ -238,7 +238,7 @@ export class LoginManager implements ILoginManager {
 			this.$userDataStore.setCookies(cookies);
 
 			let userData = await  this.$server.authentication.getLoggedInUser();
-			this.$userDataStore.setUser(<any>userData).wait();
+			await this.$userDataStore.setUser(<any>userData);
 
 			return userData;
 	}
@@ -251,14 +251,14 @@ export class LoginManager implements ILoginManager {
 					"Content-Type": "application/x-www-form-urlencoded"
 				},
 				body: querystring.stringify({ userName: user, password: password })
-			}).wait();
+			await });
 
 			let cookies = response.headers["set-cookie"];
 			if(cookies) {
 				this.$userDataStore.parseAndSetCookies(cookies);
 
 				let userData = await  this.$server.authentication.getLoggedInUser();
-				this.$userDataStore.setUser(<any>userData).wait();
+				await this.$userDataStore.setUser(<any>userData);
 			}
 	}
 }
@@ -269,7 +269,7 @@ export class TelerikLoginCommand implements ICommand {
 		private $stringParameterBuilder: IStringParameterBuilder) { }
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$loginManager.telerikLogin(args[0], args[1]).wait();
+			await this.$loginManager.telerikLogin(args[0], args[1]);
 	}
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password."), this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password.")];

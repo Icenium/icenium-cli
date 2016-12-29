@@ -25,10 +25,10 @@ class AppManagerService implements IAppManagerService {
 	public async upload(platform: string): Promise<void> {
 			let mobilePlatform = this.$mobileHelper.validatePlatformName(platform);
 			this.$project.ensureProject();
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			this.$logger.info("Accessing Telerik AppManager.");
-			this.$server.tam.verifyStoreCreated().wait();
+			await this.$server.tam.verifyStoreCreated();
 
 			this.$logger.info("Building package.");
 			let buildResult = this.$buildService.build({
@@ -39,7 +39,7 @@ class AppManagerService implements IAppManagerService {
 				showWp8SigningMessage: false,
 				buildForTAM: true,
 				downloadFiles: this.$options.download
-			}).wait();
+			await });
 
 			buildResult = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 			if(!buildResult[0] || !buildResult[0].solutionPath) {
@@ -76,8 +76,8 @@ class AppManagerService implements IAppManagerService {
 			}
 
 			let uploadedAppData: Server.UploadedAppData = mobilePlatform.toLowerCase() === this.$devicePlatformsConstants.WP8.toLowerCase() ?
-				this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings).wait() :
-				this.$server.tam.uploadApplicationFromUri(projectName, projectName, projectPath, publishSettings).wait();
+				await this.$server.tam.uploadApplication(projectName, projectName, projectPath, publishSettings) :
+				await this.$server.tam.uploadApplicationFromUri(projectName, projectName, projectPath, publishSettings);
 			this.$logger.info("Successfully uploaded package.");
 
 			if(this.$options.publish && this.$options.public){
@@ -88,7 +88,7 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	public async getGroups(): Promise<void> {
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			this.$logger.info("Accessing Telerik AppManager.");
 			this.$logger.info("Retrieving distribution groups from Telerik AppManager.");
@@ -121,24 +121,24 @@ class AppManagerService implements IAppManagerService {
 
 	public async publishLivePatch(platforms: string[]): Promise<void> {
 			this.$project.ensureProject();
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			platforms = _.map(platforms, platform => this.$mobileHelper.normalizePlatformName(platform));
 
 			let cachedOptionsRelease = this.$options.release;
 			this.$options.release = true;
 
-			this.configureLivePatchPlugin().wait();
+			await this.configureLivePatchPlugin();
 
 			this.$logger.warn("If you have not published an AppManager LiveSync-enabled version of this app before, you will not be able to distribute an AppManager LiveSync update for it.");
 			this.$logger.info("To learn how to create a new version enabled for AppManager LiveSync, run `$ appbuilder help appmanager livesync`");
 
-			this.$project.importProject().wait();
+			await this.$project.importProject();
 			this.$logger.printInfoMessageOnSameLine("Publishing patch for " + platforms.join(", ") + "...");
 
 			let patchData = <any> { Platforms: platforms, IsMandatory: this.$options.mandatory };
 			let patchUpload = this.$server.tam.uploadPatch(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, patchData);
-			this.$progressIndicator.showProgressIndicator(patchUpload, 2000).wait();
+			await this.$progressIndicator.showProgressIndicator(patchUpload, 2000);
 
 			this.$options.release = cachedOptionsRelease;
 
@@ -154,7 +154,7 @@ class AppManagerService implements IAppManagerService {
 
 			if(!_.some(plugins, plugin => plugin && plugin.data && plugin.data.Identifier === livePatchPluginId)) {
 				this.$logger.warn("The AppManager LiveSync plugin is not enabled for your project. Enabling it now for the release build configuration...");
-				$pluginsService.addPlugin(livePatchPluginId).wait();
+				await $pluginsService.addPlugin(livePatchPluginId);
 				this.$logger.info("AppManager LiveSync is now enabled for the release build configuration.");
 			}
 	}

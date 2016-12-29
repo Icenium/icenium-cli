@@ -33,22 +33,22 @@ export class PrePackageCommand implements ICommand {
 			this.$serviceProxy.setShouldAuthenticate(false);
 
 			this.$logger.info("Downloading project templates.");
-			this.$templatesService.downloadProjectTemplates().wait();
+			await this.$templatesService.downloadProjectTemplates();
 			this.$logger.info("Downloading item templates.");
-			this.$templatesService.downloadItemTemplates().wait();
+			await this.$templatesService.downloadItemTemplates();
 			this.$logger.info("Downloading project schemas.");
-			this.$jsonSchemaLoader.downloadSchemas().wait();
+			await this.$jsonSchemaLoader.downloadSchemas();
 			this.$logger.info("Downloading Cordova migration data.");
-			this.$cordovaMigrationService.downloadMigrationData().wait();
+			await this.$cordovaMigrationService.downloadMigrationData();
 			// Cordova files have to be downloaded after cordova migration data so we know which cordova versions we support
 			this.$logger.info("Downloading cordova.js files.");
-			this.$resourceDownloader.downloadCordovaJsFiles().wait();
+			await this.$resourceDownloader.downloadCordovaJsFiles();
 			this.$logger.info("Downloading image definitions.");
-			this.$resourceDownloader.downloadImageDefinitions().wait();
+			await this.$resourceDownloader.downloadImageDefinitions();
 			this.$logger.info("Downloading NativeScript migration data.");
-			this.$nativeScriptMigrationService.downloadMigrationData().wait();
+			await this.$nativeScriptMigrationService.downloadMigrationData();
 			this.$logger.info("Unpacking app resources.");
-			this.$templatesService.unpackAppResources().wait();
+			await this.$templatesService.unpackAppResources();
 
 			let testCoverageResultsDir = path.join(__dirname, "../../../coverage");
 			this.$logger.trace(`Removing test coverage results directory: '${testCoverageResultsDir}'.`);

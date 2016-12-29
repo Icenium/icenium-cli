@@ -15,11 +15,11 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 			let cachedVersion = "0.0.0.0";
 			let extensionData = {
 				packageName: packageName,
-				version: this.$serverConfiguration.assemblyVersion.wait(),
-				downloadUri: this.getExtensionDownloadUri(packageName).wait()
+				await version: this.$serverConfiguration.assemblyVersion,
+				await downloadUri: this.getExtensionDownloadUri(packageName)
 			};
 
-			this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction }).wait();
+			await this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction });
 	}
 
 	private async getExtensionDownloadUri(packageName: string): Promise<string> {

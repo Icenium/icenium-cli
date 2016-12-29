@@ -84,9 +84,9 @@ export class CloudExportProjectsCommand implements ICommand {
 
 			if(projectIdentifier) {
 				let projectName = await  this.$remoteProjectService.getProjectName(slnName, projectIdentifier);
-				this.$remoteProjectService.exportProject(slnName, projectName).wait();
+				await this.$remoteProjectService.exportProject(slnName, projectName);
 			} else {
-				this.$remoteProjectService.exportSolution(slnName).wait();
+				await this.$remoteProjectService.exportSolution(slnName);
 			}
 		}).future<void>()();
 	}
@@ -109,7 +109,7 @@ export class CloudExportProjectsCommand implements ICommand {
 
 				let slnName = args[0];
 				if(args[1]){
-					this.$remoteProjectService.getProjectName(slnName, args[1]).wait();
+					await this.$remoteProjectService.getProjectName(slnName, args[1]);
 				} else {
 					// only one argument is passed
 					let projectNames = (await  this.$remoteProjectService.getProjectsForSolution(slnName)).map(sln => sln.Name);

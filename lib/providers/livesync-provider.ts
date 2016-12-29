@@ -12,7 +12,7 @@ export class LiveSyncProvider extends AppBuilderLiveSyncProviderBase {
 
 	public buildForDevice(device: Mobile.IDevice): IFuture<string> {
 		return this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device)
-			: Future.fromResult(this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait().packageName);
+			await : Future.fromResult(this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).packageName);
 	}
 }
 $injector.register("liveSyncProvider", LiveSyncProvider);

@@ -83,7 +83,7 @@ describe("simulator-service", () => {
 
 		afterEach(() => {
 			let service = testInjector.resolve("simulatorService");
-			service.launchSimulator().wait();
+			await service.launchSimulator();
 			let _staticConfig: IStaticConfig = testInjector.resolve("staticConfig");
 			baseExpectedParameters = baseExpectedParameters.concat([_staticConfig.ANALYTICS_API_KEY]);
 			testSpecificParams = testSpecificParams.concat(baseParams);
@@ -119,6 +119,6 @@ describe("simulator-service", () => {
 	it("launchSimulator does not fail when simulator is running during download of new version", () => {
 		let testInjector = createTestInjector(true, true, false, true);
 		let service = testInjector.resolve("simulatorService");
-		service.launchSimulator().wait();
+		await service.launchSimulator();
 	});
 });

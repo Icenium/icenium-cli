@@ -27,7 +27,7 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 
     execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			let userName = args[0];
 			let password = args[1];
@@ -81,7 +81,7 @@ export class UploadApplicationCommand implements ICommand {
 				this.$errors.failWithoutHelp("You cannot upload %s projects to AppStore.", this.$project.projectData.Framework);
 			}
 
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			let application = args[0];
 			let userName = args[1];
@@ -108,7 +108,7 @@ export class UploadApplicationCommand implements ICommand {
 				password = await  this.$prompter.getPassword("Apple ID password");
 			}
 
-			this.$appStoreService.upload(userName, password, application).wait();
+			await this.$appStoreService.upload(userName, password, application);
 		}).future<void>()();
 	}
 }

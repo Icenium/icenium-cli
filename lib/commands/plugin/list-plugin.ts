@@ -4,7 +4,7 @@ export class ListPluginCommand implements ICommand {
 
 	public async execute(args: string[]): Promise<void> {
 			let plugins = this.$options.available ? this.$pluginsService.getAvailablePlugins(this.$options.count) : this.$pluginsService.getInstalledPlugins();
-			this.$pluginsService.printPlugins(this.$pluginsService.filterPlugins(plugins).wait());
+			await this.$pluginsService.printPlugins(this.$pluginsService.filterPlugins(plugins));
 	}
 
 	allowedParameters: ICommandParameter[] = [];

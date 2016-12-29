@@ -25,15 +25,15 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 				showQrCodes: false,
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath
-			}).wait();
+			await });
 			this.$options.justlaunch = true;
 			let emulateOptions: Mobile.IEmulatorOptions = await  { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME) };
-			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions).wait();
+			await this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions);
 	}
 
 	public async canExecute(args: string[]): Promise<boolean> {
-			super.canExecute(args).wait();
-			this.$androidEmulatorServices.checkDependencies().wait();
+			await super.canExecute(args);
+			await this.$androidEmulatorServices.checkDependencies();
 			return true;
 	}
 }
@@ -55,7 +55,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 
 	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureAllPlatformAssets();
-			this.$iOSEmulatorServices.checkDependencies().wait();
+			await this.$iOSEmulatorServices.checkDependencies();
 			this.$iOSEmulatorServices.checkAvailability();
 			let app = "";
 
@@ -64,7 +64,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 				app = await  this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa"));
 			}
 
-			this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
+			await this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier });
 	}
 }
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
@@ -83,7 +83,7 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 
 	public async execute(args: string[]): Promise<void> {
 			this.$project.ensureAllPlatformAssets();
-			this.$wp8EmulatorServices.checkDependencies().wait();
+			await this.$wp8EmulatorServices.checkDependencies();
 			this.$wp8EmulatorServices.checkAvailability();
 
 			let tempDir = this.$project.getTempDir("emulatorfiles");
@@ -95,9 +95,9 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 				showQrCodes: false,
 				downloadFiles: true,
 				downloadedFilePath: packageFilePath
-			}).wait();
+			await });
 
-			this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath).wait();
+			await this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath);
 	}
 
 	public isDisabled = this.$config.ON_PREM;

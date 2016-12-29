@@ -55,7 +55,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["plugin"], "3.0.0", "3.2.0").wait(), ["plugin"]);
+			await assert.deepEqual(service.migratePlugins(["plugin"], "3.0.0", "3.2.0"), ["plugin"]);
 		});
 
 		it("Return unchanged plugins if a rename matches but it's for a later version", () => {
@@ -73,7 +73,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0").wait(), ["org.apache.cordova.AudioHandler"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0"), ["org.apache.cordova.AudioHandler"]);
 		});
 
 		it("Remove plugins if they are no longer available in the version we are migrating to", () => {
@@ -86,7 +86,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.camera", "org.apache.cordova.statusbar"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.camera"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.camera", "org.apache.cordova.statusbar"], "3.2.0", "3.0.0"), ["org.apache.cordova.camera"]);
 		});
 
 		it("Return renamed plugin if a rename matches", () => {
@@ -102,7 +102,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0").wait(), ["org.apache.cordova.media"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.2.0"), ["org.apache.cordova.media"]);
 		});
 
 		it("Return renamed plugin if a rename matches and it is a downgrade", () => {
@@ -118,7 +118,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.media"], "3.2.0", "3.0.0").wait(), ["org.apache.cordova.AudioHandler"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.media"], "3.2.0", "3.0.0"), ["org.apache.cordova.AudioHandler"]);
 		});
 
 		it("Adds default enabled plugin", () => {
@@ -133,7 +133,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0").wait(), ["cordova-plugin-whitelist"]);
+			await assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0"), ["cordova-plugin-whitelist"]);
 		});
 
 		it("Adds default enabled plugin and respects exclusions", () => {
@@ -148,7 +148,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0").wait(), ["cordova-plugin-whitelist"]);
+			await assert.deepEqual(service.migratePlugins([], "3.0.0", "4.0.0"), ["cordova-plugin-whitelist"]);
 		});
 
 		it("Return renamed plugin if a rename matches and new plugin is marketplace", () => {
@@ -164,7 +164,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.sqlite"], "3.5.0", "3.7.0").wait(), ["org.apache.cordova.sqlite@1.0.2"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.sqlite"], "3.5.0", "3.7.0"), ["org.apache.cordova.sqlite@1.0.2"]);
 		});
 
 		it("Return renamed plugin if there is a rename chain", () => {
@@ -185,7 +185,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.4.0").wait(), ["org.apache.cordova.NewMedia"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.AudioHandler"], "3.0.0", "3.4.0"), ["org.apache.cordova.NewMedia"]);
 		});
 
 		it("Return renamed plugin if there is a rename chain when downgrading", () => {
@@ -206,7 +206,7 @@ describe("cordova-migration-service", () => {
 			});
 
 			let service: ICordovaMigrationService = testInjector.resolve(cordovaMigrationService.CordovaMigrationService);
-			assert.deepEqual(service.migratePlugins(["org.apache.cordova.NewMedia"], "3.4.0", "3.0.0").wait(), ["org.apache.cordova.AudioHandler"]);
+			await assert.deepEqual(service.migratePlugins(["org.apache.cordova.NewMedia"], "3.4.0", "3.0.0"), ["org.apache.cordova.AudioHandler"]);
 		});
 	});
 });

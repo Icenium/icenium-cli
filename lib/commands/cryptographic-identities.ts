@@ -302,7 +302,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 				});
 			}
 
-			return schema.length ? this.$prompter.get(schema).wait() : {};
+			await return schema.length ? this.$prompter.get(schema) : {};
 
 		}).future<IIdentityInformation>()();
 	}
@@ -374,7 +374,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 
 						return validationResult.isSuccessful ? true : validationResult.error;
 					}
-				}]).wait();
+				await }]);
 				_.extend(this.model, endDate);
 			}
 
@@ -458,7 +458,7 @@ export class RemoveCryptographicIdentity implements ICommand {
 			let identity = await  this.$identityManager.findCertificate(nameOrIndex);
 
 			if (this.$options.force || await  this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false)) {
-				this.$server.identityStore.removeIdentity(identity.Alias).wait();
+				await this.$server.identityStore.removeIdentity(identity.Alias);
 			}
 		}).future<void>()();
 	}
@@ -509,7 +509,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			let targetFile = this.$fs.createWriteStream(targetFileName);
 
 			this.$logger.info("Exporting certificate to file '%s'.", targetFileName);
-			this.$server.identityStore.getIdentity(name, password, targetFile).wait();
+			await this.$server.identityStore.getIdentity(name, password, targetFile);
 		}).future<void>()();
 	}
 
@@ -559,8 +559,8 @@ export class ImportCryptographicIdentity implements ICommand {
 			}
 
 			let result = importType === CryptographicIdentityConstants.PKCS12CERTIFICATE ?
-				this.importCertificateWithPassword(importType, password, certificateFile).wait() :
-				this.importCertificateWithoutPassword(importType, certificateFile).wait();
+				await this.importCertificateWithPassword(importType, password, certificateFile) :
+				await this.importCertificateWithoutPassword(importType, certificateFile);
 
 			_.each(result, identity => {
 				this.$logger.info("Imported certificate '%s'.", identity.Alias);
@@ -604,7 +604,7 @@ export class ImportCryptographicIdentity implements ICommand {
 	private async importCertificateWithoutPassword(importType: string, certificateFile: string): Promise<Server.CryptographicIdentityData[]> {
 			try {
 				let targetFile = this.$fs.createReadStream(certificateFile);
-				return this.$server.identityStore.importIdentity(<any>importType, '', targetFile).wait();
+				await return this.$server.identityStore.importIdentity(<any>importType, '', targetFile);
 			} catch (error) {
 				this.$errors.failWithoutHelp(error.message);
 			}
@@ -636,7 +636,7 @@ class CreateCertificateSigningRequest implements ICommand {
 			let certificateData: ICertificateSigningRequest = await  this.$server.identityStore.generateCertificationRequest(subjectNameValues);
 
 			let downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
-			downloader.downloadCertificate(certificateData.UniqueName).wait();
+			await downloader.downloadCertificate(certificateData.UniqueName);
 		}).future<void>()();
 	}
 }
@@ -696,8 +696,8 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 
 			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
 
-			if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
-				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
+			await if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject))) {
+				await this.$server.identityStore.removeCertificateRequest(req.UniqueName);
 				this.$logger.info("Removed certificate request '%s'", req.Subject);
 			}
 		}).future<void>()();
@@ -728,7 +728,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 			}
 
 			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
-			this.downloadCertificate(req.UniqueName).wait();
+			await this.downloadCertificate(req.UniqueName);
 		}).future<void>()();
 	}
 
@@ -744,7 +744,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 
 			let targetFile = this.$fs.createWriteStream(targetFileName);
 			this.$logger.info("Writing certificate signing request to %s", path.resolve(targetFileName));
-			this.$server.identityStore.getCertificateRequest(uniqueName, targetFile).wait();
+			await this.$server.identityStore.getCertificateRequest(uniqueName, targetFile);
 	}
 }
 $injector.registerCommand("certificate-request|download", DownloadCertificateSigningRequestCommand);
@@ -776,7 +776,7 @@ export class ListProvisionsCommand implements ICommand {
 		private $stringParameter: ICommandParameter) { }
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$identityManager.listProvisions(args[0]).wait();
+			await this.$identityManager.listProvisions(args[0]);
 		}).future<void>()();
 	}
 
@@ -808,7 +808,7 @@ class ImportProvisionCommand implements ICommand {
 			let provisionData = await  this.$server.mobileprovisions.importProvision(provisionFile);
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
-			this.$commandsService.tryExecuteCommand("provision", []).wait();
+			await this.$commandsService.tryExecuteCommand("provision", []);
 		}).future<void>()();
 	}
 }
@@ -821,7 +821,7 @@ class ProvisionIdCommandParameter implements ICommandParameter {
 
 	validate(validationValue: string): IFuture<boolean> {
 		return (() => {
-			this.$identityManager.findProvision(validationValue).wait();
+			await this.$identityManager.findProvision(validationValue);
 			return true;
 		}).future<boolean>()();
 	}
@@ -838,10 +838,10 @@ class RemoveProvisionCommand implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let provisionData = await  this.$identityManager.findProvision(args[0]);
-			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
+			await this.$server.mobileprovisions.removeProvision(provisionData.Identifier);
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 
-			this.$commandsService.tryExecuteCommand("provision", []).wait();
+			await this.$commandsService.tryExecuteCommand("provision", []);
 		}).future<void>()();
 	}
 }

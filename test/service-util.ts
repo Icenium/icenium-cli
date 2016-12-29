@@ -123,7 +123,7 @@ describe("ServiceProxy", () => {
 
 		let result = new (require("stream").PassThrough)();
 
-		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result).wait();
+		await proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result);
 
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});
@@ -133,7 +133,7 @@ describe("ServiceProxy", () => {
 		httpClient.setResponse({}, null, new Error("404"));
 
 		assert.throws(() => {
-			proxy.call("test4", "GET", "/package/zip", "application/json", null, null).wait();
+			await proxy.call("test4", "GET", "/package/zip", "application/json", null, null);
 		}, "404");
 	});
 });

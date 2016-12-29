@@ -36,7 +36,7 @@ export class DeployHelper implements IDeployHelper {
 	}
 
 	private async deployCore(platform: string): Promise<void> {
-			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
+			await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device });
 			platform = platform || this.$devicesService.platform;
 			this.$options.justlaunch = true;
 			let appInfo: IApplicationInformation;
@@ -59,10 +59,10 @@ export class DeployHelper implements IDeployHelper {
 					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
 					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).toString());
 
-					device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName).wait();
+					await device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName);
 					this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);
 					if (device.applicationManager.canStartApplication()) {
-						device.applicationManager.startApplication(appInfo.appIdentifier).wait();
+						await device.applicationManager.startApplication(appInfo.appIdentifier);
 					}
 			};
 
@@ -79,15 +79,15 @@ export class DeployHelper implements IDeployHelper {
 				return true;
 			};
 
-			this.$devicesService.execute(action, canExecute).wait();
+			await this.$devicesService.execute(action, canExecute);
 		}).future<void>()();
 	}
 
 	private async getAppInfoFromBuildResult(device: Mobile.IDevice): Promise<IApplicationInformation> {
 			if (this.$devicesService.isiOSSimulator(device)) {
-				return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait(), appIdentifier: this.$project.projectData.AppIdentifier };
+				await return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device), appIdentifier: this.$project.projectData.AppIdentifier };
 			} else {
-				return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
+				await return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device);
 			}
 	}
 }

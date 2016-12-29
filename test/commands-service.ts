@@ -242,7 +242,7 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParam", []).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParam", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
@@ -256,7 +256,7 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
@@ -270,7 +270,7 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParamBuilder", []).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
@@ -284,7 +284,7 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
@@ -298,7 +298,7 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("commandWithoutArgs", []).wait();
+			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
@@ -312,47 +312,47 @@ describe("commands service", () => {
 				}).future<boolean>()();
 			};
 
-			commandsService.tryExecuteCommand("InvalidCommandName", []).wait();
+			await commandsService.tryExecuteCommand("InvalidCommandName", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
 		it("executes command when it has valid mandatory arguments", () => {
-			commandsService.tryExecuteCommand("commandWithOneMandatArg", ["simple string param"]).wait();
+			await commandsService.tryExecuteCommand("commandWithOneMandatArg", ["simple string param"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
 		it("does not execute command when it has missing mandatory argument", () => {
-			commandsService.tryExecuteCommand("commandWithOneMandatArg", []).wait();
+			await commandsService.tryExecuteCommand("commandWithOneMandatArg", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
 		it("executes command when it doesn't accept arguments and there aren't passed any", () => {
-			commandsService.tryExecuteCommand("commandWithoutArgs", []).wait();
+			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
 		it("does not execute command when it doesn't accept arguments, but there are passed some", () => {
-			commandsService.tryExecuteCommand("commandWithoutArgs", ["argument"]).wait();
+			await commandsService.tryExecuteCommand("commandWithoutArgs", ["argument"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
 		it("does not execute command when it accepts arguments and the validation method of one of them is failing", () => {
-			commandsService.tryExecuteCommand("commandWithInvalidArgs", []).wait();
+			await commandsService.tryExecuteCommand("commandWithInvalidArgs", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
 		it("executes command when it has some nonmandatory arguments and there aren't passed any", () => {
-			commandsService.tryExecuteCommand("commandWithOneNonMandatArg", []).wait();
+			await commandsService.tryExecuteCommand("commandWithOneNonMandatArg", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
 		it("executes command when it has some mandatory arguments and all of them are passed", () => {
-			commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1", "param2"]).wait();
+			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1", "param2"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
 		it("does not execute command when it has some mandatory arguments and not all of them are passed", () => {
-			commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1"]).wait();
+			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
@@ -363,26 +363,26 @@ describe("commands service", () => {
 			};
 
 			// Assert validateCommandArguments is not called when canExecute returns true
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]);
 			assert.isFalse(isValidateCommandArgumentsCalled);
 
 			// Assert validateCommandArguments is not called when canExecute returns false
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["param"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["param"]);
 			assert.isFalse(isValidateCommandArgumentsCalled);
 		});
 
 		it("executes command when it implements canExecute and it returns true", () => {
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
 		it("does not execute command when it implements canExecute and it returns false", () => {
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
 		it("does not execute command when it has isEnabled set to false", () => {
-			commandsService.tryExecuteCommand("commandWithIsDisabledSetToTrue", []).wait();
+			await commandsService.tryExecuteCommand("commandWithIsDisabledSetToTrue", []);
 			assert.isFalse(isCommandExecuted);
 		});
 	});
@@ -398,7 +398,7 @@ describe("commands service", () => {
 			process.argv.push("--availableDevices");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isFalse(isCommandExecuted);
 			process.argv.pop();
 		});
@@ -408,7 +408,7 @@ describe("commands service", () => {
 			process.argv.push("--test1");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 		});
@@ -418,7 +418,7 @@ describe("commands service", () => {
 			process.argv.push("trace");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 			process.argv.pop();
@@ -447,7 +447,7 @@ describe("commands service", () => {
 			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
-			commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []).wait();
+			await commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []);
 			assert.deepEqual(loggerOutput, commandHelpData.testingCommand);
 		});
 
@@ -456,7 +456,7 @@ describe("commands service", () => {
 			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
-			commandsService.executeCommandUnchecked("nonExistingCommand", []).wait();
+			await commandsService.executeCommandUnchecked("nonExistingCommand", []);
 
 			assert.deepEqual(loggerOutput, '');
 		});

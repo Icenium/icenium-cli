@@ -16,8 +16,8 @@ fiberBootstrap.run(() => {
 	messages.pathsToMessageJsonFiles = [/* Place client-specific json message file paths here */];
 
 	if (process.argv[2] === "completion") {
-		commandDispatcher.completeCommand().wait();
+		await commandDispatcher.completeCommand();
 	} else {
-		commandDispatcher.dispatchCommand().wait();
+		await commandDispatcher.dispatchCommand();
 	}
 });

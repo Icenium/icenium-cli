@@ -29,7 +29,7 @@ class ResourceDownloader implements IResourceDownloader {
 					let targetFilePath = this.$cordovaResources.buildCordovaJsFilePath(version, platform);
 					this.$fs.createDirectory(path.dirname(targetFilePath));
 					let targetFile = this.$fs.createWriteStream(targetFilePath);
-					this.$server.cordova.getJs(version, <any>platform, targetFile).wait();
+					await this.$server.cordova.getJs(version, <any>platform, targetFile);
 				});
 			});
 	}
@@ -39,8 +39,8 @@ class ResourceDownloader implements IResourceDownloader {
 			let file = this.$fs.createWriteStream(targetPath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 			this.$logger.trace(`Downloading resource from server. Remote path is: '${remotePath}'. Target path is: '${targetPath}'.`);
-			this.$httpClient.httpRequest({ url: remotePath, pipeTo: file }).wait();
-			fileEnd.wait();
+			await this.$httpClient.httpRequest({ url: remotePath, pipeTo: file });
+			await fileEnd;
 	}
 
 	public downloadImageDefinitions(): IFuture<void> {

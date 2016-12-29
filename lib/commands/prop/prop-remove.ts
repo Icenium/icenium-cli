@@ -9,7 +9,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			if(this.$project.validateProjectProperty(args[0], _.tail(args), "del").wait()) {
+			await if(this.$project.validateProjectProperty(args[0], _.tail(args), "del")) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
 					return true;

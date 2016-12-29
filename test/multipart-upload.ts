@@ -82,7 +82,7 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 		let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
 		let tempFilePath = await  createTempFile(data);
 
-		mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
+		await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
 
 		return actualContentRanges;
 	}).future<string[]>()();
@@ -124,7 +124,7 @@ describe("multipart upload service", () => {
 			let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
 			let tempFilePath = await  createTempFile("Some data that has to be uploaded.");
 
-			mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
+			await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
 			assert.isTrue(initUploadCalled);
 			assert.isTrue(completeUploadCalled);
 			assert.isFalse(uploadChunkCalled);

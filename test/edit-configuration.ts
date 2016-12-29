@@ -77,7 +77,7 @@ describe("edit-configuration", () => {
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		assert.equal(openArgument, templateFilepath);
 		assert.isTrue(fs.existsSync(templateFilepath));
@@ -99,7 +99,7 @@ describe("edit-configuration", () => {
 		options.skipUi = true;
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		assert.deepEqual(openArgument, undefined, "When skipUi option is passed, opener should not be called");
 		assert.isTrue(fs.existsSync(templateFilepath));
@@ -119,10 +119,10 @@ describe("edit-configuration", () => {
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		let templatesService = testInjector.resolve("templatesService");
-		testInjector.resolve("fs").unzip( path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir).wait();
+		await testInjector.resolve("fs").unzip( path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir);
 
 		let expectedContent = fs.readFileSync(path.join(tempDir, "AndroidManifest.xml")).toString();
 		expectedContent = helpers.stringReplaceAll(expectedContent, "\n", "");

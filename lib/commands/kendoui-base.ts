@@ -32,7 +32,7 @@ export class KendoUIBaseCommand implements ICommand {
 	}
 
 	public async getKendoPackages(configuration?: { withReleaseNotesOnly: boolean }): Promise<Server.IKendoDownloadablePackageData[]> {
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 			this.$project.ensureCordovaProject();
 			if (!this.$project.capabilities.updateKendo) {
 				this.$errors.fail(`This operation is not applicable to ${this.$project.projectData.Framework} projects.`);

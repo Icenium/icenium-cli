@@ -20,9 +20,9 @@ export class AppManagerLiveSyncCommand implements ICommand {
 				let selectionOptions = availablePlatforms.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
 				let selectedPlatform = await  this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", selectionOptions);
 				if(selectedPlatform === AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION) {
-					this.$appManagerService.publishLivePatch(availablePlatforms).wait();
+					await this.$appManagerService.publishLivePatch(availablePlatforms);
 				} else {
-					this.$appManagerService.publishLivePatch([selectedPlatform]).wait();
+					await this.$appManagerService.publishLivePatch([selectedPlatform]);
 				}
 			} else {
 				// make sure each platform is specified only once
@@ -30,7 +30,7 @@ export class AppManagerLiveSyncCommand implements ICommand {
 				if((this.$config.ON_PREM || isNativeScript) && _.includes(platforms, windowsPhonePlatformName)) {
 					this.$errors.failWithoutHelp(`You cannot upload updates for Windows Phone.`);
 				}
-				this.$appManagerService.publishLivePatch(platforms).wait();
+				await this.$appManagerService.publishLivePatch(platforms);
 			}
 	}
 

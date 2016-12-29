@@ -43,7 +43,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	private get identifierToPlugin(): IDictionary<IPlugin> {
 		if (!this._identifierToPlugin) {
-			this.loadPluginsData().wait();
+			await this.loadPluginsData();
 		}
 
 		return this._identifierToPlugin;
@@ -71,7 +71,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
-		return corePlugins.concat(this.getLocalPlugins().wait());
+		await return corePlugins.concat(this.getLocalPlugins());
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
@@ -80,7 +80,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
 		}
 
-		return plugins.concat(this.getLocalPlugins().wait());
+		await return plugins.concat(this.getLocalPlugins());
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
@@ -100,7 +100,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			} catch (err) {
 				// If the user tries to add npm plugin we should fetch it.
 				this.$logger.info(`The plugin '${pluginName}' was not found in our list of verified Cordova plugins. We will try to find it in npm and it will be fetched instead of added.`);
-				this.fetch(pluginName).wait();
+				await this.fetch(pluginName);
 				return;
 			}
 
@@ -123,13 +123,13 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 					// In case integrated and Marketplace plugins have duplicate identifiers, try using MarketplacePlugin
 					let mpPlugin = _.find(installedPluginInstances, pl => pl.type === PluginType.MarketplacePlugin);
 					if (mpPlugin) {
-						return this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version).wait();
+						await return this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version);
 					} else {
 						this.$errors.failWithoutHelp("There are several plugins with name '%s' and they have different types: '%s'", pluginName, installedPluginsType.join(", "));
 					}
 				} else if (installedPluginsType.length === 1) {
 					if (installedPluginsType[0].toString() === PluginType.MarketplacePlugin.toString()) {
-						return this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version).wait();
+						await return this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version);
 					} else {
 						// Check if plugin is installed for current configuration.
 						let installedPlugin = this.getInstalledPluginByName(pluginName);
@@ -160,7 +160,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				configurations = _.without(configurations, forbiddenConfig);
 			}
 
-			this.configurePlugin(pluginName, version, configurations).wait();
+			await this.configurePlugin(pluginName, version, configurations);
 	}
 
 	public async removePlugin(pluginName: string): Promise<void> {
@@ -172,7 +172,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let plugin = installedPlugins[0];
 			if (!plugin) {
 				// Need to check the plugins directory because the plugin can be fetched, not added.
-				if (this.isPluginFetched(pluginName).wait()) {
+				await if (this.isPluginFetched(pluginName)) {
 					let shouldDeleteFetchedPlugin = true;
 
 					if (helpers.isInteractive()) {
@@ -249,10 +249,10 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			if (this.$project.hasBuildConfigurations) {
 				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
 				_.each(configs, (configuration: string) => {
-					this.configurePluginCore(pluginName, configuration, version).wait();
+					await this.configurePluginCore(pluginName, configuration, version);
 				});
 			} else {
-				this.configurePluginCore(pluginName, version).wait();
+				await this.configurePluginCore(pluginName, version);
 			}
 	}
 
@@ -299,7 +299,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	protected async installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): Promise<IBasicPluginInformation> {
 			let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
-			return this.getLocalPluginBasicInformation(pluginXml).wait();
+			await return this.getLocalPluginBasicInformation(pluginXml);
 	}
 
 	protected async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
@@ -310,7 +310,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 
 			_.each(configurations, (configuration) => {
-				this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration).wait();
+				await this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration);
 			});
 
 			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
@@ -328,7 +328,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	private async loadPluginsData(): Promise<void> {
 			// Cordova plugin commands are only applicable to Cordova projects
 			this.$project.ensureCordovaProject();
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 			this._identifierToPlugin = Object.create(null);
 			Future.wait([this.createPluginsData(this.$cordovaPluginsService),
 				this.createPluginsData(this.$marketplacePluginsService)]);
@@ -405,7 +405,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			let plugin = this.getBestMatchingPlugin(pluginName, version);
 			let pluginData = <IMarketplacePluginData>plugin.data;
 
-			this.setPluginVariables(pluginData.Identifier, <string[]>pluginData.Variables, configuration).wait();
+			await this.setPluginVariables(pluginData.Identifier, <string[]>pluginData.Variables, configuration);
 
 			let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
 			// remove all instances of the plugin from current configuration
@@ -427,9 +427,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 
 			if (configuration) {
-				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]).wait();
+				await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]);
 			} else {
-				this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins).wait();
+				await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins);
 			}
 
 			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
@@ -545,7 +545,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async promptForVersion(pluginName: string, versions: any[]): Promise<string> {
-			return versions.length > 1 ? this.promptForVersionCore(pluginName, versions).wait() : versions[0].value;
+			await return versions.length > 1 ? this.promptForVersionCore(pluginName, versions) : versions[0].value;
 	}
 
 	private async promptForVersionCore(pluginName: string, versions: any[]): Promise<string> {
@@ -598,7 +598,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			// in case options.debug, options.release and options.config  are not specified, let's just update all configurations without asking for prompt.
 			if (!this.specifiedConfigurations.length) {
 				selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
-				this.configurePlugin(pluginName, selectedVersion, this.$project.getAllConfigurationsNames()).wait();
+				await this.configurePlugin(pluginName, selectedVersion, this.$project.getAllConfigurationsNames());
 				return;
 			}
 
@@ -641,7 +641,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 						break;
 					case modifyAllConfigs:
 						selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
-						this.configurePlugin(pluginName, selectedVersion, configurationsToEdit).wait();
+						await this.configurePlugin(pluginName, selectedVersion, configurationsToEdit);
 						break;
 					default:
 						this.$errors.failWithoutHelp("The operation will not be completed.");

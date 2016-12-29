@@ -17,14 +17,14 @@ export class SimulatorService implements ISimulatorService {
 	}
 
 	public launchSimulator(): IFuture<void> {
-		this.$loginManager.ensureLoggedIn().wait();
+		await this.$loginManager.ensureLoggedIn();
 
 		let simulatorPackageName = this.$simulatorPlatformServices.packageName;
 		this.simulatorPath = this.$serverExtensionsService.getExtensionPath(simulatorPackageName);
-		this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this)).wait();
+		await this.$serverExtensionsService.prepareExtension(simulatorPackageName, this.ensureSimulatorIsNotRunning.bind(this));
 
 		this.$project.ensureAllPlatformAssets();
-		this.$projectMigrationService.migrateTypeScriptProject().wait();
+		await this.$projectMigrationService.migrateTypeScriptProject();
 		return this.runSimulator(simulatorPackageName);
 	}
 
@@ -46,11 +46,11 @@ export class SimulatorService implements ISimulatorService {
 				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];
 
-			if(this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME).wait()) {
+			await if(this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME)) {
 				simulatorParams.push("--trackfeatureusage");
 			}
 
-			if(this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME).wait()) {
+			await if(this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME)) {
 				simulatorParams.push("--trackexceptions");
 			}
 

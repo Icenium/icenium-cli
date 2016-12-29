@@ -52,7 +52,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 					scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
-					scaffolderData.future.wait();
+					await scaffolderData.future;
 				}
 			}
 
@@ -65,7 +65,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 				disableCommandHelpSuggestion = !migrationData.didMigrate;
 
 			if (migrationData.wasMigrated || migrationData.didMigrate) {
-				this.promptGenerate(projectPath, generatorName, screenBuilderOptions).wait().future.wait();
+				await this.promptGenerate(projectPath, generatorName, screenBuilderOptions).wait().future;
 			}
 
 			return disableCommandHelpSuggestion;
@@ -144,12 +144,12 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 			scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
-			scaffolderData.future.wait();
+			await scaffolderData.future;
 	}
 
 	private async getScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<any> {
 			if (!this.scaffolder) {
-				this.$appScaffoldingExtensionsService.prepareAppScaffolding().wait();
+				await this.$appScaffoldingExtensionsService.prepareAppScaffolding();
 
 				let generatorConfig = this.$dependencyConfigService.getGeneratorConfig(generatorName);
 

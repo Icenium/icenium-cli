@@ -91,7 +91,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	}
 
 	public async transformToAppBuilderProject(createBackup: boolean): Promise<void> {
-			this.$analyticsService.track("Migrate from Ionic", "true").wait();
+			await this.$analyticsService.track("Migrate from Ionic", "true");
 
 			if (createBackup) {
 				this.backupCurrentProject();

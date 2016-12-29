@@ -253,31 +253,31 @@ describe("cloud project commands", () => {
 				});
 
 				it("returns true when no arguments are specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute([]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute([]));
 				});
 
 				it("returns true when valid solution name is specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["Sln1"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["Sln1"]));
 				});
 
 				it("returns true when valid solution name and project name are specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 
 				it("returns true when valid solution index is specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["1"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["1"]));
 				});
 
 				it("returns true when valid solution id and project name are specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]));
 				});
 
 				it("returns true when valid solution name and project id are specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]));
 				});
 
 				it("returns true when valid solution id and project id are specified", () => {
-					assert.isTrue(exportProjectCommand.canExecute(["1", "2"]).wait());
+					await assert.isTrue(exportProjectCommand.canExecute(["1", "2"]));
 				});
 
 				it("fails when more than two arguments are passed", () => {
@@ -319,19 +319,19 @@ describe("cloud project commands", () => {
 				});
 
 				it("successfully exports project when solution name and project name are correct", () => {
-					exportProjectCommand.execute(["Sln1", "BlankProj"]).wait();
+					await exportProjectCommand.execute(["Sln1", "BlankProj"]);
 				});
 
 				it("successfully exports project when solution id and project name are correct", () => {
-					exportProjectCommand.execute(["1", "BlankProj"]).wait();
+					await exportProjectCommand.execute(["1", "BlankProj"]);
 				});
 
 				it("successfully exports project when solution name and project id are correct", () => {
-					exportProjectCommand.execute(["Sln1", "2"]).wait();
+					await exportProjectCommand.execute(["Sln1", "2"]);
 				});
 
 				it("successfully exports project when solution id and project id are correct", () => {
-					exportProjectCommand.execute(["1", "2"]).wait();
+					await exportProjectCommand.execute(["1", "2"]);
 				});
 			});
 
@@ -344,12 +344,12 @@ describe("cloud project commands", () => {
 				});
 
 				it("successfully exports project when solution name is correct and there are more than one projects in solution", () => {
-					exportProjectCommand.execute(["Sln1"]).wait();
+					await exportProjectCommand.execute(["Sln1"]);
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 				});
 
 				it("successfully exports project when solution name is correct and there is only one projects in solution", () => {
-					exportProjectCommand.execute(["Sln3"]).wait();
+					await exportProjectCommand.execute(["Sln3"]);
 					let prompter:PrompterStub = testInjector.resolve("prompter");
 					assert.isFalse(prompter.isPrompterCalled);
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
@@ -359,7 +359,7 @@ describe("cloud project commands", () => {
 			it("works correctly when no arguments are passed", () => {
 					testInjector = createTestInjector("Sln1", "BlankProj");
 					exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-					exportProjectCommand.execute([]).wait();
+					await exportProjectCommand.execute([]);
 					logger = testInjector.resolve("logger");
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 			});
@@ -389,7 +389,7 @@ describe("cloud project commands", () => {
 						return future;
 					};
 					logger = testInjector.resolve("logger");
-					exportProjectCommand.execute(["Sln1", "BlankProj"]).wait();
+					await exportProjectCommand.execute(["Sln1", "BlankProj"]);
 					assert.isTrue(logger.warnOutput.indexOf("Couldn't create project file: error is raised") !== -1);
 				});
 			});
@@ -408,11 +408,11 @@ describe("cloud project commands", () => {
 			});
 
 			it("validate method returns true when valid solution name is passed", () => {
-				assert.isTrue(commandParamter.validate("Sln1").wait());
+				await assert.isTrue(commandParamter.validate("Sln1"));
 			});
 
 			it("validate method returns true when valid solution id is passed", () => {
-				assert.isTrue(commandParamter.validate("1").wait());
+				await assert.isTrue(commandParamter.validate("1"));
 			});
 
 			it("validate method throws error when invalid solution name is passed", () => {
@@ -424,7 +424,7 @@ describe("cloud project commands", () => {
 			});
 
 			it("validate method returns false when validation value is not passed", () => {
-				assert.isFalse(commandParamter.validate(undefined).wait());
+				await assert.isFalse(commandParamter.validate(undefined));
 			});
 		});
 
@@ -446,15 +446,15 @@ describe("cloud project commands", () => {
 			});
 
 			it("when solution name is passed", () => {
-				listProjectCommand.execute(["Sln1"]).wait();
+				await listProjectCommand.execute(["Sln1"]);
 			});
 
 			it("when solution id is passed", () => {
-				listProjectCommand.execute(["1"]).wait();
+				await listProjectCommand.execute(["1"]);
 			});
 
 			it("when solution name is NOT passed", () => {
-				listProjectCommand.execute([]).wait();
+				await listProjectCommand.execute([]);
 			});
 		});
 
@@ -465,7 +465,7 @@ describe("cloud project commands", () => {
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
 				assert.equal("", logger.outOutput);
 
-				listProjectCommand.execute([]).wait();
+				await listProjectCommand.execute([]);
 
 				let sln1Index = logger.outOutput.indexOf("Sln1"),
 					sln2Index = logger.outOutput.indexOf("Sln2"),
@@ -485,7 +485,7 @@ describe("cloud project commands", () => {
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
 				assert.equal("", logger.outOutput);
 
-				listProjectCommand.execute([]).wait();
+				await listProjectCommand.execute([]);
 
 				let sln1Index = logger.outOutput.indexOf("Sln1"),
 					sln2Index = logger.outOutput.indexOf("Sln2"),

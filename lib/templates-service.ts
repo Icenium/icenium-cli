@@ -56,16 +56,16 @@ export class TemplatesService implements ITemplatesService {
 
 			_.each(templates, (template) => {
 				if (template["Category"] === "Configuration") {
-					this.downloadTemplate(template, templatesDir).wait();
+					await this.downloadTemplate(template, templatesDir);
 				}
 			});
 	}
 
 	public async unpackAppResources(): Promise<void> {
 			let cordovaAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
-			this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName).wait();
+			await this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName);
 			let nsAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.NS.Blank.zip");
-			this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName).wait();
+			await this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName);
 	}
 
 	private async unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): Promise<void> {
@@ -75,7 +75,7 @@ export class TemplatesService implements ITemplatesService {
 			// In NativeScript templates App_Resources are under app/App_Resources.
 			// In Cordova templates App_Resources are at the root.
 			// So extract all *App_Resources and filter them after that, so we'll copy the real App_Resources directory to the destination appResourcesDir.
-			this.$fs.unzip(assetsZipFileName, extractionDir, { caseSensitive: false, overwriteExisitingFiles: true }, ["*App_Resources/**"]).wait();
+			await this.$fs.unzip(assetsZipFileName, extractionDir, { caseSensitive: false, overwriteExisitingFiles: true }, ["*App_Resources/**"]);
 
 			let appResourcesDirInTemp = _(this.$fs.enumerateFilesInDirectorySync(extractionDir, null, {enumerateDirectories: true}))
 				.filter(file => path.basename(file) === "App_Resources")
@@ -92,8 +92,8 @@ export class TemplatesService implements ITemplatesService {
 			let file = this.$fs.createWriteStream(filepath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
 
-			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
-			fileEnd.wait();
+			await this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file });
+			await fileEnd;
 	}
 }
 $injector.register("templatesService", TemplatesService);

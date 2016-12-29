@@ -55,9 +55,9 @@ export class RemoteService implements IRemoteService {
 			});
 
 			req.pipe(archive);
-			this.$fs.futureFromEvent(archive, 'finish').wait();
+			await this.$fs.futureFromEvent(archive, 'finish');
 
-			this.$fs.unzip(this.packageLocation, this.appBuilderDir).wait();
+			await this.$fs.unzip(this.packageLocation, this.appBuilderDir);
 
 			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).filter(minimatch.filter("*.app"))[0]);
 
@@ -73,7 +73,7 @@ export class RemoteService implements IRemoteService {
 			}
 
 			mappedDeviceName = mappedDeviceName || deviceFamily;
-			this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, { deviceType: mappedDeviceName, appId: req.query.appId }).wait();
+			await this.$iOSEmulatorServices.runApplicationOnEmulator(appLocation, { deviceType: mappedDeviceName, appId: req.query.appId });
 
 			res.status(200).end();
 	}

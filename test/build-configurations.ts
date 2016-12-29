@@ -189,7 +189,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+	await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 
 	let availableMarketplacePlugins = [
 		{

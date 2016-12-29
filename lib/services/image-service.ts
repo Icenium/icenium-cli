@@ -77,7 +77,7 @@ class ImageService implements IImageService {
 				imageType = Server.ImageType.SplashScreen;
 			}
 
-			this.generateImages(imagePath, imageType, force).wait();
+			await this.generateImages(imagePath, imageType, force);
 	}
 
 	public async generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): Promise<void> {
@@ -91,10 +91,10 @@ class ImageService implements IImageService {
 
 			this.replaceAll = force;
 			this.$logger.printInfoMessageOnSameLine('Generating images');
-			this.$progressIndicator.showProgressIndicator(this.$server.images.generateArchive(imageType, inputImageStream, resultImageArchiveStream), 2000).wait();
+			await this.$progressIndicator.showProgressIndicator(this.$server.images.generateArchive(imageType, inputImageStream, resultImageArchiveStream), 2000);
 			this.$logger.printInfoMessageOnSameLine('Extracting images');
-			this.$progressIndicator.showProgressIndicator(this.$fs.unzip(resultImageArchivePath, tempDir), 2000).wait();
-			this.$fs.unzip(resultImageArchivePath, tempDir).wait();
+			await this.$progressIndicator.showProgressIndicator(this.$fs.unzip(resultImageArchivePath, tempDir), 2000);
+			await this.$fs.unzip(resultImageArchivePath, tempDir);
 
 			let imageBasePath = path.join(tempDir, 'App_Resources'),
 				images = this.$fs.enumerateFilesInDirectorySync(imageBasePath);
@@ -105,7 +105,7 @@ class ImageService implements IImageService {
 				}
 
 				let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
-				this.copyImageToProject(imagePath, projectImagePath).wait();
+				await this.copyImageToProject(imagePath, projectImagePath);
 			});
 	}
 

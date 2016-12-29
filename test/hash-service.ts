@@ -59,7 +59,7 @@ describe("hash service", () => {
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
 			try {
-				hashService.getFileHash("thisFileDoesNotExist", "utf8", "sha512", "base64").wait();
+				await hashService.getFileHash("thisFileDoesNotExist", "utf8", "sha512", "base64");
 			} catch(e) {
 				assert.isTrue(failed);
 				assert.isTrue(e.message.indexOf(expectedErrorMessage) > -1);
@@ -73,7 +73,7 @@ describe("hash service", () => {
 			let hashService: IHashService = testInjector.resolve("hashService");
 			let filePath = await  createTempFile("testFile");
 			try {
-				hashService.getFileHash(filePath, "not valid", "sha512", "base64").wait();
+				await hashService.getFileHash(filePath, "not valid", "sha512", "base64");
 			} catch(e) {
 				assert.isTrue(failed);
 				assert.isTrue(e.message.indexOf(expectedErrorMessage) > -1);
@@ -87,7 +87,7 @@ describe("hash service", () => {
 			let hashService: IHashService = testInjector.resolve("hashService");
 			let filePath = await  createTempFile("testFile");
 			try {
-				hashService.getFileHash(filePath, "utf8", "not valid", "base64").wait();
+				await hashService.getFileHash(filePath, "utf8", "not valid", "base64");
 			} catch(e) {
 				assert.isTrue(failed);
 				assert.isTrue(e.message.indexOf(expectedErrorMessage) > -1);
@@ -101,7 +101,7 @@ describe("hash service", () => {
 			let hashService: IHashService = testInjector.resolve("hashService");
 			let filePath = await  createTempFile("testFile");
 			try {
-				hashService.getFileHash(filePath, "utf8", "sha512", "not valid").wait();
+				await hashService.getFileHash(filePath, "utf8", "sha512", "not valid");
 			} catch(e) {
 				assert.isTrue(failed);
 				assert.isTrue(e.message.indexOf(expectedErrorMessage) > -1);

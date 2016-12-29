@@ -123,7 +123,7 @@ async function unzipPluginsFolder(fs: IFileSystem): Promise<string> {
 		let pathToPluginsZip = path.join("test", "resources", "test-plugins.zip");
 		let unzippedPluginsDirectory = temp.mkdirSync("local-plugins");
 
-		fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true }).wait();
+		await fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true });
 
 		return path.join(unzippedPluginsDirectory, "test-plugins");
 }
@@ -491,7 +491,7 @@ describe("plugins-service", () => {
 		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-		service.addPlugin("Toast").wait();
+		await service.addPlugin("Toast");
 		let installedPlugins = service.getInstalledPlugins();
 
 		assert.equal(4, installedPlugins.length);
@@ -521,7 +521,7 @@ describe("plugins-service", () => {
 		let progressIndicator: IProgressIndicator = testInjector.resolve("progressIndicator");
 		progressIndicator.showProgressIndicator = (future: IFuture<any>, timeout: number): IFuture<void> => {
 			return (() => {
-				future.wait();
+				await future;
 			}).future<void>()();
 		};
 
@@ -568,7 +568,7 @@ describe("plugins-service", () => {
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			service.configurePlugin = () => Future.fromResult();
 
-			service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginName)).wait();
+			await service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginName));
 
 			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
 
@@ -579,7 +579,7 @@ describe("plugins-service", () => {
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
 			service.configurePlugin = () => Future.fromResult();
 
-			service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginTgzName)).wait();
+			await service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginTgzName));
 
 			let installedPluginsDirectory = path.join(projectDir, "plugins");
 
@@ -608,7 +608,7 @@ describe("plugins-service", () => {
 
 			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
 
-			service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginName)).wait();
+			await service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginName));
 			project.projectData.FrameworkVersion = originalFrameworkVersion;
 			helpers.isInteractive = originalIsInteractive;
 
@@ -627,7 +627,7 @@ describe("plugins-service", () => {
 
 			let service: IPluginsService = testInjector.resolve(NativeScriptProjectPluginsService);
 
-			service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginTgzName)).wait();
+			await service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginTgzName));
 			project.projectData.FrameworkVersion = originalFrameworkVersion;
 
 			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
@@ -739,7 +739,7 @@ describe("plugins-service", () => {
 		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-		service.removePlugin("Stripe").wait();
+		await service.removePlugin("Stripe");
 
 		assert.equal(3, service.getInstalledPlugins().length);
 	});
@@ -879,7 +879,7 @@ describe("plugins-service", () => {
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
 
-				service.addPlugin(`Toast@${versionToSet}`).wait();
+				await service.addPlugin(`Toast@${versionToSet}`);
 
 				project.getConfigurationsSpecifiedByUser = () => ["debug"];
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
@@ -910,7 +910,7 @@ describe("plugins-service", () => {
 			options.debug = false;
 			options.release = true;
 
-			service.addPlugin(`Toast@${versionToSet}`).wait();
+			await service.addPlugin(`Toast@${versionToSet}`);
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(toastInReleaseConfig.length, 1);
 			assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
@@ -928,7 +928,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			service.addPlugin(`Toast@${versionToSet}`).wait();
+			await service.addPlugin(`Toast@${versionToSet}`);
 
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), (pl: IPlugin) => pl.data.Name.toLowerCase() === "toast");
 			assert.equal(1, toastInReleaseConfig.length, "Plugin toast MUST be enabled in release configuration.");
@@ -949,7 +949,7 @@ describe("plugins-service", () => {
 				options = testInjector.resolve("options");
 
 				project.getConfigurationsSpecifiedByUser = () => ["debug"];
-				service.addPlugin(`Toast@${versionToSet}`).wait();
+				await service.addPlugin(`Toast@${versionToSet}`);
 
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 				assert.equal(toastInDebugConfig.length, 1);
@@ -976,7 +976,7 @@ describe("plugins-service", () => {
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
 
-				service.addPlugin(`Toast@${versionToSet}`).wait();
+				await service.addPlugin(`Toast@${versionToSet}`);
 
 				project.getConfigurationsSpecifiedByUser = () => ["debug"];
 				let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
@@ -1018,7 +1018,7 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => [];
-			service.addPlugin(`Toast@${versionToSet}`).wait();
+			await service.addPlugin(`Toast@${versionToSet}`);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
@@ -1043,7 +1043,7 @@ describe("plugins-service", () => {
 		// 	options.debug = true;
 		// 	options.release = false;
 		// 	project.getConfigurationsSpecifiedByUser = () => ["debug"];
-		// 	service.addPlugin(`Toast@${versionToSet}`).wait();
+		await // 	service.addPlugin(`Toast@${versionToSet}`);
 
 		// 	let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 		// 	assert.equal(toastInDebugConfig.length, 1);
@@ -1093,7 +1093,7 @@ describe("plugins-service", () => {
 
 		// 	options.debug = true;
 		// 	options.release = false;
-		// 	service.addPlugin(`Toast@${versionToSet}`).wait();
+		await // 	service.addPlugin(`Toast@${versionToSet}`);
 
 		// 	let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 		// 	assert.equal(toastInDebugConfig.length, 1);
@@ -1185,7 +1185,7 @@ describe("plugins-service", () => {
 					});
 
 					afterEach(() => {
-						service.addPlugin("Toast").wait();
+						await service.addPlugin("Toast");
 
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 						let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
@@ -1219,7 +1219,7 @@ describe("plugins-service", () => {
 					it("when user wants to update same configuration only", () => {
 						options.debug = true;
 						options.release = false;
-						service.addPlugin("Toast").wait();
+						await service.addPlugin("Toast");
 
 						let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInDebugConfig.length, 1);
@@ -1233,7 +1233,7 @@ describe("plugins-service", () => {
 
 					it("when user does not specify configuration and selects to update both config from first prompt", () => {
 						options.debug = options.release = false;
-						service.addPlugin("Toast").wait();
+						await service.addPlugin("Toast");
 
 						options.debug = true;
 						options.release = false;
@@ -1251,7 +1251,7 @@ describe("plugins-service", () => {
 					it("when user wants to update the other configuration, but selects to update both configs from first prompt", () => {
 						options.debug = false;
 						options.release = true;
-						service.addPlugin("Toast").wait();
+						await service.addPlugin("Toast");
 
 						let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInReleaseConfig.length, 1);
@@ -1280,7 +1280,7 @@ describe("plugins-service", () => {
 					});
 
 					afterEach(() => {
-						service.addPlugin("Toast").wait();
+						await service.addPlugin("Toast");
 
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
 						let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
@@ -1331,7 +1331,7 @@ describe("plugins-service", () => {
 
 		it("is added to release config by default", () => {
 			let project: Project.IProject = testInjector.resolve("project");
-			service.addPlugin(livePatchId).wait();
+			await service.addPlugin(livePatchId);
 
 			project.getConfigurationsSpecifiedByUser = () => ["release"];
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
@@ -1345,7 +1345,7 @@ describe("plugins-service", () => {
 		it("is added to release config when it is specified", () => {
 			options.debug = false;
 			options.release = true;
-			service.addPlugin(livePatchId).wait();
+			await service.addPlugin(livePatchId);
 			let toastInReleaseConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInReleaseConfig.length, 1);
 			options.debug = true;
@@ -1369,7 +1369,7 @@ describe("plugins-service", () => {
 		it("adds plugin to release config only when both debug and release configs are specified", () => {
 			options.debug = true;
 			options.release = true;
-			service.addPlugin(livePatchId).wait();
+			await service.addPlugin(livePatchId);
 			options.release = false;
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
@@ -1625,7 +1625,7 @@ describe("plugins-service", () => {
 				"APP_SECRET": 2
 			};
 
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
@@ -1645,7 +1645,7 @@ describe("plugins-service", () => {
 				}
 			};
 
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1667,7 +1667,7 @@ describe("plugins-service", () => {
 				"APP_SECRET": 6
 			};
 
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1684,7 +1684,7 @@ describe("plugins-service", () => {
 				"APP_SECRET": 3
 			};
 
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1707,7 +1707,7 @@ describe("plugins-service", () => {
 			};
 			service = injector.resolve(CordovaProjectPluginsService);
 			project = injector.resolve("project");
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1724,7 +1724,7 @@ describe("plugins-service", () => {
 				"ApP_SecReT": 3
 			};
 
-			service.addPlugin("com.telerik.dropbox").wait();
+			await service.addPlugin("com.telerik.dropbox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1737,7 +1737,7 @@ describe("plugins-service", () => {
 				APP1: { SECRET: { SAMPLE: { MSG: "2" } } }
 			};
 
-			service.addPlugin("com.telerik.fakeDropBox").wait();
+			await service.addPlugin("com.telerik.fakeDropBox");
 
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);
@@ -1757,7 +1757,7 @@ describe("plugins-service", () => {
 				}
 			};
 
-			service.addPlugin("com.telerik.fakeDropBox").wait();
+			await service.addPlugin("com.telerik.fakeDropBox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1774,7 +1774,7 @@ describe("plugins-service", () => {
 				APP1: { SECRET: { SAMPLE: { MSG: "3" } } }
 			};
 
-			service.addPlugin("com.telerik.fakeDropBox").wait();
+			await service.addPlugin("com.telerik.fakeDropBox");
 
 			assert.deepEqual(expectedCordovaPluginVariablesInDebug, project.configurationSpecificData["debug"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in debug config.");
 			assert.deepEqual(expectedCordovaPluginVariablesInRelease, project.configurationSpecificData["release"]["CordovaPluginVariables"], "CordovaPluginVariables do not match in release config.");
@@ -1791,7 +1791,7 @@ describe("plugins-service", () => {
 				}
 			};
 
-			service.addPlugin("com.telerik.fakeDropBox2").wait();
+			await service.addPlugin("com.telerik.fakeDropBox2");
 
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["debug"]["CordovaPluginVariables"]);
 			assert.deepEqual(expectedCordovaPluginVariables, project.configurationSpecificData["release"]["CordovaPluginVariables"]);

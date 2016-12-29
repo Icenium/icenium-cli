@@ -46,7 +46,7 @@ export class SamplesService implements ISamplesService {
 	public async printSamplesInformation(framework?: string): Promise<void> {
 			this.$logger.info("You can choose a sample from the following: %s", EOL);
 			if (framework) {
-				this.printSamplesInformationForFramework(framework).wait();
+				await this.printSamplesInformationForFramework(framework);
 			} else {
 				_.values<string>(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => await  this.printSamplesInformationForFramework(fx));
 			}
@@ -54,7 +54,7 @@ export class SamplesService implements ISamplesService {
 
 	private async printSamplesInformationForFramework(framework: string): Promise<void> {
 			this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
-			this.$logger.info(this.getSamplesInformation(framework).wait() + EOL + EOL);
+			await this.$logger.info(this.getSamplesInformation(framework) + EOL + EOL);
 	}
 
 	public async cloneSample(sampleName: string): Promise<void> {
@@ -78,10 +78,10 @@ export class SamplesService implements ISamplesService {
 				let file = this.$fs.createWriteStream(filepath);
 				let fileEnd = this.$fs.futureFromEvent(file, "finish");
 				let accessToken = this.getGitHubAccessTokenQueryParameter("?");
-				this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
-				fileEnd.wait();
+				await this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file });
+				await fileEnd;
 
-				this.$fs.unzip(filepath, tempDir).wait();
+				await this.$fs.unzip(filepath, tempDir);
 				let projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
 				let projectDir = path.dirname(projectFile);
 				let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
@@ -92,11 +92,11 @@ export class SamplesService implements ISamplesService {
 			} finally {
 				let featureValue = sample.name;
 
-				if (this.$typeScriptService.isTypeScriptProject(tempDir).wait()) {
+				await if (this.$typeScriptService.isTypeScriptProject(tempDir)) {
 					featureValue = `${featureValue}-TS`;
 				}
 
-				this.$analyticsService.track("CreateProjectFromSample", featureValue).wait();
+				await this.$analyticsService.track("CreateProjectFromSample", featureValue);
 				try {
 					this.$fs.deleteDirectory(tempDir);
 				} catch (error) {

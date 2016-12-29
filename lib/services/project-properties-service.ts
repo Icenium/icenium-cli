@@ -63,7 +63,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			}
 
 			_.each(configurationsSpecifiedByUser, configuration => {
-				this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue).wait();
+				await this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue);
 			});
 
 			// check if CorePlugins in all configurations are the same
@@ -97,7 +97,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 				this.$errors.fail("Unknown property update mode '%s'", mode);
 			}
 
-			this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue).wait();
+			await this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue);
 
 			if (configurationSpecificData) {
 				configurationSpecificData[normalizedProperty] = propertyValue;
@@ -160,7 +160,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 
 	private async getPropRange(propData: any): Promise<string[]> {
 			if (propData.dynamicRange) {
-				return this.$injector.dynamicCall(propData.dynamicRange).wait();
+				await return this.$injector.dynamicCall(propData.dynamicRange);
 			}
 			if (propData.enum) {
 				return propData.enum;
@@ -236,7 +236,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
 			let propData = projectSchema[propertyName];
 			if (propData && propData.onChanging) {
-				this.$injector.dynamicCall(propData.onChanging, [propertyValue]).wait();
+				await this.$injector.dynamicCall(propData.onChanging, [propertyValue]);
 			}
 	}
 

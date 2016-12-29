@@ -15,10 +15,10 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 			let configs = this.$project.getConfigurationsSpecifiedByUser();
 			if(configs.length) {
 				_.each(configs, config => {
-					this.$project.printProjectProperty(args[0], config).wait();
+					await this.$project.printProjectProperty(args[0], config);
 				});
 			} else {
-				this.$project.printProjectProperty(args[0]).wait();
+				await this.$project.printProjectProperty(args[0]);
 			}
 		}).future<void>()();
 	}

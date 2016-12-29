@@ -15,7 +15,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 	}
 
 	public async call<Т>(name: string, method: string, path: string, accept: string, bodyValues: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<Т> {
-			this.ensureUpToDate().wait();
+			await this.ensureUpToDate();
 			headers = headers || Object.create(null);
 
 			let cookies: IStringDictionary;
@@ -55,7 +55,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 				response = await  this.$httpClient.httpRequest(requestOpts);
 			} catch (err) {
 				if (err.response && err.response.statusCode === 401) {
-					this.$userDataStore.clearLoginData().wait();
+					await this.$userDataStore.clearLoginData();
 				} else if (err.response && err.response.statusCode === 402) {
 					this.$errors.fail({ formatStr: "%s", suppressCommandHelp: true }, JSON.parse(err.body).Message);
 				}
@@ -128,9 +128,9 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 				let user = await  this.$userDataStore.getUser();
 				this.solutionSpaceName = user.tenant.id;
 				if (solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
-					return this.callWithoutSolutionSpaceHeader(call).wait();
+					await return this.callWithoutSolutionSpaceHeader(call);
 				} else {
-					return call().wait();
+					await return call();
 				}
 			} finally {
 				this.solutionSpaceName = null;
@@ -156,7 +156,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			if (this.useSolutionSpaceNameHeader) {
 				headers["X-Icenium-SolutionSpace"] = this.solutionSpaceName || this.$staticConfig.SOLUTION_SPACE_NAME;
 			}
-			return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers).wait();
+			await return super.call<any>(name, method, path, accept, bodyValues, resultStream, headers);
 	}
 }
 $injector.register("serviceProxy", AppBuilderServiceProxy);

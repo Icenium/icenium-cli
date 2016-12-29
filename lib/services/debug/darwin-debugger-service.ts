@@ -19,7 +19,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 
 	public async debugAndroidApplication(applicationId: string, framework: string): Promise<void> {
 			let deviceIdentifier: string;
-			this.$devicesService.detectCurrentlyAttachedDevices().wait();
+			await this.$devicesService.detectCurrentlyAttachedDevices();
 			let connectedDevices = this.$devicesService.getDevicesForPlatform("android");
 
 			if (connectedDevices.length > 1) {
@@ -49,7 +49,7 @@ export class DarwinDebuggerService implements IDebuggerService {
 			}
 
 			let inspectorAddress = `chrome://inspect:${tcpPort}`;
-			this.$clipboardService.copy(inspectorAddress).wait();
+			await this.$clipboardService.copy(inspectorAddress);
 
 			this.$logger.out(`Your application is available for debugging on port: ${tcpPort}.`);
 			this.$logger.out(`Open Google Chrome and in the address bar enter ${inspectorAddress}. You can just paste it, it is already copied to your clipboard.`);

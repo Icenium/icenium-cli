@@ -70,7 +70,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
 
 			// Make sure to download this file first, as data from it is used for fileDownloadFutures
-			this.downloadMigrationConfigFile().wait();
+			await this.downloadMigrationConfigFile();
 
 			let fileDownloadFutures = _(this.nativeScriptMigrationData.supportedVersions)
 				.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
@@ -109,7 +109,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			this.ensurePackageJsonExists(newVersion);
 
-			this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion).wait();
+			await this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion);
 	}
 
 	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
@@ -121,8 +121,8 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			try {
 				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion);
 
-				this.$projectMigrationService.migrateTypeScriptProject().wait();
-				this.$npmService.install(this.$project.getProjectDir()).wait();
+				await this.$projectMigrationService.migrateTypeScriptProject();
+				await this.$npmService.install(this.$project.getProjectDir());
 
 				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents);
 			} catch (err) {

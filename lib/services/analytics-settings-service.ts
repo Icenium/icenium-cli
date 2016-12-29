@@ -9,7 +9,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	}
 
 	public async getUserId(): Promise<string> {
-			return this.$userDataStore.getUser().wait().uid;
+			await return this.$userDataStore.getUser().uid;
 	}
 
 	public getClientName(): string {
@@ -21,7 +21,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	}
 
 	public async getUserSessionsCount(): Promise<number> {
-			return this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED").wait() || 0;
+			await return this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED") || 0;
 	}
 
 	public setUserSessionsCount(count: number): IFuture<void> {

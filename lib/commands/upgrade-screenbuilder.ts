@@ -24,7 +24,7 @@ class UpgradeScreenBuilder implements ICommand {
 				return;
 			}
 
-			this.$screenBuilderService.upgrade(this.$options.path).wait();
+			await this.$screenBuilderService.upgrade(this.$options.path);
 			this.$logger.info("Project successfully upgraded.");
 		}).future<void>()();
 	}

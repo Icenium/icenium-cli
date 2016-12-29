@@ -69,7 +69,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		assert.isTrue(injector.resolve("logger").output.indexOf("bla woot bla") >= 0);
 	});
 
@@ -85,7 +85,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla") >= 0);
 		assert.isTrue(output.indexOf("secondBla") < 0);
@@ -103,7 +103,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla") >= 0);
@@ -120,7 +120,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla") >= 0);
@@ -136,7 +136,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla") >= 0);
@@ -152,7 +152,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isCordova isNativeScript") >= 0);
@@ -166,7 +166,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isCordova isNativeScript") < 0);
 		assert.isTrue(output.indexOf("isCordova") < 0);
@@ -182,7 +182,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isLinux isWindows isMacOS") >= 0);
 	});
@@ -195,7 +195,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isLinux isWindows isMacOS") < 0);
@@ -214,7 +214,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isLinux and isCordova end") >= 0);
@@ -229,7 +229,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isLinux and isCordova end") < 0);
@@ -246,7 +246,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla isLinux end") >= 0);
 	});
@@ -263,7 +263,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla command1 and command2 end") >= 0);
 	});
@@ -280,7 +280,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla command1 and command2 end") < 0);
 		assert.isTrue(output.indexOf("command1") < 0);
@@ -301,7 +301,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla command1 end") >= 0);
 		assert.isTrue(output.indexOf("command2") < 0);
@@ -321,7 +321,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla command1 command2 command3 end") >= 0);
 	});
@@ -337,7 +337,7 @@ describe("help", () => {
 		});
 
 		let help = injector.resolve(helpCommand.HelpCommand);
-		help.execute(["foo"]).wait();
+		await help.execute(["foo"]);
 		let output = injector.resolve("logger").output;
 		assert.isTrue(output.indexOf("bla param1 param2 end") >= 0);
 	});

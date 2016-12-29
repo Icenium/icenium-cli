@@ -66,7 +66,7 @@ export class WebViewService implements IWebViewService {
 	private async enableWebViewCore(webView: IWebView): Promise<void> {
 			if (!this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
 				this.$options.default = true;
-				this.$pluginsService.addPlugin(webView.pluginIdentifier).wait();
+				await this.$pluginsService.addPlugin(webView.pluginIdentifier);
 			}
 	}
 

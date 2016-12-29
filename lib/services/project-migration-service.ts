@@ -14,7 +14,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 
 	public async migrateTypeScriptProject(): Promise<void> {
 			if (this.shouldAskForTypeScriptMigration) {
-				if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir).wait() && this.$project.projectData &&
+				await if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir) && this.$project.projectData &&
 					this.$project.projectData.Framework.toLowerCase() === constants.TARGET_FRAMEWORK_IDENTIFIERS.NativeScript.toLowerCase()) {
 
 					let projectDir = this.$project.projectDir,
@@ -25,7 +25,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 						if (this.$prompter.confirm("Do you want to continue?", () => await  true)) {
 							rimraf.sync(pathToTypingsTnsCoreModules);
 							this.$fs.deleteEmptyParents(pathToTypingsTnsCoreModules);
-							this.$npmService.install(projectDir).wait();
+							await this.$npmService.install(projectDir);
 						}
 					}
 				}

@@ -72,7 +72,7 @@ describe("mobileframework", () => {
 			it("fails when version is not in correct format", () => {
 				let message: string;
 				try {
-					mobileFwCP.validate("1").wait();
+					await mobileFwCP.validate("1");
 				} catch(e) {
 					message = e.message;
 				}
@@ -82,7 +82,7 @@ describe("mobileframework", () => {
 			it("fails when version is not supported", () => {
 				let message: string;
 				try {
-					mobileFwCP.validate("1.0.5").wait();
+					await mobileFwCP.validate("1.0.5");
 				} catch(e) {
 					message = e.message;
 				}
@@ -91,7 +91,7 @@ describe("mobileframework", () => {
 			});
 
 			it("returns true when version is correct", () => {
-				assert.isTrue(mobileFwCP.validate("1.0.0").wait());
+				await assert.isTrue(mobileFwCP.validate("1.0.0"));
 			});
 		});
 
@@ -118,7 +118,7 @@ describe("mobileframework", () => {
 				}
 			});
 			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
-			mbFrm.execute([]).wait();
+			await mbFrm.execute([]);
 			_.each(expectedOutput, version => {
 				assert.isTrue(message.indexOf(version) > -1);
 			});

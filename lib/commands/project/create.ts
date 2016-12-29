@@ -23,7 +23,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			let newProjectDir = this.$project.getNewProjectDir();
 			let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
 
-			this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
+			await this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE);
 			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)));
 
 			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
@@ -34,7 +34,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			});
 
 			try {
-				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();
+				await this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions);
 			} catch(err) {
 				this.$logger.trace(err);
 				this.$fs.deleteDirectory(projectPath);
@@ -42,7 +42,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 			}
 
 			if (this.$options.simulator && await  this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication()) {
-				this.$simulatorService.launchSimulator().wait();
+				await this.$simulatorService.launchSimulator();
 			}
 	}
 

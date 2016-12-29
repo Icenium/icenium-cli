@@ -160,7 +160,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 			let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
 
 			try {
-				this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath).wait();
+				await this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath);
 			} catch (err) {
 				// This exception is caused probably by issue with the internet connection of the user.
 				this.$logger.trace("Failed to download the NativeScript migration file.");
@@ -177,9 +177,9 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
-			if (this.$typeScriptService.isTypeScriptProject(projectDir).wait()) {
+			await if (this.$typeScriptService.isTypeScriptProject(projectDir)) {
 				try {
-					this.$npmService.install(projectDir).wait();
+					await this.$npmService.install(projectDir);
 				} catch (err) {
 					this.$logger.trace(`Failed to install all npm dependencies in the project. Error: ${err}.`);
 					this.$logger.warn("The installation of the project dependencies from npm failed. The TypeScript transpilation may fail due to missing .d.ts files.");

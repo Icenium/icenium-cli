@@ -18,10 +18,10 @@ export class AnalyticsService extends AnalyticsServiceBase implements IAnalytics
 
 	public async trackFeature(featureName: string): Promise<void> {
 			if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
-				super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY).wait();
+				await super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY);
 			}
 
-			super.trackFeature(featureName).wait();
+			await super.trackFeature(featureName);
 	}
 }
 

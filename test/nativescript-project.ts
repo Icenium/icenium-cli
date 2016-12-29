@@ -301,7 +301,7 @@ describe("NativeScript project unit tests", () => {
 			mockFsStats($fs, { hoursToAddToMtime: -3 });
 			mockFsReadText($fs, modifiedNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isTrue(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, modifiedNativeScriptMigrationFile);
@@ -311,7 +311,7 @@ describe("NativeScript project unit tests", () => {
 			mockFsStats($fs, { hoursToAddToMtime: -1 });
 			mockFsReadText($fs, modifiedNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isFalse(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, null);
@@ -321,7 +321,7 @@ describe("NativeScript project unit tests", () => {
 			mockFsStats($fs, { hoursToAddToMtime: -3 });
 			mockFsReadText($fs, currentNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isFalse(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, null);

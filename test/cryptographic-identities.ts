@@ -239,7 +239,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), provision, "Failed to select mobile provision when only one valid was present");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), provision, "Failed to select mobile provision when only one valid was present");
 		});
 
 		it("should select App Store provision when valid certificate present", () => {
@@ -248,7 +248,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['App Store']).wait(), provision, "Failed to select mobile provision when only one valid was present");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['App Store']), provision, "Failed to select mobile provision when only one valid was present");
 		});
 
 		it("should select correct provision when multiple provisions present and others have invalid identifier", () => {
@@ -267,7 +267,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector(provisions, [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), provision, "Failed to select mobile provision with appropriate application identifier");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), provision, "Failed to select mobile provision with appropriate application identifier");
 		});
 
 		it("should select correct provision when multiple provisions present and others have different type", () => {
@@ -289,7 +289,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector(provisions, [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', [provisionType]).wait(), provision, "Failed to select mobile provision with appropriate type");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', [provisionType]), provision, "Failed to select mobile provision with appropriate type");
 		});
 
 		it("should select correct provision when multiple provisions present and others do not include given device identifier", () => {
@@ -311,7 +311,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector(provisions, [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc'], device).wait(), provision, "Failed to select mobile provision with appropriate application identifier");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc'], device), provision, "Failed to select mobile provision with appropriate application identifier");
 		});
 
 		it("should select correct provision when multiple provisions present and others have expired", () => {
@@ -330,14 +330,14 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector(provisions, [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), provision, "Failed to select mobile provision with appropriate expiration date");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), provision, "Failed to select mobile provision with appropriate expiration date");
 		});
 
 		it("should select correct provision with fully wildcard identifier", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), provision, "Failed to select wildcard mobile provision");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), provision, "Failed to select wildcard mobile provision");
 		});
 
 		it("should select correct provision with partially wildcard identifier", () => {
@@ -346,7 +346,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), provision, "Failed to select wildcard mobile provision");
+			await assert.deepEqual(service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), provision, "Failed to select wildcard mobile provision");
 		});
 
 		it("should select correct provision with exact identifier", () => {
@@ -356,7 +356,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectProvision(identifier, ['AdHoc']).wait(), provision, "Failed to select wildcard mobile provision");
+			await assert.deepEqual(service.autoselectProvision(identifier, ['AdHoc']), provision, "Failed to select wildcard mobile provision");
 		});
 	});
 
@@ -379,7 +379,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectCertificate(provision).wait(), certificate, "Failed to select certificate when only one valid was present");
+			await assert.deepEqual(service.autoselectCertificate(provision), certificate, "Failed to select certificate when only one valid was present");
 		});
 
 		it("should select certificates when multiple valid are present", () => {
@@ -402,7 +402,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], certificates);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectCertificate(provision).wait(), certificate, "Failed to select valid certificate when multiple present");
+			await assert.deepEqual(service.autoselectCertificate(provision), certificate, "Failed to select valid certificate when multiple present");
 		});
 
 		it("should select first certificate when all are valid", () => {
@@ -420,7 +420,7 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([provision], certificates);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.deepEqual(service.autoselectCertificate(provision).wait(), certificates[0], "Failed to select valid certificate when multiple present");
+			await assert.deepEqual(service.autoselectCertificate(provision), certificates[0], "Failed to select valid certificate when multiple present");
 		});
 	});
 });

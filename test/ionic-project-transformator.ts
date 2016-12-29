@@ -104,7 +104,7 @@ let wp8PlatformName = "wp8";
 async function createIonicProject(testInjector: IInjector, fs: IFileSystem): Promise<string> {
 		if (!hasUnzippedProject) {
 			hasUnzippedProject = true;
-			fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true }).wait();
+			await fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true });
 		}
 
 		let options = testInjector.resolve("options");
@@ -265,7 +265,7 @@ describe("Ionic project transformator", () => {
 			createBackup = true;
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 
-			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 			assert.isTrue(fs.exists(backupDirectory));
 		});
@@ -273,7 +273,7 @@ describe("Ionic project transformator", () => {
 		it("should not create backup if createBackup is false", () => {
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 
-			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 			assert.isTrue(!fs.exists(backupDirectory));
 		});
@@ -283,7 +283,7 @@ describe("Ionic project transformator", () => {
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 			let projectDirectoryContent = shelljs.ls("-R", projectDirectory);
 
-			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 			let projectBackupDirectoryContent = shelljs.ls("-R", backupDirectory);
 
@@ -291,7 +291,7 @@ describe("Ionic project transformator", () => {
 		});
 
 		it("should create rerouting index.html", () => {
-			ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 			let indexHtml = path.join(projectDirectory, "index.html");
 
@@ -313,7 +313,7 @@ describe("Ionic project transformator", () => {
 			_.each([androidPlatformName, iosPlatformName, wp8PlatformName], (platform: string) => {
 				it(`should clone ${platform} config.xml when ${platform} is added to the Ionic project`, () => {
 					context = createConfigXmlTestsContext(platform, appResourcesDirectory);
-					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
@@ -327,7 +327,7 @@ describe("Ionic project transformator", () => {
 
 					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
-					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
@@ -353,7 +353,7 @@ describe("Ionic project transformator", () => {
 
 					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
-					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
 
@@ -387,7 +387,7 @@ describe("Ionic project transformator", () => {
 
 				fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
-				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+				await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 				assert.isTrue(fs.exists(androidTestContext.clonedConfigXmlDirectory), "Expected the Android configuration to be cloned.");
 				assert.isTrue(fs.exists(iosTestContext.clonedConfigXmlDirectory), "Expected the iOS configuration to be cloned.");
@@ -416,7 +416,7 @@ describe("Ionic project transformator", () => {
 					shelljs.exec(`echo "test" > ${path.join(ionicAndroidResourcesDirectory, resourceName, `${folderName}-${resourceFileName}`)}`);
 				});
 
-				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+				await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, ldpiFolderName)), "Expected to get the name of the directory from the Android ionic resource name.");
 				assert.isTrue(fs.exists(path.join(appbuilderAndroidResourcesDirectory, hdpiFolderName)), "Expected to get the name of the directory from the Android ionic resource name.");
@@ -434,7 +434,7 @@ describe("Ionic project transformator", () => {
 					// Need to get the list of the resources before the resources folder is deleted.
 					let ionicResources = shelljs.ls("-R", path.join(ionicResourcesDirectory, "icon"), path.join(ionicResourcesDirectory, "splash"));
 
-					ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					// Need to remove the config.xml file from the AppBuilder folder to compare only the resources.
 					fs.deleteFile(path.join(appbuilderResourcesDirectory, configXmlName));
@@ -455,7 +455,7 @@ describe("Ionic project transformator", () => {
 		describe("project cleanup", () => {
 			it("should delete the Ionic project specific files and folders.", () => {
 				let ionicProjectSpecificFilesAndFolders = ["package.json", "ionic.project", ".editorconfig", "hooks", "platforms", "resources"];
-				ionicProjectTransformator.transformToAppBuilderProject(createBackup).wait();
+				await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 				_.each(ionicProjectSpecificFilesAndFolders, (item: string) => {
 					assert.isFalse(fs.exists(path.join(projectDirectory, item)), `Expected ${item} to be deleted.`);

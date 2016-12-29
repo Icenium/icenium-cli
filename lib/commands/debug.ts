@@ -21,10 +21,10 @@ export class DebugCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 
 	public async execute(args: string[]): Promise<void> {
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 			this.$project.ensureProject();
 
-			this.runDebugger().wait();
+			await this.runDebugger();
 	}
 
 	public canExecute(args: string[]): IFuture<boolean> {
@@ -41,13 +41,13 @@ export class DebugCommand implements ICommand {
 
 				let debuggerPackageName = this.$winDebuggerService.packageName;
 				this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
-				this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this)).wait();
+				await this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this));
 
-				this.$sharedUserSettingsService.loadUserSettingsFile().wait();
+				await this.$sharedUserSettingsService.loadUserSettingsFile();
 
 				let debuggerParams = [
 					"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
-					"--app-ids", this.$project.getAppIdentifierForPlatform(this.platform).wait() // We can specify more than one appid. They should be separated with ;.
+					await "--app-ids", this.$project.getAppIdentifierForPlatform(this.platform) // We can specify more than one appid. They should be separated with ;.
 				];
 
 				this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
@@ -94,10 +94,10 @@ export class DebugAndroidCommand extends DebugCommand {
 	}
 
 	protected async runDebugger(): Promise<void> {
-			super.runDebugger().wait();
+			await super.runDebugger();
 
 			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework).wait();			}
+				await this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework);			}
 	}
 }
 
@@ -131,7 +131,7 @@ export class DebugIosCommand extends DebugCommand {
 	}
 
 	protected async runDebugger(): Promise<void> {
-			super.runDebugger().wait();
+			await super.runDebugger();
 
 			if (!this.$hostInfo.isWindows) {
 				this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);

@@ -30,9 +30,9 @@ export class AddPluginCommand implements ICommand {
 
 					return _.some(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name);
 				});
-				this.$pluginsService.printPlugins(this.$pluginsService.filterPlugins(plugins).wait());
+				await this.$pluginsService.printPlugins(this.$pluginsService.filterPlugins(plugins));
 			} else {
-				this.$pluginsService.addPlugin(args[0]).wait();
+				await this.$pluginsService.addPlugin(args[0]);
 			}
 	}
 
@@ -46,7 +46,7 @@ export class AddPluginCommand implements ICommand {
 			let pluginName = args[0];
 			// Use pluginCommandParameter's validate method for verification.
 			let pluginCommandParameter = this.$injector.resolve(PluginCommandParameter);
-			pluginCommandParameter.validate(pluginName).wait();
+			await pluginCommandParameter.validate(pluginName);
 
 			return true;
 	}

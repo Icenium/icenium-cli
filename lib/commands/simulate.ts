@@ -11,7 +11,7 @@ export class SimulateCommand implements ICommand {
 
 	public async execute(args: string[]): Promise<void> {
 			if (this.$simulatorPlatformServices.canRunApplication && await  this.$simulatorPlatformServices.canRunApplication()) {
-				this.$simulatorService.launchSimulator().wait();
+				await this.$simulatorService.launchSimulator();
 			}
 	}
 

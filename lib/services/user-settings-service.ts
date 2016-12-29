@@ -70,19 +70,19 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 					let timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
 					let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
 					if (diffDays > 1) {
-						this.downloadUserSettings().wait();
+						await this.downloadUserSettings();
 					} else {
 						this.readUserSettingsFile();
 					}
 				} else {
-					this.downloadUserSettings().wait();
+					await this.downloadUserSettings();
 				}
 			}
 	}
 
 	private async downloadUserSettings(): Promise<void> {
 			try {
-				this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
+				await this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath));
 				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
 			} catch (error) {
 				if (error.response && error.response.statusCode === 404) {
@@ -94,8 +94,8 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 	}
 
 	public async getSettingValue<T>(settingName: string): Promise<T> {
-			this.$loginManager.ensureLoggedIn().wait();
-			this.loadUserSettingsFile().wait();
+			await this.$loginManager.ensureLoggedIn();
+			await this.loadUserSettingsFile();
 
 			if (!this.userSettingsData) {
 				return null;
@@ -127,10 +127,10 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 	}
 
 	public async saveSettings(data: { [key: string]: {} }): Promise<void> {
-			this.$loginManager.ensureLoggedIn().wait();
+			await this.$loginManager.ensureLoggedIn();
 
 			if (Object.keys(data).length !== 0) {
-				this.downloadUserSettings().wait();
+				await this.downloadUserSettings();
 			} else {
 				this.readUserSettingsFile();
 			}
@@ -151,7 +151,7 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 			helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
 
 			let xml = xmlMapping.toxml(this.userSettingsData);
-			this.$server.rawSettings.saveUserSettings(UserSettings.DefaultFileName, xml).wait();
+			await this.$server.rawSettings.saveUserSettings(UserSettings.DefaultFileName, xml);
 
 			if (Object.keys(data).length !== 0) {
 				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml);

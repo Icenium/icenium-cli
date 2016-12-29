@@ -44,7 +44,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			this.$errors.failWithoutHelp(`Your project targets NativeScript version '${frameworkVersion}' which does not support plugins.`);
 		}
 
-		this.$projectMigrationService.migrateTypeScriptProject().wait();
+		await this.$projectMigrationService.migrateTypeScriptProject();
 	}
 
 	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
@@ -108,13 +108,13 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 			if (this.hasTgzExtension(pluginIdentifier)) {
 				pluginBasicInfo = await  this.fetchPluginBasicInformation(path.resolve(pluginIdentifier), "add", null, { actualName: pluginIdentifier, isTgz: true, addPluginToConfigFile: false });
-			} else if (this.checkIsValidLocalPlugin(pluginIdentifier).wait()) {
+			await } else if (this.checkIsValidLocalPlugin(pluginIdentifier)) {
 				pluginBasicInfo = await  this.installLocalPlugin(pluginIdentifier, { actualName: pluginIdentifier, isTgz: false, addPluginToConfigFile: true });
 			} else {
 				pluginBasicInfo = await  this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true });
 			}
 
-			if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir).wait()) {
+			await if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir)) {
 				// Do not pass version here, we've already added the entry in package.json, so the correct version will be installed anyway.
 				let installResult = await  this.$npmService.install(this.$project.projectDir, { installTypes: this.$options.types, name: pluginBasicInfo.name });
 				if (installResult.error) {
@@ -134,7 +134,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 				let fullPluginPath = path.join(this.$project.projectDir, pathToPlugin);
 
-				if (this.checkIsValidLocalPlugin(pathToPlugin).wait() || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
+				await if (this.checkIsValidLocalPlugin(pathToPlugin) || (this.hasTgzExtension(fullPluginPath) && this.isPluginPartOfTheProject(fullPluginPath))) {
 					this.$fs.deleteDirectory(fullPluginPath);
 				}
 
@@ -144,7 +144,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 				this.$fs.writeJson(pathToPackageJson, packageJsonContent);
 
-				this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name).wait();
+				await this.$npmService.uninstall(this.$project.projectDir, pluginBasicInfo.name);
 
 				this.$logger.printMarkdown(util.format("Successfully removed plugin `%s`.", pluginBasicInfo.name));
 			} else {
@@ -162,10 +162,10 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			}
 
 			let pluginVersion = packageJsonContent.dependencies[basicPluginInfo.name].replace("file:", "");
-			if (this.checkIsValidLocalPlugin(pluginVersion).wait()) {
-				this.installLocalPlugin(pluginVersion).wait();
+			await if (this.checkIsValidLocalPlugin(pluginVersion)) {
+				await this.installLocalPlugin(pluginVersion);
 			} else {
-				this.setPluginInPackageJson(pluginName).wait();
+				await this.setPluginInPackageJson(pluginName);
 			}
 
 			this.$logger.printMarkdown(util.format("Successfully configured plugin `%s`.", basicPluginInfo.name));
@@ -181,7 +181,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
 			let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
-			return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version).wait() || { name: dependencyInfo.name, version: dependencyInfo.version };
+			await return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version) || { name: dependencyInfo.name, version: dependencyInfo.version };
 	}
 
 	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
@@ -276,7 +276,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	}
 
 	private async getUniqueMarketplacePlugins(): Promise<IPlugin[]> {
-			return _(this.getMarketplacePlugins().wait())
+			await return _(this.getMarketplacePlugins())
 				.groupBy(pl => pl.data.Name)
 				.map((pluginGroup: IPlugin[]) => _(pluginGroup)
 					.sortBy(gr => gr.data.Version)
@@ -403,7 +403,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			version = version || "latest";
 			let result = await  this.$npmService.getPackageJsonFromNpmRegistry(packageName, version);
 			if (result) {
-				return this.constructNativeScriptPluginData(result).wait();
+				await return this.constructNativeScriptPluginData(result);
 			}
 
 			return null;
@@ -414,10 +414,10 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				pathToPlugin = pathToPlugin.replace("file:", "");
 			}
 
-			if (this.checkIsValidLocalPlugin(pathToPlugin).wait()) {
+			await if (this.checkIsValidLocalPlugin(pathToPlugin)) {
 				let fullPath = path.resolve(pathToPlugin);
 				let packageJsonContent = this.$fs.readJson(path.join(fullPath, this.$projectConstants.PACKAGE_JSON_NAME));
-				return this.constructNativeScriptPluginData(packageJsonContent).wait();
+				await return this.constructNativeScriptPluginData(packageJsonContent);
 			}
 
 			return null;
@@ -431,7 +431,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				let pathToInstalledPackage = await  this.installPackageToTempDir(url);
 				if (pathToInstalledPackage) {
 					let packageJsonContent = this.$fs.readJson(path.join(pathToInstalledPackage, this.$projectConstants.PACKAGE_JSON_NAME));
-					return this.constructNativeScriptPluginData(packageJsonContent).wait();
+					await return this.constructNativeScriptPluginData(packageJsonContent);
 
 				}
 			}
@@ -573,8 +573,8 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 				name = pluginBasicInfo.name,
 				selectedVersion = pluginBasicInfo.version || "latest",
 				basicPlugin = await  this.getBasicPluginInfoFromMarketplace(name, selectedVersion) ||
-					this.getBasicPluginInfoFromNpm(name, selectedVersion).wait() ||
-					this.getBasicPluginInfoFromUrl(pluginIdentifier).wait();
+					await this.getBasicPluginInfoFromNpm(name, selectedVersion) ||
+					await this.getBasicPluginInfoFromUrl(pluginIdentifier);
 
 			if (!basicPlugin) {
 				this.$errors.failWithoutHelp(`Unable to add plugin ${pluginIdentifier}. Make sure you've provided a valid name, path to local directory or git URL.`);

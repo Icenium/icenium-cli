@@ -35,7 +35,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 						// Call npm install for each dependency that ships with the scaffolding package itself
 						// this is done because calling npm install inside the scaffolding directory doesn't install dependencies' dependencies on some versions of npm
 						_.each(this.$fs.readDirectory(scaffoldingNodeModulesPath), dir => {
-							this.npmInstall(null, path.join(scaffoldingNodeModulesPath, dir)).wait();
+							await this.npmInstall(null, path.join(scaffoldingNodeModulesPath, dir));
 						});
 					}
 					// HACK: Some of screen builder's dependencies generate paths which are too long for Windows OS to handle
@@ -46,14 +46,14 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 
 					let generatorBaseDependencies = require(path.join(this.appScaffoldingPath, "node_modules", "screen-builder-base-generator", "package.json")).dependencies;
 					Future.wait(_.map(generatorBaseDependencies, (value, key) => this.npmInstall(`${key}@${value}`)));
-					this.npmInstall().wait();
+					await this.npmInstall();
 					let userNpmVersion = this.$sysInfo.getNpmVersion();
 					// If the user machine has npm 3 we don't need to run `$ npm dedupe` because npm itself dedupes dependencies while installing them.
 					if (!userNpmVersion || !semver.valid(userNpmVersion) || semver.major(userNpmVersion) !== 3) {
-						this.npmDedupe().wait();
+						await this.npmDedupe();
 					}
 			};
-			this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction).wait();
+			await this.prepareDependencyExtension(AppScaffoldingExtensionsService.APP_SCAFFOLDING_NAME, appScaffoldingConfig, afterPrepareAction);
 		}).future<void>()();
 	}
 

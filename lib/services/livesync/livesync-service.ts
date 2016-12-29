@@ -16,7 +16,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 	public async livesync(platform?: string): Promise<void> {
 			this.$project.ensureProject();
-			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
+			await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device });
 			platform = platform || this.$devicesService.platform;
 
 			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
@@ -39,7 +39,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 			let livesyncData: ILiveSyncData = {
 				platform: platform,
-				appIdentifier: this.$project.getAppIdentifierForPlatform(platform).wait(),
+				await appIdentifier: this.$project.getAppIdentifierForPlatform(platform),
 				projectFilesPath: projectDir,
 				syncWorkingDirectory: projectDir,
 				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
@@ -52,7 +52,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 			let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
 			if (!configurations.length) {
-				this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
+				await this.fillDeviceConfigurationInfos(livesyncData.appIdentifier);
 				let deviceConfigurations = _.reduce(this.deviceConfigurationInfos, (result, dci) => result + `${EOL}device: ${dci.applicationIdentifier} has "${dci.configuration}" configuration`, "");
 				if (deviceConfigurations && _.uniqBy(this.deviceConfigurationInfos, dci => dci.configuration).length !== 1) {
 					this.$errors.failWithoutHelp("Cannot LiveSync because application is deployed with different configurations across the devices.", deviceConfigurations);
@@ -63,12 +63,12 @@ export class LiveSyncService implements ILiveSyncService {
 					this.$options.config = [livesyncData.configuration];
 				}
 
-				$liveSyncServiceBase.sync([livesyncData]).wait();
+				await $liveSyncServiceBase.sync([livesyncData]);
 			} else {
 				configurations.forEach(configuration => {
 					livesyncData.configuration = configuration;
 					livesyncData.appIdentifier = this.$project.projectInformation.configurationSpecificData[configuration.toLowerCase()].AppIdentifier;
-					this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
+					await this.fillDeviceConfigurationInfos(livesyncData.appIdentifier);
 
 					livesyncData.canExecute = (device: Mobile.IDevice): boolean => {
 						let deviceConfigurationInfo = _.find(this.deviceConfigurationInfos, dci => dci.deviceIdentifier === device.deviceInfo.identifier);
@@ -80,7 +80,7 @@ export class LiveSyncService implements ILiveSyncService {
 						return true;
 					};
 
-					$liveSyncServiceBase.sync([livesyncData]).wait();
+					await $liveSyncServiceBase.sync([livesyncData]);
 				});
 			}
 	}

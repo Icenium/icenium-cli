@@ -141,7 +141,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
 			this.$fs.writeJson(this.cordovaMigrationFile, this._migrationData);
 
-			this.downloadMigrationConfigFile().wait();
+			await this.downloadMigrationConfigFile();
 	}
 
 	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
@@ -175,7 +175,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					let promptStr = `You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`;
 					let shouldUpdateFramework = await  this.$prompter.confirm(promptStr);
 					if (shouldUpdateFramework) {
-						this.onFrameworkVersionChanging(selectedFramework.version).wait();
+						await this.onFrameworkVersionChanging(selectedFramework.version);
 						this.$project.projectData.FrameworkVersion = selectedFramework.version;
 					} else {
 						this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
@@ -195,7 +195,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			if (this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
 				let shouldUpdateWPSdk = await  this.$prompter.confirm(`You cannot build with the Windows Phone ${this.$project.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`);
 				if (shouldUpdateWPSdk) {
-					this.onWPSdkVersionChanging("8.0").wait();
+					await this.onWPSdkVersionChanging("8.0");
 					this.$project.projectData.WPSdk = "8.0";
 				} else {
 					this.$errors.failWithoutHelp("Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.", newVersion);
@@ -206,7 +206,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			let oldVersion = this.$project.projectData.FrameworkVersion;
 			let availablePlugins = this.$pluginsService.getAvailablePlugins();
 
-			this.migrateWebView(oldVersion, newVersion).wait();
+			await this.migrateWebView(oldVersion, newVersion);
 
 			this.invalidMarketplacePlugins = _(this.$project.configurations)
 				.map(configuration => <string[]>this.$project.getProperty("CorePlugins", configuration))
@@ -220,7 +220,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.value();
 
 			if (this.invalidMarketplacePlugins.length > 0) {
-				this.promptUserForInvalidPluginsAction(this.invalidMarketplacePlugins, newVersion).wait();
+				await this.promptUserForInvalidPluginsAction(this.invalidMarketplacePlugins, newVersion);
 			}
 
 			let cordovaJsonData = this.getCordovaJsonData();
@@ -232,7 +232,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			_.each(this.invalidMarketplacePlugins, plugin => {
 				let name = (await  this.$pluginsService.getPluginBasicInformation(plugin)).name;
-				this.$pluginsService.removePlugin(name).wait();
+				await this.$pluginsService.removePlugin(name);
 			});
 
 			_.each(this.$project.configurations, (configuration: string) => {
@@ -335,10 +335,10 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 			if (newWebView.pluginIdentifier !== currentWebView.pluginIdentifier) {
 				if (currentWebView.pluginIdentifier) {
-					this.$pluginsService.removePlugin(currentWebView.pluginIdentifier).wait();
+					await this.$pluginsService.removePlugin(currentWebView.pluginIdentifier);
 				}
 
-				this.$webViewService.enableWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, newFrameworkVersion).wait();
+				await this.$webViewService.enableWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, newFrameworkVersion);
 			}
 	}
 }

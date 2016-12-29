@@ -43,7 +43,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					options.useOriginalPluginDirectory = false;
 				}
 
-				return this.fetchPluginCore(pluginIdentifier, null, options).wait();
+				await return this.fetchPluginCore(pluginIdentifier, null, options);
 			}
 
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
@@ -58,13 +58,13 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				if (pluginUrl) {
 					try {
 						// The plugin is not in npm but it is in our marketplace.
-						return this.fetchPluginCore(pluginUrl).wait();
+						await return this.fetchPluginCore(pluginUrl);
 					} catch (error) {
 						this.$errors.failWithoutHelp(`The plugin cannot be downloaded using npm, because it has no package.json in it. You can still download it from this link: ${plugin.data.Url.grey}`);
 					}
 				} else {
 					if (this.$fs.exists(path.resolve(pluginIdentifier))) {
-						return this.fetchPluginCore(pluginIdentifier).wait();
+						await return this.fetchPluginCore(pluginIdentifier);
 					} else {
 						this.$errors.failWithoutHelp(`The plugin ${pluginIdentifier} was not found in npm and it is not path to existing local plugin.`);
 					}
@@ -75,18 +75,18 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			if (pluginsCount > 1 && npmPluginResult.name !== pluginIdentifier) {
 				if (commonHelpers.isInteractive()) {
 					let selectedPlugin = await  this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys);
-					return this.fetchPluginCore(selectedPlugin).wait();
+					await return this.fetchPluginCore(selectedPlugin);
 				} else {
 					this.$errors.failWithoutHelp("There are more then 1 matching plugins: " + pluginKeys.join(", ") + ".");
 				}
 			}
 
 			try {
-				return this.fetchPluginCore(npmPluginResult.name, npmPluginResult.version).wait();
+				await return this.fetchPluginCore(npmPluginResult.name, npmPluginResult.version);
 			} catch (err) {
 				if (pluginUrl) {
 					this.$logger.trace("Error while trying to fetch plugin with id " + pluginIdentifier + " via npm. Error is: " + err.message + ".");
-					return this.fetchPluginCore(pluginUrl).wait();
+					await return this.fetchPluginCore(pluginUrl);
 				} else {
 					this.$errors.failWithoutHelp(err.message);
 				}
@@ -157,7 +157,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			};
 
 			if (pathToInstalledPlugin) {
-				return this.fetchPluginBasicInformationCore(pathToInstalledPlugin, version, installLocalPluginOptions, options).wait();
+				await return this.fetchPluginBasicInformationCore(pathToInstalledPlugin, version, installLocalPluginOptions, options);
 			} else {
 				let errorMessage = ("Unable to " + failMessageMethodName + " plugin " + pluginIdentifier + ".") +
 					" Make sure this is a valid plugin name, path to existing directory or git URL.";
@@ -251,7 +251,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				pathToPlugin = pathToInstall;
 			}
 
-			return this.installLocalPluginCore(pathToPlugin, pluginData).wait();
+			await return this.installLocalPluginCore(pathToPlugin, pluginData);
 	}
 
 	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {

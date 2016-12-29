@@ -10,7 +10,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	private _isMigrationEnabledForUser: boolean = null;
 	private get isMigrationEnabledForUser(): boolean {
 		if(this._isMigrationEnabledForUser === null) {
-			let features = await  this.$server.tap.getFeatures(this.getUserTenantId().wait(), "tap");
+			await let features = await  this.$server.tap.getFeatures(this.getUserTenantId(), "tap");
 			this._isMigrationEnabledForUser = features && features.length && _.includes(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
 		}
 		return this._isMigrationEnabledForUser;
@@ -67,7 +67,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let app = await  this.getApp(remoteSolutionName);
 			let slnName = app.isApp ? app.id : app.name;
 			let projectDir = await  this.getExportDir(app.name,  (unzipStream: any) => this.$server.appsProjects.exportProject(slnName, remoteProjectName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp});
-			this.createProjectFile(projectDir, slnName, remoteProjectName).wait();
+			await this.createProjectFile(projectDir, slnName, remoteProjectName);
 
 			this.$logger.info("%s has been successfully exported to %s", remoteProjectName, projectDir);
 	}
@@ -85,7 +85,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public async getSolutionData(solutionIdentifier: string): Promise<Server.SolutionData> {
 			let app = await  this.getApp(solutionIdentifier);
-			return this.getSolutionDataCore(app).wait();
+			await return this.getSolutionDataCore(app);
 	}
 
 	private getSolutionDataCore(app: ITapAppData): IFuture<Server.SolutionData> {
@@ -94,7 +94,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getProjectData(solutionName: string, projectName: string): Promise<Server.IWorkspaceItemData> {
-			return _.find(this.getProjectsForSolution(solutionName).wait(), pr => pr.Name === projectName);
+			await return _.find(this.getProjectsForSolution(solutionName), pr => pr.Name === projectName);
 	}
 
 	private async getExportDir(dirName: string, tapServiceCall: (_unzipStream: any) => IFuture<any>, solutionSpaceHeaderOptions: {discardSolutionSpaceHeader: boolean}): Promise<string> {
@@ -108,7 +108,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
 
 			this.$serviceProxy.makeTapServiceCall(() => await  tapServiceCall.apply(null, [unzipStream]), solutionSpaceHeaderOptions);
-			this.$fs.unzip(solutionZipFilePath, exportDir).wait();
+			await this.$fs.unzip(solutionZipFilePath, exportDir);
 
 			return exportDir;
 	}
@@ -119,7 +119,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 				let projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile)) {
 					let properties = await  this.getProjectProperties(remoteSolutionName, remoteProjectName);
-					this.$project.createProjectFile(projectDir, properties).wait();
+					await this.$project.createProjectFile(projectDir, properties);
 				}
 			} catch(e) {
 				this.$logger.warn(`Couldn't create project file: ${e.message}`);

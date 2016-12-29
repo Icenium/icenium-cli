@@ -9,7 +9,7 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return (() => {
-			if(this.$project.validateProjectProperty(args[0], _.tail(args), "add").wait()) {
+			await if(this.$project.validateProjectProperty(args[0], _.tail(args), "add")) {
 				// there's at least one value passed to validateProjectProperty
 				if(args[1]) {
 					return true;
@@ -22,7 +22,7 @@ export class AddProjectPropertyCommand extends ProjectPropertyCommandBaseLib.Pro
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			this.$project.updateProjectPropertyAndSave("add", args[0], _.tail(args)).wait();
+			await this.$project.updateProjectPropertyAndSave("add", args[0], _.tail(args));
 		}).future<void>()();
 	}
 

@@ -36,7 +36,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 				return;
 			}
 
-			this.updateKendoFiles(selectedPackage.DownloadUrl, selectedPackage.Version).wait();
+			await this.updateKendoFiles(selectedPackage.DownloadUrl, selectedPackage.Version);
 
 		}).future<void>()();
 	}
@@ -83,8 +83,8 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			let filepath = temp.path({suffix: ".zip", prefix: "abkendoupdate-"});
 			let file = this.$fs.createWriteStream(filepath);
 			let fileEnd = this.$fs.futureFromEvent(file, "finish");
-			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
-			fileEnd.wait();
+			await this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file });
+			await fileEnd;
 
 			let outDir = path.join(this.$project.getProjectDir(), "kendo"),
 				backupFolder = `${outDir}.ab-backup`;
@@ -94,7 +94,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 					this.$fs.rename(outDir, backupFolder);
 				}
 
-				this.$fs.unzip(filepath, outDir).wait();
+				await this.$fs.unzip(filepath, outDir);
 			} catch (error) {
 				if (error.code === "EPERM") {
 					this.$errors.failWithoutHelp(`Permission denied, make sure ${outDir} is not locked.`);

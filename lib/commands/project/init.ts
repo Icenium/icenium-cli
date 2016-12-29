@@ -30,12 +30,12 @@ export class InitProjectCommand implements ICommand {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait()) {
+			await if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova)) {
 				this.$logger.info("Attempting to initialize Cordova project.");
-				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-			} else if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait()) {
+				await this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
+			await } else if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript)) {
 				this.$logger.info("Attempting to initialize NativeScript project.");
-				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 			} else {
 				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
 			}

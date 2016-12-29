@@ -55,14 +55,14 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 
 					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
 					zipFile = this.$fs.createWriteStream(zipPath);
-					this.$server.cordova.getPluginsPackage(zipFile).wait();
+					await this.$server.cordova.getPluginsPackage(zipFile);
 
 					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
-					this.$fs.unzip(zipPath, pluginsPath).wait();
+					await this.$fs.unzip(zipPath, pluginsPath);
 
 					this.$logger.info("Finished downloading plugins.");
 				} catch(err) {
-					this.closeStream(zipFile).wait();
+					await this.closeStream(zipFile);
 					this.$fs.deleteDirectory(pluginsPath);
 					throw err;
 				}

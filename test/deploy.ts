@@ -250,7 +250,7 @@ describe("Deploy ios unit tests on windows", () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -270,7 +270,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);
 		setEmulatorOption(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -291,7 +291,7 @@ describe("Deploy ios unit tests on OSX", () => {
 	it("starts the iOS simulator whene there is no running simulator and no connected iOS device", () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -310,7 +310,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		emitRunningiOSSimulator(testInjector);
 		emitConnectediOSDevice(testInjector);
 		setEmulatorOption(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -331,7 +331,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
 		setEmulatorOption(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -348,7 +348,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -365,7 +365,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
 		emitConnectediOSDevice(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
@@ -384,7 +384,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);
-		deployHelper.deploy("ios").wait();
+		await deployHelper.deploy("ios");
 
 		let devicesService: Mobile.IDevicesService = testInjector.resolve("devicesService");
 		let devices = devicesService.getDeviceInstances();
