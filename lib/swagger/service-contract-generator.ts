@@ -193,8 +193,8 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 
 					serviceImplementation.addBlock(endpoint.endpointImplementation);
 				} else {
-					let implementationOpener = `public ${endpoint.operationContractName + index}(${endpoint.parameters.join(", ")}): IFuture<${endpoint.callResultType}>`;
-					let interfaceOpener = `${endpoint.operationContractName + index}(${endpoint.parameters.join(", ")}): IFuture<${endpoint.callResultType}>;`;
+					let implementationOpener = `public ${endpoint.operationContractName + index}(${endpoint.parameters.async join(", ")}): Promise<${endpoint.callResultType}>`;
+					let interfaceOpener = `${endpoint.operationContractName + index}(${endpoint.parameters.async join(", ")}): Promise<${endpoint.callResultType}>;`;
 
 					let implementationBlock = new Block(implementationOpener);
 					implementationBlock.writeLine("\t" + _.map(endpoint.endpointImplementation.codeEntities, (codeEntity: CodeGeneration.ILine) => codeEntity.content).join("\n"));
@@ -333,8 +333,8 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 		}
 
 		let callResultType = this.tsTypeSystemHelpers.isStream(responseType) ? "void" : responseType;
-		let generatedContract = Line.create(`${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>;`);
-		let generatedOperation = new Block(`public ${operationContractName}(${parameters.join(", ")}): IFuture<${callResultType}>`);
+		let generatedContract = Line.async create(`${operationContractName}(${parameters.join(", ")}): Promise<${callResultType}>;`);
+		let generatedOperation = new async Block(`public ${operationContractName}(${parameters.join(", ")}): Promise<${callResultType}>`);
 		generatedOperation.writeLine(`return this.$serviceProxy.call<${callResultType}>(${httpCallParameters.join(", ")});`);
 
 		return {

@@ -30,7 +30,7 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-function createTempFile(data: string): IFuture<string> {
+async function  createTempFile(data: string): Promise<string> {
 	let future = new Future<string>();
 	let myData = new Buffer(data); // "Some data that has to be uploaded.";
 	let pathToTempFile: string;

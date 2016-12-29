@@ -14,7 +14,7 @@ testInjector.register("npmService", {
 });
 
 class MockUserDataStore implements IUserDataStore {
-	hasCookie(): IFuture<boolean> {
+	async hasCookie(): Promise<boolean> {
 		return Promise.resolve(false);
 	}
 
@@ -22,7 +22,7 @@ class MockUserDataStore implements IUserDataStore {
 			return {"tlrkappshell": "dummy"};
 	}
 
-	getUser():IFuture<any> {
+	async getUser():Promise<any> {
 		return undefined;
 	}
 
@@ -34,11 +34,11 @@ class MockUserDataStore implements IUserDataStore {
 		return undefined;
 	}
 
-	setUser(user?: any): IFuture<void> {
+	async setUser(user?: any): Promise<void> {
 		return undefined;
 	}
 
-	clearLoginData(): IFuture<void> {
+	async clearLoginData(): Promise<void> {
 		return undefined;
 	}
 }
@@ -49,7 +49,7 @@ class MockHttpClient implements Server.IHttpClient {
 	public mockResponse: Server.IResponse;
 	public mockError: any;
 
-	httpRequest(options: any): IFuture<Server.IResponse> {
+	async httpRequest(options: any): Promise<Server.IResponse> {
 		this.options = options;
 		let future = new Future<Server.IResponse>();
 		if (this.mockError) {

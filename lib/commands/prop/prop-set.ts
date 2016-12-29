@@ -7,13 +7,13 @@ export class SetProjectPropertyCommand extends projectPropertyCommandBaseLib.Pro
 		this.$project.ensureProject();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
+	async canExecute(args: string[]): Promise<boolean> {
 			let property = args[0];
 			let propertyValues = _.tail(args);
 			return this.$project.validateProjectProperty(property, propertyValues, "set");
 	}
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return	this.$project.updateProjectPropertyAndSave("set", args[0], _.tail(args));
 	}
 

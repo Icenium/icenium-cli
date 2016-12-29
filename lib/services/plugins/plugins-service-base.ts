@@ -99,17 +99,17 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	public abstract printPlugins(plugins: IPlugin[]): void;
 
-	public abstract addPlugin(pluginIdentifier: string): IFuture<void>;
+	public abstract async addPlugin(pluginIdentifier: string): Promise<void>;
 
-	public abstract removePlugin(pluginName: string): IFuture<void>;
+	public abstract async removePlugin(pluginName: string): Promise<void>;
 
-	public abstract configurePlugin(pluginName: string, version?: string, configurations?: string[]): IFuture<void>;
+	public abstract async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void>;
 
 	public abstract isPluginInstalled(pluginName: string): boolean;
 
-	public abstract getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation>;
+	public abstract async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation>;
 
-	public abstract filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]>;
+	public abstract async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]>;
 
 	protected async isPluginFetched(pluginName: string): Promise<boolean> {
 			// Fetched plugins are in the "plugins" directory both for Cordova and NativeScript projects.
@@ -276,9 +276,9 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		return (<IMarketplacePlugin>plugin).pluginVersionsData.DefaultVersion;
 	}
 
-	protected abstract fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation>;
+	protected abstract async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation>;
 
-	protected abstract installLocalPluginCore(pluginPath: string, pluginOpts?: ILocalPluginData): IFuture<IBasicPluginInformation>;
+	protected abstract async installLocalPluginCore(pluginPath: string, pluginOpts?: ILocalPluginData): Promise<IBasicPluginInformation>;
 
 	protected abstract getPluginsDirName(): string;
 

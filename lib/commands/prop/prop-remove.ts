@@ -17,7 +17,7 @@ export class RemoveProjectPropertyCommand extends projectPropertyCommandBaseLib.
 			return false;
 	}
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$project.updateProjectPropertyAndSave("del", args[0], _.tail(args));
 	}
 

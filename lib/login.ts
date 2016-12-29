@@ -267,7 +267,7 @@ $injector.register("loginManager", LoginManager);
 export class TelerikLoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager,
 		private $stringParameterBuilder: IStringParameterBuilder) { }
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => {
 			await this.$loginManager.telerikLogin(args[0], args[1]);
 	}

@@ -2,7 +2,7 @@ class AppManagerUploadAndroidCommand implements ICommand {
 	constructor(private $appManagerService: IAppManagerService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$appManagerService.upload(this.$devicePlatformsConstants.Android.toLowerCase());
 	}
 
@@ -14,7 +14,7 @@ class AppManagerUploadIosCommand implements ICommand {
 	constructor(private $appManagerService: IAppManagerService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$appManagerService.upload(this.$devicePlatformsConstants.iOS.toLowerCase());
 	}
 
@@ -27,7 +27,7 @@ class AppManagerUploadWP8Command implements ICommand {
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $config: Config.IConfig) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$appManagerService.upload(this.$devicePlatformsConstants.WP8.toLowerCase());
 	}
 
@@ -39,7 +39,7 @@ $injector.registerCommand("appmanager|upload|wp8", AppManagerUploadWP8Command);
 class AppManagerGetGroupsCommand implements ICommand {
 	constructor(private $appManagerService: IAppManagerService) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$appManagerService.getGroups();
 	}
 

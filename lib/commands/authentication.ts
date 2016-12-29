@@ -1,7 +1,7 @@
 export class LoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$loginManager.login();
 	}
 
@@ -12,7 +12,7 @@ $injector.registerCommand("login", LoginCommand);
 
 export class LogoutCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$loginManager.logout();
 	}
 

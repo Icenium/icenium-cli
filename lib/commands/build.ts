@@ -9,7 +9,7 @@ export class BuildAndroidCommand extends EnsureProjectCommand {
 			super($project, $errors);
 		}
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.Android);
 	}
 }
@@ -24,7 +24,7 @@ export class BuildIosCommand extends EnsureProjectCommand {
 			super($project, $errors);
 		}
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.iOS, { buildForiOSSimulator: this.$options.emulator });
 	}
 }
@@ -40,7 +40,7 @@ export class BuildWP8Command extends EnsureProjectCommand {
 			super($project, $errors);
 		}
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$buildService.executeBuild(this.$devicePlatformsConstants.WP8);
 	}
 

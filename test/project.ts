@@ -42,11 +42,11 @@ class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
 	public confirmCalled: boolean = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
-	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Promise.resolve(""); }
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
+	async get(schema: IPromptSchema[]): Promise<any> { return Promise.resolve(""); }
+	async getPassword(prompt: string, options?: { allowEmpty?: boolean }): Promise<string> { return Promise.resolve(""); }
+	async getString(prompt: string): Promise<string> { return Promise.resolve(""); }
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<string> { return Promise.resolve(""); }
+	async confirm(prompt: string, defaultAction?: () => boolean): Promise<boolean> {
 		this.confirmCalled = true;
 		return Promise.resolve(this.confirmResult);
 	}
@@ -116,7 +116,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
-	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Promise.resolve(); } });
+	testInjector.async register("loginManager", { ensureLoggedIn: (): Promise<void> => { return Promise.resolve(); } });
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("httpClient", { /*intentionally empty body */ });
 	testInjector.register("multipartUploadService", {});

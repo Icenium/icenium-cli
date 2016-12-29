@@ -5,7 +5,7 @@ export class PrintSamplesCommand implements ICommand {
 		private frameworkIdentifier: string,
 		private $config: IConfiguration) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$samplesService.printSamplesInformation(this.frameworkIdentifier);
 	}
 
@@ -24,7 +24,7 @@ export class CloneSampleCommand implements ICommand {
 		private $config: IConfiguration,
 		private $options: IOptions) { }
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$samplesService.cloneSample(args[0]);
 	}
 

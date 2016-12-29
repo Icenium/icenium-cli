@@ -39,17 +39,17 @@ export class LoggerStub implements ILogger {
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }
-	printMsgWithTimeout(message: string, timeout: number): IFuture<void> {
+	async printMsgWithTimeout(message: string, timeout: number): Promise<void> {
 		return null;
 	}
 }
 
 export class FileSystemStub implements IFileSystem {
-	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
+	async zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): Promise<void> {
 		return undefined;
 	}
 
-	unzip(zipFile: string, destination: string): IFuture<void> {
+	async unzip(zipFile: string, destination: string): Promise<void> {
 		return undefined;
 	}
 	exists(path: string): boolean {
@@ -68,7 +68,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	futureFromEvent(eventEmitter: NodeJS.EventEmitter, event: string): IFuture<any> {
+	async futureFromEvent(eventEmitter: NodeJS.EventEmitter, event: string): Promise<any> {
 		return undefined;
 	}
 
@@ -152,7 +152,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	setCurrentUserAsOwner(path: string, owner: string): IFuture<void> {
+	async setCurrentUserAsOwner(path: string, owner: string): Promise<void> {
 		return undefined;
 	}
 
@@ -160,11 +160,11 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	getFileShasum(fileName: string): IFuture<string> {
+	async getFileShasum(fileName: string): Promise<string> {
 		return undefined;
 	}
 
-	readStdin(): IFuture<string> {
+	async readStdin(): Promise<string> {
 		return undefined;
 	}
 
@@ -193,7 +193,7 @@ export class ErrorsStub implements IErrors {
 		throw new Error(message);
 	}
 
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
+	async beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): Promise<boolean> {
 		return action();
 	}
 
@@ -240,27 +240,27 @@ export class OpenerStub implements IOpener {
 }
 
 export class LoginManager implements ILoginManager {
-	basicLogin(userName: string, password: string): IFuture<void> {
+	async basicLogin(userName: string, password: string): Promise<void> {
 		return undefined;
 	}
 
-	login(): IFuture<void> {
+	async login(): Promise<void> {
 		return undefined;
 	}
 
-	logout(): IFuture<void> {
+	async logout(): Promise<void> {
 		return undefined;
 	}
 
-	isLoggedIn(): IFuture<boolean> {
+	async isLoggedIn(): Promise<boolean> {
 		return Promise.resolve(false);
 	}
 
-	ensureLoggedIn(): IFuture<void> {
+	async ensureLoggedIn(): Promise<void> {
 		return undefined;
 	}
 
-	telerikLogin(user: string, password: string): IFuture<void> {
+	async telerikLogin(user: string, password: string): Promise<void> {
 		return undefined;
 	}
 }
@@ -272,11 +272,11 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 
-	unpackAppResources(): IFuture<void> {
+	async unpackAppResources(): Promise<void> {
 		return undefined;
 	}
 
-	downloadCordovaJsFiles(): IFuture<void> {
+	async downloadCordovaJsFiles(): Promise<void> {
 		return undefined;
 	}
 
@@ -292,11 +292,11 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 
-	downloadProjectTemplates(): IFuture<void> {
+	async downloadProjectTemplates(): Promise<void> {
 		return undefined;
 	}
 
-	downloadItemTemplates(): IFuture<void> {
+	async downloadItemTemplates(): Promise<void> {
 		return undefined;
 	}
 }
@@ -479,7 +479,7 @@ export class HooksService implements IHooksService {
 	}
 	async executeBeforeHooks(): Promise<void> { }).future<void>()();
 	}
-	executeAfterHooks(): IFuture<void> {
+	async executeAfterHooks(): Promise<void> {
 		return (() => {
 	}
 }
@@ -511,11 +511,11 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 export class PrompterStub implements IPrompter {
 	public confirmResult = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
-	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Promise.resolve(""); }
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
+	async get(schema: IPromptSchema[]): Promise<any> { return Promise.resolve(""); }
+	async getPassword(prompt: string, options?: { allowEmpty?: boolean }): Promise<string> { return Promise.resolve(""); }
+	async getString(prompt: string): Promise<string> { return Promise.resolve(""); }
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<string> { return Promise.resolve(""); }
+	async confirm(prompt: string, defaultAction?: () => boolean): Promise<boolean> {
 		return Promise.resolve(this.confirmResult);
 	}
 	dispose(): void { }

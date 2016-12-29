@@ -8,7 +8,7 @@ export class ImportProjectCommand extends EnsureProjectCommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return	this.$project.importProject();
 	}
 }

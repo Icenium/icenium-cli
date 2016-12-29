@@ -128,10 +128,10 @@ async function unzipPluginsFolder(fs: IFileSystem): Promise<string> {
 
 class PrompterStub implements IPrompter {
 	constructor(public choiceIndex: number, public versionIndex?: number, public pluginVariableResult?: any) { }
-	get(schema: IPromptSchema[]): IFuture<any> { return Promise.resolve(this.pluginVariableResult); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Promise.resolve(""); }
-	getString(prompt: string): IFuture<string> { return Promise.resolve(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> {
+	async get(schema: IPromptSchema[]): Promise<any> { return Promise.resolve(this.pluginVariableResult); }
+	async getPassword(prompt: string, options?: { allowEmpty?: boolean }): Promise<string> { return Promise.resolve(""); }
+	async getString(prompt: string): Promise<string> { return Promise.resolve(""); }
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<string> {
 		let selectedChoice = choices[this.choiceIndex];
 
 		if (promptMessage.toLowerCase().indexOf("plugin version do you want to use") !== -1) {
@@ -144,7 +144,7 @@ class PrompterStub implements IPrompter {
 
 		return Promise.resolve(selectedChoice);
 	}
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> { return Promise.resolve(true); }
+	async confirm(prompt: string, defaultAction?: () => boolean): Promise<boolean> { return Promise.resolve(true); }
 	dispose(): void {/*mock*/ }
 }
 

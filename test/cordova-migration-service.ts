@@ -27,7 +27,7 @@ testInjector.register("prompter", {
 	promptForChoice: (promptMessage: string, choices: any[]) => { return Promise.resolve<string>(choices[0]); }
 });
 testInjector.register("resources", {resolvePath: (x: string) => ""});
-testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Promise.resolve(); }});
+testInjector.async register("loginManager", { ensureLoggedIn: (): Promise<void> => { return Promise.resolve(); }});
 testInjector.register("webViewService", {});
 testInjector.register("serverConfiguration", {});
 testInjector.register("httpClient", {});

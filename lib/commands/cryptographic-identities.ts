@@ -243,7 +243,7 @@ export interface IIdentityInformation {
 }
 
 export interface IIdentityInformationGatherer {
-	gatherIdentityInformation(defaults: IIdentityInformation): IFuture<IIdentityInformation>;
+	async gatherIdentityInformation(defaults: IIdentityInformation): Promise<IIdentityInformation>;
 }
 
 class IdentityInformationGatherer implements IIdentityInformationGatherer {
@@ -430,7 +430,7 @@ $injector.registerCommand("certificate|create-self-signed", CreateSelfSignedIden
 
 export class ListCertificatesCommand implements ICommand {
 	constructor(private $identityManager: Server.IIdentityManager) { }
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return this.$identityManager.listCertificates();
 	}
 
@@ -689,7 +689,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 $injector.registerCommand("certificate-request|remove", RemoveCertificateSigningRequestCommand);
 
 interface ICertificateDownloader {
-	downloadCertificate(uniqueName: string): IFuture<void>;
+	async downloadCertificate(uniqueName: string): Promise<void>;
 }
 
 class DownloadCertificateSigningRequestCommand implements ICommand, ICertificateDownloader {

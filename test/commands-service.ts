@@ -62,7 +62,7 @@ class MockInvalidCommandParameter implements ICommandParameter {
 }
 
 class MockCommandWithOneMandatoryParameter implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -71,7 +71,7 @@ class MockCommandWithOneMandatoryParameter implements ICommand {
 }
 
 class MockCommandWithOneNonMandatoryParameter implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -80,7 +80,7 @@ class MockCommandWithOneNonMandatoryParameter implements ICommand {
 }
 
 class MockCommandWithSomeMandatoryParameteres implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -89,7 +89,7 @@ class MockCommandWithSomeMandatoryParameteres implements ICommand {
 }
 
 class MockCommandWithoutParameters implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -98,7 +98,7 @@ class MockCommandWithoutParameters implements ICommand {
 }
 
 class MockCommandWithInvalidParameters implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -107,11 +107,11 @@ class MockCommandWithInvalidParameters implements ICommand {
 }
 
 class MockCommandWithCanExecuteImplemented implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
+	async canExecute(args: string[]): Promise<boolean> {
 		return Promise.resolve(args[0] === "true");
 	}
 
@@ -122,7 +122,7 @@ class MockCommandWithCanExecuteImplemented implements ICommand {
 class MockCommandWithStringCommandParameter implements ICommand {
 	// Make sure stringParameter can be resolved
 	constructor(private $stringParameter: ICommandParameter) { }
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -134,7 +134,7 @@ class MockCommandWithStringParamBuilder implements ICommand {
 	// Make sure stringParameter can be resolved
 	constructor(private $stringParameter: ICommandParameter,
 		private $stringParameterBuilder: IStringParameterBuilder) { }
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -143,7 +143,7 @@ class MockCommandWithStringParamBuilder implements ICommand {
 }
 
 class MockCommandWithIsDisabledToTrue implements ICommand {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 
@@ -153,7 +153,7 @@ class MockCommandWithIsDisabledToTrue implements ICommand {
 }
 
 class MockCommandWithSpecificDashedOptions {
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		return (() => isCommandExecuted = true).future<void>()();
 	}
 

@@ -33,7 +33,7 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-function createTempFile(data: string): IFuture<string> {
+async function  createTempFile(data: string): Promise<string> {
 	let future = new Future<string>();
 	let myData = new Buffer(data); // "Some data that has to be uploaded.";
 	let pathToTempFile: string;
@@ -57,13 +57,13 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 
 		testInjector.register("server", {
 			upload: {
-				completeUpload(path: string, originalFileHash: string): IFuture<void>{
+				async completeUpload(path: string, originalFileHash: string): Promise<void>{
 					return Promise.resolve();
 				},
-				initUpload(path: string): IFuture<void>{
+				async initUpload(path: string): Promise<void>{
 					return Promise.resolve();
 				},
-				uploadChunk(path: string, hash: string, content: any): IFuture<void>{
+				async uploadChunk(path: string, hash: string, content: any): Promise<void>{
 					return Promise.resolve();
 				}
 			}
@@ -108,13 +108,13 @@ describe("multipart upload service", () => {
 				uploadChunkCalled = false;
 			testInjector.register("server", {
 				upload: {
-					completeUpload(path: string, originalFileHash: string): IFuture<void>{
+					async completeUpload(path: string, originalFileHash: string): Promise<void>{
 						return (() => completeUploadCalled = true).future<void>()();
 					},
-					initUpload(path: string): IFuture<void>{
+					async initUpload(path: string): Promise<void>{
 						return (() => initUploadCalled = true).future<void>()();
 					},
-					uploadChunk(path: string, hash: string, content: any): IFuture<void>{
+					async uploadChunk(path: string, hash: string, content: any): Promise<void>{
 						return (() => uploadChunkCalled = true).future<void>()();
 					}
 				}

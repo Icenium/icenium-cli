@@ -55,7 +55,7 @@ export class LoggerStub implements ILogger {
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void {/* mock */}
-	printMsgWithTimeout(message: string, timeout: number): IFuture<void> {
+	async printMsgWithTimeout(message: string, timeout: number): Promise<void> {
 		return null;
 	}
 }
@@ -63,7 +63,7 @@ export class LoggerStub implements ILogger {
 export class PrompterStub {
 	constructor(public promptSlnName: string, public promptPrjName: string) {}
 	public isPrompterCalled = false;
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<any> {
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<any> {
 		this.isPrompterCalled = true;
 		if(promptMessage.indexOf("solution") === -1) {
 			assert.isTrue(_.includes(choices, this.promptPrjName));

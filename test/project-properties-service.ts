@@ -71,10 +71,10 @@ class SampleProject implements Project.IFrameworkProject {
 	getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
 		return null;
 	}
-	updateMigrationConfigFile(): IFuture<void> {
+	async updateMigrationConfigFile(): Promise<void> {
 		return Promise.resolve(null);
 	}
-	ensureProject(projectDir: string): IFuture<void> {
+	async ensureProject(projectDir: string): Promise<void> {
 		return Promise.resolve(null);
 	}
 	alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }

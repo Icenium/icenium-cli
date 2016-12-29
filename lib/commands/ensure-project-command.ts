@@ -7,7 +7,7 @@ export class EnsureProjectCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
+	async execute(args: string[]): Promise<void> {
 		assert.fail("","", "You should never get here. Please contact Telerik support and send the output of your command, executed with `--log trace`.");
 		return Promise.resolve();
 	}

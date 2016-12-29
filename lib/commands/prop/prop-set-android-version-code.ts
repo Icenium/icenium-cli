@@ -8,7 +8,7 @@ export class SetAndroidVersionCodeCommand extends SetProjectPropertyCommand impl
 		super($staticConfig, $injector);
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
+	async canExecute(args: string[]): Promise<boolean> {
 		return this.$project.validateProjectProperty("AndroidVersionCode", args, "set");
 	}
 
