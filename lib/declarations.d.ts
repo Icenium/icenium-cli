@@ -12,7 +12,7 @@ declare module Server {
 	}
 
 	interface IAppBuilderServiceProxy extends IServiceProxy {
-		makeTapServiceCall<T>(call: () => Promise<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): IFuture<T>
+		makeTapServiceCall<T>(call: () => Promise<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T>
 	}
 
 	interface IServiceContractProvider {
