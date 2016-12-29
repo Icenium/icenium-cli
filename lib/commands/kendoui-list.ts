@@ -16,7 +16,7 @@ class KendoUIListCommand extends KendoUIBaseCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let packages = this.getKendoPackages().wait();
+			let packages = await  this.getKendoPackages();
 			this.$logger.out("You can download and install the following Kendo UI packages.");
 			this.$logger.out(this.getKendoPackagesAsTable(packages));
 		}).future<void>()();

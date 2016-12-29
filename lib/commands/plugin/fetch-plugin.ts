@@ -6,7 +6,7 @@ export class FetchPluginCommand implements ICommand {
 	public allowedParameters = [this.$stringParameter];
 
 	public async execute(args: string[]): Promise<void> {
-			let pluginName = this.$pluginsService.fetch(args[0]).wait();
+			let pluginName = await  this.$pluginsService.fetch(args[0]);
 
 			this.$logger.printMarkdown(`Successfully fetched plugin \`${pluginName}\``);
 	}

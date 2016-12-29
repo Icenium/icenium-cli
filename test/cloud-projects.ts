@@ -281,24 +281,24 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when more than two arguments are passed", () => {
-					assert.throws(() => exportProjectCommand.canExecute(["1", "2", "3"]).wait());
+					assert.throws(() => await  exportProjectCommand.canExecute(["1", "2", "3"]));
 				});
 
 				it("fails when solution does not have any projects", () => {
-					assert.throws(() => exportProjectCommand.canExecute(["Sln2"]).wait());
+					assert.throws(() => await  exportProjectCommand.canExecute(["Sln2"]));
 				});
 
 				it("fails when there's projectData", () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
-					assert.throws(() => exportProjectCommand.canExecute(["Sln1", "BlankProj"]).wait());
+					assert.throws(() => await  exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 			});
 
 			it("fails when console is not interactive and command arguments are not passed", () => {
 				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-				assert.throws(() => exportProjectCommand.canExecute([]).wait());
+				assert.throws(() => await  exportProjectCommand.canExecute([]));
 			});
 		});
 
@@ -378,7 +378,7 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", () => {
 					fs.exists = (projectDir: string) => true;
-					assert.throws(() => exportProjectCommand.execute(["Sln1", "BlankProj"]).wait());
+					assert.throws(() => await  exportProjectCommand.execute(["Sln1", "BlankProj"]));
 				});
 
 				it("warns when unable to create project file", () => {
@@ -416,11 +416,11 @@ describe("cloud project commands", () => {
 			});
 
 			it("validate method throws error when invalid solution name is passed", () => {
-				assert.throws(() => commandParamter.validate("Invalid name").wait());
+				assert.throws(() => await  commandParamter.validate("Invalid name"));
 			});
 
 			it("validate method throws error when invalid solution id is passed", () => {
-				assert.throws(() => commandParamter.validate("100").wait());
+				assert.throws(() => await  commandParamter.validate("100"));
 			});
 
 			it("validate method returns false when validation value is not passed", () => {

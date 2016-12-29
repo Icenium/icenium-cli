@@ -81,7 +81,7 @@ export class UserDataStore implements IUserDataStore {
 
 	private async readAndCache<T>(sourceFile: string, getter: () => T, setter: (value: string) => void): Promise<T> {
 			if(!getter()) {
-				if(!this.checkCookieExists(sourceFile, getter).wait()) {
+				if(! await this.checkCookieExists(sourceFile, getter)) {
 					throw new Error("Not logged in.");
 				}
 
@@ -159,7 +159,7 @@ export class LoginManager implements ILoginManager {
 	}
 
 	public async ensureLoggedIn(): Promise<void> {
-			if(!this.isLoggedIn().wait()) {
+			if(! await this.isLoggedIn()) {
 				this.doLogin().wait();
 			}
 	}
@@ -229,7 +229,7 @@ export class LoginManager implements ILoginManager {
 				}
 			}
 
-			let cookieData = authComplete.wait();
+			let cookieData = await  authComplete;
 			if(timeoutID !== undefined) {
 				clearTimeout(timeoutID);
 			}
@@ -237,7 +237,7 @@ export class LoginManager implements ILoginManager {
 			let cookies = JSON.parse(cookieData);
 			this.$userDataStore.setCookies(cookies);
 
-			let userData = this.$server.authentication.getLoggedInUser().wait();
+			let userData = await  this.$server.authentication.getLoggedInUser();
 			this.$userDataStore.setUser(<any>userData).wait();
 
 			return userData;
@@ -257,7 +257,7 @@ export class LoginManager implements ILoginManager {
 			if(cookies) {
 				this.$userDataStore.parseAndSetCookies(cookies);
 
-				let userData = this.$server.authentication.getLoggedInUser().wait();
+				let userData = await  this.$server.authentication.getLoggedInUser();
 				this.$userDataStore.setUser(<any>userData).wait();
 			}
 	}

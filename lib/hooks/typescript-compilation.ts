@@ -9,7 +9,7 @@ module.exports = () => {
 
 	let $projectConstants: Project.IConstants = $injector.resolve("projectConstants");
 	let $typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
-	let typeScriptFilesData = $typeScriptService.getTypeScriptFilesData($project.getProjectDir()).wait();
+	let typeScriptFilesData = await  $typeScriptService.getTypeScriptFilesData($project.getProjectDir());
 
 	if ($typeScriptService.isTypeScriptProject($project.projectDir).wait()) {
 		let $fs: IFileSystem = $injector.resolve("fs");

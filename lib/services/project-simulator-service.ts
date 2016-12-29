@@ -27,7 +27,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		private $serverExtensionsService: IServerExtensionsService) { }
 
 	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
-			let pluginsPath = this.prepareCordovaPlugins(simulatorPackageName).wait();
+			let pluginsPath = await  this.prepareCordovaPlugins(simulatorPackageName);
 			let projectData = this.$project.projectData;
 			let corePlugins = this.$project.getProperty("CorePlugins", "debug");
 

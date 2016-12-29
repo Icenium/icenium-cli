@@ -95,7 +95,7 @@ describe("ServiceProxy", () => {
 
 		httpClient.setResponse({});
 
-		let result = proxy.call("test1", "GET", "authenticate", null, null, null).wait();
+		let result = await  proxy.call("test1", "GET", "authenticate", null, null, null);
 
 		assert.equal("GET", httpClient.options.method);
 		assert.equal("/appbuilder/authenticate", httpClient.options.path);
@@ -111,7 +111,7 @@ describe("ServiceProxy", () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, JSON.stringify(expected));
 
-		let result = proxy.call("test2", "POST", "/json", "application/json", null, null).wait();
+		let result = await  proxy.call("test2", "POST", "/json", "application/json", null, null);
 
 		assert.isObject(result);
 		assert.deepEqual(result, expected);

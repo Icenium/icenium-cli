@@ -46,7 +46,7 @@ export class KendoUIBaseCommand implements ICommand {
 				withReleaseNotesOnly: configuration && configuration.withReleaseNotesOnly
 			};
 
-			let packages = this.$kendoUIService.getKendoPackages(kendoFilterOptions).wait();
+			let packages = await  this.$kendoUIService.getKendoPackages(kendoFilterOptions);
 
 			if (packages.length === 0) {
 				let message = "Cannot find Kendo UI packages that match the provided parameters.";

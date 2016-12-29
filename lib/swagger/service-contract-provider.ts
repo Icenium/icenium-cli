@@ -16,7 +16,7 @@ export class ServiceContractProvider implements Server.IServiceContractProvider 
 				request.path += path;
 			}
 
-			let result = this.$httpClient.httpRequest(request).wait();
+			let result = await  this.$httpClient.httpRequest(request);
 			if (result.error) {
 				throw result.error;
 			} else {

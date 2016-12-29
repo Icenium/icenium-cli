@@ -71,7 +71,7 @@ describe("hash service", () => {
 			let expectedErrorMessage = "Specified input file encoding not valid is not valid.";
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
-			let filePath = createTempFile("testFile").wait();
+			let filePath = await  createTempFile("testFile");
 			try {
 				hashService.getFileHash(filePath, "not valid", "sha512", "base64").wait();
 			} catch(e) {
@@ -85,7 +85,7 @@ describe("hash service", () => {
 			let expectedErrorMessage = "Specified hash algorithm not valid is not valid. Valid algorithms are";
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
-			let filePath = createTempFile("testFile").wait();
+			let filePath = await  createTempFile("testFile");
 			try {
 				hashService.getFileHash(filePath, "utf8", "not valid", "base64").wait();
 			} catch(e) {
@@ -99,7 +99,7 @@ describe("hash service", () => {
 			let expectedErrorMessage = "Specified hash encoding not valid is not valid. Valid values are";
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
-			let filePath = createTempFile("testFile").wait();
+			let filePath = await  createTempFile("testFile");
 			try {
 				hashService.getFileHash(filePath, "utf8", "sha512", "not valid").wait();
 			} catch(e) {
@@ -114,9 +114,9 @@ describe("hash service", () => {
 			let testInjector = createTestInjector();
 			let hashService: IHashService = testInjector.resolve("hashService");
 			// NOTE: in case you change testFile string passed to createTempFile, you should create new hash file as well.
-			let filePath = createTempFile("testFile").wait();
+			let filePath = await  createTempFile("testFile");
 			let expectedHash = "kpcHKUXV7JjoyHcXqsVB5EAz+HX1ffWA/X48ozSakHgaNR3OiEctsMKafwewR836Gi4dRyBsjW+GkR+hTQ4Qog==";
-			let hash = hashService.getFileHash(filePath, "utf8", "sha512", "base64").wait();
+			let hash = await  hashService.getFileHash(filePath, "utf8", "sha512", "base64");
 
 			assert.isFalse(failed);
 			assert.equal(expectedHash, hash);

@@ -174,7 +174,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	public async getValidValuesForProperty(propData: any): Promise<string[]> {
-			let range = this.getPropRange(propData).wait();
+			let range = await  this.getPropRange(propData);
 			if (range) {
 				return _.sortBy(_.values<string>(range), (val: string) => {
 					return val.toUpperCase();
@@ -189,7 +189,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		_.each(_.keys(schema), (propertyName: string) => {
 			let value = schema[propertyName];
 			help.push(util.format("  %s - %s", propertyName, value.description));
-			let range = this.getPropRange(value).wait();
+			let range = await  this.getPropRange(value);
 			if (range) {
 				help.push("    Valid values:");
 				_.each(range, (rangeDesc: any, rangeKey: any) => {

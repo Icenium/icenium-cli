@@ -45,7 +45,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 				Future.wait(chunks);
 			}
 
-			let fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
+			let fileHash = await  this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING);
 
 			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
 	}

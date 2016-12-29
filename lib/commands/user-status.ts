@@ -9,7 +9,7 @@ export class UserStatusCommand implements ICommand {
 	allowedParameters: ICommandParameter[] = [];
 
 	public async execute(args:string[]): Promise<void> {
-			let user = this.$userDataStore.getUser().wait();
+			let user = await  this.$userDataStore.getUser();
 
 			let fields: IStringDictionary = {
 				"Name": user.name,

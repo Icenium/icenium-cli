@@ -87,7 +87,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 	private fillDeviceConfigurationInfos(appIdentifier: string): IFuture<void> {
 		return this.$devicesService.execute(device => (() => {
-			let configInfo = device.getApplicationInfo(appIdentifier).wait();
+			let configInfo = await  device.getApplicationInfo(appIdentifier);
 			if (configInfo) {
 				this.deviceConfigurationInfos.push(configInfo);
 			}

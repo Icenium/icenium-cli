@@ -10,7 +10,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	private _isMigrationEnabledForUser: boolean = null;
 	private get isMigrationEnabledForUser(): boolean {
 		if(this._isMigrationEnabledForUser === null) {
-			let features = this.$server.tap.getFeatures(this.getUserTenantId().wait(), "tap").wait();
+			let features = await  this.$server.tap.getFeatures(this.getUserTenantId().wait(), "tap");
 			this._isMigrationEnabledForUser = features && features.length && _.includes(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
 		}
 		return this._isMigrationEnabledForUser;
@@ -28,8 +28,8 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	public async getAvailableAppsAndSolutions(): Promise<ITapAppData[]> {
 			if(!this.clientSolutions || !this.clientSolutions.length) {
-				let apps = this.isMigrationEnabledForUser ? this.getApps().wait() : [];
-				let solutions = this.getSolutions().wait();
+				let apps = await  this.isMigrationEnabledForUser ? this.getApps() : [];
+				let solutions = await  this.getSolutions();
 				this.clientSolutions = solutions.concat(apps);
 			}
 
@@ -37,7 +37,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	public async getProjectName(solutionId: string, projectId: string): Promise<string> {
-			let clientProjects = this.getProjectsForSolution(solutionId).wait();
+			let clientProjects = await  this.getProjectsForSolution(solutionId);
 			let result = helpers.findByNameOrIndex(projectId, clientProjects, (clientProject: Server.IWorkspaceItemData) => clientProject.Name);
 			if(!result) {
 				this.$errors.failWithoutHelp("Could not find project named '%s' inside '%s' solution or was not given a valid index. List available solutions with 'cloud list' command", projectId, solutionId);
@@ -47,44 +47,44 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	public async getProjectProperties(solutionId: string, projectId: string): Promise<any> {
-			let projectName = this.getProjectName(solutionId, projectId).wait();
-			let properties = (<any>this.getProjectData(solutionId, projectName).wait())["Properties"];
+			let projectName = await  this.getProjectName(solutionId, projectId);
+			let properties = await  (<any>this.getProjectData(solutionId, projectName))["Properties"];
 			properties.ProjectName = projectName;
 			return properties;
 	}
 
 	public async getProjectsForSolution(appId: string): Promise<Server.IWorkspaceItemData[]> {
-			let app = this.getApp(appId).wait();
+			let app = await  this.getApp(appId);
 
 			if(!(this.clientProjectsPerSolution[app.id] && this.clientProjectsPerSolution[app.id].length > 0)) {
-				this.clientProjectsPerSolution[app.id] = _.sortBy(this.getSolutionDataCore(app).wait().Items, project => project.Name);
+				this.clientProjectsPerSolution[app.id] = (await  _.sortBy(this.getSolutionDataCore(app)).Items, project => project.Name);
 			}
 
 			return this.clientProjectsPerSolution[app.id];
 	}
 
 	public async exportProject(remoteSolutionName: string, remoteProjectName: string): Promise<void> {
-			let app = this.getApp(remoteSolutionName).wait();
+			let app = await  this.getApp(remoteSolutionName);
 			let slnName = app.isApp ? app.id : app.name;
-			let projectDir = this.getExportDir(app.name,  (unzipStream: any) => this.$server.appsProjects.exportProject(slnName, remoteProjectName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp}).wait();
+			let projectDir = await  this.getExportDir(app.name,  (unzipStream: any) => this.$server.appsProjects.exportProject(slnName, remoteProjectName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp});
 			this.createProjectFile(projectDir, slnName, remoteProjectName).wait();
 
 			this.$logger.info("%s has been successfully exported to %s", remoteProjectName, projectDir);
 	}
 
 	public async exportSolution(remoteSolutionName: string): Promise<void> {
-			let app = this.getApp(remoteSolutionName).wait();
+			let app = await  this.getApp(remoteSolutionName);
 			let slnName = app.isApp ? app.id : app.name;
-			let solutionDir = this.getExportDir(app.name, (unzipStream: any) => this.$server.apps.exportApplication(slnName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp}).wait();
+			let solutionDir = await  this.getExportDir(app.name, (unzipStream: any) => this.$server.apps.exportApplication(slnName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp});
 
 			let projectsDirectories = this.$fs.readDirectory(solutionDir);
-			projectsDirectories.forEach(projectName => this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName).wait());
+			projectsDirectories.forEach(projectName => await  this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName));
 
 			this.$logger.info("%s has been successfully exported to %s", slnName, solutionDir);
 	}
 
 	public async getSolutionData(solutionIdentifier: string): Promise<Server.SolutionData> {
-			let app = this.getApp(solutionIdentifier).wait();
+			let app = await  this.getApp(solutionIdentifier);
 			return this.getSolutionDataCore(app).wait();
 	}
 
@@ -107,7 +107,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let solutionZipFilePath = temp.path({prefix: "appbuilder-cli-", suffix: '.zip'});
 			let unzipStream = this.$fs.createWriteStream(solutionZipFilePath);
 
-			this.$serviceProxy.makeTapServiceCall(() => tapServiceCall.apply(null, [unzipStream]), solutionSpaceHeaderOptions).wait();
+			this.$serviceProxy.makeTapServiceCall(() => await  tapServiceCall.apply(null, [unzipStream]), solutionSpaceHeaderOptions);
 			this.$fs.unzip(solutionZipFilePath, exportDir).wait();
 
 			return exportDir;
@@ -118,7 +118,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 				// if there is no .abproject when exporting, we must be dealing with a cordova project, otherwise everything is set server-side
 				let projectFile = path.join(projectDir, this.$projectConstants.PROJECT_FILE);
 				if(!this.$fs.exists(projectFile)) {
-					let properties = this.getProjectProperties(remoteSolutionName, remoteProjectName).wait();
+					let properties = await  this.getProjectProperties(remoteSolutionName, remoteProjectName);
 					this.$project.createProjectFile(projectDir, properties).wait();
 				}
 			} catch(e) {
@@ -128,8 +128,8 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getApps(): Promise<ITapAppData[]> {
-			let tenantId = this.getUserTenantId().wait();
-			let existingClientApps = this.$serviceProxyBase.call<any>('', 'GET', ['api','accounts', tenantId, 'apps'].join('/'), 'application/json', null, null).wait();
+			let tenantId = await  this.getUserTenantId();
+			let existingClientApps = await  this.$serviceProxyBase.call<any>('', 'GET', ['api','accounts', tenantId, 'apps'].join('/'), 'application/json', null, null);
 			return _.sortBy(existingClientApps, (clientSolution: ITapAppData) => clientSolution.name)
 					.map(app => {
 						app.displayName = app.name;
@@ -140,7 +140,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getSolutions(): Promise<ITapAppData[]> {
-			let existingClientSolutions = this.$serviceProxy.makeTapServiceCall(() => this.$server.tap.getExistingClientSolutions()).wait();
+			let existingClientSolutions = await  this.$serviceProxy.makeTapServiceCall(() => this.$server.tap.getExistingClientSolutions());
 			return _.sortBy(existingClientSolutions, (clientSolution: Server.TapSolutionData) => clientSolution.name)
 					.map(sln => {
 						return {
@@ -158,7 +158,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getApp(key: string): Promise<ITapAppData> {
-			let availableAppsAndSolutions = this.getAvailableAppsAndSolutions().wait();
+			let availableAppsAndSolutions = await  this.getAvailableAppsAndSolutions();
 			let matchingApp = _.find(availableAppsAndSolutions, app => key === app.colorizedDisplayName) // from prompter we receive colorized message
 					|| _.find(availableAppsAndSolutions, app => key === app.displayName) // in case the user writes the message on its own and adds '(NOT MIGRATED)'
 					|| _.find(availableAppsAndSolutions, app => key === app.id)
@@ -173,7 +173,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 	}
 
 	private async getUserTenantId(): Promise<string> {
-			let user = this.$userDataStore.getUser().wait();
+			let user = await  this.$userDataStore.getUser();
 			return user.tenant.id;
 	}
 }

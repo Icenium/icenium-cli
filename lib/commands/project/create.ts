@@ -41,7 +41,7 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 				throw err;
 			}
 
-			if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
+			if (this.$options.simulator && await  this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
 	}

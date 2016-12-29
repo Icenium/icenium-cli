@@ -7,7 +7,7 @@ export class ProjectPropertyCommandBase {
 		this.$staticConfig.triggerJsonSchemaValidation = false;
 		this.$project = this.$injector.resolve("project");
 		if (this.$project.projectData) {
-			this.projectSchema = this.$project.getProjectSchema().wait();
+			this.projectSchema = await  this.$project.getProjectSchema();
 		}
 	}
 

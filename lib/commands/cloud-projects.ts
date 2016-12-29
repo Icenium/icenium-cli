@@ -7,7 +7,7 @@ class SolutionIdCommandParameter implements ICommandParameter {
 	validate(validationValue?: string): IFuture<boolean> {
 		return (() => {
 			if(validationValue) {
-				let app = this.$remoteProjectService.getSolutionData(validationValue).wait();
+				let app = await  this.$remoteProjectService.getSolutionData(validationValue);
 				return !!app;
 			}
 
@@ -39,7 +39,7 @@ export class CloudListProjectsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let apps = this.$remoteProjectService.getAvailableAppsAndSolutions().wait();
+			let apps = await  this.$remoteProjectService.getAvailableAppsAndSolutions();
 			let slnName = args[0];
 			if(!slnName) {
 				let appDisplayNames = apps.map(app => app.colorizedDisplayName);
@@ -47,11 +47,11 @@ export class CloudListProjectsCommand implements ICommand {
 					this.printList(appDisplayNames);
 					return;
 				} else {
-					slnName = this.$prompter.promptForChoice("Select solution for which to list projects:", appDisplayNames).wait();
+					slnName = await  this.$prompter.promptForChoice("Select solution for which to list projects:", appDisplayNames);
 				}
 			}
 
-			let projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(proj => proj.Name);
+			let projects = (await  this.$remoteProjectService.getProjectsForSolution(slnName)).map(proj => proj.Name);
 			this.printList(projects, slnName);
 		}).future<void>()();
 	}
@@ -71,19 +71,19 @@ export class CloudExportProjectsCommand implements ICommand {
 			let projectIdentifier = args[1];
 			let slnName = args[0];
 			if(!slnName) {
-				let all = this.$remoteProjectService.getAvailableAppsAndSolutions().wait().map(sln => sln.colorizedDisplayName) || [];
-				slnName = this.$prompter.promptForChoice("Select solution to export", all).wait();
-				let projects = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(proj => proj.Name);
+				let all = (await  this.$remoteProjectService.getAvailableAppsAndSolutions()).map(sln => sln.colorizedDisplayName) || [];
+				slnName = await  this.$prompter.promptForChoice("Select solution to export", all);
+				let projects = (await  this.$remoteProjectService.getProjectsForSolution(slnName)).map(proj => proj.Name);
 				let exportSolutionItem = "Export the whole solution";
 				projects.push(exportSolutionItem);
-				let selection = this.$prompter.promptForChoice("Select project to export", projects).wait();
+				let selection = await  this.$prompter.promptForChoice("Select project to export", projects);
 				if(selection !== exportSolutionItem) {
 					projectIdentifier = selection;
 				}
 			}
 
 			if(projectIdentifier) {
-				let projectName = this.$remoteProjectService.getProjectName(slnName, projectIdentifier).wait();
+				let projectName = await  this.$remoteProjectService.getProjectName(slnName, projectIdentifier);
 				this.$remoteProjectService.exportProject(slnName, projectName).wait();
 			} else {
 				this.$remoteProjectService.exportSolution(slnName).wait();
@@ -93,7 +93,7 @@ export class CloudExportProjectsCommand implements ICommand {
 
 	canExecute(args: string[]): IFuture<boolean> {
 		return ((): boolean => {
-			let solutionNames = this.$remoteProjectService.getAvailableAppsAndSolutions().wait().map(sln => sln.colorizedDisplayName);
+			let solutionNames = (await  this.$remoteProjectService.getAvailableAppsAndSolutions()).map(sln => sln.colorizedDisplayName);
 			if(!solutionNames || !solutionNames.length) {
 				this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
 			}
@@ -112,7 +112,7 @@ export class CloudExportProjectsCommand implements ICommand {
 					this.$remoteProjectService.getProjectName(slnName, args[1]).wait();
 				} else {
 					// only one argument is passed
-					let projectNames = this.$remoteProjectService.getProjectsForSolution(slnName).wait().map(sln => sln.Name);
+					let projectNames = (await  this.$remoteProjectService.getProjectsForSolution(slnName)).map(sln => sln.Name);
 					if(!projectNames.length) {
 						this.$errors.failWithoutHelp(`Solution ${slnName} does not have any projects.`);
 					}

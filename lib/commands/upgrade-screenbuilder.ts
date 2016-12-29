@@ -19,7 +19,7 @@ class UpgradeScreenBuilder implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			if (!this.$screenBuilderService.shouldUpgrade(this.$options.path).wait()) {
+			if (! await this.$screenBuilderService.shouldUpgrade(this.$options.path)) {
 				this.$logger.info("Your project is already up-to-date with the latest Screen Builder.");
 				return;
 			}

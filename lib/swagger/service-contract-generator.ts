@@ -19,7 +19,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 	}
 
 	public async generate(): Promise<IServiceContractClientCode> {
-			let swagger = this.$serviceContractProvider.getApi().wait();
+			let swagger = await  this.$serviceContractProvider.getApi();
 			let interfacesFile= new Block();
 			let implementationsFile = new Block();
 
@@ -43,7 +43,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 			serverClass.writeLine("constructor(private $injector: IInjector){ }");
 
 			_.each(swagger.apis, (apiPath: Swagger.ISwaggerApi) => {
-				let swaggerService = this.$serviceContractProvider.getApi(apiPath.path).wait();
+				let swaggerService = await  this.$serviceContractProvider.getApi(apiPath.path);
 
 				let models: CodeGeneration.IBlock[] = this.generateModels(swaggerService.models);
 				serverModuleDeclaration.addBlocks(models);

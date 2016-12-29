@@ -56,7 +56,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
-			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
+			let url = await  this.$server.cordova.getLiveSyncUrl(fullDownloadPath);
 			if (urlKind === "manifest") {
 				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
 			}
@@ -72,7 +72,7 @@ export class BuildService implements Project.IBuildService {
 
 			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier }).wait();
 
-			let liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
+			let liveSyncToken = await  this.$server.cordova.getLiveSyncToken(solutionName, projectName);
 			buildProperties.LiveSyncToken = liveSyncToken;
 
 			let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
@@ -142,12 +142,12 @@ export class BuildService implements Project.IBuildService {
 
 				let certificateData: ICryptographicIdentity;
 				if (this.$options.certificate) {
-					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
+					certificateData = await  this.$identityManager.findCertificate(this.$options.certificate);
 				} else if (settings.buildForTAM) {
 					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
 						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
 				} else if (settings.buildConfiguration === constants.Configurations.Release) {
-					certificateData = this.$identityManager.findReleaseCertificate().wait();
+					certificateData = await  this.$identityManager.findReleaseCertificate();
 
 					if (!certificateData) {
 						this.$logger.warn("Cannot find an applicable Google Play certificate to " +
@@ -168,7 +168,7 @@ export class BuildService implements Project.IBuildService {
 					buildProperties.AndroidCodesigningIdentity = "";
 				}
 
-				let result = this.beginBuild(buildProperties).wait();
+				let result = await  this.beginBuild(buildProperties);
 				return result;
 			} else if (settings.platform === "iOS") {
 				let appIdentifier = projectData.AppIdentifier;
@@ -191,7 +191,7 @@ export class BuildService implements Project.IBuildService {
 
 				let provisionData: IProvision;
 				if (this.$options.provision) {
-					provisionData = this.$identityManager.findProvision(this.$options.provision).wait();
+					provisionData = await  this.$identityManager.findProvision(this.$options.provision);
 					if (settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
 						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
 							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
@@ -199,7 +199,7 @@ export class BuildService implements Project.IBuildService {
 				} else if (!settings.buildForiOSSimulator) {
 					let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
 					try {
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
+						provisionData = await  this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier);
 					} catch (error) {
 						if (!this.$options.download) {
 							this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
@@ -210,7 +210,7 @@ export class BuildService implements Project.IBuildService {
 							this.$logger.warn("Attempting to use Development provisioning profile instead.");
 						}
 
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.Development], deviceIdentifier).wait();
+						provisionData = await  this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.Development], deviceIdentifier);
 					}
 					this.$options.provision = provisionData.Name;
 				}
@@ -218,9 +218,9 @@ export class BuildService implements Project.IBuildService {
 
 				let certificateData: ICryptographicIdentity;
 				if (this.$options.certificate) {
-					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
+					certificateData = await  this.$identityManager.findCertificate(this.$options.certificate);
 				} else if (!settings.buildForiOSSimulator) {
-					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
+					certificateData = await  this.$identityManager.autoselectCertificate(provisionData);
 					this.$options.certificate = certificateData.Alias;
 				}
 				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
@@ -241,7 +241,7 @@ export class BuildService implements Project.IBuildService {
 					buildProperties.iOSCodesigningIdentity = certificateData.Alias;
 				}
 
-				let buildResult = this.beginBuild(buildProperties).wait();
+				let buildResult = await  this.beginBuild(buildProperties);
 				if (provisionData) {
 					buildResult.provisionType = provisionData.ProvisionType;
 				}
@@ -281,7 +281,7 @@ export class BuildService implements Project.IBuildService {
 				}
 			});
 
-			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
+			let result = await  this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties);
 
 			if (result.output) {
 				let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
@@ -343,7 +343,7 @@ export class BuildService implements Project.IBuildService {
 			this.$projectMigrationService.migrateTypeScriptProject().wait();
 			this.$project.importProject().wait();
 
-			let buildResult = this.requestCloudBuild(settings).wait();
+			let buildResult = await  this.requestCloudBuild(settings);
 			let packageDefs = buildResult.packageDefs;
 
 			if ((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
@@ -363,7 +363,7 @@ export class BuildService implements Project.IBuildService {
 				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
 				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration).wait();
+					let downloadUrl = await  this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration);
 
 					let packageUrl = (urlKind !== "package")
 						? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration).wait()
@@ -449,7 +449,7 @@ export class BuildService implements Project.IBuildService {
 	}
 
 	public async buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): Promise<string> {
-			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
+			let packageFile = (await  this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device)).packageName;
 			let tempDir = this.$project.getTempDir("emulatorFiles");
 			this.$fs.unzip(packageFile, tempDir).wait();
 			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
@@ -509,8 +509,8 @@ export class BuildService implements Project.IBuildService {
 
 			this.$project.importProject().wait();
 
-			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.getAppIdentifierForPlatform(platform).wait(), platform, null);
-			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
+			let appIdentifier = await  this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.getAppIdentifierForPlatform(platform), platform, null);
+			let liveSyncToken = await  this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName);
 
 			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
 			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,

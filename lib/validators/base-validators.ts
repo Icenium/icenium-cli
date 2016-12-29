@@ -23,7 +23,7 @@ export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 	constructor(private $injector: IInjector) { }
 
 	public async throwIfInvalid(data: Input): Promise<void> {
-			let validationResult: IValidationResult = this.validate(data).wait();
+			let validationResult: IValidationResult = await  this.validate(data);
 			if (!validationResult.isSuccessful) {
 				this.$injector.resolve("$errors").fail(validationResult.error);
 			}
@@ -49,7 +49,7 @@ export class Helpers {
 	}
 
 	public async static validateAsync(validators: Function[]): Promise<IValidationResult> {
-			let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
+			let validationResults = await  <IValidationResult[]>_.map(validators, (validator) => validator());
 			let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 			if (firstFailedValidationResult) {
 				return firstFailedValidationResult;

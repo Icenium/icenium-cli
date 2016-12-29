@@ -22,7 +22,7 @@ export class ProjectMigrationService implements Project.IProjectMigrationService
 
 					if (this.$fs.exists(pathToTypingsTnsCoreModules)) {
 						this.$logger.printMarkdown("`AppBuilder 3.5` has introduced improved TypeScript support using npm modules. The `tns-core-modules` typings are now redundant and will be removed from your app.");
-						if (this.$prompter.confirm("Do you want to continue?", () => true).wait()) {
+						if (this.$prompter.confirm("Do you want to continue?", () => await  true)) {
 							rimraf.sync(pathToTypingsTnsCoreModules);
 							this.$fs.deleteEmptyParents(pathToTypingsTnsCoreModules);
 							this.$npmService.install(projectDir).wait();

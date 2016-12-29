@@ -121,7 +121,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	}
 
 	public async downloadMigrationData(): Promise<void> {
-			let json = this.$server.cordova.getMigrationData().wait();
+			let json = await  this.$server.cordova.getMigrationData();
 			let renamedPlugins = _.map(json.RenamedPlugins, (plugin: any) => new RenamedPlugin(
 				this.parseMscorlibVersion(plugin.Version),
 				plugin.OldName,
@@ -145,8 +145,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	}
 
 	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
-			let cordovaJsonPath = `${this.$serverConfiguration.resourcesPath.wait()}/cordova/cordova.json`;
-			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath).wait();
+			let cordovaJsonPath = await  `${this.$serverConfiguration.resourcesPath}/cordova/cordova.json`;
+			return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || await  this.cordovaJsonFilePath);
 	}
 
 	public async onWPSdkVersionChanging(newVersion: string): Promise<void> {
@@ -154,7 +154,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				return;
 			}
 
-			let validWPSdks = this.getSupportedWPFrameworks().wait();
+			let validWPSdks = await  this.getSupportedWPFrameworks();
 			if (!_.includes(validWPSdks, newVersion)) {
 				this.$errors.failWithoutHelp("The selected version %s is not supported. Supported versions are %s", newVersion, validWPSdks.join(", "));
 			}
@@ -173,7 +173,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					}
 
 					let promptStr = `You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`;
-					let shouldUpdateFramework = this.$prompter.confirm(promptStr).wait();
+					let shouldUpdateFramework = await  this.$prompter.confirm(promptStr);
 					if (shouldUpdateFramework) {
 						this.onFrameworkVersionChanging(selectedFramework.version).wait();
 						this.$project.projectData.FrameworkVersion = selectedFramework.version;
@@ -193,7 +193,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			this.$project.ensureAllPlatformAssets();
 
 			if (this.$project.projectData.WPSdk && helpers.versionCompare(this.$project.projectData.WPSdk, "8.0") > 0 && helpers.versionCompare(newVersion, "3.7.0") < 0) {
-				let shouldUpdateWPSdk = this.$prompter.confirm(`You cannot build with the Windows Phone ${this.$project.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`).wait();
+				let shouldUpdateWPSdk = await  this.$prompter.confirm(`You cannot build with the Windows Phone ${this.$project.projectData.WPSdk} SDK with the currently selected target version of Apache Cordova. Do you want to switch to Windows Phone 8.0 SDK?`);
 				if (shouldUpdateWPSdk) {
 					this.onWPSdkVersionChanging("8.0").wait();
 					this.$project.projectData.WPSdk = "8.0";
@@ -214,7 +214,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				.flatten<string>()
 				.uniq()
 				.filter((plugin: string) => {
-					let pluginBasicInformation = this.$pluginsService.getPluginBasicInformation(plugin).wait();
+					let pluginBasicInformation = await  this.$pluginsService.getPluginBasicInformation(plugin);
 					return _.includes(plugin, '@') && !_.some(availablePlugins, pl => pl.data.Identifier.toLowerCase() === pluginBasicInformation.name.toLowerCase() && pl.data.Version === pluginBasicInformation.version);
 				})
 				.value();
@@ -231,13 +231,13 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			}
 
 			_.each(this.invalidMarketplacePlugins, plugin => {
-				let name = this.$pluginsService.getPluginBasicInformation(plugin).wait().name;
+				let name = (await  this.$pluginsService.getPluginBasicInformation(plugin)).name;
 				this.$pluginsService.removePlugin(name).wait();
 			});
 
 			_.each(this.$project.configurations, (configuration: string) => {
 				let oldPluginsList = this.$project.getProperty("CorePlugins", configuration);
-				let newPluginsList = this.migratePlugins(oldPluginsList, oldVersion, newVersion).wait();
+				let newPluginsList = await  this.migratePlugins(oldPluginsList, oldVersion, newVersion);
 				this.$logger.trace("Migrated core plugins to: ", helpers.formatListOfNames(newPluginsList, "and"));
 				this.$project.setProperty("CorePlugins", newPluginsList, configuration);
 			});
@@ -294,7 +294,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				remove = multipleInvalidPlugins ? `Remove those plugins from all configurations` : `Remove this plugin from all configurations`,
 				cancel = 'Cancel Cordova migration',
 				pluginsString = multipleInvalidPlugins ? `plugins ${plugins.join(', ')} are` : `plugin ${plugins.join(', ')} is`,
-				choice = this.$prompter.promptForChoice(`The ${pluginsString} not supported for Cordova version ${toVersion}. What do you want to do?`, [remove, cancel]).wait();
+				choice = await  this.$prompter.promptForChoice(`The ${pluginsString} not supported for Cordova version ${toVersion}. What do you want to do?`, [remove, cancel]);
 			if (choice === cancel) {
 				this.$errors.failWithoutHelp("Cordova migration interrupted");
 			}
@@ -302,9 +302,9 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 	private async getSupportedWPFrameworks(): Promise<string[]> {
 			let validValues: string[] = [];
-			let projectSchema = this.$project.getProjectSchema().wait();
+			let projectSchema = await  this.$project.getProjectSchema();
 			if (projectSchema) {
-				validValues = this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]).wait();
+				validValues = await  this.$projectPropertiesService.getValidValuesForProperty(projectSchema["WPSdk"]);
 			}
 
 			return validValues;

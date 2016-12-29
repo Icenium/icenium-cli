@@ -282,7 +282,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			let createBackupOfIonicProject: boolean = false;
 			if (ionicProject && !this.$options.force) {
 				this.$logger.warn(prompt);
-				createBackupOfIonicProject = this.$prompter.confirm("Do you want to create backup folder?", () => true).wait();
+				createBackupOfIonicProject = await  this.$prompter.confirm("Do you want to create backup folder?", () => true);
 			}
 
 			let projectFile = path.join(projectDir, this.$staticConfig.PROJECT_FILE_NAME);
@@ -306,7 +306,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	private async createProjectFileFromExistingProject(projectDir: string, appName?: string): Promise<void> {
 			appName = appName || path.basename(projectDir);
 
-			let properties = this.getProjectPropertiesFromExistingProject(projectDir, appName).wait();
+			let properties = await  this.getProjectPropertiesFromExistingProject(projectDir, appName);
 			this.projectData = this.alterPropertiesForNewProject(properties, appName);
 
 			try {
@@ -405,7 +405,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					});
 				} else {
 					this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues).wait();
-					_.each(this.configurationSpecificData, configData => this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues).wait());
+					_.each(this.configurationSpecificData, configData => await  this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues));
 				}
 			}
 	}
@@ -429,7 +429,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public async printProjectProperty(property: string, configuration?: string): Promise<void> {
 			if (this.projectData) {
-				let schema: any = this.getProjectSchema().wait();
+				let schema: any = await  this.getProjectSchema();
 				let mergedProjectData = Object.create(null);
 				_.extend(mergedProjectData, this.projectData);
 				if (configuration) {
@@ -504,7 +504,7 @@ export class Project extends ProjectBase implements Project.IProject {
 				this.$logger.trace("%sDesired pattern is: %s", Project.INDENTATION, property.pattern);
 			}
 
-			let validValues: string[] = this.$projectPropertiesService.getValidValuesForProperty(property).wait();
+			let validValues: string[] = await  this.$projectPropertiesService.getValidValuesForProperty(property);
 			if (validValues) {
 				this.$logger.out("%sValid values:", Project.INDENTATION);
 				_.forEach(validValues, value => {
@@ -676,7 +676,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.ensureProject();
 
 			this.$loginManager.ensureLoggedIn().wait();
-			let projectZipFile = this.zipProject().wait();
+			let projectZipFile = await  this.zipProject();
 			let fileSize = this.$fs.getFileSize(projectZipFile);
 			this.$logger.debug("zipping completed, result file size: %s", fileSize.toString());
 			let projectName = this.projectData.ProjectName;

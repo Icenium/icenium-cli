@@ -15,7 +15,7 @@ export class FindPluginsCommand implements ICommand {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			let pluginsSource = this.$pluginsService.findPlugins(args).wait();
+			let pluginsSource = await  this.$pluginsService.findPlugins(args);
 			this.$printPluginsService.printPlugins(pluginsSource, { showAllPlugins: this.$options.all }).wait();
 	}
 }

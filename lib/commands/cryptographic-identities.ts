@@ -26,12 +26,12 @@ export class CryptographicIdentityStoreService implements ICryptographicIdentity
 		private $x509: IX509CertificateLoader) { }
 
 	public async getAllProvisions(): Promise<IProvision[]> {
-			let data = this.$server.mobileprovisions.getProvisions().wait();
+			let data = await  this.$server.mobileprovisions.getProvisions();
 			return _.map(data, (identityData) => <IProvision>identityData);
 	}
 
 	public async getAllIdentities(): Promise<ICryptographicIdentity[]> {
-			let data = this.$server.identityStore.getIdentities().wait();
+			let data = await  this.$server.identityStore.getIdentities();
 			return _.map(data, (identityData) => {
 				let identity: any = identityData;
 				let certificateOrganization = this.$x509.load(identity.Certificate).issuerData['O'];
@@ -53,7 +53,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	public async listCertificates(): Promise<void> {
-			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = await  this.$cryptographicIdentityStoreService.getAllIdentities();
 			identities = _.sortBy(identities, (identity) => identity.Alias);
 			_.forEach(identities, (identity, index) => {
 				let cert = this.$x509.load(identity.Certificate);
@@ -85,12 +85,12 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public async listProvisions(provisionStr?: string): Promise<void> {
 			if (provisionStr) {
-				let provision = this.findProvision(provisionStr).wait();
+				let provision = await  this.findProvision(provisionStr);
 				this.printProvisionData(provision, 0);
 				return;
 			}
 
-			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			let provisions = await  this.$cryptographicIdentityStoreService.getAllProvisions();
 			provisions = _.sortBy(provisions, (provision) => provision.Name);
 
 			_.forEach(provisions, (provision, provisionIndex) => {
@@ -104,7 +104,7 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public async findCertificate(identityStr: string): Promise<ICryptographicIdentity> {
 			this.$logger.debug("Looking for certificate '%s'", identityStr);
-			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = await  this.$cryptographicIdentityStoreService.getAllIdentities();
 			let result = helpers.findByNameOrIndex(identityStr, identities, (ident) => ident.Alias);
 			if (!result) {
 				this.$errors.fail("Could not find certificate named '%s' or was not given " +
@@ -116,7 +116,7 @@ export class IdentityManager implements Server.IIdentityManager {
 
 	public async findProvision(provisionStr: string): Promise<IProvision> {
 			this.$logger.debug("Looking for provision '%s'", provisionStr);
-			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
+			let provisions = await  this.$cryptographicIdentityStoreService.getAllProvisions();
 			let result = helpers.findByNameOrIndex(provisionStr, provisions, (provision) => provision.Name);
 
 			if (!result) {
@@ -127,8 +127,8 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	public async autoselectProvision(appIdentifier: string, provisionTypes: string[], deviceIdentifier?: string): Promise<IProvision> {
-			let provisions = this.$cryptographicIdentityStoreService.getAllProvisions().wait();
-			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let provisions = await  this.$cryptographicIdentityStoreService.getAllProvisions();
+			let identities = await  this.$cryptographicIdentityStoreService.getAllIdentities();
 
 			provisions = _.filter(provisions, (prov) => _.includes(provisionTypes, prov.ProvisionType));
 			if (provisions.length === 0) {
@@ -146,7 +146,7 @@ export class IdentityManager implements Server.IIdentityManager {
 				let hasCompatibleCertificate = false;
 				let error = validationResult.error;
 				if (validationResult.isSuccessful) {
-					hasCompatibleCertificate = _.some(identities, (identity: ICryptographicIdentity) => validator.validateCertificate(identity, prov).wait().isSuccessful);
+					hasCompatibleCertificate = (await  _.some(identities, (identity: ICryptographicIdentity) => validator.validateCertificate(identity, prov)).isSuccessful);
 					if (!hasCompatibleCertificate) {
 						error = `Unable to find applicable certificate for provision ${prov.Name}.`;
 					}
@@ -181,12 +181,12 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	public async autoselectCertificate(provisionData: IProvision): Promise<ICryptographicIdentity> {
-			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = await  this.$cryptographicIdentityStoreService.getAllIdentities();
 
 			let validator = this.$injector.resolve(iosValidators.IOSDeploymentValidator,
 				{ deviceIdentifier: null, appIdentifier: null });
 
-			let identity = _.find(identities, (ident) => validator.validateCertificate(ident, provisionData).wait().isSuccessful);
+			let identity = (await  _.find(identities, (ident) => validator.validateCertificate(ident, provisionData)).isSuccessful);
 
 			if (identity) {
 				return identity;
@@ -203,7 +203,7 @@ export class IdentityManager implements Server.IIdentityManager {
 	}
 
 	public async findReleaseCertificate(): Promise<ICryptographicIdentity> {
-			let identities = this.$cryptographicIdentityStoreService.getAllIdentities().wait();
+			let identities = await  this.$cryptographicIdentityStoreService.getAllIdentities();
 			return _.find(identities, (identity: ICryptographicIdentity) => this.$selfSignedIdentityValidator.validateCertificate(true, identity.Certificate));
 	}
 }
@@ -259,10 +259,10 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 			let myCountry = model.Country;
 			if (!myCountry) {
 				this.$logger.trace("Find default country with call to http://freegeoip.net/json/");
-				myCountry = this.getDefaultCountry().wait();
+				myCountry = await  this.getDefaultCountry();
 			}
 
-			let user = this.$userDataStore.getUser().wait();
+			let user = await  this.$userDataStore.getUser();
 			let schema: any = [];
 
 			if (!model.Name) {
@@ -309,7 +309,7 @@ class IdentityInformationGatherer implements IIdentityInformationGatherer {
 
 	private async getDefaultCountry(): Promise<string> {
 			try {
-				let locationResponse: Server.IResponse = this.$httpClient.httpRequest("http://freegeoip.net/json/").wait();
+				let locationResponse: Server.IResponse = await  this.$httpClient.httpRequest("http://freegeoip.net/json/");
 				let location: any = JSON.parse(locationResponse.body);
 				return location.country_name;
 			} catch (err) {
@@ -344,7 +344,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			};
 			this.model = identityInfo;
 
-			identityInfo = this.$identityInformationGatherer.gatherIdentityInformation(identityInfo).wait();
+			identityInfo = await  this.$identityInformationGatherer.gatherIdentityInformation(identityInfo);
 
 			this.model.ForGooglePlayPublishing = args[3] ? (args[3].toLowerCase() === "googleplay" ? "y" : "n") : undefined;
 			this.model.StartDate = args[4];
@@ -353,7 +353,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			let promptSchema = this.getPromptSchema(this.model);
 
 			if (promptSchema.length > 0) {
-				this.model = this.$prompter.get(promptSchema).wait();
+				this.model = await  this.$prompter.get(promptSchema);
 				_.extend(this.model, identityInfo);
 			}
 
@@ -379,7 +379,7 @@ export class CreateSelfSignedIdentity implements ICommand {
 			}
 
 			let identityGenerationData = IdentityGenerationDataFactory.create(this.model);
-			let result = this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData).wait();
+			let result = await  this.$server.identityStore.generateSelfSignedIdentity(identityGenerationData);
 			this.$logger.info("Successfully created certificate '%s'.", result.Alias);
 		}).future<void>()();
 	}
@@ -455,9 +455,9 @@ export class RemoveCryptographicIdentity implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			let nameOrIndex = args[0];
-			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
+			let identity = await  this.$identityManager.findCertificate(nameOrIndex);
 
-			if (this.$options.force || this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false).wait()) {
+			if (this.$options.force || await  this.$prompter.confirm(util.format("Are you sure you want to delete certificate '%s'?", identity.Alias), () => false)) {
 				this.$server.identityStore.removeIdentity(identity.Alias).wait();
 			}
 		}).future<void>()();
@@ -484,7 +484,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			let nameOrIndex = args[0];
 			let password = args[1];
 
-			let identity = this.$identityManager.findCertificate(nameOrIndex).wait();
+			let identity = await  this.$identityManager.findCertificate(nameOrIndex);
 			let name = identity.Alias;
 			let sanitizedName = helpers.stringReplaceAll(name, /[^\w|\d|\s|\-|_|\(|\)|]/, "");
 
@@ -503,7 +503,7 @@ export class ExportCryptographicIdentity implements ICommand {
 			}
 
 			if (!password) {
-				password = this.$prompter.getPassword("Exported file password").wait();
+				password = await  this.$prompter.getPassword("Exported file password");
 			}
 
 			let targetFile = this.$fs.createWriteStream(targetFileName);
@@ -578,11 +578,11 @@ export class ImportCryptographicIdentity implements ICommand {
 				noErrorOccurred = true;
 				targetFile = this.$fs.createReadStream(certificateFile);
 				if (isPasswordRequired) {
-					password = this.$prompter.getPassword("Certificate file password", { allowEmpty: true }).wait();
+					password = await  this.$prompter.getPassword("Certificate file password", { allowEmpty: true });
 				}
 
 				try {
-					result = this.$server.identityStore.importIdentity(<any>importType, password, targetFile).wait();
+					result = await  this.$server.identityStore.importIdentity(<any>importType, password, targetFile);
 				} catch (err) {
 					noErrorOccurred = false;
 					isPasswordRequired = true;
@@ -629,11 +629,11 @@ class CreateCertificateSigningRequest implements ICommand {
 				Country: args[2]
 			};
 
-			model = this.$identityInformationGatherer.gatherIdentityInformation(model).wait();
+			model = await  this.$identityInformationGatherer.gatherIdentityInformation(model);
 
 			let subjectNameValues = IdentityGenerationDataFactory.getDistinguishedNameValues(
 				model.Name, model.Email, model.Country);
-			let certificateData: ICertificateSigningRequest = this.$server.identityStore.generateCertificationRequest(subjectNameValues).wait();
+			let certificateData: ICertificateSigningRequest = await  this.$server.identityStore.generateCertificationRequest(subjectNameValues);
 
 			let downloader: ICertificateDownloader = this.$injector.resolve(DownloadCertificateSigningRequestCommand);
 			downloader.downloadCertificate(certificateData.UniqueName).wait();
@@ -650,7 +650,7 @@ class ListCertificateSigningRequestsCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let requests: any[] = this.$server.identityStore.getCertificateRequests().wait();
+			let requests: any[] = await  this.$server.identityStore.getCertificateRequests();
 			requests = _.sortBy(requests, (req) => req.UniqueName);
 			_.forEach(requests, (req, i, list) => {
 				this.$logger.out("%s: %s", (i + 1).toString(), req.Subject);
@@ -669,7 +669,7 @@ interface ICertificateSigningRequest {
 }
 
 async function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): Promise<ICertificateSigningRequest> {
-		let requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
+		let requests: ICertificateSigningRequest[] = await  $server.identityStore.getCertificateRequests();
 		requests = _.sortBy(requests, (req) => req.UniqueName);
 
 		let index = parseInt(indexStr, 10) - 1;
@@ -694,7 +694,7 @@ class RemoveCertificateSigningRequestCommand implements ICommand {
 		return (() => {
 			let indexStr = args[0];
 
-			let req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
+			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
 
 			if (this.$prompter.confirm(util.format("Are you sure that you want to delete certificate request '%s'?", req.Subject)).wait()) {
 				this.$server.identityStore.removeCertificateRequest(req.UniqueName).wait();
@@ -727,7 +727,7 @@ class DownloadCertificateSigningRequestCommand implements ICommand, ICertificate
 				this.$errors.fail("Specify certificate signing request index to download.");
 			}
 
-			let req = this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr }).wait();
+			let req = await  this.$injector.resolve(parseCertificateIndex, { indexStr: indexStr });
 			this.downloadCertificate(req.UniqueName).wait();
 		}).future<void>()();
 	}
@@ -805,7 +805,7 @@ class ImportProvisionCommand implements ICommand {
 			}
 
 			let provisionFile = this.$fs.createReadStream(fileName);
-			let provisionData = this.$server.mobileprovisions.importProvision(provisionFile).wait();
+			let provisionData = await  this.$server.mobileprovisions.importProvision(provisionFile);
 			this.$logger.info("Successfully imported provision '%s'.", provisionData.Name);
 
 			this.$commandsService.tryExecuteCommand("provision", []).wait();
@@ -837,7 +837,7 @@ class RemoveProvisionCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let provisionData = this.$identityManager.findProvision(args[0]).wait();
+			let provisionData = await  this.$identityManager.findProvision(args[0]);
 			this.$server.mobileprovisions.removeProvision(provisionData.Identifier).wait();
 			this.$logger.info("Removed provisioning profile '%s'.", provisionData.Name);
 

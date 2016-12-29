@@ -54,14 +54,14 @@ describe("edit-configuration", () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.throws(() => command.execute([]).wait());
+		assert.throws(() => await  command.execute([]));
 	});
 
 	it("throws error when wrong configuration file is given", () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.throws(() => command.execute(["wrong"]).wait());
+		assert.throws(() => await  command.execute(["wrong"]));
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {

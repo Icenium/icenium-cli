@@ -80,7 +80,7 @@ async function createTestScenarioForContentRangeValidation(data: string): Promis
 		});
 
 		let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
-		let tempFilePath = createTempFile(data).wait();
+		let tempFilePath = await  createTempFile(data);
 
 		mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
 
@@ -122,7 +122,7 @@ describe("multipart upload service", () => {
 			testInjector.register("serviceProxy", ServiceProxy);
 
 			let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
-			let tempFilePath = createTempFile("Some data that has to be uploaded.").wait();
+			let tempFilePath = await  createTempFile("Some data that has to be uploaded.");
 
 			mpus.uploadFileByChunks(tempFilePath, "bucketKey").wait();
 			assert.isTrue(initUploadCalled);
@@ -132,27 +132,27 @@ describe("multipart upload service", () => {
 
 		it("sends correct Content-Ranges", () => {
 			let expectedContentRanges = ["bytes 0-9/34", "bytes 10-19/34", "bytes 20-29/34", "bytes 30-33/34"];
-			let actualContentRanges = createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(34)).wait();
+			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(34));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
 		it("sends correct Content-Ranges when fileSize is exact multiple of chunk size", () => {
 			let expectedContentRanges = ["bytes 0-9/20", "bytes 10-19/20"];
-			let actualContentRanges = createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(20)).wait();
+			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(20));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
 		/* fileSize = (x*chunkSize) - 1 */
 		it("sends correct Content-Ranges when fileSize is multiple of chunk size minus one", () => {
 			let expectedContentRanges = ["bytes 0-9/19", "bytes 10-18/19"];
-			let actualContentRanges = createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(19)).wait();
+			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(19));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
 		/* fileSize = (x*chunkSize) + 1 */
 		it("sends correct Content-Ranges when fileSize is multiple of chunk size plus one", () => {
 			let expectedContentRanges = ["bytes 0-9/21", "bytes 10-19/21", "bytes 20-20/21"];
-			let actualContentRanges = createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(21)).wait();
+			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(21));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 	});

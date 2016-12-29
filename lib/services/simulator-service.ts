@@ -30,7 +30,7 @@ export class SimulatorService implements ISimulatorService {
 
 	private async ensureSimulatorIsNotRunning(): Promise<void> {
 			this.$logger.info(); // HACK - display simulator downloading indicator correctly
-			let isRunning = this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName).wait();
+			let isRunning = await  this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName);
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + EOL +
 					"Close it and run $ appbuilder simulate again.");
@@ -54,7 +54,7 @@ export class SimulatorService implements ISimulatorService {
 				simulatorParams.push("--trackexceptions");
 			}
 
-			simulatorParams = simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName).wait());
+			simulatorParams = await  simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName));
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 	}
 }

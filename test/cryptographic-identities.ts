@@ -211,28 +211,28 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector([]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), 'No exception thrown when no provision found');
+			assert.throws(() => await  service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), 'No exception thrown when no provision found');
 		});
 
 		it("should throw if no certificates", () => {
 			let testInjector = createTestInjector([provision], []);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), 'No exception thrown when no suitable certificate found');
+			assert.throws(() => await  service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), 'No exception thrown when no suitable certificate found');
 		});
 
 		it("should throw if provision is expired", () => {
 			let testInjector = createTestInjector([provision], []);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']).wait(), 'No exception thrown when provision expired');
+			assert.throws(() => await  service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc']), 'No exception thrown when provision expired');
 		});
 
 		it("should throw if AdHoc provision does not contain given device identifier", () => {
 			let testInjector = createTestInjector([provision], [certificate]);
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc'], 'device1').wait(), "No exception thrown when given device identifier not present in mobile provision");
+			assert.throws(() => await  service.autoselectProvision('com.telerik.WillSetLater', ['AdHoc'], 'device1'), "No exception thrown when given device identifier not present in mobile provision");
 		});
 
 		it("should select AdHoc provision when valid certificate present", () => {
@@ -365,14 +365,14 @@ describe("IdentityManager unit tests", () => {
 			let testInjector = createTestInjector();
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectCertificate(provision).wait(), 'No exception thrown when no valid certificate found');
+			assert.throws(() => await  service.autoselectCertificate(provision), 'No exception thrown when no valid certificate found');
 		});
 
 		it("should throw if no valid certificates", () => {
 			let testInjector = createTestInjector();
 			service = testInjector.resolve(commandsModule.IdentityManager);
 
-			assert.throws(() => service.autoselectCertificate(provision).wait(), 'No exception thrown when no valid certificate found');
+			assert.throws(() => await  service.autoselectCertificate(provision), 'No exception thrown when no valid certificate found');
 		});
 
 		it("should select certificate when valid", () => {

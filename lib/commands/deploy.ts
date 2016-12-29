@@ -53,7 +53,7 @@ export class DeployHelper implements IDeployHelper {
 					}
 
 					if (!appInfo) {
-						appInfo = this.getAppInfoFromBuildResult(device).wait();
+						appInfo = await  this.getAppInfoFromBuildResult(device);
 					}
 
 					this.$logger.debug("Ready to deploy %s", appInfo.packageName);

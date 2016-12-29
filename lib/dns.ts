@@ -18,7 +18,7 @@ export class DomainNameSystem implements IDomainNameSystem {
 
 	public async getDomains(): Promise<string[]> {
 			let ipAddress = ip.address();
-			let domains = this.reverse(ipAddress).wait();
+			let domains = await  this.reverse(ipAddress);
 			return domains;
 	}
 }

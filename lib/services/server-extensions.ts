@@ -31,7 +31,7 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 
 				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 
-				let extensions = JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri).wait().body);
+				let extensions = (await  JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri)).body);
 				downloadUri = (<any>_.find(extensions["$values"],
 					{ Identifier: packageName })).DownloadUri;
 			} else {

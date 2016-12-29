@@ -254,7 +254,7 @@ describe("Ionic project transformator", () => {
 			testInjector = createTestInjector();
 
 			fs = testInjector.resolve("fs");
-			projectDirectory = createIonicProject(testInjector, fs).wait();
+			projectDirectory = await  createIonicProject(testInjector, fs);
 
 			ionicProjectTransformator = testInjector.resolve("ionicProjectTransformator");
 

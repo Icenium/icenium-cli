@@ -20,7 +20,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 			let cookies: IStringDictionary;
 			if (this.shouldAuthenticate) {
-				cookies = this.$userDataStore.getCookies().wait();
+				cookies = await  this.$userDataStore.getCookies();
 				if (cookies) {
 					let cookieValues = _.map(_.toPairs(cookies), pair => util.format("%s=%s", pair[0], pair[1]));
 					headers.Cookie = cookieValues.join("; ");
@@ -52,7 +52,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 
 			let response: Server.IResponse;
 			try {
-				response = this.$httpClient.httpRequest(requestOpts).wait();
+				response = await  this.$httpClient.httpRequest(requestOpts);
 			} catch (err) {
 				if (err.response && err.response.statusCode === 401) {
 					this.$userDataStore.clearLoginData().wait();
@@ -86,7 +86,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 			let latestVersion: string;
 
 			try {
-				latestVersion = this.getInformationFromRegistry().wait();
+				latestVersion = await  this.getInformationFromRegistry();
 			} catch (error) {
 				this.$logger.warn("Failed to retrieve AppBuilder version from npm. Make sure you are running latest version of AppBuilder CLI.");
 				this.$logger.trace(`Error is: ${error.message}`);
@@ -98,7 +98,7 @@ export class ServiceProxyBase implements Server.IServiceProxy {
 	}
 
 	private async getInformationFromRegistry(): Promise<string> {
-			let packageJson = this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase()).wait();
+			let packageJson = await  this.$npmService.getPackageJsonFromNpmRegistry(this.$staticConfig.CLIENT_NAME.toLowerCase());
 
 			if (!packageJson) {
 				throw new Error("Unable to get information from registry.");
@@ -125,7 +125,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 
 	public async makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T> {
 			try {
-				let user = this.$userDataStore.getUser().wait();
+				let user = await  this.$userDataStore.getUser();
 				this.solutionSpaceName = user.tenant.id;
 				if (solutionSpaceHeaderOptions && solutionSpaceHeaderOptions.discardSolutionSpaceHeader) {
 					return this.callWithoutSolutionSpaceHeader(call).wait();
@@ -142,7 +142,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			this.useSolutionSpaceNameHeader = false;
 			let result: any;
 			try {
-				result = action().wait();
+				result = await  action();
 			} finally {
 				this.useSolutionSpaceNameHeader = cachedUseSolutionSpaceNameValue;
 			}

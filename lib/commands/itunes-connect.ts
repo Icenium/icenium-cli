@@ -12,7 +12,7 @@ async function getAppleId($prompter: IPrompter): Promise<string> {
 			}
 		};
 
-		let result = $prompter.get([appleIdSchema]).wait();
+		let result = await  $prompter.get([appleIdSchema]);
 		return result["appleId"];
 }
 
@@ -33,14 +33,14 @@ export class ListApplicationsReadyForUploadCommand implements ICommand {
 			let password = args[1];
 
 			if(!userName) {
-				userName = getAppleId(this.$prompter).wait();
+				userName = await  getAppleId(this.$prompter);
 			}
 
 			if(!password) {
-				password = this.$prompter.getPassword("Apple ID password").wait();
+				password = await  this.$prompter.getPassword("Apple ID password");
 			}
 
-			let apps = this.$appStoreService.getApplicationsReadyForUpload(userName, password).wait();
+			let apps = await  this.$appStoreService.getApplicationsReadyForUpload(userName, password);
 			if(!apps.length) {
 				this.$logger.out("No applications are ready for upload.");
 				return;
@@ -91,12 +91,12 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			if(!userName) {
-				userName = getAppleId(this.$prompter).wait();
+				userName = await  getAppleId(this.$prompter);
 			}
 
 			if(this.$options.provision) {
 				this.$logger.info("Checking provision.");
-				let provision = this.$identityManager.findProvision(this.$options.provision).wait();
+				let provision = await  this.$identityManager.findProvision(this.$options.provision);
 
 				if(provision.ProvisionType !== constants.ProvisionType.AppStore) {
 					this.$errors.fail("Provision '%s' is of type '%s'. It must be of type AppStore in order to publish your app.",
@@ -105,7 +105,7 @@ export class UploadApplicationCommand implements ICommand {
 			}
 
 			if(!password) {
-				password = this.$prompter.getPassword("Apple ID password").wait();
+				password = await  this.$prompter.getPassword("Apple ID password");
 			}
 
 			this.$appStoreService.upload(userName, password, application).wait();

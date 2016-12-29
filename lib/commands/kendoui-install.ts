@@ -23,15 +23,15 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let packages = this.getKendoPackages().wait();
+			let packages = await  this.getKendoPackages();
 
-			let selectedPackage = this.selectKendoVersion(packages).wait();
+			let selectedPackage = await  this.selectKendoVersion(packages);
 
 			let confirm = this.$options.force || this.$prompter.confirm(
 				"This operation will overwrite existing Kendo UI framework files and " +
 				"any changes will be lost. ".red.bold +
 				"Are you sure you want to continue?",
-				() => true).wait();
+				() => await  true);
 			if (!confirm) {
 				return;
 			}
@@ -58,7 +58,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 					}
 				};
 
-				let choice = this.$prompter.get([schema]).wait();
+				let choice = await  this.$prompter.get([schema]);
 				let packageIdx = parseInt(choice.packageIdx, 10) - 1;
 				selectedPackage = packages[packageIdx];
 			}
@@ -66,7 +66,7 @@ class KendoUIInstallCommand extends KendoUIBaseCommand implements ICommand {
 			if (selectedPackage.HasReleaseNotes && !this.$options.force) {
 				let shouldShowReleaseNotes = this.$prompter.confirm(
 				"Do you want to review the release notes for this package?",
-				() => true).wait();
+				() => await  true);
 				if (shouldShowReleaseNotes) {
 					this.$opener.open(selectedPackage.ReleaseNotesUrl);
 				}

@@ -10,7 +10,7 @@ export class SimulateCommand implements ICommand {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			if (this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
+			if (this.$simulatorPlatformServices.canRunApplication && await  this.$simulatorPlatformServices.canRunApplication()) {
 				this.$simulatorService.launchSimulator().wait();
 			}
 	}

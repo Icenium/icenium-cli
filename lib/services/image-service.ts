@@ -66,9 +66,9 @@ class ImageService implements IImageService {
 	}
 
 	public async promptForImageInformation(force: boolean): Promise<void> {
-			let imagePath = this.$prompter.getString('Enter image file path:').wait(),
+			let imagePath = await  this.$prompter.getString('Enter image file path:'),
 				imageOptions = ['Icons', 'Splash Screens'],
-				chosenOption = this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions).wait(),
+				chosenOption = await  this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions),
 				imageType = Server.ImageType.Icon;
 
 			imagePath = helpers.trimSymbol(imagePath, '"');
@@ -117,7 +117,7 @@ class ImageService implements IImageService {
 			}
 
 			let replaceOptions = ['Yes for all', 'Yes', 'No', 'No for all'],
-				chosenOption = this.$prompter.promptForChoice(`${projectImagePath} already exists, do you want to replace it?`, replaceOptions).wait();
+				chosenOption = await  this.$prompter.promptForChoice(`${projectImagePath} already exists, do you want to replace it?`, replaceOptions);
 
 			switch (chosenOption) {
 				case replaceOptions[0]:

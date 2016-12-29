@@ -10,7 +10,7 @@ export class AppStoreService implements IAppStoreService {
 
 	public async upload(userName: string, password: string, application: string): Promise<void> {
 			this.$logger.info("Checking that iTunes Connect application is ready for upload.");
-			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			let apps = await  this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password);
 			let theApp = _.find(apps, (app: Server.Application) => app.Application === application);
 			if(!theApp) {
 				this.$errors.fail("App '%s' does not exist or is not ready for upload.", application);
@@ -40,7 +40,7 @@ export class AppStoreService implements IAppStoreService {
 	}
 
 	public async getApplicationsReadyForUpload(userName: string, password: string): Promise<Server.Application[]> {
-			let apps = this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password).wait();
+			let apps = await  this.$server.itmstransporter.getApplicationsReadyForUpload(userName, password);
 			apps = _.sortBy(apps, (app: Server.Application) => app.Application);
 			return apps;
 	}

@@ -60,7 +60,7 @@ class AppManagerService implements IAppManagerService {
 			};
 
 			if (this.$options.group) {
-				publishSettings.Groups = this.findGroups(this.$options.group).wait();
+				publishSettings.Groups = await  this.findGroups(this.$options.group);
 			}
 
 			if(!this.$options.publish && this.$options.public) {
@@ -92,7 +92,7 @@ class AppManagerService implements IAppManagerService {
 
 			this.$logger.info("Accessing Telerik AppManager.");
 			this.$logger.info("Retrieving distribution groups from Telerik AppManager.");
-			let groups = this.$server.tam.getGroups().wait();
+			let groups = await  this.$server.tam.getGroups();
 
 			if (!groups.length) {
 				this.$logger.info("Cannot find distribution groups.");
@@ -160,7 +160,7 @@ class AppManagerService implements IAppManagerService {
 	}
 
 	private async findGroups(identityStrings:string[]): Promise<string[]> {
-			let availableGroups = this.$server.tam.getGroups().wait();
+			let availableGroups = await  this.$server.tam.getGroups();
 
 			if (!availableGroups.length) {
 				this.$errors.failWithoutHelp("Cannot find distribution groups.");

@@ -18,7 +18,7 @@ class KendoUINotesCommand extends KendoUIBaseCommand implements ICommand {
 
 	execute(args: string[]): IFuture<void> {
 		return (() => {
-			let packages = this.getKendoPackages({withReleaseNotesOnly: true}).wait();
+			let packages = await  this.getKendoPackages({withReleaseNotesOnly: true});
 			if (packages.length === 1) {
 				this.$opener.open(_.first(packages).ReleaseNotesUrl);
 				return;
@@ -36,7 +36,7 @@ class KendoUINotesCommand extends KendoUIBaseCommand implements ICommand {
 				}
 			};
 
-			let choice = this.$prompter.get([schema]).wait(),
+			let choice = await  this.$prompter.get([schema]),
 				selectedPackage = packages[parseInt(choice.packageIdx) - 1];
 
 			this.$opener.open(selectedPackage.ReleaseNotesUrl);

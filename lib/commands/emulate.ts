@@ -27,7 +27,7 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 				downloadedFilePath: packageFilePath
 			}).wait();
 			this.$options.justlaunch = true;
-			let emulateOptions: Mobile.IEmulatorOptions = { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME).wait() };
+			let emulateOptions: Mobile.IEmulatorOptions = await  { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME) };
 			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions).wait();
 	}
 
@@ -61,7 +61,7 @@ export class EmulateIosCommand extends EnsureProjectCommand {
 
 			if (!this.$options.availableDevices) {
 				let tempDir = this.$project.getTempDir("emulatorfiles");
-				app = this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa")).wait();
+				app = await  this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa"));
 			}
 
 			this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();

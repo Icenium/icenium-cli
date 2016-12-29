@@ -16,7 +16,7 @@ export class SysInfo extends SysInfoBase {
 				pathToAndroid: "android" + (this.$hostInfo.isWindows ? ".bat" : "")
 			};
 
-			return super.getSysInfo(pathToPackageJson  || this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo).wait();
+			return super.getSysInfo(pathToPackageJson  || await  this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo);
 	}
 }
 $injector.register("sysInfo", SysInfo);

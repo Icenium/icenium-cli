@@ -29,15 +29,15 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_CERTIFICATE_ERROR_MESSAGE);
 			}
 
-			let provision = this.$identityManager.findProvision(model.provisionOption).wait();
+			let provision = await  this.$identityManager.findProvision(model.provisionOption);
 			let provisionValidationResult = this.validateProvision(provision);
 
 			if(!provisionValidationResult.isSuccessful) {
 				return provisionValidationResult;
 			}
 
-			let certificate = this.$identityManager.findCertificate(model.certificateOption).wait();
-			let certificateValidationResult = this.validateCertificate(certificate, provision).wait();
+			let certificate = await  this.$identityManager.findCertificate(model.certificateOption);
+			let certificateValidationResult = await  this.validateCertificate(certificate, provision);
 
 			if(!certificateValidationResult.isSuccessful) {
 				return certificateValidationResult;

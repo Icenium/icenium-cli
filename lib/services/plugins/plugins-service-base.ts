@@ -49,7 +49,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			let plugin = _.find(this.getAvailablePlugins(), (pl: IPlugin) => pl.data.Identifier.toLowerCase() === pluginIdentifier || pl.data.Name.toLowerCase() === pluginIdentifier);
 			let pluginUrl = plugin && plugin.data && plugin.data.Url ? plugin.data.Url : null;
 
-			let plugins = this.$npmPluginsService.optimizedSearch(this.$project.projectDir, [pluginIdentifier]).wait().getAllPlugins().wait();
+			let plugins = await  (await  this.$npmPluginsService.optimizedSearch(this.$project.projectDir, [pluginIdentifier])).getAllPlugins();
 
 			let pluginKeys = _.map(plugins, (pluginInfo: IBasicPluginInformation) => pluginInfo.name);
 			let pluginsCount = pluginKeys.length;
@@ -74,7 +74,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 			let npmPluginResult = plugins[0];
 			if (pluginsCount > 1 && npmPluginResult.name !== pluginIdentifier) {
 				if (commonHelpers.isInteractive()) {
-					let selectedPlugin = this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys).wait();
+					let selectedPlugin = await  this.$prompter.promptForChoice("We found multiple plugins with your search parameters please choose which one you want to fetch.", pluginKeys);
 					return this.fetchPluginCore(selectedPlugin).wait();
 				} else {
 					this.$errors.failWithoutHelp("There are more then 1 matching plugins: " + pluginKeys.join(", ") + ".");
@@ -144,7 +144,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 	}
 
 	protected async fetchPluginBasicInformation(pluginIdentifier: string, version: string, failMessageMethodName: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
-			let pathToInstalledPlugin = this.installPackageToTempDir(pluginIdentifier, version).wait();
+			let pathToInstalledPlugin = await  this.installPackageToTempDir(pluginIdentifier, version);
 
 			this.validatePluginInformation(pathToInstalledPlugin);
 
@@ -178,7 +178,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 					identifier = `${identifier}@${version}`;
 				}
 
-				let npmInstallOutput: string = this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir }).wait();
+				let npmInstallOutput: string = await  this.$childProcess.exec(`npm install ${identifier} --production --ignore-scripts`, { cwd: tempInstallDir });
 				let pathToPackage = path.join(tempInstallDir, NODE_MODULES_DIR_NAME);
 
 				if (this.$fs.exists(pathToPackage)) {
@@ -310,7 +310,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 				options.useOriginalPluginDirectory = false;
 			}
 
-			pluginBasicInfo = this.fetchPluginBasicInformation(pluginId, version, "fetch", pluginData, options).wait();
+			pluginBasicInfo = await  this.fetchPluginBasicInformation(pluginId, version, "fetch", pluginData, options);
 
 			return pluginBasicInfo.name;
 	}

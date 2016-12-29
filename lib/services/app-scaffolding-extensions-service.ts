@@ -42,7 +42,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 					// this is why we pre-install them so that they're at the highest point in the dependency depth.
 					// This leads to shortening the paths just enough to be safe about it.
 					// Note that if one of these modules' versions is changed this needs to be reflected in the code too!
-					["vinyl-fs@2.2.1", "gulp-decompress@1.2.0"].forEach(dependency => { this.npmInstall(dependency).wait(); });
+					["vinyl-fs@2.2.1", "gulp-decompress@1.2.0"].forEach(dependency => await  { this.npmInstall(dependency); });
 
 					let generatorBaseDependencies = require(path.join(this.appScaffoldingPath, "node_modules", "screen-builder-base-generator", "package.json")).dependencies;
 					Future.wait(_.map(generatorBaseDependencies, (value, key) => this.npmInstall(`${key}@${value}`)));
@@ -75,7 +75,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 					pathToSave: dependencyConfig.pathToSave
 				};
 
-				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, {afterDownloadAction: () => this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100)}), 5000).wait();
+				this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, {afterDownloadAction: () => await  this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100)}), 5000);
 			}
 	}
 

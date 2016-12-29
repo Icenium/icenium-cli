@@ -18,7 +18,7 @@ export class AppManagerLiveSyncCommand implements ICommand {
 			if(!args || args.length === 0) {
 				let availablePlatforms = this.$config.ON_PREM || isNativeScript ? _.without(this.$mobileHelper.platformNames, windowsPhonePlatformName) : this.$mobileHelper.platformNames;
 				let selectionOptions = availablePlatforms.concat(AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION);
-				let selectedPlatform = this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", selectionOptions).wait();
+				let selectedPlatform = await  this.$prompter.promptForChoice("This command will publish a new update version to AppManager. Please select platform?", selectionOptions);
 				if(selectedPlatform === AppManagerLiveSyncCommand.ALL_PLATFORMS_OPTION) {
 					this.$appManagerService.publishLivePatch(availablePlatforms).wait();
 				} else {

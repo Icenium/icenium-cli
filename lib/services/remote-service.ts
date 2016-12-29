@@ -24,7 +24,7 @@ export class RemoteService implements IRemoteService {
 			this.$fs.ensureDirectoryExists(this.appBuilderDir);
 
 			this.$express.post("/launch", (req: Request, res: Response) => this.onLaunchRequest(req, res));
-			let domain = this.$domainNameSystem.getDomains().wait()[0];
+			let domain = (await  this.$domainNameSystem.getDomains())[0];
 
 			this.$express.listen(portNumber, () => {
 				let ipAddress = ip.address();
@@ -62,7 +62,7 @@ export class RemoteService implements IRemoteService {
 			let appLocation = path.join(this.appBuilderDir, this.$fs.readDirectory(this.appBuilderDir).filter(minimatch.filter("*.app"))[0]);
 
 			this.$iOSEmulatorServices.checkAvailability(false);
-			let xcodeVersion = this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson).wait().xcodeVer,
+			let xcodeVersion = (await  this.$sysInfo.getSysInfo(this.$staticConfig.pathToPackageJson)).xcodeVer,
 				xcodeVersionMatch = xcodeVersion.match(/Xcode (.*)/),
 				splittedVersion = xcodeVersionMatch && xcodeVersionMatch[1] && xcodeVersionMatch[1].split("."),
 				xcodeMajorVersion = splittedVersion && splittedVersion[0],

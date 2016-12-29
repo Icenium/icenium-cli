@@ -55,7 +55,7 @@ export class DebugCommand implements ICommand {
 	}
 
 	private async ensureDebuggerIsNotRunning(): Promise<void> {
-			let isRunning = this.$processInfo.isRunning(this.$winDebuggerService.executableName).wait();
+			let isRunning = await  this.$processInfo.isRunning(this.$winDebuggerService.executableName);
 			if (isRunning) {
 				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
 					"Close it and run $ appbuilder debug again.");

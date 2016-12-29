@@ -10,7 +10,7 @@ export class KendoUIService implements IKendoUIService {
 
 	public async getKendoPackages(options: IKendoUIFilterOptions): Promise<Server.IKendoDownloadablePackageData[]> {
 			if (!this._packages) {
-				let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
+				let packages: Server.IKendoDownloadablePackageData[] = await  _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages(), p => !p.NeedPurchase);
 				if (options.verified) {
 					packages = _.filter(packages, pack => _.some(pack.VersionTags, tag => tag.toLowerCase() === KendoUIService.VERIFIED_TAG));
 				}

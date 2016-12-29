@@ -8,7 +8,7 @@ export class ServerConfiguration implements IServerConfiguration {
 			if(!this.cachedServerConfiguration) {
 				let configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
 				let httpClient = this.$injector.resolve("httpClient");
-				this.cachedServerConfiguration = JSON.parse(httpClient.httpRequest(configUri).wait().body);
+				this.cachedServerConfiguration = (await  JSON.parse(httpClient.httpRequest(configUri)).body);
 			}
 
 			return this.cachedServerConfiguration;
@@ -23,7 +23,7 @@ export class ServerConfiguration implements IServerConfiguration {
 	}
 
 	public async get resourcesPath(): Promise<string> {
-			let resourcesRelativePath = this.getConfigurationFromServer().wait().resourcesPath;
+			let resourcesRelativePath = (await  this.getConfigurationFromServer()).resourcesPath;
 			return `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/${resourcesRelativePath}`;
 	}
 }

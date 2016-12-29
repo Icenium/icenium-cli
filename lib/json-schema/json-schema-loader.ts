@@ -53,7 +53,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			});
 
 			let schemas = _.values(this.schemas);
-			_.each(schemas, (schema: ISchema) => this.loadSchema(schema).wait());
+			_.each(schemas, (schema: ISchema) => await  this.loadSchema(schema));
 		}
 	}
 

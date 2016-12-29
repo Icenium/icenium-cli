@@ -73,7 +73,7 @@ export class WebViewService implements IWebViewService {
 	private async enableDefaultWebView(platform: string): Promise<void> {
 			_(this.getWebViews(platform))
 				.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
-				.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait());
+				.each(webView => await  this.$pluginsService.removePlugin(webView.pluginIdentifier));
 	}
 }
 $injector.register("webViewService", WebViewService);

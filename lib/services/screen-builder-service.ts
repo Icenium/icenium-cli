@@ -40,15 +40,15 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	}
 
 	private async promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScreenBuilderMigrationData> {
-			let wasMigrated = !this.shouldUpgrade(projectPath).wait(),
+			let wasMigrated = await  !this.shouldUpgrade(projectPath),
 				didMigrate = false;
 
 			if (!wasMigrated) {
 				this.$logger.error(ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE);
-				didMigrate = this.$prompter.confirm('Do you want to upgrade your project now? Custom code changes might be lost.', () => false).wait();
+				didMigrate = await  this.$prompter.confirm('Do you want to upgrade your project now? Custom code changes might be lost.', () => false);
 
 				if (didMigrate) {
-					let scaffolderData = this.createScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
+					let scaffolderData = await  this.createScaffolder(projectPath, generatorName, screenBuilderOptions);
 
 					scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
@@ -61,7 +61,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public async prepareAndGeneratePrompt(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<boolean> {
 			generatorName = generatorName || this.generatorFullName;
-			let migrationData = this.promptForUpgrade(projectPath, generatorName, screenBuilderOptions).wait(),
+			let migrationData = await  this.promptForUpgrade(projectPath, generatorName, screenBuilderOptions),
 				disableCommandHelpSuggestion = !migrationData.didMigrate;
 
 			if (migrationData.wasMigrated || migrationData.didMigrate) {
@@ -74,7 +74,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	public async allSupportedCommands(projectDir: string, generatorName?: string): Promise<string[]> {
 			if (!this.allCommandsCache) {
 				generatorName = generatorName || this.generatorFullName;
-				let scaffolder = this.createScaffolder(projectDir, generatorName, { isSync: true }).wait().scaffolder;
+				let scaffolder = (await  this.createScaffolder(projectDir, generatorName, { isSync: true })).scaffolder;
 				let allSupportedCommands = scaffolder.listGenerators()
 					.map((command: string) => command.replace(new RegExp(this.generatorName + ":?"), ''))
 					.filter((command: string) => !!command);
@@ -87,7 +87,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public async generateAllCommands(projectDir: string, generatorName?: string): Promise<void> {
 			generatorName = generatorName || this.generatorFullName;
-			let commands = this.allSupportedCommands(projectDir, generatorName).wait();
+			let commands = await  this.allSupportedCommands(projectDir, generatorName);
 			_.each(commands, (command: string) => this.registerCommand(command, generatorName));
 	}
 
@@ -103,7 +103,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public async promptGenerate(projectPath: string, generatorName?: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScaffolder> {
 			generatorName = generatorName || this.generatorFullName;
-			let scaffolderData = this.createScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
+			let scaffolderData = await  this.createScaffolder(projectPath, generatorName, screenBuilderOptions);
 			let scaffolder = scaffolderData.scaffolder;
 			let type = screenBuilderOptions.type || ScreenBuilderService.DEFAULT_SCREENBUILDER_TYPE;
 			type = ScreenBuilderService.PREDEFINED_SCREENBUILDER_TYPES[type] || type;
@@ -125,22 +125,22 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 	public async shouldUpgrade(projectPath: string): Promise<boolean> {
 			if (!this.shouldUpgradeCached) {
-				let scaffolderData = this.createScaffolder(projectPath, this.generatorFullName).wait();
+				let scaffolderData = await  this.createScaffolder(projectPath, this.generatorFullName);
 
 				scaffolderData.scaffolder.initContext({ collectMetadata: true }, scaffolderData.callback);
 
-				this.shouldUpgradeCached = scaffolderData.future.wait() === ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE;
+				this.shouldUpgradeCached = await  scaffolderData.future === ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE;
 			}
 
 			return this.shouldUpgradeCached;
 	}
 
 	public async upgrade(projectPath: string): Promise<void> {
-			if (!this.shouldUpgrade(projectPath).wait()) {
+			if (! await this.shouldUpgrade(projectPath)) {
 				return;
 			}
 
-			let scaffolderData = this.createScaffolder(this.generatorFullName, projectPath).wait();
+			let scaffolderData = await  this.createScaffolder(this.generatorFullName, projectPath);
 
 			scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
@@ -176,7 +176,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	private async createScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScaffolder> {
 			screenBuilderOptions = screenBuilderOptions || {};
 
-			let scaffolder = this.getScaffolder(projectPath, generatorName, screenBuilderOptions).wait();
+			let scaffolder = await  this.getScaffolder(projectPath, generatorName, screenBuilderOptions);
 			if (screenBuilderOptions && screenBuilderOptions.isSync) {
 				return { scaffolder: scaffolder, future: null, callback: null };
 			}
@@ -239,7 +239,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 				type: this.command.substr(this.command.indexOf("-") + 1)
 			});
 
-			this.disableCommandHelpSuggestion = this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions).wait();
+			this.disableCommandHelpSuggestion = await  this.$screenBuilderService.prepareAndGeneratePrompt(projectDir, this.generatorName, screenBuilderOptions);
 	}
 
 	public allowedParameters: ICommandParameter[] = [];

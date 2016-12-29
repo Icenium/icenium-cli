@@ -40,16 +40,16 @@ export class TemplatesService implements ITemplatesService {
 	}
 
 	public async downloadProjectTemplates(): Promise<void> {
-			let templates = this.$server.projects.getProjectTemplates().wait();
+			let templates = await  this.$server.projects.getProjectTemplates();
 			let templatesDir = this.projectTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
 			this.$fs.createDirectory(templatesDir);
 
-			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
+			_.each(templates, (template) => await  this.downloadTemplate(template, templatesDir));
 	}
 
 	public async downloadItemTemplates(): Promise<void> {
-			let templates = this.$server.projects.getItemTemplates().wait();
+			let templates = await  this.$server.projects.getItemTemplates();
 			let templatesDir = this.itemTemplatesDir;
 			this.$fs.deleteDirectory(templatesDir);
 			this.$fs.createDirectory(templatesDir);
