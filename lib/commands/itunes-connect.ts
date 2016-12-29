@@ -2,8 +2,7 @@ import * as constants from "../common/constants";
 import * as commandParams from "../common/command-params";
 let Table = require("cli-table");
 
-function getAppleId($prompter: IPrompter): IFuture<string> {
-	return (() => {
+async function getAppleId($prompter: IPrompter): Promise<string> {
 		let appleIdSchema: IPromptSchema = {
 			message: "Apple ID",
 			type: "input",
@@ -15,7 +14,6 @@ function getAppleId($prompter: IPrompter): IFuture<string> {
 
 		let result = $prompter.get([appleIdSchema]).wait();
 		return result["appleId"];
-	}).future<string>()();
 }
 
 export class ListApplicationsReadyForUploadCommand implements ICommand {

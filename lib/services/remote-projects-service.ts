@@ -51,11 +51,9 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let properties = (<any>this.getProjectData(solutionId, projectName).wait())["Properties"];
 			properties.ProjectName = projectName;
 			return properties;
-		}).future()();
 	}
 
-	public getProjectsForSolution(appId: string): IFuture<Server.IWorkspaceItemData[]> {
-		return ((): Server.IWorkspaceItemData[] => {
+	public async getProjectsForSolution(appId: string): Promise<Server.IWorkspaceItemData[]> {
 			let app = this.getApp(appId).wait();
 
 			if(!(this.clientProjectsPerSolution[app.id] && this.clientProjectsPerSolution[app.id].length > 0)) {

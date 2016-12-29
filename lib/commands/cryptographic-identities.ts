@@ -668,8 +668,7 @@ interface ICertificateSigningRequest {
 	Subject: string;
 }
 
-function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): IFuture<ICertificateSigningRequest> {
-	return ((): ICertificateSigningRequest => {
+async function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Server.IServer): Promise<ICertificateSigningRequest> {
 		let requests: ICertificateSigningRequest[] = $server.identityStore.getCertificateRequests().wait();
 		requests = _.sortBy(requests, (req) => req.UniqueName);
 
@@ -679,7 +678,6 @@ function parseCertificateIndex(indexStr: string, $errors: IErrors, $server: Serv
 		}
 		let req = requests[index];
 		return req;
-	}).future<ICertificateSigningRequest>()();
 }
 
 class RemoveCertificateSigningRequestCommand implements ICommand {

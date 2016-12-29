@@ -119,15 +119,13 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	return testInjector;
 }
 
-function unzipPluginsFolder(fs: IFileSystem): IFuture<string> {
-	return ((): string => {
+async function unzipPluginsFolder(fs: IFileSystem): Promise<string> {
 		let pathToPluginsZip = path.join("test", "resources", "test-plugins.zip");
 		let unzippedPluginsDirectory = temp.mkdirSync("local-plugins");
 
 		fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true }).wait();
 
 		return path.join(unzippedPluginsDirectory, "test-plugins");
-	}).future<string>()();
 }
 
 class PrompterStub implements IPrompter {

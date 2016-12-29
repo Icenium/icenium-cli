@@ -101,8 +101,7 @@ let androidPlatformName = "android";
 let iosPlatformName = "ios";
 let wp8PlatformName = "wp8";
 
-function createIonicProject(testInjector: IInjector, fs: IFileSystem): IFuture<string> {
-	return ((): string => {
+async function createIonicProject(testInjector: IInjector, fs: IFileSystem): Promise<string> {
 		if (!hasUnzippedProject) {
 			hasUnzippedProject = true;
 			fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true }).wait();
@@ -114,7 +113,6 @@ function createIonicProject(testInjector: IInjector, fs: IFileSystem): IFuture<s
 		shelljs.cp("-Rf", [unzippedProjectDirectory + `${pathSeparator}.*`, unzippedProjectDirectory + `${pathSeparator}*`], projectDirectory);
 
 		return projectDirectory;
-	}).future<string>()();
 }
 
 function createConfigXmlTestsContext(platform: string, appResourcesDirectory: string): IConfigXmlFileTestContext {

@@ -91,10 +91,8 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-function setExecutedOnDeviceFlag(device: any): IFuture<void> {
-	return (() => {
+async function setExecutedOnDeviceFlag(device: any): Promise<void> {
 		(<any>device).isExecutedOnDevice = true;
-	}).future<void>()();
 }
 
 function iOSDeviceInfo(): Mobile.IDeviceInfo {

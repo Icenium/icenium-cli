@@ -52,8 +52,7 @@ function createTempFile(data: string): IFuture<string> {
 	return future;
 }
 
-function createTestScenarioForContentRangeValidation(data: string): IFuture<string[]> {
-	return (() => {
+async function createTestScenarioForContentRangeValidation(data: string): Promise<string[]> {
 		let testInjector = createTestInjector();
 
 		testInjector.register("server", {
@@ -75,7 +74,6 @@ function createTestScenarioForContentRangeValidation(data: string): IFuture<stri
 			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): IFuture<T> => {
 				return (() => {
 					actualContentRanges.push(headers["Content-Range"]);
-				}).future<any>()();
 			},
 			setShouldAuthenticate: (shouldAuthenticate: boolean): void => {/* mock */ },
 			setSolutionSpaceName: (solutionSpaceName: string): void => {/* mock */ }

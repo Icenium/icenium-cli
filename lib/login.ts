@@ -241,11 +241,9 @@ export class LoginManager implements ILoginManager {
 			this.$userDataStore.setUser(<any>userData).wait();
 
 			return userData;
-		}).future()();
 	}
 
-	public telerikLogin(user: string, password: string): IFuture<void> {
-		return (() => {
+	public async telerikLogin(user: string, password: string): Promise<void> {
 			let response = this.$httpClient.httpRequest({
 				method: "POST",
 				url: `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Mist/Authentication/Login`,
@@ -272,7 +270,6 @@ export class TelerikLoginCommand implements ICommand {
 	execute(args: string[]): IFuture<void> {
 		return (() => {
 			this.$loginManager.telerikLogin(args[0], args[1]).wait();
-		}).future<void>()();
 	}
 
 	allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password."), this.$stringParameterBuilder.createMandatoryParameter("Missing user name or password.")];
