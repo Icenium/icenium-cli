@@ -86,7 +86,7 @@ export class ExtensionsServiceBase {
 		return this.$fs.writeJson(this.versionsFile, this.extensionVersions);
 	}
 
-	private downloadPackage(downloadUri: string, zipFileName: string): IFuture<Server.IResponse> {
+	private async downloadPackage(downloadUri: string, zipFileName: string): Promise<Server.IResponse> {
 		this.$logger.debug("Downloading package from %s", downloadUri);
 
 		let zipFile = this.$fs.createWriteStream(zipFileName);

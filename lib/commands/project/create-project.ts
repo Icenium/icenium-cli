@@ -9,7 +9,7 @@ export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBa
 		super($errors, $project);
 	}
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		this.validateProjectData();
 		return this.$project.createNewProject(args[0], this.frameworkIdentifier, this.$options.template);
 	}

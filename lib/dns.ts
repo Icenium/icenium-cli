@@ -3,7 +3,7 @@ import Future = require("fibers/future");
 import ip = require("ip");
 
 export class DomainNameSystem implements IDomainNameSystem {
-	private reverse(ipAddress: string): IFuture<string[]> {
+	private async reverse(ipAddress: string): Promise<string[]> {
 		let future = new Future<string[]>();
 		dns.reverse(ipAddress, (err: Error, domains: string[]) => {
 			if(err) {

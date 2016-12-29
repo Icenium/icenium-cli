@@ -112,7 +112,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			await this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion);
 	}
 
-	public downloadMigrationConfigFile(targetPath?: string): IFuture<void> {
+	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
 		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME}`;
 		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, targetPath || this.$nativeScriptResources.nativeScriptMigrationFile);
 	}
@@ -140,7 +140,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
 	}
 
-	private downloadTnsPackage(language: string, version: string): IFuture<void> {
+	private async downloadTnsPackage(language: string, version: string): Promise<void> {
 		if (language === NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION) {
 			let fileName = this.getFileNameByVersion(version);
 			let remotePathUrl = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.TNS_MODULES}/${language}/${fileName}`;
@@ -148,7 +148,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 			return this.$resourceDownloader.downloadResourceFromServer(remotePathUrl, filePath);
 		}
 
-		return Future.fromResult();
+		return Promise.resolve();
 	}
 
 	private getFileNameByVersion(version: string): string {
@@ -175,7 +175,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}
 	}
 
-	private downloadPackageJsonResourceFile(): IFuture<void> {
+	private async downloadPackageJsonResourceFile(): Promise<void> {
 		let remoteFilePath = `${this.remoteNativeScriptResourcesPath}/${this.$projectConstants.PACKAGE_JSON_NAME}`;
 		return this.$resourceDownloader.downloadResourceFromServer(remoteFilePath, this.$nativeScriptResources.nativeScriptDefaultPackageJsonFile);
 	}

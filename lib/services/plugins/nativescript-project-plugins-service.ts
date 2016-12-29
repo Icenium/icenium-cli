@@ -184,8 +184,8 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			await return this.getBasicPluginInfoFromMarketplace(dependencyInfo.name, dependencyInfo.version) || { name: dependencyInfo.name, version: dependencyInfo.version };
 	}
 
-	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
-		return Future.fromResult(plugins);
+	public async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]> {
+		return Promise.resolve(plugins);
 	}
 
 	protected getCopyLocalPluginData(pathToPlugin: string): NpmPlugins.ICopyLocalPluginData {
@@ -233,7 +233,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			return basicPluginInfo;
 	}
 
-	protected fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): IFuture<IBasicPluginInformation> {
+	protected async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
 		if (pluginData && pluginData.isTgz || this.$fs.exists(pluginData.actualName)) {
 			pluginData.configFileContents = this.$fs.readJson(path.join(pathToInstalledPlugin, this.$projectConstants.PACKAGE_JSON_NAME));
 		}

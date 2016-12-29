@@ -50,7 +50,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 			await this.$server.upload.completeUpload(bucketKey, fileHash);
 	}
 
-	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {
+	private async uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): Promise<void> {
 		let headers = {
 			"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize),
 			"Content-Length": endIndex - startingIndex

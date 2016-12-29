@@ -43,7 +43,7 @@ class ResourceDownloader implements IResourceDownloader {
 			await fileEnd;
 	}
 
-	public downloadImageDefinitions(): IFuture<void> {
+	public async downloadImageDefinitions(): Promise<void> {
 		let targetPath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME);
 		return this.downloadResourceFromServer(this.imageDefinitionsResourcesPath, this.$resources.resolvePath(targetPath));
 	}

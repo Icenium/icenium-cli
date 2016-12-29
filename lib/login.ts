@@ -25,13 +25,13 @@ export class UserDataStore implements IUserDataStore {
 			}
 	}
 
-	public getCookies(): IFuture<IStringDictionary> {
+	public async getCookies(): Promise<IStringDictionary> {
 		return this.readAndCache(this.getCookieFilePath(),
 			() => this.cookies,
 			(value: string) => this.cookies = JSON.parse(value));
 	}
 
-	public getUser(): IFuture<IUser> {
+	public async getUser(): Promise<IUser> {
 		return this.readAndCache(this.getUserStateFilePath(),
 			() => this.user,
 			(value: string) => this.user = JSON.parse(value));
@@ -154,7 +154,7 @@ export class LoginManager implements ILoginManager {
 			await this.doLogin();
 	}
 
-	public isLoggedIn(): IFuture<boolean> {
+	public async isLoggedIn(): Promise<boolean> {
 		return this.$userDataStore.hasCookie();
 	}
 

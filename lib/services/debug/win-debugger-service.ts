@@ -31,7 +31,7 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 		this.waitDebuggerExit(childProcess);
 	}
 
-	public canRunApplication(): IFuture<boolean> {
+	public async canRunApplication(): Promise<boolean> {
 		return this.$hostInfo.isDotNet40Installed("Unable to start the debug tool. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 

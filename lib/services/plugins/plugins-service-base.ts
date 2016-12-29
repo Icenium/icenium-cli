@@ -23,7 +23,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		private $hostInfo: IHostInfo,
 		private $npmPluginsService: INpmPluginsService) { }
 
-	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
+	public async findPlugins(keywords: string[]): Promise<IPluginsSource> {
 		return this.$npmPluginsService.search(this.$project.projectDir, keywords, this.composeSearchQuery);
 	}
 

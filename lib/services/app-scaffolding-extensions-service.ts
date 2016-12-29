@@ -79,13 +79,13 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 			}
 	}
 
-	protected npmInstall(packageToInstall?: string, cwd?: string): IFuture<void> {
+	protected async npmInstall(packageToInstall?: string, cwd?: string): Promise<void> {
 		packageToInstall = packageToInstall || "";
 		let command = `npm install ${packageToInstall} --production`;
 		return this.$childProcess.exec(command, {cwd: cwd || this.appScaffoldingPath });
 	}
 
-	protected npmDedupe(): IFuture<void> {
+	protected async npmDedupe(): Promise<void> {
 		return this.$childProcess.exec("npm dedupe", {cwd: this.appScaffoldingPath});
 	}
 }

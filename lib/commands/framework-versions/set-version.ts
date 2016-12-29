@@ -4,7 +4,7 @@ export class SetFrameworkVersionCommand implements ICommand {
 	constructor(private $injector: IInjector,
 		private $project: Project.IProject) { }
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$project.updateProjectPropertyAndSave("set", "FrameworkVersion", args);
 	}
 

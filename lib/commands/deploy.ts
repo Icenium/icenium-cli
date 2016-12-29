@@ -13,7 +13,7 @@ export class DeployHelper implements IDeployHelper {
 		private $options: IOptions,
 		private $hostInfo: IHostInfo) { }
 
-	public deploy(platform?: string): IFuture<void> {
+	public async deploy(platform?: string): Promise<void> {
 		this.$project.ensureProject();
 
 		if (!this.$project.capabilities.deploy) {
@@ -102,7 +102,7 @@ export class DeployCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$deployHelper.deploy();
 	}
 }
@@ -118,7 +118,7 @@ export class DeployAndroidCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$deployHelper.deploy(this.$devicePlatformsConstants.Android);
 	}
 }
@@ -134,7 +134,7 @@ export class DeployIosCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$deployHelper.deploy(this.$devicePlatformsConstants.iOS);
 	}
 }
@@ -151,7 +151,7 @@ export class DeployWP8Command extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$deployHelper.deploy(this.$devicePlatformsConstants.WP8);
 	}
 

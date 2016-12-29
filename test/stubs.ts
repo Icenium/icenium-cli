@@ -359,7 +359,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public getProjectFileSchema(): IDictionary<any> { return undefined; }
 
-	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
+	public async getFullProjectFileSchema(): Promise<any> { return undefined; }
 
 	public getProjectTargets(projectDir: string): string[] { return undefined; }
 
@@ -367,7 +367,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void { return undefined; }
 
-	public getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
+	public async getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): Promise<string[]> { return undefined; }
 
 	public completeProjectProperties(properties: any): boolean { return false; }
 
@@ -377,11 +377,11 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return null;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
+	public async updateMigrationConfigFile(): Promise<void> {
 		return Future.fromResult(null);
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
+	public async ensureProject(projectDir: string): Promise<void> {
 		return Future.fromResult(null);
 	}
 
@@ -464,7 +464,7 @@ export class StaticConfig implements IStaticConfig {
 		return path.join(__dirname, "..", "package.json");
 	}
 
-	public getAdbFilePath(): IFuture<string> {
+	public async getAdbFilePath(): Promise<string> {
 		return Future.fromResult("");
 	}
 

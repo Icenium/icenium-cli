@@ -29,11 +29,11 @@ export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 			}
 	}
 
-	public validate(data: Input): IFuture<IValidationResult> {
+	public async validate(data: Input): Promise<IValidationResult> {
 		return (() => ValidationResult.ValidationResult.Successful).future<IValidationResult>()();
 	}
 
-	public validateProperty(data: Input, propertyName: string): IFuture<IValidationResult> {
+	public async validateProperty(data: Input, propertyName: string): Promise<IValidationResult> {
 		return (() => ValidationResult.ValidationResult.Successful).future<IValidationResult>()();
 	}
 }

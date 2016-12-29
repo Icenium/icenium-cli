@@ -235,7 +235,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			this.saveProject(projectDir);
 	}
 
-	public createNewProject(projectName: string, framework: string, template?: string): IFuture<void> {
+	public async createNewProject(projectName: string, framework: string, template?: string): Promise<void> {
 		if (!projectName) {
 			this.$errors.fail("No project name specified.");
 		}

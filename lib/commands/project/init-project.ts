@@ -3,7 +3,7 @@ export class InitProjectCommand implements ICommand {
 		private $project: Project.IProject,
 		private $logger: ILogger) { }
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.initializeProjectFromExistingFiles(this.frameworkIdentifier);
 	}
 

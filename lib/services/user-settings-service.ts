@@ -119,7 +119,7 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 		this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
 	}
 
-	public saveSetting<T>(key: string, value: T): IFuture<void> {
+	public async saveSetting<T>(key: string, value: T): Promise<void> {
 		let settingObject: any = {};
 		settingObject[key] = value;
 
@@ -170,7 +170,7 @@ export class UserSettingsService extends UserSettingsServiceBase implements User
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 
-	public getSettingValue<T>(settingName: string): IFuture<any> {
+	public async getSettingValue<T>(settingName: string): Promise<any> {
 		if (settingName === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
 			return this.$clientSpecificUserSettingsService.getSettingValue(settingName);
 		}
@@ -178,7 +178,7 @@ export class UserSettingsService extends UserSettingsServiceBase implements User
 		return this.$sharedUserSettingsService.getSettingValue(settingName);
 	}
 
-	public saveSetting<T>(key: string, value: T): IFuture<void> {
+	public async saveSetting<T>(key: string, value: T): Promise<void> {
 		if (key === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
 			return this.$clientSpecificUserSettingsService.saveSetting(key, value);
 		}

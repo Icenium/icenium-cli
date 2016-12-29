@@ -16,7 +16,7 @@ export class SimulatorService implements ISimulatorService {
 		private $analyticsService: IAnalyticsService) {
 	}
 
-	public launchSimulator(): IFuture<void> {
+	public async launchSimulator(): Promise<void> {
 		await this.$loginManager.ensureLoggedIn();
 
 		let simulatorPackageName = this.$simulatorPlatformServices.packageName;
@@ -46,15 +46,15 @@ export class SimulatorService implements ISimulatorService {
 				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
 			];
 
-			await if(this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME)) {
+			if(await this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME)) {
 				simulatorParams.push("--trackfeatureusage");
 			}
 
-			await if(this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME)) {
+			if(await this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME)) {
 				simulatorParams.push("--trackexceptions");
 			}
 
-			simulatorParams = await  simulatorParams.concat(this.$projectSimulatorService.getSimulatorParams(simulatorPackageName));
+			simulatorParams = simulatorParams.concat(await this.$projectSimulatorService.getSimulatorParams(simulatorPackageName));
 			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 	}
 }

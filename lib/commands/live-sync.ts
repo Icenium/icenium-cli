@@ -9,7 +9,7 @@ class LiveSyncCommandBase extends EnsureProjectCommand {
 		super($project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		this.$options.justlaunch = !this.$options.watch;
 		return Future.fromResult();
 	}

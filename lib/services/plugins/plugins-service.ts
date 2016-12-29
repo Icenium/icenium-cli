@@ -5,16 +5,16 @@ export class PluginsService implements IPluginsService {
 		private $loginManager: ILoginManager,
 		private $project: Project.IProject) { }
 
-	public getAvailablePlugins(pluginsCount?: number): IPlugin[] {
-		await return this.getPluginsService().getAvailablePlugins(pluginsCount);
+	public async getAvailablePlugins(pluginsCount?: number): Promise<IPlugin[]> {
+		return (await this.getPluginsService()).getAvailablePlugins(pluginsCount);
 	}
 
-	public getInstalledPlugins(): IPlugin[] {
-		await return this.getPluginsService().getInstalledPlugins();
+	public async getInstalledPlugins(): Promise<IPlugin[]> {
+		return (await this.getPluginsService()).getInstalledPlugins();
 	}
 
-	public printPlugins(plugins: IPlugin[]): void {
-		await this.getPluginsService().printPlugins(plugins);
+	public async printPlugins(plugins: IPlugin[]): Promise<void> {
+		(await this.getPluginsService()).printPlugins(plugins);
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
@@ -29,24 +29,24 @@ export class PluginsService implements IPluginsService {
 			await this.getPluginsService().wait().configurePlugin(pluginName, version, configurations);
 	}
 
-	public isPluginInstalled(pluginName: string): boolean {
-		await return this.getPluginsService().isPluginInstalled(pluginName);
+	public async isPluginInstalled(pluginName: string): Promise<boolean> {
+		return (await this.getPluginsService()).isPluginInstalled(pluginName);
 	}
 
-	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
-		await return this.getPluginsService().getPluginBasicInformation(pluginName);
+	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
+		return (await this.getPluginsService()).getPluginBasicInformation(pluginName);
 	}
 
-	public findPlugins(keywords: string[]): IFuture<IPluginsSource> {
-		await return this.getPluginsService().findPlugins(keywords);
+	public async findPlugins(keywords: string[]): Promise<IPluginsSource> {
+		return (await this.getPluginsService()).findPlugins(keywords);
 	}
 
 	public async fetch(pluginIdentifier: string): Promise<string> {
-			await return this.getPluginsService().wait().fetch(pluginIdentifier);
+		return (await this.getPluginsService()).fetch(pluginIdentifier);
 	}
 
-	public filterPlugins(plugins: IPlugin[]): IFuture<IPlugin[]> {
-		await return this.getPluginsService().filterPlugins(plugins);
+	public async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]> {
+		return (await this.getPluginsService()).filterPlugins(plugins);
 	}
 
 	private async getPluginsService(): Promise<IPluginsService> {

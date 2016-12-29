@@ -27,7 +27,7 @@ export class DebugCommand implements ICommand {
 			await this.runDebugger();
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
+	public async canExecute(args: string[]): Promise<boolean> {
 		if (!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on %s. The debug tools for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}

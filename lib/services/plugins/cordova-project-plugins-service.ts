@@ -256,7 +256,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 	}
 
-	public getPluginBasicInformation(pluginName: string): IFuture<IBasicPluginInformation> {
+	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
 		let dependencyInfo = this.$npmService.getDependencyInformation(pluginName);
 
 		return Future.fromResult({

@@ -10,7 +10,7 @@ export class ProjectSimulatorService implements IProjectSimulatorService {
 		return this.$frameworkSimulatorServiceResolver.resolve(this.$project.projectData.Framework);
 	}
 
-	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
+	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
 		return this.frameworkProjectSimulatorService.getSimulatorParams(simulatorPackageName);
 	}
 }
@@ -71,7 +71,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 			return pluginsPath;
 	}
 
-	public closeStream(stream: any): IFuture<void> {
+	public async closeStream(stream: any): Promise<void> {
 		let future = new Future<void>();
 		stream.close((err: Error, data: any) => {
 			if (err) {
@@ -97,7 +97,7 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 $injector.register("cordovaSimulatorService", CordovaSimulatorService);
 
 export class NativeScriptSimulatorService implements IProjectSimulatorService {
-	public getSimulatorParams(simulatorPackageName: string): IFuture<string[]> {
+	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
 		return (() => <string[]>[]).future<string[]>()();
 	}
 }

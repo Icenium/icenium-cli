@@ -4,7 +4,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 		private $staticConfig: IStaticConfig,
 		private $userSettingsService: IUserSettingsService) { }
 
-	public canDoRequest(): IFuture<boolean> {
+	public async canDoRequest(): Promise<boolean> {
 		return this.$loginManager.isLoggedIn();
 	}
 
@@ -24,7 +24,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 			await return this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED") || 0;
 	}
 
-	public setUserSessionsCount(count: number): IFuture<void> {
+	public async setUserSessionsCount(count: number): Promise<void> {
 		return this.$userSettingsService.saveSetting<number>("SESSIONS_STARTED", count);
 	}
 }

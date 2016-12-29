@@ -4,7 +4,7 @@ export class ConfigurePluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
 		private $injector: IInjector) { }
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return	this.$pluginsService.configurePlugin(args[0]);
 	}
 

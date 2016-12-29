@@ -54,7 +54,7 @@ export class WebViewService implements IWebViewService {
 		return _.find(webViews, _webView => _webView.default).name;
 	}
 
-	public enableWebView(platform: string, webViewName: string, frameworkVersion: string): IFuture<void> {
+	public async enableWebView(platform: string, webViewName: string, frameworkVersion: string): Promise<void> {
 		let webView = this.getWebView(platform, webViewName, frameworkVersion);
 		if (webView.default) {
 			return this.enableDefaultWebView(platform);

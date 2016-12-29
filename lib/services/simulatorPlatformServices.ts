@@ -59,7 +59,7 @@ class MacSimulatorPlatformServices extends platformServicesRunValidatorLib.Platf
 			{ stdio:  ["ignore", "ignore", "ignore"], detached: true }).unref();
 	}
 
-	public canRunApplication(): IFuture<boolean> {
+	public async canRunApplication(): Promise<boolean> {
 		return super.canRunApplication();
 	}
 }

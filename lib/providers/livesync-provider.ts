@@ -10,7 +10,7 @@ export class LiveSyncProvider extends AppBuilderLiveSyncProviderBase {
 		super($androidLiveSyncServiceLocator, $iosLiveSyncServiceLocator);
 	}
 
-	public buildForDevice(device: Mobile.IDevice): IFuture<string> {
+	public async buildForDevice(device: Mobile.IDevice): Promise<string> {
 		return this.$devicesService.isiOSSimulator(device) ? this.$buildService.buildForiOSSimulator(this.$options.saveTo, device)
 			await : Future.fromResult(this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).packageName);
 	}

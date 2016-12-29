@@ -162,7 +162,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		});
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
+	public async ensureProject(projectDir: string): Promise<void> {
 		return Future.fromResult();
 	}
 
@@ -205,7 +205,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return updated;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
+	public async updateMigrationConfigFile(): Promise<void> {
 		return Future.fromResult();
 	}
 
