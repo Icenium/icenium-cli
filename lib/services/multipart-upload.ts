@@ -22,7 +22,7 @@ export class MultipartUploadService implements IMultipartUploadService {
 
 			await this.$server.upload.initUpload(bucketKey);
 
-			let chunks: IFuture<void>[] = [];
+			let chunks: Promise<void>[] = [];
 			while(chunkStartByte < fileSize) {
 				// exclusive endByte
 				endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;

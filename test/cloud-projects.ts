@@ -85,7 +85,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 		getUser: () =>  Promise.resolve({tenant: {id: "id"}}),
 	});
 	testInjector.register("serviceProxy", {
-		makeTapServiceCall: (call: () => IFuture<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
+		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
 	});
 
 	testInjector.register("serviceProxyBase", {

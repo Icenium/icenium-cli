@@ -123,7 +123,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		super($httpClient, $userDataStore, $logger, $config, $staticConfig, $errors, $npmService);
 	}
 
-	public async makeTapServiceCall<T>(call: () => IFuture<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T> {
+	public async makeTapServiceCall<T>(call: () => Promise<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T> {
 			try {
 				let user = await  this.$userDataStore.getUser();
 				this.solutionSpaceName = user.tenant.id;
@@ -137,7 +137,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 			}
 	}
 
-	private async callWithoutSolutionSpaceHeader(action: () => IFuture<any>): Promise<any> {
+	private async callWithoutSolutionSpaceHeader(action: () => Promise<any>): Promise<any> {
 			let cachedUseSolutionSpaceNameValue = this.useSolutionSpaceNameHeader;
 			this.useSolutionSpaceNameHeader = false;
 			let result: any;

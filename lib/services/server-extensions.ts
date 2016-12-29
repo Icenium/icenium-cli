@@ -11,7 +11,7 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 		super(path.join($options.profileDir, "Cache"), $fs, $httpClient, $logger, $options);
 	}
 
-	public async prepareExtension(packageName: string, beforeDownloadExtensionAction: () => IFuture<void>): Promise<void> {
+	public async prepareExtension(packageName: string, beforeDownloadExtensionAction: () => Promise<void>): Promise<void> {
 			let cachedVersion = "0.0.0.0";
 			let extensionData = {
 				packageName: packageName,

@@ -162,7 +162,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("dateProvider", DateProvider);
 	testInjector.register("typeScriptService", {
-		isTypeScriptProject: (projectDir: string): IFuture<boolean> => Promise.resolve(false)
+		isTypeScriptProject: (projectDir: string): Promise<boolean> => Promise.resolve(false)
 	});
 	testInjector.register("npmService", {});
 

@@ -220,7 +220,7 @@ export class Project extends ProjectBase implements Project.IProject {
 		}
 	}
 
-	// TODO: Remove IFuture, reason: writeJson
+	// TODO: Remove Promise, reason: writeJson
 	public async createProjectFile(projectDir: string, properties: any): Promise<void> {
 			properties = properties || {};
 

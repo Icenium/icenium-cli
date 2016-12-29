@@ -46,7 +46,7 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 		open(target: string, appname?: string): void {/* mock */}
 	});
 	injector.register("commandsServiceProvider", {
-		getDynamicCommands: (): IFuture<string[]> => {
+		getDynamicCommands: (): Promise<string[]> => {
 			return Promise.resolve(<string[]>[]);
 		}
 	});

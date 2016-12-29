@@ -57,7 +57,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 		}).future<void>()();
 	}
 
-	public async prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => IFuture<void>): Promise<void> {
+	public async prepareDependencyExtension(dependencyExtensionName: string, dependencyConfig: IDependencyConfig, afterPrepareAction?: () => Promise<void>): Promise<void> {
 			let extensionVersion = this.getExtensionVersion(dependencyExtensionName);
 			let cachedVersion = extensionVersion || AppScaffoldingExtensionsService.DEFAULT_CACHED_VERSION;
 			let downloadUrl = this.$config.ON_PREM ? `${this.$config.AB_SERVER}/downloads/sb/generators/${dependencyExtensionName}/${dependencyConfig.version}` : `${AppScaffoldingExtensionsService.SCREEN_BUILDER_BUCKET_NAME}/v${dependencyConfig.version}/${dependencyExtensionName}.zip`;

@@ -193,7 +193,7 @@ export class ErrorsStub implements IErrors {
 		throw new Error(message);
 	}
 
-	async beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): Promise<boolean> {
+	async beginCommand(action: () => Promise<boolean>, printHelpCommand: () => Promise<boolean>): Promise<boolean> {
 		return action();
 	}
 
@@ -216,7 +216,7 @@ export class ErrorsNoFailStub implements IErrors {
 		throw new Error(message);
 	}
 
-	async beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): Promise<boolean> {
+	async beginCommand(action: () => Promise<boolean>, printHelpCommand: () => Promise<boolean>): Promise<boolean> {
 			try {
 				let result = await  action();
 				return result;

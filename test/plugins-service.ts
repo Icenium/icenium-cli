@@ -47,10 +47,10 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	testInjector.register("npmService", NpmService);
 	testInjector.register("npmPluginsService", NpmPluginsService);
 	testInjector.register("httpClient", {
-		httpRequest: (): IFuture<Server.IResponse> => Promise.resolve(null)
+		httpRequest: (): Promise<Server.IResponse> => Promise.resolve(null)
 	});
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: (future: IFuture<any>) => await  Promise.resolve(future)
+		showProgressIndicator: (future: Promise<any>) => await  Promise.resolve(future)
 	});
 	testInjector.register("projectConstants", {
 		PACKAGE_JSON_NAME: "package.json"
@@ -103,7 +103,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 	});
 
 	testInjector.register("loginManager", {
-		ensureLoggedIn: (): IFuture<void> => {
+		ensureLoggedIn: (): Promise<void> => {
 			return Promise.resolve();
 		}
 	});
@@ -300,7 +300,7 @@ function createTestInjectorForProjectWithBothConfigurations(installedMarketplace
 	});
 
 	testInjector.register("loginManager", {
-		ensureLoggedIn: (): IFuture<void> => {
+		ensureLoggedIn: (): Promise<void> => {
 			return Promise.resolve();
 		}
 	});
@@ -355,7 +355,7 @@ function createTestInjectorForAvailableMarketplacePlugins(availableMarketplacePl
 	});
 
 	testInjector.register("loginManager", {
-		ensureLoggedIn: (): IFuture<void> => {
+		ensureLoggedIn: (): Promise<void> => {
 			return Promise.resolve();
 		}
 	});
@@ -513,7 +513,7 @@ describe("plugins-service", () => {
 		};
 
 		let progressIndicator: IProgressIndicator = testInjector.resolve("progressIndicator");
-		progressIndicator.showProgressIndicator = async (future: IFuture<any>, timeout: number): Promise<void> => {
+		progressIndicator.showProgressIndicator = async (future: Promise<any>, timeout: number): Promise<void> => {
 				await future;
 		};
 

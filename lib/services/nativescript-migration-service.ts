@@ -74,7 +74,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 			let fileDownloadFutures = _(this.nativeScriptMigrationData.supportedVersions)
 				.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
-				.flatten<IFuture<void>>()
+				.flatten<Promise<void>>()
 				.value();
 			fileDownloadFutures.push(this.downloadPackageJsonResourceFile());
 			Future.wait(fileDownloadFutures);

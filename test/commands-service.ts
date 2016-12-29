@@ -38,7 +38,7 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }
-	printMsgWithTimeout(message: string, timeout: number): IFuture <void> { return null;}
+	printMsgWithTimeout(message: string, timeout: number): Promise <void> { return null;}
 }
 
 class MockCommandParameter implements ICommandParameter {
@@ -179,8 +179,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("stringParameter", StringCommandParameter);
 	testInjector.register("stringParameterBuilder", StringParameterBuilder);
 	testInjector.register("analyticsService", {
-		checkConsent: (): IFuture<void> => { return Promise.resolve(); },
-		trackFeature: (featureName: string): IFuture<void> => { return Promise.resolve(); }
+		checkConsent: (): Promise<void> => { return Promise.resolve(); },
+		trackFeature: (featureName: string): Promise<void> => { return Promise.resolve(); }
 	});
 	testInjector.register("resources", {});
 	testInjector.register("injector", testInjector);
@@ -211,7 +211,7 @@ function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInj
 
 	for (let command in commandHelpData) {
 		testInjector.registerCommand(command, {
-			execute: (args: string[]): IFuture<void> => { return Promise.resolve(); }
+			execute: (args: string[]): Promise<void> => { return Promise.resolve(); }
 		});
 	}
 

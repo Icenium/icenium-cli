@@ -78,7 +78,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			let solutionDir = await  this.getExportDir(app.name, (unzipStream: any) => this.$server.apps.exportApplication(slnName, false, unzipStream), {discardSolutionSpaceHeader: app.isApp});
 
 			let projectsDirectories = this.$fs.readDirectory(solutionDir);
-			projectsDirectories.forEach(projectName => await  this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName));
+			projectsDirectories.forEach(async projectName => await this.createProjectFile(path.join(solutionDir, projectName), remoteSolutionName, projectName));
 
 			this.$logger.info("%s has been successfully exported to %s", slnName, solutionDir);
 	}
@@ -97,7 +97,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 			return _.find(await this.getProjectsForSolution(solutionName), pr => pr.Name === projectName);
 	}
 
-	private async getExportDir(dirName: string, tapServiceCall: (_unzipStream: any) => IFuture<any>, solutionSpaceHeaderOptions: {discardSolutionSpaceHeader: boolean}): Promise<string> {
+	private async getExportDir(dirName: string, tapServiceCall: (_unzipStream: any) => Promise<any>, solutionSpaceHeaderOptions: {discardSolutionSpaceHeader: boolean}): Promise<string> {
 			let exportDir = path.join(this.$project.getNewProjectDir(), dirName);
 			if(this.$fs.exists(exportDir)) {
 				this.$errors.fail("The folder %s already exists!", exportDir);

@@ -35,7 +35,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	});
 	testInjector.register("serverExtensionsService", {
 		getExtensionPath: (packageName: string) => { return "extensionPath"; },
-		prepareExtension: (packageName: string, beforeDownloadPackageAction: () => IFuture<void>) => {
+		prepareExtension: (packageName: string, beforeDownloadPackageAction: () => Promise<void>) => {
 			if(useBeforeDownloadAction) {
 				return beforeDownloadPackageAction();
 			}

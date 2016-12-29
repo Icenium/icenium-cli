@@ -25,7 +25,7 @@ export class ExtensionsServiceBase {
 		return path.join(this.cacheDir, packageName);
 	}
 
-	public async prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, actions?: { beforeDownloadAction?: () => IFuture<void>; afterDownloadAction?: () => IFuture<void>}): Promise<void> {
+	public async prepareExtensionBase(extensionData: IExtensionData, initialCachedVersion: string, actions?: { beforeDownloadAction?: () => Promise<void>; afterDownloadAction?: () => Promise<void>}): Promise<void> {
 			actions = actions || {};
 
 			if (this.$fs.exists(this.versionsFile)) {

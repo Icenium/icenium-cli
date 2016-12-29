@@ -115,7 +115,7 @@ function createTestInjector() {
 	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("loginManager", {
-		ensureLoggedIn: (): IFuture<void> => {
+		ensureLoggedIn: (): Promise<void> => {
 			return Promise.resolve();
 		}
 	});
@@ -146,7 +146,7 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 
 	// Register mocked httpClient
 	testInjector.register("httpClient", {
-		httpRequest: (): IFuture<any> => {
+		httpRequest: (): Promise<any> => {
 			return Promise.resolve({
 				body: createMarketplacePluginsData(availableMarketplacePlugins)
 			});
