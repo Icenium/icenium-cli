@@ -4,13 +4,13 @@ export class InitProjectCommand implements ICommand {
 		private $logger: ILogger) { }
 
 	public async execute(args: string[]): Promise<void> {
-		return this.initializeProjectFromExistingFiles(this.frameworkIdentifier);
+		await this.initializeProjectFromExistingFiles(this.frameworkIdentifier);
 	}
 
 	public async initializeProjectFromExistingFiles(frameworkIdentifier: string): Promise<void> {
-			await this.$project.initializeProjectFromExistingFiles(frameworkIdentifier);
-			this.$logger.out("Successfully initialized %s project.", frameworkIdentifier);
+		await this.$project.initializeProjectFromExistingFiles(frameworkIdentifier);
+		this.$logger.out("Successfully initialized %s project.", frameworkIdentifier);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }

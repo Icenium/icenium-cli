@@ -6,7 +6,8 @@ export class DevConfigResetCommand implements ICommand {
 	public disableAnalytics = true;
 
 	public async execute(args: string[]): Promise<void> {
-			this.$config.reset();
+		this.$config.reset();
 	}
 }
+
 $injector.registerCommand("dev-config-reset", DevConfigResetCommand);

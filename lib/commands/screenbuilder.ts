@@ -1,5 +1,4 @@
 export class ScreenBuilderCommand implements ICommand {
-
 	constructor(private $logger: ILogger,
 		private $commandsService: ICommandsService) { }
 
@@ -7,6 +6,7 @@ export class ScreenBuilderCommand implements ICommand {
 		return this.$commandsService.tryExecuteCommand("help", ["screenbuilder"]);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand("screenbuilder", ScreenBuilderCommand);

@@ -1,5 +1,4 @@
 import * as os from "os";
-import Future = require("fibers/future");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
@@ -18,13 +17,13 @@ export class DebugCommand implements ICommand {
 		protected $hostInfo: IHostInfo,
 		protected $darwinDebuggerService: IDebuggerService) { }
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 
 	public async execute(args: string[]): Promise<void> {
-			await this.$loginManager.ensureLoggedIn();
-			this.$project.ensureProject();
+		await this.$loginManager.ensureLoggedIn();
+		await this.$project.ensureProject();
 
-			await this.runDebugger();
+		await this.runDebugger();
 	}
 
 	public async canExecute(args: string[]): Promise<boolean> {
@@ -36,30 +35,30 @@ export class DebugCommand implements ICommand {
 	}
 
 	protected async runDebugger(): Promise<void> {
-			if (this.$hostInfo.isWindows) {
-				this.$logger.info("Starting debugger...");
+		if (this.$hostInfo.isWindows) {
+			this.$logger.info("Starting debugger...");
 
-				let debuggerPackageName = this.$winDebuggerService.packageName;
-				this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
-				await this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this));
+			let debuggerPackageName = this.$winDebuggerService.packageName;
+			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
+			await this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this));
 
-				await this.$sharedUserSettingsService.loadUserSettingsFile();
+			await this.$sharedUserSettingsService.loadUserSettingsFile();
 
-				let debuggerParams = [
-					"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
-					await "--app-ids", this.$project.getAppIdentifierForPlatform(this.platform) // We can specify more than one appid. They should be separated with ;.
-				];
+			let debuggerParams = [
+				"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
+				await "--app-ids", this.$project.getAppIdentifierForPlatform(this.platform) // We can specify more than one appid. They should be separated with ;.
+			];
 
-				this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
-			}
+			this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
+		}
 	}
 
 	private async ensureDebuggerIsNotRunning(): Promise<void> {
-			let isRunning = await  this.$processInfo.isRunning(this.$winDebuggerService.executableName);
-			if (isRunning) {
-				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
-					"Close it and run $ appbuilder debug again.");
-			}
+		let isRunning = await this.$processInfo.isRunning(this.$winDebuggerService.executableName);
+		if (isRunning) {
+			this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
+				"Close it and run $ appbuilder debug again.");
+		}
 	}
 }
 
@@ -94,10 +93,11 @@ export class DebugAndroidCommand extends DebugCommand {
 	}
 
 	protected async runDebugger(): Promise<void> {
-			await super.runDebugger();
+		await super.runDebugger();
 
-			if (!this.$hostInfo.isWindows) {
-				await this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework);			}
+		if (!this.$hostInfo.isWindows) {
+			await this.$darwinDebuggerService.debugAndroidApplication(await this.$project.getAppIdentifierForPlatform(this.platform), this.$project.projectData.Framework);
+		}
 	}
 }
 
@@ -131,11 +131,11 @@ export class DebugIosCommand extends DebugCommand {
 	}
 
 	protected async runDebugger(): Promise<void> {
-			await super.runDebugger();
+		await super.runDebugger();
 
-			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);
-			}
+		if (!this.$hostInfo.isWindows) {
+			this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);
+		}
 	}
 }
 

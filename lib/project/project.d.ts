@@ -67,8 +67,8 @@ declare module Project {
 		zipProject(): Promise<string>;
 		importProject(): Promise<void>;
 
-		ensureCordovaProject(): void;
-		ensureProject(): void;
+		ensureCordovaProject(): Promise<void>;
+		ensureProject(): Promise<void>;
 
 		/**
 		 * Checks all assets (App_Resources) and completes the missing one from the default template.

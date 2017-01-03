@@ -327,7 +327,7 @@ export class BuildService implements Project.IBuildService {
 	}
 
 	public async build(settings: Project.IBuildSettings): Promise<Server.IPackageDef[]> {
-			this.$project.ensureProject();
+			await this.$project.ensureProject();
 
 			this.$jsonSchemaValidator.validate(this.$project.projectData);
 			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);

@@ -5,9 +5,10 @@ export class ConfigurePluginCommand implements ICommand {
 		private $injector: IInjector) { }
 
 	public async execute(args: string[]): Promise<void> {
-		return	this.$pluginsService.configurePlugin(args[0]);
+		await this.$pluginsService.configurePlugin(args[0]);
 	}
 
-	allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
+	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
 }
+
 $injector.registerCommand("plugin|configure", ConfigurePluginCommand);

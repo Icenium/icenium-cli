@@ -63,6 +63,8 @@ interface IAsyncValidator<Input> {
 	throwIfInvalid(data: Input): Promise<void>;
 	validate(data: Input): Promise<IValidationResult>;
 	validateProperty(data: Input, propertyName: string): Promise<IValidationResult>;
+	validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IValidationResult;
+	validateProvision(provision: IProvision): IValidationResult;
 }
 
 interface IiOSDeploymentValidatorModel {

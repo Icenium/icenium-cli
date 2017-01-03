@@ -1,3 +1,5 @@
+import { cache } from "../../common/decorators";
+
 export class ProjectPropertyCommandBase {
 	protected projectSchema: any;
 	public $project: Project.IProject;
@@ -7,8 +9,13 @@ export class ProjectPropertyCommandBase {
 		this.$staticConfig.triggerJsonSchemaValidation = false;
 		this.$project = this.$injector.resolve("project");
 		if (this.$project.projectData) {
-			this.projectSchema = await  this.$project.getProjectSchema();
+			this.projectSchema = this.$project.getProjectSchema();
 		}
+	}
+
+	@cache()
+	public async init(): Promise<void> {
+		await this.$project.ensureProject();
 	}
 
 	public get completionData(): string[] {
@@ -19,10 +26,11 @@ export class ProjectPropertyCommandBase {
 				let range = this.projectSchema[propName].range;
 				if (range) {
 					if (!_.isArray(range)) {
-						range = _.map(range, (value:{ input: string }, key:string) => {
+						range = _.map(range, (value: { input: string }, key: string) => {
 							return value.input || key;
 						});
 					}
+
 					return range;
 				}
 			} else {

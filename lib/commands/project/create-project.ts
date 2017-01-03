@@ -14,5 +14,5 @@ export class CreateProjectCommand extends ProjectCommandBaseLib.ProjectCommandBa
 		return this.$project.createNewProject(args[0], this.frameworkIdentifier, this.$options.template);
 	}
 
-	allowedParameters = [this.$nameCommandParameter];
+	public allowedParameters = [this.$nameCommandParameter];
 }

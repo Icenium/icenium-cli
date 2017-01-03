@@ -1,5 +1,4 @@
 import { EnsureProjectCommand } from "./ensure-project-command";
-import Future = require("fibers/future");
 
 class LiveSyncCommandBase extends EnsureProjectCommand {
 	constructor(protected $liveSyncService: ILiveSyncService,
@@ -11,7 +10,6 @@ class LiveSyncCommandBase extends EnsureProjectCommand {
 
 	public async execute(args: string[]): Promise<void> {
 		this.$options.justlaunch = !this.$options.watch;
-		return Promise.resolve();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -26,8 +24,8 @@ class LiveSyncDevicesCommand extends LiveSyncCommandBase {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			await super.execute(args);
-			await this.$liveSyncService.livesync();
+		await super.execute(args);
+		await this.$liveSyncService.livesync();
 	}
 
 }
@@ -44,8 +42,8 @@ class LiveSyncAndroidCommand extends LiveSyncCommandBase {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			await super.execute(args);
-			await this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
 	}
 }
 
@@ -61,11 +59,11 @@ class LiveSyncIosCommand extends LiveSyncCommandBase {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			await super.execute(args);
-			await this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
 
 $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand);
@@ -81,8 +79,8 @@ class LiveSyncWP8Command extends LiveSyncCommandBase {
 	}
 
 	public async execute(args: string[]): Promise<void> {
-			await super.execute(args);
-			await this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
 	}
 
 	public isDisabled = this.$config.ON_PREM;

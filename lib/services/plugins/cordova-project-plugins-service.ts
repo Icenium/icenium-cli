@@ -1,14 +1,13 @@
 import * as util from "util";
 import * as helpers from "../../common/helpers";
-import {NODE_MODULES_DIR_NAME} from "../../common/constants";
+import { NODE_MODULES_DIR_NAME } from "../../common/constants";
 import * as semver from "semver";
 import * as path from "path";
 import * as xmlMapping from "xml-mapping";
-import {EOL} from "os";
-import {PluginType, CordovaPluginData} from "../../plugins-data";
-import {CordovaPluginsService} from "./cordova-plugins";
-import {PluginsServiceBase} from "./plugins-service-base";
-import Future = require("fibers/future");
+import { EOL } from "os";
+import { PluginType, CordovaPluginData } from "../../plugins-data";
+import { CordovaPluginsService } from "./cordova-plugins";
+import { PluginsServiceBase } from "./plugins-service-base";
 
 export class CordovaProjectPluginsService extends PluginsServiceBase implements IPluginsService {
 	private static CORE_PLUGINS_PROPERTY_NAME = "CorePlugins";
@@ -71,7 +70,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			corePlugins = this.getInstalledPluginsForConfiguration();
 		}
 
-		return corePlugins.concat(await this.getLocalPlugins());
+		return corePlugins.concat(this.getLocalPlugins());
 	}
 
 	public async getAvailablePlugins(pluginsCount?: number): Promise<IPlugin[]> {
@@ -80,142 +79,142 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			plugins = _.filter(plugins, pl => this.isPluginSupported(pl, this.$project.projectData.FrameworkVersion));
 		}
 
-		return plugins.concat(await this.getLocalPlugins());
+		return plugins.concat(this.getLocalPlugins());
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
-			if (!pluginName) {
-				this.$errors.fail("No plugin name specified");
-			}
+		if (!pluginName) {
+			this.$errors.fail("No plugin name specified");
+		}
 
-			let pluginBasicInfo = await  this.getPluginBasicInformation(pluginName);
-			pluginName = pluginBasicInfo.name;
-			let version = pluginBasicInfo.version;
+		let pluginBasicInfo = await this.getPluginBasicInformation(pluginName);
+		pluginName = pluginBasicInfo.name;
+		let version = pluginBasicInfo.version;
 
-			let pluginNameToLowerCase = pluginName.toLowerCase();
-			let plInstances: IPlugin[];
+		let pluginNameToLowerCase = pluginName.toLowerCase();
+		let plInstances: IPlugin[];
 
-			try {
-				plInstances = this.getPluginInstancesByName(pluginName);
-			} catch (err) {
-				// If the user tries to add npm plugin we should fetch it.
-				this.$logger.info(`The plugin '${pluginName}' was not found in our list of verified Cordova plugins. We will try to find it in npm and it will be fetched instead of added.`);
-				await this.fetch(pluginName);
-				return;
-			}
+		try {
+			plInstances = this.getPluginInstancesByName(pluginName);
+		} catch (err) {
+			// If the user tries to add npm plugin we should fetch it.
+			this.$logger.info(`The plugin '${pluginName}' was not found in our list of verified Cordova plugins. We will try to find it in npm and it will be fetched instead of added.`);
+			await this.fetch(pluginName);
+			return;
+		}
 
-			if (!plInstances || !plInstances.length) {
-				this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
-			}
+		if (!plInstances || !plInstances.length) {
+			this.$errors.failWithoutHelp("Invalid plugin name: %s", pluginName);
+		}
 
-			let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration();
-			let installedPluginInstances = installedPluginsForConfiguration
-				.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase);
-			let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
-			if (!installedPluginInstances.length && pluginIdFromName) {
-				this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`);
-				installedPluginInstances = installedPluginsForConfiguration.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
-			}
+		let installedPluginsForConfiguration = this.getInstalledPluginsForConfiguration();
+		let installedPluginInstances = installedPluginsForConfiguration
+			.filter(pl => pl.data.Name.toLowerCase() === pluginNameToLowerCase || pl.data.Identifier.toLowerCase() === pluginNameToLowerCase);
+		let pluginIdFromName = this.getPluginIdFromName(pluginName).toLowerCase();
+		if (!installedPluginInstances.length && pluginIdFromName) {
+			this.$logger.trace(`Unable to find installed plugin with specified name: '${pluginName}'. Trying to find if this is an old name of installed plugin.`);
+			installedPluginInstances = installedPluginsForConfiguration.filter(pl => pl.data.Identifier.toLowerCase() === pluginIdFromName);
+		}
 
-			if (installedPluginInstances && installedPluginInstances.length > 0) {
-				let installedPluginsType = _.chain(installedPluginInstances).groupBy((pl: IPlugin) => pl.type).keys().value();
-				if (installedPluginsType.length > 1) {
-					// In case integrated and Marketplace plugins have duplicate identifiers, try using MarketplacePlugin
-					let mpPlugin = _.find(installedPluginInstances, pl => pl.type === PluginType.MarketplacePlugin);
-					if (mpPlugin) {
-						return await this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version);
-					} else {
-						this.$errors.failWithoutHelp("There are several plugins with name '%s' and they have different types: '%s'", pluginName, installedPluginsType.join(", "));
+		if (installedPluginInstances && installedPluginInstances.length > 0) {
+			let installedPluginsType = _.chain(installedPluginInstances).groupBy((pl: IPlugin) => pl.type).keys().value();
+			if (installedPluginsType.length > 1) {
+				// In case integrated and Marketplace plugins have duplicate identifiers, try using MarketplacePlugin
+				let mpPlugin = _.find(installedPluginInstances, pl => pl.type === PluginType.MarketplacePlugin);
+				if (mpPlugin) {
+					return await this.modifyInstalledMarketplacePlugin(mpPlugin.data.Identifier, version);
+				} else {
+					this.$errors.failWithoutHelp("There are several plugins with name '%s' and they have different types: '%s'", pluginName, installedPluginsType.join(", "));
+				}
+			} else if (installedPluginsType.length === 1) {
+				if (installedPluginsType[0].toString() === PluginType.MarketplacePlugin.toString()) {
+					return await this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version);
+				} else {
+					// Check if plugin is installed for current configuration.
+					let installedPlugin = this.getInstalledPluginByName(pluginName);
+					if (installedPlugin) {
+						this.$logger.info("Plugin '%s' is already installed", pluginName);
+						return;
 					}
-				} else if (installedPluginsType.length === 1) {
-					if (installedPluginsType[0].toString() === PluginType.MarketplacePlugin.toString()) {
-						return await this.modifyInstalledMarketplacePlugin(installedPluginInstances[0].data.Identifier, version);
-					} else {
-						// Check if plugin is installed for current configuration.
-						let installedPlugin = this.getInstalledPluginByName(pluginName);
-						if (installedPlugin) {
-							this.$logger.info("Plugin '%s' is already installed", pluginName);
-							return;
-						}
-					}
 				}
 			}
+		}
 
-			let pluginToAdd = this.getBestMatchingPlugin(pluginName, version);
-			if (pluginToAdd.type === PluginType.MarketplacePlugin) {
-				version = await  this.selectPluginVersion(version, pluginToAdd);
-				if (!this.isPluginSupported(pluginToAdd, this.$project.projectData.FrameworkVersion, version)) {
-					this.$errors.failWithoutHelp(`Plugin ${pluginName} is not available for framework version '${this.$project.projectData.FrameworkVersion}'.`);
-				}
+		let pluginToAdd = this.getBestMatchingPlugin(pluginName, version);
+		if (pluginToAdd.type === PluginType.MarketplacePlugin) {
+			version = await this.selectPluginVersion(version, pluginToAdd);
+			if (!this.isPluginSupported(pluginToAdd, this.$project.projectData.FrameworkVersion, version)) {
+				this.$errors.failWithoutHelp(`Plugin ${pluginName} is not available for framework version '${this.$project.projectData.FrameworkVersion}'.`);
+			}
+		}
+
+		// If there are no configurations specified by the user we need to add the plugin in all configurations.
+		let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
+		if (_(this.pluginsForbiddenConfigurations).keys().find(key => key === pluginToAdd.data.Identifier)) {
+			let forbiddenConfig = this.pluginsForbiddenConfigurations[pluginToAdd.data.Identifier];
+			if (configurations.length === 1 && _.includes(this.specifiedConfigurations, forbiddenConfig)) {
+				this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
 			}
 
-			// If there are no configurations specified by the user we need to add the plugin in all configurations.
-			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
-			if (_(this.pluginsForbiddenConfigurations).keys().find(key => key === pluginToAdd.data.Identifier)) {
-				let forbiddenConfig = this.pluginsForbiddenConfigurations[pluginToAdd.data.Identifier];
-				if (configurations.length === 1 && _.includes(this.specifiedConfigurations, forbiddenConfig)) {
-					this.$errors.failWithoutHelp(`You cannot enable plugin ${pluginName} in ${forbiddenConfig} configuration.`);
-				}
+			configurations = _.without(configurations, forbiddenConfig);
+		}
 
-				configurations = _.without(configurations, forbiddenConfig);
-			}
-
-			await this.configurePlugin(pluginName, version, configurations);
+		await this.configurePlugin(pluginName, version, configurations);
 	}
 
 	public async removePlugin(pluginName: string): Promise<void> {
-			if (!pluginName) {
-				this.$errors.fail("No plugin name specified.");
-			}
+		if (!pluginName) {
+			this.$errors.fail("No plugin name specified.");
+		}
 
-			let installedPlugins = this.getInstalledPluginByName(pluginName);
-			let plugin = installedPlugins[0];
-			if (!plugin) {
-				// Need to check the plugins directory because the plugin can be fetched, not added.
-				if (await this.isPluginFetched(pluginName)) {
-					let shouldDeleteFetchedPlugin = true;
+		let installedPlugins = this.getInstalledPluginByName(pluginName);
+		let plugin = installedPlugins[0];
+		if (!plugin) {
+			// Need to check the plugins directory because the plugin can be fetched, not added.
+			if (await this.isPluginFetched(pluginName)) {
+				let shouldDeleteFetchedPlugin = true;
 
-					if (helpers.isInteractive()) {
-						shouldDeleteFetchedPlugin = await  this.$prompter.confirm(`The plugin ${pluginName} will be deleted from the plugins folder. Are you sure you want to remove it?`, () => true);
-					}
-
-					if (shouldDeleteFetchedPlugin) {
-						this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName));
-						this.$logger.out(`Plugin ${pluginName} was successfully removed.`);
-					} else {
-						this.$logger.out(`Plugin ${pluginName} was not removed.`);
-					}
-
-					return;
-				} else {
-					this.$errors.failWithoutHelp("Could not find plugin with name %s.", pluginName);
+				if (helpers.isInteractive()) {
+					shouldDeleteFetchedPlugin = await this.$prompter.confirm(`The plugin ${pluginName} will be deleted from the plugins folder. Are you sure you want to remove it?`, () => true);
 				}
-			}
 
-			let obsoletedBy = await  this.getObsoletedByPluginIdentifier(plugin.data.Identifier);
-			let obsoletingKey = await  this.getObsoletingPluginIdentifier(plugin.data.Identifier);
+				if (shouldDeleteFetchedPlugin) {
+					this.$fs.deleteDirectory(path.join(this.$project.projectDir, this.getPluginsDirName(), pluginName));
+					this.$logger.out(`Plugin ${pluginName} was successfully removed.`);
+				} else {
+					this.$logger.out(`Plugin ${pluginName} was not removed.`);
+				}
 
-			if (this.$project.hasBuildConfigurations) {
-				// If there are no configurations specified by the user we need to remove the plugin from all configurations.
-				let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
-				_.each(configurations, (configuration: string) => {
-					this.removePluginCore(pluginName, plugin, configuration);
-					if (obsoletedBy) {
-						this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration);
-					}
-					if (obsoletingKey) {
-						this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration);
-					}
-				});
+				return;
 			} else {
-				this.removePluginCore(pluginName, plugin);
+				this.$errors.failWithoutHelp("Could not find plugin with name %s.", pluginName);
+			}
+		}
+
+		let obsoletedBy = await this.getObsoletedByPluginIdentifier(plugin.data.Identifier);
+		let obsoletingKey = await this.getObsoletingPluginIdentifier(plugin.data.Identifier);
+
+		if (this.$project.hasBuildConfigurations) {
+			// If there are no configurations specified by the user we need to remove the plugin from all configurations.
+			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
+			_.each(configurations, (configuration: string) => {
+				this.removePluginCore(pluginName, plugin, configuration);
 				if (obsoletedBy) {
-					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]);
+					this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`], configuration);
 				}
 				if (obsoletingKey) {
-					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]);
+					this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey], configuration);
 				}
+			});
+		} else {
+			this.removePluginCore(pluginName, plugin);
+			if (obsoletedBy) {
+				this.removePluginCore(obsoletedBy, this.identifierToPlugin[`${obsoletedBy}@${plugin.data.Version}`]);
 			}
+			if (obsoletingKey) {
+				this.removePluginCore(obsoletingKey, this.identifierToPlugin[obsoletingKey]);
+			}
+		}
 	}
 
 	public printPlugins(plugins: IPlugin[]): void {
@@ -242,18 +241,18 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	public isPluginInstalled(pluginName: string): boolean {
 		let installedPluginInstances = this.getInstalledPluginByName(pluginName);
-		return (installedPluginInstances && await  installedPluginInstances.length > 0) || this.isPluginFetched(pluginName);
+		return (installedPluginInstances && await installedPluginInstances.length > 0) || this.isPluginFetched(pluginName);
 	}
 
 	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
-			if (this.$project.hasBuildConfigurations) {
-				let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
-				_.each(configs, async (configuration: string) => {
-					await this.configurePluginCore(pluginName, configuration, version);
-				});
-			} else {
-				await this.configurePluginCore(pluginName, version);
-			}
+		if (this.$project.hasBuildConfigurations) {
+			let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
+			_.each(configs, async (configuration: string) => {
+				await this.configurePluginCore(pluginName, configuration, version);
+			});
+		} else {
+			await this.configurePluginCore(pluginName, version);
+		}
 	}
 
 	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
@@ -279,8 +278,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	public async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]> {
-			let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins()).map(pluginId => pluginId.toLowerCase());
-			return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
+		let obsoletedIntegratedPlugins = _.keys(this.getObsoletedIntegratedPlugins()).map(pluginId => pluginId.toLowerCase());
+		return _.filter(plugins, pl => !_.some(obsoletedIntegratedPlugins, obsoletedId => obsoletedId === pl.data.Identifier.toLowerCase() && pl.type !== PluginType.MarketplacePlugin));
 	}
 
 	protected shouldCopyToPluginsDirectory(pathToPlugin: string): boolean {
@@ -297,24 +296,24 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	protected async installLocalPluginCore(pathToPlugin: string, pluginOpts: ILocalPluginData): Promise<IBasicPluginInformation> {
-			let pluginXml = this.getPluginXmlContent(pathToPlugin);
+		let pluginXml = this.getPluginXmlContent(pathToPlugin);
 
-			return await this.getLocalPluginBasicInformation(pluginXml);
+		return await this.getLocalPluginBasicInformation(pluginXml);
 	}
 
 	protected async fetchPluginBasicInformationCore(pathToInstalledPlugin: string, version: string, pluginData?: ILocalPluginData, options?: NpmPlugins.IFetchLocalPluginOptions): Promise<IBasicPluginInformation> {
-			// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
-			pluginData.addPluginToConfigFile = false;
+		// We do not need to add the plugin to .abproject file because it will be sent with the plugins directory.
+		pluginData.addPluginToConfigFile = false;
 
-			let pluginBasicInfo = await  super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
-			let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
+		let pluginBasicInfo = await super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
+		let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 
-			_.each(configurations, async (configuration) => {
-				await this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration);
-			});
+		_.each(configurations, async (configuration) => {
+			await this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration);
+		});
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
-			return pluginBasicInfo;
+		this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
+		return pluginBasicInfo;
 
 	}
 
@@ -326,12 +325,12 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async loadPluginsData(): Promise<void> {
-			// Cordova plugin commands are only applicable to Cordova projects
-			this.$project.ensureCordovaProject();
-			await this.$loginManager.ensureLoggedIn();
-			this._identifierToPlugin = Object.create(null);
-			Future.wait([this.createPluginsData(this.$cordovaPluginsService),
-				this.createPluginsData(this.$marketplacePluginsService)]);
+		// Cordova plugin commands are only applicable to Cordova projects
+		this.$project.ensureCordovaProject();
+		await this.$loginManager.ensureLoggedIn();
+		this._identifierToPlugin = Object.create(null);
+		Future.wait([this.createPluginsData(this.$cordovaPluginsService),
+		this.createPluginsData(this.$marketplacePluginsService)]);
 	}
 
 	private getInstalledPluginsForConfiguration(config?: string): IPlugin[] {
@@ -402,39 +401,39 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async configurePluginCore(pluginName: string, configuration?: string, version?: string): Promise<void> {
-			let plugin = this.getBestMatchingPlugin(pluginName, version);
-			let pluginData = <IMarketplacePluginData>plugin.data;
+		let plugin = this.getBestMatchingPlugin(pluginName, version);
+		let pluginData = <IMarketplacePluginData>plugin.data;
 
-			await this.setPluginVariables(pluginData.Identifier, <string[]>pluginData.Variables, configuration);
+		await this.setPluginVariables(pluginData.Identifier, <string[]>pluginData.Variables, configuration);
 
-			let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
-			// remove all instances of the plugin from current configuration
-			newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(plugin.data.Identifier).map(plug => plug.toProjectDataRecord())));
-			let obsoletedBy = await  this.getObsoletedByPluginIdentifier(plugin.data.Identifier),
-				obsoletingKey = await  this.getObsoletingPluginIdentifier(plugin.data.Identifier);
-			if (obsoletedBy) {
-				newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(obsoletedBy).map(plug => plug.toProjectDataRecord())));
-			}
+		let newCorePlugins = this.$project.getProperty(CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, configuration) || [];
+		// remove all instances of the plugin from current configuration
+		newCorePlugins = _.without.apply(null, [newCorePlugins].concat(this.getPluginInstancesByName(plugin.data.Identifier).map(plug => plug.toProjectDataRecord())));
+		let obsoletedBy = await this.getObsoletedByPluginIdentifier(plugin.data.Identifier),
+			obsoletingKey = await this.getObsoletingPluginIdentifier(plugin.data.Identifier);
+		if (obsoletedBy) {
+			newCorePlugins = _.without.apply(null, [newCorePlugins].concat(this.getPluginInstancesByName(obsoletedBy).map(plug => plug.toProjectDataRecord())));
+		}
 
-			if (obsoletingKey) {
-				newCorePlugins = _.without.apply(null, [ newCorePlugins ].concat(this.getPluginInstancesByName(obsoletingKey).map(plug => plug.toProjectDataRecord())));
-			}
+		if (obsoletingKey) {
+			newCorePlugins = _.without.apply(null, [newCorePlugins].concat(this.getPluginInstancesByName(obsoletingKey).map(plug => plug.toProjectDataRecord())));
+		}
 
-			newCorePlugins.push(plugin.toProjectDataRecord(version));
+		newCorePlugins.push(plugin.toProjectDataRecord(version));
 
-			let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version || plugin.data.Version}` : "",
-				successMessageForConfigSuffix = ` for ${configuration} configuration${versionString}`,
-				successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
+		let versionString = this.isMarketplacePlugin(plugin) ? ` with version ${version || plugin.data.Version}` : "",
+			successMessageForConfigSuffix = ` for ${configuration} configuration${versionString}`,
+			successMessage = `Plugin ${pluginName} was successfully added${configuration ? successMessageForConfigSuffix : versionString}.`;
 
-			if (configuration) {
-				await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]);
-			} else {
-				await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins);
-			}
+		if (configuration) {
+			await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins, [configuration]);
+		} else {
+			await this.$project.updateProjectProperty("set", CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME, newCorePlugins);
+		}
 
-			this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
+		this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 
-			this.$logger.out(successMessage);
+		this.$logger.out(successMessage);
 	}
 
 	private removePluginCore(pluginName: string, plugin: IPlugin, configuration?: string): void {
@@ -466,48 +465,48 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async createPluginsData(pluginsService: ICordovaPluginsService): Promise<void> {
-			let plugins = await  pluginsService.getAvailablePlugins();
-			_.each(plugins, (plugin: IMarketplacePluginData) => {
-				try {
-					let data = pluginsService.createPluginData(plugin);
-					_.each(data, pluginData => {
-						if (pluginData && pluginData.data) {
-							let projectDataRecord = pluginData.toProjectDataRecord();
-							let configurations = this.$project.configurationSpecificData;
-							_.each(configurations, (configData: IDictionary<any>, configuration: string) => {
-								if (configData) {
-									let corePlugins = configData[CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME];
-									if (corePlugins && (_.includes(corePlugins, projectDataRecord) || _.includes(corePlugins, pluginData.data.Identifier))) {
-										pluginData.configurations.push(configuration);
-									}
+		let plugins = await pluginsService.getAvailablePlugins();
+		_.each(plugins, (plugin: IMarketplacePluginData) => {
+			try {
+				let data = pluginsService.createPluginData(plugin);
+				_.each(data, pluginData => {
+					if (pluginData && pluginData.data) {
+						let projectDataRecord = pluginData.toProjectDataRecord();
+						let configurations = this.$project.configurationSpecificData;
+						_.each(configurations, (configData: IDictionary<any>, configuration: string) => {
+							if (configData) {
+								let corePlugins = configData[CordovaProjectPluginsService.CORE_PLUGINS_PROPERTY_NAME];
+								if (corePlugins && (_.includes(corePlugins, projectDataRecord) || _.includes(corePlugins, pluginData.data.Identifier))) {
+									pluginData.configurations.push(configuration);
 								}
-							});
-							this._identifierToPlugin[projectDataRecord] = pluginData;
-						} else {
-							this.$logger.warn("Unable to fetch data for plugin %s.", plugin.Identifier);
-						}
-					});
-				} catch (e) {
-					this.$logger.warn("Unable to fetch data for %s plugin. Please, try again in a few minutes.", (<any>plugin).title);
-					this.$logger.trace(e);
-				}
-			});
+							}
+						});
+						this._identifierToPlugin[projectDataRecord] = pluginData;
+					} else {
+						this.$logger.warn("Unable to fetch data for plugin %s.", plugin.Identifier);
+					}
+				});
+			} catch (e) {
+				this.$logger.warn("Unable to fetch data for %s plugin. Please, try again in a few minutes.", (<any>plugin).title);
+				this.$logger.trace(e);
+			}
+		});
 	}
 
 	private async gatherVariableInformation(pluginIdentifier: string, variableName: string, configuration: string): Promise<any> {
-			let schema: IPromptSchema = {
-				name: variableName,
-				type: "input",
-				message: configuration ? util.format("Set value for variable %s in %s configuration", variableName, configuration) : util.format("Set value for variable %s", variableName)
-			};
+		let schema: IPromptSchema = {
+			name: variableName,
+			type: "input",
+			message: configuration ? util.format("Set value for variable %s in %s configuration", variableName, configuration) : util.format("Set value for variable %s", variableName)
+		};
 
-			let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
-			let pluginVariables = cordovaPluginVariables[pluginIdentifier];
-			if (pluginVariables && pluginVariables[variableName]) {
-				schema["default"] = () => pluginVariables[variableName];
-			}
+		let cordovaPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+		let pluginVariables = cordovaPluginVariables[pluginIdentifier];
+		if (pluginVariables && pluginVariables[variableName]) {
+			schema["default"] = () => pluginVariables[variableName];
+		}
 
-			return this.getPluginVariableFromVarOption(variableName, configuration) || await  this.$prompter.get([schema]);
+		return this.getPluginVariableFromVarOption(variableName, configuration) || await this.$prompter.get([schema]);
 	}
 
 	private getPluginInstancesByName(pluginName: string, version?: string): IPlugin[] {
@@ -545,18 +544,18 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async promptForVersion(pluginName: string, versions: any[]): Promise<string> {
-			return await versions.length > 1 ? this.promptForVersionCore(pluginName, versions) : versions[0].value;
+		return await versions.length > 1 ? this.promptForVersionCore(pluginName, versions) : versions[0].value;
 	}
 
 	private async promptForVersionCore(pluginName: string, versions: any[]): Promise<string> {
-			let version: string;
-			if (helpers.isInteractive()) {
-				version = await  this.$prompter.promptForChoice("Which plugin version do you want to use?", versions);
-			} else {
-				this.$errors.failWithoutHelp(`You must specify valid version in order to update your plugin when terminal is not interactive.`);
-			}
+		let version: string;
+		if (helpers.isInteractive()) {
+			version = await this.$prompter.promptForChoice("Which plugin version do you want to use?", versions);
+		} else {
+			this.$errors.failWithoutHelp(`You must specify valid version in order to update your plugin when terminal is not interactive.`);
+		}
 
-			return version;
+		return version;
 	}
 
 	private printPluginsCore(plugins: IPlugin[]): void {
@@ -576,102 +575,102 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async modifyInstalledMarketplacePlugin(pluginName: string, version: string): Promise<void> {
-			pluginName = pluginName.toLowerCase();
-			let isConsoleInteractive = helpers.isInteractive();
-			let allInstalledPlugins = this.getInstalledPluginsForConfiguration();
-			let installedPluginInstances = _(allInstalledPlugins)
-				.filter((plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName)
-				.uniqBy((plugin: IPlugin) => plugin.data.Version)
-				.value();
+		pluginName = pluginName.toLowerCase();
+		let isConsoleInteractive = helpers.isInteractive();
+		let allInstalledPlugins = this.getInstalledPluginsForConfiguration();
+		let installedPluginInstances = _(allInstalledPlugins)
+			.filter((plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName)
+			.uniqBy((plugin: IPlugin) => plugin.data.Version)
+			.value();
 
-			let selectedVersion: string;
-			if (installedPluginInstances.length > 1) {
-				this.$logger.warn(`Plugin '${pluginName}' is enabled with different versions in your project configurations. You must use the same version in all configurations.`);
-			}
+		let selectedVersion: string;
+		if (installedPluginInstances.length > 1) {
+			this.$logger.warn(`Plugin '${pluginName}' is enabled with different versions in your project configurations. You must use the same version in all configurations.`);
+		}
 
-			_.each(installedPluginInstances, (pl: IPlugin) => {
-				let configString = pl.configurations.length > 1 ? `'${pl.configurations.join(", ")}' configurations` : `'${pl.configurations[0]}' configuration`;
-				this.$logger.info(`Plugin '${pluginName}' is enabled in ${configString} with version '${pl.data.Version}'.`);
-			});
+		_.each(installedPluginInstances, (pl: IPlugin) => {
+			let configString = pl.configurations.length > 1 ? `'${pl.configurations.join(", ")}' configurations` : `'${pl.configurations[0]}' configuration`;
+			this.$logger.info(`Plugin '${pluginName}' is enabled in ${configString} with version '${pl.data.Version}'.`);
+		});
 
-			let installedPlugin = installedPluginInstances[0];
-			// in case options.debug, options.release and options.config  are not specified, let's just update all configurations without asking for prompt.
-			if (!this.specifiedConfigurations.length) {
-				selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
-				await this.configurePlugin(pluginName, selectedVersion, this.$project.getAllConfigurationsNames());
-				return;
-			}
+		let installedPlugin = installedPluginInstances[0];
+		// in case options.debug, options.release and options.config  are not specified, let's just update all configurations without asking for prompt.
+		if (!this.specifiedConfigurations.length) {
+			selectedVersion = await this.selectPluginVersion(version, installedPlugin);
+			await this.configurePlugin(pluginName, selectedVersion, this.$project.getAllConfigurationsNames());
+			return;
+		}
 
-			let configurationsToRemove = _.difference(installedPlugin.configurations, this.specifiedConfigurations);
+		let configurationsToRemove = _.difference(installedPlugin.configurations, this.specifiedConfigurations);
 
-			// If we have plugins with different version in different configurations there will be more than one pluginInstance in the installedPluginInstances and we need to get their configurations too.
-			let configurationsToEdit = _(installedPluginInstances)
-				.map((pluginInstance: IPlugin) => pluginInstance.configurations)
-				.flatten()
-				.concat(this.specifiedConfigurations)
-				.uniq()
-				.value();
+		// If we have plugins with different version in different configurations there will be more than one pluginInstance in the installedPluginInstances and we need to get their configurations too.
+		let configurationsToEdit = _(installedPluginInstances)
+			.map((pluginInstance: IPlugin) => pluginInstance.configurations)
+			.flatten()
+			.concat(this.specifiedConfigurations)
+			.uniq()
+			.value();
 
-			let removeItemChoice = `Remove plugin from [${configurationsToRemove.join(", ")}] configuration and add it to [${this.specifiedConfigurations.join(", ")}] configuration only.`;
-			let modifyAllConfigs = `Enable plugin in [${configurationsToEdit.join(", ")}] configurations with same version.`;
-			let cancelOperation = "Cancel operation.";
-			let choices = [modifyAllConfigs, cancelOperation];
+		let removeItemChoice = `Remove plugin from [${configurationsToRemove.join(", ")}] configuration and add it to [${this.specifiedConfigurations.join(", ")}] configuration only.`;
+		let modifyAllConfigs = `Enable plugin in [${configurationsToEdit.join(", ")}] configurations with same version.`;
+		let cancelOperation = "Cancel operation.";
+		let choices = [modifyAllConfigs, cancelOperation];
 
-			if (configurationsToRemove.length) {
-				choices.unshift(removeItemChoice);
-			}
+		if (configurationsToRemove.length) {
+			choices.unshift(removeItemChoice);
+		}
 
-			if (!configurationsToRemove.length && installedPlugin.configurations.length === this.specifiedConfigurations.length) {
-				if (installedPluginInstances.length > 1 && !helpers.isInteractive()) {
-					this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
-				}
-
-				selectedVersion = await  this.selectPluginVersion(version, installedPlugin, { excludeCurrentVersion: true });
-				_.each(configurationsToEdit, async (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
-				return;
-			}
-
-			if (isConsoleInteractive) {
-				let selectedItem = await  this.$prompter.promptForChoice("Select action", choices);
-				switch (selectedItem) {
-					case removeItemChoice:
-						selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
-						_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
-						_.each(this.specifiedConfigurations, async (selectedConfiguration: string) => await  this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
-						break;
-					case modifyAllConfigs:
-						selectedVersion = await  this.selectPluginVersion(version, installedPlugin);
-						await this.configurePlugin(pluginName, selectedVersion, configurationsToEdit);
-						break;
-					default:
-						this.$errors.failWithoutHelp("The operation will not be completed.");
-				}
-			} else {
+		if (!configurationsToRemove.length && installedPlugin.configurations.length === this.specifiedConfigurations.length) {
+			if (installedPluginInstances.length > 1 && !helpers.isInteractive()) {
 				this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
 			}
+
+			selectedVersion = await this.selectPluginVersion(version, installedPlugin, { excludeCurrentVersion: true });
+			_.each(configurationsToEdit, async (selectedConfiguration: string) => await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+			return;
+		}
+
+		if (isConsoleInteractive) {
+			let selectedItem = await this.$prompter.promptForChoice("Select action", choices);
+			switch (selectedItem) {
+				case removeItemChoice:
+					selectedVersion = await this.selectPluginVersion(version, installedPlugin);
+					_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
+					_.each(this.specifiedConfigurations, async (selectedConfiguration: string) => await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+					break;
+				case modifyAllConfigs:
+					selectedVersion = await this.selectPluginVersion(version, installedPlugin);
+					await this.configurePlugin(pluginName, selectedVersion, configurationsToEdit);
+					break;
+				default:
+					this.$errors.failWithoutHelp("The operation will not be completed.");
+			}
+		} else {
+			this.$errors.failWithoutHelp(`Plugin ${pluginName} is enabled in multiple configurations and you are trying to enable it in one only. You cannot do this in non-interactive terminal.`);
+		}
 	}
 
 	private async selectPluginVersion(version: string, plugin: IPlugin, options?: { excludeCurrentVersion: boolean }): Promise<string> {
-			let pluginName = plugin.data.Name;
-			let versions = this.getPluginVersions(plugin);
-			if (version) {
-				if (!_.some(versions, v => v.value === version)) {
-					this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
-				}
-			} else if (this.$options.latest) {
-				// server returns the versions in descending order
-				version = _.first(versions).value;
-			} else if (this.$options.default) {
-				version = this.getDefaultPluginVersion(plugin);
-			} else {
-				if (options && options.excludeCurrentVersion) {
-					let currentVersionIndex = _.findIndex(versions, (v) => v.value === plugin.data.Version);
-					versions.splice(currentVersionIndex, 1);
-				}
-				version = await  this.promptForVersion(pluginName, versions);
+		let pluginName = plugin.data.Name;
+		let versions = this.getPluginVersions(plugin);
+		if (version) {
+			if (!_.some(versions, v => v.value === version)) {
+				this.$errors.failWithoutHelp("Invalid version %s. The valid versions are: %s.", version, versions.map(v => v.value).join(", "));
 			}
+		} else if (this.$options.latest) {
+			// server returns the versions in descending order
+			version = _.first(versions).value;
+		} else if (this.$options.default) {
+			version = this.getDefaultPluginVersion(plugin);
+		} else {
+			if (options && options.excludeCurrentVersion) {
+				let currentVersionIndex = _.findIndex(versions, (v) => v.value === plugin.data.Version);
+				versions.splice(currentVersionIndex, 1);
+			}
+			version = await this.promptForVersion(pluginName, versions);
+		}
 
-			return version;
+		return version;
 	}
 
 	/**
@@ -797,99 +796,99 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async getObsoletedByPluginIdentifier(pluginIdentifier: string): Promise<string> {
-			let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
-			return obsoletedByInfo.obsoletedBy;
+		let obsoletedByInfo = _.find(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => key.toLowerCase() === pluginIdentifier.toLowerCase()) || Object.create(null);
+		return obsoletedByInfo.obsoletedBy;
 	}
 
 	private async getObsoletingPluginIdentifier(pluginIdentifier: string): Promise<string> {
-			let obsoletingKey: string;
+		let obsoletingKey: string;
 
-			_.each(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => {
-				if (obsoletedPluginInfo.obsoletedBy.toLowerCase() === pluginIdentifier.toLowerCase()) {
-					obsoletingKey = key;
-					return false;
-				}
-			});
+		_.each(this.getObsoletedIntegratedPlugins(), (obsoletedPluginInfo: any, key: string) => {
+			if (obsoletedPluginInfo.obsoletedBy.toLowerCase() === pluginIdentifier.toLowerCase()) {
+				obsoletingKey = key;
+				return false;
+			}
+		});
 
-			return obsoletingKey;
+		return obsoletingKey;
 	}
 
-	private async getLocalPlugins(): Promise<IPlugin[]> {
-			if (!this._localPlugins) {
-				let pluginsDir = path.join(this.$project.projectDir, "plugins");
-				if (!this.$fs.exists(pluginsDir)) {
-					return [];
-				}
-
-				this._localPlugins = _(this.$fs.readDirectory(pluginsDir))
-					.map((pluginName: string) => {
-						let pathToPlugin = path.join(pluginsDir, pluginName);
-						if (this.$fs.getFsStats(pathToPlugin).isFile()) {
-							return null;
-						}
-
-						let pluginXml = this.getPluginXmlContent(pathToPlugin);
-						let basicPluginInfo = await  this.getLocalPluginBasicInformation(pluginXml);
-						let plugin = pluginXml.plugin;
-						let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
-						let identifier = plugin.id;
-						let url = "";
-
-						if (_.has(plugin, "repo")) {
-							url = plugin.repo.$t;
-						}
-
-						if (!url && _.has(plugin, "url")) {
-							url = plugin.url.$t;
-						}
-
-						let data: IMarketplacePluginData = {
-							Name: basicPluginInfo.name,
-							Description: basicPluginInfo.description,
-							Assets: null,
-							AndroidRequiredPermissions: null,
-							Authors: [basicPluginInfo.author],
-							Url: url,
-							Identifier: identifier,
-							Version: basicPluginInfo.version,
-							Variables: basicPluginInfo.variables,
-							Publisher: { Name: basicPluginInfo.author, Url: url },
-							DownloadsCount: 0,
-							SupportedVersion: basicPluginInfo.version,
-							Platforms: platforms
-						};
-
-						return new CordovaPluginData(data, PluginType.LocalPlugin, this.$project, this.$projectConstants);
-					})
-					.filter((plugin: IPlugin) => !!plugin)
-					.value();
+	private getLocalPlugins(): IPlugin[] {
+		if (!this._localPlugins) {
+			let pluginsDir = path.join(this.$project.projectDir, "plugins");
+			if (!this.$fs.exists(pluginsDir)) {
+				return [];
 			}
 
-			return this._localPlugins;
+			this._localPlugins = _(this.$fs.readDirectory(pluginsDir))
+				.map((pluginName: string) => {
+					let pathToPlugin = path.join(pluginsDir, pluginName);
+					if (this.$fs.getFsStats(pathToPlugin).isFile()) {
+						return null;
+					}
+
+					let pluginXml = this.getPluginXmlContent(pathToPlugin);
+					let basicPluginInfo = this.getLocalPluginBasicInformation(pluginXml);
+					let plugin = pluginXml.plugin;
+					let platforms = _.isArray(plugin.platform) ? _.map(plugin.platform, (p: any) => p.name) : _.filter([plugin.platform && plugin.platform.name]);
+					let identifier = plugin.id;
+					let url = "";
+
+					if (_.has(plugin, "repo")) {
+						url = plugin.repo.$t;
+					}
+
+					if (!url && _.has(plugin, "url")) {
+						url = plugin.url.$t;
+					}
+
+					let data: IMarketplacePluginData = {
+						Name: basicPluginInfo.name,
+						Description: basicPluginInfo.description,
+						Assets: null,
+						AndroidRequiredPermissions: null,
+						Authors: [basicPluginInfo.author],
+						Url: url,
+						Identifier: identifier,
+						Version: basicPluginInfo.version,
+						Variables: basicPluginInfo.variables,
+						Publisher: { Name: basicPluginInfo.author, Url: url },
+						DownloadsCount: 0,
+						SupportedVersion: basicPluginInfo.version,
+						Platforms: platforms
+					};
+
+					return new CordovaPluginData(data, PluginType.LocalPlugin, this.$project, this.$projectConstants);
+				})
+				.filter((plugin: IPlugin) => !!plugin)
+				.value();
+		}
+
+		return this._localPlugins;
 	}
 
-	private async getLocalPluginBasicInformation(pluginXml: any): Promise<IBasicPluginInformation> {
-			// Need to add $t because of the xmlMapping library.
-			let basicPluginInformation: IBasicPluginInformation = {
-				name: pluginXml.plugin.name.$t,
-				description: pluginXml.plugin.description.$t,
-				version: pluginXml.plugin.version
-			};
+	private getLocalPluginBasicInformation(pluginXml: any): IBasicPluginInformation {
+		// Need to add $t because of the xmlMapping library.
+		let basicPluginInformation: IBasicPluginInformation = {
+			name: pluginXml.plugin.name.$t,
+			description: pluginXml.plugin.description.$t,
+			version: pluginXml.plugin.version
+		};
 
-			let pluginVariables: any[] = [];
-			if (pluginXml.plugin.preference) {
-				// Need to check if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
-				if (_.isArray(pluginXml.plugin.preference)) {
-					_.each(pluginXml.plugin.preference, (preference: any) => {
-						pluginVariables.push(preference);
-					});
-				} else {
-					pluginVariables.push(pluginXml.plugin.preference);
-				}
+		let pluginVariables: any[] = [];
+		if (pluginXml.plugin.preference) {
+			// Need to check if the preference property is array or not because thats how the xmlMapping transforms the xml to json.
+			if (_.isArray(pluginXml.plugin.preference)) {
+				_.each(pluginXml.plugin.preference, (preference: any) => {
+					pluginVariables.push(preference);
+				});
+			} else {
+				pluginVariables.push(pluginXml.plugin.preference);
 			}
+		}
 
-			basicPluginInformation.variables = pluginVariables;
-			return basicPluginInformation;
+		basicPluginInformation.variables = pluginVariables;
+		return basicPluginInformation;
 	}
 
 	private getPluginXmlContent(pathToPlugin: string): any {
@@ -903,21 +902,21 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	}
 
 	private async setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): Promise<void> {
-			let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
-			let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
+		let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
+		let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
 
-			if (variables && variables.length > 0) {
-				if (!cordovaPluginVariables[pluginIdentifier]) {
-					cordovaPluginVariables[pluginIdentifier] = {};
-				}
-
-				_.each(variables, (variable: any) => {
-					let variableName: string = variable.name || variable;
-					let variableInformation = await  this.gatherVariableInformation(pluginIdentifier, variableName, configuration);
-					cordovaPluginVariables[pluginIdentifier][variableName] = variableInformation[variableName];
-				});
-				this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
+		if (variables && variables.length > 0) {
+			if (!cordovaPluginVariables[pluginIdentifier]) {
+				cordovaPluginVariables[pluginIdentifier] = {};
 			}
+
+			_.each(variables, (variable: any) => {
+				let variableName: string = variable.name || variable;
+				let variableInformation = await  this.gatherVariableInformation(pluginIdentifier, variableName, configuration);
+				cordovaPluginVariables[pluginIdentifier][variableName] = variableInformation[variableName];
+			});
+			this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
+		}
 	}
 }
 

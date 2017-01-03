@@ -5,11 +5,12 @@ export class SetFrameworkVersionCommand implements ICommand {
 		private $project: Project.IProject) { }
 
 	public async execute(args: string[]): Promise<void> {
-		return this.$project.updateProjectPropertyAndSave("set", "FrameworkVersion", args);
+		await this.$project.updateProjectPropertyAndSave("set", "FrameworkVersion", args);
 	}
 
 	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(MobileFrameworkCommandParameter)];
 }
+
 $injector.registerCommand(["mobileframework|set", "prop|set|frameworkversion"], SetFrameworkVersionCommand);
 
 export class MobileFrameworkCommandParameter implements ICommandParameter {
@@ -23,23 +24,23 @@ export class MobileFrameworkCommandParameter implements ICommandParameter {
 	public mandatory = true;
 
 	public async validate(value: string, errorMessage?: string): Promise<boolean> {
-			this.$project.ensureProject();
-			if(!this.$project.capabilities.canChangeFrameworkVersion) {
-				this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`);
+		await this.$project.ensureProject();
+		if (!this.$project.capabilities.canChangeFrameworkVersion) {
+			this.$errors.failWithoutHelp(`You cannot change FrameworkVersion of '${this.$project.projectData.Framework}' project.`);
+		}
+
+		if (value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {
+			let supportedVersions: string[];
+			let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
+			supportedVersions = migrationService.getSupportedVersions();
+
+			if (_.includes(supportedVersions, value)) {
+				return true;
 			}
 
-			if(value.match(MobileFrameworkCommandParameter.VERSION_REGEX)) {
-				let supportedVersions: string[];
-				let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
-				supportedVersions = migrationService.getSupportedVersions();
+			this.$errors.failWithoutHelp(`The value ${value} is not a supported version. Supported versions are: ${supportedVersions.join(", ")}`);
+		}
 
-				if(_.includes(supportedVersions, value)) {
-					return true;
-				}
-
-				this.$errors.failWithoutHelp(`The value ${value} is not a supported version. Supported versions are: ${supportedVersions.join(", ")}`);
-			}
-
-			this.$errors.failWithoutHelp("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");
+		this.$errors.failWithoutHelp("Version is not in correct format. Correct format is <Major>.<Minor>.<Patch>, for example '3.5.0'.");
 	}
 }

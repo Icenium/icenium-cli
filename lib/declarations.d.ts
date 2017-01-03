@@ -633,15 +633,15 @@ interface IPluginsService {
 	 * via pluginsCount parameter.
 	 * @param {number} pluginsCount - number of NPM packages and NativeScript NPM Plugins to be shown.
 	 * The count is for each of the groups separately.
-	 * @return {IPlugin[]} - Array of plugins found.
+	 * @return {Promise<IPlugin[]>} - Array of plugins found.
 	 */
-	getAvailablePlugins(pluginsCount?: number): IPlugin[];
+	getAvailablePlugins(pluginsCount?: number): Promise<IPlugin[]>;
 
 	/**
 	 * Provides information about all installed plugins.
-	 * @return {IPlugin[]} Array of all installed plugins and information about each of them.
+	 * @return {Promise<IPlugin[]>} Array of all installed plugins and information about each of them.
 	 */
-	getInstalledPlugins(): IPlugin[];
+	getInstalledPlugins(): Promise<IPlugin[]>;
 
 	/**
 	 * Shows information about specified plugins.

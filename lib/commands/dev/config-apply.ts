@@ -6,7 +6,8 @@ export class DevConfigApplyCommand implements ICommand {
 	public disableAnalytics = true;
 
 	public async execute(args: string[]): Promise<void> {
-			this.$config.apply(args[0].toLowerCase());
+		this.$config.apply(args[0].toLowerCase());
 	}
 }
+
 $injector.registerCommand("dev-config-apply", DevConfigApplyCommand);
