@@ -30,7 +30,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 
 	public getValidProperties(framework: string): IStringDictionary {
 		let key = util.format("%s-%s", framework);
-		if(!this._validPropertiesCache[key]) {
+		if (!this._validPropertiesCache[key]) {
 			this._validPropertiesCache[key] = Object.create(null);
 			let schema = this.tryResolveValidationSchema(framework);
 			let availableProperties = _.keys(schema);
@@ -56,16 +56,16 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	public tryResolveValidationSchema(framework: string): IDictionary<any> {
 		let schema = this.tryResolveValidationSchemaCore(framework);
 		let result: IDictionary<any> = schema.properties;
-		if(schema.extends) {
+		if (schema.extends) {
 			_.each(_.keys(schema.extends.properties), (key: string) => {
-				if(!result[key]) {
+				if (!result[key]) {
 					result[key] = schema.extends.properties[key];
 				}
 			});
 		}
 
-		let projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json",framework.toLowerCase()));
-		if(this.$fs.exists(projectPropertiesFilePath)) {
+		let projectPropertiesFilePath = this.$resources.resolvePath(util.format("project-properties-%s.json", framework.toLowerCase()));
+		if (this.$fs.exists(projectPropertiesFilePath)) {
 			let fileContent = this.$fs.readJson(projectPropertiesFilePath);
 			let additionalProperties = _.keys(fileContent);
 			_.each(additionalProperties, (propertyName: string) => {
@@ -90,12 +90,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		properties[propertyName] = propertyValue;
 		_.each(this.$mobileHelper.platformNames, platformName => {
 			let validationErrors = this.getBuildSchemaValidationErrors(properties, platformName);
-			if(_.keys(validationErrors).length !== 0 && validationErrors[propertyName]) {
+			if (_.keys(validationErrors).length !== 0 && validationErrors[propertyName]) {
 				invalidPlatforms[platformName] = validationErrors[propertyName];
 			};
 		});
 
-		if(_.keys(invalidPlatforms).length === this.$mobileHelper.platformNames.length) {
+		if (_.keys(invalidPlatforms).length === this.$mobileHelper.platformNames.length) {
 			this.$errors.failWithoutHelp("The validation of provided %s property failed with following errors:\n %s", propertyName, _.values(invalidPlatforms).join("\n"));
 		}
 
@@ -104,22 +104,22 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 
 	private getBuildSchemaValidationErrors(data: Project.IData, platformName: string): IStringDictionary {
 		let buildSchemaName = this.getBuildSchemaName(platformName);
-		return this.getValidationErrors(data, {validationSchemaName: buildSchemaName, usePredefinedErrors: false});
+		return this.getValidationErrors(data, { validationSchemaName: buildSchemaName, usePredefinedErrors: false });
 	}
 
 	private getBuildSchemaName(platformName: string): string {
 		return util.format("%s%s", JsonSchemaValidator.BUILD_SCHEMA_ID_PREFIX, platformName);
 	}
 
-	public validate(data: Project.IData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}) {
+	public validate(data: Project.IData, opts?: { validationSchemaName?: string; usePredefinedErrors?: boolean }): void {
 		let validationErrors = this.getValidationErrors(data, opts);
-		if(_.keys(validationErrors).length !== 0) {
+		if (_.keys(validationErrors).length !== 0) {
 			let output = _.values(validationErrors).join("\n");
 			this.$errors.fail("Schema validation failed with following errors: \n %s", output);
 		}
 	}
 
-	private getValidationErrors(data: Project.IData, opts?: {validationSchemaName?: string; usePredefinedErrors?: boolean}): IStringDictionary {
+	private getValidationErrors(data: Project.IData, opts?: { validationSchemaName?: string; usePredefinedErrors?: boolean }): IStringDictionary {
 		opts = opts || {};
 		let validationSchema = this.tryResolveValidationSchemaCore(data.Framework, opts.validationSchemaName);
 		let schema = this.environment.createSchema(validationSchema);
@@ -131,7 +131,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 			let schemaUri = error.schemaUri;
 			let schemaUriParts = schemaUri.split("/");
 			let propertyName = schemaUriParts[schemaUriParts.length - 1];
-			if(error.message === JsonSchemaValidator.INSTANCE_IS_NOT_A_REQUIRED_TYPE_ERROR_MESSAGE) { // ugly hack :(
+			if (error.message === JsonSchemaValidator.INSTANCE_IS_NOT_A_REQUIRED_TYPE_ERROR_MESSAGE) { // ugly hack :(
 				error.details = util.format("Expected %s but got %s", error.details, data[propertyName]);
 			}
 
@@ -151,7 +151,7 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		validationSchemaName = validationSchemaName || this.getValidationSchemaName(framework);
 		let schema = this.$jsonSchemaResolver.getSchema(validationSchemaName);
 
-		if(!schema) {
+		if (!schema) {
 			this.$errors.fail("Unable to resolve validation schema.");
 		}
 
@@ -159,17 +159,18 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 	}
 
 	private getValidationSchemaName(framework: string): string {
-		if(!framework) {
+		if (!framework) {
 			return this.$jsonSchemaConstants.BASE_VALIDATION_SCHEMA_ID;
 		}
 
 		let frameworkProject = this.$frameworkProjectResolver.resolve(framework);
 		let validationSchemaName = frameworkProject.getValidationSchemaId();
-		if(!validationSchemaName) {
+		if (!validationSchemaName) {
 			return this.$jsonSchemaConstants.BASE_VALIDATION_SCHEMA_ID;
 		}
 
 		return validationSchemaName;
 	}
 }
+
 $injector.register("jsonSchemaValidator", JsonSchemaValidator);

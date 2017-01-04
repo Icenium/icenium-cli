@@ -1,7 +1,7 @@
 import * as path from "path";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
-module.exports = () => {
+module.exports = async () => {
 	let $project: Project.IProject = $injector.resolve("project");
 	if (!$project.projectData) {
 		return;
@@ -9,9 +9,9 @@ module.exports = () => {
 
 	let $projectConstants: Project.IConstants = $injector.resolve("projectConstants");
 	let $typeScriptService: ITypeScriptService = $injector.resolve("typeScriptService");
-	let typeScriptFilesData = await  $typeScriptService.getTypeScriptFilesData($project.getProjectDir());
+	let typeScriptFilesData = await $typeScriptService.getTypeScriptFilesData($project.getProjectDir());
 
-	if (await $typeScriptService.isTypeScriptProject($project.projectDir)) {
+	if ($typeScriptService.isTypeScriptProject($project.projectDir)) {
 		let $fs: IFileSystem = $injector.resolve("fs");
 		let pathToTsConfig = path.join($project.projectDir, $projectConstants.TSCONFIG_JSON_NAME);
 

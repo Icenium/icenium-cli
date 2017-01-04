@@ -7,15 +7,15 @@ export class JsonSchemaResolver implements IJsonSchemaResolver {
 	}
 
 	public getSchema(schemaId: string): ISchema {
-		if(!this.schemasCache[schemaId]) {
+		if (!this.schemasCache[schemaId]) {
 			this.schemasCache[schemaId] = this.findSchema(schemaId);
 
-			if(!this.schemasCache[schemaId]) {
+			if (!this.schemasCache[schemaId]) {
 				this.$errors.fail("Unable to find schema with id %s.", schemaId);
 			}
 
 			let extendsProperty = this.schemasCache[schemaId].extends;
-			if(extendsProperty) {
+			if (extendsProperty) {
 				this.schemasCache[schemaId].extends = {};
 				this.schemasCache[schemaId].extends.properties = Object.create(null);
 
@@ -26,17 +26,17 @@ export class JsonSchemaResolver implements IJsonSchemaResolver {
 		return this.schemasCache[schemaId];
 	}
 
-	private buildValidationSchema(extendsProperty: ISchemaExtends[], schemaId: string) {
+	private buildValidationSchema(extendsProperty: ISchemaExtends[], schemaId: string): void {
 		_.each(extendsProperty, (ext: ISchemaExtends) => {
 			let refSchema = this.findSchema(ext.$ref);
-			if(refSchema && refSchema.properties) {
+			if (refSchema && refSchema.properties) {
 				_.each(_.keys(refSchema.properties), (propertyName: string) => {
-					if(!this.schemasCache[schemaId].extends.properties[propertyName]) {
+					if (!this.schemasCache[schemaId].extends.properties[propertyName]) {
 						this.schemasCache[schemaId].extends.properties[propertyName] = refSchema.properties[propertyName];
 					}
 				});
 			}
-			if(refSchema.extends) {
+			if (refSchema.extends) {
 				this.buildValidationSchema(refSchema.extends, schemaId);
 			}
 		});
