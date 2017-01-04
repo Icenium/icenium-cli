@@ -99,7 +99,7 @@ class AppManagerService implements IAppManagerService {
 			return;
 		}
 
-		groups = _.sortBy(groups, (group) => group.Name.toLowerCase());
+		groups = _.sortBy(groups, group => group.Name.toLowerCase());
 
 		let table = new Table({
 			head: ["Index", "Name"],
@@ -179,4 +179,5 @@ class AppManagerService implements IAppManagerService {
 		});
 	}
 }
+
 $injector.register("appManagerService", AppManagerService);

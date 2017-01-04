@@ -331,7 +331,6 @@ export class BuildService implements Project.IBuildService {
 
 		this.$jsonSchemaValidator.validate(this.$project.projectData);
 		this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
-		await this.$project.validateAppIdentifier(settings.platform);
 
 		settings.projectConfiguration = settings.projectConfiguration || this.$project.getProjectConfiguration();
 		settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
@@ -362,11 +361,11 @@ export class BuildService implements Project.IBuildService {
 			let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
 			let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
 
-			let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-				let downloadUrl = await  this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration);
+			let packageDownloadViewModels = await Promise.all(_.map(appPackages, async (def: Server.IPackageDef): Promise<IPackageDownloadViewModel> => {
+				let downloadUrl = await this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration);
 
 				let packageUrl = (urlKind !== "package")
-				await ? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration)
+					? await this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration)
 					: downloadUrl;
 				this.$logger.debug("Download URL is '%s'", packageUrl);
 
@@ -379,7 +378,7 @@ export class BuildService implements Project.IBuildService {
 					}],
 					instruction: util.format("Scan the QR code below to install %s to %s", def.solution, def.platform),
 				};
-			});
+			}));
 
 			if (settings.platform === "WP8") {
 				let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
@@ -396,7 +395,7 @@ export class BuildService implements Project.IBuildService {
 		}
 
 		if (settings.downloadFiles) {
-			packageDefs.forEach((pkg: Server.IPackageDef) => {
+			await Promise.all(_.map(packageDefs, async (pkg: Server.IPackageDef) => {
 				let targetFileName: string;
 				if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
 					targetFileName = path.join(this.$project.getProjectDir(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
@@ -412,17 +411,17 @@ export class BuildService implements Project.IBuildService {
 				let targetFile = this.$fs.createWriteStream(targetFileName);
 
 				if (pkg.format === BuildService.ACCEPT_RESULT_URL) {
-					this.$httpClient.httpRequest({
+					await this.$httpClient.httpRequest({
 						url: pkg.url,
 						pipeTo: targetFile
-						await });
+					});
 				} else {
 					await this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile);
 				}
 
 				this.$logger.info("Download completed: %s", targetFileName);
 				pkg.localFile = targetFileName;
-			});
+			}));
 		}
 
 		return packageDefs;
@@ -489,13 +488,13 @@ export class BuildService implements Project.IBuildService {
 				this.$options.download = true;
 			}
 
-			this.build({
+			await this.build({
 				platform: platform,
 				showQrCodes: !this.$options.download,
 				downloadFiles: this.$options.download,
 				downloadedFilePath: this.$options.saveTo,
 				buildForiOSSimulator: opts && opts.buildForiOSSimulator
-				await });
+			});
 		}
 	}
 

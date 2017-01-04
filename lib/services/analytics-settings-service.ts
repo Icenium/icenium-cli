@@ -9,7 +9,7 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	}
 
 	public async getUserId(): Promise<string> {
-			return (await this.$userDataStore.getUser()).uid;
+		return (await this.$userDataStore.getUser()).uid;
 	}
 
 	public getClientName(): string {
@@ -21,11 +21,12 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 	}
 
 	public async getUserSessionsCount(): Promise<number> {
-			return await this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED") || 0;
+		return await this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED") || 0;
 	}
 
 	public async setUserSessionsCount(count: number): Promise<void> {
 		return this.$userSettingsService.saveSetting<number>("SESSIONS_STARTED", count);
 	}
 }
+
 $injector.register("analyticsSettingsService", AnalyticsSettingsService);

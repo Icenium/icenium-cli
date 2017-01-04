@@ -17,11 +17,11 @@ export class AnalyticsService extends AnalyticsServiceBase implements IAnalytics
 	}
 
 	public async trackFeature(featureName: string): Promise<void> {
-			if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
-				await super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY);
-			}
+		if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
+			await super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY);
+		}
 
-			await super.trackFeature(featureName);
+		await super.trackFeature(featureName);
 	}
 }
 

@@ -2,7 +2,7 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 	constructor(private $project: Project.IProject,
 		private $errors: IErrors) { }
 
-	public async canStart(platform: string): Promise<boolean> {
+	public canStart(platform: string): boolean {
 		if (this.$project.capabilities.emulate) {
 			return _.includes(this.$project.getProjectTargets(), platform.toLowerCase());
 		}
