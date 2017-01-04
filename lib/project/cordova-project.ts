@@ -2,9 +2,8 @@ import * as path from "path";
 import * as util from "util";
 import { FrameworkProjectBase } from "./framework-project-base";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
-import helpers = require("./../common/helpers");
+import { createGUID } from "./../common/helpers";
 import semver = require("semver");
-import Future = require("fibers/future");
 
 export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
@@ -99,8 +98,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	public alterPropertiesForNewProject(properties: any, projectName: string): void {
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 
-		properties.WP8ProductID = helpers.createGUID();
-		properties.WP8PublisherID = helpers.createGUID();
+		properties.WP8ProductID = createGUID();
+		properties.WP8PublisherID = createGUID();
 		properties.WP8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
 	}
 
@@ -210,7 +209,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	}
 
 	private generateWP8GUID(): string {
-		return helpers.createGUID();
+		return createGUID();
 	}
 }
+
 $injector.register("cordovaProject", CordovaProject);

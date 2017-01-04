@@ -326,7 +326,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 
 	private async loadPluginsData(): Promise<void> {
 		// Cordova plugin commands are only applicable to Cordova projects
-		this.$project.ensureCordovaProject();
+		await this.$project.ensureCordovaProject();
 		await this.$loginManager.ensureLoggedIn();
 		this._identifierToPlugin = Object.create(null);
 		Future.wait([this.createPluginsData(this.$cordovaPluginsService),
@@ -468,7 +468,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		let plugins = await pluginsService.getAvailablePlugins();
 		_.each(plugins, (plugin: IMarketplacePluginData) => {
 			try {
-				let data = pluginsService.createPluginData(plugin);
+				let data = await pluginsService.createPluginData(plugin);
 				_.each(data, pluginData => {
 					if (pluginData && pluginData.data) {
 						let projectDataRecord = pluginData.toProjectDataRecord();

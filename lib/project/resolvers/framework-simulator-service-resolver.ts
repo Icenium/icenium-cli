@@ -1,8 +1,8 @@
-import frameworkProjectResolverBaseLib = require("./framework-project-resolver-base");
+import { FrameworkProjectResolverBase } from "./framework-project-resolver-base";
 
-export class FrameworkSimulatorServiceResolver extends frameworkProjectResolverBaseLib.FrameworkProjectResolverBase implements Project.IFrameworkSimulatorServiceResolver {
+export class FrameworkSimulatorServiceResolver extends FrameworkProjectResolverBase implements Project.IFrameworkSimulatorServiceResolver {
 	constructor($errors: IErrors,
-				$injector: IInjector) {
+		$injector: IInjector) {
 		super($errors, $injector);
 	}
 
@@ -10,4 +10,5 @@ export class FrameworkSimulatorServiceResolver extends frameworkProjectResolverB
 		return this.resolveByName<IProjectSimulatorService>("SimulatorService", framework);
 	}
 }
+
 $injector.register("frameworkSimulatorServiceResolver", FrameworkSimulatorServiceResolver);

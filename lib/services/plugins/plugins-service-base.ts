@@ -28,7 +28,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 	}
 
 	public async fetch(pluginIdentifier: string): Promise<string> {
-		this.$project.ensureProject();
+		await this.$project.ensureProject();
 		if (!pluginIdentifier) {
 			this.$errors.fail("You must specify local path, URL to a plugin repository, name or keywords of a plugin published to the NPM.");
 		}

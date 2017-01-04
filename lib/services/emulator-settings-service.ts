@@ -2,10 +2,8 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 	constructor(private $project: Project.IProject,
 		private $errors: IErrors) { }
 
-	public canStart(platform: string): boolean {
-		this.$project.ensureProject();
-
-		if(this.$project.capabilities.emulate) {
+	public async canStart(platform: string): Promise<boolean> {
+		if (this.$project.capabilities.emulate) {
 			return _.includes(this.$project.getProjectTargets(), platform.toLowerCase());
 		}
 
@@ -16,4 +14,5 @@ export class EmulatorSettingsService implements Mobile.IEmulatorSettingsService 
 		return this.$project.requiredAndroidApiLevel;
 	}
 }
+
 $injector.register("emulatorSettingsService", EmulatorSettingsService);

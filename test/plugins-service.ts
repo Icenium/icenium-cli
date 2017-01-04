@@ -50,7 +50,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 		httpRequest: (): Promise<Server.IResponse> => Promise.resolve(null)
 	});
 	testInjector.register("progressIndicator", {
-		showProgressIndicator: async (future: Promise<any>) => await  Promise.resolve(future)
+		showProgressIndicator: async (future: Promise<any>) => await Promise.resolve(future)
 	});
 	testInjector.register("projectConstants", {
 		PACKAGE_JSON_NAME: "package.json"
@@ -87,7 +87,7 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 			return [];
 		},
 		async updateProjectProperty(mode: string, property: string, newValue: any): Promise<void> {
-				this.projectData.CorePlugins = newValue;
+			this.projectData.CorePlugins = newValue;
 		}
 	});
 
@@ -118,12 +118,12 @@ function createTestInjector(cordovaPlugins: any[], installedMarketplacePlugins: 
 }
 
 async function unzipPluginsFolder(fs: IFileSystem): Promise<string> {
-		let pathToPluginsZip = path.join("test", "resources", "test-plugins.zip");
-		let unzippedPluginsDirectory = temp.mkdirSync("local-plugins");
+	let pathToPluginsZip = path.join("test", "resources", "test-plugins.zip");
+	let unzippedPluginsDirectory = temp.mkdirSync("local-plugins");
 
-		await fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true });
+	await fs.unzip(pathToPluginsZip, unzippedPluginsDirectory, { overwriteExisitingFiles: true });
 
-		return path.join(unzippedPluginsDirectory, "test-plugins");
+	return path.join(unzippedPluginsDirectory, "test-plugins");
 }
 
 class PrompterStub implements IPrompter {
@@ -215,14 +215,14 @@ class ProjectStub {
 	};
 
 	async updateProjectProperty(mode: string, propertyName: string, newValue: any, configs?: string[]): Promise<void> {
-			let configurations = configs && configs.length ? configs : this.configurations;
-			_.each(configurations, configuration => {
-				if ((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
-					this.configurationSpecificData[configuration][propertyName] = newValue;
-				} else {
-					this.projectData[propertyName] = newValue;
-				}
-			});
+		let configurations = configs && configs.length ? configs : this.configurations;
+		_.each(configurations, configuration => {
+			if ((propertyName === "CorePlugins" || propertyName === "CordovaPluginVariables") && configuration) {
+				this.configurationSpecificData[configuration][propertyName] = newValue;
+			} else {
+				this.projectData[propertyName] = newValue;
+			}
+		});
 	}
 }
 
@@ -390,12 +390,12 @@ function createTestInjectorForLocalPluginsFetch(): IInjector {
 
 describe("plugins-service", () => {
 	let fetchWithMockedShellJsCp = async (service: IPluginsService, plugin: string): Promise<string> => {
-			let originalShellJsCopy = shelljs.cp;
-			(<any>shelljs).cp = (options: string, source: string, dest: string): void => { /* No implementation required. */ };
-			let fetchedPluginName = await  service.fetch(plugin);
-			(<any>shelljs).cp = originalShellJsCopy;
+		let originalShellJsCopy = shelljs.cp;
+		(<any>shelljs).cp = (options: string, source: string, dest: string): void => { /* No implementation required. */ };
+		let fetchedPluginName = await service.fetch(plugin);
+		(<any>shelljs).cp = originalShellJsCopy;
 
-			return fetchedPluginName;
+		return fetchedPluginName;
 	};
 
 	afterEach(() => {
@@ -514,7 +514,7 @@ describe("plugins-service", () => {
 
 		let progressIndicator: IProgressIndicator = testInjector.resolve("progressIndicator");
 		progressIndicator.showProgressIndicator = async (future: Promise<any>, timeout: number): Promise<void> => {
-				await future;
+			await future;
 		};
 
 		childProcess.exec = () => Promise.resolve("org.apache.cordova.battery-status@0.1.18 node_modules\\org.apache.cordova.battery-status\n");
@@ -524,7 +524,7 @@ describe("plugins-service", () => {
 		let fs: IFileSystem = testInjector.resolve("fs");
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
 		fs.readText = (dir: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Cordova Battery Plugin</description></plugin>`;
-		let fetchedPluginName = await  fetchWithMockedShellJsCp(service, "org.apache.cordova.battery-status");
+		let fetchedPluginName = await fetchWithMockedShellJsCp(service, "org.apache.cordova.battery-status");
 		assert.deepEqual(fetchedPluginName, pluginName);
 	});
 
@@ -542,7 +542,7 @@ describe("plugins-service", () => {
 			testInjector = createTestInjectorForLocalPluginsFetch();
 			fs = testInjector.resolve("fs");
 
-			let unzippedPluginsDirectory = await  unzipPluginsFolder(fs);
+			let unzippedPluginsDirectory = await unzipPluginsFolder(fs);
 
 			cordovaLocalPluginsDirectory = path.join(unzippedPluginsDirectory, "cordova");
 			nativescriptLocalPluginsDirectory = path.join(unzippedPluginsDirectory, "nativescript");
@@ -677,7 +677,7 @@ describe("plugins-service", () => {
 		fs.exists = (dir: string) => dir.indexOf(pluginXmlFileName) >= 0;
 		fs.readText = (path: string) => `<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" version="1.1.3-dev"> <name>${pluginName}</name> <description>Telerik Dropbox</description></plugin>`;
 
-		let fetchedPluginName = await  fetchWithMockedShellJsCp(service, "com.telerik.dropbox");
+		let fetchedPluginName = await fetchWithMockedShellJsCp(service, "com.telerik.dropbox");
 		assert.deepEqual(fetchedPluginName, pluginName);
 	});
 
@@ -791,7 +791,7 @@ describe("plugins-service", () => {
 
 		let testInjector = createTestInjector(cordovaPlugins, installedMarketplacePlugins, availableMarketplacePlugins);
 		let marketPlaceService: ICordovaPluginsService = testInjector.resolve("marketplacePluginsService");
-		marketPlaceService.createPluginData = (plugin: any): IMarketplacePlugin[] => {
+		marketPlaceService.createPluginData = (plugin: any): Promise<IMarketplacePlugin[]> => {
 			throw new Error("MockMarketPlace throws error when creating plugin data.");
 		};
 
@@ -1058,7 +1058,7 @@ describe("plugins-service", () => {
 
 			options.debug = true;
 			options.release = false;
-			assert.throws(async () => await  service.addPlugin(`Toast@${versionToSet}`));
+			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
 		});
 
 		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal", () => {
@@ -1071,7 +1071,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.throws(async () => await  service.addPlugin("Toast@2.0.5"));
+			assert.throws(async () => await service.addPlugin("Toast@2.0.5"));
 		});
 
 		// Uncomment this when we know that all clients support different versions for different configurations.
@@ -1107,7 +1107,7 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.throws(async () => await  service.addPlugin(`Toast@${versionToSet}`));
+			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
 		});
 
 		it("throws error when console is non-interactive and user had not specified version for plugin", () => {
@@ -1117,7 +1117,7 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.throws(async () => await  service.addPlugin("Toast"));
+			assert.throws(async () => await service.addPlugin("Toast"));
 		});
 
 		describe("throws error when specified version is not valid", () => {
@@ -1129,7 +1129,7 @@ describe("plugins-service", () => {
 				options = testInjector.resolve("options");
 
 				options.debug = options.release = false;
-				assert.throws(async () => await  service.addPlugin(`Toast@${invalidVersionToSet}`));
+				assert.throws(async () => await service.addPlugin(`Toast@${invalidVersionToSet}`));
 			});
 			describe("when plugin is not installed at all", () => {
 				it("when console is interactive", () => {
@@ -1303,7 +1303,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.throws(async () => await  service.addPlugin(`Toast@${versionToSet}`));
+			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
 		});
 	});
 
@@ -1349,7 +1349,7 @@ describe("plugins-service", () => {
 		it("throws exception when trying to add it to debug config", () => {
 			options.debug = true;
 			options.release = false;
-			assert.throws(async () => await  service.addPlugin(livePatchId));
+			assert.throws(async () => await service.addPlugin(livePatchId));
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
 			options.debug = false;

@@ -18,15 +18,15 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
-			await this.getPluginsService().wait().addPlugin(pluginName);
+		await this.getPluginsService().wait().addPlugin(pluginName);
 	}
 
 	public async removePlugin(pluginName: string): Promise<void> {
-			await this.getPluginsService().wait().removePlugin(pluginName);
+		await this.getPluginsService().wait().removePlugin(pluginName);
 	}
 
 	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
-			await this.getPluginsService().wait().configurePlugin(pluginName, version, configurations);
+		await this.getPluginsService().wait().configurePlugin(pluginName, version, configurations);
 	}
 
 	public async isPluginInstalled(pluginName: string): Promise<boolean> {
@@ -50,13 +50,13 @@ export class PluginsService implements IPluginsService {
 	}
 
 	private async getPluginsService(): Promise<IPluginsService> {
-			if (!this.frameworkProject) {
-				await this.$loginManager.ensureLoggedIn();
-				this.$project.ensureProject();
-				this.frameworkProject = this.$frameworkProjectResolver.resolve(this.$project.projectData.Framework);
-				return this.frameworkProject.pluginsService;
-			}
+		if (!this.frameworkProject) {
+			await this.$loginManager.ensureLoggedIn();
+			await this.$project.ensureProject();
+			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.$project.projectData.Framework);
 			return this.frameworkProject.pluginsService;
+		}
+		return this.frameworkProject.pluginsService;
 	}
 }
 $injector.register("pluginsService", PluginsService);

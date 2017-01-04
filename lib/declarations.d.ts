@@ -620,7 +620,7 @@ interface IDomainNameSystem {
 
 interface ICordovaPluginsService {
 	getAvailablePlugins(): Promise<Server.CordovaPluginData[]>;
-	createPluginData(plugin: any): IPlugin[];
+	createPluginData(plugin: any): Promise<IPlugin[]>;
 }
 
 /**
