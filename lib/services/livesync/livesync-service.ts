@@ -39,7 +39,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 		let livesyncData: ILiveSyncData = {
 			platform: platform,
-			await appIdentifier: this.$project.getAppIdentifierForPlatform(platform),
+			appIdentifier: await this.$project.getAppIdentifierForPlatform(platform),
 			projectFilesPath: projectDir,
 			syncWorkingDirectory: projectDir,
 			excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
@@ -65,7 +65,7 @@ export class LiveSyncService implements ILiveSyncService {
 
 			await $liveSyncServiceBase.sync([livesyncData]);
 		} else {
-			configurations.forEach(configuration => {
+			Promise.all(configurations.map(async configuration => {
 				livesyncData.configuration = configuration;
 				livesyncData.appIdentifier = this.$project.projectInformation.configurationSpecificData[configuration.toLowerCase()].AppIdentifier;
 				await this.fillDeviceConfigurationInfos(livesyncData.appIdentifier);
@@ -81,17 +81,18 @@ export class LiveSyncService implements ILiveSyncService {
 				};
 
 				await $liveSyncServiceBase.sync([livesyncData]);
-			});
+			}));
 		}
 	}
 
 	private async fillDeviceConfigurationInfos(appIdentifier: string): Promise<void> {
-		return this.$devicesService.execute(device => (() => {
+		return this.$devicesService.execute(async device => {
 			let configInfo = await device.getApplicationInfo(appIdentifier);
 			if (configInfo) {
 				this.deviceConfigurationInfos.push(configInfo);
 			}
-		}).future<void>()());
+		});
 	}
 }
+
 $injector.register("liveSyncService", LiveSyncService);

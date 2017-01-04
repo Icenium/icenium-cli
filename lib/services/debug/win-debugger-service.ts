@@ -39,8 +39,9 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 		let _this = this;
 		gaze(this.$sharedUserSettingsFileService.userSettingsFilePath, function (err: Error, watchr: any) {
 			if (err) {
-				this.$errors.fail(err.toString());
+				_this.$errors.fail(err.toString());
 			}
+
 			this.on("changed", (filePath: string) => {
 				_this.$dispatcher.dispatch(() => _this.$sharedUserSettingsService.saveSettings({}));
 			});

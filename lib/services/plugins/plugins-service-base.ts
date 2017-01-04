@@ -23,6 +23,10 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		private $hostInfo: IHostInfo,
 		private $npmPluginsService: INpmPluginsService) { }
 
+	public async init(): Promise<void> {
+		return Promise.resolve();
+	}
+
 	public async findPlugins(keywords: string[]): Promise<IPluginsSource> {
 		return this.$npmPluginsService.search(this.$project.projectDir, keywords, this.composeSearchQuery);
 	}
@@ -97,7 +101,7 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	public abstract async getInstalledPlugins(): Promise<IPlugin[]>;
 
-	public abstract printPlugins(plugins: IPlugin[]): void;
+	public abstract async printPlugins(plugins: IPlugin[]): Promise<void>;
 
 	public abstract async addPlugin(pluginIdentifier: string): Promise<void>;
 
@@ -105,13 +109,13 @@ export abstract class PluginsServiceBase implements IPluginsService {
 
 	public abstract async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void>;
 
-	public abstract isPluginInstalled(pluginName: string): boolean;
+	public abstract async isPluginInstalled(pluginName: string): Promise<boolean>;
 
 	public abstract async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation>;
 
 	public abstract async filterPlugins(plugins: IPlugin[]): Promise<IPlugin[]>;
 
-	protected async isPluginFetched(pluginName: string): Promise<boolean> {
+	protected isPluginFetched(pluginName: string): boolean {
 		// Fetched plugins are in the "plugins" directory both for Cordova and NativeScript projects.
 		let projectPluginsDirectory = path.join(this.$project.projectDir, "plugins");
 		let filterOptions = { enumerateDirectories: true, includeEmptyDirectories: false };

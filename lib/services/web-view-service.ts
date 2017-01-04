@@ -44,9 +44,15 @@ export class WebViewService implements IWebViewService {
 		return _.map(webViews, webView => webView.name.toLowerCase());
 	}
 
-	public getCurrentWebViewName(platform: string): string {
+	public async  getCurrentWebViewName(platform: string): Promise<string> {
 		let webViews = this.getWebViews(platform);
-		let webView = _.find(webViews, _webView => !_webView.default && this.$pluginsService.isPluginInstalled(_webView.pluginIdentifier));
+		let webViewsToFilter = await Promise.all(_.map(webViews, async _webView => {
+			return !_webView.default && await this.$pluginsService.isPluginInstalled(_webView.pluginIdentifier) ? _webView : null;
+		}));
+		let webView = _(webViewsToFilter)
+			.filter(w => !!w)
+			.first();
+
 		if (webView) {
 			return webView.name;
 		}
@@ -64,16 +70,21 @@ export class WebViewService implements IWebViewService {
 	}
 
 	private async enableWebViewCore(webView: IWebView): Promise<void> {
-			if (!this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
-				this.$options.default = true;
-				await this.$pluginsService.addPlugin(webView.pluginIdentifier);
-			}
+		if (!await this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
+			this.$options.default = true;
+			await this.$pluginsService.addPlugin(webView.pluginIdentifier);
+		}
 	}
 
 	private async enableDefaultWebView(platform: string): Promise<void> {
-			_(this.getWebViews(platform))
-				.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
-				.each(webView => await  this.$pluginsService.removePlugin(webView.pluginIdentifier));
+		let webViews = this.getWebViews(platform);
+		let webViewsToFilter = await Promise.all(_.map(webViews, async webView => {
+			return !webView.default && await this.$pluginsService.isPluginInstalled(webView.pluginIdentifier) ? webView : null;
+		}));
+		let filteredWebViews = _.filter(webViewsToFilter);
+
+		await Promise.all(_.map(filteredWebViews, async webView => await this.$pluginsService.removePlugin(webView.pluginIdentifier)));
 	}
 }
+
 $injector.register("webViewService", WebViewService);

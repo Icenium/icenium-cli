@@ -329,7 +329,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	private async migrateWebView(oldFrameworkVersion: string, newFrameworkVersion: string): Promise<void> {
 			// For Cordova versions below 5.0.0 with WKWebView we need to set the WKWebView to com.telerik.plugins.wkwebview.
 			// For Cordova version 5.0.0 and above with WKWebView we need to set the WKWebView to cordova-plugin-wkwebview-engine.
-			let currentWebViewName = this.$webViewService.getCurrentWebViewName(this.$projectConstants.IOS_PLATFORM_NAME);
+			let currentWebViewName = await this.$webViewService.getCurrentWebViewName(this.$projectConstants.IOS_PLATFORM_NAME);
 			let currentWebView = this.$webViewService.getWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, oldFrameworkVersion);
 			let newWebView = this.$webViewService.getWebView(this.$projectConstants.IOS_PLATFORM_NAME, currentWebViewName, newFrameworkVersion);
 

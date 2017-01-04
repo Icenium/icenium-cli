@@ -43,7 +43,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		if (!_.includes(versions, frameworkVersion)) {
 			this.$errors.failWithoutHelp(`Your project targets NativeScript version '${frameworkVersion}' which does not support plugins.`);
 		}
+	}
 
+	public async init(): Promise<void> {
 		await this.$projectMigrationService.migrateTypeScriptProject();
 	}
 
@@ -79,7 +81,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		return null;
 	}
 
-	public printPlugins(plugins: IPlugin[]): void {
+	public async printPlugins(plugins: IPlugin[]): Promise<void> {
 		let groups = _.groupBy(plugins, (plugin: IPlugin) => plugin.type);
 		let outputLines: string[] = [];
 
@@ -97,16 +99,16 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 
 	public async addPlugin(pluginIdentifier: string): Promise<void> {
 		let pluginBasicInfo: IBasicPluginInformation;
-		if (this.isPluginInstalled(pluginIdentifier)) {
+		if (await this.isPluginInstalled(pluginIdentifier)) {
 			this.$logger.printMarkdown(util.format("Plugin `%s` is already installed.", pluginIdentifier));
 			return;
 		}
 
 		if (this.hasTgzExtension(pluginIdentifier)) {
 			pluginBasicInfo = await this.fetchPluginBasicInformation(path.resolve(pluginIdentifier), "add", null, { actualName: pluginIdentifier, isTgz: true, addPluginToConfigFile: false });
-			await } else if (this.checkIsValidLocalPlugin(pluginIdentifier)) {
-				pluginBasicInfo = await this.installLocalPlugin(pluginIdentifier, { actualName: pluginIdentifier, isTgz: false, addPluginToConfigFile: true });
-			} else {
+		} else if (await this.checkIsValidLocalPlugin(pluginIdentifier)) {
+			pluginBasicInfo = await this.installLocalPlugin(pluginIdentifier, { actualName: pluginIdentifier, isTgz: false, addPluginToConfigFile: true });
+		} else {
 			pluginBasicInfo = await this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true });
 		}
 
@@ -167,12 +169,12 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		this.$logger.printMarkdown(util.format("Successfully configured plugin `%s`.", basicPluginInfo.name));
 	}
 
-	public isPluginInstalled(pluginName: string): boolean {
+	public async isPluginInstalled(pluginName: string): Promise<boolean> {
 		let packageJsonContent = this.getProjectPackageJsonContent();
-		let pluginBasicInfo = await  this.getPluginBasicInformation(pluginName);
+		let pluginBasicInfo = await this.getPluginBasicInformation(pluginName);
 		return (packageJsonContent
 			&& !!packageJsonContent.dependencies && !!packageJsonContent.dependencies[pluginBasicInfo.name]
-			&& await(!pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName));
+			&& !pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName);
 	}
 
 	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
@@ -301,7 +303,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			let result = (await this.$httpClient.httpRequest(url)).body;
 			if (result) {
 				let npmSearchResult = JSON.parse(result).results;
-				plugins = _.map(npmSearchResult, (pluginResult: any) => {
+				let pluginsToFilter = await Promise.all(_.map(npmSearchResult, async (pluginResult: any) => {
 					if (pluginResult) {
 						let pluginInfo: IPluginInfoBase = {
 							Authors: pluginResult.author,
@@ -313,13 +315,14 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 							Description: this.getStringFromNpmSearchResult(pluginResult, "description"),
 							SupportedVersion: ""
 						};
-						pluginInfo.Variables = await  this.getPluginVariablesInfoFromNpm(pluginInfo.Name, pluginInfo.Version) || [];
+						pluginInfo.Variables = await this.getPluginVariablesInfoFromNpm(pluginInfo.Name, pluginInfo.Version) || [];
 
 						return new NativeScriptPluginData(pluginInfo, PluginType.NpmPlugin, this.$project);
 					}
 
 					return null;
-				}).filter(pl => !!pl);
+				}));
+				plugins = _.filter(pluginsToFilter, pl => !!pl);
 			}
 		} catch (err) {
 			this.$logger.trace("Unable to get top NPM packages.");
@@ -345,7 +348,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 		try {
 			if (this.featuredNpmPackages && this.featuredNpmPackages.length) {
 				let pluginFutures = _.map(this.featuredNpmPackages, packageId => this.getDataForNpmPackage(packageId));
-				plugins = getFuturesResults<IPlugin>(pluginFutures, pl => !!pl && !!pl.data);
+				plugins = await getFuturesResults<IPlugin>(pluginFutures, pl => !!pl && !!pl.data);
 
 				_.each(plugins, featuredPackage => {
 					featuredPackage.type = PluginType.FeaturedPlugin;
@@ -378,7 +381,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 					let npmSearchResults: any[] = JSON.parse(result).results;
 					shouldBreak = !npmSearchResults.length;
 					let pluginFutures = _.map(npmSearchResults, pluginResult => this.getDataForNpmPackage(this.getStringFromNpmSearchResult(pluginResult, "name"), this.getStringFromNpmSearchResult(pluginResult, "version")));
-					let allPlugins = getFuturesResults<IPlugin>(pluginFutures, pl => !!pl && !!pl.data && !!pl.data.Platforms && pl.data.Platforms.length > 0);
+					let allPlugins = await getFuturesResults<IPlugin>(pluginFutures, pl => !!pl && !!pl.data && !!pl.data.Platforms && pl.data.Platforms.length > 0);
 					plugins = plugins.concat(allPlugins.slice(0, count - plugins.length));
 				} else {
 					shouldBreak = true;
@@ -598,44 +601,44 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			let pluginVariableNameInPackageJson = `${basicPlugin.name}-variables`;
 			let currentVariablesValues = packageJsonContent.nativescript[pluginVariableNameInPackageJson] || {};
 			let newObj: IStringDictionary = Object.create(null);
-			_.each(variablesInformation, (variableInfo: any, variableName: string) => {
+			await Promise.all(_.map(variablesInformation, async (variableInfo: any, variableName: string) => {
 				let currentValue = currentVariablesValues[variableName] || variableInfo.defaultValue;
-				newObj[variableName] = (await  this.gatherVariableInformation(variableName, currentValue))[variableName];
-		});
+				newObj[variableName] = (await this.gatherVariableInformation(variableName, currentValue))[variableName];
+			}));
 
-		delete packageJsonContent.nativescript[pluginVariableNameInPackageJson];
-		if (_.keys(newObj).length) {
-			packageJsonContent.nativescript[pluginVariableNameInPackageJson] = newObj;
+			delete packageJsonContent.nativescript[pluginVariableNameInPackageJson];
+			if (_.keys(newObj).length) {
+				packageJsonContent.nativescript[pluginVariableNameInPackageJson] = newObj;
+			}
 		}
+
+		return packageJsonContent;
 	}
 
-			return packageJsonContent;
-	}
+	private async gatherVariableInformation(variableName: string, defaultValue: any): Promise<any> {
+		let schema: IPromptSchema = {
+			name: variableName,
+			type: "input",
+			message: `Set value for variable ${variableName}`,
+			validate: (val: string) => !!val ? true : 'Please enter a value!'
+		};
 
-	private async gatherVariableInformation(variableName: string, defaultValue: any): Promise < any > {
-	let schema: IPromptSchema = {
-		name: variableName,
-		type: "input",
-		message: `Set value for variable ${variableName}`,
-		validate: (val: string) => !!val ? true : 'Please enter a value!'
-	};
+		if (defaultValue) {
+			schema.default = () => defaultValue;
+		}
 
-	if(defaultValue) {
-		schema.default = () => defaultValue;
-	}
+		let fromVarOpion = this.$pluginVariablesHelper.getPluginVariableFromVarOption(variableName);
+		if (!isInteractive() && !fromVarOpion) {
+			if (defaultValue) {
+				this.$logger.trace(`Console is not interactive, so default value for ${variableName} will be used: ${defaultValue}.`);
+				let defaultObj: any = Object.create(null);
+				defaultObj[variableName] = defaultValue;
+				return defaultObj;
+			}
+			this.$errors.failWithoutHelp(`Unable to find value for ${variableName} plugin variable. Ensure the --var option is specified or the plugin variable has default value.`);
+		}
 
-			let fromVarOpion = this.$pluginVariablesHelper.getPluginVariableFromVarOption(variableName);
-	if(!isInteractive() && !fromVarOpion) {
-				if (defaultValue) {
-		this.$logger.trace(`Console is not interactive, so default value for ${variableName} will be used: ${defaultValue}.`);
-		let defaultObj: any = Object.create(null);
-		defaultObj[variableName] = defaultValue;
-		return defaultObj;
-				}
-				this.$errors.failWithoutHelp(`Unable to find value for ${variableName} plugin variable. Ensure the --var option is specified or the plugin variable has default value.`);
-}
-
-return fromVarOpion || await  this.$prompter.get([schema]);
+		return fromVarOpion || await this.$prompter.get([schema]);
 	}
 }
 

@@ -628,6 +628,12 @@ interface ICordovaPluginsService {
  */
 interface IPluginsService {
 	/**
+	 * Method which will initialize the service.
+	 * @return {Promise<void>}
+	 */
+	init(): Promise<void>;
+
+	/**
 	 * Gets all available plugins for the current project type.
 	 * NOTE: For NativeScript projects the count of listed NPM packages and NPM plugins is controlled
 	 * via pluginsCount parameter.
@@ -646,9 +652,9 @@ interface IPluginsService {
 	/**
 	 * Shows information about specified plugins.
 	 * @param {IPlugin[]} plugins Array of plugins that will be printed.
-	 * @return {void}
+	 * @return {Promise<void>}
 	 */
-	printPlugins(plugins: IPlugin[]): void;
+	printPlugins(plugins: IPlugin[]): Promise<void>;
 
 	/**
 	 * Adds plugin to the current project, so it can be used in the application.
@@ -678,9 +684,9 @@ interface IPluginsService {
 	 * Checks if the specified plugin is installed for the current project.
 	 * @param {string} pluginName The name of the plugin which has to be checked. It can contain the required version.
 	 * For example these are valid names: "lodash", "lodash@3.10.1"
-	 * @return {boolean} 'true' in case the plugin with specified version is installed, false otherwise.
+	 * @return {Promise<boolean>} 'true' in case the plugin with specified version is installed, false otherwise.
 	 */
-	isPluginInstalled(pluginName: string): boolean;
+	isPluginInstalled(pluginName: string): Promise<boolean>;
 	/**
 	 * Returns basic information about the plugin - it's name, version and cordova version range
 	 * @param  {string}                  pluginName The name of the plugin
@@ -1035,7 +1041,7 @@ interface IWebViewService {
 	getWebViews(platform: string): IWebView[];
 	getWebViewNames(platform: string): string[];
 	enableWebView(platform: string, webViewName: string, frameworkVersion: string): Promise<void>;
-	getCurrentWebViewName(platform: string): string;
+	getCurrentWebViewName(platform: string): Promise<string>;
 }
 
 /**

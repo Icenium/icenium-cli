@@ -1,9 +1,16 @@
+import { cache, invokeInit } from "../../common/decorators";
+
 export class PluginsService implements IPluginsService {
 	private frameworkProject: Project.IFrameworkProject;
 
 	constructor(private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $loginManager: ILoginManager,
 		private $project: Project.IProject) { }
+
+	@cache()
+	public async init(): Promise<void> {
+		return (await this.getPluginsService()).init();
+	}
 
 	public async getAvailablePlugins(pluginsCount?: number): Promise<IPlugin[]> {
 		return (await this.getPluginsService()).getAvailablePlugins(pluginsCount);
@@ -14,19 +21,19 @@ export class PluginsService implements IPluginsService {
 	}
 
 	public async printPlugins(plugins: IPlugin[]): Promise<void> {
-		(await this.getPluginsService()).printPlugins(plugins);
+		return (await this.getPluginsService()).printPlugins(plugins);
 	}
 
 	public async addPlugin(pluginName: string): Promise<void> {
-		await this.getPluginsService().wait().addPlugin(pluginName);
+		return (await this.getPluginsService()).addPlugin(pluginName);
 	}
 
 	public async removePlugin(pluginName: string): Promise<void> {
-		await this.getPluginsService().wait().removePlugin(pluginName);
+		return (await this.getPluginsService()).removePlugin(pluginName);
 	}
 
 	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
-		await this.getPluginsService().wait().configurePlugin(pluginName, version, configurations);
+		return (await this.getPluginsService()).configurePlugin(pluginName, version, configurations);
 	}
 
 	public async isPluginInstalled(pluginName: string): Promise<boolean> {
@@ -49,6 +56,7 @@ export class PluginsService implements IPluginsService {
 		return (await this.getPluginsService()).filterPlugins(plugins);
 	}
 
+	@invokeInit()
 	private async getPluginsService(): Promise<IPluginsService> {
 		if (!this.frameworkProject) {
 			await this.$loginManager.ensureLoggedIn();
@@ -56,7 +64,9 @@ export class PluginsService implements IPluginsService {
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.$project.projectData.Framework);
 			return this.frameworkProject.pluginsService;
 		}
+
 		return this.frameworkProject.pluginsService;
 	}
 }
+
 $injector.register("pluginsService", PluginsService);

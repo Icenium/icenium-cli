@@ -62,4 +62,5 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		});
 	}
 }
+
 $injector.register("commandsServiceProvider", CommandsServiceProvider);

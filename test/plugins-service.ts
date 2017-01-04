@@ -823,28 +823,28 @@ describe("plugins-service", () => {
 			}
 		];
 
-		it("isPluginInstalled returns true when plugin is installed and plugin name is passed", () => {
+		it("isPluginInstalled returns true when plugin is installed and plugin name is passed", async () => {
 			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			assert.isTrue(service.isPluginInstalled("stripe"));
+			assert.isTrue(await service.isPluginInstalled("stripe"));
 		});
 
-		it("isPluginInstalled returns true when plugin is installed and plugin identifier is passed", () => {
+		it("isPluginInstalled returns true when plugin is installed and plugin identifier is passed", async () => {
 			let testInjector = createTestInjector([], installedMarketplacePlugins, availableMarketplacePlugins);
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			assert.isTrue(service.isPluginInstalled("com.telerik.stripe"));
+			assert.isTrue(await service.isPluginInstalled("com.telerik.stripe"));
 		});
 
-		it("isPluginInstalled returns false when plugin is not installed and plugin name is passed", () => {
+		it("isPluginInstalled returns false when plugin is not installed and plugin name is passed", async () => {
 			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			assert.isFalse(service.isPluginInstalled("stripe"));
+			assert.isFalse(await service.isPluginInstalled("stripe"));
 		});
 
-		it("isPluginInstalled returns false when plugin is not installed and plugin identifier is passed", () => {
+		it("isPluginInstalled returns false when plugin is not installed and plugin identifier is passed", async () => {
 			let testInjector = createTestInjector([], [], availableMarketplacePlugins);
 			let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-			assert.isFalse(service.isPluginInstalled("com.telerik.stripe"));
+			assert.isFalse(await service.isPluginInstalled("com.telerik.stripe"));
 		});
 	});
 	describe("adding marketplace plugin works correctly", () => {
