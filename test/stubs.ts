@@ -1,5 +1,4 @@
 /* tslint:disable:no-empty */
-import Future = require("fibers/future");
 import * as util from "util";
 import * as path from "path";
 
@@ -80,7 +79,7 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	readFile(filename: string): NodeBuffer|string {
+	readFile(filename: string): NodeBuffer | string {
 		return undefined;
 	}
 
@@ -217,12 +216,12 @@ export class ErrorsNoFailStub implements IErrors {
 	}
 
 	async beginCommand(action: () => Promise<boolean>, printHelpCommand: () => Promise<boolean>): Promise<boolean> {
-			try {
-				let result = await  action();
-				return result;
-			} catch (ex) {
-				return false;
-			}
+		try {
+			let result = await action();
+			return result;
+		} catch (ex) {
+			return false;
+		}
 	}
 
 	executeAction(action: Function): any {
@@ -409,7 +408,7 @@ export class ProjectFilesManager implements IProjectFilesManager {
 		return undefined;
 	}
 
-	public createLocalToDevicePaths(deviceAppData: Mobile.IDeviceAppData, projectFilesPath: string, projectFiles?: string[]): Mobile.ILocalToDevicePathData[] {
+	public createLocalToDevicePaths(deviceAppData: Mobile.IDeviceAppData, projectFilesPath: string, projectFiles?: string[]): Promise<Mobile.ILocalToDevicePathData[]> {
 		return undefined;
 	}
 
@@ -477,10 +476,9 @@ export class HooksService implements IHooksService {
 	}
 	initialize(commandName: string): void {
 	}
-	async executeBeforeHooks(): Promise<void> { }).future<void>()();
+	async executeBeforeHooks(): Promise<void> {
 	}
 	async executeAfterHooks(): Promise<void> {
-		return (() => {
 	}
 }
 
@@ -524,5 +522,5 @@ export class PrompterStub implements IPrompter {
 export class MessagesServiceStub implements IMessagesService {
 	pathsToMessageJsonFiles: string[];
 
-	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [ id ].concat(args)); }
+	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [id].concat(args)); }
 }
