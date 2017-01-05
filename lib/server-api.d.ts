@@ -436,14 +436,14 @@ declare module Server {
 	}
 	interface IAppsServiceContract {
 		exportApplication(appId: string, skipMetadata: boolean, $resultStream: any): Promise<void>;
-		createApplication(applicationData: Server.ApplicationCreationData): Promise<IDictionary<Object>>;
+		createApplication(applicationData: Server.ApplicationCreationData): Promise<IDictionary<Server.Object>>;
 		enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): Promise<void>;
 		getApplication(appId: string): Promise<Server.SolutionData>;
 		canLoadApplication(appId: string): Promise<boolean>;
 		deleteApplication(appId: string): Promise<void>;
 		upgradeApplication(appId: string, mandatoryOnly: boolean): Promise<void>;
 		getApplicationServices(appId: string, serviceNames: string[]): Promise<Server.ApplicationServiceData[]>;
-		enableApplicationService(appId: string, serviceData: IDictionary<Object>): Promise<IDictionary<Object>>;
+		enableApplicationService(appId: string, serviceData: IDictionary<Object>): Promise<IDictionary<Server.Object>>;
 		getApplicationType(appId: string): Promise<string>;
 		deleteApplicationCache(appId: string): Promise<void>;
 	}
@@ -617,7 +617,7 @@ declare module Server {
 		IsReadOnly: boolean;
 	}
 	interface IAppsProjectPluginsServiceContract {
-		getPlugins(appId: string, projectName: string, configuration: string): Promise<IDictionary<PluginSpecs>>;
+		getPlugins(appId: string, projectName: string, configuration: string): Promise<IDictionary<Server.PluginSpecs>>;
 		addOrUpdatePlugin(appId: string, projectName: string, pluginId: string, configuration: string, pluginSpec: Server.PluginSpec): Promise<void>;
 		removePlugin(appId: string, projectName: string, pluginId: string, configuration: string): Promise<void>;
 	}

@@ -310,10 +310,12 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 			paramsMap[parameter.name] = tsTypeName;
 		});
 
-		let responseType = this.tsTypeSystemHelpers.translate(operation.responseClass);
-		if (!this.tsTypeSystemHelpers.isBuiltIn(responseType)) {
-			responseType = "Server." + responseType;
-		}
+		let numberOfClosingBrackets = 0;
+		let responseType = this.tsTypeSystemHelpers.translate(operation.responseClass)
+			.split(/[<>]/)
+			.filter(e => e)
+			.map(rt => this.tsTypeSystemHelpers.isBuiltIn(rt) ? rt : `Server.${rt}`)
+			.reduce((prev, current) => { ++numberOfClosingBrackets; return `${prev}<${current}` }) + _.repeat(">", numberOfClosingBrackets);
 
 		let httpCallParameters = [this.quote(operation.nickname), this.quote(operation.httpMethod)];
 

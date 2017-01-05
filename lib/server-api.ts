@@ -366,8 +366,8 @@ export class AppsService implements Server.IAppsServiceContract {
 	public exportApplication(appId: string, skipMetadata: boolean, $resultStream: any): Promise<void> {
 		return this.$serviceProxy.call<void>('ExportApplication', 'GET', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'export'].join('/') + '?' + querystring.stringify({ 'skipMetadata': skipMetadata }), 'application/octet-stream', null, $resultStream);
 	}
-	public createApplication(applicationData: Server.ApplicationCreationData): Promise<IDictionary<Object>> {
-		return this.$serviceProxy.call<IDictionary<Object>>('CreateApplication', 'POST', ['api', 'apps'].join('/'), 'application/json', [{ name: 'applicationData', value: JSON.stringify(applicationData), contentType: 'application/json' }], null);
+	public createApplication(applicationData: Server.ApplicationCreationData): Promise<IDictionary<Server.Object>> {
+		return this.$serviceProxy.call<IDictionary<Server.Object>>('CreateApplication', 'POST', ['api', 'apps'].join('/'), 'application/json', [{ name: 'applicationData', value: JSON.stringify(applicationData), contentType: 'application/json' }], null);
 	}
 	public enableApplication(appId: string, expansionData: Server.ProjectTemplateExpansionData): Promise<void> {
 		return this.$serviceProxy.call<void>('EnableApplication', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/'))].join('/'), null, [{ name: 'expansionData', value: JSON.stringify(expansionData), contentType: 'application/json' }], null);
@@ -387,8 +387,8 @@ export class AppsService implements Server.IAppsServiceContract {
 	public getApplicationServices(appId: string, serviceNames: string[]): Promise<Server.ApplicationServiceData[]> {
 		return this.$serviceProxy.call<Server.ApplicationServiceData[]>('GetApplicationServices', 'GET', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'services'].join('/') + '?' + querystring.stringify({ 'serviceNames': serviceNames }), 'application/json', null, null);
 	}
-	public enableApplicationService(appId: string, serviceData: IDictionary<Object>): Promise<IDictionary<Object>> {
-		return this.$serviceProxy.call<IDictionary<Object>>('EnableApplicationService', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'services'].join('/'), 'application/json', [{ name: 'serviceData', value: JSON.stringify(serviceData), contentType: 'application/json' }], null);
+	public enableApplicationService(appId: string, serviceData: IDictionary<Object>): Promise<IDictionary<Server.Object>> {
+		return this.$serviceProxy.call<IDictionary<Server.Object>>('EnableApplicationService', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'services'].join('/'), 'application/json', [{ name: 'serviceData', value: JSON.stringify(serviceData), contentType: 'application/json' }], null);
 	}
 	public getApplicationType(appId: string): Promise<string> {
 		return this.$serviceProxy.call<string>('GetApplicationType', 'GET', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'type'].join('/'), 'application/json', null, null);
@@ -499,8 +499,8 @@ export class AppsProjectsService implements Server.IAppsProjectsServiceContract 
 export class AppsProjectPluginsService implements Server.IAppsProjectPluginsServiceContract {
 	constructor(private $serviceProxy: Server.IServiceProxy) {
 	}
-	public getPlugins(appId: string, projectName: string, configuration: string): Promise<IDictionary<PluginSpecs>> {
-		return this.$serviceProxy.call<IDictionary<PluginSpecs>>('GetPlugins', 'GET', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'projectPlugins', encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), 'application/json', null, null);
+	public getPlugins(appId: string, projectName: string, configuration: string): Promise<IDictionary<Server.PluginSpecs>> {
+		return this.$serviceProxy.call<IDictionary<Server.PluginSpecs>>('GetPlugins', 'GET', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'projectPlugins', encodeURI(projectName.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), 'application/json', null, null);
 	}
 	public addOrUpdatePlugin(appId: string, projectName: string, pluginId: string, configuration: string, pluginSpec: Server.PluginSpec): Promise<void> {
 		return this.$serviceProxy.call<void>('AddOrUpdatePlugin', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'projectPlugins', encodeURI(projectName.replace(/\\/g, '/')), encodeURI(pluginId.replace(/\\/g, '/'))].join('/') + '?' + querystring.stringify({ 'configuration': configuration }), null, [{ name: 'pluginSpec', value: JSON.stringify(pluginSpec), contentType: 'application/json' }], null);
