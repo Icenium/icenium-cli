@@ -50,7 +50,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 		let app = await this.getApp(appId);
 
 		if (!(this.clientProjectsPerSolution[app.id] && this.clientProjectsPerSolution[app.id].length > 0)) {
-			this.clientProjectsPerSolution[app.id] = _.sortBy((await this.getSolutionDataCore(app))).Items, project => project.Name;
+			this.clientProjectsPerSolution[app.id] = _.sortBy((await this.getSolutionDataCore(app)).Items, project => project.Name);
 		}
 
 		return this.clientProjectsPerSolution[app.id];

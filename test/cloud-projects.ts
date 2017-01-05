@@ -5,10 +5,9 @@ import remoteProjectsServiceLib = require("../lib/services/remote-projects-servi
 import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 import { EOL } from "os";
+import { assert } from "chai";
 
 let originalIsInteractiveMethod = helpers.isInteractive;
-let assert = require("chai").assert;
-import Future = require("fibers/future");
 import * as util from "util";
 
 export class LoggerStub implements ILogger {
@@ -253,32 +252,32 @@ describe("cloud project commands", () => {
 					exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
 				});
 
-				it("returns true when no arguments are specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute([]));
+				it("returns true when no arguments are specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute([]));
 				});
 
-				it("returns true when valid solution name is specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["Sln1"]));
+				it("returns true when valid solution name is specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["Sln1"]));
 				});
 
-				it("returns true when valid solution name and project name are specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
+				it("returns true when valid solution name and project name are specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 
-				it("returns true when valid solution index is specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["1"]));
+				it("returns true when valid solution index is specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["1"]));
 				});
 
-				it("returns true when valid solution id and project name are specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]));
+				it("returns true when valid solution id and project name are specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["1", "BlankProj"]));
 				});
 
-				it("returns true when valid solution name and project id are specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]));
+				it("returns true when valid solution name and project id are specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["Sln1", "2"]));
 				});
 
-				it("returns true when valid solution id and project id are specified", async () => {
-					await assert.isTrue(exportProjectCommand.canExecute(["1", "2"]));
+				it("returns true when valid solution id and project id are specified", () => {
+					assert.eventually.isTrue(exportProjectCommand.canExecute(["1", "2"]));
 				});
 
 				it("fails when more than two arguments are passed", () => {
@@ -357,7 +356,7 @@ describe("cloud project commands", () => {
 				});
 			});
 
-			it("works correctly when no arguments are passed", () => {
+			it("works correctly when no arguments are passed", async () => {
 				testInjector = createTestInjector("Sln1", "BlankProj");
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
 				await exportProjectCommand.execute([]);
@@ -408,12 +407,12 @@ describe("cloud project commands", () => {
 				commandParamter = listProjectCommand.allowedParameters[0];
 			});
 
-			it("validate method returns true when valid solution name is passed", async () => {
-				await assert.isTrue(commandParamter.validate("Sln1"));
+			it("validate method returns true when valid solution name is passed", () => {
+				assert.eventually.isTrue(commandParamter.validate("Sln1"));
 			});
 
-			it("validate method returns true when valid solution id is passed", async () => {
-				await assert.isTrue(commandParamter.validate("1"));
+			it("validate method returns true when valid solution id is passed", () => {
+				assert.eventually.isTrue(commandParamter.validate("1"));
 			});
 
 			it("validate method throws error when invalid solution name is passed", () => {
@@ -424,8 +423,8 @@ describe("cloud project commands", () => {
 				assert.isRejected(commandParamter.validate("100"));
 			});
 
-			it("validate method returns false when validation value is not passed", async () => {
-				await assert.isFalse(commandParamter.validate(undefined));
+			it("validate method returns false when validation value is not passed", () => {
+				assert.eventually.isFalse(commandParamter.validate(undefined));
 			});
 		});
 
@@ -460,7 +459,7 @@ describe("cloud project commands", () => {
 		});
 
 		describe("lists solutions", () => {
-			it("when no parameter provided in NON-interactive console", () => {
+			it("when no parameter provided in NON-interactive console", async () => {
 				testInjector = createTestInjector("Sln1", "BlankProj", false);
 				let logger = testInjector.resolve("logger");
 				listProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudListProjectsCommand);
@@ -477,7 +476,7 @@ describe("cloud project commands", () => {
 				assert.isTrue(sln3Index !== -1);
 			});
 
-			it("when --all option provided in interactive console", () => {
+			it("when --all option provided in interactive console", async () => {
 				testInjector = createTestInjector("Sln1", "BlankProj");
 				let logger = testInjector.resolve("logger"),
 					opts = testInjector.resolve("options");
