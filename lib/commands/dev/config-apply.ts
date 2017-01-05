@@ -3,6 +3,7 @@ export class DevConfigApplyCommand implements ICommand {
 		private $stringParameterBuilder: IStringParameterBuilder) { }
 
 	public allowedParameters: ICommandParameter[] = [this.$stringParameterBuilder.createMandatoryParameter("Specify dev environment to be applied")];
+
 	public disableAnalytics = true;
 
 	public async execute(args: string[]): Promise<void> {

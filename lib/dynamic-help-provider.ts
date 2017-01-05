@@ -5,7 +5,7 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		private $projectConstants: Project.IConstants) { }
 
 	public isProjectType(args: string[]): boolean {
-		if(this.$project.getProjectDir()) {
+		if (this.$project.getProjectDir()) {
 			let framework = this.$project.projectData.Framework.toLowerCase();
 			return _.some(args, arg => arg.toLowerCase() === framework);
 		}
@@ -15,7 +15,7 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 
 	public getLocalVariables(options: { isHtml: boolean }): IDictionary<any> {
 		let isHtml = options.isHtml;
-		let localVariables:IDictionary<any> = {};
+		let localVariables: IDictionary<any> = {};
 		localVariables["isCordova"] = isHtml || this.isProjectType([TARGET_FRAMEWORK_IDENTIFIERS.Cordova]);
 		localVariables["isNativeScript"] = isHtml || this.isProjectType([TARGET_FRAMEWORK_IDENTIFIERS.NativeScript]);
 

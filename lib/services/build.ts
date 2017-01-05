@@ -371,7 +371,7 @@ export class BuildService implements Project.IBuildService {
 
 				return {
 					qrUrl: downloadUrl,
-					qrImageData: this.$qr.generateDataUri(downloadUrl),
+					qrImageData: await this.$qr.generateDataUri(downloadUrl),
 					packageUrls: [{
 						packageUrl: packageUrl,
 						downloadText: "Download"
@@ -384,7 +384,7 @@ export class BuildService implements Project.IBuildService {
 				let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
 				let aetDef: IPackageDownloadViewModel = {
 					qrUrl: aetUrl,
-					qrImageData: this.$qr.generateDataUri(aetUrl),
+					qrImageData: await this.$qr.generateDataUri(aetUrl),
 					packageUrls: [{ packageUrl: aetUrl, downloadText: "Download application enrollment token" }],
 					instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)")
 				};
@@ -522,7 +522,7 @@ export class BuildService implements Project.IBuildService {
 
 		this.showQRCodes([{
 			instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
-			qrImageData: this.$qr.generateDataUri(fullDownloadPath)
+			qrImageData: await this.$qr.generateDataUri(fullDownloadPath)
 		}]);
 	}
 }

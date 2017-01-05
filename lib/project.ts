@@ -4,7 +4,6 @@ import * as util from "util";
 import * as commonHelpers from "./common/helpers";
 import { Configurations } from "./common/constants";
 import { ProjectBase } from "./common/appbuilder/project/project-base";
-import Future = require("fibers/future");
 import * as helpers from "./helpers";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/constants";
 

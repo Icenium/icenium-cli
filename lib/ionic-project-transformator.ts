@@ -91,20 +91,20 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 	}
 
 	public async transformToAppBuilderProject(createBackup: boolean): Promise<void> {
-			await this.$analyticsService.track("Migrate from Ionic", "true");
+		await this.$analyticsService.track("Migrate from Ionic", "true");
 
-			if (createBackup) {
-				this.backupCurrentProject();
-				this.addIonicBackupFolderToAbIgnoreFile();
-			}
+		if (createBackup) {
+			this.backupCurrentProject();
+			this.addIonicBackupFolderToAbIgnoreFile();
+		}
 
-			this.createReroutingIndexHtml();
+		this.createReroutingIndexHtml();
 
-			this.cloneResources();
+		this.cloneResources();
 
-			this.deleteEnabledPlugins();
+		await this.deleteEnabledPlugins();
 
-			this.deleteAssortedFilesAndDirectories();
+		this.deleteAssortedFilesAndDirectories();
 	}
 
 	/**
@@ -367,8 +367,8 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		this.$fs.writeFile(indexHtml, indexHtmlContent);
 	}
 
-	private deleteEnabledPlugins(): void {
-		let corePlugins = this.$pluginsService.getInstalledPlugins().map(pl => pl.data.Name);
+	private async deleteEnabledPlugins(): Promise<void> {
+		let corePlugins = (await this.$pluginsService.getInstalledPlugins()).map(pl => pl.data.Name);
 		let pluginsDir = path.join(this.$project.getProjectDir(), "plugins");
 		if (this.$fs.exists(pluginsDir)) {
 			(this.$fs.readDirectory(pluginsDir) || [])

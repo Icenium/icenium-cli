@@ -360,7 +360,7 @@ interface IX509CertificateLoader {
 }
 
 interface IQrCodeGenerator {
-	generateDataUri(data: string): string;
+	generateDataUri(data: string): Promise<string>;
 }
 
 interface IPackageDownloadLink {

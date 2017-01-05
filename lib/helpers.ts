@@ -10,8 +10,8 @@ export function getRelativeToRootPath(rootPath: string, filePath: string): strin
 export function toHash(collection: any,
 	keySelector: (value: any, positionOrKey: any, _collection: any) => string,
 	valueSelector: (_value: any, _positionOrKey: any, _collection1: any) => any
-	): any {
-	let result:any = {};
+): any {
+	let result: any = {};
 	if (_.isArray(collection)) {
 		for (let i = 0; i < collection.length; ++i) {
 			result[keySelector(collection[i], i, collection)] =
@@ -93,7 +93,7 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 	let formattedRows: string[] = [];
 	let width: number;
 	for (let r = 0; r < rows; ++r) {
-		let rowItems:string[] = [];
+		let rowItems: string[] = [];
 		for (let c = 0; c < columns; ++c) {
 			let item = columnList[c][r] || "";
 			let padding = _.map(_.range(extents[c] - item.length), (x) => " ").join("");
@@ -178,12 +178,12 @@ export function toBoolean(str: string): boolean {
 
 export function mergeRecursive(obj1: Object, obj2: Object): Object {
 	for (let p in obj2) {
-		if(!obj1.hasOwnProperty(p)) {
+		if (!obj1.hasOwnProperty(p)) {
 			obj1[p] = obj2[p];
 			continue;
 		}
 
-		if (obj2[p].constructor === Object ) {
+		if (obj2[p].constructor === Object) {
 			obj1[p] = mergeRecursive(obj1[p], obj2[p]);
 		} else {
 			obj1[p] = obj2[p];
@@ -204,9 +204,9 @@ export function block(operation: () => void): void {
 }
 
 // Remove when node incorporates ES6 array.fill
-export function fill(value: string, times: number): string[]{
+export function fill(value: string, times: number): string[] {
 	let repeatedValues: string[] = [];
-	for(let repeat = 0; repeat < times; repeat++) {
+	for (let repeat = 0; repeat < times; repeat++) {
 		repeatedValues.push(value);
 	}
 
@@ -222,7 +222,7 @@ function getDottedStringObjectRecursive(arr: string[], val: any): any {
 		rest = _.tail(arr),
 		result: any = {};
 
-	if (_.isUndefined(result[first]) ) {
+	if (_.isUndefined(result[first])) {
 		result[first] = {};
 	}
 

@@ -1,4 +1,4 @@
-import {EOL} from "os";
+import { EOL } from "os";
 import * as util from "util";
 
 export enum PluginType {

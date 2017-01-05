@@ -1,12 +1,11 @@
 require("./bootstrap");
-import fiberBootstrap = require("./common/fiber-bootstrap");
 import * as shelljs from "shelljs";
 shelljs.config.silent = true;
-import {installUncaughtExceptionListener} from "./common/errors";
+import { installUncaughtExceptionListener } from "./common/errors";
 installUncaughtExceptionListener(process.exit);
 
-fiberBootstrap.run(() => {
-	let commandDispatcher:ICommandDispatcher = $injector.resolve("commandDispatcher");
+(async () => {
+	let commandDispatcher: ICommandDispatcher = $injector.resolve("commandDispatcher");
 
 	let config: Config.IConfig = $injector.resolve("$config");
 	let errors: IErrors = $injector.resolve("$errors");
@@ -20,4 +19,5 @@ fiberBootstrap.run(() => {
 	} else {
 		await commandDispatcher.dispatchCommand();
 	}
-});
+})();
+
