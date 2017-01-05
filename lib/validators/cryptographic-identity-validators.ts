@@ -13,7 +13,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	public static INVALID_FIELD_ERROR_MESSAGE_PATTERN = "%s is invalid";
 	public static NEGATIVE_EXPIRATION_ERROR_MESSAGE = "The expiration date must be before the creation date";
 	public static INVALID_GOOGLE_PLAY_IDENTITY_EXPIRATION_DATE_ERROR_MESSAGE =
-		util.format("The expiration date of google play identity must be after %s", SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE);
+	util.format("The expiration date of google play identity must be after %s", SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE);
 
 	constructor(private $x509: IX509CertificateLoader,
 		$injector: IInjector) {
@@ -22,13 +22,13 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 
 	public validate(identityModel: ISelfSignedIdentityModel): IValidationResult {
 		let validationResult = BaseValidators.Helpers.validate([
-				() => this.validateName(identityModel.Name),
-				() => this.validateEmail(identityModel.Email),
-				() => this.validateCountry(identityModel.Country),
-				() => this.validateForGooglePlayPublishing(identityModel.ForGooglePlayPublishing),
-				() => this.validateStartDate(identityModel.StartDate),
-				() => this.validateEndDate(identityModel.ForGooglePlayPublishing, identityModel.StartDate, identityModel.EndDate)
-			]);
+			() => this.validateName(identityModel.Name),
+			() => this.validateEmail(identityModel.Email),
+			() => this.validateCountry(identityModel.Country),
+			() => this.validateForGooglePlayPublishing(identityModel.ForGooglePlayPublishing),
+			() => this.validateStartDate(identityModel.StartDate),
+			() => this.validateEndDate(identityModel.ForGooglePlayPublishing, identityModel.StartDate, identityModel.EndDate)
+		]);
 
 		return validationResult;
 	}
@@ -40,7 +40,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	public validateProperty(identityModel: ISelfSignedIdentityModel, propertyName: string): IValidationResult {
-		switch(propertyName) {
+		switch (propertyName) {
 			case "Name":
 				return this.validateName(identityModel.Name);
 			case "Email":
@@ -59,14 +59,14 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateName(name: string): IValidationResult {
-		if(commonHelpers.isNullOrWhitespace(name)) {
+		if (commonHelpers.isNullOrWhitespace(name)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Name"));
 		}
 		return ValidationResult.ValidationResult.Successful;
 	}
 
 	private validateEmail(email: string): IValidationResult {
-		if(commonHelpers.isNullOrWhitespace(email)) {
+		if (commonHelpers.isNullOrWhitespace(email)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Email"));
 		}
 		if (!validator.isEmail(email)) {
@@ -76,7 +76,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateCountry(country: string): IValidationResult {
-		if(commonHelpers.isNullOrWhitespace(country)) {
+		if (commonHelpers.isNullOrWhitespace(country)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "Country"));
 		}
 		if (_.includes(helpers.getCountries(), country)) {
@@ -90,7 +90,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 		if (commonHelpers.isNullOrWhitespace(forGooglePlayPublishing)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, "For Google Play Publishing"));
 		}
-		if(forGooglePlayPublishing.toLowerCase() === "true" || forGooglePlayPublishing.toLowerCase() === "false") {
+		if (forGooglePlayPublishing.toLowerCase() === "true" || forGooglePlayPublishing.toLowerCase() === "false") {
 			return ValidationResult.ValidationResult.Successful;
 		}
 		return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.INVALID_FIELD_ERROR_MESSAGE_PATTERN, "For Google Play Publishing"));
@@ -116,7 +116,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 	}
 
 	private validateDate(date: string, fieldName: string): IValidationResult {
-		if(commonHelpers.isNullOrWhitespace(date)) {
+		if (commonHelpers.isNullOrWhitespace(date)) {
 			return new ValidationResult.ValidationResult(util.format(SelfSignedIdentityValidator.EMPTY_FIELD_ERROR_MESSAGE_PATTERN, fieldName));
 		}
 		if (!validator.isDate(date)) {
@@ -130,7 +130,7 @@ export class SelfSignedIdentityValidator extends BaseValidators.BaseValidator<IS
 			return new ValidationResult.ValidationResult(SelfSignedIdentityValidator.NEGATIVE_EXPIRATION_ERROR_MESSAGE);
 		}
 
-		if(forGooglePlayPublishing.toLowerCase() === "true" &&
+		if (forGooglePlayPublishing.toLowerCase() === "true" &&
 			endDate < SelfSignedIdentityValidator.GOOGLE_PLAY_IDENTITY_MIN_EXPIRATION_DATE) {
 			return new ValidationResult.ValidationResult(SelfSignedIdentityValidator.INVALID_GOOGLE_PLAY_IDENTITY_EXPIRATION_DATE_ERROR_MESSAGE);
 		}

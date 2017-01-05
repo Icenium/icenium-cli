@@ -52,10 +52,11 @@ export class Helpers {
 		return ValidationResult.ValidationResult.Successful;
 	}
 
-	public static async validateAsync(validators: Function[]): Promise<IValidationResult> {
-		let validationResults = await <IValidationResult[]>_.map(validators, (validator) => validator());
+	public static async validateAsync(validators: GenericFunction<Promise<IValidationResult>>[]): Promise<IValidationResult> {
+		let validationResults = await Promise.all(_.map(validators, (validator) => validator()));
 		let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 		if (firstFailedValidationResult) {
+			Function
 			return firstFailedValidationResult;
 		}
 		return ValidationResult.ValidationResult.Successful;
