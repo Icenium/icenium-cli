@@ -49,7 +49,6 @@ export class Project extends ProjectBase implements Project.IProject {
 
 		if (this.projectData && this.projectData.Framework) {
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.projectData.Framework);
-			await this.frameworkProject.updateMigrationConfigFile();
 		}
 	}
 
@@ -399,12 +398,12 @@ export class Project extends ProjectBase implements Project.IProject {
 			await this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations);
 		} else {
 			if (projectConfigurations.length) {
-				_.each(projectConfigurations, async configuration => {
-					await this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues);
-				});
+				await Promise.all(_.map(projectConfigurations, configuration => {
+					this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues);
+				}));
 			} else {
 				await this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues);
-				_.each(this.configurationSpecificData, async configData => await this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues));
+				await Promise.all(_.map(this.configurationSpecificData, configData => this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues)));
 			}
 		}
 	}
@@ -460,11 +459,11 @@ export class Project extends ProjectBase implements Project.IProject {
 					// 'appbuilder prop print --validValue' called inside project dir
 					let propKeys = _.keys(schema);
 					let sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
-					_.each(sortedProperties, async propKey => {
+					await Promise.all(_.map(sortedProperties, propKey => {
 						let prop = schema[propKey];
 						this.$logger.info("  " + propKey);
-						await this.printValidValuesOfProperty(prop);
-					});
+						return this.printValidValuesOfProperty(prop);
+					}));
 				} else {
 					// 'appbuilder prop print' called inside project dir
 					let propKeys = _.keys(mergedProjectData);
@@ -665,12 +664,10 @@ export class Project extends ProjectBase implements Project.IProject {
 		let projectDir = this.getProjectDir();
 
 		let files = this.enumerateProjectFiles();
-		let zipOp = this.$fs.zipFiles(projectZipFile, files,
+		await this.$fs.zipFiles(projectZipFile, files,
 			p => this.getProjectRelativePath(p, projectDir));
 
-		return new Promise<string>((resolve, reject) => {
-			zipOp.resolveSuccess(() => resolve(projectZipFile));
-		});
+		return projectZipFile;
 	}
 
 	public async importProject(): Promise<void> {
@@ -763,8 +760,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	private removeExtraFiles(projectDir: string): void {
-		_.each(["mobile.vstemplate"],
-			(file) => this.$fs.deleteFile(path.join(projectDir, file)));
+		this.$fs.deleteFile(path.join(projectDir, "mobile.vstemplate"));
 	}
 
 	private async getProjectPropertiesFromExistingProject(projectDir: string, appname: string): Promise<Project.IData> {

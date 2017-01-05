@@ -3,6 +3,7 @@ import * as util from "util";
 import * as temp from "temp";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import { FrameworkProjectBase } from "./framework-project-base";
+import * as shelljs from "shelljs";
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -153,6 +154,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
 			// We do not need to update the migration file if it has been modified in the past 2 hours.
 			this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
+			shelljs.touch(nativeScriptMigrationFileName);
 			return;
 		}
 
@@ -177,6 +179,8 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
+		await this.updateMigrationConfigFile();
+
 		if (this.$typeScriptService.isTypeScriptProject(projectDir)) {
 			try {
 				await this.$npmService.install(projectDir);

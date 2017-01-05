@@ -62,7 +62,6 @@ export class PluginsService implements IPluginsService {
 			await this.$loginManager.ensureLoggedIn();
 			await this.$project.ensureProject();
 			this.frameworkProject = this.$frameworkProjectResolver.resolve(this.$project.projectData.Framework);
-			return this.frameworkProject.pluginsService;
 		}
 
 		return this.frameworkProject.pluginsService;
