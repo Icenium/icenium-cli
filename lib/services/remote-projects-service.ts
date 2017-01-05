@@ -83,7 +83,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 
 	private async getIsMigrationEnabledForUser(): Promise<boolean> {
 		if (this._isMigrationEnabledForUser === null) {
-			let features = await this.$server.tap.getFeatures(this.getUserTenantId(), "tap");
+			let features = await this.$server.tap.getFeatures(await this.getUserTenantId(), "tap");
 			this._isMigrationEnabledForUser = features && features.length && _.includes(features, RemoteProjectService.APP_FEATURE_TOGGLE_NAME);
 		}
 		return this._isMigrationEnabledForUser;

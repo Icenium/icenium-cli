@@ -28,7 +28,7 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 	public async getAvailablePlugins(): Promise<Server.CordovaPluginData[]> {
 		await this.$project.ensureCordovaProject();
 		// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
-		return await this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).concat([this.livePatchPlugin]);
+		return (await this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion)).concat([this.livePatchPlugin]);
 	}
 
 	public async createPluginData(plugin: IMarketplacePluginData): Promise<IPlugin[]> {
