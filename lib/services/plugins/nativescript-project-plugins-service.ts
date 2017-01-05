@@ -112,7 +112,7 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			pluginBasicInfo = await this.setPluginInPackageJson(pluginIdentifier, { addPluginToPackageJson: true });
 		}
 
-		if (await this.$typeScriptService.isTypeScriptProject(this.$project.projectDir)) {
+		if (this.$typeScriptService.isTypeScriptProject(this.$project.projectDir)) {
 			// Do not pass version here, we've already added the entry in package.json, so the correct version will be installed anyway.
 			let installResult = await this.$npmService.install(this.$project.projectDir, { installTypes: this.$options.types, name: pluginBasicInfo.name });
 			if (installResult.error) {

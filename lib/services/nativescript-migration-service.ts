@@ -1,4 +1,3 @@
-import Future = require("fibers/future");
 import * as path from "path";
 
 export class NativeScriptMigrationService implements IFrameworkMigrationService {
@@ -66,18 +65,18 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	}
 
 	public async downloadMigrationData(): Promise<void> {
-			this.$fs.deleteDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
-			this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
+		this.$fs.deleteDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
+		this.$fs.createDirectory(this.$nativeScriptResources.nativeScriptResourcesDir);
 
-			// Make sure to download this file first, as data from it is used for fileDownloadFutures
-			await this.downloadMigrationConfigFile();
+		// Make sure to download this file first, as data from it is used for fileDownloadFutures
+		await this.downloadMigrationConfigFile();
 
-			let fileDownloadFutures = _(this.nativeScriptMigrationData.supportedVersions)
-				.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
-				.flatten<Promise<void>>()
-				.value();
-			fileDownloadFutures.push(this.downloadPackageJsonResourceFile());
-			Future.wait(fileDownloadFutures);
+		let fileDownloadPromises = _(this.nativeScriptMigrationData.supportedVersions)
+			.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
+			.flatten<Promise<void>>()
+			.value();
+		fileDownloadPromises.push(this.downloadPackageJsonResourceFile());
+		await Promise.all(fileDownloadPromises);
 	}
 
 	public getSupportedVersions(): string[] {
@@ -101,15 +100,15 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	}
 
 	public async onFrameworkVersionChanging(newVersion: string): Promise<void> {
-			let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
-			this.$logger.trace(`Migrating from version ${currentFrameworkVersion} to ${newVersion}.`);
-			if (currentFrameworkVersion === newVersion) {
-				return;
-			}
+		let currentFrameworkVersion = this.$project.projectData.FrameworkVersion;
+		this.$logger.trace(`Migrating from version ${currentFrameworkVersion} to ${newVersion}.`);
+		if (currentFrameworkVersion === newVersion) {
+			return;
+		}
 
-			this.ensurePackageJsonExists(newVersion);
+		this.ensurePackageJsonExists(newVersion);
 
-			await this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion);
+		await this.migrateByModifyingPackageJson(currentFrameworkVersion, newVersion);
 	}
 
 	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
@@ -118,26 +117,26 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 	}
 
 	private async migrateByModifyingPackageJson(currentVersion: string, newVersion: string): Promise<void> {
-			try {
-				this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion);
+		try {
+			this.nativeScriptMigrationConfiguration.packageJsonContents.dependencies[NativeScriptMigrationService.TNS_CORE_MODULES] = this.getModuleVersion(newVersion);
 
-				await this.$projectMigrationService.migrateTypeScriptProject();
-				await this.$npmService.install(this.$project.getProjectDir());
+			await this.$projectMigrationService.migrateTypeScriptProject();
+			await this.$npmService.install(this.$project.getProjectDir());
 
-				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents);
-			} catch (err) {
-				this.traceError(err);
-				this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.oldPackageJsonContents);
+			this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.packageJsonContents);
+		} catch (err) {
+			this.traceError(err);
+			this.$fs.writeJson(this.nativeScriptMigrationConfiguration.pathToPackageJson, this.nativeScriptMigrationConfiguration.oldPackageJsonContents);
 
-				let message = "Error during migration. Restored original state of the project.";
-				if (err.errorCode === ErrorCodes.RESOURCE_PROBLEM) {
-					message = err.message;
-				}
-
-				this.$errors.failWithoutHelp(message);
+			let message = "Error during migration. Restored original state of the project.";
+			if (err.errorCode === ErrorCodes.RESOURCE_PROBLEM) {
+				message = err.message;
 			}
 
-			this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
+			this.$errors.failWithoutHelp(message);
+		}
+
+		this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
 	}
 
 	private async downloadTnsPackage(language: string, version: string): Promise<void> {

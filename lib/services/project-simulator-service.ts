@@ -1,5 +1,4 @@
 import * as path from "path";
-import Future = require("fibers/future");
 
 export class ProjectSimulatorService implements IProjectSimulatorService {
 
@@ -27,60 +26,60 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		private $serverExtensionsService: IServerExtensionsService) { }
 
 	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
-			let pluginsPath = await  this.prepareCordovaPlugins(simulatorPackageName);
-			let projectData = this.$project.projectData;
-			let corePlugins = this.$project.getProperty("CorePlugins", "debug");
+		let pluginsPath = await this.prepareCordovaPlugins(simulatorPackageName);
+		let projectData = this.$project.projectData;
+		let corePlugins = this.$project.getProperty("CorePlugins", "debug");
 
-			return [
-				"--statusbarstyle", projectData.iOSStatusBarStyle,
-				"--frameworkversion", projectData.FrameworkVersion,
-				"--orientations", projectData.DeviceOrientations.join(";"),
-				"--corepluginspath", pluginsPath,
-				"--supportedplatforms", this.$project.getProjectTargets().join(";"),
-				"--plugins", (corePlugins || []).join(";")
-			];
+		return [
+			"--statusbarstyle", projectData.iOSStatusBarStyle,
+			"--frameworkversion", projectData.FrameworkVersion,
+			"--orientations", projectData.DeviceOrientations.join(";"),
+			"--corepluginspath", pluginsPath,
+			"--supportedplatforms", this.$project.getProjectTargets().join(";"),
+			"--plugins", (corePlugins || []).join(";")
+		];
 	}
 
 	private async prepareCordovaPlugins(simulatorPackageName: string): Promise<string> {
-			let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
-			let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
+		let packageVersion = this.$serverExtensionsService.getExtensionVersion(simulatorPackageName);
+		let pluginsPath = path.join(this.$serverExtensionsService.cacheDir, this.getPluginsDirName(packageVersion));
 
-			if (!this.$fs.exists(pluginsPath)) {
-				let zipFile: any;
-				try {
-					this.$logger.info("Downloading core Cordova plugins...");
+		if (!this.$fs.exists(pluginsPath)) {
+			let zipFile: any;
+			try {
+				this.$logger.info("Downloading core Cordova plugins...");
 
-					this.$fs.createDirectory(pluginsPath);
-					let zipPath = path.join(pluginsPath, "plugins.zip");
+				this.$fs.createDirectory(pluginsPath);
+				let zipPath = path.join(pluginsPath, "plugins.zip");
 
-					this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
-					zipFile = this.$fs.createWriteStream(zipPath);
-					await this.$server.cordova.getPluginsPackage(zipFile);
+				this.$logger.debug("Downloading Cordova plugins package into '%s'", zipPath);
+				zipFile = this.$fs.createWriteStream(zipPath);
+				await this.$server.cordova.getPluginsPackage(zipFile);
 
-					this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
-					await this.$fs.unzip(zipPath, pluginsPath);
+				this.$logger.debug("Unpacking Cordova plugins from %s", zipPath);
+				await this.$fs.unzip(zipPath, pluginsPath);
 
-					this.$logger.info("Finished downloading plugins.");
-				} catch(err) {
-					await this.closeStream(zipFile);
-					this.$fs.deleteDirectory(pluginsPath);
-					throw err;
-				}
+				this.$logger.info("Finished downloading plugins.");
+			} catch (err) {
+				await this.closeStream(zipFile);
+				this.$fs.deleteDirectory(pluginsPath);
+				throw err;
 			}
+		}
 
-			return pluginsPath;
+		return pluginsPath;
 	}
 
 	public async closeStream(stream: any): Promise<void> {
-		let future = new Future<void>();
-		stream.close((err: Error, data: any) => {
-			if (err) {
-				future.throw(err);
-			} else {
-				future.return();
-			}
+		return new Promise<void>((resolve, reject) => {
+			stream.close((err: Error, data: any) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
 		});
-		return future;
 	}
 
 	private getPluginsDirName(serverVersion: string) {
@@ -94,11 +93,13 @@ export class CordovaSimulatorService implements IProjectSimulatorService {
 		return result;
 	}
 }
+
 $injector.register("cordovaSimulatorService", CordovaSimulatorService);
 
 export class NativeScriptSimulatorService implements IProjectSimulatorService {
 	public async getSimulatorParams(simulatorPackageName: string): Promise<string[]> {
-		return (() => <string[]>[]).future<string[]>()();
+		return [];
 	}
 }
+
 $injector.register("nativeScriptSimulatorService", NativeScriptSimulatorService);

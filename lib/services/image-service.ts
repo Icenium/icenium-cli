@@ -45,7 +45,6 @@ class ImageService implements IImageService {
 		}
 	}
 
-	@invokeInit()
 	public printDefinitions(): void {
 		let imageDefinitionsFilePath = path.join(this.$staticConfig.APP_RESOURCES_DIR_NAME, this.$projectConstants.IMAGE_DEFINITIONS_FILE_NAME),
 			imageDefinitionsContents: ImageDefinitionData[] = this.$resources.readJson(imageDefinitionsFilePath),
@@ -105,7 +104,7 @@ class ImageService implements IImageService {
 		let imageBasePath = path.join(tempDir, 'App_Resources'),
 			images = this.$fs.enumerateFilesInDirectorySync(imageBasePath);
 
-		Promise.all(_.map(images, async imagePath => {
+		await Promise.all(_.map(images, async imagePath => {
 			if (!this.$project.capabilities.wp8Supported && ~imagePath.indexOf(this.$devicePlatformsConstants.WP8)) {
 				return;
 			}

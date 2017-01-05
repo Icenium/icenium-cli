@@ -1,4 +1,4 @@
-import {EOL} from "os";
+import { EOL } from "os";
 import xmlMapping = require("xml-mapping");
 import * as util from "util";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
@@ -56,56 +56,56 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	public async updateCorePlugins(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>, mode: string, newValue: Array<any>, configurationsSpecifiedByUser: string[]): Promise<void> {
-			this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
+		this.moveCorePluginsToConfigurationSpecificData(projectData, configurationSpecificData);
 
-			if (configurationsSpecifiedByUser.length === 0) {
-				configurationsSpecifiedByUser = _.keys(configurationSpecificData);
-			}
+		if (configurationsSpecifiedByUser.length === 0) {
+			configurationsSpecifiedByUser = _.keys(configurationSpecificData);
+		}
 
-			_.each(configurationsSpecifiedByUser, configuration => {
-				await this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue);
-			});
+		await Promise.all(_.map(configurationsSpecifiedByUser, async configuration => {
+			await this.updateProjectProperty(projectData, configurationSpecificData[configuration], mode, this.$projectConstants.CORE_PLUGINS_PROPERTY_NAME, newValue);
+		}));
 
-			// check if CorePlugins in all configurations are the same
-			this.tryMovingCorePluginsToProjectData(projectData, configurationSpecificData);
+		// check if CorePlugins in all configurations are the same
+		this.tryMovingCorePluginsToProjectData(projectData, configurationSpecificData);
 	}
 
 	public async updateProjectProperty(projectData: Project.IData, configurationSpecificData: Project.IData, mode: string, property: string, newValue: any): Promise<void> {
-			let normalizedProperty = this.normalizePropertyName(property, projectData);
-			let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
-			if (isString) {
-				if (newValue.length > 1) {
-					this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
-				}
+		let normalizedProperty = this.normalizePropertyName(property, projectData);
+		let isString = this.$jsonSchemaValidator.getPropertyType(projectData.Framework, normalizedProperty) === "string";
+		if (isString) {
+			if (newValue.length > 1) {
+				this.$errors.fail("Property '%s' is not a collection of flags. Specify only a single property value.", property);
 			}
+		}
 
-			let propertyValue = configurationSpecificData ? configurationSpecificData[normalizedProperty] : projectData[normalizedProperty];
+		let propertyValue = configurationSpecificData ? configurationSpecificData[normalizedProperty] : projectData[normalizedProperty];
 
-			if (mode === "set") {
-				propertyValue = isString ? newValue[0] : newValue;
-			} else if (mode === "del") {
-				if (!(propertyValue instanceof Array)) {
-					this.$errors.fail("Unable to remove value to non-flags property");
-				}
-				propertyValue = _.difference(propertyValue, newValue);
-			} else if (mode === "add") {
-				if (!(propertyValue instanceof Array)) {
-					this.$errors.fail("Unable to add value to non-flags property");
-				}
-				propertyValue = _.union(propertyValue, newValue);
-			} else {
-				this.$errors.fail("Unknown property update mode '%s'", mode);
+		if (mode === "set") {
+			propertyValue = isString ? newValue[0] : newValue;
+		} else if (mode === "del") {
+			if (!(propertyValue instanceof Array)) {
+				this.$errors.fail("Unable to remove value to non-flags property");
 			}
-
-			await this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue);
-
-			if (configurationSpecificData) {
-				configurationSpecificData[normalizedProperty] = propertyValue;
-			} else {
-				projectData[normalizedProperty] = propertyValue;
+			propertyValue = _.difference(propertyValue, newValue);
+		} else if (mode === "add") {
+			if (!(propertyValue instanceof Array)) {
+				this.$errors.fail("Unable to add value to non-flags property");
 			}
+			propertyValue = _.union(propertyValue, newValue);
+		} else {
+			this.$errors.fail("Unknown property update mode '%s'", mode);
+		}
 
-			this.validateProjectData(projectData, configurationSpecificData);
+		await this.notifyPropertyChanged(projectData.Framework, normalizedProperty, propertyValue);
+
+		if (configurationSpecificData) {
+			configurationSpecificData[normalizedProperty] = propertyValue;
+		} else {
+			projectData[normalizedProperty] = propertyValue;
+		}
+
+		this.validateProjectData(projectData, configurationSpecificData);
 	}
 
 	public normalizePropertyName(propertyName: string, projectData: Project.IData): string {
@@ -121,37 +121,37 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	public async getPropertiesForAllSupportedProjects(): Promise<string> {
-			let result: string[] = [];
-			let schemas: IDictionary<IDictionary<any>> = Object.create(null);
+		let result: string[] = [];
+		let schemas: IDictionary<IDictionary<any>> = Object.create(null);
 
-			let targetFrameworkIdentifiers = _.values(TARGET_FRAMEWORK_IDENTIFIERS);
-			_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
-				let projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
-				schemas[targetFrameworkIdentifier] = projectSchema;
+		let targetFrameworkIdentifiers = _.values(TARGET_FRAMEWORK_IDENTIFIERS);
+		_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
+			let projectSchema = this.$frameworkProjectResolver.resolve(targetFrameworkIdentifier).getProjectFileSchema();
+			schemas[targetFrameworkIdentifier] = projectSchema;
+		});
+
+		// Get common properties
+		let schemaValues = _.values(schemas);
+		let firstArray = _.first(schemaValues);
+		let commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
+			return _.every(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
+		});
+
+		await Promise.all(_.map(_.keys(schemas), async (targetFrameworkIdentifier: string) => {
+			let specificFrameworkPropertyNames = _.difference(_.keys(schemas[targetFrameworkIdentifier]), commonPropertyNames);
+			let specificFrameworkProperties: IDictionary<any> = Object.create(null);
+			_.each(specificFrameworkPropertyNames, (propertyName: string) => {
+				specificFrameworkProperties[propertyName] = schemas[targetFrameworkIdentifier][propertyName];
 			});
+			let title = util.format("Project properties for %s projects:", targetFrameworkIdentifier);
+			result.push(await this.getProjectSchemaPartHelp(specificFrameworkProperties, title));
+		}));
 
-			// Get common properties
-			let schemaValues = _.values(schemas);
-			let firstArray = _.first(schemaValues);
-			let commonPropertyNames = _.filter(_.keys(firstArray), (propertyName: string) => {
-				return _.every(schemaValues, (schema: IDictionary<any>) => schema[propertyName] && schema[propertyName] === firstArray[propertyName]);
-			});
+		let commonProperties: IDictionary<string> = Object.create(null);
+		_.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
+		result.push(await this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
 
-			_.each(_.keys(schemas), (targetFrameworkIdentifier: string) => {
-				let specificFrameworkPropertyNames = _.difference(_.keys(schemas[targetFrameworkIdentifier]), commonPropertyNames);
-				let specificFrameworkProperties: IDictionary<any> = Object.create(null);
-				_.each(specificFrameworkPropertyNames, (propertyName: string) => {
-					specificFrameworkProperties[propertyName] = schemas[targetFrameworkIdentifier][propertyName];
-				});
-				let title = util.format("Project properties for %s projects:", targetFrameworkIdentifier);
-				result.push(this.getProjectSchemaPartHelp(specificFrameworkProperties, title));
-			});
-
-			let commonProperties: IDictionary<string> = Object.create(null);
-			_.each(commonPropertyNames, (propertyName: string) => commonProperties[propertyName] = firstArray[propertyName]);
-			result.push(this.getProjectSchemaPartHelp(commonProperties, "Common properties for all projects"));
-
-			return result.join(EOL + EOL);
+		return result.join(EOL + EOL);
 	}
 
 	private getValidProperties(projectData: Project.IData): any {
@@ -159,37 +159,40 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	private async getPropRange(propData: any): Promise<string[]> {
-			if (propData.dynamicRange) {
-				return await this.$injector.dynamicCall(propData.dynamicRange);
+		if (propData.dynamicRange) {
+			return await this.$injector.dynamicCall(propData.dynamicRange);
+		}
+
+		if (propData.enum) {
+			return propData.enum;
+		}
+
+		if (propData.items) {
+			if (propData.items.enum) {
+				return propData.items.enum;
 			}
-			if (propData.enum) {
-				return propData.enum;
-			}
-			if (propData.items) {
-				if (propData.items.enum) {
-					return propData.items.enum;
-				}
-			}
-			return propData.range;
+		}
+
+		return propData.range;
 	}
 
 	public async getValidValuesForProperty(propData: any): Promise<string[]> {
-			let range = await  this.getPropRange(propData);
-			if (range) {
-				return _.sortBy(_.values<string>(range), (val: string) => {
-					return val.toUpperCase();
-				});
-			}
+		let range = await this.getPropRange(propData);
+		if (range) {
+			return _.sortBy(_.values<string>(range), (val: string) => {
+				return val.toUpperCase();
+			});
+		}
 
-			return null;
+		return null;
 	}
 
-	private getProjectSchemaPartHelp(schema: any, title: string): string {
+	private async getProjectSchemaPartHelp(schema: any, title: string): Promise<string> {
 		let help = [title];
-		_.each(_.keys(schema), (propertyName: string) => {
+		await Promise.all(_.map(_.keys(schema), async (propertyName: string) => {
 			let value = schema[propertyName];
 			help.push(util.format("  %s - %s", propertyName, value.description));
-			let range = await  this.getPropRange(value);
+			let range = await this.getPropRange(value);
 			if (range) {
 				help.push("    Valid values:");
 				_.each(range, (rangeDesc: any, rangeKey: any) => {
@@ -205,7 +208,7 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			} else if (value.regex) {
 				help.push("    Valid values match /" + value.regex.toString() + "/");
 			}
-		});
+		}));
 
 		return help.join(EOL);
 	}
@@ -233,11 +236,11 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 	}
 
 	private async notifyPropertyChanged(framework: string, propertyName: string, propertyValue: any): Promise<void> {
-			let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
-			let propData = projectSchema[propertyName];
-			if (propData && propData.onChanging) {
-				await this.$injector.dynamicCall(propData.onChanging, [propertyValue]);
-			}
+		let projectSchema = this.$jsonSchemaValidator.tryResolveValidationSchema(framework);
+		let propData = projectSchema[propertyName];
+		if (propData && propData.onChanging) {
+			await this.$injector.dynamicCall(propData.onChanging, [propertyValue]);
+		}
 	}
 
 	private moveCorePluginsToConfigurationSpecificData(projectData: Project.IData, configurationSpecificData: IDictionary<Project.IData>): void {
@@ -299,8 +302,10 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 			this.$logger.trace("No difference between CorePlugins in each configuration detected. CorePlugins should be moved to project data.");
 			return true;
 		}
+
 		this.$logger.trace("There's difference between CorePlugins in configuration files. CorePlugins cannot be moved to project data.");
 		return false;
 	}
 }
+
 $injector.register("projectPropertiesService", ProjectPropertiesService);

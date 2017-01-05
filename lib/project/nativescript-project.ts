@@ -177,7 +177,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
-		if (await this.$typeScriptService.isTypeScriptProject(projectDir)) {
+		if (this.$typeScriptService.isTypeScriptProject(projectDir)) {
 			try {
 				await this.$npmService.install(projectDir);
 			} catch (err) {

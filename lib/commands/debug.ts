@@ -31,7 +31,7 @@ export class DebugCommand implements ICommand {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on %s. The debug tools for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}
 
-		return this.$hostInfo.isDarwin ? Promise.resolve(true) : this.$winDebuggerService.canRunApplication();
+		return this.$hostInfo.isDarwin ? true : await this.$winDebuggerService.canRunApplication();
 	}
 
 	protected async runDebugger(): Promise<void> {
