@@ -1148,7 +1148,7 @@ interface IAppStoreService {
  */
 interface IScaffolder {
 	scaffolder: any;
-	future: Promise<any>;
+	promise: Promise<any>;
 	callback: Function;
 }
 

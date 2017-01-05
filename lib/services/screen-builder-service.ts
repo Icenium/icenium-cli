@@ -1,6 +1,6 @@
-import Future = require("fibers/future");
 import * as path from "path";
 import * as util from "util";
+import { deferPromise } from "../common/helpers";
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	private static UPGRADE_ERROR_MESSAGES = ["Your app has been build with an obsolete version of Screen Builder. Please, migrate it to latest version and retry.",
@@ -40,7 +40,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	}
 
 	private async promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScreenBuilderMigrationData> {
-		let wasMigrated = await !this.shouldUpgrade(projectPath),
+		let wasMigrated = !(await this.shouldUpgrade(projectPath)),
 			didMigrate = false;
 
 		if (!wasMigrated) {
@@ -52,7 +52,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 				scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
-				await scaffolderData.future;
+				await scaffolderData.promise;
 			}
 		}
 
@@ -65,7 +65,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 			disableCommandHelpSuggestion = !migrationData.didMigrate;
 
 		if (migrationData.wasMigrated || migrationData.didMigrate) {
-			await this.promptGenerate(projectPath, generatorName, screenBuilderOptions).wait().future;
+			await (await this.promptGenerate(projectPath, generatorName, screenBuilderOptions)).promise;
 		}
 
 		return disableCommandHelpSuggestion;
@@ -129,14 +129,14 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 			scaffolderData.scaffolder.initContext({ collectMetadata: true }, scaffolderData.callback);
 
-			this.shouldUpgradeCached = await scaffolderData.future === ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE;
+			this.shouldUpgradeCached = (await scaffolderData.promise) === ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE;
 		}
 
 		return this.shouldUpgradeCached;
 	}
 
 	public async upgrade(projectPath: string): Promise<void> {
-		if (! await this.shouldUpgrade(projectPath)) {
+		if (! (await this.shouldUpgrade(projectPath))) {
 			return;
 		}
 
@@ -144,7 +144,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 		scaffolderData.scaffolder.upgrade(scaffolderData.callback);
 
-		await scaffolderData.future;
+		await scaffolderData.promise;
 	}
 
 	private async getScaffolder(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<any> {
@@ -178,25 +178,31 @@ export class ScreenBuilderService implements IScreenBuilderService {
 
 		let scaffolder = await this.getScaffolder(projectPath, generatorName, screenBuilderOptions);
 		if (screenBuilderOptions && screenBuilderOptions.isSync) {
-			return { scaffolder: scaffolder, future: null, callback: null };
+			return { scaffolder: scaffolder, promise: null, callback: null };
 		}
 
-		let future = new Future<any>();
+		let deferredPromise = await deferPromise();
 		let callback = (err: Error, data: any) => {
 			if (err) {
 				let error = this.getErrorsRecursive(err).join('\n');
 				this.$logger.trace(`Screen Builder error while prompting: ${err.message}`);
 				if (~ScreenBuilderService.UPGRADE_ERROR_MESSAGES.indexOf(err.message)) {
-					future.return(ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE);
+					if (deferredPromise.isPending()) {
+						deferredPromise.resolve(ScreenBuilderService.UPGRADE_ERROR_MESSAGE_SHOWN_ON_THE_CONSOLE);
+					}
 				} else {
-					future.throw(new Error(error));
+					if (deferredPromise.isPending()) {
+						deferredPromise.reject(new Error(error));
+					}
 				}
 			} else {
-				future.return(data);
+				if (deferredPromise.isPending()) {
+					deferredPromise.resolve(data);
+				}
 			}
 		};
 
-		return { scaffolder: scaffolder, future: future, callback: callback };
+		return { scaffolder: scaffolder, promise: deferredPromise.promise, callback: callback };
 	}
 
 	private getErrorsRecursive(errorObject: any): string[] {

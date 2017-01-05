@@ -1,4 +1,4 @@
-import {EOL} from "os";
+import { EOL } from "os";
 
 export class SimulatorService implements ISimulatorService {
 	private simulatorPath: string;
@@ -13,8 +13,7 @@ export class SimulatorService implements ISimulatorService {
 		private $serverExtensionsService: IServerExtensionsService,
 		private $simulatorPlatformServices: IExtensionPlatformServices,
 		private $staticConfig: IStaticConfig,
-		private $analyticsService: IAnalyticsService) {
-	}
+		private $analyticsService: IAnalyticsService) { }
 
 	public async launchSimulator(): Promise<void> {
 		await this.$loginManager.ensureLoggedIn();
@@ -29,33 +28,34 @@ export class SimulatorService implements ISimulatorService {
 	}
 
 	private async ensureSimulatorIsNotRunning(): Promise<void> {
-			this.$logger.info(); // HACK - display simulator downloading indicator correctly
-			let isRunning = await  this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName);
-			if (isRunning) {
-				this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + EOL +
-					"Close it and run $ appbuilder simulate again.");
-			}
+		this.$logger.info(); // HACK - display simulator downloading indicator correctly
+		let isRunning = await this.$processInfo.isRunning(this.$simulatorPlatformServices.executableName);
+		if (isRunning) {
+			this.$errors.failWithoutHelp("AppBuilder Simulator is currently running and cannot be updated." + EOL +
+				"Close it and run $ appbuilder simulate again.");
+		}
 	}
 
 	private async runSimulator(simulatorPackageName: string): Promise<void> {
-			this.$logger.info("Starting simulator...");
+		this.$logger.info("Starting simulator...");
 
-			let simulatorParams = [
-				"--path", this.$project.getProjectDir(),
-				"--assemblypaths", this.simulatorPath,
-				"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
-			];
+		let simulatorParams = [
+			"--path", this.$project.getProjectDir(),
+			"--assemblypaths", this.simulatorPath,
+			"--analyticsaccountcode", this.$staticConfig.ANALYTICS_API_KEY
+		];
 
-			if(await this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME)) {
-				simulatorParams.push("--trackfeatureusage");
-			}
+		if (await this.$analyticsService.isEnabled(this.$staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME)) {
+			simulatorParams.push("--trackfeatureusage");
+		}
 
-			if(await this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME)) {
-				simulatorParams.push("--trackexceptions");
-			}
+		if (await this.$analyticsService.isEnabled(this.$staticConfig.ERROR_REPORT_SETTING_NAME)) {
+			simulatorParams.push("--trackexceptions");
+		}
 
-			simulatorParams = simulatorParams.concat(await this.$projectSimulatorService.getSimulatorParams(simulatorPackageName));
-			this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
+		simulatorParams = simulatorParams.concat(await this.$projectSimulatorService.getSimulatorParams(simulatorPackageName));
+		this.$simulatorPlatformServices.runApplication(this.simulatorPath, simulatorParams);
 	}
 }
+
 $injector.register("simulatorService", SimulatorService);
