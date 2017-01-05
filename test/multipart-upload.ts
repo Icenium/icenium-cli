@@ -4,7 +4,7 @@ import stubs = require("./stubs");
 import temp = require("temp");
 import hostInfoLib = require("../lib/common/host-info");
 temp.track();
-import {assert} from "chai";
+import { assert } from "chai";
 import * as fileSys from "fs";
 
 let multipartUploadServiceFile = require("../lib/services/multipart-upload");
@@ -12,10 +12,11 @@ let fileSystemFile = require("../lib/common/file-system");
 let hashServiceFile = require("../lib/services/hash-service");
 
 class ServiceProxy implements Server.IServiceProxy {
-	call<T> (name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> {
+	call<T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> {
 		/*intentionally empty*/
+		return null;
 	}
-	setShouldAuthenticate(shouldAuthenticate: boolean): void { /* mock */}
+	setShouldAuthenticate(shouldAuthenticate: boolean): void { /* mock */ }
 	setSolutionSpaceName(solutionSpaceName: string): void { /* mock */ }
 }
 
@@ -33,62 +34,63 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-async function  createTempFile(data: string): Promise<string> {
-	let future = new Future<string>();
-	let myData = new Buffer(data); // "Some data that has to be uploaded.";
-	let pathToTempFile: string;
-	temp.open("tempMultipartUploadFile", function(err, info) {
-		if(!err) {
-			pathToTempFile = info.path;
+async function createTempFile(data: string): Promise<string> {
+	return new Promise<string>((resolve, reject) => {
+		let myData = new Buffer(data); // "Some data that has to be uploaded.";
+		let pathToTempFile: string;
+		temp.open("tempMultipartUploadFile", function (err, info) {
+			if (!err) {
+				pathToTempFile = info.path;
 
-			fileSys.write(info.fd, myData, 0, data.length, 0, () => {
-				future.return(pathToTempFile);
-			});
-		} else {
-			future.throw(err);
-		}
-	});
-
-	return future;
-}
-
-async function createTestScenarioForContentRangeValidation(data: string): Promise<string[]> {
-		let testInjector = createTestInjector();
-
-		testInjector.register("server", {
-			upload: {
-				async completeUpload(path: string, originalFileHash: string): Promise<void>{
-					return Promise.resolve();
-				},
-				async initUpload(path: string): Promise<void>{
-					return Promise.resolve();
-				},
-				async uploadChunk(path: string, hash: string, content: any): Promise<void>{
-					return Promise.resolve();
-				}
+				fileSys.write(info.fd, myData, 0, data.length, 0, () => {
+					resolve(pathToTempFile);
+				});
+			} else {
+				reject(err);
 			}
 		});
 
-		let actualContentRanges: string[] = [];
-		testInjector.register("serviceProxy", {
-			call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> => {
-				actualContentRanges.push(headers["Content-Range"]);
+	});
+}
+
+async function createTestScenarioForContentRangeValidation(data: string): Promise<string[]> {
+	let testInjector = createTestInjector();
+
+	testInjector.register("server", {
+		upload: {
+			async completeUpload(path: string, originalFileHash: string): Promise<void> {
+				return Promise.resolve();
 			},
-			setShouldAuthenticate: (shouldAuthenticate: boolean): void => {/* mock */ },
-			setSolutionSpaceName: (solutionSpaceName: string): void => {/* mock */ }
-		});
+			async initUpload(path: string): Promise<void> {
+				return Promise.resolve();
+			},
+			async uploadChunk(path: string, hash: string, content: any): Promise<void> {
+				return Promise.resolve();
+			}
+		}
+	});
 
-		let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
-		let tempFilePath = await  createTempFile(data);
+	let actualContentRanges: string[] = [];
+	testInjector.register("serviceProxy", {
+		call: <T>(name: string, method: string, path: string, accept: string, body: Server.IRequestBodyElement[], resultStream: NodeJS.WritableStream, headers?: any): Promise<T> => {
+			actualContentRanges.push(headers["Content-Range"]);
+			return null;
+		},
+		setShouldAuthenticate: (shouldAuthenticate: boolean): void => {/* mock */ },
+		setSolutionSpaceName: (solutionSpaceName: string): void => {/* mock */ }
+	});
 
-		await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
+	let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
+	let tempFilePath = await createTempFile(data);
 
-		return actualContentRanges;
+	await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
+
+	return actualContentRanges;
 }
 
 function createDataWithSpecifiedLength(length: number): string {
 	let data = "";
-	for(let i = 0; i < length; i++) {
+	for (let i = 0; i < length; i++) {
 		data += "a";
 	}
 
@@ -99,20 +101,20 @@ describe("multipart upload service", () => {
 	describe("uploadChunk", () => {
 		// As the current autogenerated code for uploadChunk method is unusable for us,
 		// this test verifies that we are calling our own uploadChunk method.
-		it("does NOT call autogenerated UploadChunk", () => {
+		it("does NOT call autogenerated UploadChunk", async () => {
 			let testInjector = createTestInjector();
 			let completeUploadCalled = false,
 				initUploadCalled = false,
 				uploadChunkCalled = false;
 			testInjector.register("server", {
 				upload: {
-					async completeUpload(path: string, originalFileHash: string): Promise<void>{
+					async completeUpload(path: string, originalFileHash: string): Promise<void> {
 						return (() => completeUploadCalled = true).future<void>()();
 					},
-					async initUpload(path: string): Promise<void>{
+					async initUpload(path: string): Promise<void> {
 						return (() => initUploadCalled = true).future<void>()();
 					},
-					async uploadChunk(path: string, hash: string, content: any): Promise<void>{
+					async uploadChunk(path: string, hash: string, content: any): Promise<void> {
 						return (() => uploadChunkCalled = true).future<void>()();
 					}
 				}
@@ -120,7 +122,7 @@ describe("multipart upload service", () => {
 			testInjector.register("serviceProxy", ServiceProxy);
 
 			let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");
-			let tempFilePath = await  createTempFile("Some data that has to be uploaded.");
+			let tempFilePath = await createTempFile("Some data that has to be uploaded.");
 
 			await mpus.uploadFileByChunks(tempFilePath, "bucketKey");
 			assert.isTrue(initUploadCalled);
@@ -128,29 +130,29 @@ describe("multipart upload service", () => {
 			assert.isFalse(uploadChunkCalled);
 		});
 
-		it("sends correct Content-Ranges", () => {
+		it("sends correct Content-Ranges", async () => {
 			let expectedContentRanges = ["bytes 0-9/34", "bytes 10-19/34", "bytes 20-29/34", "bytes 30-33/34"];
-			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(34));
+			let actualContentRanges = await createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(34));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
-		it("sends correct Content-Ranges when fileSize is exact multiple of chunk size", () => {
+		it("sends correct Content-Ranges when fileSize is exact multiple of chunk size", async () => {
 			let expectedContentRanges = ["bytes 0-9/20", "bytes 10-19/20"];
-			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(20));
+			let actualContentRanges = await createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(20));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
 		/* fileSize = (x*chunkSize) - 1 */
-		it("sends correct Content-Ranges when fileSize is multiple of chunk size minus one", () => {
+		it("sends correct Content-Ranges when fileSize is multiple of chunk size minus one", async () => {
 			let expectedContentRanges = ["bytes 0-9/19", "bytes 10-18/19"];
-			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(19));
+			let actualContentRanges = await createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(19));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 
 		/* fileSize = (x*chunkSize) + 1 */
-		it("sends correct Content-Ranges when fileSize is multiple of chunk size plus one", () => {
+		it("sends correct Content-Ranges when fileSize is multiple of chunk size plus one", async () => {
 			let expectedContentRanges = ["bytes 0-9/21", "bytes 10-19/21", "bytes 20-20/21"];
-			let actualContentRanges = await  createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(21));
+			let actualContentRanges = await createTestScenarioForContentRangeValidation(createDataWithSpecifiedLength(21));
 			assert.deepEqual(expectedContentRanges, actualContentRanges);
 		});
 	});

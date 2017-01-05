@@ -400,12 +400,12 @@ export class Project extends ProjectBase implements Project.IProject {
 			await this.$projectPropertiesService.updateCorePlugins(this.projectData, this.configurationSpecificData, mode, propertyValues, projectConfigurations);
 		} else {
 			if (projectConfigurations.length) {
-				_.each(projectConfigurations, configuration => {
+				_.each(projectConfigurations, async configuration => {
 					await this.$projectPropertiesService.updateProjectProperty(this.projectData, this.configurationSpecificData[configuration], mode, normalizedPropertyName, propertyValues);
 				});
 			} else {
 				await this.$projectPropertiesService.updateProjectProperty(this.projectData, undefined, mode, normalizedPropertyName, propertyValues);
-				_.each(this.configurationSpecificData, configData => await  this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues));
+				_.each(this.configurationSpecificData, async configData => await this.$projectPropertiesService.updateProjectProperty(configData, undefined, mode, normalizedPropertyName, propertyValues));
 			}
 		}
 	}
@@ -418,7 +418,8 @@ export class Project extends ProjectBase implements Project.IProject {
 		await this.updateProjectProperty(mode, normalizedPropertyName, propertyValues, projectConfigurations);
 
 		this.saveProject(this.getProjectDir(), this.getAllConfigurationsNames());
-		projectConfigurations.forEach(configuration => {
+
+		projectConfigurations.forEach(async configuration => {
 			await this.printProjectProperty(normalizedPropertyName, configuration);
 		});
 
@@ -429,7 +430,7 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public async printProjectProperty(property: string, configuration?: string): Promise<void> {
 		if (this.projectData) {
-			let schema: any = this.getProjectSchema();
+			let schema: any = await this.getProjectSchema();
 			let mergedProjectData = Object.create(null);
 			_.extend(mergedProjectData, this.projectData);
 			if (configuration) {
@@ -460,7 +461,7 @@ export class Project extends ProjectBase implements Project.IProject {
 					// 'appbuilder prop print --validValue' called inside project dir
 					let propKeys = _.keys(schema);
 					let sortedProperties = _.sortBy(propKeys, (propertyName: string) => propertyName.toUpperCase());
-					_.each(sortedProperties, propKey => {
+					_.each(sortedProperties, async propKey => {
 						let prop = schema[propKey];
 						this.$logger.info("  " + propKey);
 						await this.printValidValuesOfProperty(prop);
@@ -477,7 +478,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			// We'll get here only when command is called outside of project directory and --validValue is specified
 			if (property) {
 				let targetFrameworkIdentifiers = _.values(TARGET_FRAMEWORK_IDENTIFIERS);
-				_.each(targetFrameworkIdentifiers, (targetFrameworkIdentifier: string) => {
+				_.each(targetFrameworkIdentifiers, async (targetFrameworkIdentifier: string) => {
 					let projectSchema: IDictionary<any> = this.$jsonSchemaValidator.tryResolveValidationSchema(targetFrameworkIdentifier);
 					let currentProp = _.find(_.keys(projectSchema), key => key === property);
 					if (currentProp) {
@@ -613,7 +614,8 @@ export class Project extends ProjectBase implements Project.IProject {
 		this.$errors.fail("Invalid property name '%s'.", property);
 	}
 
-	public getProjectSchema(): any {
+
+	public async getProjectSchema(): Promise<any> {
 		if (!this._projectSchema) {
 			this._projectSchema = this.frameworkProject.getProjectFileSchema();
 		}
@@ -667,9 +669,9 @@ export class Project extends ProjectBase implements Project.IProject {
 		let zipOp = this.$fs.zipFiles(projectZipFile, files,
 			p => this.getProjectRelativePath(p, projectDir));
 
-		let result = new Future<string>();
-		zipOp.resolveSuccess(() => result.return(projectZipFile));
-		return await result;
+		return new Promise<string>((resolve, reject) => {
+			zipOp.resolveSuccess(() => resolve(projectZipFile));
+		});
 	}
 
 	public async importProject(): Promise<void> {

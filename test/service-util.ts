@@ -3,14 +3,14 @@ import ServiceUtil = require("../lib/service-util");
 import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-let assert:chai.Assert = chai.assert;
+let assert: chai.Assert = chai.assert;
 
 let testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("npmService", {
-	getPackageJsonFromNpmRegistry: (packageName: string) => Promise.resolve( { version: "3.0.0" } )
+	getPackageJsonFromNpmRegistry: (packageName: string) => Promise.resolve({ version: "3.0.0" })
 });
 
 class MockUserDataStore implements IUserDataStore {
@@ -19,10 +19,10 @@ class MockUserDataStore implements IUserDataStore {
 	}
 
 	async getCookies(): Promise<IStringDictionary> {
-			return {"tlrkappshell": "dummy"};
+		return { "tlrkappshell": "dummy" };
 	}
 
-	async getUser():Promise<any> {
+	async getUser(): Promise<any> {
 		return undefined;
 	}
 
@@ -51,13 +51,13 @@ class MockHttpClient implements Server.IHttpClient {
 
 	async httpRequest(options: any): Promise<Server.IResponse> {
 		this.options = options;
-		let future = new Future<Server.IResponse>();
-		if (this.mockError) {
-			future.throw(this.mockError);
-		} else {
-			future.return(this.mockResponse);
-		}
-		return future;
+		return new Promise<Server.IResponse>((resolve, reject) => {
+			if (this.mockError) {
+				reject(this.mockError);
+			} else {
+				resolve(this.mockResponse);
+			}
+		});
 	}
 
 	public setResponse(headers: any, body?: any, error?: any) {
@@ -88,12 +88,12 @@ describe("ServiceProxy", () => {
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});
 
-	it("calls api without arguments and expected return", () => {
+	it("calls api without arguments and expected return", async () => {
 		let proxy = makeProxy();
 
 		httpClient.setResponse({});
 
-		let result = await  proxy.call("test1", "GET", "authenticate", null, null, null);
+		let result = await proxy.call("test1", "GET", "authenticate", null, null, null);
 
 		assert.equal("GET", httpClient.options.method);
 		assert.equal("/appbuilder/authenticate", httpClient.options.path);
@@ -103,19 +103,19 @@ describe("ServiceProxy", () => {
 		assert.equal(httpClient.options.headers.Cookie, "tlrkappshell=dummy");
 	});
 
-	it("calls api and returns JSON", () => {
-		let expected = {a: "b", c: 4};
+	it("calls api and returns JSON", async () => {
+		let expected = { a: "b", c: 4 };
 
 		let proxy = makeProxy();
 		httpClient.setResponse({}, JSON.stringify(expected));
 
-		let result = await  proxy.call("test2", "POST", "/json", "application/json", null, null);
+		let result = await proxy.call("test2", "POST", "/json", "application/json", null, null);
 
 		assert.isObject(result);
 		assert.deepEqual(result, expected);
 	});
 
-	it("calls api and pipes result to stream", () => {
+	it("calls api and pipes result to stream", async () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null);
 

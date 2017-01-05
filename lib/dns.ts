@@ -4,22 +4,22 @@ import ip = require("ip");
 
 export class DomainNameSystem implements IDomainNameSystem {
 	private async reverse(ipAddress: string): Promise<string[]> {
-		let future = new Future<string[]>();
-		dns.reverse(ipAddress, (err: Error, domains: string[]) => {
-			if(err) {
-				future.return([]);
-			} else {
-				future.return(domains);
-			}
-		});
+		return new Promise<string[]>((resolve, reject) => {
+			dns.reverse(ipAddress, (err: Error, domains: string[]) => {
+				if (err) {
+					resolve([]);
+				} else {
+					resolve(domains);
+				}
+			});
 
-		return future;
+		});
 	}
 
 	public async getDomains(): Promise<string[]> {
-			let ipAddress = ip.address();
-			let domains = await  this.reverse(ipAddress);
-			return domains;
+		let ipAddress = ip.address();
+		let domains = await this.reverse(ipAddress);
+		return domains;
 	}
 }
 $injector.register("domainNameSystem", DomainNameSystem);

@@ -4,7 +4,7 @@ import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
-import {EOL} from "os";
+import { EOL } from "os";
 
 let originalIsInteractiveMethod = helpers.isInteractive;
 let assert = require("chai").assert;
@@ -23,49 +23,49 @@ export class LoggerStub implements ILogger {
 
 	setLevel(level: string): void { /* mock */ }
 	getLevel(): string { return undefined; }
-	fatal(formatStr: string, ...args:string[]): void {/* mock */}
-	error(formatStr: string, ...args:string[]): void {/* mock */}
-	warn(formatStr: string, ...args:string[]): void {
+	fatal(formatStr: string, ...args: string[]): void {/* mock */ }
+	error(formatStr: string, ...args: string[]): void {/* mock */ }
+	warn(formatStr: string, ...args: string[]): void {
 		args.unshift(formatStr);
 		this.warnOutput += util.format.apply(null, args) + EOL;
 	}
-	warnWithLabel(formatStr: string, ...args:string[]): void {
+	warnWithLabel(formatStr: string, ...args: string[]): void {
 		this.warn(formatStr, ...args);
 	}
-	info(formatStr: string, ...args:string[]): void {
+	info(formatStr: string, ...args: string[]): void {
 		args.unshift(formatStr);
 		this.infoOutput += util.format.apply(null, args) + EOL;
 	}
-	debug(formatStr: string, ...args:string[]): void {/* mock */}
-	trace(formatStr: string, ...args:string[]): void {
+	debug(formatStr: string, ...args: string[]): void {/* mock */ }
+	trace(formatStr: string, ...args: string[]): void {
 		// uncomment when debugging unit tests to print to the console
 		//args.unshift(formatStr);
 		//console.log(util.format.apply(null, args));
 	}
 
-	out(formatStr: string, ...args:string[]): void {
+	out(formatStr: string, ...args: string[]): void {
 		args.unshift(formatStr);
 		this.outOutput += util.format.apply(null, args) + EOL;
 	}
 
-	write(...args:string[]): void {/* mock */}
+	write(...args: string[]): void {/* mock */ }
 
-	printMarkdown(...args:string[]): void {/* mock */}
+	printMarkdown(...args: string[]): void {/* mock */ }
 
 	prepare(item: any): string { return item; }
 
-	printInfoMessageOnSameLine(message: string): void {/* mock */}
+	printInfoMessageOnSameLine(message: string): void {/* mock */ }
 	async printMsgWithTimeout(message: string, timeout: number): Promise<void> {
 		return null;
 	}
 }
 
 export class PrompterStub {
-	constructor(public promptSlnName: string, public promptPrjName: string) {}
+	constructor(public promptSlnName: string, public promptPrjName: string) { }
 	public isPrompterCalled = false;
 	async promptForChoice(promptMessage: string, choices: any[]): Promise<any> {
 		this.isPrompterCalled = true;
-		if(promptMessage.indexOf("solution") === -1) {
+		if (promptMessage.indexOf("solution") === -1) {
 			assert.isTrue(_.includes(choices, this.promptPrjName));
 			return Promise.resolve(this.promptPrjName);
 		}
@@ -82,14 +82,15 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	helpers.isInteractive = () => { return isInteractive; };
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
-		getUser: () =>  Promise.resolve({tenant: {id: "id"}}),
+		getUser: () => Promise.resolve({ tenant: { id: "id" } }),
 	});
 	testInjector.register("serviceProxy", {
-		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
+		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }) => { return call(); }
 	});
 
 	testInjector.register("serviceProxyBase", {
-		call: (tenantId: string) => { return Promise.resolve(
+		call: (tenantId: string) => {
+			return Promise.resolve(
 				[{
 					"id": "id2",
 					"name": "Sln2",
@@ -117,7 +118,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 					"isMigrating": false,
 					"description": "AppBuilder cross platform project"
 				}]);
-			},
+		},
 		setShouldAuthenticate: (shouldAuthenticate: boolean) => false
 	});
 
@@ -133,7 +134,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 		},
 		apps: {
 			getApplication: (slnName: string, checkUpgradability: boolean) => {
-				if(slnName === "id1") {
+				if (slnName === "id1") {
 					return Promise.resolve({
 						"Name": "Sln1",
 						"Items": [
@@ -179,7 +180,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 						"Items": [],
 						"IsUpgradeable": false
 					});
-				} else if(slnName === "id3") {
+				} else if (slnName === "id3") {
 					return Promise.resolve({
 						"Name": "Sln1",
 						"Items": [
@@ -214,20 +215,20 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	});
 	testInjector.register("fs", {
 		exists: (path: string) => {
-			if(path.indexOf("abproject") !== -1) {
+			if (path.indexOf("abproject") !== -1) {
 				return true;
 			} else {
 				return false;
 			}
 		},
-		createWriteStream: (path: string) => {/* mock */},
+		createWriteStream: (path: string) => {/* mock */ },
 		unzip: (zipFile: string, destinationDir: string) => Promise.resolve(),
 		readDirectory: (projectDir: string): string[] => []
 	});
 	testInjector.register("remoteProjectService", remoteProjectsServiceLib.RemoteProjectService);
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("project", {
-		getNewProjectDir:() => "proj dir",
+		getNewProjectDir: () => "proj dir",
 		createProjectFile: (projectDir: string, properties: any) => Promise.resolve()
 	});
 	testInjector.register("prompter", new PrompterStub(promptSlnName, promptPrjName));
@@ -281,24 +282,24 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when more than two arguments are passed", () => {
-					assert.throws(async () => await  exportProjectCommand.canExecute(["1", "2", "3"]));
+					assert.throws(async () => await exportProjectCommand.canExecute(["1", "2", "3"]));
 				});
 
 				it("fails when solution does not have any projects", () => {
-					assert.throws(async () => await  exportProjectCommand.canExecute(["Sln2"]));
+					assert.throws(async () => await exportProjectCommand.canExecute(["Sln2"]));
 				});
 
 				it("fails when there's projectData", () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
-					assert.throws(async () => await  exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
+					assert.throws(async () => await exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 			});
 
 			it("fails when console is not interactive and command arguments are not passed", () => {
 				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-				assert.throws(async () => await  exportProjectCommand.canExecute([]));
+				assert.throws(async () => await exportProjectCommand.canExecute([]));
 			});
 		});
 
@@ -350,18 +351,18 @@ describe("cloud project commands", () => {
 
 				it("successfully exports project when solution name is correct and there is only one projects in solution", async () => {
 					await exportProjectCommand.execute(["Sln3"]);
-					let prompter:PrompterStub = testInjector.resolve("prompter");
+					let prompter: PrompterStub = testInjector.resolve("prompter");
 					assert.isFalse(prompter.isPrompterCalled);
 					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 				});
 			});
 
 			it("works correctly when no arguments are passed", () => {
-					testInjector = createTestInjector("Sln1", "BlankProj");
-					exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-					await exportProjectCommand.execute([]);
-					logger = testInjector.resolve("logger");
-					assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
+				testInjector = createTestInjector("Sln1", "BlankProj");
+				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
+				await exportProjectCommand.execute([]);
+				logger = testInjector.resolve("logger");
+				assert.isTrue(logger.infoOutput.indexOf("has been successfully exported") !== -1);
 			});
 
 			describe("fails when project is already created", () => {
@@ -378,15 +379,15 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", () => {
 					fs.exists = (projectDir: string) => true;
-					assert.throws(async () => await  exportProjectCommand.execute(["Sln1", "BlankProj"]));
+					assert.throws(async () => await exportProjectCommand.execute(["Sln1", "BlankProj"]));
 				});
 
-				it("warns when unable to create project file", () => {
+				it("warns when unable to create project file", async () => {
 					fs.exists = (param: string) => false;
 					project.createProjectFile = (projectDir: string, properties: any) => {
-						let future = new Future<void>();
-						future.throw(new Error("error is raised"));
-						return future;
+						return new Promise<void>((resolve, reject) => {
+							reject(new Error("error is raised"));
+						});
 					};
 					logger = testInjector.resolve("logger");
 					await exportProjectCommand.execute(["Sln1", "BlankProj"]);
@@ -394,7 +395,7 @@ describe("cloud project commands", () => {
 				});
 			});
 		});
-});
+	});
 
 	describe("list project command", () => {
 		let testInjector: IInjector;
@@ -416,11 +417,11 @@ describe("cloud project commands", () => {
 			});
 
 			it("validate method throws error when invalid solution name is passed", () => {
-				assert.throws(async () => await  commandParamter.validate("Invalid name"));
+				assert.throws(async () => await commandParamter.validate("Invalid name"));
 			});
 
 			it("validate method throws error when invalid solution id is passed", () => {
-				assert.throws(async () => await  commandParamter.validate("100"));
+				assert.throws(async () => await commandParamter.validate("100"));
 			});
 
 			it("validate method returns false when validation value is not passed", async () => {
