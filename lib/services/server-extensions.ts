@@ -12,33 +12,33 @@ export class ServerExtensionsService extends serverExtensionsBaseLib.ExtensionsS
 	}
 
 	public async prepareExtension(packageName: string, beforeDownloadExtensionAction: () => Promise<void>): Promise<void> {
-			let cachedVersion = "0.0.0.0";
-			let extensionData = {
-				packageName: packageName,
-				await version: this.$serverConfiguration.assemblyVersion,
-				await downloadUri: this.getExtensionDownloadUri(packageName)
-			};
+		let cachedVersion = "0.0.0.0";
+		let extensionData = {
+			packageName: packageName,
+			version: await this.$serverConfiguration.assemblyVersion(),
+			downloadUri: await this.getExtensionDownloadUri(packageName)
+		};
 
-			await this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction });
+		await this.prepareExtensionBase(extensionData, cachedVersion, { beforeDownloadAction: beforeDownloadExtensionAction });
 	}
 
 	private async getExtensionDownloadUri(packageName: string): Promise<string> {
-			let serverUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER;
-			let downloadUri: string;
+		let serverUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER;
+		let downloadUri: string;
 
-			if (this.$config.USE_CDN_FOR_EXTENSION_DOWNLOAD) {
-				let servicesExtensionsUri = serverUri + "/appbuilder/services/extensions";
+		if (this.$config.USE_CDN_FOR_EXTENSION_DOWNLOAD) {
+			let servicesExtensionsUri = serverUri + "/appbuilder/services/extensions";
 
-				this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
+			this.$logger.trace("Getting extensions from %s", servicesExtensionsUri);
 
-				let extensions = (await  JSON.parse(this.$httpClient.httpRequest(servicesExtensionsUri)).body);
-				downloadUri = (<any>_.find(extensions["$values"],
-					{ Identifier: packageName })).DownloadUri;
-			} else {
-				downloadUri = serverUri + "/appbuilder/ClientBin/" + packageName + '.xap';
-			}
+			let extensions = JSON.parse((await this.$httpClient.httpRequest(servicesExtensionsUri)).body);
+			downloadUri = (<any>_.find(extensions["$values"],
+				{ Identifier: packageName })).DownloadUri;
+		} else {
+			downloadUri = serverUri + "/appbuilder/ClientBin/" + packageName + '.xap';
+		}
 
-			return downloadUri;
+		return downloadUri;
 	}
 }
 $injector.register("serverExtensionsService", ServerExtensionsService);

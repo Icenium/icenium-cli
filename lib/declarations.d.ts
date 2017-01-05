@@ -329,9 +329,9 @@ interface IDependencyConfigService {
 }
 
 interface IServerConfiguration {
-	tfisServer: Promise<string>;
-	assemblyVersion: Promise<string>;
-	resourcesPath: Promise<string>;
+	tfisServer(): Promise<string>;
+	assemblyVersion(): Promise<string>;
+	resourcesPath(): Promise<string>;
 }
 
 interface IExtensionPlatformServices extends IRunValidator {
