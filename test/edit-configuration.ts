@@ -10,7 +10,7 @@ import yok = require("../lib/common/yok");
 import config = require("../lib/config");
 import helpers = require("../lib/helpers");
 import hostInfoLib = require("../lib/common/host-info");
-import {EOL} from "os";
+import { EOL } from "os";
 import temp = require("temp");
 temp.track();
 let assert: chai.Assert = chai.assert;
@@ -28,11 +28,13 @@ function createTestInjector() {
 		getProjectDir: (): string => {
 			return testInjector.resolve("options").path;
 		},
-		ensureProject: () => { /* mock*/},
-		projectConfigFiles: [{ template: "android-manifest",
+		ensureProject: () => { /* mock*/ },
+		projectConfigFiles: [{
+			template: "android-manifest",
 			filepath: "App_Resources/Android/AndroidManifest.xml",
 			templateFilepath: "Mobile.Cordova.Android.ManifestXml.zip",
-			helpText: "" }]
+			helpText: ""
+		}]
 	});
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("opener", stubs.OpenerStub);
@@ -64,7 +66,7 @@ describe("edit-configuration", () => {
 		assert.isRejected(command.execute(["wrong"]));
 	});
 
-	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
+	it("creates and opens file if correct configuration file is given and it doesn't exist", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -83,7 +85,7 @@ describe("edit-configuration", () => {
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
 
-	it("only creates file if correct configuration file is given that doesn't exist and --skipUi is passed", () => {
+	it("only creates file if correct configuration file is given that doesn't exist and --skipUi is passed", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -105,7 +107,7 @@ describe("edit-configuration", () => {
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
 
-	it("doesn't modify file if correct configuration file is given and it exists", () => {
+	it("doesn't modify file if correct configuration file is given and it exists", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -122,7 +124,7 @@ describe("edit-configuration", () => {
 		await command.execute([template.template]);
 
 		let templatesService = testInjector.resolve("templatesService");
-		await testInjector.resolve("fs").unzip( path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir);
+		await testInjector.resolve("fs").unzip(path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir);
 
 		let expectedContent = fs.readFileSync(path.join(tempDir, "AndroidManifest.xml")).toString();
 		expectedContent = helpers.stringReplaceAll(expectedContent, "\n", "");

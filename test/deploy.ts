@@ -1,19 +1,18 @@
 import yok = require("../lib/common/yok");
-import {DevicesService} from "../lib/common/mobile/mobile-core/devices-service";
-import {Logger} from "../lib/common/logger";
-import {FileSystem} from "../lib/common/file-system";
-import {Errors} from "../lib/common/errors";
-import {MobileHelper} from "../lib/common/mobile/mobile-helper";
-import {Options} from "../lib/options";
-import {DeployHelper} from "../lib/commands/deploy";
-import {DeviceDiscovery} from "../lib/common/mobile/mobile-core/device-discovery";
-import {StaticConfig} from "../lib/config";
-import {Messages} from "../lib/common/messages/messages";
-import {MessagesService} from "../lib/common/services/messages-service";
-import {MobilePlatformsCapabilities} from "../lib/common/appbuilder/mobile-platforms-capabilities";
-import {DevicePlatformsConstants} from "../lib/common/mobile/device-platforms-constants";
+import { DevicesService } from "../lib/common/mobile/mobile-core/devices-service";
+import { Logger } from "../lib/common/logger";
+import { FileSystem } from "../lib/common/file-system";
+import { Errors } from "../lib/common/errors";
+import { MobileHelper } from "../lib/common/mobile/mobile-helper";
+import { Options } from "../lib/options";
+import { DeployHelper } from "../lib/commands/deploy";
+import { DeviceDiscovery } from "../lib/common/mobile/mobile-core/device-discovery";
+import { StaticConfig } from "../lib/config";
+import { Messages } from "../lib/common/messages/messages";
+import { MessagesService } from "../lib/common/services/messages-service";
+import { MobilePlatformsCapabilities } from "../lib/common/appbuilder/mobile-platforms-capabilities";
+import { DevicePlatformsConstants } from "../lib/common/mobile/device-platforms-constants";
 import * as constants from "../lib/common/constants";
-import Future = require("fibers/future");
 import chai = require("chai");
 let assert: chai.Assert = chai.assert;
 
@@ -34,7 +33,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("messages", Messages);
 	testInjector.register("messagesService", MessagesService);
 	testInjector.register("fs", FileSystem);
-	testInjector.register("processService", { });
+	testInjector.register("processService", {});
 	testInjector.register("project", {
 		ensureProject: () => { /* */ },
 		capabilities: {
@@ -58,23 +57,16 @@ function createTestInjector(): IInjector {
 	testInjector.register("options", Options);
 
 	testInjector.register("androidEmulatorServices", {
-		startEmulator: () => {
-			return (() => {
-				isAndroidEmulatorStarted = true;
-				//emitConnectedAndroidDevice(testInjector);
-			}).future<void>()();
-		}
+		startEmulator: async () => { isAndroidEmulatorStarted = true; }
 	});
 	testInjector.register("iOSEmulatorServices", {
-		startEmulator: () => {
-			return (() => {
-				isiOSSimulatorStarted = true;
-				emitRunningiOSSimulator(testInjector);
-			}).future<void>()();
+		startEmulator: async () => {
+			isiOSSimulatorStarted = true;
+			emitRunningiOSSimulator(testInjector);
 		}
 	});
 	testInjector.register("wp8EmulatorServices", {
-		startEmulator: () => Promise.resolve()
+		startEmulator: async () => undefined
 	});
 
 	testInjector.register("mobilePlatformsCapabilities", MobilePlatformsCapabilities);
@@ -92,7 +84,7 @@ function createTestInjector(): IInjector {
 }
 
 async function setExecutedOnDeviceFlag(device: any): Promise<void> {
-		(<any>device).isExecutedOnDevice = true;
+	(<any>device).isExecutedOnDevice = true;
 }
 
 function iOSDeviceInfo(): Mobile.IDeviceInfo {
@@ -125,7 +117,7 @@ function emitConnectediOSDevice(testInjector: IInjector) {
 	device = {
 		deviceInfo: deviceInfo,
 		applicationManager: applicationManager,
-		fileSystem: { },
+		fileSystem: {},
 		isEmulator: false
 	};
 
@@ -163,7 +155,7 @@ function emitRunningiOSSimulator(testInjector: IInjector) {
 	device = {
 		deviceInfo: deviceInfo,
 		applicationManager: applicationManager,
-		fileSystem: { },
+		fileSystem: {},
 		isEmulator: true
 	};
 
@@ -246,7 +238,7 @@ describe("Deploy ios unit tests on windows", () => {
 
 		unsetEmulatorOption(testInjector);
 	});
-	it("deploys on connected device when there is connected device and --emulator option is not specified", () => {
+	it("deploys on connected device when there is connected device and --emulator option is not specified", async () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);
@@ -265,7 +257,7 @@ describe("Deploy ios unit tests on windows", () => {
 });
 
 describe("Deploy ios unit tests on OSX", () => {
-	it("starts the iOS simulator when there is only connected iOS device and --emulator option is specified", () => {
+	it("starts the iOS simulator when there is only connected iOS device and --emulator option is specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);
@@ -288,7 +280,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		unsetEmulatorOption(testInjector);
 		isiOSSimulatorStarted = false;
 	});
-	it("starts the iOS simulator whene there is no running simulator and no connected iOS device", () => {
+	it("starts the iOS simulator whene there is no running simulator and no connected iOS device", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		await deployHelper.deploy("ios");
@@ -304,7 +296,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		removeiOSSimulator(testInjector, simulator.deviceInfo.identifier);
 		isiOSSimulatorStarted = false;
 	});
-	it("deploys only on iOS simulator when there is running simulator and connected iOS device and --emulator option is specified", () => {
+	it("deploys only on iOS simulator when there is running simulator and connected iOS device and --emulator option is specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
@@ -326,7 +318,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		removeiOSDevice(testInjector, iOSDevice.deviceInfo.identifier);
 		unsetEmulatorOption(testInjector);
 	});
-	it("deploys on iOS simulator when there is only running simulator and --emulator option is specified", () => {
+	it("deploys on iOS simulator when there is only running simulator and --emulator option is specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
@@ -344,7 +336,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		removeiOSSimulator(testInjector, simulator.deviceInfo.identifier);
 		unsetEmulatorOption(testInjector);
 	});
-	it("deploys on iOS simulator when there is only running simulator and --emulator option is not specified", () => {
+	it("deploys on iOS simulator when there is only running simulator and --emulator option is not specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
@@ -360,7 +352,7 @@ describe("Deploy ios unit tests on OSX", () => {
 
 		removeiOSSimulator(testInjector, simulator.deviceInfo.identifier);
 	});
-	it("deploys on iOS device when there is running simulator and connected iOS device and --emulator option is not specified", () => {
+	it("deploys on iOS device when there is running simulator and connected iOS device and --emulator option is not specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitRunningiOSSimulator(testInjector);
@@ -380,7 +372,7 @@ describe("Deploy ios unit tests on OSX", () => {
 		removeiOSSimulator(testInjector, simulator.deviceInfo.identifier);
 		removeiOSDevice(testInjector, iOSDevice.deviceInfo.identifier);
 	});
-	it("deploys on iOS device when there is only connected iOS device and --emulator option is not specified", () => {
+	it("deploys on iOS device when there is only connected iOS device and --emulator option is not specified", async () => {
 		let testInjector = prepareTestInjectorForDarwin();
 		let deployHelper = testInjector.resolve("deployHelper");
 		emitConnectediOSDevice(testInjector);

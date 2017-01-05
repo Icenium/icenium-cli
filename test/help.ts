@@ -2,7 +2,6 @@ import * as path from "path";
 import yok = require("../lib/common/yok");
 import helpCommand = require("../lib/common/commands/help");
 import stubs = require("./stubs");
-import Future = require("fibers/future");
 import microTemplateServiceLib = require("../lib/common/services/micro-templating-service");
 import dynamicHelpProviderLib = require("../lib/dynamic-help-provider");
 import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
@@ -43,7 +42,7 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 	injector.register("microTemplateService", microTemplateServiceLib.MicroTemplateService);
 	injector.register("htmlHelpService", htmlHelpServiceLib.HtmlHelpService);
 	injector.register("opener", {
-		open(target: string, appname?: string): void {/* mock */}
+		open(target: string, appname?: string): void {/* mock */ }
 	});
 	injector.register("commandsServiceProvider", {
 		getDynamicCommands: (): Promise<string[]> => {
@@ -57,7 +56,7 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 };
 
 describe("help", () => {
-	it("processes substitution points",() => {
+	it("processes substitution points", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command: () => "woot"
@@ -73,7 +72,7 @@ describe("help", () => {
 		assert.isTrue(injector.resolve("logger").output.indexOf("bla woot bla") >= 0);
 	});
 
-	it("process correctly if construction with dynamicCall returning false",() => {
+	it("process correctly if construction with dynamicCall returning false", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command: () => false
@@ -91,7 +90,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("secondBla") < 0);
 	});
 
-	it("process correctly if construction with dynamicCall returning true",() => {
+	it("process correctly if construction with dynamicCall returning true", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command: () => true
@@ -111,7 +110,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla secondBla") >= 0);
 	});
 
-	it("process correctly if construction returning false",() => {
+	it("process correctly if construction returning false", async () => {
 		let injector = createTestInjector();
 
 		injector.register("fs", {
@@ -128,7 +127,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla secondBla") < 0);
 	});
 
-	it("process correctly if construction returning true",() => {
+	it("process correctly if construction returning true", async () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -144,7 +143,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla secondBla") >= 0);
 	});
 
-	it("process correctly is* projectType variables when they are true",() => {
+	it("process correctly is* projectType variables when they are true", async () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -158,7 +157,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla isCordova isNativeScript") >= 0);
 	});
 
-	it("process correctly is* projectType variables when they are false",() => {
+	it("process correctly is* projectType variables when they are false", async () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -174,7 +173,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla") >= 0);
 	});
 
-	it("process correctly is* platform variables when they are true",() => {
+	it("process correctly is* platform variables when they are true", async () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -187,7 +186,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla isLinux isWindows isMacOS") >= 0);
 	});
 
-	it("process correctly is* platform variables when they are false",() => {
+	it("process correctly is* platform variables when they are false", async () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -205,7 +204,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla") >= 0);
 	});
 
-	it("process correctly multiple if statements with local variables (all are true)",() => {
+	it("process correctly multiple if statements with local variables (all are true)", async () => {
 		let injector = createTestInjector();
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -220,7 +219,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla isLinux and isCordova end") >= 0);
 	});
 
-	it("process correctly multiple if statements with local variables (all are false)",() => {
+	it("process correctly multiple if statements with local variables (all are false)", async () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: false });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -238,7 +237,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla end") >= 0);
 	});
 
-	it("process correctly multiple if statements with local variables (isProjectType is false, isPlatform is true)",() => {
+	it("process correctly multiple if statements with local variables (isProjectType is false, isPlatform is true)", async () => {
 		let injector = createTestInjector({ isProjectTypeResult: false, isPlatformResult: true });
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
@@ -251,7 +250,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla isLinux end") >= 0);
 	});
 
-	it("process correctly multiple if statements with dynamicCalls (all are true)",() => {
+	it("process correctly multiple if statements with dynamicCalls (all are true)", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command1: () => true,
@@ -268,7 +267,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla command1 and command2 end") >= 0);
 	});
 
-	it("process correctly multiple if statements with dynamicCalls (all are false)",() => {
+	it("process correctly multiple if statements with dynamicCalls (all are false)", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command1: () => false,
@@ -288,7 +287,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla end") >= 0);
 	});
 
-	it("process correctly multiple if statements with dynamicCalls (different result)",() => {
+	it("process correctly multiple if statements with dynamicCalls (different result)", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command1: () => true,
@@ -308,7 +307,7 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("command3") < 0);
 	});
 
-	it("process correctly multiple dynamicCalls",() => {
+	it("process correctly multiple dynamicCalls", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
 			command1: () => "command1",
@@ -326,10 +325,10 @@ describe("help", () => {
 		assert.isTrue(output.indexOf("bla command1 command2 command3 end") >= 0);
 	});
 
-	it("process correctly dynamicCalls with parameters",() => {
+	it("process correctly dynamicCalls with parameters", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
-			command1: (...args:string[]) => args.join(" ")
+			command1: (...args: string[]) => args.join(" ")
 		});
 		injector.register("fs", {
 			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],

@@ -1,6 +1,5 @@
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
-import {assert} from "chai";
+import { assert } from "chai";
 
 let fileSystemFile = require("../lib/common/file-system");
 let printVersionsFile = require("../lib/commands/framework-versions/print-versions");
@@ -36,7 +35,7 @@ function createTestInjector(): IInjector {
 			return [{ displayName: "version_1_0_0", version: "1.0.0" }, { displayName: "version_1_0_1", version: "1.0.1" }];
 		},
 
-		getDisplayNameForVersion: (version: string): string =>  "version_1_0_0"
+		getDisplayNameForVersion: (version: string): string => "version_1_0_0"
 	};
 
 	testInjector.register("cordovaMigrationService", migrationService);
@@ -69,21 +68,21 @@ describe("mobileframework", () => {
 					testInjector.resolve("projectConstants"));
 			});
 
-			it("fails when version is not in correct format", () => {
+			it("fails when version is not in correct format", async () => {
 				let message: string;
 				try {
 					await mobileFwCP.validate("1");
-				} catch(e) {
+				} catch (e) {
 					message = e.message;
 				}
 				assert.isTrue(message.indexOf("not in correct format") > -1);
 			});
 
-			it("fails when version is not supported", () => {
+			it("fails when version is not supported", async () => {
 				let message: string;
 				try {
 					await mobileFwCP.validate("1.0.5");
-				} catch(e) {
+				} catch (e) {
 					message = e.message;
 				}
 
@@ -108,7 +107,7 @@ describe("mobileframework", () => {
 	});
 
 	describe("print", () => {
-		it("prints display names of supported versions", () => {
+		it("prints display names of supported versions", async () => {
 			let expectedOutput = ["version_1_0_0", "version_1_0_1"];
 			let testInjector = createTestInjector();
 			let message: string;
