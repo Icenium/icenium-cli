@@ -13,8 +13,7 @@ import { MessagesService } from "../lib/common/services/messages-service";
 import { MobilePlatformsCapabilities } from "../lib/common/appbuilder/mobile-platforms-capabilities";
 import { DevicePlatformsConstants } from "../lib/common/mobile/device-platforms-constants";
 import * as constants from "../lib/common/constants";
-import chai = require("chai");
-let assert: chai.Assert = chai.assert;
+import { assert } from "chai";
 
 class IOSDeviceDiscoveryMock extends DeviceDiscovery { }
 
@@ -223,18 +222,18 @@ function prepareTestInjectorForDarwin(): IInjector {
 }
 
 describe("Deploy ios unit tests on windows", () => {
-	it("throws ERROR_NO_DEVICES when there is no connected devices", () => {
+	it("throws ERROR_NO_DEVICES when there is no connected devices", async () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
-		assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES);
+		await assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES);
 	});
-	it("throws error when --emulator option is specified", () => { // appbuilder deploy ios --emulator
+	it("throws error when --emulator option is specified", async () => { // appbuilder deploy ios --emulator
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
 		setEmulatorOption(testInjector);
-		assert.isRejected(deployHelper.deploy("ios"), "You can use iOS simulator only on OS X.");
+		await assert.isRejected(deployHelper.deploy("ios"), "You can use iOS simulator only on OS X.");
 
 		unsetEmulatorOption(testInjector);
 	});

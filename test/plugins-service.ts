@@ -730,7 +730,7 @@ describe("plugins-service", () => {
 
 		assert.equal(3, (await service.getInstalledPlugins()).length);
 	});
-	it("throw if installed plugin is not available", () => {
+	it("throw if installed plugin is not available", async () => {
 		let installedMarketplacePlugins = [{
 			Identifier: "com.telerik.Invalid",
 			Name: "Stripe",
@@ -741,7 +741,7 @@ describe("plugins-service", () => {
 		let testInjector = createTestInjector([], installedMarketplacePlugins, []);
 
 		let service: IPluginsService = testInjector.resolve(CordovaProjectPluginsService);
-		assert.isRejected(service.getInstalledPlugins());
+		await assert.isRejected(service.getInstalledPlugins());
 	});
 	it("does not fail if data for one of the plugins cannot be fetched", async () => {
 		let cordovaPlugins = [
@@ -1044,7 +1044,7 @@ describe("plugins-service", () => {
 		// 	assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		// });
 
-		it("throws error when plugin is enabled in both configs and user tries to add it to one config only in non interactive terminal", () => {
+		it("throws error when plugin is enabled in both configs and user tries to add it to one config only in non interactive terminal", async () => {
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePlugins, installedMarketplacePlugins, false);
 			testInjector.register("prompter", new PrompterStub(1));
@@ -1053,10 +1053,10 @@ describe("plugins-service", () => {
 
 			options.debug = true;
 			options.release = false;
-			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
+			await assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 
-		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal", () => {
+		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal", async () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			let installedMarketplacePluginsInRelease: any[] = [];
 
@@ -1066,7 +1066,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.isRejected(service.addPlugin("Toast@2.0.5"));
+			await assert.isRejected(service.addPlugin("Toast@2.0.5"));
 		});
 
 		// Uncomment this when we know that all clients support different versions for different configurations.
@@ -1093,7 +1093,7 @@ describe("plugins-service", () => {
 		// 	assert.deepEqual(_.first(toastInReleaseConfig).data.Version, versionToSet);
 		// });
 
-		it("throws error when console is non-interactive and plugin is enabled in both configs with different versions and user tries to add it to one config only", () => {
+		it("throws error when console is non-interactive and plugin is enabled in both configs with different versions and user tries to add it to one config only", async () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")],
 				installedMarketplacePluginsInRelease = [getToastPlugin("2.0.4", "release")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, installedMarketplacePluginsInRelease, false);
@@ -1102,29 +1102,29 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
+			await assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 
-		it("throws error when console is non-interactive and user had not specified version for plugin", () => {
+		it("throws error when console is non-interactive and user had not specified version for plugin", async () => {
 			testInjector = createTestInjectorForProjectWithBothConfigurations([], [], false);
 			let project: Project.IProject = testInjector.resolve("project");
 			testInjector.register("prompter", new PrompterStub(1));
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.isRejected(service.addPlugin("Toast"));
+			await assert.isRejected(service.addPlugin("Toast"));
 		});
 
 		describe("throws error when specified version is not valid", () => {
 			let invalidVersionToSet = "2.0.8";
 			let installedMarketplacePlugins = [getToastPlugin("2.0.1", "debug")];
-			afterEach(() => {
+			afterEach(async () => {
 				testInjector.register("prompter", new PrompterStub(1));
 				service = testInjector.resolve(CordovaProjectPluginsService);
 				options = testInjector.resolve("options");
 
 				options.debug = options.release = false;
-				assert.isRejected(service.addPlugin(`Toast@${invalidVersionToSet}`));
+				await assert.isRejected(service.addPlugin(`Toast@${invalidVersionToSet}`));
 			});
 			describe("when plugin is not installed at all", () => {
 				it("when console is interactive", () => {
@@ -1290,7 +1290,7 @@ describe("plugins-service", () => {
 			});
 		});
 
-		it("does not modify anything and cancels operation when user selects to keep current configurations", () => {
+		it("does not modify anything and cancels operation when user selects to keep current configurations", async () => {
 			let installedMarketplacePluginsInDebug = [getToastPlugin("2.0.1", "debug")];
 			testInjector = createTestInjectorForProjectWithBothConfigurations(installedMarketplacePluginsInDebug, [], true);
 			testInjector.register("prompter", new PrompterStub(2));
@@ -1298,7 +1298,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
+			await assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 	});
 
@@ -1344,7 +1344,7 @@ describe("plugins-service", () => {
 		it("throws exception when trying to add it to debug config", async () => {
 			options.debug = true;
 			options.release = false;
-			assert.isRejected(service.addPlugin(livePatchId));
+			await assert.isRejected(service.addPlugin(livePatchId));
 			let toastInDebugConfig = _.filter(await service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
 			options.debug = false;

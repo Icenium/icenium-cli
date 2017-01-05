@@ -1,5 +1,4 @@
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import hostInfoLib = require("../lib/common/host-info");
 import temp = require("temp");

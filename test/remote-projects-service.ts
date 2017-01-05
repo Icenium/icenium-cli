@@ -135,8 +135,8 @@ describe("remote project service", () => {
 	});
 
 	describe("getProjectsForSolution", () => {
-		it("fails when solution name does not exist", () => {
-			assert.isRejected(remoteProjectService.getProjectsForSolution("Invalid name"));
+		it("fails when solution name does not exist", async () => {
+			await assert.isRejected(remoteProjectService.getProjectsForSolution("Invalid name"));
 		});
 
 		it("returns correct sorted result when name is correct", async () => {
@@ -151,8 +151,8 @@ describe("remote project service", () => {
 			assert.deepEqual(expectedResult, projects.map(pr => pr.Name));
 		});
 
-		it("fails when solution index is out of range", () => {
-			assert.isRejected(remoteProjectService.getProjectsForSolution("5"));
+		it("fails when solution index is out of range", async () => {
+			await assert.isRejected(remoteProjectService.getProjectsForSolution("5"));
 		});
 	});
 
@@ -162,20 +162,20 @@ describe("remote project service", () => {
 			"Framework": "Cordova"
 		};
 
-		it("fails when solution name is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectProperties("Invalid name", "BlankProj"));
+		it("fails when solution name is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectProperties("Invalid name", "BlankProj"));
 		});
 
-		it("fails when solution index is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectProperties("5", "BlankProj"));
+		it("fails when solution index is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectProperties("5", "BlankProj"));
 		});
 
-		it("fails when project name is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectProperties("Sln1", "Invalid name"));
+		it("fails when project name is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectProperties("Sln1", "Invalid name"));
 		});
 
-		it("fails when project index is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectProperties("Sln1", "5"));
+		it("fails when project index is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectProperties("Sln1", "5"));
 		});
 
 		it("returns correct properties when solution name and project name are correct", async () => {
@@ -201,20 +201,20 @@ describe("remote project service", () => {
 
 	describe("getProjectName", () => {
 		let expectedResult = "BlankProj";
-		it("fails when solution name is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectName("Invalid name", "BlankProj"));
+		it("fails when solution name is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectName("Invalid name", "BlankProj"));
 		});
 
-		it("fails when solution index is not correct", () => {
-			assert.isRejected(remoteProjectService.getProjectName("5", "BlankProj"));
+		it("fails when solution index is not correct", async () => {
+			await assert.isRejected(remoteProjectService.getProjectName("5", "BlankProj"));
 		});
 
-		it("fails when solution name is correct but project name is not", () => {
-			assert.isRejected(remoteProjectService.getProjectName("Sln1", "Invalid name"));
+		it("fails when solution name is correct but project name is not", async () => {
+			await assert.isRejected(remoteProjectService.getProjectName("Sln1", "Invalid name"));
 		});
 
-		it("fails when solution name is correct but project id is not", () => {
-			assert.isRejected(remoteProjectService.getProjectName("Sln1", "5"));
+		it("fails when solution name is correct but project id is not", async () => {
+			await assert.isRejected(remoteProjectService.getProjectName("Sln1", "5"));
 		});
 
 		it("returns correct name when solution name and project name are correct", async () => {

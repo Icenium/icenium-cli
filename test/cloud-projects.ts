@@ -280,25 +280,25 @@ describe("cloud project commands", () => {
 					assert.eventually.isTrue(exportProjectCommand.canExecute(["1", "2"]));
 				});
 
-				it("fails when more than two arguments are passed", () => {
-					assert.isRejected(exportProjectCommand.canExecute(["1", "2", "3"]));
+				it("fails when more than two arguments are passed", async () => {
+					await assert.isRejected(exportProjectCommand.canExecute(["1", "2", "3"]));
 				});
 
-				it("fails when solution does not have any projects", () => {
-					assert.isRejected(exportProjectCommand.canExecute(["Sln2"]));
+				it("fails when solution does not have any projects", async () => {
+					await assert.isRejected(exportProjectCommand.canExecute(["Sln2"]));
 				});
 
-				it("fails when there's projectData", () => {
+				it("fails when there's projectData", async () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
-					assert.isRejected(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
+					await assert.isRejected(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
 				});
 			});
 
-			it("fails when console is not interactive and command arguments are not passed", () => {
+			it("fails when console is not interactive and command arguments are not passed", async () => {
 				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-				assert.isRejected(exportProjectCommand.canExecute([]));
+				await assert.isRejected(exportProjectCommand.canExecute([]));
 			});
 		});
 
@@ -376,9 +376,9 @@ describe("cloud project commands", () => {
 					fs = testInjector.resolve("fs");
 				});
 
-				it("fails when projectDir exists", () => {
+				it("fails when projectDir exists", async () => {
 					fs.exists = (projectDir: string) => true;
-					assert.isRejected(exportProjectCommand.execute(["Sln1", "BlankProj"]));
+					await assert.isRejected(exportProjectCommand.execute(["Sln1", "BlankProj"]));
 				});
 
 				it("warns when unable to create project file", async () => {
@@ -415,12 +415,12 @@ describe("cloud project commands", () => {
 				assert.eventually.isTrue(commandParamter.validate("1"));
 			});
 
-			it("validate method throws error when invalid solution name is passed", () => {
-				assert.isRejected(commandParamter.validate("Invalid name"));
+			it("validate method throws error when invalid solution name is passed", async () => {
+				await assert.isRejected(commandParamter.validate("Invalid name"));
 			});
 
-			it("validate method throws error when invalid solution id is passed", () => {
-				assert.isRejected(commandParamter.validate("100"));
+			it("validate method throws error when invalid solution id is passed", async () => {
+				await assert.isRejected(commandParamter.validate("100"));
 			});
 
 			it("validate method returns false when validation value is not passed", () => {

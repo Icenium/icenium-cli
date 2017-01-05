@@ -95,13 +95,13 @@ describe("mobileframework", () => {
 		});
 
 		describe("canChangeFrameworkVersion is false", () => {
-			it("validate method throws", () => {
+			it("validate method throws", async () => {
 				let project: Project.IProject = testInjector.resolve("project");
 				project.capabilities.canChangeFrameworkVersion = false;
 				mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 					testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"),
 					testInjector.resolve("projectConstants"));
-				assert.isRejected(mobileFwCP.validate("1.0.0"));
+				await assert.isRejected(mobileFwCP.validate("1.0.0"));
 			});
 		});
 	});
@@ -123,7 +123,7 @@ describe("mobileframework", () => {
 			});
 		});
 
-		it("print command should fail", () => {
+		it("print command should fail", async () => {
 			let testInjector = createTestInjector();
 			let message: string;
 			testInjector.register("logger", {
@@ -134,7 +134,7 @@ describe("mobileframework", () => {
 			let project: Project.IProject = testInjector.resolve("project");
 			project.capabilities.canChangeFrameworkVersion = false;
 			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
-			assert.isRejected(mbFrm.canExecute([]));
+			await assert.isRejected(mbFrm.canExecute([]));
 		});
 	});
 });

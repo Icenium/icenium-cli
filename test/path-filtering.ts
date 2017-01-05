@@ -1,8 +1,6 @@
-
-import chai = require("chai");
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
-let assert: chai.Assert = chai.assert;
+import { assert } from "chai";
 let pfs = require("../lib/common/appbuilder/services/path-filtering");
 
 let projectDir = "c:/projectDir/";

@@ -177,7 +177,12 @@ export class FileSystemStub implements IFileSystem {
 }
 
 export class ErrorsStub implements IErrors {
-	private impl: IErrors = new (require("../lib/common/errors").Errors)();
+	private impl: IErrors;
+
+	constructor(private $injector: IInjector) {
+		this.impl = new (require("../lib/common/errors").Errors)($injector);
+	}
+
 
 	printCallStack: boolean = false;
 

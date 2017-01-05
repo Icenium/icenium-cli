@@ -11,9 +11,9 @@ import config = require("../lib/config");
 import helpers = require("../lib/helpers");
 import hostInfoLib = require("../lib/common/host-info");
 import { EOL } from "os";
+import { assert } from "chai";
 import temp = require("temp");
 temp.track();
-let assert: chai.Assert = chai.assert;
 
 function createTestInjector() {
 	let testInjector = new yok.Yok();
@@ -52,18 +52,18 @@ function setTempDir(testInjector: IInjector): string {
 
 describe("edit-configuration", () => {
 
-	it("throws error when no parameter is given", () => {
+	it("throws error when no parameter is given", async () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.isRejected(command.execute([]));
+		await assert.isRejected(command.execute([]));
 	});
 
-	it("throws error when wrong configuration file is given", () => {
+	it("throws error when wrong configuration file is given", async () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.isRejected(command.execute(["wrong"]));
+		await assert.isRejected(command.execute(["wrong"]));
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", async () => {

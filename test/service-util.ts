@@ -2,7 +2,7 @@ import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-let assert: chai.Assert = chai.assert;
+import { assert } from "chai";
 
 let testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
@@ -125,10 +125,10 @@ describe("ServiceProxy", () => {
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});
 
-	it("throws error returned by HTTP client", () => {
+	it("throws error returned by HTTP client", async () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
-		assert.isRejected(proxy.call("test4", "GET", "/package/zip", "application/json", null, null), "404");
+		await assert.isRejected(proxy.call("test4", "GET", "/package/zip", "application/json", null, null), "404");
 	});
 });
