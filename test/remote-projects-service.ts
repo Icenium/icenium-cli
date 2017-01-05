@@ -178,22 +178,22 @@ describe("remote project service", () => {
 			assert.isRejected(remoteProjectService.getProjectProperties("Sln1", "5"));
 		});
 
-		it("returns correct properties when solution name and project name are correct", () => {
+		it("returns correct properties when solution name and project name are correct", async () => {
 			let properties = await remoteProjectService.getProjectProperties("Sln1", "BlankProj");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
-		it("returns correct properties when solution id and project name are correct", () => {
+		it("returns correct properties when solution id and project name are correct", async () => {
 			let properties = await remoteProjectService.getProjectProperties("1", "BlankProj");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
-		it("returns correct properties when solution name and project id are correct", () => {
+		it("returns correct properties when solution name and project id are correct", async () => {
 			let properties = await remoteProjectService.getProjectProperties("Sln1", "2");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
-		it("returns correct properties when solution name and project id are correct", () => {
+		it("returns correct properties when solution name and project id are correct", async () => {
 			let properties = await remoteProjectService.getProjectProperties("1", "2");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
@@ -217,17 +217,17 @@ describe("remote project service", () => {
 			assert.isRejected(remoteProjectService.getProjectName("Sln1", "5"));
 		});
 
-		it("returns correct name when solution name and project name are correct", () => {
+		it("returns correct name when solution name and project name are correct", async () => {
 			let projName = await remoteProjectService.getProjectName("Sln1", "BlankProj");
 			assert.deepEqual(expectedResult, projName);
 		});
 
-		it("returns correct name when solution id and project name are correct", () => {
+		it("returns correct name when solution id and project name are correct", async () => {
 			let projName = await remoteProjectService.getProjectName("1", "BlankProj");
 			assert.deepEqual(expectedResult, projName);
 		});
 
-		it("returns correct name when solution name and project id are correct", () => {
+		it("returns correct name when solution name and project id are correct", async () => {
 			let projName = await remoteProjectService.getProjectName("Sln1", "2");
 			assert.deepEqual(expectedResult, projName);
 		});

@@ -1,8 +1,7 @@
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import configLib = require("../lib/config");
-import {assert} from "chai";
+import { assert } from "chai";
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
 let resourceLoaderFile = require("../lib/common/resource-loader");
