@@ -1,5 +1,4 @@
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import temp = require("temp");
 import hostInfoLib = require("../lib/common/host-info");
@@ -108,17 +107,12 @@ describe("multipart upload service", () => {
 				uploadChunkCalled = false;
 			testInjector.register("server", {
 				upload: {
-					async completeUpload(path: string, originalFileHash: string): Promise<void> {
-						return (() => completeUploadCalled = true).future<void>()();
-					},
-					async initUpload(path: string): Promise<void> {
-						return (() => initUploadCalled = true).future<void>()();
-					},
-					async uploadChunk(path: string, hash: string, content: any): Promise<void> {
-						return (() => uploadChunkCalled = true).future<void>()();
-					}
-				}
+					completeUpload: async (path: string, originalFileHash: string): Promise<void> => { completeUploadCalled = true },
+					initUpload: async (path: string): Promise<void> => { initUploadCalled = true },
+					uploadChunk: async (path: string, hash: string, content: any): Promise<void> => { uploadChunkCalled = true }
+				},
 			});
+
 			testInjector.register("serviceProxy", ServiceProxy);
 
 			let mpus: IMultipartUploadService = testInjector.resolve("multipartUploadService");

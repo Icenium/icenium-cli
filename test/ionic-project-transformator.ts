@@ -2,26 +2,25 @@ import * as path from "path";
 import * as temp from "temp";
 import * as shelljs from "shelljs";
 import * as xmlMapping from "xml-mapping";
-import {Project} from "../lib/project";
-import {CordovaProject} from "./../lib/project/cordova-project";
-import {Yok} from "../lib/common/yok";
-import {ProjectConstants} from "../lib/common/appbuilder/project-constants";
-import {ResourceLoader} from "../lib/common/resource-loader";
-import {PluginsService} from "../lib/services/plugins/plugins-service";
-import {FrameworkProjectResolver} from "../lib/project/resolvers/framework-project-resolver";
-import {IonicProjectTransformator} from "../lib/ionic-project-transformator";
-import {ErrorsStub, LoggerStub, PrompterStub} from "./stubs";
-import {DevicePlatformsConstants} from "../lib/common/mobile/device-platforms-constants";
-import {FileSystem} from "../lib/common/file-system";
-import {Configuration, StaticConfig} from "../lib/config";
-import {ChildProcess} from "../lib/common/child-process";
-import {HostInfo} from "../lib/common/host-info";
-import {JsonSchemaValidator} from "../lib/json-schema/json-schema-validator";
-import {JsonSchemaConstants} from "../lib/json-schema/json-schema-constants";
-import {JsonSchemaLoader} from "../lib/json-schema/json-schema-loader";
-import {ProjectPropertiesService} from "../lib/services/project-properties-service";
-import {assert} from "chai";
-import Future = require("fibers/future");
+import { Project } from "../lib/project";
+import { CordovaProject } from "./../lib/project/cordova-project";
+import { Yok } from "../lib/common/yok";
+import { ProjectConstants } from "../lib/common/appbuilder/project-constants";
+import { ResourceLoader } from "../lib/common/resource-loader";
+import { PluginsService } from "../lib/services/plugins/plugins-service";
+import { FrameworkProjectResolver } from "../lib/project/resolvers/framework-project-resolver";
+import { IonicProjectTransformator } from "../lib/ionic-project-transformator";
+import { ErrorsStub, LoggerStub, PrompterStub } from "./stubs";
+import { DevicePlatformsConstants } from "../lib/common/mobile/device-platforms-constants";
+import { FileSystem } from "../lib/common/file-system";
+import { Configuration, StaticConfig } from "../lib/config";
+import { ChildProcess } from "../lib/common/child-process";
+import { HostInfo } from "../lib/common/host-info";
+import { JsonSchemaValidator } from "../lib/json-schema/json-schema-validator";
+import { JsonSchemaConstants } from "../lib/json-schema/json-schema-constants";
+import { JsonSchemaLoader } from "../lib/json-schema/json-schema-loader";
+import { ProjectPropertiesService } from "../lib/services/project-properties-service";
+import { assert } from "chai";
 temp.track();
 
 let ionicBackupFolderName = "Ionic_Backup";
@@ -102,17 +101,17 @@ let iosPlatformName = "ios";
 let wp8PlatformName = "wp8";
 
 async function createIonicProject(testInjector: IInjector, fs: IFileSystem): Promise<string> {
-		if (!hasUnzippedProject) {
-			hasUnzippedProject = true;
-			await fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true });
-		}
+	if (!hasUnzippedProject) {
+		hasUnzippedProject = true;
+		await fs.unzip(path.join("test", "resources", "ionic-transform-test.zip"), unzippedProjectDirectory, { overwriteExisitingFiles: true });
+	}
 
-		let options = testInjector.resolve("options");
-		let projectDirectory = temp.mkdirSync("ionic-transform-test");
-		options.path = projectDirectory;
-		shelljs.cp("-Rf", [unzippedProjectDirectory + `${pathSeparator}.*`, unzippedProjectDirectory + `${pathSeparator}*`], projectDirectory);
+	let options = testInjector.resolve("options");
+	let projectDirectory = temp.mkdirSync("ionic-transform-test");
+	options.path = projectDirectory;
+	shelljs.cp("-Rf", [unzippedProjectDirectory + `${pathSeparator}.*`, unzippedProjectDirectory + `${pathSeparator}*`], projectDirectory);
 
-		return projectDirectory;
+	return projectDirectory;
 }
 
 function createConfigXmlTestsContext(platform: string, appResourcesDirectory: string): IConfigXmlFileTestContext {
@@ -139,17 +138,17 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 			src: `resources${pathSeparator}android${pathSeparator}icon${pathSeparator}${drawableFolderName}-icon.png`,
 			density: resourceDensity
 		}, {
-				src: `resources${pathSeparator}android${pathSeparator}icon${pathSeparator}${drawableFolderName}-icon.png`,
-				density: resourceDensity
-			}];
+			src: `resources${pathSeparator}android${pathSeparator}icon${pathSeparator}${drawableFolderName}-icon.png`,
+			density: resourceDensity
+		}];
 
 		let ionicSplashScreenResources = [{
 			src: `resources${pathSeparator}android${pathSeparator}splash${pathSeparator}${drawableFolderName}-screen.png`,
 			density: resourceDensity
 		}, {
-				src: `resources${pathSeparator}android${pathSeparator}splash${pathSeparator}${drawableFolderName}-screen.png`,
-				density: resourceDensity
-			}];
+			src: `resources${pathSeparator}android${pathSeparator}splash${pathSeparator}${drawableFolderName}-screen.png`,
+			density: resourceDensity
+		}];
 
 		context.platformDataWithMultipleResources = {
 			name: androidPlatformName,
@@ -182,14 +181,14 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 		let ionicIconResources = [{
 			src: `resources${pathSeparator}ios${pathSeparator}icon${pathSeparator}icon.png`
 		}, {
-				src: `resources${pathSeparator}ios${pathSeparator}icon${pathSeparator}icon.png`
-			}];
+			src: `resources${pathSeparator}ios${pathSeparator}icon${pathSeparator}icon.png`
+		}];
 
 		let ionicSplashScreenResources = [{
 			src: `resources${pathSeparator}ios${pathSeparator}splash${pathSeparator}Default-568h@2x~iphone.png`
 		}, {
-				src: `resources${pathSeparator}ios${pathSeparator}splash${pathSeparator}Default-568h@2x~iphone.png`
-			}];
+			src: `resources${pathSeparator}ios${pathSeparator}splash${pathSeparator}Default-568h@2x~iphone.png`
+		}];
 
 		context.platformDataWithMultipleResources = {
 			name: iosPlatformName,
@@ -218,14 +217,14 @@ function createConfigXmlTestsContext(platform: string, appResourcesDirectory: st
 		let ionicIconResources = [{
 			src: `resources${pathSeparator}wp8${pathSeparator}icon${pathSeparator}ApplicationIcon.png`
 		}, {
-				src: `resources${pathSeparator}wp8${pathSeparator}icon${pathSeparator}ApplicationIcon.png`
-			}];
+			src: `resources${pathSeparator}wp8${pathSeparator}icon${pathSeparator}ApplicationIcon.png`
+		}];
 
 		let ionicSplashScreenResources = [{
 			src: `resources${pathSeparator}wp8${pathSeparator}splash${pathSeparator}SplashScreenImage.png`
 		}, {
-				src: `resources${pathSeparator}wp8${pathSeparator}splash${pathSeparator}SplashScreenImage.png`
-			}];
+			src: `resources${pathSeparator}wp8${pathSeparator}splash${pathSeparator}SplashScreenImage.png`
+		}];
 
 		context.platformDataWithMultipleResources = {
 			name: "wp8",
@@ -250,18 +249,18 @@ describe("Ionic project transformator", () => {
 	let createBackup: boolean;
 
 	describe("integration tests", () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			testInjector = createTestInjector();
 
 			fs = testInjector.resolve("fs");
-			projectDirectory = await  createIonicProject(testInjector, fs);
+			projectDirectory = await createIonicProject(testInjector, fs);
 
 			ionicProjectTransformator = testInjector.resolve("ionicProjectTransformator");
 
 			createBackup = false;
 		});
 
-		it("should create backup if createBackup is true", () => {
+		it("should create backup if createBackup is true", async () => {
 			createBackup = true;
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 
@@ -270,7 +269,7 @@ describe("Ionic project transformator", () => {
 			assert.isTrue(fs.exists(backupDirectory));
 		});
 
-		it("should not create backup if createBackup is false", () => {
+		it("should not create backup if createBackup is false", async () => {
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 
 			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
@@ -278,7 +277,7 @@ describe("Ionic project transformator", () => {
 			assert.isTrue(!fs.exists(backupDirectory));
 		});
 
-		it("should create full backup of the project", () => {
+		it("should create full backup of the project", async () => {
 			createBackup = true;
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
 			let projectDirectoryContent = shelljs.ls("-R", projectDirectory);
@@ -310,8 +309,8 @@ describe("Ionic project transformator", () => {
 				appResourcesDirectory = path.join(projectDirectory, appResourcesFolderName);
 			});
 
-			_.each([androidPlatformName, iosPlatformName, wp8PlatformName], (platform: string) => {
-				it(`should clone ${platform} config.xml when ${platform} is added to the Ionic project`, () => {
+			for (let platform of [androidPlatformName, iosPlatformName, wp8PlatformName]) {
+				it(`should clone ${platform} config.xml when ${platform} is added to the Ionic project`, async () => {
 					context = createConfigXmlTestsContext(platform, appResourcesDirectory);
 					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
@@ -320,23 +319,17 @@ describe("Ionic project transformator", () => {
 					assert.isTrue(fs.exists(clonedConfigXmlDirectory), `Expected the ${context.platformName} configuration to be cloned from the Ionic config.xml.`);
 				});
 
-				it(`should clone correctly for ${platform} when only one resource is added to icon and slpash`, () => {
+				it(`should clone correctly for ${platform} when only one resource is added to icon and slpash`, async () => {
 					context = createConfigXmlTestsContext(platform, appResourcesDirectory);
-
 					ionicConfiXml.widget.platform = context.platformDataWithSingleResources;
-
 					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
 					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
-
 					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory));
-
 					let expectedIconResource: IonicConfigXmlFile.IResource = context.expectedIconResource;
-
 					let expectedSplashScreenResource: IonicConfigXmlFile.IResource = context.expectedSplashScreenResource;
-
 					let appBuilderPlatformData = (<IonicConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
 
 					assert.isFalse(_.isArray(appBuilderConfigXml.widget.platform), `Expected ${context.platformName} config.xml to have only the ${context.platformName} configuration.`);
@@ -346,19 +339,15 @@ describe("Ionic project transformator", () => {
 					assert.deepEqual((<IonicConfigXmlFile.IResource>appBuilderPlatformData.splash).src, expectedSplashScreenResource.src, "Expected the moved splash screen resource to have correct src.");
 				});
 
-				it(`should clone correctly for ${platform} when more than one resource is added to icon and slpash`, () => {
+				it(`should clone correctly for ${platform} when more than one resource is added to icon and slpash`, async () => {
 					context = createConfigXmlTestsContext(platform, appResourcesDirectory);
-
 					ionicConfiXml.widget.platform = context.platformDataWithMultipleResources;
-
 					fs.writeFile(ionicConfigXmlDirectory, xmlMapping.toxml(ionicConfiXml));
 
 					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					let clonedConfigXmlDirectory = context.clonedConfigXmlDirectory;
-
 					let appBuilderConfigXml: IonicConfigXmlFile.IConfigXmlFile = xmlMapping.tojson(fs.readText(clonedConfigXmlDirectory));
-
 					let appBuilderPlatformData = (<IonicConfigXmlFile.IPlatform>appBuilderConfigXml.widget.platform);
 
 					assert.isTrue(_.isArray(appBuilderPlatformData.icon), `Expected ${context.platformName} config.xml to have more than one icon when the Ionic config.xml contains more than one icon.`);
@@ -371,9 +360,9 @@ describe("Ionic project transformator", () => {
 						(<IonicConfigXmlFile.IResource[]>context.platformDataWithMultipleResources.splash).length,
 						`Expected ${context.platformName} config.xml to have splash screen resources equal to the splash screen resources of the Ionic config.xml file for ${context.platformName}.`);
 				});
-			});
+			}
 
-			it(`should clone correctly when more than platform configurations are added to the Ionic config.xml file.`, () => {
+			it(`should clone correctly when more than platform configurations are added to the Ionic config.xml file.`, async () => {
 				let platformConfigXmlItem: IonicConfigXmlFile.IPlatform[] = [];
 				let androidTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(androidPlatformName, appResourcesDirectory);
 				let iosTestContext: IConfigXmlFileTestContext = createConfigXmlTestsContext(iosPlatformName, appResourcesDirectory);
@@ -396,7 +385,7 @@ describe("Ionic project transformator", () => {
 		});
 
 		describe("resources cloning", () => {
-			it("should clone Android resources correctly.", () => {
+			it("should clone Android resources correctly.", async () => {
 				let densityLdpi = "ldpi";
 				let densityHdpi = "hdpi";
 				let ldpiFolderName = `drawable-${densityLdpi}`;
@@ -427,7 +416,7 @@ describe("Ionic project transformator", () => {
 			});
 
 			_.each(["iOS", "WP8"], (appbuilderPlatformName: string) => {
-				it(`should clone ${appbuilderPlatformName} resources correctly.`, () => {
+				it(`should clone ${appbuilderPlatformName} resources correctly.`, async () => {
 					let appbuilderResourcesDirectory = path.join(projectDirectory, appResourcesFolderName, appbuilderPlatformName);
 					let ionicResourcesDirectory = path.join(projectDirectory, "resources", appbuilderPlatformName.toLocaleLowerCase());
 
@@ -453,7 +442,7 @@ describe("Ionic project transformator", () => {
 		});
 
 		describe("project cleanup", () => {
-			it("should delete the Ionic project specific files and folders.", () => {
+			it("should delete the Ionic project specific files and folders.", async () => {
 				let ionicProjectSpecificFilesAndFolders = ["package.json", "ionic.project", ".editorconfig", "hooks", "platforms", "resources"];
 				await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 

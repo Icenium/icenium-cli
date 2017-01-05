@@ -2,7 +2,7 @@
 import chai = require("chai");
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
-let assert:chai.Assert = chai.assert;
+let assert: chai.Assert = chai.assert;
 let pfs = require("../lib/common/appbuilder/services/path-filtering");
 
 let projectDir = "c:/projectDir/";
@@ -53,7 +53,7 @@ describe("PathFilteringService", () => {
 	it("test exclusion by two rules and in subdir", () => {
 		let projectFiles = prefixWithProjectDir(["A/B/file.txt"]);
 		let actual = testInjector.resolve("pathFilteringService").filterIgnoredFiles(projectFiles, ["A/B/*", "!A/B/file.txt", "A/**/*"], projectDir);
-		let expected:string[] = [];
+		let expected: string[] = [];
 		assert.deepEqual(actual, expected);
 	});
 
@@ -63,7 +63,7 @@ describe("PathFilteringService", () => {
 		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
-		let expected = ["a","b"];
+		let expected = ["a", "b"];
 		assert.deepEqual(actual, expected);
 	});
 
@@ -73,7 +73,7 @@ describe("PathFilteringService", () => {
 		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
-		let expected = ["a","b"];
+		let expected = ["a", "b"];
 		assert.deepEqual(actual, expected);
 	});
 
@@ -83,7 +83,7 @@ describe("PathFilteringService", () => {
 		fs.readText = () => ignoreRules;
 
 		let actual = testInjector.resolve("pathFilteringService").getRulesFromFile("<ignored>");
-		let expected = ["a","b"];
+		let expected = ["a", "b"];
 		assert.deepEqual(actual, expected);
 	});
 
