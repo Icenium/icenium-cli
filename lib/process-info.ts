@@ -16,7 +16,7 @@ export class ProcessInfo implements IProcessInfo {
 		} else if (this.$hostInfo.isDarwin) {
 			result = (await this.$childProcess.spawnFromEvent("ps", ["xc"], "close")).stdout.indexOf(name) !== -1;
 		} else if (this.$hostInfo.isLinux) {
-			result = (await !helpers.isNullOrWhitespace(this.$childProcess.spawnFromEvent("ps", ["--no-headers", "-C", name], "close")).stdout);
+			result = (!helpers.isNullOrWhitespace((await this.$childProcess.spawnFromEvent("ps", ["--no-headers", "-C", name], "close")).stdout));
 		}
 
 		return result;

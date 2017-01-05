@@ -75,10 +75,8 @@ export class BuildService implements Project.IBuildService {
 		let liveSyncToken = await this.$server.cordova.getLiveSyncToken(solutionName, projectName);
 		buildProperties.LiveSyncToken = liveSyncToken;
 
-		let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
-		await this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000);
-
-		let body = buildProjectFuture.get();
+		let buildProjectPromise = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
+		let body = await this.$progressIndicator.showProgressIndicator(buildProjectPromise, 2000);
 		let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
 			let fullPath = buildResult.FullPath.replace(/\\/g, "/");
 			let solutionPath = util.format("%s/%s", projectName, fullPath);

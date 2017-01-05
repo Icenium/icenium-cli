@@ -4,7 +4,7 @@ export class NameParameter implements ICommandParameter {
 	public mandatory = true;
 
 	public async validate(validationValue: string): Promise<boolean> {
-		await this.$projectNameValidator.validate(validationValue);
+		return this.$projectNameValidator.validate(validationValue);
 	}
 }
 

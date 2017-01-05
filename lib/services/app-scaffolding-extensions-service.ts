@@ -73,7 +73,7 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 				pathToSave: dependencyConfig.pathToSave
 			};
 
-			this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, { afterDownloadAction: async () => await this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100) }), 5000);
+			await this.$progressIndicator.showProgressIndicator(this.prepareExtensionBase(dependencyExtensionData, cachedVersion, { afterDownloadAction: async () => await this.$progressIndicator.showProgressIndicator(afterPrepareAction(), 100) }), 5000);
 		}
 	}
 
