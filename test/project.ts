@@ -276,7 +276,7 @@ describe("project integration tests", () => {
 		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", () => {
 			prompter.confirmResult = false;
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-			assert.throws(async () => await  project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]));
+			assert.isRejected(project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]));
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
 		});
@@ -288,7 +288,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
 
 			prompter.confirmResult = false;
-			assert.throws(async () => await  project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]));
+			assert.isRejected(project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]));
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
 		});
@@ -595,13 +595,13 @@ describe("project unit tests", () => {
 		it("disallows 'add' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]));
+			assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]));
 		});
 
 		it("disallows 'del' on non-flag property", () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]));
+			assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]));
 		});
 
 		it("sets bundle version when given proper input", () => {
@@ -614,7 +614,7 @@ describe("project unit tests", () => {
 		it("throws on invalid bundle version string", () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]));
+			assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]));
 		});
 
 		it("sets enumerated property", () => {
@@ -627,7 +627,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated property", () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]));
+			assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]));
 		});
 
 		it("appends to verbatim enumerated collection property", () => {
@@ -667,7 +667,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated collection property", () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			assert.throws(async () => await  projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]));
+			assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]));
 		});
 
 		it("makes case-insensitive comparisons of property name", () => {
@@ -965,7 +965,7 @@ describe("project unit tests", () => {
 					CorePlugins: ["org.apache.cordova.camera"]
 				}
 			};
-			assert.throws(async () => await  projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []));
+			assert.isRejected(projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []));
 			assert.deepEqual(["org.apache.cordova.battery-status"], projectData.CorePlugins);
 			assert.deepEqual(["org.apache.cordova.contacts"], configSpecificData["debug"].CorePlugins);
 			assert.deepEqual(["org.apache.cordova.camera"], configSpecificData["release"].CorePlugins);

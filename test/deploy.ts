@@ -235,14 +235,14 @@ describe("Deploy ios unit tests on windows", () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
-		assert.throws(async () => await  deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES);
+		assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES);
 	});
 	it("throws error when --emulator option is specified", () => { // appbuilder deploy ios --emulator
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
 		setEmulatorOption(testInjector);
-		assert.throws(async () => await  deployHelper.deploy("ios"), "You can use iOS simulator only on OS X.");
+		assert.isRejected(deployHelper.deploy("ios"), "You can use iOS simulator only on OS X.");
 
 		unsetEmulatorOption(testInjector);
 	});

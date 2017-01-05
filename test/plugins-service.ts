@@ -1058,7 +1058,7 @@ describe("plugins-service", () => {
 
 			options.debug = true;
 			options.release = false;
-			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
+			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 
 		it("throws error when plugin is enabled in one config and user wants to update the other one in non-interactive terminal", () => {
@@ -1071,7 +1071,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.throws(async () => await service.addPlugin("Toast@2.0.5"));
+			assert.isRejected(service.addPlugin("Toast@2.0.5"));
 		});
 
 		// Uncomment this when we know that all clients support different versions for different configurations.
@@ -1107,7 +1107,7 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
+			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 
 		it("throws error when console is non-interactive and user had not specified version for plugin", () => {
@@ -1117,7 +1117,7 @@ describe("plugins-service", () => {
 			service = testInjector.resolve(CordovaProjectPluginsService);
 
 			project.getConfigurationsSpecifiedByUser = () => ["debug"];
-			assert.throws(async () => await service.addPlugin("Toast"));
+			assert.isRejected(service.addPlugin("Toast"));
 		});
 
 		describe("throws error when specified version is not valid", () => {
@@ -1129,7 +1129,7 @@ describe("plugins-service", () => {
 				options = testInjector.resolve("options");
 
 				options.debug = options.release = false;
-				assert.throws(async () => await service.addPlugin(`Toast@${invalidVersionToSet}`));
+				assert.isRejected(service.addPlugin(`Toast@${invalidVersionToSet}`));
 			});
 			describe("when plugin is not installed at all", () => {
 				it("when console is interactive", () => {
@@ -1303,7 +1303,7 @@ describe("plugins-service", () => {
 			options = testInjector.resolve("options");
 			options.debug = false;
 			options.release = true;
-			assert.throws(async () => await service.addPlugin(`Toast@${versionToSet}`));
+			assert.isRejected(service.addPlugin(`Toast@${versionToSet}`));
 		});
 	});
 
@@ -1349,7 +1349,7 @@ describe("plugins-service", () => {
 		it("throws exception when trying to add it to debug config", () => {
 			options.debug = true;
 			options.release = false;
-			assert.throws(async () => await service.addPlugin(livePatchId));
+			assert.isRejected(service.addPlugin(livePatchId));
 			let toastInDebugConfig = _.filter(service.getInstalledPlugins(), pl => pl.data.Identifier === livePatchId);
 			assert.equal(toastInDebugConfig.length, 0);
 			options.debug = false;
