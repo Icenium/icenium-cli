@@ -2,20 +2,20 @@ import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
-import {assert} from "chai";
-import Future = require("fibers/future");
+import { assert } from "chai";
 
 function createTestInjector(): IInjector {
 	let testInjector = new yok.Yok();
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("userDataStore", {
-		getUser: () =>  Promise.resolve({tenant: {id: "id"}}),
+		getUser: () => Promise.resolve({ tenant: { id: "id" } }),
 	});
 	testInjector.register("serviceProxy", {
-		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: {discardSolutionSpaceHeader: boolean}) => {return call();}
+		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }) => { return call(); }
 	});
 	testInjector.register("serviceProxyBase", {
-		call: (tenantId: string) => { return Promise.resolve(
+		call: (tenantId: string) => {
+			return Promise.resolve(
 				[{
 					"id": "id2",
 					"name": "Sln2",
@@ -34,7 +34,7 @@ function createTestInjector(): IInjector {
 					"isMigrating": false,
 					"description": "AppBuilder cross platform project"
 				}]);
-			},
+		},
 		setShouldAuthenticate: (shouldAuthenticate: boolean) => false
 	});
 	testInjector.register("server", {
@@ -100,19 +100,19 @@ function createTestInjector(): IInjector {
 		}
 	});
 	testInjector.register("project", {
-		getNewProjectDir:() => "proj dir",
+		getNewProjectDir: () => "proj dir",
 		createProjectFile: (projectDir: string, properties: any) => Promise.resolve()
 	});
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("fs", {
 		exists: (path: string) => {
-			if(path.indexOf("abproject") !== -1) {
+			if (path.indexOf("abproject") !== -1) {
 				return true;
 			} else {
 				return false;
 			}
 		},
-		createWriteStream: (path: string) => { /* intentionally empty body*/},
+		createWriteStream: (path: string) => { /* intentionally empty body*/ },
 		unzip: (zipFile: string, destinationDir: string) => Promise.resolve(),
 		readDirectory: (projectDir: string): string[] => []
 	});
@@ -122,37 +122,37 @@ function createTestInjector(): IInjector {
 
 describe("remote project service", () => {
 	let testInjector: IInjector;
-		let remoteProjectService: IRemoteProjectService;
-		beforeEach(() => {
-			testInjector = createTestInjector();
-			remoteProjectService = testInjector.resolve(remoteProjectsServiceLib.RemoteProjectService);
-		});
+	let remoteProjectService: IRemoteProjectService;
+	beforeEach(() => {
+		testInjector = createTestInjector();
+		remoteProjectService = testInjector.resolve(remoteProjectsServiceLib.RemoteProjectService);
+	});
 
-	it("getSolutions returns correct sorted results", () => {
-		let solutions = await  remoteProjectService.getAvailableAppsAndSolutions();
+	it("getSolutions returns correct sorted results", async () => {
+		let solutions = await remoteProjectService.getAvailableAppsAndSolutions();
 		let expectedResult = ["Sln1", "Sln2"];
 		assert.deepEqual(expectedResult, solutions.map(sln => sln.name));
 	});
 
 	describe("getProjectsForSolution", () => {
 		it("fails when solution name does not exist", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectsForSolution("Invalid name") );
+			assert.isRejected(remoteProjectService.getProjectsForSolution("Invalid name"));
 		});
 
-		it("returns correct sorted result when name is correct", () => {
-			let projects = await  remoteProjectService.getProjectsForSolution("Sln1");
+		it("returns correct sorted result when name is correct", async () => {
+			let projects = await remoteProjectService.getProjectsForSolution("Sln1");
 			let expectedResult = ["ABlankProjMobileTesting", "BlankProj"];
 			assert.deepEqual(expectedResult, projects.map(pr => pr.Name));
 		});
 
-		it("returns correct sorted result when passed index is correct", () => {
-			let projects = await  remoteProjectService.getProjectsForSolution("1");
+		it("returns correct sorted result when passed index is correct", async () => {
+			let projects = await remoteProjectService.getProjectsForSolution("1");
 			let expectedResult = ["ABlankProjMobileTesting", "BlankProj"];
 			assert.deepEqual(expectedResult, projects.map(pr => pr.Name));
 		});
 
 		it("fails when solution index is out of range", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectsForSolution("5") );
+			assert.throws(async () => await remoteProjectService.getProjectsForSolution("5"));
 		});
 	});
 
@@ -163,38 +163,38 @@ describe("remote project service", () => {
 		};
 
 		it("fails when solution name is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectProperties("Invalid name", "BlankProj") );
+			assert.throws(async () => await remoteProjectService.getProjectProperties("Invalid name", "BlankProj"));
 		});
 
 		it("fails when solution index is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectProperties("5", "BlankProj") );
+			assert.throws(async () => await remoteProjectService.getProjectProperties("5", "BlankProj"));
 		});
 
 		it("fails when project name is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectProperties("Sln1", "Invalid name") );
+			assert.throws(async () => await remoteProjectService.getProjectProperties("Sln1", "Invalid name"));
 		});
 
 		it("fails when project index is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectProperties("Sln1", "5") );
+			assert.throws(async () => await remoteProjectService.getProjectProperties("Sln1", "5"));
 		});
 
 		it("returns correct properties when solution name and project name are correct", () => {
-			let properties = await  remoteProjectService.getProjectProperties("Sln1", "BlankProj");
+			let properties = await remoteProjectService.getProjectProperties("Sln1", "BlankProj");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
 		it("returns correct properties when solution id and project name are correct", () => {
-			let properties = await  remoteProjectService.getProjectProperties("1", "BlankProj");
+			let properties = await remoteProjectService.getProjectProperties("1", "BlankProj");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
 		it("returns correct properties when solution name and project id are correct", () => {
-			let properties = await  remoteProjectService.getProjectProperties("Sln1", "2");
+			let properties = await remoteProjectService.getProjectProperties("Sln1", "2");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 
 		it("returns correct properties when solution name and project id are correct", () => {
-			let properties = await  remoteProjectService.getProjectProperties("1", "2");
+			let properties = await remoteProjectService.getProjectProperties("1", "2");
 			assert.deepEqual(expectedPropertiesResult, properties);
 		});
 	});
@@ -202,33 +202,33 @@ describe("remote project service", () => {
 	describe("getProjectName", () => {
 		let expectedResult = "BlankProj";
 		it("fails when solution name is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectName("Invalid name", "BlankProj") );
+			assert.throws(async () => await remoteProjectService.getProjectName("Invalid name", "BlankProj"));
 		});
 
 		it("fails when solution index is not correct", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectName("5", "BlankProj") );
+			assert.throws(async () => await remoteProjectService.getProjectName("5", "BlankProj"));
 		});
 
 		it("fails when solution name is correct but project name is not", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectName("Sln1", "Invalid name") );
+			assert.throws(async () => await remoteProjectService.getProjectName("Sln1", "Invalid name"));
 		});
 
 		it("fails when solution name is correct but project id is not", () => {
-			assert.throws( async () => await  remoteProjectService.getProjectName("Sln1", "5") );
+			assert.throws(async () => await remoteProjectService.getProjectName("Sln1", "5"));
 		});
 
 		it("returns correct name when solution name and project name are correct", () => {
-			let projName = await  remoteProjectService.getProjectName("Sln1", "BlankProj");
+			let projName = await remoteProjectService.getProjectName("Sln1", "BlankProj");
 			assert.deepEqual(expectedResult, projName);
 		});
 
 		it("returns correct name when solution id and project name are correct", () => {
-			let projName = await  remoteProjectService.getProjectName("1", "BlankProj");
+			let projName = await remoteProjectService.getProjectName("1", "BlankProj");
 			assert.deepEqual(expectedResult, projName);
 		});
 
 		it("returns correct name when solution name and project id are correct", () => {
-			let projName = await  remoteProjectService.getProjectName("Sln1", "2");
+			let projName = await remoteProjectService.getProjectName("Sln1", "2");
 			assert.deepEqual(expectedResult, projName);
 		});
 	});

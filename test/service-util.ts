@@ -1,6 +1,5 @@
 import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 let assert: chai.Assert = chai.assert;
@@ -130,8 +129,6 @@ describe("ServiceProxy", () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
-		assert.throws(async () => {
-			await proxy.call("test4", "GET", "/package/zip", "application/json", null, null);
-		}, "404");
+		assert.isRejected(proxy.call("test4", "GET", "/package/zip", "application/json", null, null), "404");
 	});
 });

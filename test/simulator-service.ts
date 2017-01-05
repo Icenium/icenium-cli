@@ -1,8 +1,7 @@
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
-import {assert} from "chai";
-let staticConfig: any =  {
+import { assert } from "chai";
+let staticConfig: any = {
 	TRACK_FEATURE_USAGE_SETTING_NAME: "AnalyticsSettings.TrackFeatureUsage",
 	TRACK_EXCEPTIONS_SETTING_NAME: "AnalyticsSettings.TrackExceptions"
 };
@@ -36,7 +35,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("serverExtensionsService", {
 		getExtensionPath: (packageName: string) => { return "extensionPath"; },
 		prepareExtension: (packageName: string, beforeDownloadPackageAction: () => Promise<void>) => {
-			if(useBeforeDownloadAction) {
+			if (useBeforeDownloadAction) {
 				return beforeDownloadPackageAction();
 			}
 			return Promise.resolve();
@@ -53,7 +52,7 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("staticConfig", staticConfigLib.StaticConfig);
 	testInjector.register("analyticsService", {
 		isEnabled: (featureName: string) => {
-			if(featureName === staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME) {
+			if (featureName === staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME) {
 				return Promise.resolve(isFeatureTrackingEnabled);
 			} else if (featureName === staticConfig.TRACK_EXCEPTIONS_SETTING_NAME) {
 				return Promise.resolve(isExceptionsTrackingEnabled);
@@ -81,7 +80,7 @@ describe("simulator-service", () => {
 			testSpecificParams = [];
 		});
 
-		afterEach(() => {
+		afterEach(async () => {
 			let service = testInjector.resolve("simulatorService");
 			await service.launchSimulator();
 			let _staticConfig: IStaticConfig = testInjector.resolve("staticConfig");
@@ -113,10 +112,10 @@ describe("simulator-service", () => {
 	it("launchSimulator fails when simulator is running during download of new version", () => {
 		let testInjector = createTestInjector(true, true, true, true);
 		let service = testInjector.resolve("simulatorService");
-		assert.throws(async () => await  service.launchSimulator());
+		assert.isRejected(service.launchSimulator());
 	});
 
-	it("launchSimulator does not fail when simulator is running during download of new version", () => {
+	it("launchSimulator does not fail when simulator is running during download of new version", async () => {
 		let testInjector = createTestInjector(true, true, false, true);
 		let service = testInjector.resolve("simulatorService");
 		await service.launchSimulator();
