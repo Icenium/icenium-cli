@@ -1,6 +1,8 @@
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import { assert } from "chai";
+import { EOL } from "os";
+
 let staticConfig: any = {
 	TRACK_FEATURE_USAGE_SETTING_NAME: "AnalyticsSettings.TrackFeatureUsage",
 	TRACK_EXCEPTIONS_SETTING_NAME: "AnalyticsSettings.TrackExceptions"
@@ -112,7 +114,7 @@ describe("simulator-service", () => {
 	it("launchSimulator fails when simulator is running during download of new version", async () => {
 		let testInjector = createTestInjector(true, true, true, true);
 		let service = testInjector.resolve("simulatorService");
-		await assert.isRejected(service.launchSimulator(), "AppBuilder Simulator is currently running and cannot be updated.\r\nClose it and run $ appbuilder simulate again.");
+		await assert.isRejected(service.launchSimulator(), `AppBuilder Simulator is currently running and cannot be updated.${EOL}Close it and run $ appbuilder simulate again.`);
 	});
 
 	it("launchSimulator does not fail when simulator is running during download of new version", async () => {

@@ -6,6 +6,7 @@ import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
 import { EOL } from "os";
 import { assert } from "chai";
+import * as path from "path";
 
 let originalIsInteractiveMethod = helpers.isInteractive;
 import * as util from "util";
@@ -380,7 +381,7 @@ describe("cloud project commands", () => {
 				it("fails when projectDir exists", async () => {
 					fs.exists = (projectDir: string) => true;
 					const solutionName = "Sln1";
-					await assert.isRejected(exportProjectCommand.execute([solutionName, "BlankProj"]), `The folder proj dir\\${solutionName} already exists!`);
+					await assert.isRejected(exportProjectCommand.execute([solutionName, "BlankProj"]), `The folder proj ${path.join("dir", solutionName)} already exists!`);
 				});
 
 				it("warns when unable to create project file", async () => {
