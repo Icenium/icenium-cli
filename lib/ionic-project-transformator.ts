@@ -307,7 +307,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 
 	private copyResources(resourceDirectory: string, appBuilderPlatformResourcesDirectory: string): void {
 		// Need to add / at the end of resourceDirectory to copy the content of the directory directly to appBuilderPlatformResourcesDirectory not in subfolder.
-		let resourceDirectoryContentPath = `${resourceDirectory}/`;
+		let resourceDirectoryContentPath = `${resourceDirectory}/*`;
 
 		shelljs.cp("-rf", resourceDirectoryContentPath, appBuilderPlatformResourcesDirectory);
 	}
