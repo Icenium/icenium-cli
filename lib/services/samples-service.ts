@@ -47,8 +47,8 @@ export class SamplesService implements ISamplesService {
 			await this.printSamplesInformationForFramework(framework);
 		} else {
 			let targetFrameworkIdentifiers = _.values<string>(TARGET_FRAMEWORK_IDENTIFIERS);
-			for (let framework of targetFrameworkIdentifiers) {
-				await this.printSamplesInformationForFramework(framework);
+			for (let frameworkIdentifier of targetFrameworkIdentifiers) {
+				await this.printSamplesInformationForFramework(frameworkIdentifier);
 			}
 		}
 	}
