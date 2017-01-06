@@ -176,6 +176,7 @@ describe("project integration tests", () => {
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
 		options = testInjector.resolve("options");
+		testInjector.resolve("nativeScriptProject").updateMigrationConfigFile = async () => undefined;
 	});
 
 	describe("createNewProject", () => {
