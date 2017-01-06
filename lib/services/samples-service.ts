@@ -47,13 +47,15 @@ export class SamplesService implements ISamplesService {
 			await this.printSamplesInformationForFramework(framework);
 		} else {
 			let targetFrameworkIdentifiers = _.values<string>(TARGET_FRAMEWORK_IDENTIFIERS);
-			await Promise.all(_.map(targetFrameworkIdentifiers, async fx => await this.printSamplesInformationForFramework(fx)));
+			for (let framework of targetFrameworkIdentifiers) {
+				await this.printSamplesInformationForFramework(framework);
+			}
 		}
 	}
 
 	private async printSamplesInformationForFramework(framework: string): Promise<void> {
 		this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
-		await this.$logger.info(this.getSamplesInformation(framework) + EOL + EOL);
+		this.$logger.info(await this.getSamplesInformation(framework) + EOL + EOL);
 	}
 
 	public async cloneSample(sampleName: string): Promise<void> {
@@ -63,7 +65,7 @@ export class SamplesService implements ISamplesService {
 		}
 
 		let sampleNameLower = sampleName.toLowerCase();
-		let sample = await _.find(await this.getSamples(), (_sample: Sample) => _sample.name.toLowerCase() === sampleNameLower);
+		let sample = _.find(await this.getSamples(), (_sample: Sample) => _sample.name.toLowerCase() === sampleNameLower);
 		if (!sample) {
 			this.$errors.fail("There is no sample named '%s'.", sampleName);
 		}
@@ -154,7 +156,7 @@ export class SamplesService implements ISamplesService {
 
 	private async getSamples(framework?: string): Promise<Sample[]> {
 		let regex = this.getRegExpForFramework(framework);
-		let repos = await _.filter(this.getIceniumRepositories(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
+		let repos = _.filter(await this.getIceniumRepositories(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
 		let samples = _.map(repos, (repo: any) => {
 			return new Sample(
 				repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
@@ -170,11 +172,11 @@ export class SamplesService implements ISamplesService {
 		return sortedSamples;
 	}
 
-	private async getPagedResult(gitHubEndpointUrl: string, page: number): Promise<string[]> {
+	private async getPagedResult(gitHubEndpointUrl: string, page: number): Promise<any[]> {
 		try {
 			let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
 			let accessToken = this.getGitHubAccessTokenQueryParameter("&");
-			let result = (await this.$httpClient.httpRequest(`${requestUrl}${accessToken}`)).body;
+			let result = JSON.parse((await this.$httpClient.httpRequest(`${requestUrl}${accessToken}`)).body);
 			return result;
 		} catch (error) {
 			this.$logger.debug(error);
@@ -182,7 +184,7 @@ export class SamplesService implements ISamplesService {
 		}
 	}
 
-	private _repos: string[];
+	private _repos: any[];
 
 	private async getIceniumRepositories(): Promise<string[]> {
 		if (!this._repos) {
@@ -194,7 +196,8 @@ export class SamplesService implements ISamplesService {
 				if (_.isEmpty(pagedResult)) {
 					break;
 				}
-				Array.prototype.push.apply(this._repos, pagedResult);
+
+				this._repos = this._repos.concat(pagedResult);
 			}
 		}
 
