@@ -557,7 +557,7 @@ describe("plugins-service", () => {
 
 			await service.fetch(path.join(cordovaLocalPluginsDirectory, testPluginName));
 
-			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+			let installedPlugins = _.map(shelljs.ls(path.join(projectDir, "plugins")), f => f);
 
 			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local Cordova plugin should be fetched.");
 		});
@@ -570,12 +570,12 @@ describe("plugins-service", () => {
 
 			let installedPluginsDirectory = path.join(projectDir, "plugins");
 
-			let installedPlugins = shelljs.ls(installedPluginsDirectory);
+			let installedPlugins = _.map(shelljs.ls(installedPluginsDirectory), f => f);
 
 			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local Cordova plugin should be fetched.");
 
-			let expectedPluginContent = shelljs.ls(path.join(cordovaLocalPluginsDirectory, testPluginName));
-			let actualPluginContent = shelljs.ls(path.join(installedPluginsDirectory, testPluginName));
+			let expectedPluginContent = _.map(shelljs.ls(path.join(cordovaLocalPluginsDirectory, testPluginName)), f => f);
+			let actualPluginContent = _.map(shelljs.ls(path.join(installedPluginsDirectory, testPluginName)), f => f);
 			assert.isTrue(_.difference(expectedPluginContent, actualPluginContent).length === 0, "The local Cordova plugin should be extracted.");
 		});
 
@@ -599,7 +599,7 @@ describe("plugins-service", () => {
 			project.projectData.FrameworkVersion = originalFrameworkVersion;
 			helpers.isInteractive = originalIsInteractive;
 
-			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+			let installedPlugins = _.map(shelljs.ls(path.join(projectDir, "plugins")), f => f);
 
 			assert.isTrue(_.includes(installedPlugins, testPluginName), "The local NativeScript plugin should be fetched.");
 			assert.equal(promptsCount, 2, "Should prompt for al plugin variables.");
@@ -617,7 +617,7 @@ describe("plugins-service", () => {
 			await service.fetch(path.join(nativescriptLocalPluginsDirectory, testPluginTgzName));
 			project.projectData.FrameworkVersion = originalFrameworkVersion;
 
-			let installedPlugins = shelljs.ls(path.join(projectDir, "plugins"));
+			let installedPlugins = _.map(shelljs.ls(path.join(projectDir, "plugins")), f => f);
 
 			assert.isTrue(_.includes(installedPlugins, testPluginTgzName), "The local NativeScript plugin should be fetched.");
 		});

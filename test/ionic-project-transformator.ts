@@ -62,7 +62,8 @@ function createTestInjector(): IInjector {
 	testInjector.register("jsonSchemaConstants", JsonSchemaConstants);
 	testInjector.register("jsonSchemaLoader", JsonSchemaLoader);
 	testInjector.register("cordovaProjectPluginsService", {
-		getInstalledPlugins: () => <IPlugin[]>[]
+		getInstalledPlugins: async () => <IPlugin[]>[],
+		init: async () => undefined
 	});
 	testInjector.register("cordovaPluginsService", {
 		getAvailablePlugins: () => Promise.resolve([])
@@ -280,11 +281,11 @@ describe("Ionic project transformator", () => {
 		it("should create full backup of the project", async () => {
 			createBackup = true;
 			let backupDirectory = path.join(projectDirectory, ionicBackupFolderName);
-			let projectDirectoryContent = shelljs.ls("-R", projectDirectory);
+			let projectDirectoryContent = _.map(shelljs.ls("-R", projectDirectory), f => f);
 
 			await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
-			let projectBackupDirectoryContent = shelljs.ls("-R", backupDirectory);
+			let projectBackupDirectoryContent = _.map(shelljs.ls("-R", backupDirectory), f => f);
 
 			assert.deepEqual(projectDirectoryContent, projectBackupDirectoryContent);
 		});
@@ -421,14 +422,14 @@ describe("Ionic project transformator", () => {
 					let ionicResourcesDirectory = path.join(projectDirectory, "resources", appbuilderPlatformName.toLocaleLowerCase());
 
 					// Need to get the list of the resources before the resources folder is deleted.
-					let ionicResources = shelljs.ls("-R", path.join(ionicResourcesDirectory, "icon"), path.join(ionicResourcesDirectory, "splash"));
+					let ionicResources = _.map(shelljs.ls("-R", path.join(ionicResourcesDirectory, "icon"), path.join(ionicResourcesDirectory, "splash")), f => f);
 
 					await ionicProjectTransformator.transformToAppBuilderProject(createBackup);
 
 					// Need to remove the config.xml file from the AppBuilder folder to compare only the resources.
 					fs.deleteFile(path.join(appbuilderResourcesDirectory, configXmlName));
 
-					let differentResources = _.difference(shelljs.ls("-R", appbuilderResourcesDirectory),
+					let differentResources = _.difference(_.map(shelljs.ls("-R", appbuilderResourcesDirectory), f => f),
 						ionicResources);
 
 					if (appbuilderPlatformName === "WP8" && differentResources.length > 0) {

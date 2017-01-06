@@ -336,7 +336,7 @@ export class IonicProjectTransformator implements IIonicProjectTransformator {
 		this.$logger.warn(`Creating backup in ${ionicProjectBackupDir}. This could take more than one minute. Please be patient.`);
 
 		// Use -A to get only the folders and files names without the "." and ".." entries.
-		let allProjectItems = shelljs.ls("-A", this.$project.getProjectDir());
+		let allProjectItems = _.map(shelljs.ls("-A", this.$project.getProjectDir()), f => f);
 
 		if (this.$fs.exists(ionicProjectBackupDir)) {
 			this.$fs.deleteDirectory(ionicProjectBackupDir);
