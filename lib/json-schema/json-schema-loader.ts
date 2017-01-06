@@ -52,7 +52,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 			});
 
 			let schemas = _.values(this.schemas);
-			_.each(schemas, async (schema: ISchema) => await this.loadSchema(schema));
+			_.each(schemas, (schema: ISchema) => this.loadSchema(schema));
 		}
 	}
 
@@ -61,13 +61,13 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		return _.includes(schemaIds, schemaId);
 	}
 
-	private async loadSchema(schema: ISchema): Promise<void> {
+	private loadSchema(schema: ISchema): void {
 		let id = schema.id;
 		let extendsProperty = schema.extends;
 
 		if (!this.isSchemaLoaded(id)) {
 			if (extendsProperty && extendsProperty.length > 0) {
-				await Promise.all(_.map(extendsProperty, async (ext: ISchemaExtends) => {
+				_.each(extendsProperty, (ext: ISchemaExtends) => {
 					let schemaRef = ext.$ref;
 					let extSchema = this.findSchema(schemaRef);
 
@@ -75,8 +75,8 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 						this.$errors.fail("Schema %s not found.", schemaRef);
 					}
 
-					await this.loadSchema(extSchema);
-				}));
+					this.loadSchema(extSchema);
+				});
 			}
 
 			this.loadedSchemas[schema.id] = schema;

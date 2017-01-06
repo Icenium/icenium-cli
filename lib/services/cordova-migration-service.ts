@@ -145,8 +145,8 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	}
 
 	public async downloadMigrationConfigFile(targetPath?: string): Promise<void> {
-		let cordovaJsonPath = await `${this.$serverConfiguration.resourcesPath}/cordova/cordova.json`;
-		return this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || await this.cordovaJsonFilePath);
+		let cordovaJsonPath = `${await this.$serverConfiguration.resourcesPath()}/cordova/cordova.json`;
+		await this.$resourceDownloader.downloadResourceFromServer(cordovaJsonPath, targetPath || this.cordovaJsonFilePath);
 	}
 
 	public async onWPSdkVersionChanging(newVersion: string): Promise<void> {
