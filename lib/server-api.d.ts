@@ -1008,4 +1008,3 @@ declare module Server {
 		versioncontrol: Server.IVersioncontrolServiceContract;
 	}
 }
-

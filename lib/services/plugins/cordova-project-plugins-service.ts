@@ -330,7 +330,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		await this.$project.ensureCordovaProject();
 		await this.$loginManager.ensureLoggedIn();
 		this._identifierToPlugin = Object.create(null);
-		await this.createPluginsData(this.$cordovaPluginsService)
+		await this.createPluginsData(this.$cordovaPluginsService);
 		await this.createPluginsData(this.$marketplacePluginsService);
 	}
 

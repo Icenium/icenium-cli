@@ -7,7 +7,6 @@ import { assert } from "chai";
 import { StringCommandParameter, StringParameterBuilder } from "../lib/common/command-params";
 import { OptionType } from "../lib/common/options";
 import { Options } from "../lib/options";
-import { Configuration } from "../lib/config";
 import { HostInfo } from "../lib/common/host-info";
 
 let isCommandExecuted: boolean;

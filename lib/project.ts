@@ -612,7 +612,6 @@ export class Project extends ProjectBase implements Project.IProject {
 		this.$errors.fail("Invalid property name '%s'.", property);
 	}
 
-
 	public async getProjectSchema(): Promise<any> {
 		if (!this._projectSchema) {
 			this._projectSchema = this.frameworkProject.getProjectFileSchema();

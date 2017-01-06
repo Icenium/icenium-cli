@@ -28,7 +28,6 @@ export class HashService implements IHashService {
 			});
 		});
 
-
 		await promise;
 		return cryptoHash.digest(hashEncoding);
 	}

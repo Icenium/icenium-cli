@@ -1,4 +1,3 @@
-import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");

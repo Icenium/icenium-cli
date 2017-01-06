@@ -315,7 +315,7 @@ export class ServiceContractGenerator implements IServiceContractGenerator {
 			.split(/[<>]/)
 			.filter(e => e)
 			.map(rt => this.tsTypeSystemHelpers.isBuiltIn(rt) ? rt : `Server.${rt}`)
-			.reduce((prev, current) => { ++numberOfClosingBrackets; return `${prev}<${current}` }) + _.repeat(">", numberOfClosingBrackets);
+			.reduce((prev, current) => { ++numberOfClosingBrackets; return `${prev}<${current}`; }) + _.repeat(">", numberOfClosingBrackets);
 
 		let httpCallParameters = [this.quote(operation.nickname), this.quote(operation.httpMethod)];
 

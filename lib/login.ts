@@ -209,7 +209,7 @@ export class LoginManager implements ILoginManager {
 		await this.$fs.futureFromEvent(localhostServer, "listening");
 
 		let authComplete = new Promise<string>((resolve, reject) => {
-			authCompleteResolveAction = resolve
+			authCompleteResolveAction = resolve;
 
 			let port = localhostServer.address().port;
 

@@ -1,4 +1,3 @@
-import chai = require("chai");
 import yok = require("../lib/common/yok");
 import stubs = require("./stubs");
 import pnv = require("../lib/common/validators/project-name-validator");

@@ -960,4 +960,3 @@ export class ServiceContainer implements Server.IServer {
 	public versioncontrol: Server.IVersioncontrolServiceContract = this.$injector.resolve(VersioncontrolService);
 }
 $injector.register('server', ServiceContainer);
-

@@ -18,7 +18,7 @@ export class ExtensionsServiceBase {
 		if (!this.extensionVersions) {
 			return null;
 		}
-		
+
 		return this.extensionVersions[packageName];
 	}
 

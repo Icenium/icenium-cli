@@ -107,9 +107,9 @@ describe("multipart upload service", () => {
 				uploadChunkCalled = false;
 			testInjector.register("server", {
 				upload: {
-					completeUpload: async (path: string, originalFileHash: string): Promise<void> => { completeUploadCalled = true },
-					initUpload: async (path: string): Promise<void> => { initUploadCalled = true },
-					uploadChunk: async (path: string, hash: string, content: any): Promise<void> => { uploadChunkCalled = true }
+					completeUpload: async (path: string, originalFileHash: string): Promise<void> => { completeUploadCalled = true; },
+					initUpload: async (path: string): Promise<void> => { initUploadCalled = true; },
+					uploadChunk: async (path: string, hash: string, content: any): Promise<void> => { uploadChunkCalled = true; }
 				},
 			});
 

@@ -1,4 +1,3 @@
-import chai = require("chai");
 import fs = require("fs");
 import * as path from "path";
 import stubs = require("./stubs");

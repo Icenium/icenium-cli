@@ -20,4 +20,3 @@ installUncaughtExceptionListener(process.exit);
 		await commandDispatcher.dispatchCommand();
 	}
 })();
-

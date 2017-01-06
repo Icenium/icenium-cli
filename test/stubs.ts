@@ -183,7 +183,6 @@ export class ErrorsStub implements IErrors {
 		this.impl = new (require("../lib/common/errors").Errors)($injector);
 	}
 
-
 	printCallStack: boolean = false;
 
 	fail(formatStr: string, ...args: any[]): void;

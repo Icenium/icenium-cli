@@ -56,7 +56,6 @@ export class Helpers {
 		let validationResults = await Promise.all(_.map(validators, (validator) => validator()));
 		let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
 		if (firstFailedValidationResult) {
-			Function
 			return firstFailedValidationResult;
 		}
 		return ValidationResult.ValidationResult.Successful;
