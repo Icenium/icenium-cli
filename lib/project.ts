@@ -684,7 +684,7 @@ export class Project extends ProjectBase implements Project.IProject {
 			await this.$progressIndicator.showProgressIndicator(this.$multipartUploadService.uploadFileByChunks(projectZipFile, bucketKey), 2000, { surpressTrailingNewLine: true });
 			await this.$progressIndicator.showProgressIndicator(this.$server.projects.importLocalProject(projectName, projectName, bucketKey, true), 2000);
 		} else {
-			this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName, true,
+			await this.$progressIndicator.showProgressIndicator(this.$server.projects.importProject(projectName, projectName, true,
 				await this.$fs.createReadStream(projectZipFile)), 2000);
 		}
 
