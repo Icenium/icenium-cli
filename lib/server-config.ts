@@ -8,7 +8,7 @@ export class ServerConfiguration implements IServerConfiguration {
 		if (!this.cachedServerConfiguration) {
 			let configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
 			let httpClient = this.$injector.resolve("httpClient");
-			this.cachedServerConfiguration =JSON.parse((await httpClient.httpRequest(configUri)).body);
+			this.cachedServerConfiguration = JSON.parse((await httpClient.httpRequest(configUri)).body);
 		}
 
 		return this.cachedServerConfiguration;
