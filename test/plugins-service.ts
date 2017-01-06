@@ -1171,7 +1171,7 @@ describe("plugins-service", () => {
 						service = testInjector.resolve(CordovaProjectPluginsService);
 					});
 
-					afterEach(async () => {
+					const assertResult = async () => {
 						await service.addPlugin("Toast");
 
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
@@ -1183,13 +1183,15 @@ describe("plugins-service", () => {
 						let toastInReleaseConfig = _.filter(await service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInReleaseConfig.length, 1);
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
-					});
+					};
 
 					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
+						assertResult();
 					});
 					it("when user does not specify configuration", () => {
 						project.getConfigurationsSpecifiedByUser = () => [];
+						assertResult();
 					});
 				});
 
@@ -1266,7 +1268,7 @@ describe("plugins-service", () => {
 						service = testInjector.resolve(CordovaProjectPluginsService);
 					});
 
-					afterEach(async () => {
+					const assertResult = async () => {
 						await service.addPlugin("Toast");
 
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
@@ -1278,13 +1280,15 @@ describe("plugins-service", () => {
 						let toastInReleaseConfig = _.filter(await service.getInstalledPlugins(), pl => pl.data.Name.toLowerCase() === "toast");
 						assert.equal(toastInReleaseConfig.length, 1);
 						assert.deepEqual(_.first(toastInReleaseConfig).data.Version, selectedVersionFromPrompt);
-					});
+					};
 
 					it("when user specifies one configuration only and selects to enable it in both configurations from the prompter", () => {
 						project.getConfigurationsSpecifiedByUser = () => ["debug"];
+						assertResult();
 					});
 					it("when user does not specify configuration", () => {
 						project.getConfigurationsSpecifiedByUser = () => [];
+						assertResult();
 					});
 				});
 			});

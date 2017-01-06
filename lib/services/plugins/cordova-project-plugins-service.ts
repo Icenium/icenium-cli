@@ -62,10 +62,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	public async getInstalledPlugins(): Promise<IPlugin[]> {
 		let corePlugins: IPlugin[] = [];
 		if (this.specifiedConfigurations.length) {
-			corePlugins = _(this.specifiedConfigurations)
-				.map((configuration: string) => this.getInstalledPluginsForConfiguration(configuration))
-				.flatten<IPlugin>()
-				.value();
+			const installedPluginsForConfigurationPromises = this.specifiedConfigurations.map(async configuration => await this.getInstalledPluginsForConfiguration(configuration));
+			corePlugins = _.flatten<IPlugin>(await Promise.all(installedPluginsForConfigurationPromises));
 		} else {
 			corePlugins = await this.getInstalledPluginsForConfiguration();
 		}
@@ -309,9 +307,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		let pluginBasicInfo = await super.installLocalPlugin(pathToInstalledPlugin, pluginData, options);
 		let configurations = this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames();
 
-		_.each(configurations, async (configuration) => {
+		for (let configuration of configurations) {
 			await this.setPluginVariables(pluginBasicInfo.name, pluginBasicInfo.variables, configuration);
-		});
+		}
 
 		this.$project.saveProject(this.$project.projectDir, this.$project.getAllConfigurationsNames());
 		return pluginBasicInfo;
@@ -578,7 +576,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	private async modifyInstalledMarketplacePlugin(pluginName: string, version: string): Promise<void> {
 		pluginName = pluginName.toLowerCase();
 		let isConsoleInteractive = helpers.isInteractive();
-		let allInstalledPlugins = this.getInstalledPluginsForConfiguration();
+		let allInstalledPlugins = await this.getInstalledPluginsForConfiguration();
 		let installedPluginInstances = _(allInstalledPlugins)
 			.filter((plugin: IPlugin) => plugin.data.Name.toLowerCase() === pluginName || plugin.data.Identifier.toLowerCase() === pluginName)
 			.uniqBy((plugin: IPlugin) => plugin.data.Version)
@@ -627,7 +625,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 			}
 
 			selectedVersion = await this.selectPluginVersion(version, installedPlugin, { excludeCurrentVersion: true });
-			_.each(configurationsToEdit, async (selectedConfiguration: string) => await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+			for (let selectedConfiguration of configurationsToEdit) {
+				await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion);
+			}
 			return;
 		}
 
@@ -637,7 +637,10 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				case removeItemChoice:
 					selectedVersion = await this.selectPluginVersion(version, installedPlugin);
 					_.each(configurationsToRemove, (configurationToRemove: string) => this.removePluginCore(pluginName, installedPlugin, configurationToRemove));
-					_.each(this.specifiedConfigurations, async (selectedConfiguration: string) => await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion));
+					for (let selectedConfiguration of this.specifiedConfigurations) {
+						await this.configurePluginCore(pluginName, selectedConfiguration, selectedVersion);
+					}
+
 					break;
 				case modifyAllConfigs:
 					selectedVersion = await this.selectPluginVersion(version, installedPlugin);
