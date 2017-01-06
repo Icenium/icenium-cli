@@ -277,7 +277,7 @@ describe("project integration tests", () => {
 		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", async () => {
 			prompter.confirmResult = false;
 			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-			await assert.isRejected(project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]));
+			await assert.isRejected(project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]), "Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
 		});
@@ -289,7 +289,7 @@ describe("project integration tests", () => {
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
 
 			prompter.confirmResult = false;
-			await assert.isRejected(project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]));
+			await assert.isRejected(project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]), "Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
 		});
@@ -596,13 +596,13 @@ describe("project unit tests", () => {
 		it("disallows 'add' on non-flag property", async () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]));
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]), "Unable to add value to non-flags property");
 		});
 
 		it("disallows 'del' on non-flag property", async () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]));
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]), "Unable to remove value to non-flags property");
 		});
 
 		it("sets bundle version when given proper input", async () => {
@@ -615,7 +615,7 @@ describe("project unit tests", () => {
 		it("throws on invalid bundle version string", async () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]));
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]), "Schema validation failed with following errors: \n Property BundleVersion: String does not match pattern. /^(\\d+)(\\.\\d+)(\\.\\d+)?(\\.\\d+)?$/");
 		});
 
 		it("sets enumerated property", async () => {
@@ -628,7 +628,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated property", async () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]));
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]), "Schema validation failed with following errors: \n Property iOSStatusBarStyle: Instance is not one of the possible values. Default,BlackTranslucent,BlackOpaque,Hidden");
 		});
 
 		it("appends to verbatim enumerated collection property", async () => {
@@ -668,7 +668,7 @@ describe("project unit tests", () => {
 		it("disallows unrecognized values for enumerated collection property", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]));
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]), "Schema validation failed with following errors: \n Property items: Instance is not one of the possible values. Portrait,Landscape");
 		});
 
 		it("makes case-insensitive comparisons of property name", async () => {
@@ -966,7 +966,7 @@ describe("project unit tests", () => {
 					CorePlugins: ["org.apache.cordova.camera"]
 				}
 			};
-			await assert.isRejected(projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []));
+			await assert.isRejected(projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []), "CorePlugins are defined in both \'.abproject\' and \'.debug.abproject\'. Remove them from one of the files and try again.");
 			assert.deepEqual(["org.apache.cordova.battery-status"], projectData.CorePlugins);
 			assert.deepEqual(["org.apache.cordova.contacts"], configSpecificData["debug"].CorePlugins);
 			assert.deepEqual(["org.apache.cordova.camera"], configSpecificData["release"].CorePlugins);

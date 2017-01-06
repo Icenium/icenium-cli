@@ -101,7 +101,7 @@ describe("mobileframework", () => {
 				mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 					testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"),
 					testInjector.resolve("projectConstants"));
-				await assert.isRejected(mobileFwCP.validate("1.0.0"));
+				await assert.isRejected(mobileFwCP.validate("1.0.0"), "You cannot change FrameworkVersion of \'Cordova\' project.");
 			});
 		});
 	});
@@ -134,7 +134,7 @@ describe("mobileframework", () => {
 			let project: Project.IProject = testInjector.resolve("project");
 			project.capabilities.canChangeFrameworkVersion = false;
 			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
-			await assert.isRejected(mbFrm.canExecute([]));
+			await assert.isRejected(mbFrm.canExecute([]), "This command is not applicable to Cordova projects.");
 		});
 	});
 });

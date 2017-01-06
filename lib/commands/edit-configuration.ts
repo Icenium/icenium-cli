@@ -37,6 +37,10 @@ export class EditConfigurationCommand implements ICommand {
 	public async execute(args: string[]): Promise<void> {
 		let file = args[0];
 		let template = _.find(this.$project.projectConfigFiles, { template: file });
+		if (!template) {
+			this.$errors.fail("Please enter valid configuration file name.");
+		}
+
 		await this.executeImplementation(template);
 	}
 

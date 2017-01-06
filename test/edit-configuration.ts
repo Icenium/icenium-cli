@@ -55,14 +55,14 @@ describe("edit-configuration", () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		await assert.isRejected(command.execute([]));
+		await assert.isRejected(command.execute([]), "Please enter valid configuration file name.");
 	});
 
 	it("throws error when wrong configuration file is given", async () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		await assert.isRejected(command.execute(["wrong"]));
+		await assert.isRejected(command.execute(["wrong"]), "Please enter valid configuration file name.");
 	});
 
 	it("creates and opens file if correct configuration file is given and it doesn't exist", async () => {

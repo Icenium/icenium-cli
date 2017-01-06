@@ -281,24 +281,25 @@ describe("cloud project commands", () => {
 				});
 
 				it("fails when more than two arguments are passed", async () => {
-					await assert.isRejected(exportProjectCommand.canExecute(["1", "2", "3"]));
+					await assert.isRejected(exportProjectCommand.canExecute(["1", "2", "3"]), "This command accepts maximum two parameters - solution name and project name.");
 				});
 
 				it("fails when solution does not have any projects", async () => {
-					await assert.isRejected(exportProjectCommand.canExecute(["Sln2"]));
+					const solutionName = "Sln2";
+					await assert.isRejected(exportProjectCommand.canExecute([solutionName]), `Solution ${solutionName} does not have any projects.`);
 				});
 
 				it("fails when there's projectData", async () => {
 					let project = testInjector.resolve("project");
 					project.projectData = <any>{};
-					await assert.isRejected(exportProjectCommand.canExecute(["Sln1", "BlankProj"]));
+					await assert.isRejected(exportProjectCommand.canExecute(["Sln1", "BlankProj"]), "Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 				});
 			});
 
 			it("fails when console is not interactive and command arguments are not passed", async () => {
 				testInjector = createTestInjector("", "", false);
 				exportProjectCommand = testInjector.resolve(cloudProjectsCommandsLib.CloudExportProjectsCommand);
-				await assert.isRejected(exportProjectCommand.canExecute([]));
+				await assert.isRejected(exportProjectCommand.canExecute([]), "When console is not interactive, you have to provide at least one argument.");
 			});
 		});
 
@@ -378,7 +379,8 @@ describe("cloud project commands", () => {
 
 				it("fails when projectDir exists", async () => {
 					fs.exists = (projectDir: string) => true;
-					await assert.isRejected(exportProjectCommand.execute(["Sln1", "BlankProj"]));
+					const solutionName = "Sln1";
+					await assert.isRejected(exportProjectCommand.execute([solutionName, "BlankProj"]), `The folder proj dir\\${solutionName} already exists!`);
 				});
 
 				it("warns when unable to create project file", async () => {
@@ -416,11 +418,13 @@ describe("cloud project commands", () => {
 			});
 
 			it("validate method throws error when invalid solution name is passed", async () => {
-				await assert.isRejected(commandParamter.validate("Invalid name"));
+				const invalidName = "Invalid name";
+				await assert.isRejected(commandParamter.validate(invalidName), `Unable to find app with identifier ${invalidName}.`);
 			});
 
 			it("validate method throws error when invalid solution id is passed", async () => {
-				await assert.isRejected(commandParamter.validate("100"));
+				const identifier = "100";
+				await assert.isRejected(commandParamter.validate(identifier), `Unable to find app with identifier ${identifier}.`);
 			});
 
 			it("validate method returns false when validation value is not passed", () => {
