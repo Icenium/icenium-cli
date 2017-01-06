@@ -90,7 +90,7 @@ describe("mobileframework", () => {
 			});
 
 			it("returns true when version is correct", async () => {
-				await assert.isTrue(mobileFwCP.validate("1.0.0"));
+				assert.isTrue(await mobileFwCP.validate("1.0.0"));
 			});
 		});
 
