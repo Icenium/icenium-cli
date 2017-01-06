@@ -248,9 +248,9 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	public async configurePlugin(pluginName: string, version?: string, configurations?: string[]): Promise<void> {
 		if (this.$project.hasBuildConfigurations) {
 			let configs = configurations || (this.specifiedConfigurations.length ? this.specifiedConfigurations : this.$project.getAllConfigurationsNames());
-			_.each(configs, async (configuration: string) => {
+			for (let configuration of configs) {
 				await this.configurePluginCore(pluginName, configuration, version);
-			});
+			}
 		} else {
 			await this.configurePluginCore(pluginName, version);
 		}
