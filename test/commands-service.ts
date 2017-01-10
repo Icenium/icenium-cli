@@ -133,8 +133,7 @@ class MockCommandWithStringCommandParameter implements ICommand {
 
 class MockCommandWithStringParamBuilder implements ICommand {
 	// Make sure stringParameter can be resolved
-	constructor(private $stringParameter: ICommandParameter,
-		private $stringParameterBuilder: IStringParameterBuilder) { }
+	constructor(private $stringParameterBuilder: IStringParameterBuilder) { }
 	async execute(args: string[]): Promise<void> {
 		isCommandExecuted = true;
 	}

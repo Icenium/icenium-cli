@@ -13,7 +13,6 @@ export class RemoteService implements IRemoteService {
 		private $express: IExpress,
 		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
 		private $domainNameSystem: IDomainNameSystem,
-		private $options: IOptions,
 		private $sysInfo: ISysInfo,
 		private $staticConfig: IStaticConfig) {
 		this.appBuilderDir = path.join(os.tmpdir(), 'AppBuilder');

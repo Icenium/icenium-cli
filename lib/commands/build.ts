@@ -1,11 +1,10 @@
 import { EnsureProjectCommand } from "./ensure-project-command";
 
 export class BuildAndroidCommand extends EnsureProjectCommand {
-	constructor(private $buildService: Project.IBuildService,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		$project: Project.IProject,
-		$errors: IErrors,
-		private $options: IOptions) {
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors,
+		private $buildService: Project.IBuildService,
+		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants) {
 		super($project, $errors);
 	}
 
@@ -17,11 +16,11 @@ export class BuildAndroidCommand extends EnsureProjectCommand {
 $injector.registerCommand("build|android", BuildAndroidCommand);
 
 export class BuildIosCommand extends EnsureProjectCommand {
-	constructor(private $buildService: Project.IBuildService,
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors,
+		private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $options: IOptions,
-		$project: Project.IProject,
-		$errors: IErrors) {
+		private $options: IOptions) {
 		super($project, $errors);
 	}
 
@@ -33,11 +32,10 @@ export class BuildIosCommand extends EnsureProjectCommand {
 $injector.registerCommand("build|ios", BuildIosCommand);
 
 export class BuildWP8Command extends EnsureProjectCommand {
-	constructor(private $buildService: Project.IBuildService,
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors,
+		private $buildService: Project.IBuildService,
 		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		$project: Project.IProject,
-		$errors: IErrors,
-		private $options: IOptions,
 		private $config: Config.IConfig) {
 		super($project, $errors);
 	}

@@ -1,25 +1,25 @@
 {
 	"rules": {
 		"class-name": true,
-        "curly": true,
+		"curly": true,
 		"eofline": true,
-        "indent": true,
+		"indent": true,
 		"interface-name": true,
-        "jsdoc-format": true,
-        "max-line-length": [false, 140],
-        "no-consecutive-blank-lines": true,
-        "no-construct": true,
-        "no-debugger": true,
-        "no-duplicate-key": true,
+		"jsdoc-format": true,
+		"max-line-length": [
+			false,
+			140
+		],
+		"no-consecutive-blank-lines": true,
+		"no-construct": true,
+		"no-debugger": true,
 		"no-duplicate-variable": true,
 		"no-shadowed-variable": true,
 		"no-empty": true,
-        "no-eval": true,
+		"no-eval": true,
 		"no-switch-case-fall-through": true,
 		"no-trailing-whitespace": true,
-		"no-unreachable": true,
 		"no-unused-expression": true,
-		"no-unused-variable": true,
 		"no-use-before-declare": true,
 		"no-var-keyword": true,
 		"no-var-requires": false,
@@ -28,13 +28,21 @@
 			"check-open-brace",
 			"check-catch",
 			"check-else"
-    	],
-		"quotemark": [false, "double"],
+		],
+		"quotemark": [
+			false,
+			"double"
+		],
 		"semicolon": true,
 		"switch-default": false,
-        "triple-equals": [true, "allow-null-check"],
-		"use-strict": true,
-        "variable-name": [false, "allow-leading-underscore"],
+		"triple-equals": [
+			true,
+			"allow-null-check"
+		],
+		"variable-name": [
+			false,
+			"allow-leading-underscore"
+		],
 		"whitespace": [
 			false,
 			"check-branch",

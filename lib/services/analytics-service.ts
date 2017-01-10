@@ -7,13 +7,12 @@ export class AnalyticsService extends AnalyticsServiceBase implements IAnalytics
 	constructor(protected $logger: ILogger,
 		protected $options: IOptions,
 		$staticConfig: Config.IStaticConfig,
-		$errors: IErrors,
 		$prompter: IPrompter,
 		$userSettingsService: UserSettings.IUserSettingsService,
 		$analyticsSettingsService: IAnalyticsSettingsService,
 		$progressIndicator: IProgressIndicator,
 		$osInfo: IOsInfo) {
-		super($logger, $options, $staticConfig, $errors, $prompter, $userSettingsService, $analyticsSettingsService, $progressIndicator, $osInfo);
+		super($logger, $options, $staticConfig, $prompter, $userSettingsService, $analyticsSettingsService, $progressIndicator, $osInfo);
 	}
 
 	public async trackFeature(featureName: string): Promise<void> {

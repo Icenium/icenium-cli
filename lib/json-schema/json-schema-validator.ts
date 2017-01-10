@@ -1,4 +1,6 @@
 import * as util from "util";
+import { cache } from "./../common/decorators";
+
 let jsv = require("JSV").JSV;
 
 export class JsonSchemaValidator implements IJsonSchemaValidator {
@@ -17,8 +19,8 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		private $frameworkProjectResolver: Project.IFrameworkProjectResolver,
 		private $fs: IFileSystem,
 		private $jsonSchemaConstants: IJsonSchemaConstants,
-		private $jsonSchemaLoader: IJsonSchemaLoader, // Don't delete this row, we need it
-		private $jsonSchemaResolver: IJsonSchemaResolver,
+		private $jsonSchemaLoader: IJsonSchemaLoader,
+		private $injector: IInjector,
 		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $resources: IResourceLoader) {
@@ -26,6 +28,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 		this.environment.setDefaultSchemaURI(JsonSchemaValidator.DEFAULT_SCHEMA_URI);
 
 		this._validPropertiesCache = Object.create(null);
+	}
+
+	@cache()
+	private get $jsonSchemaResolver(): IJsonSchemaResolver {
+		this.$jsonSchemaLoader.prepareSchemas();
+		return this.$injector.resolve("jsonSchemaResolver");
 	}
 
 	public getValidProperties(framework: string): IStringDictionary {

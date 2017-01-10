@@ -11,7 +11,6 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 		private $config: IConfiguration,
 		private $dependencyConfigService: IDependencyConfigService,
 		private $progressIndicator: IProgressIndicator,
-		private $staticConfig: IStaticConfig,
 		private $sysInfo: ISysInfo,
 		protected $fs: IFileSystem,
 		protected $httpClient: Server.IHttpClient,

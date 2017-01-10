@@ -1,6 +1,5 @@
 export class FindPluginsCommand implements ICommand {
 	constructor(private $errors: IErrors,
-		private $logger: ILogger,
 		private $options: IOptions,
 		private $printPluginsService: IPrintPluginsService,
 		private $pluginsService: IPluginsService) { }

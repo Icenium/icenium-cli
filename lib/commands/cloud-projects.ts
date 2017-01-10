@@ -18,8 +18,7 @@ export class CloudListProjectsCommand implements ICommand {
 	constructor(private $logger: ILogger,
 		private $remoteProjectService: IRemoteProjectService,
 		private $prompter: IPrompter,
-		private $options: IOptions,
-		private $errors: IErrors) { }
+		private $options: IOptions) { }
 
 	public allowedParameters: ICommandParameter[] = [new SolutionIdCommandParameter(this.$remoteProjectService)];
 

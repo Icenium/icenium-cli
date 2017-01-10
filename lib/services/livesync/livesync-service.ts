@@ -7,7 +7,6 @@ export class LiveSyncService implements ILiveSyncService {
 
 	constructor(private $devicesService: Mobile.IDevicesService,
 		private $errors: IErrors,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $project: Project.IProject,
 		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,

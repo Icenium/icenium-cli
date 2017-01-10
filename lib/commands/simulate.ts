@@ -1,12 +1,10 @@
 export class SimulateCommand implements ICommand {
 	private projectData: Project.IData;
 
-	constructor(private $errors: IErrors,
-		private $project: Project.IProject,
+	constructor(private $project: Project.IProject,
 		private $simulatorService: ISimulatorService,
-		private $simulatorPlatformServices: IExtensionPlatformServices,
-		private $hostCapabilities: IHostCapabilities) {
-		this.projectData = $project.projectData;
+		private $simulatorPlatformServices: IExtensionPlatformServices) {
+		this.projectData = this.$project.projectData;
 	}
 
 	public async execute(args: string[]): Promise<void> {

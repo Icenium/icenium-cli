@@ -3,9 +3,7 @@ import * as semver from "semver";
 export class WebViewService implements IWebViewService {
 	private static CORDOVA_VERSION_FIVE = "5.0.0";
 
-	constructor(private $errors: IErrors,
-		private $pluginsService: IPluginsService,
-		private $projectConstants: Project.IConstants,
+	constructor(private $pluginsService: IPluginsService,
 		private $options: IOptions) { }
 
 	public get supportedWebViews(): IDictionary<IWebView[]> {

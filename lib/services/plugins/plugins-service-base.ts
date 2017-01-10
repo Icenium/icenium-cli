@@ -20,7 +20,6 @@ export abstract class PluginsServiceBase implements IPluginsService {
 		protected $httpClient: Server.IHttpClient,
 		protected $options: IOptions,
 		protected $npmService: INpmService,
-		private $hostInfo: IHostInfo,
 		private $npmPluginsService: INpmPluginsService) { }
 
 	public async init(): Promise<void> {

@@ -30,9 +30,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 	constructor(private $cordovaResources: ICordovaResourceLoader,
 		private $errors: IErrors,
 		private $fs: IFileSystem,
-		private $httpClient: Server.IHttpClient,
 		private $logger: ILogger,
-		private $loginManager: ILoginManager,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants,
@@ -135,7 +133,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 			integratedPlugins[version] = json.IntegratedPlugins[version];
 		});
 		let supportedFrameworkVersion: IFrameworkVersion[] = _(json.SupportedFrameworkVersions)
-			.map(fv => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version) }; })
+			.map((fv: any) => { return { displayName: fv.DisplayName, version: this.parseMscorlibVersion(fv.Version) }; })
 			.filter(fv => _.includes(cliSupportedVersions, fv.version))
 			.value();
 		this._migrationData = new MigrationData(renamedPlugins, cliSupportedVersions, integratedPlugins, supportedFrameworkVersion, (<any>json).CorePluginRegex);
@@ -345,4 +343,5 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 		}
 	}
 }
+
 $injector.register("cordovaMigrationService", CordovaMigrationService);

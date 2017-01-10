@@ -41,13 +41,11 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
 
 export class EmulateIosCommand extends EnsureProjectCommand {
-	constructor(private $fs: IFileSystem,
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors,
 		private $buildService: Project.IBuildService,
 		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $options: IOptions,
-		$project: Project.IProject,
-		$errors: IErrors) {
+		private $options: IOptions) {
 		super($project, $errors);
 	}
 

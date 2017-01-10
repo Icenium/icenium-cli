@@ -37,7 +37,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		$npmService: INpmService,
 		$hostInfo: IHostInfo,
 		$npmPluginsService: INpmPluginsService) {
-		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $hostInfo, $npmPluginsService);
+		super($errors, $logger, $prompter, $fs, $project, $projectConstants, $childProcess, $httpClient, $options, $npmService, $npmPluginsService);
 	}
 
 	/**

@@ -10,7 +10,6 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 	constructor(private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $sharedUserSettingsService: IUserSettingsService,
 		protected $errors: IErrors,
-		private $logger: ILogger,
 		private $dispatcher: IFutureDispatcher,
 		private $childProcess: IChildProcess,
 		private $hostInfo: IHostInfo) { }

@@ -11,7 +11,6 @@ export class MultipartUploadService implements IMultipartUploadService {
 		private $server: Server.IServer,
 		private $serviceProxy: Server.IServiceProxy,
 		private $hashService: IHashService,
-		private $errors: IErrors,
 		private $logger: ILogger) { }
 
 	public async uploadFileByChunks(filePath: string, bucketKey: string): Promise<void> {

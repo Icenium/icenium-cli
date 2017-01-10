@@ -1,8 +1,7 @@
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "./common/constants";
 
 export class DynamicHelpProvider implements IDynamicHelpProvider {
-	constructor(private $project: Project.IProject,
-		private $projectConstants: Project.IConstants) { }
+	constructor(private $project: Project.IProject) { }
 
 	public isProjectType(args: string[]): boolean {
 		if (this.$project.getProjectDir()) {
@@ -22,4 +21,5 @@ export class DynamicHelpProvider implements IDynamicHelpProvider {
 		return localVariables;
 	}
 }
+
 $injector.register("dynamicHelpProvider", DynamicHelpProvider);

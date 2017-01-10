@@ -12,7 +12,6 @@ export class ProjectPropertiesService implements IProjectPropertiesService {
 		private $injector: IInjector,
 		private $jsonSchemaValidator: IJsonSchemaValidator,
 		private $projectConstants: Project.IConstants,
-		private $resources: IResourceLoader,
 		private $logger: ILogger) { }
 
 	public getProjectProperties(projectFile: string, isJsonProjectFile: boolean, frameworkProject: Project.IFrameworkProject): Project.IData {

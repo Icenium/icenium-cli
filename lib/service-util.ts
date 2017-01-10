@@ -160,38 +160,3 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 	}
 }
 $injector.register("serviceProxy", AppBuilderServiceProxy);
-
-class CodePrinter {
-	private indent = "";
-	private lines: string[] = [];
-
-	public pushIndent(): void {
-		this.indent += "\t";
-	}
-
-	public popIndent(): void {
-		this.indent = this.indent.substr(1);
-	}
-
-	public writeLine(lineFormat?: string, ...args: any[]) {
-		if (!lineFormat) {
-			this.lines.push("");
-		} else {
-			if (_.endsWith(lineFormat, "}")) {
-				this.popIndent();
-				lineFormat += "\r\n";
-			}
-
-			args.unshift(lineFormat);
-			this.lines.push(this.indent + util.format.apply(null, args));
-
-			if (_.endsWith(lineFormat, "{")) {
-				this.pushIndent();
-			}
-		}
-	}
-
-	public toString(): string {
-		return this.lines.join("\r\n");
-	}
-}

@@ -8,7 +8,6 @@ export class AppManagerLiveSyncCommand implements ICommand {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $appManagerService: IAppManagerService,
 		private $errors: IErrors,
-		private $logger: ILogger,
 		private $config: Config.IConfig) { }
 
 	public async execute(args: string[]): Promise<void> {

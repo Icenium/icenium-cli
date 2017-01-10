@@ -46,3 +46,5 @@ export class JsonSchemaResolver implements IJsonSchemaResolver {
 		return _.find(this.schemas, (s: ISchema) => s.id === schemaId);
 	}
 }
+
+$injector.register("jsonSchemaResolver", JsonSchemaResolver);

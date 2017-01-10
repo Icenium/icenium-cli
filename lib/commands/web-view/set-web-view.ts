@@ -2,7 +2,6 @@ import semver = require("semver");
 
 export class SetWebViewCommand implements ICommand {
 	constructor(private $webViewService: IWebViewService,
-		private $injector: IInjector,
 		private $errors: IErrors,
 		private $logger: ILogger,
 		private $project: Project.IProject) { }

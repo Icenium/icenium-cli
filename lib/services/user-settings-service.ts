@@ -174,12 +174,12 @@ export class UserSettingsService extends UserSettingsServiceBase implements User
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 
-	public async getSettingValue<T>(settingName: string): Promise<any> {
+	public async getSettingValue<T>(settingName: string): Promise<T> {
 		if (settingName === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
-			return this.$clientSpecificUserSettingsService.getSettingValue(settingName);
+			return <Promise<T>>this.$clientSpecificUserSettingsService.getSettingValue(settingName);
 		}
 
-		return this.$sharedUserSettingsService.getSettingValue(settingName);
+		return <Promise<T>>this.$sharedUserSettingsService.getSettingValue(settingName);
 	}
 
 	public async saveSetting<T>(key: string, value: T): Promise<void> {

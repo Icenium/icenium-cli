@@ -4,7 +4,6 @@ export class DarwinDebuggerService implements IDebuggerService {
 	constructor(private $devicesService: Mobile.IDevicesService,
 		private $androidEmulatorServices: Mobile.IAndroidEmulatorServices,
 		private $androidProcessService: Mobile.IAndroidProcessService,
-		private $androidDeviceDiscovery: Mobile.IAndroidDeviceDiscovery,
 		private $clipboardService: IClipboardService,
 		private $opener: IOpener,
 		private $errors: IErrors,

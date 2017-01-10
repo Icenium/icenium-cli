@@ -13,14 +13,7 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		private $httpClient: Server.IHttpClient,
 		private $injector: IInjector,
 		private $resources: IResourceLoader) {
-		this.schemasFolderPath = this.$resources.resolvePath("json-schemas");
-		this.schemas = Object.create(null);
-		this.loadedSchemas = Object.create(null);
-
-		this.loadSchemas();
-
-		let schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
-		this.$injector.register("jsonSchemaResolver", schemaResolver);
+		this.prepareSchemas();
 	}
 
 	public async downloadSchemas(): Promise<void> {
@@ -37,6 +30,18 @@ export class JsonSchemaLoader implements IJsonSchemaLoader {
 		await fileEnd;
 
 		await this.$fs.unzip(filePath, this.schemasFolderPath);
+	}
+
+	public prepareSchemas(): void {
+		this.schemasFolderPath = this.$resources.resolvePath("json-schemas");
+		this.schemas = Object.create(null);
+		this.loadedSchemas = Object.create(null);
+
+		this.loadSchemas();
+
+		let schemaResolver = this.$injector.resolve(jsonSchemaResolverPath.JsonSchemaResolver, { schemas: this.loadedSchemas });
+		this.$injector.register("jsonSchemaResolver", schemaResolver);
+
 	}
 
 	private loadSchemas(): void {

@@ -17,7 +17,6 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	};
 
 	constructor(private $appScaffoldingExtensionsService: IAppScaffoldingExtensionsService,
-		private $childProcess: IChildProcess,
 		private $dependencyConfigService: IDependencyConfigService,
 		private $errors: IErrors,
 		private $fs: IFileSystem,
@@ -136,7 +135,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	}
 
 	public async upgrade(projectPath: string): Promise<void> {
-		if (! (await this.shouldUpgrade(projectPath))) {
+		if (!(await this.shouldUpgrade(projectPath))) {
 			return;
 		}
 
@@ -231,7 +230,6 @@ class ScreenBuilderDynamicCommand implements ICommand {
 
 	constructor(public generatorName: string,
 		public command: string,
-		private $fs: IFileSystem,
 		private $options: IOptions,
 		private $project: Project.IProject,
 		private $screenBuilderService: IScreenBuilderService) { }

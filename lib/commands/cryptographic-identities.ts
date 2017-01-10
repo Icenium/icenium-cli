@@ -673,7 +673,6 @@ async function parseCertificateIndex(indexStr: string, $errors: IErrors, $server
 
 class RemoveCertificateSigningRequestCommand implements ICommand {
 	constructor(private $logger: ILogger,
-		private $errors: IErrors,
 		private $injector: IInjector,
 		private $prompter: IPrompter,
 		private $server: Server.IServer,

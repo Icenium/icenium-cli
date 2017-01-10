@@ -11,7 +11,7 @@ export class AddPluginCommand implements ICommand {
 			let plugins = _.reject(await this.$pluginsService.getAvailablePlugins(), (plugin: IPlugin) => {
 				if (plugin.type === pluginsDataLib.PluginType.MarketplacePlugin) {
 					let marketPlacePlugin = <IMarketplacePlugin>plugin;
-					let installedPlugin = _.find(installedPlugins, (installedPlugin: IPlugin) => installedPlugin.data.Name === plugin.data.Name && installedPlugin.data.Version === plugin.data.Version);
+					let installedPlugin = _.find(installedPlugins, (p: IPlugin) => p.data.Name === plugin.data.Name && p.data.Version === plugin.data.Version);
 					if (installedPlugin) {
 						if (marketPlacePlugin.pluginVersionsData.Versions.length > 1) {
 							// reject installed version
@@ -57,8 +57,7 @@ export class AddPluginCommand implements ICommand {
 $injector.registerCommand("plugin|add", AddPluginCommand);
 
 class PluginCommandParameter implements ICommandParameter {
-	constructor(private $pluginsService: IPluginsService,
-		private $errors: IErrors) { }
+	constructor(private $errors: IErrors) { }
 
 	public mandatory = true;
 

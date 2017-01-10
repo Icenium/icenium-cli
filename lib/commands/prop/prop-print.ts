@@ -27,14 +27,12 @@ export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPr
 		}
 	}
 
-	public allowedParameters: ICommandParameter[] = [new PrintProjectCommandParameter(this.$project)];
+	public allowedParameters: ICommandParameter[] = [new PrintProjectCommandParameter()];
 }
 
 $injector.registerCommand("prop|print", PrintProjectCommand);
 
 class PrintProjectCommandParameter implements ICommandParameter {
-	constructor(private $project: Project.IProject) { }
-
 	public mandatory = false;
 
 	public async validate(validationValue: string): Promise<boolean> {

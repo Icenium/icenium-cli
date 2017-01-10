@@ -75,14 +75,14 @@ export class SamplesService implements ISamplesService {
 		try {
 			temp.track();
 			tempDir = temp.mkdirSync("appbuilderSamples");
-			let filepath = path.join(tempDir, sampleName);
-			let file = this.$fs.createWriteStream(filepath);
-			let fileEnd = this.$fs.futureFromEvent(file, "finish");
+			let sampleFilePath = path.join(tempDir, sampleName);
+			let sampleFile = this.$fs.createWriteStream(sampleFilePath);
+			let fileEnd = this.$fs.futureFromEvent(sampleFile, "finish");
 			let accessToken = this.getGitHubAccessTokenQueryParameter("?");
-			await this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file });
+			await this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: sampleFile });
 			await fileEnd;
 
-			await this.$fs.unzip(filepath, tempDir);
+			await this.$fs.unzip(sampleFilePath, tempDir);
 			let projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
 			let projectDir = path.dirname(projectFile);
 			let files = this.$fs.enumerateFilesInDirectorySync(projectDir);

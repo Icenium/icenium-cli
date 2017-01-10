@@ -2,11 +2,8 @@ import { CordovaPluginData, PluginType } from "./../../plugins-data";
 
 export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,
-		private $fs: IFileSystem,
-		private $config: IConfiguration,
 		private $server: Server.IServer,
 		private $projectConstants: Project.IConstants,
-		private $resources: IResourceLoader,
 		private $cordovaResources: ICordovaResourceLoader) { }
 
 	// HACK: Information for this plugin is never returned from the server, so keep it here.
