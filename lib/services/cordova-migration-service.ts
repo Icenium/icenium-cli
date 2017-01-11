@@ -282,8 +282,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 				this.$fs.copyFile(file + backupSuffix, file);
 			});
 			this.$errors.failWithoutHelp(error.message);
-		}
-		finally {
+		} finally {
 			_.each(backedUpFiles, file => {
 				this.$fs.deleteFile(file + backupSuffix);
 			});

@@ -3,7 +3,10 @@
 		"class-name": true,
 		"curly": true,
 		"eofline": true,
-		"indent": true,
+		"indent": [
+			true,
+			"tabs"
+		],
 		"interface-name": true,
 		"jsdoc-format": true,
 		"max-line-length": [
@@ -25,33 +28,44 @@
 		"no-var-requires": false,
 		"one-line": [
 			true,
-			"check-open-brace",
 			"check-catch",
-			"check-else"
+			"check-finally",
+			"check-else",
+			"check-open-brace",
+			"check-whitespace"
 		],
 		"quotemark": [
 			false,
 			"double"
 		],
 		"semicolon": true,
+		"space-before-function-paren": false,
 		"switch-default": false,
+		"trailing-comma": [
+			false,
+			{
+				"multiline": "always",
+				"singleline": "always"
+			}
+		],
 		"triple-equals": [
 			true,
 			"allow-null-check"
 		],
+		"typeof-compare": true,
+		"use-isnan": true,
 		"variable-name": [
-			false,
+			true,
+			"ban-keywords",
 			"allow-leading-underscore"
 		],
 		"whitespace": [
-			false,
+			true,
 			"check-branch",
 			"check-decl",
 			"check-operator",
 			"check-module",
-			"check-separator",
-			"check-type",
-			"check-typecast"
+			"check-separator"
 		]
 	}
 }

@@ -30,8 +30,8 @@ export function isStringOptionEmpty(optionValue: string): boolean {
 	return optionValue === undefined || optionValue === null || optionValue === "null" || optionValue === "false" || optionValue === "true";
 }
 
-export function stringReplaceAll(string: string, find: any, replace: string): string {
-	return string.split(find).join(replace);
+export function stringReplaceAll(inputString: string, find: any, replace: string): string {
+	return inputString.split(find).join(replace);
 }
 
 export function capitalizeFirstLetter(str: string): string {

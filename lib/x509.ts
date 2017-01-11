@@ -3,7 +3,7 @@ import moment = require("moment");
 class X509Certificate implements IX509Certificate {
 	private x509: any;
 
-	constructor(private $logger: ILogger) {}
+	constructor(private $logger: ILogger) { }
 
 	public load(certificatePem: string): void {
 		let jsrsasign = require("../vendor/jsrsasign");
@@ -32,7 +32,7 @@ class X509Certificate implements IX509Certificate {
 		}
 
 		let format = "YYMMDDHHmmss";
-		if(certificateDate.length === 15) {
+		if (certificateDate.length === 15) {
 			format = "YYYYMMDDHHmmss";
 		}
 
@@ -40,7 +40,7 @@ class X509Certificate implements IX509Certificate {
 	}
 
 	private static parseKeyValues(keyValueStr: string): any {
-		let result:any = {};
+		let result: any = {};
 		let keyValues = keyValueStr.split("/");
 		keyValues.forEach((kv) => {
 			let keyAndValue = kv.split("=");
@@ -53,9 +53,9 @@ class X509Certificate implements IX509Certificate {
 }
 
 export class X509CertificateLoader implements IX509CertificateLoader {
-	constructor(private $injector: IInjector) {}
+	constructor(private $injector: IInjector) { }
 
-	load(certificatePem:string):IX509Certificate {
+	load(certificatePem: string): IX509Certificate {
 		let cert: X509Certificate = this.$injector.resolve(X509Certificate);
 		cert.load(certificatePem);
 		return cert;
