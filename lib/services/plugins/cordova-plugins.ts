@@ -2,11 +2,8 @@ import { CordovaPluginData, PluginType } from "./../../plugins-data";
 
 export class CordovaPluginsService implements ICordovaPluginsService {
 	constructor(private $project: Project.IProject,
-		private $fs: IFileSystem,
-		private $config: IConfiguration,
 		private $server: Server.IServer,
 		private $projectConstants: Project.IConstants,
-		private $resources: IResourceLoader,
 		private $cordovaResources: ICordovaResourceLoader) { }
 
 	// HACK: Information for this plugin is never returned from the server, so keep it here.
@@ -25,16 +22,14 @@ export class CordovaPluginsService implements ICordovaPluginsService {
 		"AndroidRequiredPermissions": ["android.permission.INTERNET"]
 	};
 
-	public getAvailablePlugins(): IFuture<Server.CordovaPluginData[]> {
-		return ((): Server.CordovaPluginData[] => {
-			this.$project.ensureCordovaProject();
-			// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
-			return this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion).wait().concat([this.livePatchPlugin]);
-		}).future<Server.CordovaPluginData[]>()();
+	public async getAvailablePlugins(): Promise<Server.CordovaPluginData[]> {
+		await this.$project.ensureCordovaProject();
+		// TODO: Remove the LivePatch HACK when the server returns correct results. Also check the tests.
+		return (await this.$server.cordova.getPlugins(this.$project.projectData.FrameworkVersion)).concat([this.livePatchPlugin]);
 	}
 
-	public createPluginData(plugin: IMarketplacePluginData): IPlugin[] {
-		this.$project.ensureCordovaProject();
+	public async createPluginData(plugin: IMarketplacePluginData): Promise<IPlugin[]> {
+		await this.$project.ensureCordovaProject();
 		return [new CordovaPluginData(plugin, this.getPluginTypeByIdentifier(plugin.Identifier), this.$project, this.$projectConstants)];
 	}
 

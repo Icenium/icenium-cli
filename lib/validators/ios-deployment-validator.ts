@@ -20,52 +20,49 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		super($injector);
 	}
 
-	public validate(model: IiOSDeploymentValidatorModel): IFuture<IValidationResult> {
-		return (() => {
-			if(!model.provisionOption) {
-				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_PROVISION_ERROR_MESSAGE);
-			}
+	public async validate(model: IiOSDeploymentValidatorModel): Promise<IValidationResult> {
+		if (!model.provisionOption) {
+			return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_PROVISION_ERROR_MESSAGE);
+		}
 
-			if(!model.certificateOption) {
-				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_CERTIFICATE_ERROR_MESSAGE);
-			}
+		if (!model.certificateOption) {
+			return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_SPECIFIED_CERTIFICATE_ERROR_MESSAGE);
+		}
 
-			let provision = this.$identityManager.findProvision(model.provisionOption).wait();
-			let provisionValidationResult = this.validateProvision(provision);
+		let provision = await this.$identityManager.findProvision(model.provisionOption);
+		let provisionValidationResult = this.validateProvision(provision);
 
-			if(!provisionValidationResult.isSuccessful) {
-				return provisionValidationResult;
-			}
+		if (!provisionValidationResult.isSuccessful) {
+			return provisionValidationResult;
+		}
 
-			let certificate = this.$identityManager.findCertificate(model.certificateOption).wait();
-			let certificateValidationResult = this.validateCertificate(certificate, provision).wait();
+		let certificate = await this.$identityManager.findCertificate(model.certificateOption);
+		let certificateValidationResult = await this.validateCertificate(certificate, provision);
 
-			if(!certificateValidationResult.isSuccessful) {
-				return certificateValidationResult;
-			}
+		if (!certificateValidationResult.isSuccessful) {
+			return certificateValidationResult;
+		}
 
-			return new ValidationResult.ValidationResult(null);
-
-		}).future<IValidationResult>()();
+		return new ValidationResult.ValidationResult(null);
 	}
 
-	public validateProvision(provision: IProvision):IValidationResult {
-		if(!provision) {
+	public validateProvision(provision: IProvision): IValidationResult {
+		if (!provision) {
 			return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_PROVISION_ERROR_MESSAGE);
 		}
-		if(Date.parse(provision.ExpirationDate) < new Date().getTime()) {
+		if (Date.parse(provision.ExpirationDate) < new Date().getTime()) {
 			return new ValidationResult.ValidationResult(IOSDeploymentValidator.EXPIRED_PROVISON_ERROR_MESSAGE);
 		}
-		if(provision.ApplicationIdentifier !== "*") {
+		if (provision.ApplicationIdentifier !== "*") {
 			let provisionIdentifierPattern = new RegExp(this.getRegexPattern(provision.ApplicationIdentifier));
-			if(!provisionIdentifierPattern.test(this.appIdentifier)) {
+			if (!provisionIdentifierPattern.test(this.appIdentifier)) {
 				return new ValidationResult.ValidationResult(IOSDeploymentValidator.APPLICATION_IDENTIFIER_MISMATCH);
 			}
 		}
 
-		if(this.deviceIdentifier) {
+		if (this.deviceIdentifier) {
 			let isInProvisionedDevices = provision.ProvisionedDevices && _.includes(provision.ProvisionedDevices, this.deviceIdentifier);
-			if(!isInProvisionedDevices) {
+			if (!isInProvisionedDevices) {
 				return new ValidationResult.ValidationResult(util.format("The device with identifier '%s' is not included in provisioned devices for given provision. Use `$ appbuilder provision -v` to list all devices included in provision", this.deviceIdentifier));
 			}
 		}
@@ -73,22 +70,20 @@ export class IOSDeploymentValidator extends BaseValidators.BaseAsyncValidator<Ii
 		return new ValidationResult.ValidationResult(null);
 	}
 
-	public validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IFuture<IValidationResult> {
-		return(() => {
-			if(!certificate) {
-				return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_CERTIFICATE_ERROR_MESSAGE);
-			}
+	public validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IValidationResult {
+		if (!certificate) {
+			return new ValidationResult.ValidationResult(IOSDeploymentValidator.NOT_FOUND_CERTIFICATE_ERROR_MESSAGE);
+		}
 
-			if(!this.$identityManager.isCertificateCompatibleWithProvision(certificate, provision)) {
-				return new ValidationResult.ValidationResult("Certificate is not included in provision's certificates");
-			}
+		if (!this.$identityManager.isCertificateCompatibleWithProvision(certificate, provision)) {
+			return new ValidationResult.ValidationResult("Certificate is not included in provision's certificates");
+		}
 
-			if(this.isCertificateExpired(certificate.Certificate)) {
-				return new ValidationResult.ValidationResult(IOSDeploymentValidator.EXPIRED_CERTIFICATE_ERROR_MESSAGE);
-			}
+		if (this.isCertificateExpired(certificate.Certificate)) {
+			return new ValidationResult.ValidationResult(IOSDeploymentValidator.EXPIRED_CERTIFICATE_ERROR_MESSAGE);
+		}
 
-			return new ValidationResult.ValidationResult(null);
-		}).future<IValidationResult>()();
+		return new ValidationResult.ValidationResult(null);
 	}
 
 	private isCertificateExpired(certificate: string): boolean {

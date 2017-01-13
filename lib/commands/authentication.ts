@@ -1,22 +1,24 @@
 export class LoginCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }
 
-	execute(args: string[]): IFuture<void> {
-		return this.$loginManager.login();
+	public async execute(args: string[]): Promise<void> {
+		await this.$loginManager.login();
 	}
 
-	allowedParameters: ICommandParameter[] = [];
-	disableAnalytics = true;
+	public allowedParameters: ICommandParameter[] = [];
+	public disableAnalytics = true;
 }
+
 $injector.registerCommand("login", LoginCommand);
 
 export class LogoutCommand implements ICommand {
 	constructor(private $loginManager: ILoginManager) { }
-	execute(args: string[]): IFuture<void> {
-		return this.$loginManager.logout();
+	public async execute(args: string[]): Promise<void> {
+		await this.$loginManager.logout();
 	}
 
-	allowedParameters: ICommandParameter[] = [];
-	disableAnalytics = true;
+	public allowedParameters: ICommandParameter[] = [];
+	public disableAnalytics = true;
 }
+
 $injector.registerCommand("logout", LogoutCommand);

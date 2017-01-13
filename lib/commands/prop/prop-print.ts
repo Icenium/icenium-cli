@@ -1,40 +1,41 @@
 import * as projectPropertyCommandBaseLib from "./prop-command-base";
+import { cache, invokeInit } from "../../common/decorators";
 
 export class PrintProjectCommand extends projectPropertyCommandBaseLib.ProjectPropertyCommandBase implements ICommand {
 	constructor($staticConfig: IStaticConfig,
 		$injector: IInjector,
 		protected $options: IOptions) {
 		super($staticConfig, $injector);
-		if(!this.$options.validValue) {
-			this.$project.ensureProject();
+	}
+
+	@cache()
+	public async init(): Promise<void> {
+		if (!this.$options.validValue) {
+			await super.init();
 		}
 	}
 
-	execute(args:string[]): IFuture<void> {
-		return ((): void => {
-			let configs = this.$project.getConfigurationsSpecifiedByUser();
-			if(configs.length) {
-				_.each(configs, config => {
-					this.$project.printProjectProperty(args[0], config).wait();
-				});
-			} else {
-				this.$project.printProjectProperty(args[0]).wait();
-			}
-		}).future<void>()();
+	@invokeInit()
+	public async execute(args: string[]): Promise<void> {
+		let configs = this.$project.getConfigurationsSpecifiedByUser();
+		if (configs.length) {
+			Promise.all(_.map(configs, async config => {
+				await this.$project.printProjectProperty(args[0], config);
+			}));
+		} else {
+			await this.$project.printProjectProperty(args[0]);
+		}
 	}
 
-	allowedParameters:ICommandParameter[] = [new PrintProjectCommandParameter(this.$project)];
+	public allowedParameters: ICommandParameter[] = [new PrintProjectCommandParameter()];
 }
+
 $injector.registerCommand("prop|print", PrintProjectCommand);
 
 class PrintProjectCommandParameter implements ICommandParameter {
-	constructor(private $project: Project.IProject) { }
+	public mandatory = false;
 
-	mandatory = false;
-
-	validate(validationValue: string): IFuture<boolean> {
-		return ((): boolean => {
-			return !!validationValue;
-		}).future<boolean>()();
+	public async validate(validationValue: string): Promise<boolean> {
+		return !!validationValue;
 	}
 }

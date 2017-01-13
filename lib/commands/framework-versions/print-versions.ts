@@ -7,37 +7,34 @@ export class PrintFrameworkVersionsCommand implements ICommand {
 		private $logger: ILogger,
 		private $errors: IErrors) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
-			let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks();
-			let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion);
-			if (projectFrameworkVersion) {
-				this.$logger.info(`Your project is using version ${projectFrameworkVersion}`);
-			}
+	public async execute(args: string[]): Promise<void> {
+		let migrationService = this.$project.projectData.Framework === TARGET_FRAMEWORK_IDENTIFIERS.Cordova ? this.$cordovaMigrationService : this.$nativeScriptMigrationService;
+		let supportedVersions: IFrameworkVersion[] = migrationService.getSupportedFrameworks();
+		let projectFrameworkVersion = migrationService.getDisplayNameForVersion(this.$project.projectData.FrameworkVersion);
+		if (projectFrameworkVersion) {
+			this.$logger.info(`Your project is using version ${projectFrameworkVersion}`);
+		}
 
-			this.$logger.info("Supported versions are: ");
-			_.each(supportedVersions, (sv: IFrameworkVersion) => {
-				this.$logger.info(sv.displayName);
-			});
-		}).future<void>()();
+		this.$logger.info("Supported versions are: ");
+		_.each(supportedVersions, (sv: IFrameworkVersion) => {
+			this.$logger.info(sv.displayName);
+		});
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return (() => {
-			if (args && args.length > 0) {
-				this.$errors.fail("This command does not accept parameters.");
-			}
+	public async canExecute(args: string[]): Promise<boolean> {
+		if (args && args.length > 0) {
+			this.$errors.fail("This command does not accept parameters.");
+		}
 
-			this.$project.ensureProject();
-			if (!this.$project.capabilities.canChangeFrameworkVersion) {
-				this.$errors.failWithoutHelp(`This command is not applicable to ${this.$project.projectData.Framework} projects.`);
-			}
+		await this.$project.ensureProject();
+		if (!this.$project.capabilities.canChangeFrameworkVersion) {
+			this.$errors.failWithoutHelp(`This command is not applicable to ${this.$project.projectData.Framework} projects.`);
+		}
 
-			return true;
-		}).future<boolean>()();
+		return true;
 	}
 }
+
 $injector.registerCommand(["mobileframework|*print", "prop|print|frameworkversion"], PrintFrameworkVersionsCommand);

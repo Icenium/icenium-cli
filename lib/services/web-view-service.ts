@@ -3,9 +3,7 @@ import * as semver from "semver";
 export class WebViewService implements IWebViewService {
 	private static CORDOVA_VERSION_FIVE = "5.0.0";
 
-	constructor(private $errors: IErrors,
-		private $pluginsService: IPluginsService,
-		private $projectConstants: Project.IConstants,
+	constructor(private $pluginsService: IPluginsService,
 		private $options: IOptions) { }
 
 	public get supportedWebViews(): IDictionary<IWebView[]> {
@@ -44,9 +42,15 @@ export class WebViewService implements IWebViewService {
 		return _.map(webViews, webView => webView.name.toLowerCase());
 	}
 
-	public getCurrentWebViewName(platform: string): string {
+	public async  getCurrentWebViewName(platform: string): Promise<string> {
 		let webViews = this.getWebViews(platform);
-		let webView = _.find(webViews, _webView => !_webView.default && this.$pluginsService.isPluginInstalled(_webView.pluginIdentifier));
+		let webViewsToFilter = await Promise.all(_.map(webViews, async _webView => {
+			return !_webView.default && await this.$pluginsService.isPluginInstalled(_webView.pluginIdentifier) ? _webView : null;
+		}));
+		let webView = _(webViewsToFilter)
+			.filter(w => !!w)
+			.first();
+
 		if (webView) {
 			return webView.name;
 		}
@@ -54,7 +58,7 @@ export class WebViewService implements IWebViewService {
 		return _.find(webViews, _webView => _webView.default).name;
 	}
 
-	public enableWebView(platform: string, webViewName: string, frameworkVersion: string): IFuture<void> {
+	public async enableWebView(platform: string, webViewName: string, frameworkVersion: string): Promise<void> {
 		let webView = this.getWebView(platform, webViewName, frameworkVersion);
 		if (webView.default) {
 			return this.enableDefaultWebView(platform);
@@ -63,21 +67,22 @@ export class WebViewService implements IWebViewService {
 		return this.enableWebViewCore(webView);
 	}
 
-	private enableWebViewCore(webView: IWebView): IFuture<void> {
-		return (() => {
-			if (!this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
-				this.$options.default = true;
-				this.$pluginsService.addPlugin(webView.pluginIdentifier).wait();
-			}
-		}).future<void>()();
+	private async enableWebViewCore(webView: IWebView): Promise<void> {
+		if (!await this.$pluginsService.isPluginInstalled(webView.pluginIdentifier)) {
+			this.$options.default = true;
+			await this.$pluginsService.addPlugin(webView.pluginIdentifier);
+		}
 	}
 
-	private enableDefaultWebView(platform: string): IFuture<void> {
-		return (() => {
-			_(this.getWebViews(platform))
-				.filter(webView => !webView.default && this.$pluginsService.isPluginInstalled(webView.pluginIdentifier))
-				.each(webView => this.$pluginsService.removePlugin(webView.pluginIdentifier).wait());
-		}).future<void>()();
+	private async enableDefaultWebView(platform: string): Promise<void> {
+		let webViews = this.getWebViews(platform);
+		let webViewsToFilter = await Promise.all(_.map(webViews, async webView => {
+			return !webView.default && await this.$pluginsService.isPluginInstalled(webView.pluginIdentifier) ? webView : null;
+		}));
+		let filteredWebViews = _.filter(webViewsToFilter);
+
+		await Promise.all(_.map(filteredWebViews, async webView => await this.$pluginsService.removePlugin(webView.pluginIdentifier)));
 	}
 }
+
 $injector.register("webViewService", WebViewService);

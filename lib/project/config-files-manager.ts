@@ -59,4 +59,5 @@ export class ConfigFilesManager implements Project.IConfigFilesManager {
 		};
 	}
 }
+
 $injector.register("configFilesManager", ConfigFilesManager);

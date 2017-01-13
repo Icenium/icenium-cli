@@ -1,5 +1,4 @@
 /* tslint:disable:no-empty */
-import Future = require("fibers/future");
 import * as util from "util";
 import * as path from "path";
 
@@ -39,17 +38,17 @@ export class LoggerStub implements ILogger {
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }
-	printMsgWithTimeout(message: string, timeout: number): IFuture<void> {
+	async printMsgWithTimeout(message: string, timeout: number): Promise<void> {
 		return null;
 	}
 }
 
 export class FileSystemStub implements IFileSystem {
-	zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): IFuture<void> {
+	async zipFiles(zipFile: string, files: string[], zipPathCallback: (path: string) => string): Promise<void> {
 		return undefined;
 	}
 
-	unzip(zipFile: string, destination: string): IFuture<void> {
+	async unzip(zipFile: string, destination: string): Promise<void> {
 		return undefined;
 	}
 	exists(path: string): boolean {
@@ -68,7 +67,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	futureFromEvent(eventEmitter: NodeJS.EventEmitter, event: string): IFuture<any> {
+	async futureFromEvent(eventEmitter: NodeJS.EventEmitter, event: string): Promise<any> {
 		return undefined;
 	}
 
@@ -80,7 +79,7 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	readFile(filename: string): NodeBuffer|string {
+	readFile(filename: string): NodeBuffer | string {
 		return undefined;
 	}
 
@@ -152,7 +151,7 @@ export class FileSystemStub implements IFileSystem {
 		return undefined;
 	}
 
-	setCurrentUserAsOwner(path: string, owner: string): IFuture<void> {
+	async setCurrentUserAsOwner(path: string, owner: string): Promise<void> {
 		return undefined;
 	}
 
@@ -160,11 +159,11 @@ export class FileSystemStub implements IFileSystem {
 		return [];
 	}
 
-	getFileShasum(fileName: string): IFuture<string> {
+	async getFileShasum(fileName: string): Promise<string> {
 		return undefined;
 	}
 
-	readStdin(): IFuture<string> {
+	async readStdin(): Promise<string> {
 		return undefined;
 	}
 
@@ -178,7 +177,11 @@ export class FileSystemStub implements IFileSystem {
 }
 
 export class ErrorsStub implements IErrors {
-	private impl: IErrors = new (require("../lib/common/errors").Errors)();
+	private impl: IErrors;
+
+	constructor() {
+		this.impl = new (require("../lib/common/errors").Errors)($injector);
+	}
 
 	printCallStack: boolean = false;
 
@@ -193,7 +196,7 @@ export class ErrorsStub implements IErrors {
 		throw new Error(message);
 	}
 
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
+	async beginCommand(action: () => Promise<boolean>, printHelpCommand: () => Promise<boolean>): Promise<boolean> {
 		return action();
 	}
 
@@ -216,15 +219,13 @@ export class ErrorsNoFailStub implements IErrors {
 		throw new Error(message);
 	}
 
-	beginCommand(action: () => IFuture<boolean>, printHelpCommand: () => IFuture<boolean>): IFuture<boolean> {
-		return (() => {
-			try {
-				let result = action().wait();
-				return result;
-			} catch (ex) {
-				return false;
-			}
-		}).future<boolean>()();
+	async beginCommand(action: () => Promise<boolean>, printHelpCommand: () => Promise<boolean>): Promise<boolean> {
+		try {
+			let result = await action();
+			return result;
+		} catch (ex) {
+			return false;
+		}
 	}
 
 	executeAction(action: Function): any {
@@ -242,27 +243,27 @@ export class OpenerStub implements IOpener {
 }
 
 export class LoginManager implements ILoginManager {
-	basicLogin(userName: string, password: string): IFuture<void> {
+	async basicLogin(userName: string, password: string): Promise<void> {
 		return undefined;
 	}
 
-	login(): IFuture<void> {
+	async login(): Promise<void> {
 		return undefined;
 	}
 
-	logout(): IFuture<void> {
+	async logout(): Promise<void> {
 		return undefined;
 	}
 
-	isLoggedIn(): IFuture<boolean> {
-		return Future.fromResult(false);
+	async isLoggedIn(): Promise<boolean> {
+		return Promise.resolve(false);
 	}
 
-	ensureLoggedIn(): IFuture<void> {
+	async ensureLoggedIn(): Promise<void> {
 		return undefined;
 	}
 
-	telerikLogin(user: string, password: string): IFuture<void> {
+	async telerikLogin(user: string, password: string): Promise<void> {
 		return undefined;
 	}
 }
@@ -274,11 +275,11 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 
-	unpackAppResources(): IFuture<void> {
+	async unpackAppResources(): Promise<void> {
 		return undefined;
 	}
 
-	downloadCordovaJsFiles(): IFuture<void> {
+	async downloadCordovaJsFiles(): Promise<void> {
 		return undefined;
 	}
 
@@ -294,11 +295,11 @@ export class TemplateServiceStub implements ITemplatesService {
 		return undefined;
 	}
 
-	downloadProjectTemplates(): IFuture<void> {
+	async downloadProjectTemplates(): Promise<void> {
 		return undefined;
 	}
 
-	downloadItemTemplates(): IFuture<void> {
+	async downloadItemTemplates(): Promise<void> {
 		return undefined;
 	}
 }
@@ -359,7 +360,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public getProjectFileSchema(): IDictionary<any> { return undefined; }
 
-	public getFullProjectFileSchema(): IFuture<any> { return undefined; }
+	public async getFullProjectFileSchema(): Promise<any> { return undefined; }
 
 	public getProjectTargets(projectDir: string): string[] { return undefined; }
 
@@ -367,7 +368,7 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 
 	public ensureAllPlatformAssets(projectDir: string, frameworkVersion: string): void { return undefined; }
 
-	public getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): IFuture<string[]> { return undefined; }
+	public async getSimulatorParams(projectDir: string, projectData: Project.IData, simulatorPackageName: string): Promise<string[]> { return undefined; }
 
 	public completeProjectProperties(properties: any): boolean { return false; }
 
@@ -377,12 +378,12 @@ class FrameworkProjectStub implements Project.IFrameworkProject {
 		return null;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
-		return Future.fromResult(null);
+	public async updateMigrationConfigFile(): Promise<void> {
+		return Promise.resolve(null);
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
-		return Future.fromResult(null);
+	public async ensureProject(projectDir: string): Promise<void> {
+		return Promise.resolve(null);
 	}
 
 	public alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
@@ -411,7 +412,7 @@ export class ProjectFilesManager implements IProjectFilesManager {
 		return undefined;
 	}
 
-	public createLocalToDevicePaths(deviceAppData: Mobile.IDeviceAppData, projectFilesPath: string, projectFiles?: string[]): Mobile.ILocalToDevicePathData[] {
+	public createLocalToDevicePaths(deviceAppData: Mobile.IDeviceAppData, projectFilesPath: string, projectFiles?: string[]): Promise<Mobile.ILocalToDevicePathData[]> {
 		return undefined;
 	}
 
@@ -464,8 +465,8 @@ export class StaticConfig implements IStaticConfig {
 		return path.join(__dirname, "..", "package.json");
 	}
 
-	public getAdbFilePath(): IFuture<string> {
-		return Future.fromResult("");
+	public async getAdbFilePath(): Promise<string> {
+		return Promise.resolve("");
 	}
 
 	public get PATH_TO_BOOTSTRAP(): string {
@@ -479,11 +480,9 @@ export class HooksService implements IHooksService {
 	}
 	initialize(commandName: string): void {
 	}
-	executeBeforeHooks(): IFuture<void> {
-		return (() => { }).future<void>()();
+	async executeBeforeHooks(): Promise<void> {
 	}
-	executeAfterHooks(): IFuture<void> {
-		return (() => { }).future<void>()();
+	async executeAfterHooks(): Promise<void> {
 	}
 }
 
@@ -514,12 +513,12 @@ export class JsonSchemaValidator implements IJsonSchemaValidator {
 export class PrompterStub implements IPrompter {
 	public confirmResult = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
-	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
-		return Future.fromResult(this.confirmResult);
+	async get(schema: IPromptSchema[]): Promise<any> { return Promise.resolve(""); }
+	async getPassword(prompt: string, options?: { allowEmpty?: boolean }): Promise<string> { return Promise.resolve(""); }
+	async getString(prompt: string): Promise<string> { return Promise.resolve(""); }
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<string> { return Promise.resolve(""); }
+	async confirm(prompt: string, defaultAction?: () => boolean): Promise<boolean> {
+		return Promise.resolve(this.confirmResult);
 	}
 	dispose(): void { }
 }
@@ -527,5 +526,5 @@ export class PrompterStub implements IPrompter {
 export class MessagesServiceStub implements IMessagesService {
 	pathsToMessageJsonFiles: string[];
 
-	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [ id ].concat(args)); }
+	getMessage(id: string, ...args: string[]): string { return util.format.apply(null, [id].concat(args)); }
 }

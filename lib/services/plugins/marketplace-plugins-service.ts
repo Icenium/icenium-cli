@@ -6,12 +6,13 @@ export class MarketplacePluginsService implements ICordovaPluginsService {
 		private $project: Project.IProject,
 		private $projectConstants: Project.IConstants) { }
 
-	public getAvailablePlugins(): IFuture<any> {
+	public async getAvailablePlugins(): Promise<any> {
 		return this.$server.cordova.getMarketplacePluginsData(this.$project.projectData.Framework);
 	}
 
-	public createPluginData(plugin: IMarketplacePluginVersionsDataBase): IPlugin[] { // DefaultVersion, Identifier, Versions
+	public async createPluginData(plugin: IMarketplacePluginVersionsDataBase): Promise<IPlugin[]> { // DefaultVersion, Identifier, Versions
 		return _.map(plugin.Versions, (pluginVersionData) => new PluginsDataLib.MarketplacePluginData(plugin, pluginVersionData, this.$project, this.$projectConstants));
 	}
 }
+
 $injector.register("marketplacePluginsService", MarketplacePluginsService);

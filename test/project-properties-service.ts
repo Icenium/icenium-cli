@@ -1,8 +1,7 @@
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
 import configLib = require("../lib/config");
-import {assert} from "chai";
+import { assert } from "chai";
 
 let projectPropertiesServiceFile = require("../lib/services/project-properties-service");
 let resourceLoaderFile = require("../lib/common/resource-loader");
@@ -71,11 +70,11 @@ class SampleProject implements Project.IFrameworkProject {
 	getPluginVariablesInfo(projectInformation: Project.IProjectInformation, projectDir?: string, configuration?: string): IDictionary<IStringDictionary> {
 		return null;
 	}
-	updateMigrationConfigFile(): IFuture<void> {
-		return Future.fromResult(null);
+	async updateMigrationConfigFile(): Promise<void> {
+		return Promise.resolve(null);
 	}
-	ensureProject(projectDir: string): IFuture<void> {
-		return Future.fromResult(null);
+	async ensureProject(projectDir: string): Promise<void> {
+		return Promise.resolve(null);
 	}
 	alterPropertiesForNewProjectBase(properties: any, projectName: string): void { /* No implementation required. */ }
 	getProjectFileSchemaByName(name: string): IDictionary<any> {

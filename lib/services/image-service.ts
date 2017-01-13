@@ -1,4 +1,5 @@
 import * as helpers from "../common/helpers";
+import { cache, invokeInit } from "../common/decorators";
 import * as path from "path";
 import temp = require("temp");
 
@@ -33,9 +34,11 @@ class ImageService implements IImageService {
 		private $prompter: IPrompter,
 		private $staticConfig: Config.IStaticConfig,
 		private $resources: IResourceLoader,
-		private $server: Server.IServer) {
+		private $server: Server.IServer) { }
 
-		this.$project.ensureProject();
+	@cache()
+	public async init(): Promise<void> {
+		await this.$project.ensureProject();
 
 		if (!this.$project.capabilities.imageGeneration) {
 			this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
@@ -65,75 +68,71 @@ class ImageService implements IImageService {
 		this.$logger.out(table.toString());
 	}
 
-	public promptForImageInformation(force: boolean): IFuture<void> {
-		return (() => {
-			let imagePath = this.$prompter.getString('Enter image file path:').wait(),
-				imageOptions = ['Icons', 'Splash Screens'],
-				chosenOption = this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions).wait(),
-				imageType = Server.ImageType.Icon;
+	@invokeInit()
+	public async promptForImageInformation(force: boolean): Promise<void> {
+		let imagePath = await this.$prompter.getString('Enter image file path:'),
+			imageOptions = ['Icons', 'Splash Screens'],
+			chosenOption = await this.$prompter.promptForChoice(`What type of resources do you want to create?`, imageOptions),
+			imageType = Server.ImageType.Icon;
 
-			imagePath = helpers.trimSymbol(imagePath, '"');
+		imagePath = helpers.trimSymbol(imagePath, '"');
 
-			if (chosenOption === imageOptions[1]) {
-				imageType = Server.ImageType.SplashScreen;
+		if (chosenOption === imageOptions[1]) {
+			imageType = Server.ImageType.SplashScreen;
+		}
+
+		await this.generateImages(imagePath, imageType, force);
+	}
+
+	@invokeInit()
+	public async generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): Promise<void> {
+		this.validateImage(initialImagePath);
+
+		temp.track();
+		let inputImageStream = this.$fs.createReadStream(initialImagePath),
+			tempDir = temp.mkdirSync('ab-images-'),
+			resultImageArchivePath = path.join(tempDir, 'images.zip'),
+			resultImageArchiveStream = this.$fs.createWriteStream(resultImageArchivePath);
+
+		this.replaceAll = force;
+		this.$logger.printInfoMessageOnSameLine('Generating images');
+		await this.$progressIndicator.showProgressIndicator(this.$server.images.generateArchive(imageType, inputImageStream, resultImageArchiveStream), 2000);
+		this.$logger.printInfoMessageOnSameLine('Extracting images');
+		await this.$progressIndicator.showProgressIndicator(this.$fs.unzip(resultImageArchivePath, tempDir), 2000);
+		await this.$fs.unzip(resultImageArchivePath, tempDir);
+
+		let imageBasePath = path.join(tempDir, 'App_Resources'),
+			images = this.$fs.enumerateFilesInDirectorySync(imageBasePath);
+
+		await Promise.all(_.map(images, async imagePath => {
+			if (!this.$project.capabilities.wp8Supported && ~imagePath.indexOf(this.$devicePlatformsConstants.WP8)) {
+				return;
 			}
 
-			this.generateImages(imagePath, imageType, force).wait();
-		}).future<void>()();
+			let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
+			await this.copyImageToProject(imagePath, projectImagePath);
+		}));
 	}
 
-	public generateImages(initialImagePath: string, imageType: Server.ImageType, force: boolean): IFuture<void> {
-		return (() => {
-			this.validateImage(initialImagePath);
+	private async copyImageToProject(imagePath: string, projectImagePath: string): Promise<void> {
+		this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
 
-			temp.track();
-			let inputImageStream = this.$fs.createReadStream(initialImagePath),
-				tempDir = temp.mkdirSync('ab-images-'),
-				resultImageArchivePath = path.join(tempDir, 'images.zip'),
-				resultImageArchiveStream = this.$fs.createWriteStream(resultImageArchivePath);
+		if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
+			return this.$fs.copyFile(imagePath, projectImagePath);
+		}
 
-			this.replaceAll = force;
-			this.$logger.printInfoMessageOnSameLine('Generating images');
-			this.$progressIndicator.showProgressIndicator(this.$server.images.generateArchive(imageType, inputImageStream, resultImageArchiveStream), 2000).wait();
-			this.$logger.printInfoMessageOnSameLine('Extracting images');
-			this.$progressIndicator.showProgressIndicator(this.$fs.unzip(resultImageArchivePath, tempDir), 2000).wait();
-			this.$fs.unzip(resultImageArchivePath, tempDir).wait();
+		let replaceOptions = ['Yes for all', 'Yes', 'No', 'No for all'],
+			chosenOption = await this.$prompter.promptForChoice(`${projectImagePath} already exists, do you want to replace it?`, replaceOptions);
 
-			let imageBasePath = path.join(tempDir, 'App_Resources'),
-				images = this.$fs.enumerateFilesInDirectorySync(imageBasePath);
-
-			_.each(images, imagePath => {
-				if (!this.$project.capabilities.wp8Supported && ~imagePath.indexOf(this.$devicePlatformsConstants.WP8)) {
-					return;
-				}
-
-				let projectImagePath = path.join(this.$project.appResourcesPath(), imagePath.substring(imageBasePath.length));
-				this.copyImageToProject(imagePath, projectImagePath).wait();
-			});
-		}).future<void>()();
-	}
-
-	private copyImageToProject(imagePath: string, projectImagePath: string): IFuture<void> {
-		return (() => {
-			this.$fs.ensureDirectoryExists(path.dirname(projectImagePath));
-
-			if (this.replaceAll || !this.$fs.exists(projectImagePath)) {
+		switch (chosenOption) {
+			case replaceOptions[0]:
+				this.replaceAll = true;
 				return this.$fs.copyFile(imagePath, projectImagePath);
-			}
-
-			let replaceOptions = ['Yes for all', 'Yes', 'No', 'No for all'],
-				chosenOption = this.$prompter.promptForChoice(`${projectImagePath} already exists, do you want to replace it?`, replaceOptions).wait();
-
-			switch (chosenOption) {
-				case replaceOptions[0]:
-					this.replaceAll = true;
-					return this.$fs.copyFile(imagePath, projectImagePath);
-				case replaceOptions[1]:
-					return this.$fs.copyFile(imagePath, projectImagePath);
-				case replaceOptions[3]:
-					this.$errors.failWithoutHelp('Operation canceled.');
-			}
-		}).future<void>()();
+			case replaceOptions[1]:
+				return this.$fs.copyFile(imagePath, projectImagePath);
+			case replaceOptions[3]:
+				this.$errors.failWithoutHelp('Operation canceled.');
+		}
 	}
 
 	private pushImageToTable(table: any, platform: string, icon: ImageData, splashScreen: ImageData): void {
@@ -169,4 +168,5 @@ class ImageService implements IImageService {
 		return image ? `Path: ${image.FileName}` : '';
 	}
 }
+
 $injector.register("imageService", ImageService);

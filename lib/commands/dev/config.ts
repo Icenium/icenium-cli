@@ -1,12 +1,11 @@
 export class DevConfigCommand implements ICommand {
-	allowedParameters: ICommandParameter[];
+	public allowedParameters: ICommandParameter[];
 
 	constructor(private $config: IConfiguration) { }
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			return this.$config.printConfigData();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		await this.$config.printConfigData();
 	}
 }
+
 $injector.registerCommand("dev-config", DevConfigCommand);

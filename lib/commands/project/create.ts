@@ -16,39 +16,38 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 		super($errors, $project);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.validateProjectData();
+	public async execute(args: string[]): Promise<void> {
+		this.validateProjectData();
 
-			let projectName = args[0];
-			let newProjectDir = this.$project.getNewProjectDir();
-			let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
+		let projectName = args[0];
+		let newProjectDir = this.$project.getNewProjectDir();
+		let projectPath = path.resolve(this.$options.path ? newProjectDir : path.join(newProjectDir, projectName));
 
-			this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE).wait();
-			_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)));
+		await this.$project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova, this.$config.DEFAULT_CORDOVA_PROJECT_TEMPLATE);
+		_.each(this.$screenBuilderService.screenBuilderSpecificFiles, fileName => this.$fs.deleteFile(path.join(projectPath, fileName)));
 
-			let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
-				projectPath: projectPath,
-				answers: {
-					name: projectName
-				}
-			});
-
-			try {
-				this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions).wait();
-			} catch(err) {
-				this.$logger.trace(err);
-				this.$fs.deleteDirectory(projectPath);
-				throw err;
+		let screenBuilderOptions = this.$screenBuilderService.composeScreenBuilderOptions(this.$options.answers, {
+			projectPath: projectPath,
+			answers: {
+				name: projectName
 			}
+		});
 
-			if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
-				this.$simulatorService.launchSimulator().wait();
-			}
-		}).future<void>()();
+		try {
+			await this.$screenBuilderService.prepareAndGeneratePrompt(projectPath, this.$screenBuilderService.generatorFullName, screenBuilderOptions);
+		} catch (err) {
+			this.$logger.trace(err);
+			this.$fs.deleteDirectory(projectPath);
+			throw err;
+		}
+
+		if (this.$options.simulator && this.$simulatorPlatformServices.canRunApplication && await this.$simulatorPlatformServices.canRunApplication()) {
+			await this.$simulatorService.launchSimulator();
+		}
 	}
 
 	allowedParameters = [this.$nameCommandParameter];
 }
+
 $injector.registerCommand("create|*default", CreateCommand);
 $injector.registerCommand("create|screenbuilder", CreateCommand);

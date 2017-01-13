@@ -17,10 +17,9 @@ import devicePlatformsLib = require("../lib/common/mobile/device-platforms-const
 import hostInfoLib = require("../lib/common/host-info");
 import optionsLib = require("../lib/options");
 import assert = require("assert");
-import Future = require("fibers/future");
-import {ConfigFilesManager} from "../lib/project/config-files-manager";
+import { ConfigFilesManager } from "../lib/project/config-files-manager";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
-import {CordovaResourceLoader} from "../lib/cordova-resource-loader";
+import { CordovaResourceLoader } from "../lib/cordova-resource-loader";
 import * as path from "path";
 import temp = require("temp");
 import * as util from "util";
@@ -115,8 +114,8 @@ function createTestInjector() {
 	testInjector.register("devicePlatformsConstants", devicePlatformsLib.DevicePlatformsConstants);
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
 	testInjector.register("loginManager", {
-		ensureLoggedIn: (): IFuture<void> => {
-			return Future.fromResult();
+		ensureLoggedIn: (): Promise<void> => {
+			return Promise.resolve();
 		}
 	});
 	testInjector.register("hostInfo", hostInfoLib.HostInfo);
@@ -133,21 +132,21 @@ function updateTestInjector(testInjector: IInjector, cordovaPlugins: any[], avai
 	testInjector.register("server", {
 		cordova: {
 			getPlugins: () => {
-				return Future.fromResult(cordovaPlugins);
+				return Promise.resolve(cordovaPlugins);
 			},
 			getMarketplacePluginData: (pluginIdentifier: string, pluginVersion: string) => {
-				return Future.fromResult(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
+				return Promise.resolve(_.find(availableMarketplacePlugins, p => p.Identifier === pluginIdentifier && p.Version === pluginVersion));
 			},
 			getMarketplacePluginsData: () => {
-				return Future.fromResult(cordovaPlugins);
+				return Promise.resolve(cordovaPlugins);
 			}
 		}
 	});
 
 	// Register mocked httpClient
 	testInjector.register("httpClient", {
-		httpRequest: (): IFuture<any> => {
-			return Future.fromResult({
+		httpRequest: (): Promise<any> => {
+			return Promise.resolve({
 				body: createMarketplacePluginsData(availableMarketplacePlugins)
 			});
 		}
@@ -168,7 +167,7 @@ function getProjectFileName(configuration: string) {
 	return projectFileName;
 }
 
-function assertCorePluginsCount(configuration?: string) {
+async function assertCorePluginsCount(configuration?: string) {
 	let testInjector = createTestInjector();
 	let options = testInjector.resolve("options");
 	let project = testInjector.resolve("project");
@@ -189,7 +188,7 @@ function assertCorePluginsCount(configuration?: string) {
 		options.release = true;
 	}
 
-	project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+	await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 
 	let availableMarketplacePlugins = [
 		{
@@ -213,7 +212,7 @@ function assertCorePluginsCount(configuration?: string) {
 		return abProjectContent[propertyName];
 	};
 
-	assert.equal(abProjectContent["CorePlugins"].length, service.getInstalledPlugins().length);
+	assert.equal(abProjectContent["CorePlugins"].length, (await service.getInstalledPlugins()).length);
 }
 
 describe("build-configurations-integration-tests", () => {

@@ -1,6 +1,6 @@
 import * as path from "path";
 import { EnsureProjectCommand } from "./ensure-project-command";
-import {Configurations} from "../common/constants";
+import { Configurations } from "../common/constants";
 
 export class EmulateAndroidCommand extends EnsureProjectCommand {
 	constructor(private $buildService: Project.IBuildService,
@@ -15,65 +15,57 @@ export class EmulateAndroidCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$project.ensureAllPlatformAssets();
-			this.$androidEmulatorServices.checkAvailability();
-			let tempDir = this.$project.getTempDir("emulatorfiles");
-			let packageFilePath = path.join(tempDir, "package.apk");
-			this.$buildService.build({
-				platform: this.$devicePlatformsConstants.Android,
-				showQrCodes: false,
-				downloadFiles: true,
-				downloadedFilePath: packageFilePath
-			}).wait();
-			this.$options.justlaunch = true;
-			let emulateOptions: Mobile.IEmulatorOptions = { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME).wait() };
-			this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions).wait();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		this.$project.ensureAllPlatformAssets();
+		this.$androidEmulatorServices.checkAvailability();
+		let tempDir = this.$project.getTempDir("emulatorfiles");
+		let packageFilePath = path.join(tempDir, "package.apk");
+		await this.$buildService.build({
+			platform: this.$devicePlatformsConstants.Android,
+			showQrCodes: false,
+			downloadFiles: true,
+			downloadedFilePath: packageFilePath
+		});
+		this.$options.justlaunch = true;
+		let emulateOptions: Mobile.IEmulatorOptions = await { appId: this.$project.getAppIdentifierForPlatform(this.$projectConstants.ANDROID_PLATFORM_NAME) };
+		await this.$androidEmulatorServices.runApplicationOnEmulator(packageFilePath, emulateOptions);
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
-		return ((): boolean => {
-			super.canExecute(args).wait();
-			this.$androidEmulatorServices.checkDependencies().wait();
-			return true;
-		}).future<boolean>()();
+	public async canExecute(args: string[]): Promise<boolean> {
+		await super.canExecute(args);
+		await this.$androidEmulatorServices.checkDependencies();
+		return true;
 	}
 }
+
 $injector.registerCommand("emulate|android", EmulateAndroidCommand);
 
 export class EmulateIosCommand extends EnsureProjectCommand {
-	constructor(private $fs: IFileSystem,
+	constructor(protected $project: Project.IProject,
+		protected $errors: IErrors,
 		private $buildService: Project.IBuildService,
 		private $iOSEmulatorServices: Mobile.IEmulatorPlatformServices,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
-		private $options: IOptions,
-		$project: Project.IProject,
-		$errors: IErrors) {
+		private $options: IOptions) {
 		super($project, $errors);
-
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$project.ensureAllPlatformAssets();
-			this.$iOSEmulatorServices.checkDependencies().wait();
-			this.$iOSEmulatorServices.checkAvailability();
-			let app = "";
+	public async execute(args: string[]): Promise<void> {
+		this.$project.ensureAllPlatformAssets();
+		await this.$iOSEmulatorServices.checkDependencies();
+		this.$iOSEmulatorServices.checkAvailability();
+		let app = "";
 
-			if (!this.$options.availableDevices) {
-				let tempDir = this.$project.getTempDir("emulatorfiles");
-				app = this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa")).wait();
-			}
+		if (!this.$options.availableDevices) {
+			let tempDir = this.$project.getTempDir("emulatorfiles");
+			app = await this.$buildService.buildForiOSSimulator(path.join(tempDir, "package.ipa"));
+		}
 
-			this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier }).wait();
-
-		}).future<void>()();
+		await this.$iOSEmulatorServices.runApplicationOnEmulator(app, { appId: this.$project.projectData.AppIdentifier });
 	}
 }
+
 $injector.registerCommand("emulate|ios", EmulateIosCommand);
 
 export class EmulateWp8Command extends EnsureProjectCommand {
@@ -88,27 +80,26 @@ export class EmulateWp8Command extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$project.ensureAllPlatformAssets();
-			this.$wp8EmulatorServices.checkDependencies().wait();
-			this.$wp8EmulatorServices.checkAvailability();
+	public async execute(args: string[]): Promise<void> {
+		this.$project.ensureAllPlatformAssets();
+		await this.$wp8EmulatorServices.checkDependencies();
+		this.$wp8EmulatorServices.checkAvailability();
 
-			let tempDir = this.$project.getTempDir("emulatorfiles");
-			let packageFilePath = path.join(tempDir, "package.xap");
-			this.$buildService.build({
-				platform: this.$devicePlatformsConstants.WP8,
-				projectConfiguration: Configurations.Debug,
-				buildConfiguration: Configurations.Debug,
-				showQrCodes: false,
-				downloadFiles: true,
-				downloadedFilePath: packageFilePath
-			}).wait();
+		let tempDir = this.$project.getTempDir("emulatorfiles");
+		let packageFilePath = path.join(tempDir, "package.xap");
+		await this.$buildService.build({
+			platform: this.$devicePlatformsConstants.WP8,
+			projectConfiguration: Configurations.Debug,
+			buildConfiguration: Configurations.Debug,
+			showQrCodes: false,
+			downloadFiles: true,
+			downloadedFilePath: packageFilePath
+		});
 
-			this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath).wait();
-		}).future<void>()();
+		await this.$wp8EmulatorServices.runApplicationOnEmulator(packageFilePath);
 	}
 
 	public isDisabled = this.$config.ON_PREM;
 }
+
 $injector.registerCommand("emulate|wp8", EmulateWp8Command);

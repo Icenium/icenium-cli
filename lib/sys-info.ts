@@ -1,24 +1,22 @@
-import {SysInfoBase} from "./common/sys-info-base";
+import { SysInfoBase } from "./common/sys-info-base";
 
 export class SysInfo extends SysInfoBase {
 	constructor(protected $childProcess: IChildProcess,
-				protected $hostInfo: IHostInfo,
-				protected $iTunesValidator: Mobile.IiTunesValidator,
-				protected $logger: ILogger,
-				protected $winreg: IWinReg,
-				private $staticConfig: IStaticConfig) {
+		protected $hostInfo: IHostInfo,
+		protected $iTunesValidator: Mobile.IiTunesValidator,
+		protected $logger: ILogger,
+		protected $winreg: IWinReg,
+		private $staticConfig: IStaticConfig) {
 		super($childProcess, $hostInfo, $iTunesValidator, $logger, $winreg);
 	}
 
-	public getSysInfo(pathToPackageJson: string, androidToolsInfo?: {pathToAdb: string, pathToAndroid: string}): IFuture<ISysInfoData> {
-		return ((): ISysInfoData => {
-			let defaultAndroidToolsInfo = {
-				pathToAdb: "adb",
-				pathToAndroid: "android" + (this.$hostInfo.isWindows ? ".bat" : "")
-			};
+	public async getSysInfo(pathToPackageJson: string, androidToolsInfo?: { pathToAdb: string, pathToAndroid: string }): Promise<ISysInfoData> {
+		let defaultAndroidToolsInfo = {
+			pathToAdb: "adb",
+			pathToAndroid: "android" + (this.$hostInfo.isWindows ? ".bat" : "")
+		};
 
-			return super.getSysInfo(pathToPackageJson  || this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo).wait();
-		}).future<ISysInfoData>()();
+		return super.getSysInfo(pathToPackageJson || await this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo);
 	}
 }
 $injector.register("sysInfo", SysInfo);

@@ -1,5 +1,5 @@
 import constants = require("../../common/constants");
-import {EOL} from "os";
+import { EOL } from "os";
 
 export class LiveSyncService implements ILiveSyncService {
 	private excludedProjectDirsAndFiles = ["app_resources", "plugins", ".*.tmp", ".ab"];
@@ -7,93 +7,91 @@ export class LiveSyncService implements ILiveSyncService {
 
 	constructor(private $devicesService: Mobile.IDevicesService,
 		private $errors: IErrors,
-		private $devicePlatformsConstants: Mobile.IDevicePlatformsConstants,
 		private $project: Project.IProject,
 		private $logger: ILogger,
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $options: IOptions,
 		private $injector: IInjector) { }
 
-	public livesync(platform?: string): IFuture<void> {
-		return (() => {
-			this.$project.ensureProject();
-			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
-			platform = platform || this.$devicesService.platform;
+	public async livesync(platform?: string): Promise<void> {
+		await this.$project.ensureProject();
+		await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device });
+		platform = platform || this.$devicesService.platform;
 
-			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
-				this.$errors.failWithoutHelp("The AppBuilder Companion app is not available on %s devices.", platform);
+		if (!this.$mobileHelper.getPlatformCapabilities(platform).companion && this.$options.companion) {
+			this.$errors.failWithoutHelp("The AppBuilder Companion app is not available on %s devices.", platform);
+		}
+
+		if (!this.$devicesService.hasDevices) {
+			this.$errors.failWithoutHelp(constants.ERROR_NO_DEVICES);
+		}
+
+		if (!this.$project.capabilities.livesync && !this.$options.companion) {
+			this.$errors.failWithoutHelp("Use $ appbuilder livesync cloud to sync your application to Telerik Nativescript Companion App. You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+		}
+
+		if (!this.$project.capabilities.livesyncCompanion && this.$options.companion) {
+			this.$errors.failWithoutHelp("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
+		}
+
+		let projectDir = this.$project.getProjectDir();
+
+		let livesyncData: ILiveSyncData = {
+			platform: platform,
+			appIdentifier: await this.$project.getAppIdentifierForPlatform(platform),
+			projectFilesPath: projectDir,
+			syncWorkingDirectory: projectDir,
+			excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
+			additionalConfigurations: this.$project.projectInformation.configurations
+		};
+
+		this.deviceConfigurationInfos = [];
+
+		let configurations = this.$project.getConfigurationsSpecifiedByUser();
+
+		let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
+		if (!configurations.length) {
+			await this.fillDeviceConfigurationInfos(livesyncData.appIdentifier);
+			let deviceConfigurations = _.reduce(this.deviceConfigurationInfos, (result, dci) => result + `${EOL}device: ${dci.applicationIdentifier} has "${dci.configuration}" configuration`, "");
+			if (deviceConfigurations && _.uniqBy(this.deviceConfigurationInfos, dci => dci.configuration).length !== 1) {
+				this.$errors.failWithoutHelp("Cannot LiveSync because application is deployed with different configurations across the devices.", deviceConfigurations);
 			}
 
-			if (!this.$devicesService.hasDevices) {
-				this.$errors.failWithoutHelp(constants.ERROR_NO_DEVICES);
+			livesyncData.configuration = this.deviceConfigurationInfos && this.deviceConfigurationInfos[0] && this.deviceConfigurationInfos[0].configuration;
+			if (livesyncData.configuration) {
+				this.$options.config = [livesyncData.configuration];
 			}
 
-			if (!this.$project.capabilities.livesync && !this.$options.companion) {
-				this.$errors.failWithoutHelp("Use $ appbuilder livesync cloud to sync your application to Telerik Nativescript Companion App. You will be able to LiveSync %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
-			}
+			await $liveSyncServiceBase.sync([livesyncData]);
+		} else {
+			Promise.all(configurations.map(async configuration => {
+				livesyncData.configuration = configuration;
+				livesyncData.appIdentifier = this.$project.projectInformation.configurationSpecificData[configuration.toLowerCase()].AppIdentifier;
+				await this.fillDeviceConfigurationInfos(livesyncData.appIdentifier);
 
-			if (!this.$project.capabilities.livesyncCompanion && this.$options.companion) {
-				this.$errors.failWithoutHelp("You will be able to LiveSync %s based applications to the Companion app in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
-			}
+				livesyncData.canExecute = (device: Mobile.IDevice): boolean => {
+					let deviceConfigurationInfo = _.find(this.deviceConfigurationInfos, dci => dci.deviceIdentifier === device.deviceInfo.identifier);
+					if (deviceConfigurationInfo && deviceConfigurationInfo.configuration && deviceConfigurationInfo.configuration.toLowerCase() !== configuration.toLowerCase() && !this.$options.companion) {
+						this.$logger.warn(`Cannot LiveSync to device with identifier ${device.deviceInfo.identifier}. You are trying to synchronize changes for the ${configuration} configuration but the device expects changes for the ${deviceConfigurationInfo.configuration} configuration. Change the target configuration for the LiveSync operation or re-build and re-deploy your app in another configuration.`);
+						return false;
+					}
 
-			let projectDir = this.$project.getProjectDir();
+					return true;
+				};
 
-			let livesyncData: ILiveSyncData = {
-				platform: platform,
-				appIdentifier: this.$project.getAppIdentifierForPlatform(platform).wait(),
-				projectFilesPath: projectDir,
-				syncWorkingDirectory: projectDir,
-				excludedProjectDirsAndFiles: this.excludedProjectDirsAndFiles,
-				additionalConfigurations: this.$project.projectInformation.configurations
-			};
-
-			this.deviceConfigurationInfos = [];
-
-			let configurations = this.$project.getConfigurationsSpecifiedByUser();
-
-			let $liveSyncServiceBase: ILiveSyncServiceBase = this.$injector.resolve("$liveSyncServiceBase");
-			if (!configurations.length) {
-				this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
-				let deviceConfigurations = _.reduce(this.deviceConfigurationInfos, (result, dci) => result + `${EOL}device: ${dci.applicationIdentifier} has "${dci.configuration}" configuration`, "");
-				if (deviceConfigurations && _.uniqBy(this.deviceConfigurationInfos, dci => dci.configuration).length !== 1) {
-					this.$errors.failWithoutHelp("Cannot LiveSync because application is deployed with different configurations across the devices.", deviceConfigurations);
-				}
-
-				livesyncData.configuration = this.deviceConfigurationInfos && this.deviceConfigurationInfos[0] && this.deviceConfigurationInfos[0].configuration;
-				if (livesyncData.configuration) {
-					this.$options.config = [livesyncData.configuration];
-				}
-
-				$liveSyncServiceBase.sync([livesyncData]).wait();
-			} else {
-				configurations.forEach(configuration => {
-					livesyncData.configuration = configuration;
-					livesyncData.appIdentifier = this.$project.projectInformation.configurationSpecificData[configuration.toLowerCase()].AppIdentifier;
-					this.fillDeviceConfigurationInfos(livesyncData.appIdentifier).wait();
-
-					livesyncData.canExecute = (device: Mobile.IDevice): boolean => {
-						let deviceConfigurationInfo = _.find(this.deviceConfigurationInfos, dci => dci.deviceIdentifier === device.deviceInfo.identifier);
-						if (deviceConfigurationInfo && deviceConfigurationInfo.configuration && deviceConfigurationInfo.configuration.toLowerCase() !== configuration.toLowerCase() && !this.$options.companion) {
-							this.$logger.warn(`Cannot LiveSync to device with identifier ${device.deviceInfo.identifier}. You are trying to synchronize changes for the ${configuration} configuration but the device expects changes for the ${deviceConfigurationInfo.configuration} configuration. Change the target configuration for the LiveSync operation or re-build and re-deploy your app in another configuration.`);
-							return false;
-						}
-
-						return true;
-					};
-
-					$liveSyncServiceBase.sync([livesyncData]).wait();
-				});
-			}
-		}).future<void>()();
+				await $liveSyncServiceBase.sync([livesyncData]);
+			}));
+		}
 	}
 
-	private fillDeviceConfigurationInfos(appIdentifier: string): IFuture<void> {
-		return this.$devicesService.execute(device => (() => {
-			let configInfo = device.getApplicationInfo(appIdentifier).wait();
+	private async fillDeviceConfigurationInfos(appIdentifier: string): Promise<void> {
+		return this.$devicesService.execute(async device => {
+			let configInfo = await device.getApplicationInfo(appIdentifier);
 			if (configInfo) {
 				this.deviceConfigurationInfos.push(configInfo);
 			}
-		}).future<void>()());
+		});
 	}
 }
+
 $injector.register("liveSyncService", LiveSyncService);

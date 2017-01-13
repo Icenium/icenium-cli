@@ -20,6 +20,7 @@ export class ClientUserSettingsFileService implements IUserSettingsFileService {
 		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }
+
 $injector.register("clientUserSettingsFileService", ClientUserSettingsFileService);
 
 export class ClientSpecificUserSettingsService extends UserSettingsServiceBase {
@@ -28,6 +29,7 @@ export class ClientSpecificUserSettingsService extends UserSettingsServiceBase {
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 }
+
 $injector.register("clientSpecificUserSettingsService", ClientSpecificUserSettingsService);
 
 export class SharedUserSettingsFileService implements IUserSettingsFileService {
@@ -47,6 +49,7 @@ export class SharedUserSettingsFileService implements IUserSettingsFileService {
 		return this.$fs.deleteFile(this.userSettingsFilePath);
 	}
 }
+
 $injector.register("sharedUserSettingsFileService", SharedUserSettingsFileService);
 
 export class SharedUserSettingsService extends UserSettingsServiceBase implements IUserSettingsService {
@@ -61,111 +64,104 @@ export class SharedUserSettingsService extends UserSettingsServiceBase implement
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 
-	public loadUserSettingsFile(): IFuture<void> {
-		return (() => {
-			if (!this.userSettingsData) {
-				this.$fs.createDirectory(this.$options.profileDir);
+	public async loadUserSettingsFile(): Promise<void> {
+		if (!this.userSettingsData) {
+			this.$fs.createDirectory(this.$options.profileDir);
 
-				if (this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath)) {
-					let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath);
-					let timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
-					let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-					if (diffDays > 1) {
-						this.downloadUserSettings().wait();
-					} else {
-						this.readUserSettingsFile();
-					}
+			if (this.$fs.exists(this.$sharedUserSettingsFileService.userSettingsFilePath)) {
+				let fileInfo = this.$fs.getFsStats(this.$sharedUserSettingsFileService.userSettingsFilePath);
+				let timeDiff = Math.abs(new Date().getTime() - fileInfo.mtime.getTime());
+				let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+				if (diffDays > 1) {
+					await this.downloadUserSettings();
 				} else {
-					this.downloadUserSettings().wait();
+					this.readUserSettingsFile();
 				}
+			} else {
+				await this.downloadUserSettings();
 			}
-		}).future<void>()();
+		}
 	}
 
-	private downloadUserSettings(): IFuture<void> {
-		return (() => {
-			try {
-				this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath)).wait();
-				this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
-			} catch (error) {
-				if (error.response && error.response.statusCode === 404) {
-					this.userSettingsData = null;
-				} else {
-					throw error;
-				}
+	private async downloadUserSettings(): Promise<void> {
+		try {
+			await this.$server.rawSettings.getUserSettings(UserSettings.DefaultFileName, this.$fs.createWriteStream(this.$sharedUserSettingsFileService.userSettingsFilePath));
+			this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
+		} catch (error) {
+			if (error.response && error.response.statusCode === 404) {
+				this.userSettingsData = null;
+			} else {
+				throw error;
 			}
-		}).future<void>()();
+		}
 	}
 
-	public getSettingValue<T>(settingName: string): IFuture<T> {
-		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
-			this.loadUserSettingsFile().wait();
+	public async getSettingValue<T>(settingName: string): Promise<T> {
+		await this.$loginManager.ensureLoggedIn();
+		await this.loadUserSettingsFile();
 
-			if (!this.userSettingsData) {
-				return null;
-			}
+		if (!this.userSettingsData) {
+			return null;
+		}
 
-			let data = this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG];
-			try {
-				settingName.split(".").forEach(property => { data = data[property]; });
-			} catch (e) {
-				return null;
-			}
+		let data = this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG];
+		try {
+			settingName.split(".").forEach(property => { data = data[property]; });
+		} catch (e) {
+			return null;
+		}
 
-			if (data && data.$t) {
-				return data.$t;
-			}
+		if (data && data.$t) {
+			return data.$t;
+		}
 
-			return data;
-		}).future<T>()();
+		return data;
 	}
 
 	private readUserSettingsFile(): void {
 		this.userSettingsData = xmlMapping.tojson(this.$fs.readText(this.$sharedUserSettingsFileService.userSettingsFilePath));
 	}
 
-	public saveSetting<T>(key: string, value: T): IFuture<void> {
+	public async saveSetting<T>(key: string, value: T): Promise<void> {
 		let settingObject: any = {};
 		settingObject[key] = value;
 
 		return this.saveSettings(settingObject);
 	}
 
-	public saveSettings(data: { [key: string]: {} }): IFuture<void> {
-		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
+	public async saveSettings(data: { [key: string]: {} }): Promise<void> {
+		await this.$loginManager.ensureLoggedIn();
 
-			if (Object.keys(data).length !== 0) {
-				this.downloadUserSettings().wait();
-			} else {
-				this.readUserSettingsFile();
-			}
+		if (Object.keys(data).length !== 0) {
+			await this.downloadUserSettings();
+		} else {
+			this.readUserSettingsFile();
+		}
 
-			this.userSettingsData = this.userSettingsData || {};
+		this.userSettingsData = this.userSettingsData || {};
 
-			if (!this.userSettingsData.hasOwnProperty(SharedUserSettingsService.SETTINGS_ROOT_TAG)) {
-				this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG] = {};
-			}
+		if (!this.userSettingsData.hasOwnProperty(SharedUserSettingsService.SETTINGS_ROOT_TAG)) {
+			this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG] = {};
+		}
 
-			Object.keys(data).forEach(property => {
-				let newPropertyName = property + ".$t";
-				data[newPropertyName] = data[property];
-				delete data[property];
-			});
+		Object.keys(data).forEach(property => {
+			let newPropertyName = property + ".$t";
+			data[newPropertyName] = data[property];
+			delete data[property];
+		});
 
-			let convertedData = helpers.convertDottedStringToObject(data);
-			helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
+		let convertedData = helpers.convertDottedStringToObject(data);
+		helpers.mergeRecursive(this.userSettingsData[SharedUserSettingsService.SETTINGS_ROOT_TAG], convertedData);
 
-			let xml = xmlMapping.toxml(this.userSettingsData);
-			this.$server.rawSettings.saveUserSettings(UserSettings.DefaultFileName, xml).wait();
+		let xml = xmlMapping.toxml(this.userSettingsData);
+		await this.$server.rawSettings.saveUserSettings(UserSettings.DefaultFileName, xml);
 
-			if (Object.keys(data).length !== 0) {
-				this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml);
-			}
-		}).future<void>()();
+		if (Object.keys(data).length !== 0) {
+			this.$fs.writeFile(this.$sharedUserSettingsFileService.userSettingsFilePath, xml);
+		}
 	}
 }
+
 $injector.register("sharedUserSettingsService", SharedUserSettingsService);
 
 export class UserSettingsService extends UserSettingsServiceBase implements UserSettings.IUserSettingsService {
@@ -178,15 +174,15 @@ export class UserSettingsService extends UserSettingsServiceBase implements User
 		super($clientUserSettingsFileService.userSettingsFilePath, $fs);
 	}
 
-	public getSettingValue<T>(settingName: string): IFuture<any> {
+	public async getSettingValue<T>(settingName: string): Promise<T> {
 		if (settingName === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
-			return this.$clientSpecificUserSettingsService.getSettingValue(settingName);
+			return <Promise<T>>this.$clientSpecificUserSettingsService.getSettingValue(settingName);
 		}
 
-		return this.$sharedUserSettingsService.getSettingValue(settingName);
+		return <Promise<T>>this.$sharedUserSettingsService.getSettingValue(settingName);
 	}
 
-	public saveSetting<T>(key: string, value: T): IFuture<void> {
+	public async saveSetting<T>(key: string, value: T): Promise<void> {
 		if (key === UserSettingsService.ANALYTICS_INSTALLATION_ID_PROPERTY_NAME) {
 			return this.$clientSpecificUserSettingsService.saveSetting(key, value);
 		}
@@ -194,4 +190,5 @@ export class UserSettingsService extends UserSettingsServiceBase implements User
 		return this.$sharedUserSettingsService.saveSetting(key, value);
 	}
 }
+
 $injector.register("userSettingsService", UserSettingsService);

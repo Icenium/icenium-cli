@@ -13,8 +13,8 @@ export class DeployHelper implements IDeployHelper {
 		private $options: IOptions,
 		private $hostInfo: IHostInfo) { }
 
-	public deploy(platform?: string): IFuture<void> {
-		this.$project.ensureProject();
+	public async deploy(platform?: string): Promise<void> {
+		await this.$project.ensureProject();
 
 		if (!this.$project.capabilities.deploy) {
 			this.$errors.failWithoutHelp("You will be able to deploy %s based applications in a future release of the Telerik AppBuilder CLI.", this.$project.projectData.Framework);
@@ -32,69 +32,64 @@ export class DeployHelper implements IDeployHelper {
 			this.$errors.failWithoutHelp(`--emulator option is not supported for ${platform} platform. It is only supported for iOS platform.`);
 		}
 
-		return this.deployCore(platform);
+		await this.deployCore(platform);
 	}
 
-	private deployCore(platform: string): IFuture<void> {
-		return ((): void => {
-			this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device }).wait();
-			platform = platform || this.$devicesService.platform;
-			this.$options.justlaunch = true;
-			let appInfo: IApplicationInformation;
+	private async deployCore(platform: string): Promise<void> {
+		await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device });
+		platform = platform || this.$devicesService.platform;
+		this.$options.justlaunch = true;
+		let appInfo: IApplicationInformation;
 
-			let action = (device: Mobile.IDevice): IFuture<void> => {
-				return (() => {
-					let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
-					if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
-						let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
-						if (helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
-							this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
-							return;
-						}
-					}
-
-					if (!appInfo) {
-						appInfo = this.getAppInfoFromBuildResult(device).wait();
-					}
-
-					this.$logger.debug("Ready to deploy %s", appInfo.packageName);
-					this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).toString());
-
-					device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName).wait();
-					this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);
-					if (device.applicationManager.canStartApplication()) {
-						device.applicationManager.startApplication(appInfo.appIdentifier).wait();
-					}
-				}).future<void>()();
-			};
-
-			let canExecute = (device: Mobile.IDevice): boolean => {
-				if (this.$options.device) {
-					return device.deviceInfo.identifier === this.$devicesService.getDeviceByDeviceOption().deviceInfo.identifier;
+		let action = async (device: Mobile.IDevice): Promise<void> => {
+			let deploymentTarget = this.$project.projectData.iOSDeploymentTarget;
+			if (deploymentTarget && this.$mobileHelper.isiOSPlatform(device.deviceInfo.platform)) {
+				let deviceVersion = _.take(device.deviceInfo.version.split("."), 2).join(".");
+				if (helpers.versionCompare(deviceVersion, deploymentTarget) < 0) {
+					this.$logger.error(`You cannot deploy on device ${device.deviceInfo.identifier} with OS version ${deviceVersion} when iOSDeploymentTarget is set to ${deploymentTarget}.`);
+					return;
 				}
-
-				if (this.$mobileHelper.isiOSPlatform(platform) && this.$hostInfo.isDarwin) {
-					let isiOS = this.$options.emulator ? this.$devicesService.isiOSSimulator(device) : this.$devicesService.isiOSDevice(device);
-					return this.$devicesService.isOnlyiOSSimultorRunning() || isiOS;
-				}
-
-				return true;
-			};
-
-			this.$devicesService.execute(action, canExecute).wait();
-		}).future<void>()();
-	}
-
-	private getAppInfoFromBuildResult(device: Mobile.IDevice): IFuture<IApplicationInformation> {
-		return ((): IApplicationInformation => {
-			if (this.$devicesService.isiOSSimulator(device)) {
-				return { packageName: this.$buildService.buildForiOSSimulator(this.$options.saveTo, device).wait(), appIdentifier: this.$project.projectData.AppIdentifier };
-			} else {
-				return this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device).wait();
 			}
-		}).future<IApplicationInformation>()();
+
+			if (!appInfo) {
+				appInfo = await this.getAppInfoFromBuildResult(device);
+			}
+
+			this.$logger.debug("Ready to deploy %s", appInfo.packageName);
+			this.$logger.debug("File is %d bytes", this.$fs.getFileSize(appInfo.packageName).toString());
+
+			await device.applicationManager.reinstallApplication(appInfo.appIdentifier, appInfo.packageName);
+			this.$logger.info(`Successfully deployed on device with identifier '${device.deviceInfo.identifier}'.`);
+			if (device.applicationManager.canStartApplication()) {
+				await device.applicationManager.startApplication(appInfo.appIdentifier);
+			}
+		};
+
+		let canExecute = (device: Mobile.IDevice): boolean => {
+			if (this.$options.device) {
+				return device.deviceInfo.identifier === this.$devicesService.getDeviceByDeviceOption().deviceInfo.identifier;
+			}
+
+			if (this.$mobileHelper.isiOSPlatform(platform) && this.$hostInfo.isDarwin) {
+				let isiOS = this.$options.emulator ? this.$devicesService.isiOSSimulator(device) : this.$devicesService.isiOSDevice(device);
+				return this.$devicesService.isOnlyiOSSimultorRunning() || isiOS;
+			}
+
+			return true;
+		};
+
+		await this.$devicesService.execute(action, canExecute);
+	}
+
+	private async getAppInfoFromBuildResult(device: Mobile.IDevice): Promise<IApplicationInformation> {
+		if (this.$devicesService.isiOSSimulator(device)) {
+			return { packageName: await this.$buildService.buildForiOSSimulator(this.$options.saveTo, device), appIdentifier: this.$project.projectData.AppIdentifier };
+		} else {
+			return await this.$buildService.buildForDeploy(this.$devicesService.platform, this.$options.saveTo, false, device);
+		}
 	}
 }
+
 $injector.register("deployHelper", DeployHelper);
 
 export class DeployCommand extends EnsureProjectCommand {
@@ -106,10 +101,11 @@ export class DeployCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return this.$deployHelper.deploy();
+	public async execute(args: string[]): Promise<void> {
+		await this.$deployHelper.deploy();
 	}
 }
+
 $injector.registerCommand("deploy|*devices", DeployCommand);
 
 export class DeployAndroidCommand extends EnsureProjectCommand {
@@ -122,10 +118,11 @@ export class DeployAndroidCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return this.$deployHelper.deploy(this.$devicePlatformsConstants.Android);
+	public async execute(args: string[]): Promise<void> {
+		await this.$deployHelper.deploy(this.$devicePlatformsConstants.Android);
 	}
 }
+
 $injector.registerCommand("deploy|android", DeployAndroidCommand);
 
 export class DeployIosCommand extends EnsureProjectCommand {
@@ -138,10 +135,11 @@ export class DeployIosCommand extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return this.$deployHelper.deploy(this.$devicePlatformsConstants.iOS);
+	public async execute(args: string[]): Promise<void> {
+		await this.$deployHelper.deploy(this.$devicePlatformsConstants.iOS);
 	}
 }
+
 $injector.registerCommand("deploy|ios", DeployIosCommand);
 
 export class DeployWP8Command extends EnsureProjectCommand {
@@ -155,10 +153,11 @@ export class DeployWP8Command extends EnsureProjectCommand {
 
 	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return this.$deployHelper.deploy(this.$devicePlatformsConstants.WP8);
+	public async execute(args: string[]): Promise<void> {
+		await this.$deployHelper.deploy(this.$devicePlatformsConstants.WP8);
 	}
 
 	public isDisabled = this.$config.ON_PREM;
 }
+
 $injector.registerCommand("deploy|wp8", DeployWP8Command);

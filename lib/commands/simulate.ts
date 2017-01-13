@@ -1,22 +1,19 @@
 export class SimulateCommand implements ICommand {
 	private projectData: Project.IData;
 
-	constructor(private $errors: IErrors,
-		private $project: Project.IProject,
+	constructor(private $project: Project.IProject,
 		private $simulatorService: ISimulatorService,
-		private $simulatorPlatformServices: IExtensionPlatformServices,
-		private $hostCapabilities: IHostCapabilities) {
-			this.projectData = $project.projectData;
+		private $simulatorPlatformServices: IExtensionPlatformServices) {
+		this.projectData = this.$project.projectData;
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			if (this.$simulatorPlatformServices.canRunApplication && this.$simulatorPlatformServices.canRunApplication().wait()) {
-				this.$simulatorService.launchSimulator().wait();
-			}
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		if (this.$simulatorPlatformServices.canRunApplication && await this.$simulatorPlatformServices.canRunApplication()) {
+			await this.$simulatorService.launchSimulator();
+		}
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand("simulate", SimulateCommand);

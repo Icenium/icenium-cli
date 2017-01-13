@@ -1,22 +1,20 @@
 /* tslint:disable:no-empty */
-import {Yok} from "../lib/common/yok";
-import future = require("fibers/future");
+import { Yok } from "../lib/common/yok";
 import * as stubs from "./stubs";
-import {CommandsService} from "../lib/common/services/commands-service";
-import {Configuration} from "../lib/config";
+import { CommandsService } from "../lib/common/services/commands-service";
 import * as util from "util";
-import {assert} from "chai";
-import {StringCommandParameter, StringParameterBuilder} from "../lib/common/command-params";
-import {OptionType} from "../lib/common/options";
-import {Options} from "../lib/options";
-import {HostInfo} from "../lib/common/host-info";
+import { assert } from "chai";
+import { StringCommandParameter, StringParameterBuilder } from "../lib/common/command-params";
+import { OptionType } from "../lib/common/options";
+import { Options } from "../lib/options";
+import { HostInfo } from "../lib/common/host-info";
 
 let isCommandExecuted: boolean;
 
 export class LoggerStubWithErrorOnFatal implements ILogger {
 	setLevel(level: string): void { }
 	getLevel(): string { return undefined; }
-	fatal(formatStr: string, ...args: string[]): void { throw new Error();}
+	fatal(formatStr: string, ...args: string[]): void { throw new Error(); }
 	error(formatStr: string, ...args: string[]): void { }
 	warn(formatStr: string, ...args: string[]): void { }
 	warnWithLabel(formatStr: string, ...args: string[]): void { }
@@ -33,12 +31,12 @@ export class LoggerStubWithErrorOnFatal implements ILogger {
 
 	write(...args: string[]): void { }
 
-	printMarkdown(...args:string[]): void {/* mock */}
+	printMarkdown(...args: string[]): void {/* mock */ }
 
 	prepare(item: any): string { return item; }
 
 	printInfoMessageOnSameLine(message: string): void { }
-	printMsgWithTimeout(message: string, timeout: number): IFuture <void> { return null;}
+	printMsgWithTimeout(message: string, timeout: number): Promise<void> { return null; }
 }
 
 class MockCommandParameter implements ICommandParameter {
@@ -47,8 +45,8 @@ class MockCommandParameter implements ICommandParameter {
 	}
 
 	mandatory = false;
-	validate(value: string): IFuture<boolean> {
-		return (() => { return true; }).future<boolean>()();
+	async validate(value: string): Promise<boolean> {
+		return true;
 	}
 }
 
@@ -58,14 +56,15 @@ class MockInvalidCommandParameter implements ICommandParameter {
 	}
 
 	mandatory = false;
-	validate(value: string): IFuture<boolean> {
-		return (() => { return false; }).future<boolean>()();
+	async validate(value: string): Promise<boolean> {
+		return false;
 	}
 }
 
 class MockCommandWithOneMandatoryParameter implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
+		return Promise.resolve();
 	}
 
 	disableAnalytics = true;
@@ -73,8 +72,8 @@ class MockCommandWithOneMandatoryParameter implements ICommand {
 }
 
 class MockCommandWithOneNonMandatoryParameter implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -82,8 +81,8 @@ class MockCommandWithOneNonMandatoryParameter implements ICommand {
 }
 
 class MockCommandWithSomeMandatoryParameteres implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -91,8 +90,8 @@ class MockCommandWithSomeMandatoryParameteres implements ICommand {
 }
 
 class MockCommandWithoutParameters implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -100,8 +99,8 @@ class MockCommandWithoutParameters implements ICommand {
 }
 
 class MockCommandWithInvalidParameters implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -109,12 +108,12 @@ class MockCommandWithInvalidParameters implements ICommand {
 }
 
 class MockCommandWithCanExecuteImplemented implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
-	canExecute(args: string[]): IFuture<boolean> {
-		return future.fromResult(args[0] === "true");
+	async canExecute(args: string[]): Promise<boolean> {
+		return Promise.resolve(args[0] === "true");
 	}
 
 	disableAnalytics = true;
@@ -124,8 +123,8 @@ class MockCommandWithCanExecuteImplemented implements ICommand {
 class MockCommandWithStringCommandParameter implements ICommand {
 	// Make sure stringParameter can be resolved
 	constructor(private $stringParameter: ICommandParameter) { }
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -134,10 +133,9 @@ class MockCommandWithStringCommandParameter implements ICommand {
 
 class MockCommandWithStringParamBuilder implements ICommand {
 	// Make sure stringParameter can be resolved
-	constructor(private $stringParameter: ICommandParameter,
-		private $stringParameterBuilder: IStringParameterBuilder) { }
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	constructor(private $stringParameterBuilder: IStringParameterBuilder) { }
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -145,8 +143,8 @@ class MockCommandWithStringParamBuilder implements ICommand {
 }
 
 class MockCommandWithIsDisabledToTrue implements ICommand {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	isDisabled = true;
@@ -155,8 +153,8 @@ class MockCommandWithIsDisabledToTrue implements ICommand {
 }
 
 class MockCommandWithSpecificDashedOptions {
-	execute(args: string[]): IFuture<void> {
-		return (() => isCommandExecuted = true).future<void>()();
+	async execute(args: string[]): Promise<void> {
+		isCommandExecuted = true;
 	}
 
 	disableAnalytics = true;
@@ -171,7 +169,7 @@ class MockCommandWithSpecificDashedOptions {
 function createTestInjector(): IInjector {
 	let testInjector = new Yok();
 	testInjector.register("hostInfo", HostInfo);
-	testInjector.register("config", Configuration);
+	testInjector.register("config", {});
 	testInjector.register("logger", LoggerStubWithErrorOnFatal);
 	testInjector.register("fs", stubs.FileSystemStub);
 	testInjector.register("errors", stubs.ErrorsNoFailStub);
@@ -181,13 +179,13 @@ function createTestInjector(): IInjector {
 	testInjector.register("stringParameter", StringCommandParameter);
 	testInjector.register("stringParameterBuilder", StringParameterBuilder);
 	testInjector.register("analyticsService", {
-		checkConsent: (): IFuture<void> => { return future.fromResult(); },
-		trackFeature: (featureName: string): IFuture<void> => { return future.fromResult(); }
+		checkConsent: (): Promise<void> => { return Promise.resolve(); },
+		trackFeature: (featureName: string): Promise<void> => { return Promise.resolve(); }
 	});
 	testInjector.register("resources", {});
 	testInjector.register("injector", testInjector);
 	testInjector.register("commandsServiceProvider", {
-		registerDynamicSubCommands: () => {}
+		registerDynamicSubCommands: () => { }
 	});
 	testInjector.registerCommand("commandWithOneMandatArg", MockCommandWithOneMandatoryParameter);
 	testInjector.registerCommand("commandWithOneNonMandatArg", MockCommandWithOneNonMandatoryParameter);
@@ -203,7 +201,7 @@ function createTestInjector(): IInjector {
 	return testInjector;
 }
 
-function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInjector {
+function setUpTestInjector(testInjector: IInjector, commandHelpData?: any): IInjector {
 	testInjector.register("resources", {
 		readJson: (resourcePath: string): any => commandHelpData,
 		resolvePath: (resourcePath: string): string => {
@@ -213,7 +211,7 @@ function setUpTestInjector(testInjector :IInjector, commandHelpData?: any): IInj
 
 	for (let command in commandHelpData) {
 		testInjector.registerCommand(command, {
-			execute: (args: string[]): IFuture<void> => { return future.fromResult(); }
+			execute: (args: string[]): Promise<void> => { return Promise.resolve(); }
 		});
 	}
 
@@ -232,157 +230,146 @@ describe("commands service", () => {
 			commandsService = testInjector.resolve(CommandsService);
 		});
 
-		it("executes command which has only StringCommandParameter when param is NOT passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("executes command which has only StringCommandParameter when param is NOT passed", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParam", []).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParam", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("executes command which has only StringCommandParameter when param is passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("executes command which has only StringCommandParameter when param is passed", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParam", ["stringParameter"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command which has mandatory StringCommandParameter created with StringParameterBuilder and param is not passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("does not execute command which has mandatory StringCommandParameter created with StringParameterBuilder and param is not passed", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParamBuilder", []).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command which has mandatory StringCommandParameter created with StringParameterBuilder and param is passed", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("executes command which has mandatory StringCommandParameter created with StringParameterBuilder and param is passed", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]).wait();
+			await commandsService.tryExecuteCommand("commandWithStringParamBuilder", ["stringParameter"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("calls executeCommand when command name is valid", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("calls executeCommand when command name is valid", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("commandWithoutArgs", []).wait();
+			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not call executeCommand when command name is invalid", () => {
-			commandsService.executeCommandUnchecked = (commandName: string): IFuture<boolean> => {
-				return (() => {
-					if (commandName !== "help") {
-						isCommandExecuted = true;
-					}
-					return false;
-				}).future<boolean>()();
+		it("does not call executeCommand when command name is invalid", async () => {
+			commandsService.executeCommandUnchecked = async (commandName: string): Promise<boolean> => {
+				if (commandName !== "help") {
+					isCommandExecuted = true;
+				}
+				return false;
 			};
 
-			commandsService.tryExecuteCommand("InvalidCommandName", []).wait();
+			await commandsService.tryExecuteCommand("InvalidCommandName", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it has valid mandatory arguments", () => {
-			commandsService.tryExecuteCommand("commandWithOneMandatArg", ["simple string param"]).wait();
+		it("executes command when it has valid mandatory arguments", async () => {
+			await commandsService.tryExecuteCommand("commandWithOneMandatArg", ["simple string param"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it has missing mandatory argument", () => {
-			commandsService.tryExecuteCommand("commandWithOneMandatArg", []).wait();
+		it("does not execute command when it has missing mandatory argument", async () => {
+			await commandsService.tryExecuteCommand("commandWithOneMandatArg", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it doesn't accept arguments and there aren't passed any", () => {
-			commandsService.tryExecuteCommand("commandWithoutArgs", []).wait();
+		it("executes command when it doesn't accept arguments and there aren't passed any", async () => {
+			await commandsService.tryExecuteCommand("commandWithoutArgs", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it doesn't accept arguments, but there are passed some", () => {
-			commandsService.tryExecuteCommand("commandWithoutArgs", ["argument"]).wait();
+		it("does not execute command when it doesn't accept arguments, but there are passed some", async () => {
+			await commandsService.tryExecuteCommand("commandWithoutArgs", ["argument"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("does not execute command when it accepts arguments and the validation method of one of them is failing", () => {
-			commandsService.tryExecuteCommand("commandWithInvalidArgs", []).wait();
+		it("does not execute command when it accepts arguments and the validation method of one of them is failing", async () => {
+			await commandsService.tryExecuteCommand("commandWithInvalidArgs", []);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("executes command when it has some nonmandatory arguments and there aren't passed any", () => {
-			commandsService.tryExecuteCommand("commandWithOneNonMandatArg", []).wait();
+		it("executes command when it has some nonmandatory arguments and there aren't passed any", async () => {
+			await commandsService.tryExecuteCommand("commandWithOneNonMandatArg", []);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("executes command when it has some mandatory arguments and all of them are passed", () => {
-			commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1", "param2"]).wait();
+		it("executes command when it has some mandatory arguments and all of them are passed", async () => {
+			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1", "param2"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it has some mandatory arguments and not all of them are passed", () => {
-			commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1"]).wait();
+		it("does not execute command when it has some mandatory arguments and not all of them are passed", async () => {
+			await commandsService.tryExecuteCommand("commandWithSomeMandatArgs", ["param1"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("does not call validateMandatoryParams when command implements canExecute method.", () => {
+		it("does not call validateMandatoryParams when command implements canExecute method.", async () => {
 			let isValidateCommandArgumentsCalled = false;
 			commandsService.validateCommandArguments = () => {
 				isValidateCommandArgumentsCalled = true;
 			};
 
 			// Assert validateCommandArguments is not called when canExecute returns true
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]);
 			assert.isFalse(isValidateCommandArgumentsCalled);
 
 			// Assert validateCommandArguments is not called when canExecute returns false
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["param"]).wait();
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["param"]);
 			assert.isFalse(isValidateCommandArgumentsCalled);
 		});
 
-		it("executes command when it implements canExecute and it returns true", () => {
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]).wait();
+		it("executes command when it implements canExecute and it returns true", async () => {
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["true"]);
 			assert.isTrue(isCommandExecuted);
 		});
 
-		it("does not execute command when it implements canExecute and it returns false", () => {
-			commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]).wait();
+		it("does not execute command when it implements canExecute and it returns false", async () => {
+			await commandsService.tryExecuteCommand("commandWithCanExecute", ["false"]);
 			assert.isFalse(isCommandExecuted);
 		});
 
-		it("does not execute command when it has isEnabled set to false", () => {
-			commandsService.tryExecuteCommand("commandWithIsDisabledSetToTrue", []).wait();
+		it("does not execute command when it has isEnabled set to false", async () => {
+			await commandsService.tryExecuteCommand("commandWithIsDisabledSetToTrue", []);
 			assert.isFalse(isCommandExecuted);
 		});
 	});
@@ -393,32 +380,32 @@ describe("commands service", () => {
 			testInjector = createTestInjector();
 		});
 
-		it("does not execute command when it has its own dashed options and invalid one is passed", () => {
+		it("does not execute command when it has its own dashed options and invalid one is passed", async () => {
 			// this is valid globally, but this command has its own dashed options and availableDevices is not part of them
 			process.argv.push("--availableDevices");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isFalse(isCommandExecuted);
 			process.argv.pop();
 		});
 
-		it("executes command when it has its own dashed options and one of them is passed", () => {
+		it("executes command when it has its own dashed options and one of them is passed", async () => {
 			// this is NOT valid globally, but this command has its own dashed options and test1 is part of them
 			process.argv.push("--test1");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 		});
 
-		it("executes command when it has its own dashed options and a global one is passed", () => {
+		it("executes command when it has its own dashed options and a global one is passed", async () => {
 			process.argv.push("--log");
 			process.argv.push("trace");
 			testInjector.register("options", Options);
 			commandsService = testInjector.resolve("commandsService");
-			commandsService.tryExecuteCommand("commandWithDashedOptions", []).wait();
+			await commandsService.tryExecuteCommand("commandWithDashedOptions", []);
 			assert.isTrue(isCommandExecuted);
 			process.argv.pop();
 			process.argv.pop();
@@ -442,21 +429,21 @@ describe("commands service", () => {
 			});
 		});
 
-		it("shows command help message after successful command execute", () => {
+		it("shows command help message after successful command execute", async () => {
 			let commandHelpData = { testingCommand: "testingCommand" };
 			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
-			commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []).wait();
+			await commandsService.executeCommandUnchecked(commandHelpData.testingCommand, []);
 			assert.deepEqual(loggerOutput, commandHelpData.testingCommand);
 		});
 
-		it("does not show command help message after unsuccessful command execute", () => {
+		it("does not show command help message after unsuccessful command execute", async () => {
 			let commandHelpData = { testingCommand: "testingCommand" };
 			testInjector = setUpTestInjector(testInjector, commandHelpData);
 			commandsService = testInjector.resolve("commandsService");
 
-			commandsService.executeCommandUnchecked("nonExistingCommand", []).wait();
+			await commandsService.executeCommandUnchecked("nonExistingCommand", []);
 
 			assert.deepEqual(loggerOutput, '');
 		});

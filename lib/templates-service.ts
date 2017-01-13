@@ -26,7 +26,7 @@ export class TemplatesService implements ITemplatesService {
 
 	public getTemplatesString(regexp: RegExp, replacementNames: IStringDictionary): string {
 		let templates = _(this.$fs.readDirectory(this.projectTemplatesDir))
-			.map((file) => {
+			.map((file: string) => {
 				let match = file.match(regexp),
 					templateName = match && match[1],
 					replacementName = templateName && replacementNames[templateName.toLowerCase()];
@@ -39,71 +39,62 @@ export class TemplatesService implements ITemplatesService {
 		return helpers.formatListOfNames(templates);
 	}
 
-	public downloadProjectTemplates(): IFuture<void> {
-		return (() => {
-			let templates = this.$server.projects.getProjectTemplates().wait();
-			let templatesDir = this.projectTemplatesDir;
-			this.$fs.deleteDirectory(templatesDir);
-			this.$fs.createDirectory(templatesDir);
+	public async downloadProjectTemplates(): Promise<void> {
+		let templates = await this.$server.projects.getProjectTemplates();
+		let templatesDir = this.projectTemplatesDir;
+		this.$fs.deleteDirectory(templatesDir);
+		this.$fs.createDirectory(templatesDir);
 
-			_.each(templates, (template) => this.downloadTemplate(template, templatesDir).wait());
-		}).future<void>()();
+		await Promise.all(_.map(templates, async (template: any) => await this.downloadTemplate(template, templatesDir)));
 	}
 
-	public downloadItemTemplates(): IFuture<void> {
-		return (() => {
-			let templates = this.$server.projects.getItemTemplates().wait();
-			let templatesDir = this.itemTemplatesDir;
-			this.$fs.deleteDirectory(templatesDir);
-			this.$fs.createDirectory(templatesDir);
+	public async downloadItemTemplates(): Promise<void> {
+		let templates = await this.$server.projects.getItemTemplates();
+		let templatesDir = this.itemTemplatesDir;
+		this.$fs.deleteDirectory(templatesDir);
+		this.$fs.createDirectory(templatesDir);
 
-			_.each(templates, (template) => {
-				if (template["Category"] === "Configuration") {
-					this.downloadTemplate(template, templatesDir).wait();
-				}
-			});
-		}).future<void>()();
-	}
-
-	public unpackAppResources(): IFuture<void> {
-		return (() => {
-			let cordovaAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
-			this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName).wait();
-			let nsAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.NS.Blank.zip");
-			this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName).wait();
-		}).future<void>()();
-	}
-
-	private unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): IFuture<void> {
-		return (() => {
-			temp.track();
-			let extractionDir = temp.mkdirSync("appResourcesTemp");
-
-			// In NativeScript templates App_Resources are under app/App_Resources.
-			// In Cordova templates App_Resources are at the root.
-			// So extract all *App_Resources and filter them after that, so we'll copy the real App_Resources directory to the destination appResourcesDir.
-			this.$fs.unzip(assetsZipFileName, extractionDir, { caseSensitive: false, overwriteExisitingFiles: true }, ["*App_Resources/**"]).wait();
-
-			let appResourcesDirInTemp = _(this.$fs.enumerateFilesInDirectorySync(extractionDir, null, {enumerateDirectories: true}))
-				.filter(file => path.basename(file) === "App_Resources")
-				.first();
-			if (appResourcesDirInTemp) {
-				shelljs.cp("-rf", `${appResourcesDirInTemp}`, appResourcesDir);
+		await Promise.all(_.map(templates, async (template: any) => {
+			if (template["Category"] === "Configuration") {
+				await this.downloadTemplate(template, templatesDir);
 			}
-		}).future<void>()();
+		}));
 	}
 
-	private downloadTemplate(template: any, templatesDir: string): IFuture<void> {
-		return (() => {
-			let downloadUri = template.DownloadUri;
-			let name = path.basename(downloadUri);
-			let filepath = path.join(templatesDir, name);
-			let file = this.$fs.createWriteStream(filepath);
-			let fileEnd = this.$fs.futureFromEvent(file, "finish");
+	public async unpackAppResources(): Promise<void> {
+		let cordovaAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.Cordova.Blank.zip");
+		await this.unpackAppResourcesCore(this.$resources.resolvePath("Cordova"), cordovaAssetsZipFileName);
+		let nsAssetsZipFileName = path.join(this.projectTemplatesDir, "Telerik.Mobile.NS.Blank.zip");
+		await this.unpackAppResourcesCore(this.$resources.resolvePath("NativeScript"), nsAssetsZipFileName);
+	}
 
-			this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file }).wait();
-			fileEnd.wait();
-		}).future<void>()();
+	private async unpackAppResourcesCore(appResourcesDir: string, assetsZipFileName: string): Promise<void> {
+		temp.track();
+		let extractionDir = temp.mkdirSync("appResourcesTemp");
+
+		// In NativeScript templates App_Resources are under app/App_Resources.
+		// In Cordova templates App_Resources are at the root.
+		// So extract all *App_Resources and filter them after that, so we'll copy the real App_Resources directory to the destination appResourcesDir.
+		await this.$fs.unzip(assetsZipFileName, extractionDir, { caseSensitive: false, overwriteExisitingFiles: true }, ["*App_Resources/**"]);
+
+		let appResourcesDirInTemp = _(this.$fs.enumerateFilesInDirectorySync(extractionDir, null, { enumerateDirectories: true }))
+			.filter((file: string) => path.basename(file) === "App_Resources")
+			.first();
+
+		if (appResourcesDirInTemp) {
+			shelljs.cp("-rf", `${appResourcesDirInTemp}`, appResourcesDir);
+		}
+	}
+
+	private async downloadTemplate(template: any, templatesDir: string): Promise<void> {
+		let downloadUri = template.DownloadUri;
+		let name = path.basename(downloadUri);
+		let filepath = path.join(templatesDir, name);
+		let file = this.$fs.createWriteStream(filepath);
+		let fileEnd = this.$fs.futureFromEvent(file, "finish");
+
+		await this.$httpClient.httpRequest({ url: downloadUri, pipeTo: file });
+		await fileEnd;
 	}
 }
 $injector.register("templatesService", TemplatesService);

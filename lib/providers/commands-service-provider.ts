@@ -38,11 +38,11 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		return this.$screenBuilderService.commandsPrefix;
 	}
 
-	public getDynamicCommands(): IFuture<string[]> {
+	public async getDynamicCommands(): Promise<string[]> {
 		return this.$screenBuilderService.allSupportedCommands(this.$injector.resolve("project").getProjectDir(), this.$screenBuilderService.generatorFullName);
 	}
 
-	public generateDynamicCommands(): IFuture<void> {
+	public async generateDynamicCommands(): Promise<void> {
 		return this.$screenBuilderService.generateAllCommands(this.$injector.resolve("project").getProjectDir(), this.$screenBuilderService.generatorFullName);
 	}
 
@@ -62,4 +62,5 @@ class CommandsServiceProvider implements ICommandsServiceProvider {
 		});
 	}
 }
+
 $injector.register("commandsServiceProvider", CommandsServiceProvider);

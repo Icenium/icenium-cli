@@ -5,39 +5,36 @@ export class KendoUIService implements IKendoUIService {
 
 	private _packages: Server.IKendoDownloadablePackageData[] = null;
 
-	constructor(private $server: Server.IServer) {
-	}
+	constructor(private $server: Server.IServer) { }
 
-	public getKendoPackages(options: IKendoUIFilterOptions): IFuture<Server.IKendoDownloadablePackageData[]> {
-		return (() => {
-			if (!this._packages) {
-				let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>this.$server.kendo.getPackages().wait(), p => !p.NeedPurchase);
-				if (options.verified) {
-					packages = _.filter(packages, pack => _.some(pack.VersionTags, tag => tag.toLowerCase() === KendoUIService.VERIFIED_TAG));
-				}
-
-				if (options.core) {
-					packages = _.filter(packages, pack => pack.Name === KendoUIService.KENDO_CORE);
-				}
-
-				if (options.professional) {
-					packages = _.filter(packages, pack => pack.Name === KendoUIService.KENDO_PROFESSIONAL);
-				}
-
-				if (options.withReleaseNotesOnly) {
-					packages = _.filter(packages, pack => pack.HasReleaseNotes);
-				}
-
-				if (options.latest) {
-					let latestPackage = _.first(packages);
-					packages = _.filter(packages, pack => pack.Version === latestPackage.Version);
-				}
-
-				this._packages = packages;
+	public async getKendoPackages(options: IKendoUIFilterOptions): Promise<Server.IKendoDownloadablePackageData[]> {
+		if (!this._packages) {
+			let packages: Server.IKendoDownloadablePackageData[] = _.filter(<Server.IKendoDownloadablePackageData[]>(await this.$server.kendo.getPackages()), p => !p.NeedPurchase);
+			if (options.verified) {
+				packages = _.filter(packages, pack => _.some(pack.VersionTags, tag => tag.toLowerCase() === KendoUIService.VERIFIED_TAG));
 			}
 
-			return this._packages;
-		}).future<Server.IKendoDownloadablePackageData[]>()();
+			if (options.core) {
+				packages = _.filter(packages, pack => pack.Name === KendoUIService.KENDO_CORE);
+			}
+
+			if (options.professional) {
+				packages = _.filter(packages, pack => pack.Name === KendoUIService.KENDO_PROFESSIONAL);
+			}
+
+			if (options.withReleaseNotesOnly) {
+				packages = _.filter(packages, pack => pack.HasReleaseNotes);
+			}
+
+			if (options.latest) {
+				let latestPackage = _.first(packages);
+				packages = _.filter(packages, pack => pack.Version === latestPackage.Version);
+			}
+
+			this._packages = packages;
+		}
+
+		return this._packages;
 	}
 }
 

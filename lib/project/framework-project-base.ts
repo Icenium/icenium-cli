@@ -82,9 +82,9 @@ export abstract class FrameworkProjectBase implements Project.IFrameworkProjectB
 		return updated;
 	}
 
-	public abstract ensureProject(projectDir: string): IFuture<void>;
+	public abstract async ensureProject(projectDir: string): Promise<void>;
 
-	public abstract updateMigrationConfigFile(): IFuture<void>;
+	public abstract async updateMigrationConfigFile(): Promise<void>;
 
 	private generateDefaultAppId(appName: string): string {
 		let sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");

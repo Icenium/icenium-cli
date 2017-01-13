@@ -23,32 +23,31 @@ import * as mobilePlatformsCapabilitiesLib from "../lib/common/appbuilder/mobile
 import * as cordovaResourcesLib from "../lib/cordova-resource-loader";
 import * as projectPropertiesService from "../lib/services/project-properties-service";
 import * as cordovaMigrationService from "../lib/services/cordova-migration-service";
-import Future = require("fibers/future");
 import * as hostInfoLib from "../lib/common/host-info";
-import {DeviceAppDataProvider} from "../lib/common/appbuilder/providers/device-app-data-provider";
-import {ProjectFilesProvider} from "../lib/common/appbuilder/providers/project-files-provider";
-import {DeviceAppDataFactory} from "../lib/common/mobile/device-app-data/device-app-data-factory";
-import {LocalToDevicePathDataFactory} from "../lib/common/mobile/local-to-device-path-data-factory";
-import {ConfigFilesManager} from "../lib/project/config-files-manager";
-import {assert} from "chai";
-import {NativeScriptProjectCapabilities} from "../lib/common/appbuilder/project/nativescript-project-capabilities";
-import {CordovaProjectCapabilities} from "../lib/common/appbuilder/project/cordova-project-capabilities";
+import { DeviceAppDataProvider } from "../lib/common/appbuilder/providers/device-app-data-provider";
+import { ProjectFilesProvider } from "../lib/common/appbuilder/providers/project-files-provider";
+import { DeviceAppDataFactory } from "../lib/common/mobile/device-app-data/device-app-data-factory";
+import { LocalToDevicePathDataFactory } from "../lib/common/mobile/local-to-device-path-data-factory";
+import { ConfigFilesManager } from "../lib/project/config-files-manager";
+import { assert } from "chai";
+import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/project/nativescript-project-capabilities";
+import { CordovaProjectCapabilities } from "../lib/common/appbuilder/project/cordova-project-capabilities";
 temp.track();
 let projectConstants = new projectConstantsLib.ProjectConstants();
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../lib/common/constants";
-import {DateProvider} from "../lib/providers/date-provider";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../lib/common/constants";
+import { DateProvider } from "../lib/providers/date-provider";
 
 class PrompterStub implements IPrompter {
 	public confirmResult: boolean = false;
 	public confirmCalled: boolean = false;
 
-	get(schema: IPromptSchema[]): IFuture<any> { return Future.fromResult(""); }
-	getPassword(prompt: string, options?: { allowEmpty?: boolean }): IFuture<string> { return Future.fromResult(""); }
-	getString(prompt: string): IFuture<string> { return Future.fromResult(""); }
-	promptForChoice(promptMessage: string, choices: any[]): IFuture<string> { return Future.fromResult(""); }
-	confirm(prompt: string, defaultAction?: () => boolean): IFuture<boolean> {
+	async get(schema: IPromptSchema[]): Promise<any> { return Promise.resolve(""); }
+	async getPassword(prompt: string, options?: { allowEmpty?: boolean }): Promise<string> { return Promise.resolve(""); }
+	async getString(prompt: string): Promise<string> { return Promise.resolve(""); }
+	async promptForChoice(promptMessage: string, choices: any[]): Promise<string> { return Promise.resolve(""); }
+	async confirm(prompt: string, defaultAction?: () => boolean): Promise<boolean> {
 		this.confirmCalled = true;
-		return Future.fromResult(this.confirmResult);
+		return Promise.resolve(this.confirmResult);
 	}
 	public dispose() { /* intentionally empty body */ }
 }
@@ -75,9 +74,9 @@ function createTestInjector(): IInjector {
 	testInjector.register("server", {
 		cordova: {
 			getCordovaFrameworkVersions: () => {
-				return Future.fromResult([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
-					{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
-					{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
+				return Promise.resolve([{ DisplayName: "version_3_2_0", Version: { _Major: 3, _Minor: 2, _Build: 0, _Revision: -1 } },
+				{ DisplayName: "version_3_5_0", Version: { _Major: 3, _Minor: 5, _Build: 0, _Revision: -1 } },
+				{ DisplayName: "version_3_7_0", Version: { _Major: 3, _Minor: 7, _Build: 0, _Revision: -1 } }]);
 			}
 		}
 
@@ -107,6 +106,7 @@ function createTestInjector(): IInjector {
 			if (!framework || framework === "Cordova") {
 				return testInjector.resolve("cordovaProject");
 			}
+
 			return testInjector.resolve("nativeScriptProject");
 		}
 	});
@@ -116,16 +116,16 @@ function createTestInjector(): IInjector {
 	testInjector.register("projectConstants", projectConstantsLib.ProjectConstants);
 	testInjector.register("projectFilesManager", projectFilesManagerLib.ProjectFilesManager);
 	testInjector.register("jsonSchemaConstants", jsonSchemaConstantsLib.JsonSchemaConstants);
-	testInjector.register("loginManager", { ensureLoggedIn: (): IFuture<void> => { return Future.fromResult(); } });
+	testInjector.register("loginManager", { ensureLoggedIn: async (): Promise<void> => { /*intentionally empty body */ } });
 	testInjector.register("mobilePlatformsCapabilities", mobilePlatformsCapabilitiesLib.MobilePlatformsCapabilities);
-	testInjector.register("httpClient", { /*intentionally empty body */ });
+	testInjector.register("httpClient", {});
 	testInjector.register("multipartUploadService", {});
 	testInjector.register("progressIndicator", {});
 	testInjector.register("nativeScriptProjectCapabilities", NativeScriptProjectCapabilities);
 	testInjector.register("cordovaProjectCapabilities", CordovaProjectCapabilities);
 
 	testInjector.register("pluginsService", {
-		getPluginBasicInformation: (pluginName: string) => Future.fromResult({ name: 'Name', version: '1.0.0' }),
+		getPluginBasicInformation: (pluginName: string) => Promise.resolve({ name: 'Name', version: '1.0.0' }),
 		getPluginVersions: (plugin: IPlugin) => {
 			return [{
 				name: '1.0.0',
@@ -151,7 +151,7 @@ function createTestInjector(): IInjector {
 		minSupportedVersion: "4.0.0",
 		getCurrentWebViewName: () => "Default",
 		getWebView: () => ({ name: "Default" }),
-		enableWebView: () => Future.fromResult()
+		enableWebView: () => Promise.resolve()
 	});
 	testInjector.register("serverConfiguration", {});
 
@@ -162,7 +162,7 @@ function createTestInjector(): IInjector {
 	testInjector.register("configFilesManager", ConfigFilesManager);
 	testInjector.register("dateProvider", DateProvider);
 	testInjector.register("typeScriptService", {
-		isTypeScriptProject: (projectDir: string): IFuture<boolean> => Future.fromResult(false)
+		isTypeScriptProject: async (projectDir: string): Promise<boolean> => false
 	});
 	testInjector.register("npmService", {});
 
@@ -176,10 +176,11 @@ describe("project integration tests", () => {
 		testInjector.register("fs", fslib.FileSystem);
 		testInjector.register("projectPropertiesService", projectPropertiesLib.ProjectPropertiesService);
 		options = testInjector.resolve("options");
+		testInjector.resolve("nativeScriptProject").updateMigrationConfigFile = async () => undefined;
 	});
 
 	describe("createNewProject", () => {
-		it("creates a valid project folder (Cordova project)", () => {
+		it("creates a valid project folder (Cordova project)", async () => {
 			project = testInjector.resolve(projectlib.Project);
 			let tempFolder = temp.mkdirSync("template");
 			let projectName = "Test";
@@ -188,14 +189,14 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 
 			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-Cordova.abproject"));
 			let testProperties = JSON.parse(abProject.toString());
 			let correctProperties = JSON.parse(correctABProject.toString());
 
-			let projectSchema = project.getProjectSchema().wait();
+			let projectSchema = await project.getProjectSchema();
 			let guidRegex = new RegExp(projectSchema.WP8ProductID.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
@@ -211,7 +212,7 @@ describe("project integration tests", () => {
 			}
 		});
 
-		it("creates a valid project folder (NativeScript project)", () => {
+		it("creates a valid project folder (NativeScript project)", async () => {
 			project = testInjector.resolve(projectlib.Project);
 			let tempFolder = temp.mkdirSync("template");
 			let projectName = "Test";
@@ -220,13 +221,13 @@ describe("project integration tests", () => {
 			options.template = "Blank";
 			options.appid = "com.telerik.Test";
 
-			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+			await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 			let abProject = fs.readFileSync(path.join(tempFolder, ".abproject"));
 			let correctABProject = fs.readFileSync(path.join(__dirname, "/resources/blank-NativeScript.abproject"));
 			let testProperties = JSON.parse(abProject.toString());
 			let correctProperties = JSON.parse(correctABProject.toString());
 
-			let projectSchema = project.getProjectSchema().wait();
+			let projectSchema = await project.getProjectSchema();
 			let guidRegex = new RegExp(projectSchema.ProjectGuid.regex);
 
 			assert.ok(guidRegex.test(testProperties.ProjectGuid));
@@ -241,7 +242,7 @@ describe("project integration tests", () => {
 
 	describe("updateProjectPropertiesAndSave", () => {
 		let prompter: PrompterStub;
-		beforeEach(() => {
+		beforeEach(async () => {
 			prompter = testInjector.resolve("prompter");
 			prompter.confirmResult = true;
 			let tempFolder = temp.mkdirSync("template");
@@ -251,65 +252,65 @@ describe("project integration tests", () => {
 			options.appid = "com.telerik.Test";
 			let projectName = "Test";
 			project = testInjector.resolve("project");
-			project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+			await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 			options.debug = options.release = false;
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 		});
 
-		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", () => {
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", async () => {
+			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk must be 8.1");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
 
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
 
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk must be downgraded to 8.0 when downgrading Cordova version from 3.7.0");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
 		});
 
-		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", () => {
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", async () => {
+			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be updated to 3.7.0 when WPSdk is updated to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk should have been updated to 8.1");
 		});
 
-		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", () => {
+		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", async () => {
 			prompter.confirmResult = false;
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
-			assert.throws(() => project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait());
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
+			await assert.isRejected(project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]), "Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
 		});
 
-		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses", () => {
+		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses", async () => {
 			// First set WPSdk to 8.1 and FrameworkVersion to 3.7.0
 			prompter.confirmResult = true;
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
 
 			prompter.confirmResult = false;
-			assert.throws(() => project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait());
+			await assert.isRejected(project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]), "Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
 		});
 
-		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", () => {
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
+		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", async () => {
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 			prompter.confirmCalled = false;
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]).wait();
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
 			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change WPSdk to 8.0, but it is already 8.0. DO NOT PROMPT HERE!");
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.5.0");
 		});
 
-		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", () => {
-			project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]).wait();
+		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", async () => {
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
 			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
 
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.0"]).wait();
+			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.0"]);
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version should have been migrated to 8.0");
 			prompter.confirmCalled = false;
-			project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]).wait();
+			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
 			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change Cordova version to 3.7.0, but it is already 3.7.0. DO NOT PROMPT HERE!");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version should have been migrated to 8.0");
 		});
@@ -341,45 +342,45 @@ describe("project integration tests", () => {
 				fs.unlinkSync(path.join(projectDir, projectConstants.PACKAGE_JSON_NAME));
 			}
 
-			it("Blank template has all mandatory files", () => {
+			it("Blank template has all mandatory files", async () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				let projectDir = project.getProjectDir();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
-			it("TypeScript.Blank template has mandatory files", () => {
+			it("TypeScript.Blank template has mandatory files", async () => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				let projectDir = project.getProjectDir();
 				let packageJson = path.join(projectDir, projectConstants.PACKAGE_JSON_NAME);
 				assert.isTrue(fs.existsSync(packageJson), "NativeScript TypeScript.Blank template does not contain mandatory 'package.json' file. This file is required in init command. You should check if this is problem with the template or change init command to use another file.");
 			});
 
-			it("existing TypeScript.Blank project has project files after init", () => {
+			it("existing TypeScript.Blank project has project files after init", async () => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("existing project has project files after init", () => {
+			it("existing project has project files after init", async () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("empty directory has project files after init", () => {
+			it("empty directory has project files after init", async () => {
 				options.path = tempFolder;
-				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
+				await project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
 				assertProjectFilesExistAfterInit(tempFolder);
 			});
 		});
@@ -405,25 +406,25 @@ describe("project integration tests", () => {
 				});
 			}
 
-			it("existing project has configuration specific files and .abignore files after init", () => {
+			it("existing project has configuration specific files and .abignore files after init", async () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 				removeProjectFiles(projectDir);
 				options.path = projectDir;
-				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				assertProjectFilesExistAfterInit(projectDir);
 			});
 
-			it("empty directory has project files after init", () => {
+			it("empty directory has project files after init", async () => {
 				options.path = tempFolder;
-				project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				assertProjectFilesExistAfterInit(tempFolder);
 			});
 
-			it("Blank template has all mandatory files", () => {
+			it("Blank template has all mandatory files", async () => {
 				options.template = "Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -432,9 +433,9 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("TypeScript.Blank template has mandatory files", () => {
+			it("TypeScript.Blank template has mandatory files", async () => {
 				options.template = "TypeScript.Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -443,9 +444,9 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.Drawer template has mandatory files", () => {
+			it("KendoUI.Drawer template has mandatory files", async () => {
 				options.template = "KendoUI.Drawer";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -454,9 +455,9 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("When KendoUI.Blank is specified use KendoUI.Empty", () => {
+			it("When KendoUI.Blank is specified use KendoUI.Empty", async () => {
 				options.template = "KendoUI.Blank";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -465,9 +466,9 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.Empty template has mandatory files", () => {
+			it("KendoUI.Empty template has mandatory files", async () => {
 				options.template = "KendoUI.Empty";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -476,9 +477,9 @@ describe("project integration tests", () => {
 				});
 			});
 
-			it("KendoUI.TabStrip template has mandatory files", () => {
+			it("KendoUI.TabStrip template has mandatory files", async () => {
 				options.template = "KendoUI.TabStrip";
-				project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
+				await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 				let projectDir = project.getProjectDir();
 
 				_.forEach(mobileHelper.platformNames, platform => {
@@ -578,113 +579,113 @@ describe("project unit tests", () => {
 	});
 
 	describe("updateProjectProperty", () => {
-		it("sets unconstrained string property", () => {
+		it("sets unconstrained string property", async () => {
 			let projectData = getProjectData();
 			projectData.DisplayName = "wrong";
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "DisplayName", ["fine"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "DisplayName", ["fine"]);
 			assert.equal("fine", projectData.DisplayName);
 		});
 
-		it("sets string property with custom validator", () => {
+		it("sets string property with custom validator", async () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "ProjectName", ["fine"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "ProjectName", ["fine"]);
 			assert.equal("fine", projectData.ProjectName);
 		});
 
-		it("disallows 'add' on non-flag property", () => {
+		it("disallows 'add' on non-flag property", async () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]).wait());
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "ProjectName", ["fine"]), "Unable to add value to non-flags property");
 		});
 
-		it("disallows 'del' on non-flag property", () => {
+		it("disallows 'del' on non-flag property", async () => {
 			let projectData = getProjectData();
 			projectData.ProjectName = "wrong";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]).wait());
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "ProjectName", ["fine"]), "Unable to remove value to non-flags property");
 		});
 
-		it("sets bundle version when given proper input", () => {
+		it("sets bundle version when given proper input", async () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30"]);
 			assert.equal("10.20.30", projectData.BundleVersion);
 		});
 
-		it("throws on invalid bundle version string", () => {
+		it("throws on invalid bundle version string", async () => {
 			let projectData = getProjectData();
 			projectData.BundleVersion = "0";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]).wait());
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "BundleVersion", ["10.20.30c"]), "Schema validation failed with following errors: \n Property BundleVersion: String does not match pattern. /^(\\d+)(\\.\\d+)(\\.\\d+)?(\\.\\d+)?$/");
 		});
 
-		it("sets enumerated property", () => {
+		it("sets enumerated property", async () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["Hidden"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["Hidden"]);
 			assert.equal("Hidden", projectData.iOSStatusBarStyle);
 		});
 
-		it("disallows unrecognized values for enumerated property", () => {
+		it("disallows unrecognized values for enumerated property", async () => {
 			let projectData = getProjectData();
 			projectData.iOSStatusBarStyle = "Default";
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]).wait());
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "iOSStatusBarStyle", ["does not exist"]), "Schema validation failed with following errors: \n Property iOSStatusBarStyle: Instance is not one of the possible values. Default,BlackTranslucent,BlackOpaque,Hidden");
 		});
 
-		it("appends to verbatim enumerated collection property", () => {
+		it("appends to verbatim enumerated collection property", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Portrait"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Portrait"]);
 			assert.deepEqual(["Portrait"], projectData.DeviceOrientations);
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]);
 			assert.deepEqual(["Portrait", "Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("appends to enumerated collection property with shorthand", () => {
+		it("appends to enumerated collection property with shorthand", async () => {
 			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1"]);
 			assert.deepEqual(["1"], projectData.iOSDeviceFamily);
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["2"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["2"]);
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
-		it("appends multiple values to enumerated collection property", () => {
+		it("appends multiple values to enumerated collection property", async () => {
 			let projectData = getProjectData();
 			projectData.iOSDeviceFamily = [];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1", "2"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "iOSDeviceFamily", ["1", "2"]);
 			assert.deepEqual(["1", "2"], projectData.iOSDeviceFamily);
 		});
 
-		it("removes from enumerated collection property", () => {
+		it("removes from enumerated collection property", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = ["Landscape", "Portrait"];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]);
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "DeviceOrientations", ["Portrait"]);
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("disallows unrecognized values for enumerated collection property", () => {
+		it("disallows unrecognized values for enumerated collection property", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			assert.throws(() => projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]).wait());
+			await assert.isRejected(projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape", "bar"]), "Schema validation failed with following errors: \n Property items: Instance is not one of the possible values. Portrait,Landscape");
 		});
 
-		it("makes case-insensitive comparisons of property name", () => {
+		it("makes case-insensitive comparisons of property name", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "deviceorientations", ["Landscape"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "deviceorientations", ["Landscape"]);
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("makes case-insensitive comparisons of property values", () => {
+		it("makes case-insensitive comparisons of property values", async () => {
 			let projectData = getProjectData();
 			projectData.DeviceOrientations = [];
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "DeviceOrientations", ["Landscape"]);
 			assert.deepEqual(["Landscape"], projectData.DeviceOrientations);
 		});
 
-		it("adds CorePlugins to configuration specfic data when it is specified", () => {
+		it("adds CorePlugins to configuration specfic data when it is specified", async () => {
 			// this is the equivalent of $ appbuilder prop set CorePlugins A B C --debug
 			let projectData = getProjectData();
 			configSpecificData = {
@@ -693,7 +694,7 @@ describe("project unit tests", () => {
 					"org.apache.cordova.contacts"]
 			};
 
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "CorePlugins", ["org.apache.cordova.file"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "add", "CorePlugins", ["org.apache.cordova.file"]);
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.battery-status",
@@ -703,7 +704,7 @@ describe("project unit tests", () => {
 			}, configSpecificData);
 		});
 
-		it("removes value from configuration specfic data when CorePlugins are modified in it", () => {
+		it("removes value from configuration specfic data when CorePlugins are modified in it", async () => {
 			// this is the equivalent of $ appbuilder prop remove CorePlugins A B C --debug
 			let projectData = getProjectData();
 			configSpecificData = {
@@ -711,7 +712,7 @@ describe("project unit tests", () => {
 					"org.apache.cordova.camera",
 					"org.apache.cordova.contacts"]
 			};
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "CorePlugins", ["org.apache.cordova.contacts"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "del", "CorePlugins", ["org.apache.cordova.contacts"]);
 			assert.deepEqual([], projectData.CorePlugins, "CorePlugins in project data should not be modified.");
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.battery-status",
@@ -719,7 +720,7 @@ describe("project unit tests", () => {
 			}, configSpecificData, "CorePlugins in configuration specific data should be modified.");
 		});
 
-		it("sets CorePlugins to configuration specfic data when it is specified", () => {
+		it("sets CorePlugins to configuration specfic data when it is specified", async () => {
 			// this is the equivalent of $ appbuilder prop set CorePlugins A B C --debug
 			let projectData = getProjectData();
 			configSpecificData = {
@@ -728,7 +729,7 @@ describe("project unit tests", () => {
 					"org.apache.cordova.contacts"]
 			};
 
-			projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "CorePlugins", ["org.apache.cordova.file", "org.apache.cordova.camera"]).wait();
+			await projectProperties.updateProjectProperty(projectData, configSpecificData, "set", "CorePlugins", ["org.apache.cordova.file", "org.apache.cordova.camera"]);
 			assert.deepEqual([], projectData.CorePlugins);
 			assert.deepEqual({
 				"CorePlugins": ["org.apache.cordova.file",
@@ -756,8 +757,8 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("adds CorePlugins to configuration specfic data when it is specified", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], ["debug"]).wait();
+			it("adds CorePlugins to configuration specfic data when it is specified", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
@@ -772,8 +773,8 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("removes CorePlugin from debug configuration data when it is specified", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], ["debug"]).wait();
+			it("removes CorePlugin from debug configuration data when it is specified", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
@@ -786,8 +787,8 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("sets CorePlugins to debug configuration when it is specified", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], ["debug"]).wait();
+			it("sets CorePlugins to debug configuration when it is specified", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.file"],
@@ -801,7 +802,7 @@ describe("project unit tests", () => {
 		});
 
 		describe("moves CorePlugins to projectData when they are the same in config files", () => {
-			it("after prop add", () => {
+			it("after prop add", async () => {
 				configSpecificData = {
 					debug: {
 						CorePlugins: ["org.apache.cordova.battery-status"]
@@ -812,7 +813,7 @@ describe("project unit tests", () => {
 					}
 				};
 				let projectData = getProjectData();
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(["org.apache.cordova.battery-status",
 					"org.apache.cordova.geolocation"],
 					projectData.CorePlugins);
@@ -821,7 +822,7 @@ describe("project unit tests", () => {
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop set", () => {
+			it("after prop set", async () => {
 				configSpecificData = {
 					debug: {
 						CorePlugins: ["org.apache.cordova.battery-status"]
@@ -831,14 +832,14 @@ describe("project unit tests", () => {
 					}
 				};
 				let projectData = getProjectData();
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
 
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(undefined, configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop rm", () => {
+			it("after prop rm", async () => {
 				configSpecificData = {
 					debug: {
 						CorePlugins: ["org.apache.cordova.battery-status",
@@ -849,7 +850,7 @@ describe("project unit tests", () => {
 					}
 				};
 				let projectData = getProjectData();
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]);
 				assert.deepEqual(["org.apache.cordova.geolocation"], projectData.CorePlugins);
 
 				assert.deepEqual(undefined, configSpecificData["debug"].CorePlugins);
@@ -868,24 +869,24 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("after prop add", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+			it("after prop add", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status",
 					"org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop set", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]).wait();
+			it("after prop set", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.geolocation"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.geolocation"], configSpecificData["debug"].CorePlugins);
 				assert.deepEqual(["org.apache.cordova.battery-status"], configSpecificData["release"].CorePlugins);
 			});
 
-			it("after prop rm", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]).wait();
+			it("after prop rm", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.battery-status"], ["debug"]);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual([], configSpecificData["debug"].CorePlugins);
@@ -912,8 +913,8 @@ describe("project unit tests", () => {
 				};
 			});
 
-			it("adds CorePlugins to configuration specfic data", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []).wait();
+			it("adds CorePlugins to configuration specfic data", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
@@ -929,8 +930,8 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("removes CorePlugin from all configurations", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], []).wait();
+			it("removes CorePlugin from all configurations", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "del", ["org.apache.cordova.camera"], []);
 				assert.deepEqual(undefined, projectData.CorePlugins);
 
 				assert.deepEqual(["org.apache.cordova.battery-status",
@@ -942,8 +943,8 @@ describe("project unit tests", () => {
 					configSpecificData["release"].CorePlugins);
 			});
 
-			it("sets CorePlugins to both configurations when it is specified", () => {
-				projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], []).wait();
+			it("sets CorePlugins to both configurations when it is specified", async () => {
+				await projectProperties.updateCorePlugins(projectData, configSpecificData, "set", ["org.apache.cordova.file"], []);
 				assert.deepEqual(["org.apache.cordova.file"], projectData.CorePlugins);
 
 				assert.deepEqual(undefined,
@@ -954,7 +955,7 @@ describe("project unit tests", () => {
 			});
 		});
 
-		it("throws exception when different CorePlugins are part of both .abproject and any config specific file", () => {
+		it("throws exception when different CorePlugins are part of both .abproject and any config specific file", async () => {
 			let projectData = getProjectData();
 			projectData.CorePlugins = ["org.apache.cordova.battery-status"];
 			configSpecificData = {
@@ -965,13 +966,13 @@ describe("project unit tests", () => {
 					CorePlugins: ["org.apache.cordova.camera"]
 				}
 			};
-			assert.throws(() => projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []).wait());
+			await assert.isRejected(projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []), "CorePlugins are defined in both \'.abproject\' and \'.debug.abproject\'. Remove them from one of the files and try again.");
 			assert.deepEqual(["org.apache.cordova.battery-status"], projectData.CorePlugins);
 			assert.deepEqual(["org.apache.cordova.contacts"], configSpecificData["debug"].CorePlugins);
 			assert.deepEqual(["org.apache.cordova.camera"], configSpecificData["release"].CorePlugins);
 		});
 
-		it("does not throw exception when the same CorePlugins are part of both .abproject and any config specific file", () => {
+		it("does not throw exception when the same CorePlugins are part of both .abproject and any config specific file", async () => {
 			let projectData = getProjectData();
 			projectData.CorePlugins = ["org.apache.cordova.battery-status"];
 			configSpecificData = {
@@ -982,7 +983,7 @@ describe("project unit tests", () => {
 					CorePlugins: ["org.apache.cordova.battery-status"]
 				}
 			};
-			projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []).wait();
+			await projectProperties.updateCorePlugins(projectData, configSpecificData, "add", ["org.apache.cordova.file"], []);
 			assert.deepEqual(["org.apache.cordova.battery-status",
 				"org.apache.cordova.file"],
 				projectData.CorePlugins);

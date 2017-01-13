@@ -5,17 +5,18 @@ export class PrintSamplesCommand implements ICommand {
 		private frameworkIdentifier: string,
 		private $config: IConfiguration) { }
 
-	execute(args: string[]): IFuture<void> {
-		return this.$samplesService.printSamplesInformation(this.frameworkIdentifier);
+	public async execute(args: string[]): Promise<void> {
+		await this.$samplesService.printSamplesInformation(this.frameworkIdentifier);
 	}
 
-	get isDisabled() {
+	public get isDisabled() {
 		return this.$config.ON_PREM;
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
-$injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, {frameworkIdentifier: ""}));
+
+$injector.registerCommand("sample|*list", $injector.resolve(PrintSamplesCommand, { frameworkIdentifier: "" }));
 
 export class CloneSampleCommand implements ICommand {
 	constructor(private $samplesService: ISamplesService,
@@ -24,16 +25,17 @@ export class CloneSampleCommand implements ICommand {
 		private $config: IConfiguration,
 		private $options: IOptions) { }
 
-	execute(args: string[]): IFuture<void> {
-		return this.$samplesService.cloneSample(args[0]);
+	public async execute(args: string[]): Promise<void> {
+		await this.$samplesService.cloneSample(args[0]);
 	}
 
-	get isDisabled() {
+	public get isDisabled() {
 		return this.$config.ON_PREM;
 	}
 
-	allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$fs, this.$errors, this.$options)];
+	public allowedParameters: ICommandParameter[] = [new CloneCommandParameter(this.$fs, this.$errors, this.$options)];
 }
+
 $injector.registerCommand("sample|clone", CloneSampleCommand);
 
 class CloneCommandParameter implements ICommandParameter {
@@ -41,21 +43,19 @@ class CloneCommandParameter implements ICommandParameter {
 		private $errors: IErrors,
 		private $options: IOptions) { }
 
-	mandatory = true;
+	public mandatory = true;
 
-	validate(validationValue: string): IFuture<boolean> {
-		return (() => {
-			if(validationValue) {
-				let sampleName = <string>validationValue;
-				let cloneTo = this.$options.path || sampleName;
-				if(this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
-					this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
-				}
-
-				return true;
+	public async validate(validationValue: string): Promise<boolean> {
+		if (validationValue) {
+			let sampleName = <string>validationValue;
+			let cloneTo = this.$options.path || sampleName;
+			if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
+				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
 			}
 
-			return false;
-		}).future<boolean>()();
+			return true;
+		}
+
+		return false;
 	}
 }

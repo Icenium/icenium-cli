@@ -4,14 +4,12 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 		private $staticConfig: IStaticConfig,
 		private $userSettingsService: IUserSettingsService) { }
 
-	public canDoRequest(): IFuture<boolean> {
+	public async canDoRequest(): Promise<boolean> {
 		return this.$loginManager.isLoggedIn();
 	}
 
-	public getUserId(): IFuture<string> {
-		return (() => {
-			return this.$userDataStore.getUser().wait().uid;
-		}).future<string>()();
+	public async getUserId(): Promise<string> {
+		return (await this.$userDataStore.getUser()).uid;
 	}
 
 	public getClientName(): string {
@@ -22,14 +20,13 @@ export class AnalyticsSettingsService implements IAnalyticsSettingsService {
 		return "http://www.telerik.com/company/privacy-policy";
 	}
 
-	public getUserSessionsCount(): IFuture<number> {
-		return (() => {
-			return this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED").wait() || 0;
-		}).future<number>()();
+	public async getUserSessionsCount(): Promise<number> {
+		return await this.$userSettingsService.getSettingValue<number>("SESSIONS_STARTED") || 0;
 	}
 
-	public setUserSessionsCount(count: number): IFuture<void> {
+	public async setUserSessionsCount(count: number): Promise<void> {
 		return this.$userSettingsService.saveSetting<number>("SESSIONS_STARTED", count);
 	}
 }
+
 $injector.register("analyticsSettingsService", AnalyticsSettingsService);

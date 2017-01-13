@@ -1,5 +1,4 @@
 import { EnsureProjectCommand } from "./ensure-project-command";
-import Future = require("fibers/future");
 
 class LiveSyncCommandBase extends EnsureProjectCommand {
 	constructor(protected $liveSyncService: ILiveSyncService,
@@ -9,9 +8,8 @@ class LiveSyncCommandBase extends EnsureProjectCommand {
 		super($project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		this.$options.justlaunch = !this.$options.watch;
-		return Future.fromResult();
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
@@ -25,11 +23,9 @@ class LiveSyncDevicesCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			super.execute(args).wait();
-			this.$liveSyncService.livesync().wait();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		await super.execute(args);
+		await this.$liveSyncService.livesync();
 	}
 
 }
@@ -45,11 +41,9 @@ class LiveSyncAndroidCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			super.execute(args).wait();
-			this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android).wait();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.Android);
 	}
 }
 
@@ -64,14 +58,12 @@ class LiveSyncIosCommand extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			super.execute(args).wait();
-			this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS).wait();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.iOS);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
 
 $injector.registerCommand(["livesync|ios", "live-sync|ios"], LiveSyncIosCommand);
@@ -86,11 +78,9 @@ class LiveSyncWP8Command extends LiveSyncCommandBase {
 		super($liveSyncService, $options, $project, $errors);
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			super.execute(args).wait();
-			this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8).wait();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		await super.execute(args);
+		await this.$liveSyncService.livesync(this.$devicePlatformsConstants.WP8);
 	}
 
 	public isDisabled = this.$config.ON_PREM;

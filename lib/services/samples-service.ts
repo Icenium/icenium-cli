@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as util from "util";
-import {EOL} from "os";
+import { EOL } from "os";
 import temp = require("temp");
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 
@@ -10,8 +10,7 @@ class Sample {
 		public description: string,
 		public zipUrl: string,
 		public githubUrl: string,
-		public type: string) {
-	}
+		public type: string) { }
 }
 
 export class SamplesService implements ISamplesService {
@@ -36,117 +35,111 @@ export class SamplesService implements ISamplesService {
 		private $staticConfig: IStaticConfig,
 		private $options: IOptions,
 		private $typeScriptService: ITypeScriptService,
-		private $injector: IInjector) {
-	}
+		private $injector: IInjector) { }
 
 	public get $analyticsService(): IAnalyticsService {
 		return this.$injector.resolve("analyticsService");
 	}
 
-	public printSamplesInformation(framework?: string): IFuture<void> {
-		return (() => {
-			this.$logger.info("You can choose a sample from the following: %s", EOL);
-			if (framework) {
-				this.printSamplesInformationForFramework(framework).wait();
-			} else {
-				_.values<string>(TARGET_FRAMEWORK_IDENTIFIERS).forEach(fx => this.printSamplesInformationForFramework(fx).wait());
+	public async printSamplesInformation(framework?: string): Promise<void> {
+		this.$logger.info("You can choose a sample from the following: %s", EOL);
+		if (framework) {
+			await this.printSamplesInformationForFramework(framework);
+		} else {
+			let targetFrameworkIdentifiers = _.values<string>(TARGET_FRAMEWORK_IDENTIFIERS);
+			for (let frameworkIdentifier of targetFrameworkIdentifiers) {
+				await this.printSamplesInformationForFramework(frameworkIdentifier);
 			}
-		}).future<void>()();
+		}
 	}
 
-	private printSamplesInformationForFramework(framework: string): IFuture<void> {
-		return (() => {
-			this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
-			this.$logger.info(this.getSamplesInformation(framework).wait() + EOL + EOL);
-		}).future<void>()();
+	private async printSamplesInformationForFramework(framework: string): Promise<void> {
+		this.$logger.info("%s samples:%s=========================%s", framework, EOL, EOL);
+		this.$logger.info(await this.getSamplesInformation(framework) + EOL + EOL);
 	}
 
-	public cloneSample(sampleName: string): IFuture<void> {
-		return (() => {
-			let cloneTo = this.$options.path || sampleName;
-			if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
-				this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
+	public async cloneSample(sampleName: string): Promise<void> {
+		let cloneTo = this.$options.path || sampleName;
+		if (this.$fs.exists(cloneTo) && this.$fs.readDirectory(cloneTo).length > 0) {
+			this.$errors.fail("Cannot clone sample in the specified path. The directory %s is not empty. Specify an empty target directory and try again.", path.resolve(cloneTo));
+		}
+
+		let sampleNameLower = sampleName.toLowerCase();
+		let sample = _.find(await this.getSamples(), (_sample: Sample) => _sample.name.toLowerCase() === sampleNameLower);
+		if (!sample) {
+			this.$errors.fail("There is no sample named '%s'.", sampleName);
+		}
+
+		this.$logger.info("Cloning sample from GitHub...");
+		let tempDir: string;
+		try {
+			temp.track();
+			tempDir = temp.mkdirSync("appbuilderSamples");
+			let sampleFilePath = path.join(tempDir, sampleName);
+			let sampleFile = this.$fs.createWriteStream(sampleFilePath);
+			let fileEnd = this.$fs.futureFromEvent(sampleFile, "finish");
+			let accessToken = this.getGitHubAccessTokenQueryParameter("?");
+			await this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: sampleFile });
+			await fileEnd;
+
+			await this.$fs.unzip(sampleFilePath, tempDir);
+			let projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
+			let projectDir = path.dirname(projectFile);
+			let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
+			_.each(files, file => {
+				let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
+				this.$fs.copyFile(file, targetDir);
+			});
+		} finally {
+			let featureValue = sample.name;
+
+			if (this.$typeScriptService.isTypeScriptProject(tempDir)) {
+				featureValue = `${featureValue}-TS`;
 			}
 
-			let sampleNameLower = sampleName.toLowerCase();
-			let sample = _.find(this.getSamples().wait(), (_sample: Sample) => _sample.name.toLowerCase() === sampleNameLower);
-			if (!sample) {
-				this.$errors.fail("There is no sample named '%s'.", sampleName);
-			}
-
-			this.$logger.info("Cloning sample from GitHub...");
-			let tempDir: string;
+			await this.$analyticsService.track("CreateProjectFromSample", featureValue);
 			try {
-				temp.track();
-				tempDir = temp.mkdirSync("appbuilderSamples");
-				let filepath = path.join(tempDir, sampleName);
-				let file = this.$fs.createWriteStream(filepath);
-				let fileEnd = this.$fs.futureFromEvent(file, "finish");
-				let accessToken = this.getGitHubAccessTokenQueryParameter("?");
-				this.$httpClient.httpRequest({ url: `${sample.zipUrl}${accessToken}`, pipeTo: file }).wait();
-				fileEnd.wait();
-
-				this.$fs.unzip(filepath, tempDir).wait();
-				let projectFile = _.first(this.$fs.enumerateFilesInDirectorySync(tempDir, (filepath, stat) => stat.isDirectory() || path.basename(filepath) === this.$staticConfig.PROJECT_FILE_NAME));
-				let projectDir = path.dirname(projectFile);
-				let files = this.$fs.enumerateFilesInDirectorySync(projectDir);
-				_.each(files, file => {
-					let targetDir = path.join(cloneTo, file.replace(projectDir, ""));
-					this.$fs.copyFile(file, targetDir);
-				});
-			} finally {
-				let featureValue = sample.name;
-
-				if (this.$typeScriptService.isTypeScriptProject(tempDir).wait()) {
-					featureValue = `${featureValue}-TS`;
-				}
-
-				this.$analyticsService.track("CreateProjectFromSample", featureValue).wait();
-				try {
-					this.$fs.deleteDirectory(tempDir);
-				} catch (error) {
-					this.$logger.debug(error);
-				}
-			}
-		}).future<void>()();
-	}
-
-	private getSamplesInformation(framework: string): IFuture<string> {
-		return (() => {
-			let availableSamples: Sample[];
-			try {
-				availableSamples = this.getSamples(framework).wait();
+				this.$fs.deleteDirectory(tempDir);
 			} catch (error) {
-				return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
+				this.$logger.debug(error);
+			}
+		}
+	}
+
+	private async getSamplesInformation(framework: string): Promise<string> {
+		let availableSamples: Sample[];
+		try {
+			availableSamples = await this.getSamples(framework);
+		} catch (error) {
+			return SamplesService.SAMPLES_PULL_FAILED_MESSAGE;
+		}
+
+		let sortedCategories = _.sortBy(this.sampleCategories, category => category.order);
+		let categories = _.map(sortedCategories, category => {
+			return {
+				name: category.name,
+				samples: _.filter(availableSamples, sample => sample.type === category.id)
+			};
+		});
+
+		let outputLines: string[] = [];
+		_.each(categories, category => {
+			if (category.samples.length === 0) {
+				return;
 			}
 
-			let sortedCategories = _.sortBy(this.sampleCategories, category => category.order);
-			let categories = _.map(sortedCategories, category => {
-				return {
-					name: category.name,
-					samples: _.filter(availableSamples, sample => sample.type === category.id)
-				};
+			outputLines.push(util.format("   %s:%s   ======================", category.name, EOL));
+
+			_.each(category.samples, (sample: Sample) => {
+				let nameRow = util.format("      Sample: %s", sample.displayName);
+				let descriptionRow = util.format("      Description: %s", sample.description);
+				let gitClone = util.format("      Github repository page: %s", sample.githubUrl);
+				let cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
+				outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(EOL));
 			});
+		});
 
-			let outputLines: string[] = [];
-			_.each(categories, category => {
-				if (category.samples.length === 0) {
-					return;
-				}
-
-				outputLines.push(util.format("   %s:%s   ======================", category.name, EOL));
-
-				_.each(category.samples, (sample: Sample) => {
-					let nameRow = util.format("      Sample: %s", sample.displayName);
-					let descriptionRow = util.format("      Description: %s", sample.description);
-					let gitClone = util.format("      Github repository page: %s", sample.githubUrl);
-					let cloneCommand = util.format("      Clone command: $ appbuilder sample clone %s", sample.name);
-					outputLines.push([nameRow, descriptionRow, gitClone, cloneCommand].join(EOL));
-				});
-			});
-
-			return outputLines.join(EOL + EOL);
-		}).future<string>()();
+		return outputLines.join(EOL + EOL);
 	}
 
 	private getRegExpForFramework(framework?: string): RegExp {
@@ -161,60 +154,54 @@ export class SamplesService implements ISamplesService {
 		}
 	}
 
-	private getSamples(framework?: string): IFuture<Sample[]> {
-		return (() => {
-			let regex = this.getRegExpForFramework(framework);
-			let repos = _.filter(this.getIceniumRepositories().wait(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
-			let samples = _.map(repos, (repo: any) => {
-				return new Sample(
-					repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
-					repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim(),
-					repo.description,
-					repo.url + "/zipball/" + repo.default_branch,
-					repo.html_url,
-					this.getTypeFromDescription(repo.description));
-			});
+	private async getSamples(framework?: string): Promise<Sample[]> {
+		let regex = this.getRegExpForFramework(framework);
+		let repos = _.filter(await this.getIceniumRepositories(), (repo: any) => regex.test(repo.clone_url) && !repo[SamplesService.REMOTE_LOCK_STATE_PRIVATE]);
+		let samples = _.map(repos, (repo: any) => {
+			return new Sample(
+				repo.name.replace(SamplesService.NAME_PREFIX_REMOVAL_REGEX, ""),
+				repo.name.replace(SamplesService.NAME_FORMAT_REGEX, " ").trim(),
+				repo.description,
+				repo.url + "/zipball/" + repo.default_branch,
+				repo.html_url,
+				this.getTypeFromDescription(repo.description));
+		});
 
-			let sortedSamples = _.sortBy(samples, sample => sample.displayName);
+		let sortedSamples = _.sortBy(samples, sample => sample.displayName);
 
-			return sortedSamples;
-		}).future<Sample[]>()();
+		return sortedSamples;
 	}
 
-	private getPagedResult(gitHubEndpointUrl: string, page: number): IFuture<string[]> {
-		return (() => {
-			try {
-				let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
-				let accessToken = this.getGitHubAccessTokenQueryParameter("&");
-				let result = JSON.parse(this.$httpClient.httpRequest(`${requestUrl}${accessToken}`).wait().body);
-				return result;
-			} catch (error) {
-				this.$logger.debug(error);
-				this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
-			}
-
-		}).future<string[]>()();
+	private async getPagedResult(gitHubEndpointUrl: string, page: number): Promise<any[]> {
+		try {
+			let requestUrl = gitHubEndpointUrl + "&page=" + page.toString();
+			let accessToken = this.getGitHubAccessTokenQueryParameter("&");
+			let result = JSON.parse((await this.$httpClient.httpRequest(`${requestUrl}${accessToken}`)).body);
+			return result;
+		} catch (error) {
+			this.$logger.debug(error);
+			this.$errors.fail(SamplesService.SAMPLES_PULL_FAILED_MESSAGE);
+		}
 	}
 
-	private _repos: string[];
+	private _repos: any[];
 
-	private getIceniumRepositories(): IFuture<string[]> {
-		return ((): string[] => {
-			if (!this._repos) {
-				let gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
-				this._repos = [];
+	private async getIceniumRepositories(): Promise<string[]> {
+		if (!this._repos) {
+			let gitHubEndpointUrl = SamplesService.GITHUB_ICENIUM_LOCATION_ENDPOINT;
+			this._repos = [];
 
-				for (let page = 1; ; ++page) {
-					let pagedResult = this.getPagedResult(gitHubEndpointUrl, page).wait();
-					if (_.isEmpty(pagedResult)) {
-						break;
-					}
-					Array.prototype.push.apply(this._repos, pagedResult);
+			for (let page = 1; ; ++page) {
+				let pagedResult = await this.getPagedResult(gitHubEndpointUrl, page);
+				if (_.isEmpty(pagedResult)) {
+					break;
 				}
-			}
 
-			return this._repos;
-		}).future<string[]>()();
+				this._repos = this._repos.concat(pagedResult);
+			}
+		}
+
+		return this._repos;
 	}
 
 	private getTypeFromDescription(description: string): string {
@@ -243,4 +230,5 @@ export class SamplesService implements ISamplesService {
 		return accessToken;
 	}
 }
+
 $injector.register("samplesService", SamplesService);

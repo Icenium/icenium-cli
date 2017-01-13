@@ -12,9 +12,9 @@ declare module Project {
 		 */
 		isIonicProject(projectDir: string): boolean;
 
-		createNewProject(projectName: string, framework: string, template?: string): IFuture<void>;
-		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): IFuture<void>;
-		createProjectFile(projectDir: string, properties: any): IFuture<void>;
+		createNewProject(projectName: string, framework: string, template?: string): Promise<void>;
+		initializeProjectFromExistingFiles(framework: string, projectDir?: string, appName?: string): Promise<void>;
+		createProjectFile(projectDir: string, properties: any): Promise<void>;
 
 		/**
 		 * Creates directory for the new project.
@@ -24,7 +24,7 @@ declare module Project {
 		createTemplateFolder(projectDir: string): void;
 
 		getNewProjectDir(): string;
-		getProjectSchema(): IFuture<any>;
+		getProjectSchema(): Promise<any>;
 		getLiveSyncUrl(): string;
 		getBuildConfiguration(): string;
 
@@ -50,11 +50,11 @@ declare module Project {
 		 */
 		getConfigFileContent(template: string): any;
 
-		updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
-		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): IFuture<void>;
-		printProjectProperty(property: string, configuration?: string): IFuture<void>;
+		updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): Promise<void>;
+		updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): Promise<void>;
+		printProjectProperty(property: string, configuration?: string): Promise<void>;
 		setProperty(propertyName: string, value: any, configuration: string): void;
-		validateProjectProperty(property: string, args: string[], mode: string): IFuture<boolean>;
+		validateProjectProperty(property: string, args: string[], mode: string): Promise<boolean>;
 		adjustBuildProperties(buildProperties: any): any;
 
 		/**
@@ -64,11 +64,11 @@ declare module Project {
 		 * @returns {void}
 		 */
 		saveProject(projectDir?: string, configurations?: string[]): void;
-		zipProject(): IFuture<string>;
-		importProject(): IFuture<void>;
+		zipProject(): Promise<string>;
+		importProject(): Promise<void>;
 
-		ensureCordovaProject(): void;
-		ensureProject(): void;
+		ensureCordovaProject(): Promise<void>;
+		ensureProject(): Promise<void>;
 
 		/**
 		 * Checks all assets (App_Resources) and completes the missing one from the default template.
@@ -105,7 +105,7 @@ declare module Project {
 		/**
 		 * Get information about plugin variables for current project.
 		 * @param {string} configuration Optional parameter that is specified the configuration for which plugin variables info will be returned.
-		 * @return {IFuture<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
+		 * @return {Promise<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
 		 * @example
 		 * {
 		 *    "plugin1": {
@@ -182,7 +182,7 @@ declare module Project {
 		 * @param {Project.IProjectInformation} projectInformation Information about the project - values of properties from .abproject and configuration specific .abproject.
 		 * @param {string} projectDir Optional parameter that specifies the project directory. Required for NativeScript projects.
 		 * @param {string} configuration Optional parameter that is specified the configuration for which plugin variables info will be returned. Required for Cordova projects.
-		 * @return {IFuture<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
+		 * @return {Promise<IDictionary<IStringDictionary>>} Information about all plugins, their plugin variables and values of the variables.
 		 * For NativeScript projects the values are taken from package.json. For Cordova project the information is read from .abproject (configuration specific .abproject).
 		 * @example
 		 * {
@@ -200,7 +200,7 @@ declare module Project {
 		/**
 		 * Updates the json file which contains the migration information. If the user is not connectet to the internet the file will not be updated and the CLI will use the one which is downloaded when the CLI is installed or updated.
 		 */
-		updateMigrationConfigFile(): IFuture<void>;
+		updateMigrationConfigFile(): Promise<void>;
 	}
 
 	interface IFrameworkProjectBase {
@@ -228,7 +228,7 @@ declare module Project {
 		 * Ensures the project has all required files.
 		 * @param {string} projectDir The directory of the project.
 		 */
-		ensureProject(projectDir: string): IFuture<void>;
+		ensureProject(projectDir: string): Promise<void>;
 	}
 
 	interface IFrameworkProjectResolverBase {

@@ -6,11 +6,12 @@ export class ImportProjectCommand extends EnsureProjectCommand {
 		super($project, $errors);
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 
-	execute(args: string[]): IFuture<void> {
-		return	this.$project.importProject();
+	public async execute(args: string[]): Promise<void> {
+		await this.$project.importProject();
 	}
 }
+
 $injector.registerCommand("livesync|cloud", ImportProjectCommand);
 $injector.registerCommand("live-sync|cloud", ImportProjectCommand);

@@ -20,7 +20,7 @@ export class InitProjectCommand implements ICommand {
 		private $mobileHelper: Mobile.IMobileHelper,
 		private $projectConstants: Project.IConstants) {
 
-		this.projectDir = $project.getNewProjectDir();
+		this.projectDir = this.$project.getNewProjectDir();
 		this.tnsModulesDir = new FileDescriptor(path.join(this.projectDir, "app", "tns_modules"), "directory");
 		this.indexHtml = new FileDescriptor(path.join(this.projectDir, "index.html"), "file");
 		this.cordovaFiles = _.map(this.$mobileHelper.platformNames, platform => new FileDescriptor(`cordova.${platform}.js`.toLowerCase(), "file"));
@@ -29,52 +29,48 @@ export class InitProjectCommand implements ICommand {
 		this.generateMandatoryAndForbiddenFiles();
 	}
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait()) {
-				this.$logger.info("Attempting to initialize Cordova project.");
-				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova).wait();
-			} else if(this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait()) {
-				this.$logger.info("Attempting to initialize NativeScript project.");
-				this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript).wait();
-			} else {
-				this.$errors.fail("Cannot determine project type. Specify project type and try again.");
-			}
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		if (this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.Cordova)) {
+			this.$logger.info("Attempting to initialize Cordova project.");
+			this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
+		} else if (this.isProjectType(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript)) {
+			this.$logger.info("Attempting to initialize NativeScript project.");
+			await this.$project.initializeProjectFromExistingFiles(TARGET_FRAMEWORK_IDENTIFIERS.NativeScript);
+		} else {
+			this.$errors.fail("Cannot determine project type. Specify project type and try again.");
+		}
 	}
 
-	private isProjectType(projectType: string): IFuture<boolean> {
-		return (() => {
-			let result = true;
-			let projectData = this.projectFilesDescriptors[projectType];
+	private isProjectType(projectType: string): boolean {
+		let result = true;
+		let projectData = this.projectFilesDescriptors[projectType];
 
-			_.each(projectData.mandatoryFiles, (file: FileDescriptor) => {
-				if(!this.$fs.exists(file.path)) {
-					this.$logger.trace("Missing %s %s. The project type is not %s.", file.path, file.type, projectType);
+		_.each(projectData.mandatoryFiles, (file: FileDescriptor) => {
+			if (!this.$fs.exists(file.path)) {
+				this.$logger.trace("Missing %s %s. The project type is not %s.", file.path, file.type, projectType);
+				result = false;
+				// break execution of _.each
+				return false;
+			}
+		});
+
+		if (result) {
+			_.each(projectData.forbiddenFiles, (file: FileDescriptor) => {
+				if (this.$fs.exists(file.path)) {
+					this.$logger.trace("Found %s %s. The project type is not %s.", file.path, file.type, projectType);
 					result = false;
 					// break execution of _.each
 					return false;
 				}
 			});
+		}
 
-			if(result) {
-				_.each(projectData.forbiddenFiles, (file: FileDescriptor) => {
-					if(this.$fs.exists(file.path)) {
-						this.$logger.trace("Found %s %s. The project type is not %s.", file.path, file.type, projectType);
-						result = false;
-						// break execution of _.each
-						return false;
-					}
-				});
-			}
+		// Ionic projects are special, they lack cordova.platform.js files and have package.json. Deal with them here
+		if (projectType === TARGET_FRAMEWORK_IDENTIFIERS.Cordova && !result) {
+			result = this.$project.isIonicProject(this.projectDir);
+		}
 
-			// Ionic projects are special, they lack cordova.platform.js files and have package.json. Deal with them here
-			if (projectType === TARGET_FRAMEWORK_IDENTIFIERS.Cordova && !result) {
-				result = this.$project.isIonicProject(this.projectDir);
-			}
-
-			return result;
-		}).future<boolean>()();
+		return result;
 	}
 
 	private generateMandatoryAndForbiddenFiles() {
@@ -93,4 +89,5 @@ export class InitProjectCommand implements ICommand {
 
 	allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand("init|*unknown", InitProjectCommand);

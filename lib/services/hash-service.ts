@@ -1,6 +1,5 @@
-import Future = require("fibers/future");
-let crypto = require("crypto");
 import * as util from "util";
+let crypto = require("crypto");
 
 export class HashService implements IHashService {
 	constructor(private $fs: IFileSystem,
@@ -10,55 +9,51 @@ export class HashService implements IHashService {
 	private static validHashEncodings: string[] = ["hex", "binary", "base64"];
 	private static validInputEncodings: string[] = ["utf8", "ascii", "binary"];
 
-	public getFileHash(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): IFuture<string> {
-		return ((): string => {
-			this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding);
+	public async getFileHash(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): Promise<string> {
+		this.validateInputParameters(filePath, inputEncoding, hashAlgorithm, hashEncoding);
 
-			let cryptoHash = crypto.createHash(hashAlgorithm);
-			let future = new Future<void>();
+		let cryptoHash = crypto.createHash(hashAlgorithm);
+		let promise = new Promise<void>((resolve, reject) => {
 			let fileStr = this.$fs.createReadStream(filePath);
 			fileStr.on("data", (chunk: NodeBuffer) => {
 				cryptoHash.update(chunk, inputEncoding);
 			});
 
 			fileStr.on("end", () => {
-				if(!future.isResolved()) {
-					future.return();
-				}
+				resolve();
 			});
 
 			fileStr.on("error", (err: Error) => {
-				if(!future.isResolved()) {
-					future.throw(err);
-				}
+				reject(err);
 			});
+		});
 
-			future.wait();
-			return cryptoHash.digest(hashEncoding);
-		}).future<string>()();
+		await promise;
+		return cryptoHash.digest(hashEncoding);
 	}
 
 	private validateInputParameters(filePath: string, inputEncoding: string, hashAlgorithm: string, hashEncoding: string): void {
-		if(!this.$fs.exists(filePath)) {
+		if (!this.$fs.exists(filePath)) {
 			this.$errors.fail(util.format("Specified file %s does not exist.", filePath));
 		}
 
-		if(!_.includes(HashService.validInputEncodings, inputEncoding)) {
+		if (!_.includes(HashService.validInputEncodings, inputEncoding)) {
 			this.$errors.fail(util.format("Specified input file encoding %s is not valid. Valid values are %s", inputEncoding, HashService.validInputEncodings));
 		}
 
 		this.validateHashAlgorithm(hashAlgorithm);
 
-		if(!_.includes(HashService.validHashEncodings, hashEncoding)) {
+		if (!_.includes(HashService.validHashEncodings, hashEncoding)) {
 			this.$errors.fail(util.format("Specified hash encoding %s is not valid. Valid values are %s", hashEncoding, HashService.validHashEncodings));
 		}
 	}
 
 	private validateHashAlgorithm(hashAlgorithm: string): void {
 		let hashes = crypto.getHashes();
-		if(!_.includes(hashes, hashAlgorithm)) {
+		if (!_.includes(hashes, hashAlgorithm)) {
 			this.$errors.fail(util.format("Specified hash algorithm %s is not valid. Valid algorithms are %s", hashAlgorithm, hashes));
 		}
 	}
 }
+
 $injector.register("hashService", HashService);

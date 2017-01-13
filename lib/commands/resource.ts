@@ -3,14 +3,13 @@ import * as helpers from "../common/helpers";
 class Resource implements ICommand {
 	constructor(private $imageService: IImageService) { }
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
-			return this.$imageService.printDefinitions();
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		return this.$imageService.printDefinitions();
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand("resource|*list", Resource);
 
 class ResourceCreate implements ICommand {
@@ -18,23 +17,22 @@ class ResourceCreate implements ICommand {
 		private $imageService: IImageService,
 		private $options: IOptions) { }
 
-	execute(args: string[]): IFuture<void> {
-		return (() => {
-			if (this.$options.icon && this.$options.splash) {
-				this.$imageService.generateImages(this.$options.icon, Server.ImageType.Icon, this.$options.force).wait();
-				this.$imageService.generateImages(this.$options.splash, Server.ImageType.SplashScreen, this.$options.force).wait();
-			} else if (this.$options.icon) {
-				this.$imageService.generateImages(this.$options.icon, Server.ImageType.Icon, this.$options.force).wait();
-			} else if (this.$options.splash) {
-				this.$imageService.generateImages(this.$options.splash, Server.ImageType.SplashScreen, this.$options.force).wait();
-			} else if (!helpers.isInteractive()) {
-				this.$errors.failWithoutHelp('Console is not interactive');
-			} else {
-				this.$imageService.promptForImageInformation(this.$options.force).wait();
-			}
-		}).future<void>()();
+	public async execute(args: string[]): Promise<void> {
+		if (this.$options.icon && this.$options.splash) {
+			await this.$imageService.generateImages(this.$options.icon, Server.ImageType.Icon, this.$options.force);
+			await this.$imageService.generateImages(this.$options.splash, Server.ImageType.SplashScreen, this.$options.force);
+		} else if (this.$options.icon) {
+			await this.$imageService.generateImages(this.$options.icon, Server.ImageType.Icon, this.$options.force);
+		} else if (this.$options.splash) {
+			await this.$imageService.generateImages(this.$options.splash, Server.ImageType.SplashScreen, this.$options.force);
+		} else if (!helpers.isInteractive()) {
+			this.$errors.failWithoutHelp('Console is not interactive');
+		} else {
+			await this.$imageService.promptForImageInformation(this.$options.force);
+		}
 	}
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 }
+
 $injector.registerCommand(["resource|create"], ResourceCreate);

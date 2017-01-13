@@ -11,7 +11,7 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 		private $errors: IErrors,
 		private $staticConfig: IStaticConfig) { }
 
-	generateQrCode(data: string) {
+	public async generateQrCode(data: string): Promise<any> {
 		let errorCorrectionLevel = "L";
 		let errorCorrectionOffset = _.indexOf(QrCodeGenerator.ERROR_CORRECTION_LEVEL, errorCorrectionLevel);
 
@@ -36,12 +36,13 @@ export class QrCodeGenerator implements IQrCodeGenerator {
 		}
 
 		// Since the max Reed-Solomon block index was calculated before the for loop and no exception was thrown in it here the only error can be because of long project name.
-		this.$clipboardService.copy(data).wait();
+		await this.$clipboardService.copy(data);
+
 		this.$errors.failWithoutHelp(`Your project name is too long to generate QR Code for its link. The application url ${data.green} ${"is copied to your clipboard and you can use online QR Code generator to generate QR Code for you.".red}.`);
 	}
 
-	public generateDataUri(data: string): string {
-		let qr = this.generateQrCode(data);
+	public async generateDataUri(data: string): Promise<string> {
+		let qr = await this.generateQrCode(data);
 		let cells = qr.getModuleCount();
 		let size = this.$staticConfig.QR_SIZE;
 		let cellSize = Math.ceil(size / (cells + 2 * 4 /* margin */));

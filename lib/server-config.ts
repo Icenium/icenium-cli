@@ -4,35 +4,27 @@ export class ServerConfiguration implements IServerConfiguration {
 	constructor(private $config: IConfiguration,
 		private $injector: IInjector) { }
 
-	private getConfigurationFromServer(): IFuture<any> {
-		return (() => {
-			if(!this.cachedServerConfiguration) {
-				let configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
-				let httpClient = this.$injector.resolve("httpClient");
-				this.cachedServerConfiguration = JSON.parse(httpClient.httpRequest(configUri).wait().body);
-			}
+	private async getConfigurationFromServer(): Promise<any> {
+		if (!this.cachedServerConfiguration) {
+			let configUri = this.$config.AB_SERVER_PROTO + "://" + this.$config.AB_SERVER + "/appbuilder/configuration.json";
+			let httpClient = this.$injector.resolve("httpClient");
+			this.cachedServerConfiguration = JSON.parse((await httpClient.httpRequest(configUri)).body);
+		}
 
-			return this.cachedServerConfiguration;
-		}).future<any>()();
+		return this.cachedServerConfiguration;
 	}
 
-	public get tfisServer(): IFuture<string> {
-		return (() => {
-			return this.getConfigurationFromServer().wait().stsServer;
-		}).future<string>()();
+	public async tfisServer(): Promise<string> {
+		return (await this.getConfigurationFromServer()).stsServer;
 	}
 
-	public get assemblyVersion(): IFuture<string> {
-		return (() => {
-			return this.getConfigurationFromServer().wait().assemblyVersion;
-		}).future<string>()();
+	public async assemblyVersion(): Promise<string> {
+		return (await this.getConfigurationFromServer()).assemblyVersion;
 	}
 
-	public get resourcesPath(): IFuture<string> {
-		return (() => {
-			let resourcesRelativePath = this.getConfigurationFromServer().wait().resourcesPath;
-			return `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/${resourcesRelativePath}`;
-		}).future<string>()();
+	public async resourcesPath(): Promise<string> {
+		let resourcesRelativePath = (await this.getConfigurationFromServer()).resourcesPath;
+		return `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/${resourcesRelativePath}`;
 	}
 }
 $injector.register("serverConfiguration", ServerConfiguration);

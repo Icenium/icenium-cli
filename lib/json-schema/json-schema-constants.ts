@@ -5,4 +5,5 @@ export class JsonSchemaConstants implements IJsonSchemaConstants {
 	public CORDOVA_VERSION_3_SCHEMA_ID = "Cordova-3.*";
 	public NATIVESCRIPT_SCHEMA_ID = "NativeScript*";
 }
+
 $injector.register("jsonSchemaConstants", JsonSchemaConstants);

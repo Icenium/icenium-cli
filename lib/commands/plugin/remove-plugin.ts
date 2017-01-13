@@ -2,12 +2,13 @@ import pluginConfigureCommandParameterLib = require("./plugin-configure-command-
 
 export class RemovePluginCommand implements ICommand {
 	constructor(private $pluginsService: IPluginsService,
-				private $injector: IInjector) { }
+		private $injector: IInjector) { }
 
-	public execute(args: string[]): IFuture<void> {
+	public async execute(args: string[]): Promise<void> {
 		return this.$pluginsService.removePlugin(args[0]);
 	}
 
-	allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
+	public allowedParameters: ICommandParameter[] = [this.$injector.resolve(pluginConfigureCommandParameterLib.PluginConfigureCommandParameter)];
 }
+
 $injector.registerCommand("plugin|remove", RemovePluginCommand);

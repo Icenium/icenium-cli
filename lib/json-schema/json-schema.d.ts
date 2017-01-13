@@ -14,7 +14,8 @@ interface ISchemaExtends {
 }
 
 interface IJsonSchemaLoader {
-	downloadSchemas(): IFuture<void>;
+	downloadSchemas(): Promise<void>;
+	prepareSchemas(): void;
 }
 
 interface IJsonSchemaResolver {

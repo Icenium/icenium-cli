@@ -19,20 +19,20 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 	}
 
 	public translate(typeName: string): string {
-		if(this.isNumber(typeName)) {
+		if (this.isNumber(typeName)) {
 			return TSTypeSystemHelpers.NUMBER_TYPE_NAME;
 		}
 
-		if(this.isGeneric(typeName)) {
+		if (this.isGeneric(typeName)) {
 			return TSTypeSystemHelpers.ANY_TYPE_NAME;
 		}
 
-		if(this.isMap(typeName)) {
+		if (this.isMap(typeName)) {
 			return this.translateMap(typeName);
 		}
 
 		let match = /List\[(.+)\]/.exec(typeName);
-		if(match) {
+		if (match) {
 			return this.translate(match[1]) + "[]";
 		}
 
@@ -73,7 +73,7 @@ export class TSTypeSystemHelpers implements Swagger.ITsTypeSystemHelpers {
 		let keyStartIndex = typeName.indexOf(TSTypeSystemHelpers.ARRAY_START_CHAR) + 1;
 		let keyValueSeparatorIndex = typeName.indexOf(TSTypeSystemHelpers.COMMA_CHAR);
 		let key = typeName.substr(keyStartIndex, keyValueSeparatorIndex - keyStartIndex);
-		if(key !== TSTypeSystemHelpers.STRING_TYPE_NAME) {
+		if (key !== TSTypeSystemHelpers.STRING_TYPE_NAME) {
 			return TSTypeSystemHelpers.ANY_TYPE_NAME;
 		} else {
 			let value = typeName.substr(keyValueSeparatorIndex + 1, typeName.indexOf(TSTypeSystemHelpers.ARRAY_END_CHAR) - keyValueSeparatorIndex - 1);

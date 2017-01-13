@@ -1,33 +1,31 @@
-import Future = require("fibers/future");
 let clipboard = require("copy-paste");
 
 export class ClipboardService implements IClipboardService {
-	public copy(text: string): IFuture<string> {
-		let future = new Future<string>();
+	public async copy(text: string): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			clipboard.copy(text, (err: any, result: string) => {
+				if (err) {
+					reject(err);
+					return;
+				}
 
-		clipboard.copy(text, (err: any, result: string) => {
-			if (err) {
-				future.throw(err);
-			}
+				resolve(result);
+			});
 
-			future.return(result);
 		});
-
-		return future;
 	}
 
-	public paste(): IFuture<string> {
-		let future = new Future<string>();
+	public async paste(): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			clipboard.paste((err: any, result: string) => {
+				if (err) {
+					reject(err);
+					return;
+				}
 
-		clipboard.paste((err: any, result: string) => {
-			if (err) {
-				future.throw(err);
-			}
-
-			future.return(result);
+				resolve(result);
+			});
 		});
-
-		return future;
 	}
 }
 

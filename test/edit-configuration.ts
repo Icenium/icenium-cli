@@ -1,4 +1,3 @@
-import chai = require("chai");
 import fs = require("fs");
 import * as path from "path";
 import stubs = require("./stubs");
@@ -10,10 +9,10 @@ import yok = require("../lib/common/yok");
 import config = require("../lib/config");
 import helpers = require("../lib/helpers");
 import hostInfoLib = require("../lib/common/host-info");
-import {EOL} from "os";
+import { EOL } from "os";
+import { assert } from "chai";
 import temp = require("temp");
 temp.track();
-let assert: chai.Assert = chai.assert;
 
 function createTestInjector() {
 	let testInjector = new yok.Yok();
@@ -28,11 +27,13 @@ function createTestInjector() {
 		getProjectDir: (): string => {
 			return testInjector.resolve("options").path;
 		},
-		ensureProject: () => { /* mock*/},
-		projectConfigFiles: [{ template: "android-manifest",
+		ensureProject: () => { /* mock*/ },
+		projectConfigFiles: [{
+			template: "android-manifest",
 			filepath: "App_Resources/Android/AndroidManifest.xml",
 			templateFilepath: "Mobile.Cordova.Android.ManifestXml.zip",
-			helpText: "" }]
+			helpText: ""
+		}]
 	});
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("opener", stubs.OpenerStub);
@@ -50,21 +51,21 @@ function setTempDir(testInjector: IInjector): string {
 
 describe("edit-configuration", () => {
 
-	it("throws error when no parameter is given", () => {
+	it("throws error when no parameter is given", async () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.throws(() => command.execute([]).wait());
+		await assert.isRejected(command.execute([]), "Please enter valid configuration file name.");
 	});
 
-	it("throws error when wrong configuration file is given", () => {
+	it("throws error when wrong configuration file is given", async () => {
 		let testInjector = createTestInjector();
 		setTempDir(testInjector);
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		assert.throws(() => command.execute(["wrong"]).wait());
+		await assert.isRejected(command.execute(["wrong"]), "Please enter valid configuration file name.");
 	});
 
-	it("creates and opens file if correct configuration file is given and it doesn't exist", () => {
+	it("creates and opens file if correct configuration file is given and it doesn't exist", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -77,13 +78,13 @@ describe("edit-configuration", () => {
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilepath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		assert.equal(openArgument, templateFilepath);
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
 
-	it("only creates file if correct configuration file is given that doesn't exist and --skipUi is passed", () => {
+	it("only creates file if correct configuration file is given that doesn't exist and --skipUi is passed", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -99,13 +100,13 @@ describe("edit-configuration", () => {
 		options.skipUi = true;
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		assert.deepEqual(openArgument, undefined, "When skipUi option is passed, opener should not be called");
 		assert.isTrue(fs.existsSync(templateFilepath));
 	});
 
-	it("doesn't modify file if correct configuration file is given and it exists", () => {
+	it("doesn't modify file if correct configuration file is given and it exists", async () => {
 		let testInjector = createTestInjector();
 		let tempDir = setTempDir(testInjector);
 		let template = testInjector.resolve("project").projectConfigFiles[0];
@@ -119,10 +120,10 @@ describe("edit-configuration", () => {
 		testInjector.resolve("fs").createDirectory(path.dirname(templateFilePath));
 
 		let command = testInjector.resolve(editConfiguration.EditConfigurationCommand);
-		command.execute([template.template]).wait();
+		await command.execute([template.template]);
 
 		let templatesService = testInjector.resolve("templatesService");
-		testInjector.resolve("fs").unzip( path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir).wait();
+		await testInjector.resolve("fs").unzip(path.join(templatesService.itemTemplatesDir, template.templateFilepath), tempDir);
 
 		let expectedContent = fs.readFileSync(path.join(tempDir, "AndroidManifest.xml")).toString();
 		expectedContent = helpers.stringReplaceAll(expectedContent, "\n", "");

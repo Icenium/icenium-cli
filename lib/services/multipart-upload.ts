@@ -1,4 +1,3 @@
-import Future = require("fibers/future");
 import * as util from "util";
 
 export class MultipartUploadService implements IMultipartUploadService {
@@ -12,47 +11,44 @@ export class MultipartUploadService implements IMultipartUploadService {
 		private $server: Server.IServer,
 		private $serviceProxy: Server.IServiceProxy,
 		private $hashService: IHashService,
-		private $errors: IErrors,
 		private $logger: ILogger) { }
 
-	public uploadFileByChunks(filePath: string, bucketKey: string): IFuture<void> {
-		return (() => {
-			let fileSize: number = this.$fs.getFileSize(filePath);
-			let chunkStartByte = 0,
-				endByte: number;
+	public async uploadFileByChunks(filePath: string, bucketKey: string): Promise<void> {
+		let fileSize: number = this.$fs.getFileSize(filePath);
+		let chunkStartByte = 0,
+			endByte: number;
 
-			this.$server.upload.initUpload(bucketKey).wait();
+		await this.$server.upload.initUpload(bucketKey);
 
-			let chunks: IFuture<void>[] = [];
-			while(chunkStartByte < fileSize) {
-				// exclusive endByte
-				endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;
+		let chunks: Promise<void>[] = [];
+		while (chunkStartByte < fileSize) {
+			// exclusive endByte
+			endByte = chunkStartByte + MultipartUploadService.CHUNK_SIZE;
 
-				if(endByte > fileSize) {
-					endByte = fileSize;
-				}
-
-				let chunkStream = this.$fs.createReadStream(filePath, { start: chunkStartByte, end: endByte });
-				let future = this.uploadChunk(bucketKey, chunkStartByte, endByte, chunkStream, fileSize);
-				chunks.push(future);
-				chunkStartByte = endByte;
-				if(chunks.length === MultipartUploadService.MAX_CONCURRENT_UPLOADS) {
-					Future.wait(chunks);
-					chunks = [];
-				}
+			if (endByte > fileSize) {
+				endByte = fileSize;
 			}
 
-			if(chunks.length > 0) {
-				Future.wait(chunks);
+			let chunkStream = this.$fs.createReadStream(filePath, { start: chunkStartByte, end: endByte });
+			let promise = this.uploadChunk(bucketKey, chunkStartByte, endByte, chunkStream, fileSize);
+			chunks.push(promise);
+			chunkStartByte = endByte;
+			if (chunks.length === MultipartUploadService.MAX_CONCURRENT_UPLOADS) {
+				await Promise.all(chunks);
+				chunks = [];
 			}
+		}
 
-			let fileHash = this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING).wait();
+		if (chunks.length > 0) {
+			await Promise.all(chunks);
+		}
 
-			this.$server.upload.completeUpload(bucketKey, fileHash).wait();
-		}).future<void>()();
+		let fileHash = await this.$hashService.getFileHash(filePath, MultipartUploadService.INPUT_FILE_ENCODING, MultipartUploadService.HASH_ALGORITHM, MultipartUploadService.HASH_ENCODING);
+
+		await this.$server.upload.completeUpload(bucketKey, fileHash);
 	}
 
-	private uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): IFuture<void> {
+	private async uploadChunk(path: string, startingIndex: number, endIndex: number, content: NodeJS.ReadableStream, fileSize: number): Promise<void> {
 		let headers = {
 			"Content-Range": util.format("bytes %d-%d/%s", startingIndex, endIndex - 1, fileSize),
 			"Content-Length": endIndex - startingIndex
@@ -63,4 +59,5 @@ export class MultipartUploadService implements IMultipartUploadService {
 		return this.$serviceProxy.call<void>('UploadChunk', 'PUT', ['api', 'upload', encodeURI(path.replace(/\\/g, '/'))].join('/'), null, [{ name: 'content', value: content, contentType: 'application/octet-stream' }], null, headers);
 	}
 }
+
 $injector.register("multipartUploadService", MultipartUploadService);

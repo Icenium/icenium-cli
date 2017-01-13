@@ -1,8 +1,9 @@
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
-import {assert} from "chai";
-let staticConfig: any =  {
+import { assert } from "chai";
+import { EOL } from "os";
+
+let staticConfig: any = {
 	TRACK_FEATURE_USAGE_SETTING_NAME: "AnalyticsSettings.TrackFeatureUsage",
 	TRACK_EXCEPTIONS_SETTING_NAME: "AnalyticsSettings.TrackExceptions"
 };
@@ -18,28 +19,28 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("errors", stubs.ErrorsStub);
 	testInjector.register("logger", stubs.LoggerStub);
 	testInjector.register("loginManager", {
-		ensureLoggedIn: () => { return Future.fromResult(); }
+		ensureLoggedIn: () => { return Promise.resolve(); }
 	});
 	testInjector.register("projectMigrationService", {
-		migrateTypeScriptProject: () => Future.fromResult()
+		migrateTypeScriptProject: () => Promise.resolve()
 	});
 	testInjector.register("processInfo", {
-		isRunning: (executableName: string) => { return Future.fromResult(!!isRunning); }
+		isRunning: (executableName: string) => { return Promise.resolve(!!isRunning); }
 	});
 	testInjector.register("project", {
 		getProjectDir: () => projectDir,
 		ensureAllPlatformAssets: () => { /* Intentionally left blanck */ }
 	});
 	testInjector.register("projectSimulatorService", {
-		getSimulatorParams: (simulatorPackageName: string) => { return Future.fromResult(baseParams); }
+		getSimulatorParams: (simulatorPackageName: string) => { return Promise.resolve(baseParams); }
 	});
 	testInjector.register("serverExtensionsService", {
 		getExtensionPath: (packageName: string) => { return "extensionPath"; },
-		prepareExtension: (packageName: string, beforeDownloadPackageAction: () => IFuture<void>) => {
-			if(useBeforeDownloadAction) {
+		prepareExtension: (packageName: string, beforeDownloadPackageAction: () => Promise<void>) => {
+			if (useBeforeDownloadAction) {
 				return beforeDownloadPackageAction();
 			}
-			return Future.fromResult();
+			return Promise.resolve();
 		}
 	});
 	testInjector.register("simulatorPlatformServices", {
@@ -53,13 +54,13 @@ function createTestInjector(isFeatureTrackingEnabled: boolean, isExceptionsTrack
 	testInjector.register("staticConfig", staticConfigLib.StaticConfig);
 	testInjector.register("analyticsService", {
 		isEnabled: (featureName: string) => {
-			if(featureName === staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME) {
-				return Future.fromResult(isFeatureTrackingEnabled);
+			if (featureName === staticConfig.TRACK_FEATURE_USAGE_SETTING_NAME) {
+				return Promise.resolve(isFeatureTrackingEnabled);
 			} else if (featureName === staticConfig.TRACK_EXCEPTIONS_SETTING_NAME) {
-				return Future.fromResult(isExceptionsTrackingEnabled);
+				return Promise.resolve(isExceptionsTrackingEnabled);
 			}
 
-			return Future.fromResult(undefined);
+			return Promise.resolve(undefined);
 		}
 	});
 	testInjector.register("simulatorService", simulatorServiceLib.SimulatorService);
@@ -81,9 +82,9 @@ describe("simulator-service", () => {
 			testSpecificParams = [];
 		});
 
-		afterEach(() => {
+		afterEach(async () => {
 			let service = testInjector.resolve("simulatorService");
-			service.launchSimulator().wait();
+			await service.launchSimulator();
 			let _staticConfig: IStaticConfig = testInjector.resolve("staticConfig");
 			baseExpectedParameters = baseExpectedParameters.concat([_staticConfig.ANALYTICS_API_KEY]);
 			testSpecificParams = testSpecificParams.concat(baseParams);
@@ -110,15 +111,15 @@ describe("simulator-service", () => {
 		});
 	});
 
-	it("launchSimulator fails when simulator is running during download of new version", () => {
+	it("launchSimulator fails when simulator is running during download of new version", async () => {
 		let testInjector = createTestInjector(true, true, true, true);
 		let service = testInjector.resolve("simulatorService");
-		assert.throws(() => service.launchSimulator().wait());
+		await assert.isRejected(service.launchSimulator(), `AppBuilder Simulator is currently running and cannot be updated.${EOL}Close it and run $ appbuilder simulate again.`);
 	});
 
-	it("launchSimulator does not fail when simulator is running during download of new version", () => {
+	it("launchSimulator does not fail when simulator is running during download of new version", async () => {
 		let testInjector = createTestInjector(true, true, false, true);
 		let service = testInjector.resolve("simulatorService");
-		service.launchSimulator().wait();
+		await service.launchSimulator();
 	});
 });

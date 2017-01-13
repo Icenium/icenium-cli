@@ -1,30 +1,26 @@
-import chai = require("chai");
 import ServiceUtil = require("../lib/service-util");
-import Future = require("fibers/future");
 import stubs = require("./stubs");
 import yok = require("../lib/common/yok");
-let assert:chai.Assert = chai.assert;
+import { assert } from "chai";
 
 let testInjector = new yok.Yok();
 testInjector.register("logger", stubs.LoggerStub);
 testInjector.register("serverConfiguration", {});
 testInjector.register("errors", stubs.ErrorsStub);
 testInjector.register("npmService", {
-	getPackageJsonFromNpmRegistry: (packageName: string) => Future.fromResult( { version: "3.0.0" } )
+	getPackageJsonFromNpmRegistry: (packageName: string) => Promise.resolve({ version: "3.0.0" })
 });
 
 class MockUserDataStore implements IUserDataStore {
-	hasCookie(): IFuture<boolean> {
-		return Future.fromResult(false);
+	async hasCookie(): Promise<boolean> {
+		return Promise.resolve(false);
 	}
 
-	getCookies(): IFuture<IStringDictionary> {
-		return (() => {
-			return {"tlrkappshell": "dummy"};
-		}).future<IStringDictionary>()();
+	async getCookies(): Promise<IStringDictionary> {
+		return { "tlrkappshell": "dummy" };
 	}
 
-	getUser():IFuture<any> {
+	async getUser(): Promise<any> {
 		return undefined;
 	}
 
@@ -36,11 +32,11 @@ class MockUserDataStore implements IUserDataStore {
 		return undefined;
 	}
 
-	setUser(user?: any): IFuture<void> {
+	async setUser(user?: any): Promise<void> {
 		return undefined;
 	}
 
-	clearLoginData(): IFuture<void> {
+	async clearLoginData(): Promise<void> {
 		return undefined;
 	}
 }
@@ -51,15 +47,15 @@ class MockHttpClient implements Server.IHttpClient {
 	public mockResponse: Server.IResponse;
 	public mockError: any;
 
-	httpRequest(options: any): IFuture<Server.IResponse> {
+	async httpRequest(options: any): Promise<Server.IResponse> {
 		this.options = options;
-		let future = new Future<Server.IResponse>();
-		if (this.mockError) {
-			future.throw(this.mockError);
-		} else {
-			future.return(this.mockResponse);
-		}
-		return future;
+		return new Promise<Server.IResponse>((resolve, reject) => {
+			if (this.mockError) {
+				reject(this.mockError);
+			} else {
+				resolve(this.mockResponse);
+			}
+		});
 	}
 
 	public setResponse(headers: any, body?: any, error?: any) {
@@ -90,12 +86,12 @@ describe("ServiceProxy", () => {
 		testInjector.resolve("config").SOLUTION_SPACE_NAME = "MockedSolutionSpaceName";
 	});
 
-	it("calls api without arguments and expected return", () => {
+	it("calls api without arguments and expected return", async () => {
 		let proxy = makeProxy();
 
 		httpClient.setResponse({});
 
-		let result = proxy.call("test1", "GET", "authenticate", null, null, null).wait();
+		let result = await proxy.call("test1", "GET", "authenticate", null, null, null);
 
 		assert.equal("GET", httpClient.options.method);
 		assert.equal("/appbuilder/authenticate", httpClient.options.path);
@@ -105,35 +101,33 @@ describe("ServiceProxy", () => {
 		assert.equal(httpClient.options.headers.Cookie, "tlrkappshell=dummy");
 	});
 
-	it("calls api and returns JSON", () => {
-		let expected = {a: "b", c: 4};
+	it("calls api and returns JSON", async () => {
+		let expected = { a: "b", c: 4 };
 
 		let proxy = makeProxy();
 		httpClient.setResponse({}, JSON.stringify(expected));
 
-		let result = proxy.call("test2", "POST", "/json", "application/json", null, null).wait();
+		let result = await proxy.call("test2", "POST", "/json", "application/json", null, null);
 
 		assert.isObject(result);
 		assert.deepEqual(result, expected);
 	});
 
-	it("calls api and pipes result to stream", () => {
+	it("calls api and pipes result to stream", async () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null);
 
 		let result = new (require("stream").PassThrough)();
 
-		proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result).wait();
+		await proxy.call("test3", "GET", "/package/zip", "application/octet-stream", null, result);
 
 		assert.strictEqual(httpClient.options.pipeTo, result);
 	});
 
-	it("throws error returned by HTTP client", () => {
+	it("throws error returned by HTTP client", async () => {
 		let proxy = makeProxy();
 		httpClient.setResponse({}, null, new Error("404"));
 
-		assert.throws(() => {
-			proxy.call("test4", "GET", "/package/zip", "application/json", null, null).wait();
-		}, "404");
+		await assert.isRejected(proxy.call("test4", "GET", "/package/zip", "application/json", null, null), "404");
 	});
 });

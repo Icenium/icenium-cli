@@ -1,5 +1,4 @@
 import * as os from "os";
-import Future = require("fibers/future");
 
 export class DebugCommand implements ICommand {
 	private debuggerPath: string;
@@ -18,54 +17,48 @@ export class DebugCommand implements ICommand {
 		protected $hostInfo: IHostInfo,
 		protected $darwinDebuggerService: IDebuggerService) { }
 
-	allowedParameters: ICommandParameter[] = [];
+	public allowedParameters: ICommandParameter[] = [];
 
-	public execute(args: string[]): IFuture<void> {
-		return (() => {
-			this.$loginManager.ensureLoggedIn().wait();
-			this.$project.ensureProject();
+	public async execute(args: string[]): Promise<void> {
+		await this.$loginManager.ensureLoggedIn();
+		await this.$project.ensureProject();
 
-			this.runDebugger().wait();
-		}).future<void>()();
+		await this.runDebugger();
 	}
 
-	public canExecute(args: string[]): IFuture<boolean> {
+	public async canExecute(args: string[]): Promise<boolean> {
 		if (!this.$hostCapabilities.capabilities[process.platform].debugToolsSupported) {
 			this.$errors.fail("In this version of the Telerik AppBuilder CLI, you cannot run the debug tools on %s. The debug tools for %s will become available in a future release of the Telerik AppBuilder CLI.", process.platform, process.platform);
 		}
 
-		return this.$hostInfo.isDarwin ? Future.fromResult(true) : this.$winDebuggerService.canRunApplication();
+		return this.$hostInfo.isDarwin ? true : await this.$winDebuggerService.canRunApplication();
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
-			if (this.$hostInfo.isWindows) {
-				this.$logger.info("Starting debugger...");
+	protected async runDebugger(): Promise<void> {
+		if (this.$hostInfo.isWindows) {
+			this.$logger.info("Starting debugger...");
 
-				let debuggerPackageName = this.$winDebuggerService.packageName;
-				this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
-				this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this)).wait();
+			let debuggerPackageName = this.$winDebuggerService.packageName;
+			this.debuggerPath = this.$serverExtensionsService.getExtensionPath(debuggerPackageName);
+			await this.$serverExtensionsService.prepareExtension(debuggerPackageName, this.ensureDebuggerIsNotRunning.bind(this));
 
-				this.$sharedUserSettingsService.loadUserSettingsFile().wait();
+			await this.$sharedUserSettingsService.loadUserSettingsFile();
 
-				let debuggerParams = [
-					"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
-					"--app-ids", this.$project.getAppIdentifierForPlatform(this.platform).wait() // We can specify more than one appid. They should be separated with ;.
-				];
+			let debuggerParams = [
+				"--user-settings", this.$sharedUserSettingsFileService.userSettingsFilePath,
+				await "--app-ids", this.$project.getAppIdentifierForPlatform(this.platform) // We can specify more than one appid. They should be separated with ;.
+			];
 
-				this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
-			}
-		}).future<void>()();
+			this.$winDebuggerService.runApplication(this.debuggerPath, debuggerParams);
+		}
 	}
 
-	private ensureDebuggerIsNotRunning(): IFuture<void> {
-		return (() => {
-			let isRunning = this.$processInfo.isRunning(this.$winDebuggerService.executableName).wait();
-			if (isRunning) {
-				this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
-					"Close it and run $ appbuilder debug again.");
-			}
-		}).future<void>()();
+	private async ensureDebuggerIsNotRunning(): Promise<void> {
+		let isRunning = await this.$processInfo.isRunning(this.$winDebuggerService.executableName);
+		if (isRunning) {
+			this.$errors.failWithoutHelp("AppBuilder Debugger is currently running and cannot be updated." + os.EOL +
+				"Close it and run $ appbuilder debug again.");
+		}
 	}
 }
 
@@ -99,13 +92,12 @@ export class DebugAndroidCommand extends DebugCommand {
 		this.platform = this.$projectConstants.ANDROID_PLATFORM_NAME;
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
-			super.runDebugger().wait();
+	protected async runDebugger(): Promise<void> {
+		await super.runDebugger();
 
-			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugAndroidApplication(this.$project.getAppIdentifierForPlatform(this.platform).wait(), this.$project.projectData.Framework).wait();			}
-		}).future<void>()();
+		if (!this.$hostInfo.isWindows) {
+			await this.$darwinDebuggerService.debugAndroidApplication(await this.$project.getAppIdentifierForPlatform(this.platform), this.$project.projectData.Framework);
+		}
 	}
 }
 
@@ -138,14 +130,12 @@ export class DebugIosCommand extends DebugCommand {
 			$darwinDebuggerService);
 	}
 
-	protected runDebugger(): IFuture<void> {
-		return (() => {
-			super.runDebugger().wait();
+	protected async runDebugger(): Promise<void> {
+		await super.runDebugger();
 
-			if (!this.$hostInfo.isWindows) {
-				this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);
-			}
-		}).future<void>()();
+		if (!this.$hostInfo.isWindows) {
+			this.$darwinDebuggerService.debugIosApplication(this.$project.projectData.AppIdentifier);
+		}
 	}
 }
 

@@ -1,6 +1,5 @@
 import yok = require("../lib/common/yok");
-import Future = require("fibers/future");
-import {assert} from "chai";
+import { assert } from "chai";
 
 let fileSystemFile = require("../lib/common/file-system");
 let printVersionsFile = require("../lib/commands/framework-versions/print-versions");
@@ -22,8 +21,8 @@ function createTestInjector(): IInjector {
 			FrameworkVersion: "",
 			Framework: "Cordova"
 		},
-		saveProject: (): IFuture<void> => { return Future.fromResult(); },
-		onFrameworkVersionChanging: (): IFuture<void> => { return Future.fromResult(); },
+		saveProject: (): Promise<void> => { return Promise.resolve(); },
+		onFrameworkVersionChanging: (): Promise<void> => { return Promise.resolve(); },
 		capabilities: {
 			canChangeFrameworkVersion: true
 		},
@@ -36,7 +35,7 @@ function createTestInjector(): IInjector {
 			return [{ displayName: "version_1_0_0", version: "1.0.0" }, { displayName: "version_1_0_1", version: "1.0.1" }];
 		},
 
-		getDisplayNameForVersion: (version: string): string =>  "version_1_0_0"
+		getDisplayNameForVersion: (version: string): string => "version_1_0_0"
 	};
 
 	testInjector.register("cordovaMigrationService", migrationService);
@@ -69,46 +68,46 @@ describe("mobileframework", () => {
 					testInjector.resolve("projectConstants"));
 			});
 
-			it("fails when version is not in correct format", () => {
+			it("fails when version is not in correct format", async () => {
 				let message: string;
 				try {
-					mobileFwCP.validate("1").wait();
-				} catch(e) {
+					await mobileFwCP.validate("1");
+				} catch (e) {
 					message = e.message;
 				}
 				assert.isTrue(message.indexOf("not in correct format") > -1);
 			});
 
-			it("fails when version is not supported", () => {
+			it("fails when version is not supported", async () => {
 				let message: string;
 				try {
-					mobileFwCP.validate("1.0.5").wait();
-				} catch(e) {
+					await mobileFwCP.validate("1.0.5");
+				} catch (e) {
 					message = e.message;
 				}
 
 				assert.isTrue(message.indexOf("not a supported version") > -1);
 			});
 
-			it("returns true when version is correct", () => {
-				assert.isTrue(mobileFwCP.validate("1.0.0").wait());
+			it("returns true when version is correct", async () => {
+				assert.isTrue(await mobileFwCP.validate("1.0.0"));
 			});
 		});
 
 		describe("canChangeFrameworkVersion is false", () => {
-			it("validate method throws", () => {
+			it("validate method throws", async () => {
 				let project: Project.IProject = testInjector.resolve("project");
 				project.capabilities.canChangeFrameworkVersion = false;
 				mobileFwCP = new setVersionFile.MobileFrameworkCommandParameter(testInjector.resolve("cordovaMigrationService"),
 					testInjector.resolve("project"), testInjector.resolve("errors"), testInjector.resolve("nativeScriptMigrationService"),
 					testInjector.resolve("projectConstants"));
-				assert.throws(() => mobileFwCP.validate("1.0.0").wait());
+				await assert.isRejected(mobileFwCP.validate("1.0.0"), "You cannot change FrameworkVersion of \'Cordova\' project.");
 			});
 		});
 	});
 
 	describe("print", () => {
-		it("prints display names of supported versions", () => {
+		it("prints display names of supported versions", async () => {
 			let expectedOutput = ["version_1_0_0", "version_1_0_1"];
 			let testInjector = createTestInjector();
 			let message: string;
@@ -118,13 +117,13 @@ describe("mobileframework", () => {
 				}
 			});
 			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
-			mbFrm.execute([]).wait();
+			await mbFrm.execute([]);
 			_.each(expectedOutput, version => {
 				assert.isTrue(message.indexOf(version) > -1);
 			});
 		});
 
-		it("print command should fail", () => {
+		it("print command should fail", async () => {
 			let testInjector = createTestInjector();
 			let message: string;
 			testInjector.register("logger", {
@@ -135,7 +134,7 @@ describe("mobileframework", () => {
 			let project: Project.IProject = testInjector.resolve("project");
 			project.capabilities.canChangeFrameworkVersion = false;
 			let mbFrm: ICommand = testInjector.resolve("mobileframework|*print");
-			assert.throws(() => mbFrm.canExecute([]).wait());
+			await assert.isRejected(mbFrm.canExecute([]), "This command is not applicable to Cordova projects.");
 		});
 	});
 });

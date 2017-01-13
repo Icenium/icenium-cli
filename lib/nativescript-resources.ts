@@ -6,10 +6,10 @@ export class NativeScriptResources implements INativeScriptResources {
 	private _nativeScriptMigrationFile: string;
 
 	constructor(private $projectConstants: Project.IConstants,
-		private $resources: IResourceLoader) {}
+		private $resources: IResourceLoader) { }
 
 	public get nativeScriptResourcesDir(): string {
-		if(!this._nativeScriptResourcesDir) {
+		if (!this._nativeScriptResourcesDir) {
 			this._nativeScriptResourcesDir = this.$resources.resolvePath("NativeScript");
 		}
 
@@ -17,7 +17,7 @@ export class NativeScriptResources implements INativeScriptResources {
 	}
 
 	public get nativeScriptMigrationFile(): string {
-		if(!this._nativeScriptMigrationFile) {
+		if (!this._nativeScriptMigrationFile) {
 			this._nativeScriptMigrationFile = path.join(this.nativeScriptResourcesDir, "nativeScript-migration-data.json");
 		}
 
@@ -25,7 +25,7 @@ export class NativeScriptResources implements INativeScriptResources {
 	}
 
 	public get nativeScriptDefaultPackageJsonFile(): string {
-		if(!this._nativeScriptDefaultPackageJsonFile) {
+		if (!this._nativeScriptDefaultPackageJsonFile) {
 			this._nativeScriptDefaultPackageJsonFile = path.join(this.nativeScriptResourcesDir, this.$projectConstants.PACKAGE_JSON_NAME);
 		}
 

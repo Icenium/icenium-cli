@@ -35,278 +35,268 @@ export class BuildService implements Project.IBuildService {
 		private $projectConstants: Project.IConstants,
 		private $httpClient: Server.IHttpClient) { }
 
-	public getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): IFuture<string> {
-		return ((): string => {
-			urlKind = urlKind.toLowerCase();
-			if (urlKind !== "manifest" && urlKind !== "package") {
-				throw new Error("urlKind must be either 'manifest' or 'package'");
-			}
+	public async getDownloadUrl(urlKind: string, liveSyncToken: string, packageDef: Server.IPackageDef, projectConfiguration: string): Promise<string> {
+		urlKind = urlKind.toLowerCase();
+		if (urlKind !== "manifest" && urlKind !== "package") {
+			throw new Error("urlKind must be either 'manifest' or 'package'");
+		}
 
-			let fullDownloadPath: string;
-			if (packageDef.format === BuildService.ACCEPT_RESULT_URL && urlKind === "package") {
-				fullDownloadPath = packageDef.url;
-			} else {
-				// escape URLs twice to work around a bug in bit.ly
-				fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s&projectConfiguration=%s",
-					this.$config.AB_SERVER_PROTO,
-					this.$config.AB_SERVER, urlKind,
-					querystring.escape(querystring.escape(packageDef.relativePath)),
-					querystring.escape(querystring.escape(liveSyncToken)),
-					projectConfiguration);
-			}
+		let fullDownloadPath: string;
+		if (packageDef.format === BuildService.ACCEPT_RESULT_URL && urlKind === "package") {
+			fullDownloadPath = packageDef.url;
+		} else {
+			// escape URLs twice to work around a bug in bit.ly
+			fullDownloadPath = util.format("%s://%s/appbuilder/Mist/MobilePackage/%s?packagePath=%s&token=%s&projectConfiguration=%s",
+				this.$config.AB_SERVER_PROTO,
+				this.$config.AB_SERVER, urlKind,
+				querystring.escape(querystring.escape(packageDef.relativePath)),
+				querystring.escape(querystring.escape(liveSyncToken)),
+				projectConfiguration);
+		}
 
-			this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
+		this.$logger.debug("Minifying LiveSync URL '%s'", fullDownloadPath);
 
-			let url = this.$server.cordova.getLiveSyncUrl(fullDownloadPath).wait();
-			if (urlKind === "manifest") {
-				url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
-			}
+		let url = await this.$server.cordova.getLiveSyncUrl(fullDownloadPath);
+		if (urlKind === "manifest") {
+			url = "itms-services://?action=download-manifest&amp;url=" + querystring.escape(url);
+		}
 
-			this.$logger.debug("Device install URL '%s'", url);
+		this.$logger.debug("Device install URL '%s'", url);
 
-			return url;
-		}).future<string>()();
+		return url;
 	}
 
-	private buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): IFuture<Server.IBuildResult> {
-		return ((): Server.IBuildResult => {
-			this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
-			this.$logger.printInfoMessageOnSameLine("Building...");
+	private async buildProject(solutionName: string, projectName: string, solutionSpace: string, buildProperties: any): Promise<Server.IBuildResult> {
+		this.$logger.info("Building project %s/%s (%s)", solutionName, projectName, solutionSpace);
+		this.$logger.printInfoMessageOnSameLine("Building...");
 
-			this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier }).wait();
+		await this.$server.projects.setProjectProperty(solutionName, projectName, buildProperties.Configuration, { AppIdentifier: buildProperties.AppIdentifier });
 
-			let liveSyncToken = this.$server.cordova.getLiveSyncToken(solutionName, projectName).wait();
-			buildProperties.LiveSyncToken = liveSyncToken;
+		let liveSyncToken = await this.$server.cordova.getLiveSyncToken(solutionName, projectName);
+		buildProperties.LiveSyncToken = liveSyncToken;
 
-			let buildProjectFuture = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
-			this.$progressIndicator.showProgressIndicator(buildProjectFuture, 2000).wait();
+		let buildProjectPromise = this.$server.build.buildProject(solutionName, projectName, { Properties: buildProperties, Targets: [] });
+		let body = await this.$progressIndicator.showProgressIndicator(buildProjectPromise, 2000);
+		let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
+			let fullPath = buildResult.FullPath.replace(/\\/g, "/");
+			let solutionPath = util.format("%s/%s", projectName, fullPath);
 
-			let body = buildProjectFuture.get();
-			let buildResults: Server.IPackageDef[] = body.ResultsByTarget["Build"].Items.map((buildResult: any) => {
-				let fullPath = buildResult.FullPath.replace(/\\/g, "/");
-				let solutionPath = util.format("%s/%s", projectName, fullPath);
+			let fileExtension: string = buildResult.Extension;
 
-				let fileExtension: string = buildResult.Extension;
+			// Since the server can return in the Extension property string which is the file extension followed by query string we need to remove the query string.
+			let indexOfQueryString = fileExtension.indexOf("?");
+			if (indexOfQueryString >= 0) {
+				fileExtension = fileExtension.substring(0, indexOfQueryString);
+			}
 
-				// Since the server can return in the Extension property string which is the file extension followed by query string we need to remove the query string.
-				let indexOfQueryString = fileExtension.indexOf("?");
-				if (indexOfQueryString >= 0) {
-					fileExtension = fileExtension.substring(0, indexOfQueryString);
-				}
-
-				let fullFileName = `${buildResult.Filename}${fileExtension}`;
-				return {
-					platform: buildResult.Platform,
-					solution: solutionName,
-					solutionPath: solutionPath,
-					relativePath: buildResult.FullPath,
-					disposition: buildResult.Disposition,
-					format: buildResult.Format,
-					url: buildResult.FullPath,
-					fileName: fullFileName,
-					key: buildResult.Key,
-					value: buildResult.Value,
-					architecture: buildResult.Architecture
-				};
-			});
-
+			let fullFileName = `${buildResult.Filename}${fileExtension}`;
 			return {
-				buildResults: buildResults,
-				output: body.Output,
-				errors: body.Errors.map(error => error.Message)
+				platform: buildResult.Platform,
+				solution: solutionName,
+				solutionPath: solutionPath,
+				relativePath: buildResult.FullPath,
+				disposition: buildResult.Disposition,
+				format: buildResult.Format,
+				url: buildResult.FullPath,
+				fileName: fullFileName,
+				key: buildResult.Key,
+				value: buildResult.Value,
+				architecture: buildResult.Architecture
 			};
-		}).future<Server.IBuildResult>()();
+		});
+
+		return {
+			buildResults: buildResults,
+			output: body.Output,
+			errors: body.Errors.map(error => error.Message)
+		};
 	}
 
-	private requestCloudBuild(settings: Project.IBuildSettings): IFuture<Project.IBuildResult> {
-		return ((): Project.IBuildResult => {
-			settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
-			let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()] || this.$project.projectData;
+	private async requestCloudBuild(settings: Project.IBuildSettings): Promise<Project.IBuildResult> {
+		settings.platform = this.$mobileHelper.normalizePlatformName(settings.platform);
+		let projectData = this.$project.projectInformation.configurationSpecificData[settings.projectConfiguration.toLowerCase()] || this.$project.projectData;
 
-			let buildProperties: any = {
-				ProjectConfiguration: settings.projectConfiguration,
-				BuildConfiguration: settings.buildConfiguration,
-				Platform: settings.platform,
-				AppIdentifier: projectData.AppIdentifier,
-				ProjectName: projectData.ProjectName,
-				Author: projectData.Author,
-				Description: projectData.Description,
-				FrameworkVersion: projectData.FrameworkVersion,
-				BundleVersion: projectData.BundleVersion,
-				DeviceOrientations: projectData.DeviceOrientations,
-				BuildForiOSSimulator: settings.buildForiOSSimulator || false,
-				AcceptResults: `${BuildService.ACCEPT_RESULT_URL};${BuildService.ACCEPT_RESULT_LOCAL_PATH}`
-			};
+		let buildProperties: any = {
+			ProjectConfiguration: settings.projectConfiguration,
+			BuildConfiguration: settings.buildConfiguration,
+			Platform: settings.platform,
+			AppIdentifier: projectData.AppIdentifier,
+			ProjectName: projectData.ProjectName,
+			Author: projectData.Author,
+			Description: projectData.Description,
+			FrameworkVersion: projectData.FrameworkVersion,
+			BundleVersion: projectData.BundleVersion,
+			DeviceOrientations: projectData.DeviceOrientations,
+			BuildForiOSSimulator: settings.buildForiOSSimulator || false,
+			AcceptResults: `${BuildService.ACCEPT_RESULT_URL};${BuildService.ACCEPT_RESULT_LOCAL_PATH}`
+		};
 
-			this.$project.adjustBuildProperties(buildProperties);
+		this.$project.adjustBuildProperties(buildProperties);
 
-			if (settings.platform === "Android") {
-				buildProperties.AndroidPermissions = projectData.AndroidPermissions;
-				buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
-				buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
+		if (settings.platform === "Android") {
+			buildProperties.AndroidPermissions = projectData.AndroidPermissions;
+			buildProperties.AndroidVersionCode = projectData.AndroidVersionCode;
+			buildProperties.AndroidHardwareAcceleration = projectData.AndroidHardwareAcceleration;
 
-				let certificateData: ICryptographicIdentity;
-				if (this.$options.certificate) {
-					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
-				} else if (settings.buildForTAM) {
-					this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
-						"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
-				} else if (settings.buildConfiguration === constants.Configurations.Release) {
-					certificateData = this.$identityManager.findReleaseCertificate().wait();
+			let certificateData: ICryptographicIdentity;
+			if (this.$options.certificate) {
+				certificateData = await this.$identityManager.findCertificate(this.$options.certificate);
+			} else if (settings.buildForTAM) {
+				this.$logger.warn("You have not specified certificate to code sign this app. We'll use default debug certificate. " +
+					"Use --certificate option to specify your own certificate. You can check available certificates with '$ appbuilder certificate' command.");
+			} else if (settings.buildConfiguration === constants.Configurations.Release) {
+				certificateData = await this.$identityManager.findReleaseCertificate();
 
-					if (!certificateData) {
-						this.$logger.warn("Cannot find an applicable Google Play certificate to " +
-							"code sign this app. You will not be able to publish this app to " +
-							"Google Play. To create a Google Play certificate, run\n" +
-							"    $ appbuilder certificate create-self-signed");
-					}
+				if (!certificateData) {
+					this.$logger.warn("Cannot find an applicable Google Play certificate to " +
+						"code sign this app. You will not be able to publish this app to " +
+						"Google Play. To create a Google Play certificate, run\n" +
+						"    $ appbuilder certificate create-self-signed");
+				}
+			}
+
+			if (certificateData) {
+				if (certificateData.isiOS) {
+					this.$errors.failWithoutHelp("The certificate you have chosen is ineligible for the Android platform.");
 				}
 
-				if (certificateData) {
-					if (certificateData.isiOS) {
-						this.$errors.failWithoutHelp("The certificate you have chosen is ineligible for the Android platform.");
-					}
+				buildProperties.AndroidCodesigningIdentity = certificateData.Alias;
+				this.$logger.info("Using certificate '%s'", certificateData.Alias);
+			} else {
+				buildProperties.AndroidCodesigningIdentity = "";
+			}
 
-					buildProperties.AndroidCodesigningIdentity = certificateData.Alias;
-					this.$logger.info("Using certificate '%s'", certificateData.Alias);
-				} else {
-					buildProperties.AndroidCodesigningIdentity = "";
+			let result = await this.beginBuild(buildProperties);
+			return result;
+		} else if (settings.platform === "iOS") {
+			let appIdentifier = projectData.AppIdentifier;
+
+			let configFileContent = this.$project.getConfigFileContent("ios-info");
+			if (configFileContent) {
+				let parsed = plist.parse(configFileContent);
+				let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
+				if (cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
+					appIdentifier = cfBundleIdentifier;
 				}
+			}
 
-				let result = this.beginBuild(buildProperties).wait();
-				return result;
-			} else if (settings.platform === "iOS") {
-				let appIdentifier = projectData.AppIdentifier;
+			buildProperties.iOSDisplayName = projectData.DisplayName;
+			buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
+			buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
+			buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
 
-				let configFileContent = this.$project.getConfigFileContent("ios-info");
-				if (configFileContent) {
-					let parsed = plist.parse(configFileContent);
-					let cfBundleIdentifier = (<any>parsed).CFBundleIdentifier;
-					if (cfBundleIdentifier && cfBundleIdentifier !== BuildService.APPIDENTIFIER_PLACE_HOLDER) {
-						appIdentifier = cfBundleIdentifier;
-					}
+			let completeAutoselect = (!this.$options.provision && !this.$options.certificate);
+
+			let provisionData: IProvision;
+			if (this.$options.provision) {
+				provisionData = await this.$identityManager.findProvision(this.$options.provision);
+				if (settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
+					this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
+						"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
 				}
-
-				buildProperties.iOSDisplayName = projectData.DisplayName;
-				buildProperties.iOSDeviceFamily = projectData.iOSDeviceFamily;
-				buildProperties.iOSStatusBarStyle = projectData.iOSStatusBarStyle;
-				buildProperties.iOSBackgroundMode = projectData.iOSBackgroundMode;
-
-				let completeAutoselect = (!this.$options.provision && !this.$options.certificate);
-
-				let provisionData: IProvision;
-				if (this.$options.provision) {
-					provisionData = this.$identityManager.findProvision(this.$options.provision).wait();
-					if (settings.buildForTAM && provisionData.ProvisionType === constants.ProvisionType.AppStore) {
-						this.$errors.failWithoutHelp("You cannot use AppStore provision for upload in AppManager. Please use Development, AdHoc or Enterprise provision." +
-							"You can check availalbe provisioning profiles by using '$ appbuilder provision' command.");
-					}
-				} else if (!settings.buildForiOSSimulator) {
-					let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
-					try {
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier).wait();
-					} catch (error) {
-						if (!this.$options.download) {
-							this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
-							let additionalInfo = error.message.split(EOL)[1];
-							if (additionalInfo) {
-								this.$logger.warn(additionalInfo);
-							}
-							this.$logger.warn("Attempting to use Development provisioning profile instead.");
+			} else if (!settings.buildForiOSSimulator) {
+				let deviceIdentifier = settings.device ? settings.device.deviceInfo.identifier : undefined;
+				try {
+					provisionData = await this.$identityManager.autoselectProvision(appIdentifier, settings.provisionTypes || [constants.ProvisionType.AdHoc], deviceIdentifier);
+				} catch (error) {
+					if (!this.$options.download) {
+						this.$logger.warn("Cannot generate QR code because an applicable AdHoc provisioning profile is not available.");
+						let additionalInfo = error.message.split(EOL)[1];
+						if (additionalInfo) {
+							this.$logger.warn(additionalInfo);
 						}
-
-						provisionData = this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.Development], deviceIdentifier).wait();
+						this.$logger.warn("Attempting to use Development provisioning profile instead.");
 					}
-					this.$options.provision = provisionData.Name;
-				}
-				this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
 
-				let certificateData: ICryptographicIdentity;
-				if (this.$options.certificate) {
-					certificateData = this.$identityManager.findCertificate(this.$options.certificate).wait();
-				} else if (!settings.buildForiOSSimulator) {
-					certificateData = this.$identityManager.autoselectCertificate(provisionData).wait();
-					this.$options.certificate = certificateData.Alias;
+					provisionData = await this.$identityManager.autoselectProvision(appIdentifier, [constants.ProvisionType.Development], deviceIdentifier);
 				}
-				this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
-
-				if (!completeAutoselect) {
-					let iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
-						appIdentifier: appIdentifier,
-						deviceIdentifier: settings.device ? settings.device.deviceInfo.identifier : null
-					});
-					iOSDeploymentValidator.throwIfInvalid(
-						{ provisionOption: this.$options.provision, certificateOption: this.$options.certificate }).wait();
-				}
-
-				if (provisionData) {
-					buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
-				}
-				if (certificateData) {
-					buildProperties.iOSCodesigningIdentity = certificateData.Alias;
-				}
-
-				let buildResult = this.beginBuild(buildProperties).wait();
-				if (provisionData) {
-					buildResult.provisionType = provisionData.ProvisionType;
-				}
-				return buildResult;
-			} else if (settings.platform === "WP8") {
-				let buildCompanyHubApp = !settings.downloadFiles;
-				if (this.$project.projectData.WPSdk === "8.1" && ((this.$options.release && settings.downloadFiles) || settings.buildForTAM)) {
-					this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
-						settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
-							"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
-				}
-
-				if (buildCompanyHubApp) {
-					buildProperties.WP8CompanyHubApp = true;
-					if (settings.showWp8SigningMessage === undefined) {
-						this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
-							" deployed using a QR code. Use the --download switch if you want to cable deploy" +
-							" or publish the built app package.");
-					}
-				}
-
-				return this.beginBuild(buildProperties).wait();
-			} else {
-				this.$logger.fatal("Unknown platform '%s'.", settings.platform);
-				return null;
+				this.$options.provision = provisionData.Name;
 			}
-		}).future<Project.IBuildResult>()();
+			this.$logger.info("Using mobile provision '%s'", provisionData ? provisionData.Name : "[No provision]");
+
+			let certificateData: ICryptographicIdentity;
+			if (this.$options.certificate) {
+				certificateData = await this.$identityManager.findCertificate(this.$options.certificate);
+			} else if (!settings.buildForiOSSimulator) {
+				certificateData = await this.$identityManager.autoselectCertificate(provisionData);
+				this.$options.certificate = certificateData.Alias;
+			}
+			this.$logger.info("Using certificate '%s'", certificateData ? certificateData.Alias : "[No certificate]");
+
+			if (!completeAutoselect) {
+				let iOSDeploymentValidator = this.$injector.resolve(iOSDeploymentValidatorLib.IOSDeploymentValidator, {
+					appIdentifier: appIdentifier,
+					deviceIdentifier: settings.device ? settings.device.deviceInfo.identifier : null
+				});
+				iOSDeploymentValidator.throwIfInvalid(
+					await { provisionOption: this.$options.provision, certificateOption: this.$options.certificate });
+			}
+
+			if (provisionData) {
+				buildProperties.MobileProvisionIdentifier = provisionData.Identifier;
+			}
+			if (certificateData) {
+				buildProperties.iOSCodesigningIdentity = certificateData.Alias;
+			}
+
+			let buildResult = await this.beginBuild(buildProperties);
+			if (provisionData) {
+				buildResult.provisionType = provisionData.ProvisionType;
+			}
+			return buildResult;
+		} else if (settings.platform === "WP8") {
+			let buildCompanyHubApp = !settings.downloadFiles;
+			if (this.$project.projectData.WPSdk === "8.1" && ((this.$options.release && settings.downloadFiles) || settings.buildForTAM)) {
+				this.$logger.warn("Verify that you have configured your project for publishing in the Windows Phone Store. For more information see: %s",
+					settings.buildForTAM ? "http://docs.telerik.com/platform/appbuilder/publishing-your-app/publish-appmanager#prerequisites" :
+						"http://docs.telerik.com/platform/appbuilder/publishing-your-app/distribute-production/publish-wp8#prerequisites");
+			}
+
+			if (buildCompanyHubApp) {
+				buildProperties.WP8CompanyHubApp = true;
+				if (settings.showWp8SigningMessage === undefined) {
+					this.$logger.info("The app file will be signed as a Telerik Company Hub app so that it can be" +
+						" deployed using a QR code. Use the --download switch if you want to cable deploy" +
+						" or publish the built app package.");
+				}
+			}
+
+			return await this.beginBuild(buildProperties);
+		} else {
+			this.$logger.fatal("Unknown platform '%s'.", settings.platform);
+			return null;
+		}
 	}
 
-	private beginBuild(buildProperties: any): IFuture<Project.IBuildResult> {
-		return ((): Project.IBuildResult => {
-			Object.keys(buildProperties).forEach((prop) => {
-				if (buildProperties[prop] === undefined) {
-					this.$logger.warn(`Build property '${prop}' is undefined. The property is optional, but you can set it by running '${this.$staticConfig.CLIENT_NAME.toLowerCase()} prop set ${prop} <value>'.`);
-				}
-
-				if (_.isArray(buildProperties[prop])) {
-					buildProperties[prop] = buildProperties[prop].join(";");
-				}
-			});
-
-			let result = this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties).wait();
-
-			if (result.output) {
-				let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
-				this.$fs.writeFile(buildLogFilePath, result.output);
-				this.$logger.info("Build log written to '%s'", buildLogFilePath);
+	private async beginBuild(buildProperties: any): Promise<Project.IBuildResult> {
+		Object.keys(buildProperties).forEach((prop) => {
+			if (buildProperties[prop] === undefined) {
+				this.$logger.warn(`Build property '${prop}' is undefined. The property is optional, but you can set it by running '${this.$staticConfig.CLIENT_NAME.toLowerCase()} prop set ${prop} <value>'.`);
 			}
 
-			this.$logger.debug(result.buildResults);
-
-			if (result.errors.length) {
-				this.$logger.error("Build errors: %s", util.inspect(result.errors));
+			if (_.isArray(buildProperties[prop])) {
+				buildProperties[prop] = buildProperties[prop].join(";");
 			}
+		});
 
-			return {
-				buildProperties: buildProperties,
-				packageDefs: result.buildResults
-			};
-		}).future<Project.IBuildResult>()();
+		let result = await this.buildProject(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName, this.$staticConfig.SOLUTION_SPACE_NAME, buildProperties);
+
+		if (result.output) {
+			let buildLogFilePath = path.join(this.$project.getTempDir(), "build.log");
+			this.$fs.writeFile(buildLogFilePath, result.output);
+			this.$logger.info("Build log written to '%s'", buildLogFilePath);
+		}
+
+		this.$logger.debug(result.buildResults);
+
+		if (result.errors.length) {
+			this.$logger.error("Build errors: %s", util.inspect(result.errors));
+		}
+
+		return {
+			buildProperties: buildProperties,
+			packageDefs: result.buildResults
+		};
 	}
 
 	private showQRCodes(packageDefs: IPackageDownloadViewModel[]): void {
@@ -334,217 +324,204 @@ export class BuildService implements Project.IBuildService {
 		this.$opener.open(scanFile);
 	}
 
-	public build(settings: Project.IBuildSettings): IFuture<Server.IPackageDef[]> {
-		return ((): Server.IPackageDef[] => {
-			this.$project.ensureProject();
+	public async build(settings: Project.IBuildSettings): Promise<Server.IPackageDef[]> {
+		await this.$project.ensureProject();
 
-			this.$jsonSchemaValidator.validate(this.$project.projectData);
-			this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
-			this.$project.validateAppIdentifier(settings.platform).wait();
+		this.$jsonSchemaValidator.validate(this.$project.projectData);
+		this.$jsonSchemaValidator.validateWithBuildSchema(this.$project.projectData, settings.platform);
 
-			settings.projectConfiguration = settings.projectConfiguration || this.$project.getProjectConfiguration();
-			settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
+		settings.projectConfiguration = settings.projectConfiguration || this.$project.getProjectConfiguration();
+		settings.buildConfiguration = settings.buildConfiguration || this.$project.getBuildConfiguration();
 
-			this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
-				settings.platform, settings.projectConfiguration, settings.buildConfiguration);
+		this.$logger.info("Building project for platform '%s', project configuration '%s', build configuration '%s'",
+			settings.platform, settings.projectConfiguration, settings.buildConfiguration);
 
-			this.$project.ensureAllPlatformAssets();
-			this.$projectMigrationService.migrateTypeScriptProject().wait();
-			this.$project.importProject().wait();
+		this.$project.ensureAllPlatformAssets();
+		await this.$projectMigrationService.migrateTypeScriptProject();
+		await this.$project.importProject();
 
-			let buildResult = this.requestCloudBuild(settings).wait();
-			let packageDefs = buildResult.packageDefs;
+		let buildResult = await this.requestCloudBuild(settings);
+		let packageDefs = buildResult.packageDefs;
 
-			if ((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
-				this.$logger.info("Package built with '%s' provision type. Downloading package, instead of generating QR code.", buildResult.provisionType);
-				this.$logger.info("Deploy manually to your device using iTunes.");
-				settings.showQrCodes = false;
-				settings.downloadFiles = true;
+		if ((buildResult.provisionType === constants.ProvisionType.Development || buildResult.provisionType === constants.ProvisionType.AppStore) && !settings.downloadFiles && !settings.buildForTAM) {
+			this.$logger.info("Package built with '%s' provision type. Downloading package, instead of generating QR code.", buildResult.provisionType);
+			this.$logger.info("Deploy manually to your device using iTunes.");
+			settings.showQrCodes = false;
+			settings.downloadFiles = true;
+		}
+
+		if (!packageDefs.length) {
+			this.$errors.fail("Build failed. For more information read the build log.");
+		}
+
+		if (settings.showQrCodes) {
+			let urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
+			let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
+			let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
+
+			let packageDownloadViewModels = await Promise.all(_.map(appPackages, async (def: Server.IPackageDef): Promise<IPackageDownloadViewModel> => {
+				let downloadUrl = await this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration);
+
+				let packageUrl = (urlKind !== "package")
+					? await this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration)
+					: downloadUrl;
+				this.$logger.debug("Download URL is '%s'", packageUrl);
+
+				return {
+					qrUrl: downloadUrl,
+					qrImageData: await this.$qr.generateDataUri(downloadUrl),
+					packageUrls: [{
+						packageUrl: packageUrl,
+						downloadText: "Download"
+					}],
+					instruction: util.format("Scan the QR code below to install %s to %s", def.solution, def.platform),
+				};
+			}));
+
+			if (settings.platform === "WP8") {
+				let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
+				let aetDef: IPackageDownloadViewModel = {
+					qrUrl: aetUrl,
+					qrImageData: await this.$qr.generateDataUri(aetUrl),
+					packageUrls: [{ packageUrl: aetUrl, downloadText: "Download application enrollment token" }],
+					instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)")
+				};
+				packageDownloadViewModels.push(aetDef);
 			}
 
-			if (!packageDefs.length) {
-				this.$errors.fail("Build failed. For more information read the build log.");
-			}
+			this.showQRCodes(packageDownloadViewModels);
+		}
 
-			if (settings.showQrCodes) {
-				let urlKind = buildResult.provisionType === constants.ProvisionType.AdHoc ? "manifest" : "package";
-				let liveSyncToken = buildResult.buildProperties.LiveSyncToken;
-				let appPackages = _.filter(packageDefs, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult");
-
-				let packageDownloadViewModels = _.map(appPackages, (def: Server.IPackageDef): IPackageDownloadViewModel => {
-					let downloadUrl = this.getDownloadUrl(urlKind, liveSyncToken, def, settings.projectConfiguration).wait();
-
-					let packageUrl = (urlKind !== "package")
-						? this.getDownloadUrl("package", liveSyncToken, def, settings.projectConfiguration).wait()
-						: downloadUrl;
-					this.$logger.debug("Download URL is '%s'", packageUrl);
-
-					return {
-						qrUrl: downloadUrl,
-						qrImageData: this.$qr.generateDataUri(downloadUrl),
-						packageUrls: [{
-							packageUrl: packageUrl,
-							downloadText: "Download"
-						}],
-						instruction: util.format("Scan the QR code below to install %s to %s", def.solution, def.platform),
-					};
-				});
-
-				if (settings.platform === "WP8") {
-					let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
-					let aetDef: IPackageDownloadViewModel = {
-						qrUrl: aetUrl,
-						qrImageData: this.$qr.generateDataUri(aetUrl),
-						packageUrls: [{ packageUrl: aetUrl, downloadText: "Download application enrollment token" }],
-						instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)")
-					};
-					packageDownloadViewModels.push(aetDef);
+		if (settings.downloadFiles) {
+			await Promise.all(_.map(packageDefs, async (pkg: Server.IPackageDef) => {
+				let targetFileName: string;
+				if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
+					targetFileName = path.join(this.$project.getProjectDir(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
+				} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
+					targetFileName = settings.downloadedFilePath
+						|| path.join(this.$project.getProjectDir(), pkg.fileName);
+				} else {
+					// We will get here if the disposition is BuildResultMetadata which is not file for download.
+					return;
 				}
 
-				this.showQRCodes(packageDownloadViewModels);
-			}
+				this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.fileName, targetFileName);
+				let targetFile = this.$fs.createWriteStream(targetFileName);
 
-			if (settings.downloadFiles) {
-				packageDefs.forEach((pkg: Server.IPackageDef) => {
-					let targetFileName: string;
-					if (pkg.disposition === this.$projectConstants.ADDITIONAL_FILE_DISPOSITION) {
-						targetFileName = path.join(this.$project.getProjectDir(), this.$projectConstants.ADDITIONAL_FILES_DIRECTORY, pkg.fileName);
-					} else if (pkg.disposition === this.$projectConstants.BUILD_RESULT_DISPOSITION) {
-						targetFileName = settings.downloadedFilePath
-							|| path.join(this.$project.getProjectDir(), pkg.fileName);
-					} else {
-						// We will get here if the disposition is BuildResultMetadata which is not file for download.
-						return;
-					}
+				if (pkg.format === BuildService.ACCEPT_RESULT_URL) {
+					await this.$httpClient.httpRequest({
+						url: pkg.url,
+						pipeTo: targetFile
+					});
+				} else {
+					await this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile);
+				}
 
-					this.$logger.info("Downloading file '%s/%s' into '%s'", pkg.solution, pkg.fileName, targetFileName);
-					let targetFile = this.$fs.createWriteStream(targetFileName);
+				this.$logger.info("Download completed: %s", targetFileName);
+				pkg.localFile = targetFileName;
+			}));
+		}
 
-					if (pkg.format === BuildService.ACCEPT_RESULT_URL) {
-						this.$httpClient.httpRequest({
-							url: pkg.url,
-							pipeTo: targetFile
-						}).wait();
-					} else {
-						this.$server.filesystem.getContent(pkg.solution, pkg.solutionPath, targetFile).wait();
-					}
-
-					this.$logger.info("Download completed: %s", targetFileName);
-					pkg.localFile = targetFileName;
-				});
-			}
-
-			return packageDefs;
-		}).future<Server.IPackageDef[]>()();
+		return packageDefs;
 	}
 
-	public buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): IFuture<IApplicationInformation> {
-		return ((): IApplicationInformation => {
-			platform = this.$mobileHelper.validatePlatformName(platform);
-			this.$project.ensureProject();
-			let buildResult = this.build({
-				platform: platform,
-				downloadFiles: true,
-				downloadedFilePath: downloadedFilePath,
-				buildForiOSSimulator: buildForiOSSimulator,
-				device: device
-			}).wait();
+	public async buildForDeploy(platform: string, downloadedFilePath: string, buildForiOSSimulator?: boolean, device?: Mobile.IDevice): Promise<IApplicationInformation> {
+		platform = this.$mobileHelper.validatePlatformName(platform);
+		await this.$project.ensureProject();
+		let buildResult = await this.build({
+			platform: platform,
+			downloadFiles: true,
+			downloadedFilePath: downloadedFilePath,
+			buildForiOSSimulator: buildForiOSSimulator,
+			device: device
+		});
 
-			let packageName = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
-			let metadata = _.filter(buildResult, (def: Server.IPackageDef) => def.disposition === "BuildResultMetadata" && def.key === "AppIdentifier")[0];
-			let appIdentifier = metadata ? metadata.value : this.$project.projectData.AppIdentifier;
-			return {
-				packageName,
-				appIdentifier
-			};
-		}).future<IApplicationInformation>()();
+		let packageName = _.filter(buildResult, (def: Server.IPackageDef) => !def.disposition || def.disposition === "BuildResult")[0].localFile;
+		let metadata = _.filter(buildResult, (def: Server.IPackageDef) => def.disposition === "BuildResultMetadata" && def.key === "AppIdentifier")[0];
+		let appIdentifier = metadata ? metadata.value : this.$project.projectData.AppIdentifier;
+		return {
+			packageName,
+			appIdentifier
+		};
 	}
 
-	public buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): IFuture<string> {
-		return (() => {
-			let packageFile = this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device).wait().packageName;
-			let tempDir = this.$project.getTempDir("emulatorFiles");
-			this.$fs.unzip(packageFile, tempDir).wait();
-			let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
-			return appFilePath;
-		}).future<string>()();
+	public async buildForiOSSimulator(downloadedFilePath: string, device?: Mobile.IDevice): Promise<string> {
+		let packageFile = (await this.buildForDeploy(this.$devicePlatformsConstants.iOS, downloadedFilePath, true, device)).packageName;
+		let tempDir = this.$project.getTempDir("emulatorFiles");
+		await this.$fs.unzip(packageFile, tempDir);
+		let appFilePath = path.join(tempDir, this.$fs.readDirectory(tempDir).filter(minimatch.filter("*.app"))[0]);
+		return appFilePath;
 	}
 
-	public executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
-		return (() => {
-			this.$project.ensureProject();
+	public async executeBuild(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void> {
+		await this.$project.ensureProject();
 
-			if (!this.$project.capabilities.build) {
-				this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
-			}
+		if (!this.$project.capabilities.build) {
+			this.$errors.failWithoutHelp("This command is not applicable to %s projects ", this.$project.projectData.Framework);
+		}
 
-			this.executeBuildCore(platform, opts).wait();
-		}).future<void>()();
+		await this.executeBuildCore(platform, opts);
 	}
 
-	private executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): IFuture<void> {
-		return (() => {
-			platform = this.$mobileHelper.validatePlatformName(platform);
+	private async executeBuildCore(platform: string, opts?: { buildForiOSSimulator?: boolean }): Promise<void> {
+		platform = this.$mobileHelper.validatePlatformName(platform);
 
-			if (this.$options.saveTo) {
+		if (this.$options.saveTo) {
+			this.$options.download = true;
+		}
+
+		if (this.$options.download && this.$options.companion) {
+			this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
+		}
+
+		await this.$loginManager.ensureLoggedIn();
+
+		this.$project.checkSdkVersions(platform);
+
+		if (this.$options.companion) {
+			await this.deployToIon(platform);
+		} else {
+			if (!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
+				this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
 				this.$options.download = true;
 			}
 
-			if (this.$options.download && this.$options.companion) {
-				this.$errors.fail("Cannot specify both --download (or --save-to) and --companion options.");
-			}
-
-			this.$loginManager.ensureLoggedIn().wait();
-
-			this.$project.checkSdkVersions(platform);
-
-			if (this.$options.companion) {
-				this.deployToIon(platform).wait();
-			} else {
-				if (!this.$mobileHelper.getPlatformCapabilities(platform).wirelessDeploy && !this.$options.download) {
-					this.$logger.info("Wireless deploying is not supported for platform %s. The package will be downloaded after build.", platform);
-					this.$options.download = true;
-				}
-
-				this.build({
-					platform: platform,
-					showQrCodes: !this.$options.download,
-					downloadFiles: this.$options.download,
-					downloadedFilePath: this.$options.saveTo,
-					buildForiOSSimulator: opts && opts.buildForiOSSimulator
-				}).wait();
-			}
-		}).future<void>()();
+			await this.build({
+				platform: platform,
+				showQrCodes: !this.$options.download,
+				downloadFiles: this.$options.download,
+				downloadedFilePath: this.$options.saveTo,
+				buildForiOSSimulator: opts && opts.buildForiOSSimulator
+			});
+		}
 	}
 
-	private deployToIon(platform: string): IFuture<void> {
-		return (() => {
-			platform = this.$mobileHelper.validatePlatformName(platform);
-			if (!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
-				this.$errors.fail("The companion app is not available on %s.", platform);
-			}
+	private async deployToIon(platform: string): Promise<void> {
+		platform = this.$mobileHelper.validatePlatformName(platform);
+		if (!this.$mobileHelper.getPlatformCapabilities(platform).companion) {
+			this.$errors.fail("The companion app is not available on %s.", platform);
+		}
 
-			this.$logger.info("Deploying to AppBuilder companion app.");
+		this.$logger.info("Deploying to AppBuilder companion app.");
 
-			this.$project.importProject().wait();
+		await this.$project.importProject();
 
-			let appIdentifier = this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.getAppIdentifierForPlatform(platform).wait(), platform, null);
-			let liveSyncToken = this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName).wait();
+		let appIdentifier = await this.$deviceAppDataFactory.create<ILiveSyncDeviceAppData>(this.$project.getAppIdentifierForPlatform(platform), platform, null);
+		let liveSyncToken = await this.$server.cordova.getLiveSyncToken(this.$project.projectData.ProjectName, this.$project.projectData.ProjectName);
 
-			let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
-			let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,
-				appIdentifier.encodeLiveSyncHostUri(hostPart),
-				querystring.escape(liveSyncToken),
-				querystring.escape(this.$project.projectData.ProjectName),
-				this.$project.getProjectConfiguration());
+		let hostPart = util.format("%s://%s/appbuilder", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER);
+		let fullDownloadPath = util.format(appIdentifier.liveSyncFormat,
+			appIdentifier.encodeLiveSyncHostUri(hostPart),
+			querystring.escape(liveSyncToken),
+			querystring.escape(this.$project.projectData.ProjectName),
+			this.$project.getProjectConfiguration());
 
-			this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
+		this.$logger.debug("Using LiveSync URL for Ion: %s", fullDownloadPath);
 
-			this.showQRCodes([{
-				instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
-				qrImageData: this.$qr.generateDataUri(fullDownloadPath)
-			}]);
-		}).future<void>()();
+		this.showQRCodes([{
+			instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
+			qrImageData: await this.$qr.generateDataUri(fullDownloadPath)
+		}]);
 	}
 }
 

@@ -14,7 +14,7 @@ export class DependencyConfigService implements IDependencyConfigService {
 	public getGeneratorConfig(generatorName: string): IGeneratorConfig {
 		let generators = this.getAllGenerators();
 		let generatorConfig = _.find(generators, (generator: IGeneratorConfig) => generator.name === generatorName);
-		if(!generatorConfig) {
+		if (!generatorConfig) {
 			this.$errors.fail("Unable to find config data for %s. Check if config/generator-config.json exists and try again.", generatorName);
 		}
 
@@ -32,10 +32,10 @@ export class DependencyConfigService implements IDependencyConfigService {
 	}
 
 	private getDependencyConfigContent(): any {
-		if(!this.dependencyConfigCache) {
+		if (!this.dependencyConfigCache) {
 			try {
 				this.dependencyConfigCache = this.$fs.readJson(this.dependencyConfigFilePath);
-			} catch(e) {
+			} catch (e) {
 				this.$errors.fail("Unable to process config/dependency-config.json file. Check if it exists and try again.");
 			}
 		}
@@ -43,4 +43,5 @@ export class DependencyConfigService implements IDependencyConfigService {
 		return this.dependencyConfigCache;
 	}
 }
+
 $injector.register("dependencyConfigService", DependencyConfigService);

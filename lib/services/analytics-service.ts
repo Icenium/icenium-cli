@@ -7,23 +7,20 @@ export class AnalyticsService extends AnalyticsServiceBase implements IAnalytics
 	constructor(protected $logger: ILogger,
 		protected $options: IOptions,
 		$staticConfig: Config.IStaticConfig,
-		$errors: IErrors,
 		$prompter: IPrompter,
 		$userSettingsService: UserSettings.IUserSettingsService,
 		$analyticsSettingsService: IAnalyticsSettingsService,
 		$progressIndicator: IProgressIndicator,
 		$osInfo: IOsInfo) {
-		super($logger, $options, $staticConfig, $errors, $prompter, $userSettingsService, $analyticsSettingsService, $progressIndicator, $osInfo);
+		super($logger, $options, $staticConfig, $prompter, $userSettingsService, $analyticsSettingsService, $progressIndicator, $osInfo);
 	}
 
-	public trackFeature(featureName: string): IFuture<void> {
-		return (() => {
-			if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
-				super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY).wait();
-			}
+	public async trackFeature(featureName: string): Promise<void> {
+		if (this.$options.analyticsClient === AnalyticsService.SUBLIME_ANALYTICS_CLIENT_NAME) {
+			await super.restartEqatecMonitor(AnalyticsService.SUBLIME_ANALYTICS_PROJECT_KEY);
+		}
 
-			super.trackFeature(featureName).wait();
-		}).future<void>()();
+		await super.trackFeature(featureName);
 	}
 }
 

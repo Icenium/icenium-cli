@@ -3,6 +3,7 @@ import * as util from "util";
 import * as temp from "temp";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import { FrameworkProjectBase } from "./framework-project-base";
+import * as shelljs from "shelljs";
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -145,50 +146,49 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 		return null;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
-		return (() => {
-			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
-			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
-			let currentTime = this.$dateProvider.getCurrentDate();
+	public async updateMigrationConfigFile(): Promise<void> {
+		let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
+		let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
+		let currentTime = this.$dateProvider.getCurrentDate();
 
-			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
-				// We do not need to update the migration file if it has been modified in the past 2 hours.
-				this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
-				return;
-			}
+		if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
+			// We do not need to update the migration file if it has been modified in the past 2 hours.
+			this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
+			shelljs.touch(nativeScriptMigrationFileName);
+			return;
+		}
 
-			let downloadDestinationDirectory = temp.mkdirSync("nativescript-migration");
-			let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
+		let downloadDestinationDirectory = temp.mkdirSync("nativescript-migration");
+		let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
 
-			try {
-				this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath).wait();
-			} catch (err) {
-				// This exception is caused probably by issue with the internet connection of the user.
-				this.$logger.trace("Failed to download the NativeScript migration file.");
-				return;
-			}
+		try {
+			await this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath);
+		} catch (err) {
+			// This exception is caused probably by issue with the internet connection of the user.
+			this.$logger.trace("Failed to download the NativeScript migration file.");
+			return;
+		}
 
-			let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
-			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
+		let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
+		let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
 
-			if (currentMigrationFileContent !== newMigrationFileContent) {
-				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
-				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
-			}
-		}).future<void>()();
+		if (currentMigrationFileContent !== newMigrationFileContent) {
+			this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
+			this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
+		}
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
-		return (() => {
-			if (this.$typeScriptService.isTypeScriptProject(projectDir).wait()) {
-				try {
-					this.$npmService.install(projectDir).wait();
-				} catch (err) {
-					this.$logger.trace(`Failed to install all npm dependencies in the project. Error: ${err}.`);
-					this.$logger.warn("The installation of the project dependencies from npm failed. The TypeScript transpilation may fail due to missing .d.ts files.");
-				}
+	public async ensureProject(projectDir: string): Promise<void> {
+		await this.updateMigrationConfigFile();
+
+		if (this.$typeScriptService.isTypeScriptProject(projectDir)) {
+			try {
+				await this.$npmService.install(projectDir);
+			} catch (err) {
+				this.$logger.trace(`Failed to install all npm dependencies in the project. Error: ${err}.`);
+				this.$logger.warn("The installation of the project dependencies from npm failed. The TypeScript transpilation may fail due to missing .d.ts files.");
 			}
-		}).future<void>()();
+		}
 	}
 }
 

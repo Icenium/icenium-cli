@@ -1,13 +1,13 @@
 import * as helpers from "../lib/helpers";
-import {assert} from "chai";
+import { assert } from "chai";
 
 describe("helpers", () => {
 	describe("toHash", () => {
 		it("converts array to hash", () => {
 			let source = ["one", "two"];
-			let result:any = helpers.toHash(source, (value) => value, (value, key, _source) => {
-					return {key: key, value: value, source: _source};
-				});
+			let result: any = helpers.toHash(source, (value) => value, (value, key, _source) => {
+				return { key: key, value: value, source: _source };
+			});
 
 			assert.equal(2, Object.keys(result).length);
 			assert.isDefined(result.one);
@@ -21,10 +21,10 @@ describe("helpers", () => {
 		});
 
 		it("converts hash to another hash", () => {
-			let source = {one:1, two:2};
-			let result:any = helpers.toHash(source, (value, key) => key,
+			let source = { one: 1, two: 2 };
+			let result: any = helpers.toHash(source, (value, key) => key,
 				(value, key, _source) => {
-					return {key: key, value: value, source: _source};
+					return { key: key, value: value, source: _source };
 				});
 
 			assert.equal(2, Object.keys(result).length);
@@ -41,31 +41,31 @@ describe("helpers", () => {
 
 	describe("findByNameOrIndex", () => {
 		it("should find exact name match", () => {
-			let source = [{name: "Foo 1"}, {name: "Foo"}];
+			let source = [{ name: "Foo 1" }, { name: "Foo" }];
 			let result = helpers.findByNameOrIndex("Foo", source, (e) => e.name);
 			assert.equal(result.name, "Foo");
 		});
 
 		it("should find name by prefix", () => {
-			let source = [{name: "AaBb"}, {name: "Bb"}];
+			let source = [{ name: "AaBb" }, { name: "Bb" }];
 			let result = helpers.findByNameOrIndex("Bb", source, (e) => e.name);
 			assert.equal(result.name, "Bb");
 		});
 
 		it("should not find name by substring", () => {
-			let source = [{name: "Foo 10"}];
+			let source = [{ name: "Foo 10" }];
 			let result = helpers.findByNameOrIndex("10", source, (e) => e.name);
 			assert.notOk(result);
 		});
 
 		it("should find element by index", () => {
-			let source = [{name: "Foo 2"}, {name: "Foo 3"}, {name: "Foo 4"}];
+			let source = [{ name: "Foo 2" }, { name: "Foo 3" }, { name: "Foo 4" }];
 			let result = helpers.findByNameOrIndex("2", source, (e) => e.name);
 			assert.equal(result.name, "Foo 3");
 		});
 
 		it("should find element by index with pound sign", () => {
-			let source = [{name: "2"}, {name: "3"}];
+			let source = [{ name: "2" }, { name: "3" }];
 			let result = helpers.findByNameOrIndex("#2", source, (e) => e.name);
 			assert.equal(result.name, "3");
 		});
@@ -87,19 +87,19 @@ describe("helpers", () => {
 
 	describe("mergeRecursive", () => {
 		it("should merge one level objects with different properties", () => {
-			assert.deepEqual({ a: 1, b: 2, c: 3, d: 4 }, helpers.mergeRecursive({a: 1, b: 2}, {c: 3, d: 4}));
+			assert.deepEqual({ a: 1, b: 2, c: 3, d: 4 }, helpers.mergeRecursive({ a: 1, b: 2 }, { c: 3, d: 4 }));
 		});
 		it("should merge one level objects with same properties", () => {
-			assert.deepEqual({ a: 10, b: 20, c: 30, d: 40 }, helpers.mergeRecursive({a: 1, b: 2, c: 3, d: 4}, {a: 10, b: 20, c: 30, d: 40}));
+			assert.deepEqual({ a: 10, b: 20, c: 30, d: 40 }, helpers.mergeRecursive({ a: 1, b: 2, c: 3, d: 4 }, { a: 10, b: 20, c: 30, d: 40 }));
 		});
 		it("should merge deep objects", () => {
-			assert.deepEqual({ a: 10, b: {c: 1, d: 2}}, helpers.mergeRecursive({a: 1, b: {c: 1}}, {a: 10, b: {d: 2}}));
+			assert.deepEqual({ a: 10, b: { c: 1, d: 2 } }, helpers.mergeRecursive({ a: 1, b: { c: 1 } }, { a: 10, b: { d: 2 } }));
 		});
 		it("should merge very deep objects", () => {
-			assert.deepEqual({ a: 10, b: {c: { d: { e: { f: { g: { h: 100}}}}}}}, helpers.mergeRecursive({ a: 10, b: {c: { d: { e: { f: { g: { h: 1}}}}}}}, { a: 10, b: {c: { d: { e: { f: { g: { h: 100}}}}}}}));
+			assert.deepEqual({ a: 10, b: { c: { d: { e: { f: { g: { h: 100 } } } } } } }, helpers.mergeRecursive({ a: 10, b: { c: { d: { e: { f: { g: { h: 1 } } } } } } }, { a: 10, b: { c: { d: { e: { f: { g: { h: 100 } } } } } } }));
 		});
 		it("should merge deep objects with different root property", () => {
-			assert.deepEqual({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}, k: { l: { m: { n: { p: 1}}}}}, helpers.mergeRecursive({ a: { b: { c: 10 }, d: { e: { f: 10}, k : {}}}}, { k: { l: { m: { n: { p: 1}}}}}));
+			assert.deepEqual({ a: { b: { c: 10 }, d: { e: { f: 10 }, k: {} } }, k: { l: { m: { n: { p: 1 } } } } }, helpers.mergeRecursive({ a: { b: { c: 10 }, d: { e: { f: 10 }, k: {} } } }, { k: { l: { m: { n: { p: 1 } } } } }));
 		});
 	});
 

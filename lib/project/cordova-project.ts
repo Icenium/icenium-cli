@@ -2,9 +2,8 @@ import * as path from "path";
 import * as util from "util";
 import { FrameworkProjectBase } from "./framework-project-base";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
-import helpers = require("./../common/helpers");
+import { createGUID } from "./../common/helpers";
 import semver = require("semver");
-import Future = require("fibers/future");
 
 export class CordovaProject extends FrameworkProjectBase implements Project.IFrameworkProject {
 	private static WP8_DEFAULT_PACKAGE_IDENTITY_NAME_PREFIX = "1234Telerik";
@@ -99,8 +98,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 	public alterPropertiesForNewProject(properties: any, projectName: string): void {
 		this.alterPropertiesForNewProjectBase(properties, projectName);
 
-		properties.WP8ProductID = helpers.createGUID();
-		properties.WP8PublisherID = helpers.createGUID();
+		properties.WP8ProductID = createGUID();
+		properties.WP8PublisherID = createGUID();
 		properties.WP8PackageIdentityName = this.getCorrectWP8PackageIdentityName(properties.AppIdentifier);
 	}
 
@@ -162,8 +161,8 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		});
 	}
 
-	public ensureProject(projectDir: string): IFuture<void> {
-		return Future.fromResult();
+	public async ensureProject(projectDir: string): Promise<void> {
+		return Promise.resolve();
 	}
 
 	private ensureCordovaJs(platform: string, projectDir: string, frameworkVersion: string): void {
@@ -205,12 +204,13 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 		return updated;
 	}
 
-	public updateMigrationConfigFile(): IFuture<void> {
-		return Future.fromResult();
+	public async updateMigrationConfigFile(): Promise<void> {
+		return Promise.resolve();
 	}
 
 	private generateWP8GUID(): string {
-		return helpers.createGUID();
+		return createGUID();
 	}
 }
+
 $injector.register("cordovaProject", CordovaProject);

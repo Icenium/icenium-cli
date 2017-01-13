@@ -1,23 +1,22 @@
-import {assert} from "chai";
-import Future = require("fibers/future");
+import { assert } from "chai";
 import * as path from "path";
-import {Yok} from "../lib/common/yok";
-import {NativeScriptProject} from "../lib/project/nativescript-project";
-import {ProjectConstants} from "../lib/common/appbuilder/project-constants";
-import {Configuration, StaticConfig} from "../lib/config";
-import {ConfigFilesManager} from "../lib/project/config-files-manager";
-import {NativeScriptProjectCapabilities} from "../lib/common/appbuilder/project/nativescript-project-capabilities";
-import {FileSystem} from "../lib/common/file-system";
-import {Options} from "../lib/options";
-import {JsonSchemaConstants} from "../lib/json-schema/json-schema-constants";
-import {JsonSchemaLoader} from "../lib/json-schema/json-schema-loader";
-import {JsonSchemaResolver} from "../lib/json-schema/json-schema-resolver";
-import {JsonSchemaValidator} from "../lib/json-schema/json-schema-validator";
-import {MobileHelper} from "../lib/common/mobile/mobile-helper";
-import {MobilePlatformsCapabilities} from "../lib/common/appbuilder/mobile-platforms-capabilities";
-import {DevicePlatformsConstants} from "../lib/common/mobile/device-platforms-constants";
-import {HostInfo} from "../lib/common/host-info";
-import {DateProvider} from "../lib/providers/date-provider";
+import { Yok } from "../lib/common/yok";
+import { NativeScriptProject } from "../lib/project/nativescript-project";
+import { ProjectConstants } from "../lib/common/appbuilder/project-constants";
+import { Configuration, StaticConfig } from "../lib/config";
+import { ConfigFilesManager } from "../lib/project/config-files-manager";
+import { NativeScriptProjectCapabilities } from "../lib/common/appbuilder/project/nativescript-project-capabilities";
+import { FileSystem } from "../lib/common/file-system";
+import { Options } from "../lib/options";
+import { JsonSchemaConstants } from "../lib/json-schema/json-schema-constants";
+import { JsonSchemaLoader } from "../lib/json-schema/json-schema-loader";
+import { JsonSchemaResolver } from "../lib/json-schema/json-schema-resolver";
+import { JsonSchemaValidator } from "../lib/json-schema/json-schema-validator";
+import { MobileHelper } from "../lib/common/mobile/mobile-helper";
+import { MobilePlatformsCapabilities } from "../lib/common/appbuilder/mobile-platforms-capabilities";
+import { DevicePlatformsConstants } from "../lib/common/mobile/device-platforms-constants";
+import { HostInfo } from "../lib/common/host-info";
+import { DateProvider } from "../lib/providers/date-provider";
 import * as stubs from "./stubs";
 
 let currentDate = new Date(2016, 7, 28, 10);
@@ -46,7 +45,7 @@ function createTestInjector(): IInjector {
 		resolve: () => testInjector.resolve("nativeScriptProject")
 	});
 	testInjector.register("httpClient", { /*intentionally empty body */ });
-	testInjector.register("nativeScriptMigrationService", { downloadMigrationConfigFile: (targetPath: string): IFuture<void> => Future.fromResult() });
+	testInjector.register("nativeScriptMigrationService", { downloadMigrationConfigFile: async (targetPath: string): Promise<void> => undefined });
 	testInjector.register("nativeScriptResources", { /*intentionally empty body */ });
 	testInjector.register("mobileHelper", MobileHelper);
 	testInjector.register("mobilePlatformsCapabilities", MobilePlatformsCapabilities);
@@ -297,31 +296,31 @@ describe("NativeScript project unit tests", () => {
 			changedMigrationFileContent = null;
 		});
 
-		it("should update the configuration file if the current file has different content.", () => {
+		it("should update the configuration file if the current file has different content.", async () => {
 			mockFsStats($fs, { hoursToAddToMtime: -3 });
 			mockFsReadText($fs, modifiedNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isTrue(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, modifiedNativeScriptMigrationFile);
 		});
 
-		it("should not update the configuration file if the current file has been changed in the past 2 hours.", () => {
+		it("should not update the configuration file if the current file has been changed in the past 2 hours.", async () => {
 			mockFsStats($fs, { hoursToAddToMtime: -1 });
 			mockFsReadText($fs, modifiedNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isFalse(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, null);
 		});
 
-		it("should not update the configuration file if the current file has no changes.", () => {
+		it("should not update the configuration file if the current file has no changes.", async () => {
 			mockFsStats($fs, { hoursToAddToMtime: -3 });
 			mockFsReadText($fs, currentNativeScriptMigrationFile, currentNativeScriptMigrationFile);
 
-			nativeScriptProject.updateMigrationConfigFile().wait();
+			await nativeScriptProject.updateMigrationConfigFile();
 
 			assert.isFalse(hasChangedTheMigrationFile.valueOf());
 			assert.deepEqual(changedMigrationFileContent, null);

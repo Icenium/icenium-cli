@@ -19,25 +19,27 @@ export class BaseValidator<Input> implements IValidator<Input> {
 	}
 }
 
-export class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
+export abstract class BaseAsyncValidator<Input> implements IAsyncValidator<Input> {
 	constructor(private $injector: IInjector) { }
 
-	public throwIfInvalid(data: Input): IFuture<void> {
-		return (() => {
-			let validationResult: IValidationResult = this.validate(data).wait();
-			if (!validationResult.isSuccessful) {
-				this.$injector.resolve("$errors").fail(validationResult.error);
-			}
-		}).future<void>()();
+	public async throwIfInvalid(data: Input): Promise<void> {
+		let validationResult: IValidationResult = await this.validate(data);
+		if (!validationResult.isSuccessful) {
+			this.$injector.resolve("$errors").fail(validationResult.error);
+		}
 	}
 
-	public validate(data: Input): IFuture<IValidationResult> {
-		return (() => ValidationResult.ValidationResult.Successful).future<IValidationResult>()();
+	public async validate(data: Input): Promise<IValidationResult> {
+		return ValidationResult.ValidationResult.Successful;
 	}
 
-	public validateProperty(data: Input, propertyName: string): IFuture<IValidationResult> {
-		return (() => ValidationResult.ValidationResult.Successful).future<IValidationResult>()();
+	public async validateProperty(data: Input, propertyName: string): Promise<IValidationResult> {
+		return ValidationResult.ValidationResult.Successful;
 	}
+
+	public abstract validateCertificate(certificate: ICryptographicIdentity, provision: IProvision): IValidationResult;
+
+	public abstract validateProvision(provision: IProvision): IValidationResult;
 }
 
 export class Helpers {
@@ -50,15 +52,13 @@ export class Helpers {
 		return ValidationResult.ValidationResult.Successful;
 	}
 
-	public static validateAsync(validators: Function[]): IFuture<IValidationResult> {
-		return (() => {
-			let validationResults = <IValidationResult[]>_.map(validators, (validator) => validator().wait());
-			let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
-			if (firstFailedValidationResult) {
-				return firstFailedValidationResult;
-			}
-			return ValidationResult.ValidationResult.Successful;
-		}).future<IValidationResult>()();
+	public static async validateAsync(validators: GenericFunction<Promise<IValidationResult>>[]): Promise<IValidationResult> {
+		let validationResults = await Promise.all(_.map(validators, (validator) => validator()));
+		let firstFailedValidationResult = Helpers.getFirstFailedValidationResult(validationResults);
+		if (firstFailedValidationResult) {
+			return firstFailedValidationResult;
+		}
+		return ValidationResult.ValidationResult.Successful;
 	}
 
 	private static getFirstFailedValidationResult(validationResults: IValidationResult[]): IValidationResult {

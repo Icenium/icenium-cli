@@ -10,7 +10,6 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 	constructor(private $sharedUserSettingsFileService: IUserSettingsFileService,
 		private $sharedUserSettingsService: IUserSettingsService,
 		protected $errors: IErrors,
-		private $logger: ILogger,
 		private $dispatcher: IFutureDispatcher,
 		private $childProcess: IChildProcess,
 		private $hostInfo: IHostInfo) { }
@@ -31,7 +30,7 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 		this.waitDebuggerExit(childProcess);
 	}
 
-	public canRunApplication(): IFuture<boolean> {
+	public async canRunApplication(): Promise<boolean> {
 		return this.$hostInfo.isDotNet40Installed("Unable to start the debug tool. Verify that you have installed .NET 4.0 or later and try again.");
 	}
 
@@ -39,8 +38,9 @@ export class WinDebuggerService implements IExtensionPlatformServices {
 		let _this = this;
 		gaze(this.$sharedUserSettingsFileService.userSettingsFilePath, function (err: Error, watchr: any) {
 			if (err) {
-				this.$errors.fail(err.toString());
+				_this.$errors.fail(err.toString());
 			}
+
 			this.on("changed", (filePath: string) => {
 				_this.$dispatcher.dispatch(() => _this.$sharedUserSettingsService.saveSettings({}));
 			});
