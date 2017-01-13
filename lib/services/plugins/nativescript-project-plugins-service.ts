@@ -65,12 +65,14 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			if (content && content.dependencies) {
 				let pluginsToFilter = await Promise.all(_.map(content.dependencies, async (version: string, name: string) => {
 					let marketplacePlugin = _.find(await this.getMarketplacePlugins(), pl => pl.data.Name === name && pl.data.Version === version);
-					let plugin = marketplacePlugin || await this.getDataForNpmPackage(name, version)
-						|| await this.getDataForLocalPlugin(name, version)
-						|| await this.getDataFromGitHubUrl(name, version);
+					let plugin = marketplacePlugin ||
+						await this.getDataForNpmPackage(name, version) ||
+						await this.getDataForLocalPlugin(name, version) ||
+						await this.getDataFromGitHubUrl(name, version);
 					if (!plugin) {
 						this.$logger.warn(`Unable to find information about plugin '${name}' with version '${version}'.`);
 					}
+
 					return plugin;
 				}));
 
@@ -172,9 +174,9 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 	public async isPluginInstalled(pluginName: string): Promise<boolean> {
 		let packageJsonContent = this.getProjectPackageJsonContent();
 		let pluginBasicInfo = await this.getPluginBasicInformation(pluginName);
-		return (packageJsonContent
+		return packageJsonContent
 			&& !!packageJsonContent.dependencies && !!packageJsonContent.dependencies[pluginBasicInfo.name]
-			&& !pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName);
+			&& (!pluginBasicInfo.version || packageJsonContent.dependencies[pluginBasicInfo.name] === pluginBasicInfo.version) || this.isPluginFetched(pluginName);
 	}
 
 	public async getPluginBasicInformation(pluginName: string): Promise<IBasicPluginInformation> {
