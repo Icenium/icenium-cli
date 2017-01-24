@@ -3,14 +3,12 @@
 // Definitions by: Boris Yankov <https://github.com/borisyankov/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/* =================== USAGE =================== 
+/* =================== USAGE ===================
 
     import express = require('express');
     var app = express();
 
  =============================================== */
-
-/// <reference path="../common/definitions/node.d.ts" />
 
 declare module Express {
 
@@ -512,7 +510,7 @@ declare module "express" {
             sendFile(path: string, options: any): void;
             sendFile(path: string, fn: Errback): void;
             sendFile(path: string, options: any, fn: Errback): void;
-            
+
             sendfile(path: string): void;
             sendfile(path: string, options: any): void;
             sendfile(path: string, fn: Errback): void;

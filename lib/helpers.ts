@@ -1,3 +1,5 @@
+import { WriteStream, ReadStream } from "tty";
+
 export function fromWindowsRelativePathToUnix(windowsRelativePath: string): string {
 	return windowsRelativePath.replace(/\\/g, "/");
 }
@@ -110,7 +112,7 @@ function formatListInMultipleColumns(list: string[], columns: number): IFormatti
 }
 
 export function formatListForDisplayInMultipleColumns(list: string[]): string {
-	let consoleWidth = process.stdout.columns;
+	let consoleWidth = (<WriteStream>process.stdout).columns;
 	let bestFormatting: IFormatting;
 	for (let i = 1; i <= 8; ++i) {
 		let formatting = formatListInMultipleColumns(list, i);
@@ -195,11 +197,11 @@ export function mergeRecursive(obj1: Object, obj2: Object): Object {
 
 export function block(operation: () => void): void {
 	if (isInteractive()) {
-		process.stdin.setRawMode(false);
+		(<ReadStream>process.stdin).setRawMode(false);
 	}
 	operation();
 	if (isInteractive()) {
-		process.stdin.setRawMode(true);
+		(<ReadStream>process.stdin).setRawMode(true);
 	}
 }
 
