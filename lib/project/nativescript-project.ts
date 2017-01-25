@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as util from "util";
 import * as temp from "temp";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
-import {FrameworkProjectBase} from "./framework-project-base";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
+import { FrameworkProjectBase } from "./framework-project-base";
 import Future = require("fibers/future");
 temp.track();
 
@@ -121,7 +121,7 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
 				let targetFilePath = path.join(appResourcesHolderDirectory, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
+				if (this.shouldCopyPlatformAsset(appResourceFile, targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
 					this.$logger.trace("File not found, copying %s", appResourceFile);
 					this.$fs.copyFile(appResourceFile, targetFilePath).wait();

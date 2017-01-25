@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as util from "util";
-import {FrameworkProjectBase} from "./framework-project-base";
-import {TARGET_FRAMEWORK_IDENTIFIERS} from "../common/constants";
+import { FrameworkProjectBase } from "./framework-project-base";
+import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import helpers = require("./../common/helpers");
 import semver = require("semver");
 import Future = require("fibers/future");
@@ -157,7 +157,7 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 				let relativePath = path.relative(appResourcesDir, appResourceFile);
 				let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 				this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-				if (!this.$fs.exists(targetFilePath).wait()) {
+				if (this.shouldCopyPlatformAsset(appResourceFile, targetFilePath).wait()) {
 					this.printAssetUpdateMessage();
 					this.$logger.trace("File not found, copying %s", appResourceFile);
 					this.$fs.copyFile(appResourceFile, targetFilePath).wait();
