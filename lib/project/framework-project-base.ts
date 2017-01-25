@@ -1,3 +1,6 @@
+import * as path from "path";
+import { FileExtensions } from "../common/constants";
+
 export abstract class FrameworkProjectBase implements Project.IFrameworkProjectBase {
 	protected static MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE = 60 * 60 * 1000 * 2;
 	private assetUpdateMessagePrinted = false;
@@ -87,6 +90,18 @@ export abstract class FrameworkProjectBase implements Project.IFrameworkProjectB
 	public abstract ensureProject(projectDir: string): IFuture<void>;
 
 	public abstract updateMigrationConfigFile(): IFuture<void>;
+
+	protected shouldCopyPlatformAsset(sourceFilePath: string, targetFilePath: string): IFuture<boolean> {
+		return ((): boolean => {
+			if (path.extname(sourceFilePath) === FileExtensions.PNG_FILE) {
+				let lastIndexOfExtension = targetFilePath.lastIndexOf(FileExtensions.PNG_FILE);
+				let ninePatchAssetPath = targetFilePath.substring(0, lastIndexOfExtension) + FileExtensions.NINE_PATCH_PNG_FILE;
+				return !this.$fs.exists(targetFilePath).wait() && !this.$fs.exists(ninePatchAssetPath).wait();
+			} else {
+				return !this.$fs.exists(targetFilePath).wait();
+			}
+		}).future<boolean>()();
+	}
 
 	private generateDefaultAppId(appName: string): string {
 		let sanitizedName = _.filter(appName.split(""), c => /[a-zA-Z0-9]/.test(c)).join("");
