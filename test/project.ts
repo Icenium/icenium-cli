@@ -516,7 +516,7 @@ describe("project integration tests", () => {
 			let projectFolder = path.join(tempFolder, projectName);
 
 			fs.mkdirSync(projectFolder);
-			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", "0666"));
+			fs.closeSync(fs.openSync(path.join(projectFolder, "temp"), "a", 666));
 			assert.throws(() => project.createTemplateFolder(projectFolder));
 		});
 	});
