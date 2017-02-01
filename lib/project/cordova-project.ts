@@ -153,12 +153,13 @@ export class CordovaProject extends FrameworkProjectBase implements Project.IFra
 			let relativePath = path.relative(appResourcesDir, appResourceFile);
 			let targetFilePath = path.join(projectDir, this.$staticConfig.APP_RESOURCES_DIR_NAME, relativePath);
 			this.$logger.trace("Checking app resources: %s must match %s", appResourceFile, targetFilePath);
-			if (!this.$fs.exists(targetFilePath)) {
+			if (this.shouldCopyPlatformAsset(appResourceFile, targetFilePath)) {
 				this.printAssetUpdateMessage();
 				this.$logger.trace("File not found, copying %s", appResourceFile);
 				this.$fs.copyFile(appResourceFile, targetFilePath);
 			}
 		});
+
 	}
 
 	public async ensureProject(projectDir: string): Promise<void> {
