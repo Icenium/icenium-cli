@@ -116,7 +116,10 @@ class AppManagerService implements IAppManagerService {
 	public openAppManagerStore(): void {
 		let tamUrl = `${this.$config.AB_SERVER_PROTO}://${this.$config.AB_SERVER}/appbuilder/Services/tam`;
 		this.$logger.info("Go to %s to manage your apps.", tamUrl);
-		this.$opener.open(tamUrl);
+
+		if (!this.$options.skipUi) {
+			this.$opener.open(tamUrl);
+		}
 	}
 
 	public async publishLivePatch(platforms: string[]): Promise<void> {
