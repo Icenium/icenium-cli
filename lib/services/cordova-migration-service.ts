@@ -159,15 +159,15 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 		this.$logger.info("Migrating to WPSdk version %s", newVersion);
 		if (helpers.versionCompare(newVersion, "8.0") > 0) {
-			// at least Cordova 3.7 is required
-			if (helpers.versionCompare(this.$project.projectData.FrameworkVersion, "3.7.0") < 0) {
+			// at least Cordova 4.0.0 is required
+			if (helpers.versionCompare(this.$project.projectData.FrameworkVersion, "4.0.0") < 0) {
 				let cordovaVersions = this.getSupportedFrameworks();
 
 				// Find last framework which is not experimental.
 				let selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) === -1);
-				if (helpers.versionCompare(selectedFramework.version, "3.7.0") < 0) {
-					// if latest stable framework version is below 3.7.0, find last 'Experimental'.
-					selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("3.7.0", cv.version) <= 0);
+				if (helpers.versionCompare(selectedFramework.version, "4.0.0") < 0) {
+					// if latest stable framework version is below 4.0.0, find last 'Experimental'.
+					selectedFramework = _.findLast(cordovaVersions, cv => cv.displayName.indexOf(this.$projectConstants.EXPERIMENTAL_TAG) !== -1 && helpers.versionCompare("4.0.0", cv.version) <= 0);
 				}
 
 				let promptStr = `You cannot build with the Windows Phone ${newVersion} SDK with the currently selected target version of Apache Cordova. Do you want to switch to ${selectedFramework.displayName}?`;
@@ -176,7 +176,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 					await this.onFrameworkVersionChanging(selectedFramework.version);
 					this.$project.projectData.FrameworkVersion = selectedFramework.version;
 				} else {
-					this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.", newVersion);
+					this.$errors.failWithoutHelp("Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 4.0.0 or later and try again.", newVersion);
 				}
 			}
 		}
