@@ -254,64 +254,24 @@ describe("project integration tests", () => {
 			project = testInjector.resolve("project");
 			await project.createNewProject(projectName, TARGET_FRAMEWORK_IDENTIFIERS.Cordova);
 			options.debug = options.release = false;
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["4.0.0"]);
 		});
 
-		it("updates WPSdk to 8.0 when Cordova is downgraded from 3.7.0", async () => {
+		it("updates FrameworkVersion to 4.0.0 when WPSdk is updated to 8.1", async () => {
 			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
-			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk must be 8.1");
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0");
-
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-
-			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk must be downgraded to 8.0 when downgrading Cordova version from 3.7.0");
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.7.0");
-		});
-
-		it("updates FrameworkVersion to 3.7.0 when WPSdk is updated to 8.1", async () => {
-			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be updated to 3.7.0 when WPSdk is updated to 8.1");
+			assert.strictEqual(project.projectData.FrameworkVersion, "4.0.0", "Cordova version must be updated to 4.0.0 when WPSdk is updated to 8.1");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk should have been updated to 8.1");
 		});
 
-		it("does not update FrameworkVersion to 3.7.0 when trying to update WPSdk to 8.1 but user refuses", async () => {
-			prompter.confirmResult = false;
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-			await assert.isRejected(project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]), "Unable to set Windows Phone %s as the target SDK. Migrate to Apache Cordova 3.7.0 or later and try again.");
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version must stay to 3.5.0 when user refuses to upgrade WPSdk to 8.1");
-			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version must be 8.0 when user refuses to upgrade it to 8.1");
-		});
-
-		it("does not update WPSdk to 8.0 when trying to update FrameworkVersion to 3.5.0 but user refuses", async () => {
-			// First set WPSdk to 8.1 and FrameworkVersion to 3.7.0
-			prompter.confirmResult = true;
-			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must be 3.7.0.");
-
-			prompter.confirmResult = false;
-			await assert.isRejected(project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]), "Unable to set %s as the target Apache Cordova version. Set the target Windows Phone SDK to 8.0 and try again.");
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version must stay to 3.7.0 when user refuses to downgrade WPSdk to 8.0");
-			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version must be 8.1 when user refuses to downgrade it to 8.1");
-		});
-
-		it("does not prompt for WPSdk downgrade to 8.0 when Cordova is downgraded from 3.7.0 and WPSdk is already 8.0", async () => {
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
-			prompter.confirmCalled = false;
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.5.0"]);
-			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change WPSdk to 8.0, but it is already 8.0. DO NOT PROMPT HERE!");
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.5.0", "Cordova version should have been migrated to 3.5.0");
-		});
-
-		it("does not prompt for Cordova upgrade to 3.7.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 3.7.0", async () => {
-			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["3.7.0"]);
-			assert.strictEqual(project.projectData.FrameworkVersion, "3.7.0", "Cordova version should have been migrated to 3.7.0");
+		it("does not prompt for Cordova upgrade to 4.0.0 when WPSdk is upgraded to 8.1 and FrameworkVersion is already 4.0.0", async () => {
+			await project.updateProjectPropertyAndSave("set", "FrameworkVersion", ["4.0.0"]);
+			assert.strictEqual(project.projectData.FrameworkVersion, "4.0.0", "Cordova version should have been migrated to 4.0.0");
 
 			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.0"]);
 			assert.strictEqual(project.projectData.WPSdk, "8.0", "WPSdk version should have been migrated to 8.0");
 			prompter.confirmCalled = false;
 			await project.updateProjectPropertyAndSave("set", "WPSdk", ["8.1"]);
-			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change Cordova version to 3.7.0, but it is already 3.7.0. DO NOT PROMPT HERE!");
+			assert.isFalse(prompter.confirmCalled, "We have prompted for confirmation to change Cordova version to 4.0.0, but it is already 4.0.0. DO NOT PROMPT HERE!");
 			assert.strictEqual(project.projectData.WPSdk, "8.1", "WPSdk version should have been migrated to 8.0");
 		});
 	});
