@@ -46,7 +46,7 @@
     "hex": "0.0.1",
     "iconv-lite": "0.4.3",
     "inquirer": "0.8.2",
-    "ios-device-lib": "0.1.0",
+    "ios-device-lib": "0.2.0",
     "ios-sim-portable": "~2.0.0",
     "ip": "0.3.2",
     "lodash": "4.13.1",
