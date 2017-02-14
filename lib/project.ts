@@ -390,7 +390,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	public async updateProjectProperty(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): Promise<void> {
-		let data = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
+		let data = await this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
 			normalizedPropertyName = data.normalizedPropertyName,
 			projectConfigurations = data.projectConfigurations;
 
@@ -409,7 +409,7 @@ export class Project extends ProjectBase implements Project.IProject {
 	}
 
 	public async updateProjectPropertyAndSave(mode: string, propertyName: string, propertyValues: string[], configurations?: string[]): Promise<void> {
-		let data = this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
+		let data = await this.validateUpdatePropertyInfo(propertyName, propertyValues, configurations),
 			normalizedPropertyName = data.normalizedPropertyName,
 			projectConfigurations = data.projectConfigurations;
 
@@ -777,8 +777,8 @@ export class Project extends ProjectBase implements Project.IProject {
 		return null;
 	}
 
-	private validateUpdatePropertyInfo(propertyName: string, propertyValues: string[], configurations: string[]): IUpdatePropertyInfo {
-		this.ensureProject();
+	private async  validateUpdatePropertyInfo(propertyName: string, propertyValues: string[], configurations: string[]): Promise<IUpdatePropertyInfo> {
+		await this.ensureProject();
 
 		let projectConfigurations = (configurations && configurations.length) ? configurations : this.getConfigurationsSpecifiedByUser(),
 			normalizedPropertyName = this.$projectPropertiesService.normalizePropertyName(propertyName, this.projectData);
