@@ -28,7 +28,9 @@ export class KendoUIService implements IKendoUIService {
 
 			if (options.latest) {
 				let latestPackage = _.first(packages);
-				packages = _.filter(packages, pack => pack.Version === latestPackage.Version);
+				packages = [_(packages)
+					.filter(pack => pack.Version === latestPackage.Version)
+					.first()];
 			}
 
 			this._packages = packages;
