@@ -202,7 +202,7 @@ export class CordovaMigrationService implements ICordovaMigrationService {
 
 		this.$logger.info("Migrating to Cordova version %s", versionDisplayName);
 		let oldVersion = this.$project.projectData.FrameworkVersion;
-		let availablePlugins = this.$pluginsService.getAvailablePlugins();
+		let availablePlugins = await this.$pluginsService.getAvailablePlugins();
 
 		await this.migrateWebView(oldVersion, newVersion);
 
