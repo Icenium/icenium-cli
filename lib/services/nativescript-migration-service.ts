@@ -1,9 +1,6 @@
 import * as path from "path";
 
 export class NativeScriptMigrationService implements IFrameworkMigrationService {
-	private static TYPESCRIPT_ABBREVIATION = "TS";
-	private static JAVASCRIPT_ABBREVIATION = "JS";
-	private static SUPPORTED_LANGUAGES = [NativeScriptMigrationService.JAVASCRIPT_ABBREVIATION, NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION];
 	private static REMOTE_NATIVESCRIPT_MIGRATION_DATA_FILENAME = "NativeScript.json";
 	private static TYPINGS = "typings";
 	private static TNS_CORE_MODULES = "tns-core-modules";
@@ -68,13 +65,7 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 
 		// Make sure to download this file first, as data from it is used for fileDownloadFutures
 		await this.downloadMigrationConfigFile();
-
-		let fileDownloadPromises = _(this.nativeScriptMigrationData.supportedVersions)
-			.map(supportedVersion => _.map(NativeScriptMigrationService.SUPPORTED_LANGUAGES, language => this.downloadTnsPackage(language, supportedVersion.version)))
-			.flatten<Promise<void>>()
-			.value();
-		fileDownloadPromises.push(this.downloadPackageJsonResourceFile());
-		await Promise.all(fileDownloadPromises);
+		await this.downloadPackageJsonResourceFile();
 	}
 
 	public getSupportedVersions(): string[] {
@@ -135,21 +126,6 @@ export class NativeScriptMigrationService implements IFrameworkMigrationService 
 		}
 
 		this.$logger.info(`Project migrated successfully from ${currentVersion} to ${newVersion}.`);
-	}
-
-	private async downloadTnsPackage(language: string, version: string): Promise<void> {
-		if (language === NativeScriptMigrationService.TYPESCRIPT_ABBREVIATION) {
-			let fileName = this.getFileNameByVersion(version);
-			let remotePathUrl = `${this.remoteNativeScriptResourcesPath}/${NativeScriptMigrationService.TNS_MODULES}/${language}/${fileName}`;
-			let filePath = path.join(this.tnsModulesDirectoryPath, language, fileName);
-			return this.$resourceDownloader.downloadResourceFromServer(remotePathUrl, filePath);
-		}
-
-		return Promise.resolve();
-	}
-
-	private getFileNameByVersion(version: string): string {
-		return `${version}${NativeScriptMigrationService.TNS_CORE_MODULES}.zip`;
 	}
 
 	private getDeprecatedVersions(): string[] {
