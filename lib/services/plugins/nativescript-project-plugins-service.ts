@@ -603,10 +603,12 @@ export class NativeScriptProjectPluginsService extends PluginsServiceBase implem
 			let pluginVariableNameInPackageJson = `${basicPlugin.name}-variables`;
 			let currentVariablesValues = packageJsonContent.nativescript[pluginVariableNameInPackageJson] || {};
 			let newObj: IStringDictionary = Object.create(null);
-			await Promise.all(_.map(variablesInformation, async (variableInfo: any, variableName: string) => {
+
+			for (let variableName in variablesInformation) {
+				let variableInfo = variablesInformation[variableName];
 				let currentValue = currentVariablesValues[variableName] || variableInfo.defaultValue;
 				newObj[variableName] = (await this.gatherVariableInformation(variableName, currentValue))[variableName];
-			}));
+			}
 
 			delete packageJsonContent.nativescript[pluginVariableNameInPackageJson];
 			if (_.keys(newObj).length) {

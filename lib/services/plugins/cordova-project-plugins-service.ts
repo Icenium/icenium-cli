@@ -905,7 +905,7 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 		return xmlMapping.tojson(this.$fs.readText(pathToPluginXml));
 	}
 
-	private async setPluginVariables(pluginIdentifier: string, variables: string[], configuration: string): Promise<void> {
+	private async setPluginVariables(pluginIdentifier: string, variables: any[], configuration: string): Promise<void> {
 		let originalPluginVariables = this.$project.getProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, configuration) || {};
 		let cordovaPluginVariables: any = _.cloneDeep(originalPluginVariables);
 
@@ -914,11 +914,12 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 				cordovaPluginVariables[pluginIdentifier] = {};
 			}
 
-			await Promise.all(_.map(variables, async (variable: any) => {
+			for (let variable of variables) {
 				let variableName: string = variable.name || variable;
 				let variableInformation = await this.gatherVariableInformation(pluginIdentifier, variableName, configuration);
 				cordovaPluginVariables[pluginIdentifier][variableName] = variableInformation[variableName];
-			}));
+			}
+
 			this.$project.setProperty(CordovaProjectPluginsService.CORDOVA_PLUGIN_VARIABLES_PROPERTY_NAME, cordovaPluginVariables, configuration);
 		}
 	}
