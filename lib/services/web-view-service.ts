@@ -42,7 +42,7 @@ export class WebViewService implements IWebViewService {
 		return _.map(webViews, webView => webView.name.toLowerCase());
 	}
 
-	public async  getCurrentWebViewName(platform: string): Promise<string> {
+	public async getCurrentWebViewName(platform: string): Promise<string> {
 		let webViews = this.getWebViews(platform);
 		let webViewsToFilter = await Promise.all(_.map(webViews, async _webView => {
 			return !_webView.default && await this.$pluginsService.isPluginInstalled(_webView.pluginIdentifier) ? _webView : null;
