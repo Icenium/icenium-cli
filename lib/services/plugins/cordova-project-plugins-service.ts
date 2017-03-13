@@ -874,8 +874,8 @@ export class CordovaProjectPluginsService extends PluginsServiceBase implements 
 	private getLocalPluginBasicInformation(pluginXml: any): IBasicPluginInformation {
 		// Need to add $t because of the xmlMapping library.
 		let basicPluginInformation: IBasicPluginInformation = {
-			name: pluginXml.plugin.name.$t,
-			description: pluginXml.plugin.description.$t,
+			name: pluginXml.plugin.name ? pluginXml.plugin.name.$t : "",
+			description: pluginXml.plugin.description ? pluginXml.plugin.description.$t : "",
 			version: pluginXml.plugin.version
 		};
 
