@@ -1,5 +1,5 @@
 import * as path from "path";
-import {ConfigBase} from "./common/config-base";
+import { ConfigBase } from "./common/config-base";
 import { StaticConfigBase } from "./common/static-config-base";
 import * as osenv from "osenv";
 
@@ -7,9 +7,6 @@ export class Configuration extends ConfigBase implements IConfiguration { // Use
 	AB_SERVER_PROTO: string;
 	AB_SERVER: string;
 	DEBUG: boolean;
-	USE_PROXY: boolean;
-	PROXY_HOSTNAME: string;
-	PROXY_PORT: number;
 	ON_PREM: boolean;
 	DEFAULT_CORDOVA_PROJECT_TEMPLATE: string;
 	DEFAULT_NATIVESCRIPT_PROJECT_TEMPLATE: string;
