@@ -16,4 +16,7 @@ Command | Description
 [error-reporting](error-reporting.html) | Configures anonymous error reporting for the AppBuilder CLI.
 [autocomplete](autocomplete.html) | Prints your current command-line completion settings. If disabled, prompts you to enable it.
 [help](help.html) | Lists the available commands or shows information about the selected command.
+[proxy](proxy.html) | Displays proxy settings.
+[proxy clear](proxy-clear.html) | Clears proxy settings.
+[proxy set](proxy-set.html) | Sets proxy settings.
 <% } %>
