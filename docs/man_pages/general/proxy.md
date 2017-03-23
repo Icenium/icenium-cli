@@ -13,10 +13,6 @@ Displays proxy settings.
 * `clear` - Clears proxy settings
 
 <% if(isHtml) { %>
-### Command Limitations
-
-* You can run this command only on Windows OS.
-
 ### Related Commands
 
 Command | Description
