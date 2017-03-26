@@ -7,11 +7,15 @@ export class AppScaffoldingExtensionsService extends ExtensionsServiceBase imple
 	private static SCREEN_BUILDER_BUCKET_NAME = "http://s3.amazonaws.com/screenbuilder-cli";
 	private static DEFAULT_CACHED_VERSION = "0.0.0";
 
+	private get $sysInfo(): ISysInfo {
+		return this.$injector.resolve("$sysInfo");
+	}
+
 	constructor(private $childProcess: IChildProcess,
 		private $config: IConfiguration,
 		private $dependencyConfigService: IDependencyConfigService,
 		private $progressIndicator: IProgressIndicator,
-		private $sysInfo: ISysInfo,
+		private $injector: IInjector,
 		protected $fs: IFileSystem,
 		protected $httpClient: Server.IHttpClient,
 		protected $logger: ILogger,
