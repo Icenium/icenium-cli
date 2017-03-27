@@ -23,7 +23,8 @@ class DoctorService implements IDoctorService {
 			this.printPackageManagerTip();
 			result = true;
 		}
-		if (!sysInfo.androidInstalled) {
+
+		if (!sysInfo.emulatorInstalled) {
 			this.$logger.warn("WARNING: The Android SDK is not installed or is not configured properly.");
 			this.$logger.out("You will not be able to run your apps in the native emulator. To be able to run apps" + EOL
 				+ "in the native Android emulator, verify that you have installed the latest Android SDK " + EOL

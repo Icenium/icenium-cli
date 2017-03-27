@@ -6,14 +6,14 @@ export class SysInfo extends SysInfoBase {
 		protected $iTunesValidator: Mobile.IiTunesValidator,
 		protected $logger: ILogger,
 		protected $winreg: IWinReg,
-		private $staticConfig: IStaticConfig) {
-		super($childProcess, $hostInfo, $iTunesValidator, $logger, $winreg);
+		private $staticConfig: IStaticConfig,
+		protected $androidEmulatorServices: Mobile.IAndroidEmulatorServices) {
+		super($childProcess, $hostInfo, $iTunesValidator, $logger, $winreg, $androidEmulatorServices);
 	}
 
-	public async getSysInfo(pathToPackageJson: string, androidToolsInfo?: { pathToAdb: string, pathToAndroid: string }): Promise<ISysInfoData> {
+	public async getSysInfo(pathToPackageJson: string, androidToolsInfo?: { pathToAdb: string }): Promise<ISysInfoData> {
 		let defaultAndroidToolsInfo = {
-			pathToAdb: "adb",
-			pathToAndroid: "android" + (this.$hostInfo.isWindows ? ".bat" : "")
+			pathToAdb: "adb"
 		};
 
 		return super.getSysInfo(pathToPackageJson || await this.$staticConfig.pathToPackageJson, androidToolsInfo || defaultAndroidToolsInfo);
