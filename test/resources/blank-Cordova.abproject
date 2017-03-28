@@ -19,7 +19,7 @@
         "ID_CAP_WEBBROWSERCOMPONENT"
      ]
     ,"WP8Requirements": []
-    ,"FrameworkVersion": "6.4.0"
+    ,"FrameworkVersion": "4.0.0"
     ,"AndroidPermissions": [
         "android.permission.INTERNET"
     ]
