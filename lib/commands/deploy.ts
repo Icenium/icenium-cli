@@ -36,7 +36,7 @@ export class DeployHelper implements IDeployHelper {
 	}
 
 	private async deployCore(platform: string): Promise<void> {
-		await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device });
+		await this.$devicesService.initialize({ platform: platform, deviceId: this.$options.device, emulator: this.$options.emulator });
 		platform = platform || this.$devicesService.platform;
 		this.$options.justlaunch = true;
 		let appInfo: IApplicationInformation;

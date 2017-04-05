@@ -222,18 +222,18 @@ function prepareTestInjectorForDarwin(): IInjector {
 }
 
 describe("Deploy ios unit tests on windows", () => {
-	it("throws ERROR_NO_DEVICES when there is no connected devices", async () => {
+	it("throws ERROR_NO_DEVICES_CANT_USE_IOS_SIMULATOR when there is no connected devices", async () => {
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
-		await assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES);
+		await assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES_CANT_USE_IOS_SIMULATOR);
 	});
 	it("throws error when --emulator option is specified", async () => { // appbuilder deploy ios --emulator
 		let testInjector = prepareTestInjectorForWindows();
 		let deployHelper = testInjector.resolve("deployHelper");
 
 		setEmulatorOption(testInjector);
-		await assert.isRejected(deployHelper.deploy("ios"), "You can use iOS simulator only on OS X.");
+		await assert.isRejected(deployHelper.deploy("ios"), constants.ERROR_NO_DEVICES_CANT_USE_IOS_SIMULATOR);
 
 		unsetEmulatorOption(testInjector);
 	});
