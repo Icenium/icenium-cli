@@ -14,6 +14,7 @@ export class BuildService implements Project.IBuildService {
 	private static ACCEPT_RESULT_LOCAL_PATH = "LocalPath";
 
 	constructor(private $config: IConfiguration,
+		private $clipboardService: IClipboardService,
 		private $staticConfig: IStaticConfig,
 		private $logger: ILogger,
 		private $errors: IErrors,
@@ -369,7 +370,7 @@ export class BuildService implements Project.IBuildService {
 
 				return {
 					qrUrl: downloadUrl,
-					qrImageData: await this.$qr.generateDataUri(downloadUrl),
+					qrImageData: await this.getQrImageData(downloadUrl),
 					packageUrls: [{
 						packageUrl: packageUrl,
 						downloadText: "Download"
@@ -382,7 +383,7 @@ export class BuildService implements Project.IBuildService {
 				let aetUrl = util.format("%s://%s/%s", this.$config.AB_SERVER_PROTO, this.$config.AB_SERVER, BuildService.WinPhoneAetPath);
 				let aetDef: IPackageDownloadViewModel = {
 					qrUrl: aetUrl,
-					qrImageData: await this.$qr.generateDataUri(aetUrl),
+					qrImageData: await this.getQrImageData(aetUrl),
 					packageUrls: [{ packageUrl: aetUrl, downloadText: "Download application enrollment token" }],
 					instruction: util.format("Scan the QR code below to install the Telerik Company Hub App application enrollment token (AET)")
 				};
@@ -520,8 +521,19 @@ export class BuildService implements Project.IBuildService {
 
 		this.showQRCodes([{
 			instruction: util.format("Scan the QR code below to load %s in the AppBuilder companion app for %s", this.$project.projectData.ProjectName, platform),
-			qrImageData: await this.$qr.generateDataUri(fullDownloadPath)
+			qrImageData: await this.getQrImageData(fullDownloadPath)
 		}]);
+	}
+
+	private async getQrImageData(data: string): Promise<string> {
+		const qrImageData = await this.$qr.generateDataUri(data);
+		if (!qrImageData) {
+			await this.$clipboardService.copy(data);
+
+			this.$errors.failWithoutHelp(`Your project name is too long to generate QR Code for its link. The application url ${data.green} ${"is copied to your clipboard and you can use online QR Code generator to generate QR Code for you.".red}.`);
+		}
+
+		return qrImageData;
 	}
 }
 
