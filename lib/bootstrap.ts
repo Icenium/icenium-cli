@@ -35,7 +35,6 @@ $injector.require("samplesService", "./services/samples-service");
 $injector.requireCommand("sample|*list", "./commands/samples");
 $injector.requireCommand("sample|clone", "./commands/samples");
 $injector.require("x509", "./x509");
-$injector.require("qr", "./qr");
 
 $injector.requireCommand("plugin|*list", "./commands/plugin/list-plugin");
 $injector.requireCommand("plugin|add", "./commands/plugin/add-plugin");

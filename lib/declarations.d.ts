@@ -316,7 +316,6 @@ interface IStaticConfig extends Config.IStaticConfig {
 	 * The full path to the file, which contains GitHub access token used for GitHub api calls.
 	 */
 	GITHUB_ACCESS_TOKEN_FILEPATH: string;
-	QR_SIZE: number;
 	SOLUTION_SPACE_NAME: string;
 	triggerJsonSchemaValidation: boolean;
 }
@@ -357,10 +356,6 @@ interface IX509Certificate {
 
 interface IX509CertificateLoader {
 	load(certificatePem: string): IX509Certificate;
-}
-
-interface IQrCodeGenerator {
-	generateDataUri(data: string): Promise<string>;
 }
 
 interface IPackageDownloadLink {
