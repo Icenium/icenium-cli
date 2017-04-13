@@ -80,7 +80,7 @@ export class StaticConfig extends StaticConfigBase implements IStaticConfig {
 	public ANALYTICS_INSTALLATION_ID_SETTING_NAME = "AnalyticsInstallationID";
 	public SYS_REQUIREMENTS_LINK = "http://docs.telerik.com/platform/appbuilder/running-appbuilder/running-the-cli/system-requirements-cli";
 	public SOLUTION_SPACE_NAME = "Private_Build_Folder";
-	public FULL_CLIENT_NAME = "Telerik AppBuilder CLI by Progress";
+	public FULL_CLIENT_NAME = "Progress Telerik AppBuilder CLI";
 	public get GITHUB_ACCESS_TOKEN_FILEPATH(): string {
 		return path.join(osenv.home(), StaticConfig.TOKEN_FILENAME);
 	}

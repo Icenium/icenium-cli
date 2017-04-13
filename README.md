@@ -1,11 +1,11 @@
-Command-Line Interface for Telerik AppBuilder by Progress
+Command-Line Interface for Progress Telerik AppBuilder
 ===========
 
 *Build and publish cross-platform hybrid or native apps using a single pure HTML5, CSS, and JavaScript code base*
 
 [![AppBuilder](https://raw.github.com/Icenium/icenium-cli/release/ab-logo.png "AppBuilder")](http://www.telerik.com/appbuilder "The AppBuilder web site")
 
-**Leverage the cloud capabilities of the Telerik Platform and Telerik AppBuilder from the command line**
+**Leverage the cloud capabilities of the Progress Telerik Platform and Progress Telerik Platform AppBuilder from the command line**
 
 The AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybrid and native mobile apps for iOS, Android and Windows Phone from your favorite IDE or code editor. You can develop your projects locally from the convenience of your preferred code editor and run the command-line to test, build, deploy in the simulator or on devices, and publish your applications to the App Store, Google Play or Windows Phone Store.
 
@@ -177,7 +177,7 @@ If you are working with the AppBuilder CLI behind a web proxy, you might need to
 Quick Start
 ===
 
-1. [Log In](#login "Log in the Telerik Platform")
+1. [Log In](#login "Log in the Progress Telerik Platform")
 1. [Create Project](#create "Create a local project")
 1. [Run in Simulator](#simulator "Run in the device simulator")
 1. [Run on Device](#device "Run on device")
@@ -186,9 +186,9 @@ Quick Start
 1. [Modify the Application Package with .abignore](#modify-the-application-package)
 1. [Get Help](#help "List the available commands and options")
 
-<a name="login"><b>1. Log in the Telerik Platform</b></a>
+<a name="login"><b>1. Log in the Progress Telerik Platform</b></a>
 
-To connect to your Telerik Platform account, run the following command.
+To connect to your Progress Telerik Platform account, run the following command.
 
 ```bash
 $ appbuilder login
@@ -331,7 +331,7 @@ On the device, in the running app, tap and hold with three fingers until the dow
 
 <a name="modify-the-application-package"><b>8. Modify the application package with .abignore</b></a>
 
-When you develop apps with the Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
+When you develop apps with the Progress Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
 
 Starting with AppBuilder 2.6, all newly created projects or cloned sample apps contain a default `.abignore`. To manage the exclude and include rules for projects created with earlier versions of AppBuilder, you need to manually add `.abignore` to your project.
 
