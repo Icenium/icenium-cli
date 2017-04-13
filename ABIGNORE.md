@@ -11,7 +11,7 @@ To set exclude and include rules, you can create and manage an `.abignore` file 
 
 ## Overview
 
-When you develop apps with the Telerik AppBuilder Command-Line Interface by Progress (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
+When you develop apps with the Progress Telerik AppBuilder Command-Line Interface (AppBuilder CLI), you can choose which files to exclude from your application package. To set exclude and include rules, you can modify the `.abignore` file in the root of your project.
 
 The AppBuilder CLI respects `.abignore` during the following operations.
 

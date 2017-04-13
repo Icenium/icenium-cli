@@ -1,4 +1,4 @@
-Contribute to the Telerik AppBuilder Command-Line Interface by Progress
+Contribute to the Progress Telerik AppBuilder Command-Line Interface
 ===
 
 *Help us improve the AppBuilder CLI*
