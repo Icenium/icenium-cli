@@ -84,7 +84,7 @@ export class LiveSyncService implements ILiveSyncService {
 		}
 	}
 
-	private async fillDeviceConfigurationInfos(appIdentifier: string): Promise<void> {
+	private async fillDeviceConfigurationInfos(appIdentifier: string): Promise<Mobile.IDeviceActionResult<void>[]> {
 		return this.$devicesService.execute(async device => {
 			let configInfo = await device.getApplicationInfo(appIdentifier);
 			if (configInfo) {
