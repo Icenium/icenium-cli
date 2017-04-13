@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder login`
 
-Opens a new browser window in which you can provide your login credentials for the Telerik Platform by Progress.
+Opens a new browser window in which you can provide your login credentials for the Progress Telerik Platform.
 
 After you have authenticated with the Telerik Platform, you can close the browser window and continue your work from the command line.
 
