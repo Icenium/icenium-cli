@@ -3,7 +3,6 @@ import * as util from "util";
 import * as temp from "temp";
 import { TARGET_FRAMEWORK_IDENTIFIERS } from "../common/constants";
 import { FrameworkProjectBase } from "./framework-project-base";
-import * as shelljs from "shelljs";
 temp.track();
 
 export class NativeScriptProject extends FrameworkProjectBase implements Project.IFrameworkProject {
@@ -147,34 +146,33 @@ export class NativeScriptProject extends FrameworkProjectBase implements Project
 	}
 
 	public async updateMigrationConfigFile(): Promise<void> {
-		let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
-		let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
-		let currentTime = this.$dateProvider.getCurrentDate();
-
-		if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
-			// We do not need to update the migration file if it has been modified in the past 2 hours.
-			this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
-			shelljs.touch(nativeScriptMigrationFileName);
-			return;
-		}
-
-		let downloadDestinationDirectory = temp.mkdirSync("nativescript-migration");
-		let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
-
 		try {
+			let nativeScriptMigrationFileName = this.$nativeScriptResources.nativeScriptMigrationFile;
+			let currentMigrationConfigStatus = this.$fs.getFsStats(nativeScriptMigrationFileName);
+			let currentTime = this.$dateProvider.getCurrentDate();
+
+			if (currentTime.getTime() - currentMigrationConfigStatus.mtime.getTime() < FrameworkProjectBase.MAX_MIGRATION_FILE_EDIT_TIME_DIFFERENCE) {
+				// We do not need to update the migration file if it has been modified in the past 2 hours.
+				this.$logger.trace(`The current NativeScript migration file was updated on ${currentMigrationConfigStatus.mtime}.`);
+				return;
+			}
+
+			let downloadDestinationDirectory = temp.mkdirSync("nativescript-migration");
+			let downloadedFilePath = path.join(downloadDestinationDirectory, "nativeScript-migration-data.json");
+
 			await this.$nativeScriptMigrationService.downloadMigrationConfigFile(downloadedFilePath);
+
+			let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
+			let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
+
+			if (currentMigrationFileContent !== newMigrationFileContent) {
+				this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
+				this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
+			} else {
+				this.$fs.utimes(nativeScriptMigrationFileName, currentTime, currentTime);
+			}
 		} catch (err) {
-			// This exception is caused probably by issue with the internet connection of the user.
-			this.$logger.trace("Failed to download the NativeScript migration file.");
-			return;
-		}
-
-		let newMigrationFileContent = this.$fs.readText(downloadedFilePath);
-		let currentMigrationFileContent = this.$fs.readText(nativeScriptMigrationFileName);
-
-		if (currentMigrationFileContent !== newMigrationFileContent) {
-			this.$fs.writeFile(nativeScriptMigrationFileName, newMigrationFileContent);
-			this.$logger.trace(`NativeScript migration file updated on ${currentTime}.`);
+			this.$logger.trace("Failed to download the NativeScript migration file.", err);
 		}
 	}
 
