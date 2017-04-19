@@ -63,6 +63,9 @@ export class FileSystemStub implements IFileSystem {
 		return null;
 	}
 
+	utimes(path: string, atime: Date, mtime: Date): void {
+	}
+
 	getFileSize(path: string): number {
 		return undefined;
 	}
