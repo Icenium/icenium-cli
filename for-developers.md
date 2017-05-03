@@ -1,7 +1,7 @@
 icenium-cli
 ===========
 
-Cross-Platform Command Line Interface for Telerik AppBuilder by Progress.
+Cross-Platform Command Line Interface for Progress Telerik Platform AppBuilder.
 
 First steps
 ===
