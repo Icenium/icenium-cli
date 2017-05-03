@@ -8,8 +8,8 @@ General | `$ appbuilder <Command> [Parameters] [--options <Values>]`
 Command | Description
 -------|----------
 [help `<Command>`](general/help.html) | Shows additional information about the commands in this list in the browser.
-[login](general/login.html) | Logs you in the Telerik Platform by Progress.
-[logout](general/logout.html) | Logs you out from the Telerik Platform by Progress.
+[login](general/login.html) | Logs you in the Progress Telerik Platform.
+[logout](general/logout.html) | Logs you out from the Progress Telerik Platform.
 [user](general/user.html) | Prints information about the currently logged in user.
 [usage-reporting](general/usage-reporting.html) | Configures anonymous usage reporting.
 [error-reporting](general/error-reporting.html) | Configures anonymous error reporting.
@@ -24,7 +24,7 @@ Command | Description
 [sample](project/creation/sample.html) | Lists sample apps.
 [sample&nbsp;clone](project/creation/sample-clone.html) | Clones a selected sample app.
 [init](project/creation/init.html) | Initializes an existing project for development.
-[cloud](project/creation/cloud.html) | Lists all solutions and projects associated with your Telerik Platform account.
+[cloud](project/creation/cloud.html) | Lists all solutions and projects associated with your Progress Telerik Platform account.
 [cloud&nbsp;export](project/creation/cloud-export.html) | Exports one or all projects from a selected solution from the cloud.
 [build `<Platform>`](project/testing/build.html) | Builds the project for a selected target platform and downloads the application package or produces a QR code for deploying the application package.
 [deploy `<Platform>`](project/testing/deploy.html) | Builds and deploys the project to a connected device.
@@ -98,8 +98,8 @@ Command | Description
 [provision&nbsp;remove](publishing/provision-remove.html) | Removes a registered provisioning profile.
 [appstore&nbsp;list](publishing/appstore-list.html) | Lists all applications in iTunes Connect.
 [appstore&nbsp;upload](publishing/appstore-upload.html) | Builds the project and uploads the binary to iTunes Connect.
-[appmanager groups](publishing/appmanager-groups.html) | Lists the distribution groups configured in your Telerik AppManager portal.
-[appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Telerik AppManager.
+[appmanager groups](publishing/appmanager-groups.html) | Lists the distribution groups configured in your Progress Telerik AppManager portal.
+[appmanager&nbsp;upload&nbsp;`<Platform>`](publishing/appmanager-upload.html) | Builds the project and uploads the binary to Progress Telerik AppManager.
 [appmanager&nbsp;livesync&nbsp;`<Platforms>`](publishing/appmanager-livesync.html) | Publishes a new Telerik AppManager LiveSync update of your published app.
 
 ## Global Options

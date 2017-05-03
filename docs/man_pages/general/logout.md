@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder logout`
 
-Logs you out from the Telerik Platform by Progress.
+Logs you out from the Progress Telerik Platform.
 
 <% if(isConsole) { %>IMPORTANT: To run any operations that require access to the cloud services such as build, deploy or synchronize with cloud, you need to be logged in.<% } %>
 <% if(isHtml) { %>
