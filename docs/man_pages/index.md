@@ -15,7 +15,7 @@ Command | Description
 [error-reporting](general/error-reporting.html) | Configures anonymous error reporting.
 [autocomplete](general/autocomplete.html) | Manages your command-line completion settings.
 [doctor](general/doctor.html) | Checks your system for configuration problems which might prevent the AppBuilder CLI from working properly.
-[proxy](proxy/proxy.html) | Displays proxy settings.
+[proxy](general/proxy.html) | Displays proxy settings.
 
 ## Project Development Commands
 Command | Description
