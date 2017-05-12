@@ -55,6 +55,10 @@ export class FileSystemStub implements IFileSystem {
 		return true;
 	}
 
+	realpath(): string {
+		return "";
+	}
+
 	deleteFile(path: string): void {
 		return undefined;
 	}
