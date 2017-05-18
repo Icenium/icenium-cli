@@ -55,6 +55,10 @@ export class FileSystemStub implements IFileSystem {
 		return true;
 	}
 
+	realpath(): string {
+		return "";
+	}
+
 	deleteFile(path: string): void {
 		return undefined;
 	}
@@ -438,6 +442,7 @@ export class StaticConfig implements IStaticConfig {
 	public COMMAND_HELP_FILE_NAME = 'command-help.json';
 	public RESOURCE_DIR_PATH = path.join(__dirname, "resources");
 	public QR_SIZE = 300;
+	public USER_AGENT_NAME = "agent";
 	public version = "1";
 	helpTextPath = "help";
 	adbFilePath = "adbFilePath";
