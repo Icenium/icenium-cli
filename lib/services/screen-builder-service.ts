@@ -38,6 +38,10 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "add";
 	}
 
+	public printDeprecationWarning(): void {
+		this.$logger.warn("This command is deprecated and will be removed in the next official release.");
+	}
+
 	private async promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScreenBuilderMigrationData> {
 		let wasMigrated = !(await this.shouldUpgrade(projectPath)),
 			didMigrate = false;
@@ -235,6 +239,7 @@ class ScreenBuilderDynamicCommand implements ICommand {
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public async execute(args: string[]): Promise<void> {
+		this.$screenBuilderService.printDeprecationWarning();
 		await this.$project.ensureProject();
 		let projectDir = this.$project.getProjectDir();
 		this.$screenBuilderService.ensureScreenBuilderProject(projectDir);
