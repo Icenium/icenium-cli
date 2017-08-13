@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as util from "util";
 import { deferPromise } from "../common/helpers";
+import { cache } from "../common/decorators";
 
 export class ScreenBuilderService implements IScreenBuilderService {
 	private static UPGRADE_ERROR_MESSAGES = ["Your app has been build with an obsolete version of Screen Builder. Please, migrate it to latest version and retry.",
@@ -38,8 +39,14 @@ export class ScreenBuilderService implements IScreenBuilderService {
 		return "add";
 	}
 
+	@cache()
 	public printDeprecationWarning(): void {
-		this.$logger.warn("This command is deprecated and will be removed in the next official release.");
+		this.$logger.warn(this.getDeprecationWarning());
+	}
+
+	@cache()
+	public getDeprecationWarning(): string {
+		return "This command is deprecated and will be removed in the next official release.";
 	}
 
 	private async promptForUpgrade(projectPath: string, generatorName: string, screenBuilderOptions?: IScreenBuilderOptions): Promise<IScreenBuilderMigrationData> {
@@ -121,6 +128,7 @@ export class ScreenBuilderService implements IScreenBuilderService {
 	}
 
 	public ensureScreenBuilderProject(projectDir: string): void {
+		this.printDeprecationWarning();
 		if (!_.every(this.screenBuilderSpecificFiles, file => this.$fs.exists(path.join(projectDir, file)))) {
 			this.$errors.failWithoutHelp("This command is applicable only to Screen Builder projects.");
 		}
@@ -239,7 +247,6 @@ class ScreenBuilderDynamicCommand implements ICommand {
 		private $screenBuilderService: IScreenBuilderService) { }
 
 	public async execute(args: string[]): Promise<void> {
-		this.$screenBuilderService.printDeprecationWarning();
 		await this.$project.ensureProject();
 		let projectDir = this.$project.getProjectDir();
 		this.$screenBuilderService.ensureScreenBuilderProject(projectDir);

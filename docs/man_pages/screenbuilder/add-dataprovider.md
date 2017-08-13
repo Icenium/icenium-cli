@@ -1,6 +1,8 @@
 add-dataProvider
 ==========
 
+<span style="color:red;font-size:15px"><%= #{screenBuilderService.getDeprecationWarning} %> </span>
+
 Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-dataProvider` [--answers <File Path>]
