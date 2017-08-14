@@ -1,6 +1,8 @@
 add-about
 ==========
 
+<span style="color:red;font-size:15px"><%= #{screenBuilderService.getDeprecationWarning} %> </span>
+
 Usage | Synopsis
 ------|-------
 General | `$ appbuilder add-about` [--answers <File Path>]

@@ -5,7 +5,7 @@ Usage | Synopsis
 ------|-------
 Create hybrid | `$ appbuilder create hybrid <App name>`
 Create native | `$ appbuilder create native <App name>`
-Create with Screen Builder | `$ appbuilder create screenbuilder <App Name> [--answers <File Path>] [--no-simulator]` OR `$ appbuilder create <App Name> [--answers <File Path>] [--no-simulator]`
+Create with Screen Builder | `$ appbuilder create screenbuilder <App Name> [--answers <File Path>] [--no-simulator]` OR `$ appbuilder create <App Name> [--answers <File Path>] [--no-simulator]` <span style="color:red;font-size:13px">\*\* <%= #{screenBuilderService.getDeprecationWarning} %> </span>
 
 Creates a project for hybrid or native development. If `screenbuilder` and `<Type>` are not specified, creates a new project for hybrid development with Screen Builder.
 

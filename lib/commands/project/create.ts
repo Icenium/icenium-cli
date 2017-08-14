@@ -17,6 +17,8 @@ export class CreateCommand extends ProjectCommandBaseLib.ProjectCommandBase {
 	}
 
 	public async execute(args: string[]): Promise<void> {
+		this.$screenBuilderService.printDeprecationWarning();
+
 		this.validateProjectData();
 
 		let projectName = args[0];
