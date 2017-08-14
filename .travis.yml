@@ -1,0 +1,17 @@
+env:
+  global:
+  - APPBUILDER_SKIP_POSTINSTALL_TASKS=1
+  - ResourceDownloadEnvironment=LIVE
+  - DeploymentEnvironment=SIT
+language: node_js
+node_js:
+- '6'
+git:
+  submodules: true
+install:
+- npm install --ignore-scripts
+before_script:
+- npm install grunt
+script:
+- node_modules/.bin/grunt lint
+- node_modules/.bin/grunt pack --no-color
