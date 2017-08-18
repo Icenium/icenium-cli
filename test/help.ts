@@ -7,8 +7,12 @@ import dynamicHelpProviderLib = require("../lib/dynamic-help-provider");
 import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
 import optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
+import { assert } from "chai";
 
-let assert = require("chai").assert;
+interface ITestData {
+	input: string;
+	expectedOutput: string;
+}
 
 let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResult: boolean }): IInjector => {
 	let injector = new yok.Yok();
@@ -56,6 +60,65 @@ let createTestInjector = (opts?: { isProjectTypeResult: boolean; isPlatformResul
 };
 
 describe("help", () => {
+	const testData: ITestData[] = [
+		{
+			input: "bla <span>test</span> bla",
+			expectedOutput: "bla test bla"
+		},
+		{
+			input: 'bla <span>span 1</span> bla <span>span 2</span> end',
+			expectedOutput: "bla span 1 bla span 2 end"
+		},
+		{
+			input: 'bla <span style="color:red">test</span> bla',
+			expectedOutput: "bla test bla"
+		},
+		{
+			input: 'bla <span style="color:red;font-size:15px">test</span> bla',
+			expectedOutput: "bla test bla"
+		},
+		{
+			input: `bla
+<span style="color:red;font-size:15px">
+test
+</span>bla`,
+			expectedOutput: "blatestbla"
+		},
+		{
+			input: `bla
+<span style="color:red;font-size:15px">
+span 1
+</span>bla
+<span style="color:red;font-size:15px">
+span 2
+</span>
+end`,
+			expectedOutput: "blaspan 1blaspan 2end"
+		}
+	];
+
+	describe("does not print <span> tags in terminal", () => {
+		for (const testIndex in testData) {
+			it(`test case ${testIndex}`, async () => {
+				const testCase = testData[testIndex];
+				const injector = createTestInjector();
+				injector.register("module", {
+					command: () => "woot"
+				});
+
+				injector.register("fs", {
+					enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
+					readText: () => testCase.input
+				});
+
+				const help = injector.resolve(helpCommand.HelpCommand);
+				await help.execute(["foo"]);
+				const actualOutput = injector.resolve("logger").output.trim();
+				assert.equal(actualOutput, testCase.expectedOutput);
+			});
+		}
+	});
+
 	it("processes substitution points", async () => {
 		let injector = createTestInjector();
 		injector.register("module", {
