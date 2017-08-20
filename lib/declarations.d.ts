@@ -453,6 +453,11 @@ interface IScreenBuilderService {
 	ensureScreenBuilderProject(projectPath: string): void;
 	shouldUpgrade(projectPath: string): Promise<boolean>;
 	upgrade(projectPath: string): Promise<void>;
+
+	/**
+	 * Prints warning that ScreenBuilder commands are deprecated.
+	 */
+	printDeprecationWarning(): void;
 }
 
 /**

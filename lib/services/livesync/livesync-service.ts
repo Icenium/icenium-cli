@@ -62,7 +62,11 @@ export class LiveSyncService implements ILiveSyncService {
 				this.$options.config = [livesyncData.configuration];
 			}
 
-			await $liveSyncServiceBase.sync([livesyncData], this.$project.projectDir);
+			await $liveSyncServiceBase.sync([livesyncData], this.$project.projectDir, {
+				configuration: livesyncData.configuration,
+				additionalConfigurations: livesyncData.additionalConfigurations
+			});
+
 		} else {
 			Promise.all(configurations.map(async configuration => {
 				livesyncData.configuration = configuration;
@@ -79,7 +83,10 @@ export class LiveSyncService implements ILiveSyncService {
 					return true;
 				};
 
-				await $liveSyncServiceBase.sync([livesyncData], this.$project.projectDir);
+				await $liveSyncServiceBase.sync([livesyncData], this.$project.projectDir, {
+					configuration: livesyncData.configuration,
+					additionalConfigurations: livesyncData.additionalConfigurations
+				});
 			}));
 		}
 	}

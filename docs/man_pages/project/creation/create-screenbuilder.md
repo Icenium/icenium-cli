@@ -1,6 +1,8 @@
 create screenbuilder
 ==========
 
+<span style="color:red;font-size:15px"><%= #{screenBuilderService.getDeprecationWarning} %> </span>
+
 Usage | Synopsis
 ------|-------
 General | `$ appbuilder create screenbuilder <App name> [--answers <File Path>] [--path <Directory>] [--appid <App ID>] [--no-simulator]`
