@@ -1,7 +1,9 @@
 upgrade-screenbuilder
 ==========
 
+<br>
 <span style="color:red;font-size:15px"><%= #{screenBuilderService.getDeprecationWarning} %> </span>
+<br>
 
 Usage | Synopsis
 ------|-------
