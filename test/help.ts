@@ -8,6 +8,7 @@ import htmlHelpServiceLib = require("../lib/common/services/html-help-service");
 import optionsLib = require("../lib/options");
 import hostInfoLib = require("../lib/common/host-info");
 import { assert } from "chai";
+import {EOL} from "os";
 
 interface ITestData {
 	input: string;
@@ -94,6 +95,40 @@ span 2
 </span>
 end`,
 			expectedOutput: "blaspan 1blaspan 2end"
+		},
+		{
+			input: `some text on upper line
+and another one
+bla
+<span style="color:red;font-size:15px">
+span 1
+</span>bla
+<span style="color:red;font-size:15px">
+span 2
+</span>
+end`,
+			expectedOutput: `some text on upper line
+and another one
+blaspan 1blaspan 2end`
+		},
+		{
+			input: `some text on upper line
+and another one
+bla
+<span style="color:red;font-size:15px">
+span 1
+</span>bla
+<span style="color:red;font-size:15px">
+span 2
+</span>
+end
+some text on next line
+and another one`,
+			expectedOutput: `some text on upper line
+and another one
+blaspan 1blaspan 2end
+some text on next line
+and another one`
 		}
 	];
 
@@ -117,6 +152,24 @@ end`,
 				assert.equal(actualOutput, testCase.expectedOutput);
 			});
 		}
+	});
+
+	it("does not print <br> tags in terminal", async () => {
+		const injector = createTestInjector();
+		injector.register("module", {
+			command: () => "woot"
+		});
+
+		injector.register("fs", {
+			enumerateFilesInDirectorySync: (path: string) => ["foo.md"],
+			readText: () => `some text<br>more text</br></ br>and more<br/>and again<br />and final line`
+		});
+
+		const help = injector.resolve(helpCommand.HelpCommand);
+		await help.execute(["foo"]);
+		const actualOutput = injector.resolve("logger").output.trim();
+		const expectedOutput = `some text${EOL}more text${EOL}${EOL}and more${EOL}and again${EOL}and final line`;
+		assert.equal(actualOutput, expectedOutput);
 	});
 
 	it("processes substitution points", async () => {

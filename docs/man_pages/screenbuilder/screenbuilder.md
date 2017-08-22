@@ -1,7 +1,9 @@
 screenbuilder
 ==========
 
+<br>
 <span style="color:red;font-size:15px"><%= #{screenBuilderService.getDeprecationWarning} %> </span>
+<br>
 
 Usage | Synopsis
 ------|-------
@@ -10,6 +12,9 @@ General | `$ appbuilder screenbuilder`
 Shows all commands for project development with Screen Builder.
 
 <% if(isConsole) { %>WARNING: This set of commands is applicable only to Apache Cordova projects created with Screen Builder.<% } %>
+<br>
+<span style="color:red;font-size:15px"><%= "These commands are deprecated and will be removed in the next official release." %></span>
+<br>
 
 Command | Description
 ----------|----------

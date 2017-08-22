@@ -50,13 +50,17 @@ Command | Description
 [resource create](lib-management/resource-create.html) | Creates image resources for all mobile platforms from a single high-resolution image.
 
 ## Screen Builder Development Commands
+<br>
+<span style="color:red;font-size:15px"><%= "These commands are deprecated and will be removed in the next official release." %></span>
+<br>
+
 Command | Description
 -------|----------
 [create screenbuilder](project/creation/create.html) | Creates a new project for hybrid development with Screen Builder.
 [screenbuilder](screenbuilder/screenbuilder.html) | Shows all commands for project development with Screen Builder.
 [upgrade-screenbuilder](screenbuilder/upgrade-screenbuilder.html) | Upgrades a project to the latest Screen Builder version.
 [add-view](screenbuilder/add-view.html) | Adds a new application view to your project.
-[add-dataprovider](add-dataprovider.html) | Connects your project to a data provider.
+[add-dataprovider](screenbuilder/add-dataprovider.html) | Connects your project to a data provider.
 [add-authentication](screenbuilder/add-authentication.html) | Inserts sign-in and sign-up forms in an existing application view.
 [add-about](screenbuilder/add-about.html) | Inserts a new about form in an existing application view.
 [add-list](screenbuilder/add-list.html) | Inserts a new list in an existing application view.
