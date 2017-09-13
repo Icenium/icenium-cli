@@ -530,7 +530,7 @@ export class BuildService implements Project.IBuildService {
 		if (!qrImageData) {
 			await this.$clipboardService.copy(data);
 
-			this.$errors.failWithoutHelp(`Your project name is too long to generate QR Code for its link. The application url ${data.green} ${"is copied to your clipboard and you can use online QR Code generator to generate QR Code for you.".red}.`);
+			this.$logger.warn(`Your project name is too long to generate QR Code for its link. The application url ${data.green} ${"is copied to your clipboard and you can use online QR Code generator to generate QR Code for you.".red}.`);
 		}
 
 		return qrImageData;
