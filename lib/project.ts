@@ -70,6 +70,19 @@ export class Project extends ProjectBase implements Project.IProject {
 
 	public get projectData(): Project.IData {
 		if (!this._projectData) {
+			const projectDir = this.getProjectDir();
+			if (projectDir) {
+				const debugProjectFile = path.join(projectDir, this.$projectConstants.DEBUG_PROJECT_FILE_NAME);
+				if (this.$options.debug && !this.$fs.exists(debugProjectFile)) {
+					this.$fs.writeJson(debugProjectFile, {});
+				}
+
+				const releaseProjectFile = path.join(projectDir, this.$projectConstants.RELEASE_PROJECT_FILE_NAME);
+				if (this.$options.release && !this.$fs.exists(releaseProjectFile)) {
+					this.$fs.writeJson(releaseProjectFile, {});
+				}
+			}
+
 			this.readProjectData();
 		}
 
