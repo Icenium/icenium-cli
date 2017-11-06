@@ -483,6 +483,8 @@ declare module Server {
 		Properties: IDictionary<string>;
 		Comparer: any;
 		Count: number;
+		FullPath: string;
+		Filename: string;
 		Keys: string[];
 		Values: string[];
 		Item: string;
@@ -508,6 +510,7 @@ declare module Server {
 	}
 	interface IAppsBuildServiceContract {
 		buildProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): Promise<Server.BuildResultData>;
+		exportProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): Promise<Server.BuildResultData>;
 	}
 	interface IBuildServiceContract {
 		buildProject(solutionName: string, projectName: string, buildRequest: Server.BuildRequestData): Promise<Server.BuildResultData>;

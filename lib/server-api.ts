@@ -427,10 +427,14 @@ export class BowerService implements Server.IBowerServiceContract {
 	}
 }
 export class AppsBuildService implements Server.IAppsBuildServiceContract {
-	constructor(private $serviceProxy: Server.IServiceProxy) {
+	constructor(private $serviceProxy: Server.IAppBuilderServiceProxy) {
 	}
 	public buildProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): Promise<Server.BuildResultData> {
 		return this.$serviceProxy.call<Server.BuildResultData>('BuildProject', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'build', encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{ name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json' }], null);
+	}
+	public exportProject(appId: string, projectName: string, buildRequest: Server.BuildRequestData): Promise<Server.BuildResultData> {
+		const call = this.$serviceProxy.call.bind(this.$serviceProxy, 'ExportProject', 'POST', ['api', 'apps', encodeURI(appId.replace(/\\/g, '/')), 'build', 'export', encodeURI(projectName.replace(/\\/g, '/'))].join('/'), 'application/json', [{ name: 'buildRequest', value: JSON.stringify(buildRequest), contentType: 'application/json' }], null);
+		return this.$serviceProxy.callWithoutSolutionSpaceHeader<Server.BuildResultData>(call);
 	}
 }
 export class BuildService implements Server.IBuildServiceContract {

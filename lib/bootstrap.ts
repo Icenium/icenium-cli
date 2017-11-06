@@ -19,6 +19,7 @@ $injector.require("templatesService", "./templates-service");
 $injector.require("serverExtensionsService", "./services/server-extensions");
 $injector.require("appScaffoldingExtensionsService", "./services/app-scaffolding-extensions-service");
 $injector.require("screenBuilderService", "./services/screen-builder-service");
+$injector.require("cloudProjectsService", "./services/cloud-projects-service");
 
 $injector.require("darwinDebuggerService", "./services/debug/darwin-debugger-service");
 $injector.require("winDebuggerService", "./services/debug/win-debugger-service");
@@ -111,6 +112,7 @@ $injector.requireCommand("prop|print|androidversioncode", "./commands/prop/prop-
 
 $injector.requireCommand("cloud|*list", "./commands/cloud-projects");
 $injector.requireCommand("cloud|export", "./commands/cloud-projects");
+$injector.requireCommand("export", "./commands/cloud-projects");
 
 $injector.require("deployHelper", "./commands/deploy");
 $injector.requireCommand("deploy|*devices", "./commands/deploy");
