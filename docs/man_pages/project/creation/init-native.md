@@ -5,10 +5,10 @@ Usage | Synopsis
 ------|-------
 General | `$ appbuilder init native [--appid <App ID>]`
 
-Initializes an existing NativeScript project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains any existing project configuration.<% } %> 
+Initializes an existing NativeScript project for development in the current directory. <% if(isHtml) { %>If the directory contains an existing AppBuilder project (created with the Telerik AppBuilder extension for Visual Studio or synchronized from GitHub), the project retains any existing project configuration.<% } %>
 
 ### Options
-* `--appid` - Sets the application identifier for your app. 
+* `--appid` - Sets the application identifier for your app.
 
 ### Attributes
 * `<App ID>` must consist of one or more alphanumeric strings, separated by a dot. The strings must be valid uniform type identifiers (UTIs), containing letters, numbers, hyphens, underscores or periods. The application identifier corresponds to the Bundle ID for iOS apps and to the package identifier for Android apps. If not specified, the application identifier is set to `com.telerik.<current directory name>`.
@@ -28,6 +28,7 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
+[export](export.html) | Exports a cloud-based project from a selected solution to facilitate the migration to a different framework.
 [init](init.html) | Initializes an existing project for development.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [sample](sample.html) | Lists all available sample apps with name, description, GitHub repository, and clone command.
