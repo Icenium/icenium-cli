@@ -57,7 +57,7 @@ export class CloudListProjectsCommand implements ICommand {
 $injector.registerCommand("cloud|*list", CloudListProjectsCommand);
 
 export class CloudExportProjectsCommand implements ICommand {
-	protected _shouldCheckProject = true;
+	protected _isCloudToLocalExport = true;
 	constructor(protected $errors: IErrors,
 		protected $remoteProjectService: IRemoteProjectService,
 		protected $cloudProjectsService: ICloudProjectsService,
@@ -85,13 +85,17 @@ export class CloudExportProjectsCommand implements ICommand {
 			this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
 		}
 
-		if (this._shouldCheckProject && this.$project.projectData) {
+		if (this._isCloudToLocalExport && this.$project.projectData) {
 			this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 		}
 
 		if (args && args.length) {
 			if (args.length > 2) {
 				this.$errors.fail("This command accepts maximum two parameters - solution name and project name.");
+			}
+
+			if (!this._isCloudToLocalExport && !commonHelpers.isInteractive() && (!args[0] || !args[1])) {
+				this.$errors.fail("Running this command in non-interactive mode requires both parameters - solution name and project name.");
 			}
 
 			let slnName = args[0];
@@ -128,7 +132,7 @@ export class ExportCommand extends CloudExportProjectsCommand implements IComman
 	}
 
 	public allowedParameters: ICommandParameter[] = [];
-	protected _shouldCheckProject = false;
+	protected _isCloudToLocalExport = false;
 
 	public async execute(args: string[]): Promise<void> {
 		const solutionProjectInfo = await this.$cloudProjectsService.getSolutionProjectInfo({
@@ -172,10 +176,15 @@ export class ExportCommand extends CloudExportProjectsCommand implements IComman
 
 			this.$logger.info(`Downloading ${buildItem.Filename} to ${downloadPath}...`);
 			const targetFile = this.$fs.createWriteStream(downloadPath);
-			await this.$httpClient.httpRequest({
-				url: downloadUrl,
-				pipeTo: targetFile
-			});
+			try {
+				await this.$httpClient.httpRequest({
+					url: downloadUrl,
+					pipeTo: targetFile
+				});
+			} catch (ex) {
+				this.$logger.trace("Downloading failed. Exception: ", ex);
+				this.$fs.deleteFile(targetFile);
+			}
 		}
 	}
 }

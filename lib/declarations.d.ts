@@ -165,7 +165,7 @@ interface ILoginManager {
 	telerikLogin(user: string, password: string): Promise<void>;
 }
 
-declare module Server2.Contract {
+declare module Server.Contract {
 	interface IParameter {
 		name: string;
 		binding: {
