@@ -1,4 +1,6 @@
 import commonHelpers = require("../common/helpers");
+import { EOL } from "os";
+import { resolve, join, extname, dirname } from "path";
 
 class SolutionIdCommandParameter implements ICommandParameter {
 	constructor(private $remoteProjectService: IRemoteProjectService) { }
@@ -55,33 +57,25 @@ export class CloudListProjectsCommand implements ICommand {
 $injector.registerCommand("cloud|*list", CloudListProjectsCommand);
 
 export class CloudExportProjectsCommand implements ICommand {
-	constructor(private $errors: IErrors,
-		private $remoteProjectService: IRemoteProjectService,
-		private $prompter: IPrompter,
-		private $project: Project.IProject) { }
+	protected _isCloudToLocalExport = true;
+	constructor(protected $errors: IErrors,
+		protected $remoteProjectService: IRemoteProjectService,
+		protected $cloudProjectsService: ICloudProjectsService,
+		protected $project: Project.IProject) { }
 
 	public allowedParameters: ICommandParameter[] = [];
 
 	public async execute(args: string[]): Promise<void> {
-		let projectIdentifier = args[1];
-		let slnName = args[0];
-		if (!slnName) {
-			let all = (await this.$remoteProjectService.getAvailableAppsAndSolutions()).map(sln => sln.colorizedDisplayName) || [];
-			slnName = await this.$prompter.promptForChoice("Select solution to export", all);
-			let projects = (await this.$remoteProjectService.getProjectsForSolution(slnName)).map(proj => proj.Name);
-			let exportSolutionItem = "Export the whole solution";
-			projects.push(exportSolutionItem);
-			let selection = await this.$prompter.promptForChoice("Select project to export", projects);
-			if (selection !== exportSolutionItem) {
-				projectIdentifier = selection;
-			}
-		}
+		const solutionProjectInfo = await this.$cloudProjectsService.getSolutionProjectInfo({
+			projectName: args[1],
+			solutionName: args[0],
+			enableExportWholeSolution: true
+		});
 
-		if (projectIdentifier) {
-			let projectName = await this.$remoteProjectService.getProjectName(slnName, projectIdentifier);
-			await this.$remoteProjectService.exportProject(slnName, projectName);
+		if (solutionProjectInfo.projectName) {
+			await this.$remoteProjectService.exportProject(solutionProjectInfo.solutionName, solutionProjectInfo.projectName);
 		} else {
-			await this.$remoteProjectService.exportSolution(slnName);
+			await this.$remoteProjectService.exportSolution(solutionProjectInfo.solutionName);
 		}
 	}
 
@@ -91,13 +85,17 @@ export class CloudExportProjectsCommand implements ICommand {
 			this.$errors.failWithoutHelp("You do not have any projects in the cloud.");
 		}
 
-		if (this.$project.projectData) {
+		if (this._isCloudToLocalExport && this.$project.projectData) {
 			this.$errors.failWithoutHelp("Cannot create project in this location because the specified directory is part of an existing project. Switch to or specify another location and try again.");
 		}
 
 		if (args && args.length) {
 			if (args.length > 2) {
 				this.$errors.fail("This command accepts maximum two parameters - solution name and project name.");
+			}
+
+			if (!this._isCloudToLocalExport && !commonHelpers.isInteractive() && (!args[0] || !args[1])) {
+				this.$errors.fail("Running this command in non-interactive mode requires both parameters - solution name and project name.");
 			}
 
 			let slnName = args[0];
@@ -117,5 +115,78 @@ export class CloudExportProjectsCommand implements ICommand {
 		return true;
 	}
 }
-
 $injector.registerCommand("cloud|export", CloudExportProjectsCommand);
+
+export class ExportCommand extends CloudExportProjectsCommand implements ICommand {
+	constructor($project: Project.IProject,
+		protected $errors: IErrors,
+		protected $remoteProjectService: IRemoteProjectService,
+		protected $cloudProjectsService: ICloudProjectsService,
+		private $server: Server.IServer,
+		private $logger: ILogger,
+		private $httpClient: Server.IHttpClient,
+		private $fs: IFileSystem,
+		private $progressIndicator: IProgressIndicator,
+		private $options: IOptions) {
+		super($errors, $remoteProjectService, $cloudProjectsService, $project);
+	}
+
+	public allowedParameters: ICommandParameter[] = [];
+	protected _isCloudToLocalExport = false;
+
+	public async execute(args: string[]): Promise<void> {
+		const solutionProjectInfo = await this.$cloudProjectsService.getSolutionProjectInfo({
+			projectName: args[1],
+			solutionName: args[0],
+			forceChooseProject: true
+		});
+
+		const properties = {
+			Framework: solutionProjectInfo.framework,
+			AcceptResults: "Url;LocalPath"
+		};
+
+		this.$logger.info("Exporting project...");
+		// Fail early if the download path exists
+		let downloadPath = resolve(this.$options.path || ".");
+		const downloadPathExists = this.$fs.exists(downloadPath);
+		let downloadPathIsDirectory = true;
+		if (downloadPathExists) {
+			downloadPathIsDirectory = this.$fs.getFsStats(downloadPath).isDirectory();
+			if (!downloadPathIsDirectory) {
+				this.$errors.failWithoutHelp(`Cannot download result package in ${downloadPath} as it already exists.`);
+			}
+		}
+
+		const exportPromise = this.$server.appsBuild.exportProject(solutionProjectInfo.id, solutionProjectInfo.projectName, { Properties: properties, Targets: [] });
+		const response = await this.$progressIndicator.showProgressIndicator<Server.BuildResultData>(exportPromise, 2000);
+		if (response.Errors.length) {
+			this.$errors.failWithoutHelp(`Export errors:${EOL}${response.Errors.map(e => e.Message).join(EOL)}`);
+		} else {
+			const buildItem = response.ResultsByTarget["Build"].Items[0];
+			const downloadUrl = buildItem.FullPath;
+			if (!downloadPathExists || downloadPathIsDirectory) {
+				if (extname(downloadPath)) {
+					this.$fs.ensureDirectoryExists(dirname(downloadPath));
+				} else {
+					this.$fs.ensureDirectoryExists(downloadPath);
+					downloadPath = join(downloadPath, buildItem.Filename);
+				}
+			}
+
+			this.$logger.info(`Downloading ${buildItem.Filename} to ${downloadPath}...`);
+			const targetFile = this.$fs.createWriteStream(downloadPath);
+			try {
+				await this.$httpClient.httpRequest({
+					url: downloadUrl,
+					pipeTo: targetFile
+				});
+			} catch (ex) {
+				this.$logger.trace("Downloading failed. Exception: ", ex);
+				this.$fs.deleteFile(targetFile);
+			}
+		}
+	}
+}
+
+$injector.registerCommand("export", ExportCommand);

@@ -23,6 +23,7 @@ Command | Description
 [create `<Type>`](project/creation/create.html) | Creates a new project from template.
 [sample](project/creation/sample.html) | Lists sample apps.
 [sample&nbsp;clone](project/creation/sample-clone.html) | Clones a selected sample app.
+[export](project/creation/export.html) | Exports a cloud-based project from a selected solution to facilitate the migration to a different framework.
 [init](project/creation/init.html) | Initializes an existing project for development.
 [cloud](project/creation/cloud.html) | Lists all solutions and projects associated with your Progress Telerik Platform account.
 [cloud&nbsp;export](project/creation/cloud-export.html) | Exports one or all projects from a selected solution from the cloud.

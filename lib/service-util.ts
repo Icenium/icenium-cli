@@ -137,7 +137,7 @@ export class AppBuilderServiceProxy extends ServiceProxyBase implements Server.I
 		}
 	}
 
-	private async callWithoutSolutionSpaceHeader(action: () => Promise<any>): Promise<any> {
+	public async callWithoutSolutionSpaceHeader<T>(action: () => Promise<T>): Promise<T> {
 		let cachedUseSolutionSpaceNameValue = this.useSolutionSpaceNameHeader;
 		this.useSolutionSpaceNameHeader = false;
 		let result: any;

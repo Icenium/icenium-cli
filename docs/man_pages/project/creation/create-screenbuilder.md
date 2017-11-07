@@ -29,6 +29,7 @@ Command | Description
 [cloud export](cloud-export.html) | Exports one or all projects from a selected solution from the cloud.
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
+[export](export.html) | Exports a cloud-based project from a selected solution to facilitate the migration to a different framework.
 [init](init.html) | Initializes an existing project for development.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.

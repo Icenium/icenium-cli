@@ -3,3 +3,7 @@ export class UserSettings {
 	static LocalFileName = "local-user-settings.json";
 	static FileExtension = ".user-settings.xml";
 }
+
+export class ExportOptions {
+	static WholeSolution = "Export the whole solution";
+}

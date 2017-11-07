@@ -3,10 +3,10 @@ sample native
 
 Usage | Synopsis
 ------|-------
-General | `$ appbuilder sample native`    
+General | `$ appbuilder sample native`
 
 Lists all available NativeScript sample apps with name, description, GitHub repository and clone command. To clone a selected sample app, run its clone command.
-<% if(isHtml) { %> 
+<% if(isHtml) { %>
 
 ### Related Commands
 
@@ -19,6 +19,7 @@ in the current directory.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
 [create](create.html) | Creates a project for hybrid or native development.
+[export](export.html) | Exports a cloud-based project from a selected solution to facilitate the migration to a different framework.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.
 [init](init.html) | Initializes an existing project for development.
