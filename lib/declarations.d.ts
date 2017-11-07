@@ -13,6 +13,7 @@ declare module Server {
 
 	interface IAppBuilderServiceProxy extends IServiceProxy {
 		makeTapServiceCall<T>(call: () => Promise<T>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }): Promise<T>
+		callWithoutSolutionSpaceHeader<T>(action: () => Promise<T>): Promise<T>;
 	}
 
 	interface IServiceContractProvider {
@@ -1236,6 +1237,31 @@ interface IIonicProjectTransformator {
 	 * Creates AppBuilder project from Ionic project by removing unnecesary files, copying the resources and parsing the Ionic config.xml file.
 	 */
 	transformToAppBuilderProject(createBackup: boolean): Promise<void>
+}
+
+interface ISolutionName {
+	solutionName: string;
+}
+
+interface IId {
+	id: string;
+}
+
+interface ISolutionProjectInfoBase extends ISolutionName {
+	projectName?: string;
+}
+
+interface ISolutionProjectInfo extends ISolutionProjectInfoBase, IId {
+	framework: string;
+}
+
+interface ISolutionProjectPairOptions extends ISolutionProjectInfoBase {
+	enableExportWholeSolution?: boolean;
+	forceChooseProject?: boolean;
+}
+
+interface ICloudProjectsService {
+	getSolutionProjectInfo(opts: ISolutionProjectPairOptions): Promise<ISolutionProjectInfo>;
 }
 
 /**

@@ -4,6 +4,7 @@ import yok = require("../lib/common/yok");
 import remoteProjectsServiceLib = require("../lib/services/remote-projects-service");
 import cloudProjectsCommandsLib = require("../lib/commands/cloud-projects");
 import projectConstantsLib = require("../lib/common/appbuilder/project-constants");
+import { CloudProjectsService } from "../lib/services/cloud-projects-service";
 import { EOL } from "os";
 import { assert } from "chai";
 import * as path from "path";
@@ -84,6 +85,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	testInjector.register("userDataStore", {
 		getUser: () => Promise.resolve({ tenant: { id: "id" } }),
 	});
+	testInjector.register("cloudProjectsService", CloudProjectsService);
 	testInjector.register("serviceProxy", {
 		makeTapServiceCall: (call: () => Promise<any>, solutionSpaceHeaderOptions?: { discardSolutionSpaceHeader: boolean }) => { return call(); }
 	});

@@ -26,6 +26,7 @@ Command | Description
 [create hybrid](create-hybrid.html) | Creates a new project from an Apache Cordova-based template.
 [create native](create-native.html) | Creates a new project from a NativeScript-based template.
 [create screenbuilder](create-screenbuilder.html) | Creates a new project for hybrid development with Screen Builder.
+[export](export.html) | Exports a cloud-based project from a selected solution to facilitate the migration to a different framework.
 [init hybrid](init-hybrid.html) | Initializes an existing Apache Cordova project for development in the current directory.
 [init native](init-native.html) | Initializes an existing NativeScript project for development in the current directory.
 [sample](sample.html) | Lists all available sample apps with name, description, GitHub repository, and clone command.
