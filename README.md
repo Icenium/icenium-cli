@@ -1,3 +1,6 @@
+<div style="padding: 8px; background-color: #f1c40f; color: #34495e; font-weight: bold;">Progress will discontinue Telerik Platform on May 10th, 2018. <a style="border: 1px solid #34495e; padding: 3px 8px; margin-left: 10px" href="https://www.telerik.com/platform-next-level">Learn more</a></div>
+===========
+
 Command-Line Interface for Progress Telerik AppBuilder
 ===========
 
@@ -23,10 +26,10 @@ The AppBuilder CLI lets you build, test, deploy, and publish cross-platform hybr
 Installation
 ===
 
-Latest version: AppBuilder 3.7.6
-<br/>Release date: Oct 02, 2017
+Latest version: AppBuilder 3.7.7
+<br/>Release date: Nov 10, 2017
 
-> AppBuilder 3.7.6 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-7-5" target="_blank">AppBuilder 3.7.6 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-7" target="_blank">AppBuilder 3.7 Release Notes</a>.
+> AppBuilder 3.7.7 is an update release. For a complete list of the improvements and updates available in this release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-7-5" target="_blank">AppBuilder 3.7.7 Release Notes</a>.<br/>For a complete list of the improvements and updates available in the earlier major release, see <a href="http://docs.telerik.com/platform/appbuilder/release-notes/v3-7" target="_blank">AppBuilder 3.7 Release Notes</a>.
 
 ### System Requirements
 
