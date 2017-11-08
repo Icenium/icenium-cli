@@ -36,7 +36,7 @@ export class CloudProjectsService implements ICloudProjectsService {
 		if (opts.projectName) {
 			opts.projectName = await this.$remoteProjectService.getProjectName(opts.solutionName, opts.projectName);
 			const solution = solutionData.Items[0];
-			framework = solution.Framework;
+			framework = solution.Framework.toLowerCase() === "nativescript" ? "tns" : solution.Framework;
 			const app = apps.find(sln => sln.colorizedDisplayName === solution.Name);
 			id = app && app.id;
 		}

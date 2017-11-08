@@ -151,8 +151,8 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 								],
 								"Properties": {
 									"ProjectName": "BlankProj",
-									"Framework": "Cordova"
-								}
+								},
+								"Framework": "Cordova"
 							},
 							{
 								"Name": "ABlankProjMobileTesting",
@@ -169,8 +169,8 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 								],
 								"Properties": {
 									"ProjectName": "ABlankProjMobileTesting",
-									"Framework": "MobileTesting"
 								},
+								"Framework": "MobileTesting",
 								"PerConfigurationProperties": {}
 							}
 						],
@@ -197,8 +197,8 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 								],
 								"Properties": {
 									"ProjectName": "BlankProj",
-									"Framework": "Cordova"
-								}
+								},
+								"Framework": "Cordova"
 							}
 						],
 						"IsUpgradeable": false
@@ -239,7 +239,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	return testInjector;
 }
 
-describe("cloud project commands", () => {
+describe.only("cloud project commands", () => {
 	after(() => {
 		helpers.isInteractive = originalIsInteractiveMethod;
 	});
