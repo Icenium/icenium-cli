@@ -1,5 +1,5 @@
-<div style="padding: 8px; background-color: #f1c40f; color: #34495e; font-weight: bold;">Progress will discontinue Telerik Platform on May 10th, 2018. <a style="border: 1px solid #34495e; padding: 3px 8px; margin-left: 10px" href="https://www.telerik.com/platform-next-level">Learn more</a></div>
-===========
+<h1 style="padding: 8px; background-color: #f1c40f; color: #34495e; font-weight: bold;">Progress will discontinue Telerik Platform on May 10th, 2018. <a id="qwdq" style="border: 1px solid #34495e; padding: 3px 8px; margin-left: 10px" href="https://www.telerik.com/platform-next-level">Learn more</a></h1><br/><br/><br/>
+
 
 Command-Line Interface for Progress Telerik AppBuilder
 ===========
