@@ -239,7 +239,7 @@ function createTestInjector(promptSlnName?: string, promptPrjName?: string, isIn
 	return testInjector;
 }
 
-describe.only("cloud project commands", () => {
+describe("cloud project commands", () => {
 	after(() => {
 		helpers.isInteractive = originalIsInteractiveMethod;
 	});

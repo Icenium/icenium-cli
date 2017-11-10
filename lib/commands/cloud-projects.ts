@@ -170,7 +170,12 @@ export class ExportCommand extends CloudExportProjectsCommand implements IComman
 					this.$fs.ensureDirectoryExists(dirname(downloadPath));
 				} else {
 					this.$fs.ensureDirectoryExists(downloadPath);
-					downloadPath = join(downloadPath, buildItem.Filename);
+					let resultFileName = buildItem.Filename;
+					if (extname(resultFileName) === "") {
+						resultFileName += ".zip";
+					}
+
+					downloadPath = join(downloadPath, resultFileName);
 				}
 			}
 
