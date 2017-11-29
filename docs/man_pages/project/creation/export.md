@@ -3,7 +3,7 @@ export
 
 Usage | Synopsis
 ------|-------
-Export selected project from solution so that it can be used with Cordova CLI | `$ appbuilder cloud export [<Solution Name or Index> [<Project Name or Index> [--path <Directory or File>]]]`
+Export selected project from solution so that it can be used with Cordova CLI | `$ appbuilder export [<Solution Name or Index> [<Project Name or Index> [--path <Directory or File>]]]`
 
 Exports a cloud-based project from a selected solution to facilitate the migration to a different framework. NativeScript projects can be developed with the NativeScript CLI, whereas Hybrid projects can be developed with the Cordova CLI.
 

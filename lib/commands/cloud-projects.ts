@@ -8,8 +8,8 @@ class SolutionIdCommandParameter implements ICommandParameter {
 
 	public async validate(validationValue?: string): Promise<boolean> {
 		if (validationValue) {
-			let app = await this.$remoteProjectService.getSolutionData(validationValue);
-			return !!app;
+			const { solutionData } = await this.$remoteProjectService.getSolutionData(validationValue);
+			return !!solutionData;
 		}
 
 		return false;

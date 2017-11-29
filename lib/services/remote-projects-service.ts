@@ -50,7 +50,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 		let app = await this.getApp(appId);
 
 		if (!(this.clientProjectsPerSolution[app.id] && this.clientProjectsPerSolution[app.id].length > 0)) {
-			this.clientProjectsPerSolution[app.id] = _.sortBy((await this.getSolutionDataCore(app)).Items, project => project.Name);
+			this.clientProjectsPerSolution[app.id] = _.sortBy((await this.getSolutionDataCore(app)).solutionData.Items, project => project.Name);
 		}
 
 		return this.clientProjectsPerSolution[app.id];
@@ -76,7 +76,7 @@ export class RemoteProjectService implements IRemoteProjectService {
 		this.$logger.info("%s has been successfully exported to %s", slnName, solutionDir);
 	}
 
-	public async getSolutionData(solutionIdentifier: string): Promise<Server.SolutionData> {
+	public async getSolutionData(solutionIdentifier: string): Promise<SolutionFullInfo> {
 		let app = await this.getApp(solutionIdentifier);
 		return await this.getSolutionDataCore(app);
 	}
@@ -89,9 +89,13 @@ export class RemoteProjectService implements IRemoteProjectService {
 		return this._isMigrationEnabledForUser;
 	}
 
-	private async getSolutionDataCore(app: ITapAppData): Promise<Server.SolutionData> {
+	private async getSolutionDataCore(app: ITapAppData): Promise<SolutionFullInfo> {
 		let name = app.isApp ? app.id : app.name;
-		return this.$serviceProxy.makeTapServiceCall(() => this.$server.apps.getApplication(name), { discardSolutionSpaceHeader: app.isApp });
+		const solutionData = await this.$serviceProxy.makeTapServiceCall(() => this.$server.apps.getApplication(name), { discardSolutionSpaceHeader: app.isApp });
+		return {
+			solutionData,
+			solutionName: app.colorizedDisplayName
+		};
 	}
 
 	private async getProjectData(solutionName: string, projectName: string): Promise<Server.IWorkspaceItemData> {

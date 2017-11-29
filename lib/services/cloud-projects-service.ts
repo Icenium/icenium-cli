@@ -16,7 +16,7 @@ export class CloudProjectsService implements ICloudProjectsService {
 			opts.solutionName = await this.$prompter.promptForChoice("Select solution to export", solutionNames);
 		}
 
-		const solutionData = await this.$remoteProjectService.getSolutionData(opts.solutionName);
+		const { solutionData, solutionName } = await this.$remoteProjectService.getSolutionData(opts.solutionName);
 		if (!solutionData.Items || !solutionData.Items.length) {
 			this.$errors.failWithoutHelp(`Solution ${solutionData.Name} does not contain any projects.`);
 		}
@@ -37,7 +37,7 @@ export class CloudProjectsService implements ICloudProjectsService {
 			opts.projectName = await this.$remoteProjectService.getProjectName(opts.solutionName, opts.projectName);
 			const solution = solutionData.Items[0];
 			framework = solution.Framework.toLowerCase() === "nativescript" ? "tns" : solution.Framework;
-			const app = apps.find(sln => sln.colorizedDisplayName === solution.Name);
+			const app = apps.find(sln => sln.colorizedDisplayName === solutionName);
 			id = app && app.id;
 		}
 

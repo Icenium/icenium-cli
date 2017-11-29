@@ -165,6 +165,11 @@ interface ILoginManager {
 	telerikLogin(user: string, password: string): Promise<void>;
 }
 
+interface SolutionFullInfo {
+	solutionData: Server.SolutionData;
+	solutionName: string;
+}
+
 declare module Server.Contract {
 	interface IParameter {
 		name: string;
@@ -902,7 +907,7 @@ interface IRemoteProjectService {
 	exportProject(remoteSolutionName: string, remoteProjectName: string): Promise<void>;
 	exportSolution(remoteSolutionName: string): Promise<void>;
 	getAvailableAppsAndSolutions(): Promise<ITapAppData[]>;
-	getSolutionData(propertyValue: string): Promise<Server.SolutionData>;
+	getSolutionData(propertyValue: string): Promise<SolutionFullInfo>;
 }
 
 interface IProjectSimulatorService {
