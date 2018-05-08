@@ -1,6 +1,0 @@
-{
-	"AB_SERVER": "{{ platform_host }}",
-	"AB_SERVER_PROTO": "https",
-	"DEBUG": false,
-	"ON_PREM": true
-}

@@ -1,6 +1,0 @@
-{
-	"AB_SERVER": "platform.telerik.com",
-	"AB_SERVER_PROTO": "https",
-	"DEBUG": false,
-	"USE_CDN_FOR_EXTENSION_DOWNLOAD": true
-}
