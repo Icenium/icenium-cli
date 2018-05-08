@@ -33,3 +33,13 @@ npm-debug.log
 node_modules
 
 test-scripts/
+.vscode
+.gitmodules
+xunit.xml
+.travis.yml
+ab-logo.png
+ABIGNORE.md
+CONTRIBUTING.md
+tsconfig.json
+tslint.json
+.editorconfig

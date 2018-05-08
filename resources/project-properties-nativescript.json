@@ -1,7 +1,0 @@
-{
-	"FrameworkVersion": {
-		"description": "NativeScript framework version.",
-		"dynamicRange": "#{nativeScriptMigrationService.getSupportedVersions}",
-		"onChanging": "#{nativeScriptMigrationService.onFrameworkVersionChanging}"
-	}
-}

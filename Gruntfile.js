@@ -1,7 +1,6 @@
 var os = require("os");
 
 var now = new Date().toISOString();
-var nodeArgs = require("./lib/common/scripts/node-args").getNodeArgs();
 
 function shallowCopy(obj) {
 	var result = {};
@@ -30,13 +29,6 @@ module.exports = function (grunt) {
 
 	var defaultEnvironment = "sit";
 	// When there are node_modules inside lib\common directory, CLI behaves incorrectly, so delete this dir.
-	var path = require("path");
-	var commonLibNodeModules = path.join("lib", "common", "node_modules");
-	if (require("fs").existsSync(commonLibNodeModules)) {
-		grunt.file.delete(commonLibNodeModules);
-	}
-	grunt.file.write(path.join("lib", "common", ".d.ts"), "");
-
 	grunt.initConfig({
 		deploymentEnvironment: process.env["DeploymentEnvironment"] || defaultEnvironment,
 		resourceDownloadEnvironment: process.env["ResourceDownloadEnvironment"] || defaultEnvironment,
@@ -97,29 +89,15 @@ module.exports = function (grunt) {
 			},
 
 			apply_resources_environment: {
-				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-config-apply <%= resourceDownloadEnvironment %>"
+				command: "node bin/appbuilder dev-config-apply <%= resourceDownloadEnvironment %>"
 			},
 
 			prepare_resources: {
-				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-prepackage"
-			},
-
-			ci_unit_tests: {
-				command: "npm test",
-				options: {
-					execOptions: {
-						env: (function () {
-							var env = shallowCopy(process.env);
-							env["XUNIT_FILE"] = "test-reports.xml";
-							env["LOG_XUNIT"] = "true";
-							return env;
-						})()
-					}
-				}
+				command: "node bin/appbuilder dev-prepackage"
 			},
 
 			apply_deployment_environment: {
-				command: "node " + nodeArgs.join(" ") + " bin/appbuilder dev-config-apply <%= deploymentEnvironment %>"
+				command: "node bin/appbuilder dev-config-apply <%= deploymentEnvironment %>"
 			},
 
 			build_package: {
@@ -196,7 +174,7 @@ module.exports = function (grunt) {
 		});
 	});
 
-	grunt.registerTask("test", ["ts:devall", "shell:ci_unit_tests"]);
+	grunt.registerTask("test", ["ts:devall"]);
 
 	grunt.registerTask("remove_prepublish_script", function () {
 		var packageJson = grunt.file.readJSON("package.json");
@@ -220,11 +198,6 @@ module.exports = function (grunt) {
 		"ts:release_build",
 
 		"remove_prepublish_script",
-
-		"shell:apply_resources_environment",
-		"shell:prepare_resources",
-		"shell:apply_deployment_environment",
-		"shell:ci_unit_tests",
 
 		"set_package_version",
 		"delete_coverage_dir",
