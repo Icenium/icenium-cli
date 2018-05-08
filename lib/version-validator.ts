@@ -53,7 +53,6 @@ async function getNpmProxySettings(): Promise<IProxySettings> {
 }
 
 async function getPackageJsonFromNpmRegistry(packageName: string, version?: string): Promise<any> {
-	debugger;
 	let packageJsonContent: any;
 	version = version || "latest";
 	try {
@@ -74,7 +73,7 @@ async function getPackageJsonFromNpmRegistry(packageName: string, version?: stri
 
 			// Note that proto ends with :
 			options.proxy = `${proto}//${host}:${port}`;
-			options.rejectUnauthorized = proxySettings ? proxySettings.rejectUnauthorized : true
+			options.rejectUnauthorized = proxySettings ? proxySettings.rejectUnauthorized : true;
 		}
 
 		const result = await new Promise((resolve, reject) => {
@@ -161,7 +160,7 @@ async function ensureUpToDate(): Promise<void> {
 	}
 
 	const pathToPackageJson = join(__dirname, "..", "package.json");
-	const packageJsonContent =readFileSync(pathToPackageJson).toString();
+	const packageJsonContent = readFileSync(pathToPackageJson).toString();
 	const currentVersion = JSON.parse(packageJsonContent).version;
 	if (latestVersion && versionCompare(latestVersion, currentVersion) > 0) {
 		console.error("You are running an outdated version of the Telerik AppBuilder CLI. To run this command, you need to update to the latest version of the Telerik AppBuilder CLI. To update now, run 'npm install -g appbuilder'.");
